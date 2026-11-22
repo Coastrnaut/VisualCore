@@ -34,6 +34,8 @@ final class ChronoConstellatorSkyScene {
     var orbit: ChronoConstellatorOrbit = .authored
     /// The cell a star drag would start the star on, set by the presenter before each frame.
     var candidateCell: Int?
+    /// The eased light levels (feature 356), set by the presenter before each frame; nil draws the snapshot's own levels.
+    var lights: ChronoConstellatorLights?
     /// The light direction of the field (towards the light, from the upper left front).
     static let lightDirection = SIMD3<Float>(-0.4, 0.8, 0.45)
 
@@ -48,6 +50,7 @@ final class ChronoConstellatorSkyScene {
         let tick: Int
         let tier: Int
         let fallback: Bool
+        let lights: ChronoConstellatorLights?
     }
 
     private var registry: ResourceRegistry?
@@ -110,9 +113,9 @@ final class ChronoConstellatorSkyScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let camera = ChronoConstellatorSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
-        let key = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
+        let key = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil, lights: lights)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
-        geometryKey = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
+        geometryKey = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil, lights: lights)
         if fallbackReason != nil {
             try drawFallback(camera)
             try drawCandidate(snapshot, camera: camera)
@@ -122,7 +125,9 @@ final class ChronoConstellatorSkyScene {
         let cell = Float(ChronoConstellatorSceneGeometry.cellSize(snapshot))
         try drawField(camera, cell: cell)
         try drawCandidate(snapshot, camera: camera)
-        let gain = ChronoConstellatorShaders.glowGain(for: tier)
+        // The win glow (feature 356) raises the gain by up to half; `u_glowLimit` still caps it (0.5 under Reduce
+        // Flashing).
+        let gain = ChronoConstellatorShaders.glowGain(for: tier) * (1 + 0.5 * (lights?.glow ?? 0))
         try drawGlow(starRenderer, camera: camera, time: time, ticks: tier.ribbonTicks, animate: animate,
                      gain: gain, shell: false)
         try drawGlow(ribbonRenderer, camera: camera, time: time, ticks: tier.ribbonTicks, animate: animate,
@@ -136,9 +141,10 @@ final class ChronoConstellatorSkyScene {
 
     /// The geometry key of `snapshot` at `tier` in the given mode.
     private static func key(_ s: ChronoConstellatorSceneSnapshot, tier: ChronoConstellatorTier,
-                            fallback: Bool) -> GeometryKey {
+                            fallback: Bool, lights: ChronoConstellatorLights?) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, histories: s.stars.map(\.history), phases: s.phases, holds: s.holds,
-                    stage: s.stage, failure: s.failure, tick: s.tick, tier: tier.index, fallback: fallback)
+                    stage: s.stage, failure: s.failure, tick: s.tick, tier: tier.index, fallback: fallback,
+                    lights: lights)
     }
 
     private func rebuild(_ snapshot: ChronoConstellatorSceneSnapshot, tier: ChronoConstellatorTier) throws {
@@ -148,11 +154,11 @@ final class ChronoConstellatorSkyScene {
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let field = try ChronoConstellatorSceneGeometry.fieldMesh(snapshot, tier: tier)
+                let field = try ChronoConstellatorSceneGeometry.fieldMesh(snapshot, tier: tier, lights: lights)
                 fieldRenderer = try Self.renderer(field, vertex: ChronoConstellatorShaders.fieldVertex,
                                                   fragment: fieldFragment, name: "chrono-constellator-field",
                                                   registry: registry)
-                let stars = try ChronoConstellatorSceneGeometry.starMesh(snapshot, tier: tier)
+                let stars = try ChronoConstellatorSceneGeometry.starMesh(snapshot, tier: tier, lights: lights)
                 if !stars.indices.isEmpty {
                     starRenderer = try Self.renderer(stars, vertex: ChronoConstellatorShaders.glowVertex,
                                                      fragment: ChronoConstellatorShaders.glowFragment,
@@ -174,8 +180,10 @@ final class ChronoConstellatorSkyScene {
         let minimal = ChronoConstellatorTier.of(ChronoConstellatorTier.all.count - 1)
         let up = Vec3(0, 1, 0)
         let parts: [(part: ChronoConstellatorColouredMesh, colourInNormals: Bool)] = [
-            (part: try ChronoConstellatorSceneGeometry.fieldPart(snapshot, tier: minimal), colourInNormals: false),
-            (part: try ChronoConstellatorSceneGeometry.starPart(snapshot, tier: minimal), colourInNormals: true),
+            (part: try ChronoConstellatorSceneGeometry.fieldPart(snapshot, tier: minimal, lights: lights),
+             colourInNormals: false),
+            (part: try ChronoConstellatorSceneGeometry.starPart(snapshot, tier: minimal, lights: lights),
+             colourInNormals: true),
             (part: try ChronoConstellatorSceneGeometry.ribbonPart(snapshot, tier: minimal), colourInNormals: true),
         ]
         for entry in parts where !entry.part.mesh.indices.isEmpty {

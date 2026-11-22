@@ -541,14 +541,15 @@ enum ChronoConstellatorGestureScript {
         #expect(try ChronoConstellatorTest.digest(shell) == digest)
         #expect(shell.presenter.refusalLog.count == logBefore + 1)
         #expect(shell.presenter.refusalLog.last == expected.result.code)
-        #expect(shell.presenter.mirror.message == "That change was refused: \(expected.result.code)")
+        let words: String = ChronoConstellatorFeedbackPlan.refusalText(code: expected.result.code)
+        #expect(shell.presenter.mirror.message == words)
 
         // An out-of-range start phase sent through the presenter's own path.
         let phase: ActionResult = shell.presenter.send("star.phase", [Double(star), 99], port: shell.port)
         #expect(phase != .accepted)
         #expect(shell.presenter.refusalLog.count == logBefore + 2)
         #expect(shell.presenter.refusalLog.last == phase.code)
-        #expect(shell.presenter.mirror.message == "That change was refused: \(phase.code)")
+        #expect(shell.presenter.mirror.message == ChronoConstellatorFeedbackPlan.refusalText(code: phase.code))
         #expect(try ChronoConstellatorTest.digest(shell) == digest)
     }
 

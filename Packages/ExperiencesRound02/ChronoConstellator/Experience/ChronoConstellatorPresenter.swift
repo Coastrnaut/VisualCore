@@ -20,6 +20,12 @@
 // smallest edit count); `retry` starts the level again in its mode, `undo` takes back the last change, `rewind` returns
 // to tick 0, and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`, sent as
 // `mode.daily [year, month, day]`), never in the core.
+// Feature 356 (R02-G06-06) T-R02G0606-006 (FR-R02G0606-001 … 006; clarifications Q1–Q5): after every described change the
+// presenter routes `ChronoConstellatorFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback
+// route (`feedback`, injectable), announces star picks and refusals in words (the panel shows the same words), keeps a
+// feedback log, eases the scene's lights (`ChronoConstellatorLights`, 0.45 s fades under Reduce Flashing) and offers the
+// ambient loop (`ChronoConstellatorSound`) the recipe of the stars on target and the stage at level openings and changes
+// of either. The mirror carries the summary element's text and the sound choice. Presentation only.
 #if os(iOS)
 import ChronoConstellatorCore
 import Foundation
@@ -29,6 +35,8 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
+import VisualCoreAudioDSP
 
 /// What the controls show: the latest state the presenter described.
 @MainActor
@@ -70,10 +78,17 @@ final class ChronoConstellatorMirror {
     var smallest = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
     var pickedLevel = 1
+    /// The summary element's text (feature 356): the tick, the edits left and every star.
+    var summary = ""
+    /// Whether the ambient sound is on (feature 356; off by default).
+    var soundOn = false
 
     /// The picked star's name, or "none".
     var pickedStarLabel: String {
-        starNames.indices.contains(pickedStar) ? starNames[pickedStar].capitalized : "none"
+        // Only the first letter is raised ("Star 1 (ring)"), as the announcements say it (feature 356).
+        guard starNames.indices.contains(pickedStar) else { return "none" }
+        let name: String = starNames[pickedStar]
+        return name.prefix(1).uppercased() + name.dropFirst()
     }
 
     /// The picked star's start phase as "phase p of L".
@@ -134,10 +149,24 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
     private var hintKey: String?
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 355).
     private(set) var dailyDate: DateComponents?
+    /// The feedback route of announcements and haptics (feature 356; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 356; tests and diagnostics).
+    private(set) var feedbackLog: [ChronoConstellatorFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 356).
+    private(set) var lights: ChronoConstellatorLights
+    /// The frame time of the last draw, for easing the lights.
+    private var lastFrameTime: Double?
+    /// The level and mode the lights belong to.
+    private var lightsLevel: String?
+    /// The ambient sound (feature 356).
+    let sound: ChronoConstellatorSound
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = ChronoConstellatorLights(reducedFlash: reduceFlashing)
+        sound = ChronoConstellatorSound(recipe: ChronoConstellatorSoundRecipe.recipe(onTarget: [], stage: .loading))
         scene.reducedFlash = reduceFlashing
     }
 
@@ -166,6 +195,16 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // A new level (or mode) starts from its own lights: they settle at once; only changes within a play fade.
+        let level = "\(core.levelNumber)/\(core.mode)"
+        if let last = lastFrameTime, lightsLevel == level, frame.time > last {
+            lights.step(toward: snapshot, elapsed: frame.time - last)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lightsLevel = level
+        lastFrameTime = frame.time
+        scene.lights = lights
         scene.orbit = gestures.orbit
         scene.candidateCell = gestures.candidateCell
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
@@ -209,6 +248,7 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
             case .release(let star, let start):
                 send("star.release", [Double(star), Double(start)], port: port)
             case .select(let star):
+                if mirror.pickedStar != star { route(ChronoConstellatorFeedbackPlan.picked(star: star)) }
                 mirror.pickedStar = star
             case .resetView:
                 break   // the controller has already returned to the authored orbit; the next frame draws it
@@ -237,12 +277,54 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(result.code)"
+            let plan = ChronoConstellatorFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(result.code)
             if refusalLog.count > Self.refusalLogLimit { refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit) }
         }
         return result
     }
+
+    // MARK: Feedback and sound (feature 356)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: ChronoConstellatorFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// Moves the panel's star pick by `delta` stars and announces the star ("Star k (shape) picked.").
+    func pickStar(_ delta: Int) {
+        let before = mirror.pickedStar
+        mirror.pickNext(delta)
+        guard mirror.pickedStar != before else { return }
+        route(ChronoConstellatorFeedbackPlan.picked(star: mirror.pickedStar))
+    }
+
+    /// The ambient recipe of `core`'s stars on target and stage.
+    static func recipe(_ core: ChronoConstellatorExperienceCore) -> AmbientLoopRecipe {
+        ChronoConstellatorSoundRecipe.recipe(onTarget: ChronoConstellatorSoundRecipe.onTarget(core.snapshot(time: 0)),
+                                             stage: core.play.stage)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current stars and stage.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 
     /// The frame probes of the frame last drawn: the top-left and bottom-right corners, outside the grid (the camera fits
     /// the scene inside a 5 % margin), are `dark` (the indigo clear) once a snapshot was drawn by the real scene; none
@@ -354,7 +436,19 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
         }
         if mirror.pickedStar >= level.stars.count { mirror.pickedStar = 0 }
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        if let previous = latestCore {
+            route(ChronoConstellatorFeedbackPlan.after(old: previous, new: core))
+            let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            let changed = ChronoConstellatorSoundRecipe.onTarget(previous.snapshot(time: 0))
+                != ChronoConstellatorSoundRecipe.onTarget(core.snapshot(time: 0))
+                || previous.play.stage != core.play.stage
+            if opened || changed { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         latestCore = core
+        mirror.summary = ChronoConstellatorFeedbackPlan.summaryText(core: core)
         if let key = hintKey, key != Self.hintKey(core) { clearHint() }
         mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
         mirror.failureText = core.failureExplanation?.text

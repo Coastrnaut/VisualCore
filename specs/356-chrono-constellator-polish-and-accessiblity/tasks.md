@@ -51,7 +51,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 5: Wiring (presenter, panel, scene, sound)
 
-- [ ] T-R02G0606-006 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorSound.swift` (wanted, on screen, active;
+- [X] T-R02G0606-006 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorSound.swift` (wanted, on screen, active; — Verified 2026-11-22: 2026-11-22: sim-27 (ChronoConstellatorExperienceTests, 45 tests in 7 suites on iOS 27.2 incl. 8 accessibility tests: recorded feedback, level 1 won with panel operations, preview not announced, sound state table, labels and summary, Reduce Flashing ring fade, Reduce Motion stills) exit 0
   injected player for tests; recipe offered at level openings, changes of the stars on target or stage and when turned
   on) and edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorPresenter.swift` (route `ChronoConstellatorFeedbackPlan` after each
   described change, star pick and refusal through `feedback`, a feedback log, the eased lights stepped per frame into the
