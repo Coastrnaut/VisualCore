@@ -31,6 +31,67 @@ Canonical overrides:
 - **Model:** feature 353 (Chrono Constellator's hero renderer) for the adapter, snapshot, geometry, CPU reference,
   scenarios, presenter, scene, fallback and registration.
 
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+353's answers. Facts checked in code (read-only, 2026-11-22): Chrono Constellator's experience (R02-G06-03 … 10) is the
+pattern in this package — a Core adapter with a per-process cache of generated levels, an immutable scene snapshot, a CPU
+projection reference, GLSL sources in the Core, an iOS-only experience target (`…Experience.swift`, presenter, scene,
+controls), a scenario manifest with 80 acceptance scenarios, a registration with content facts in
+`Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Amethyst Escape kernel provides the level (sectors
+6 … 12, shells 2 … 5, apertures, walls, blocked wedges, exit gap), crystal (offsets, pearl pocket), play
+(`rotate(shell, step)`, `advance`, undo, redo, stages, failure) and the certified catalog with its pinned digest
+(e65c4529…94e6); `AppModelTests` uses `r02-g07.amethyst-escape` as its example of an unregistered candidate; the catalog's
+design gives the palette "amethyst purple and cool platinum" and the geometry "procedurally beveled wedge polyhedra with
+analytic faceting".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the crystal lies in the xz-plane,
+  y up, centred at the origin. With n shells and S sectors, shell k (0 innermost) is the annulus from radius
+  r_k = 0.2 + k·w to r_k + w, w = 0.8 / n; sector s of shell k covers the angles 2π·(s + o_k)/S … 2π·(s + o_k + 1)/S
+  measured from +x towards −z, o_k being the shell's offset, so the world sector of a wedge is (s + o_k) mod S. Each
+  wedge is a bevelled prism (height h_k = 0.08 + 0.06·(n − 1 − k), so inner shells stand taller like a cathedral)
+  inset by 0.04·w on each side; an aperture is an opening in the shell's outer wall drawn as a gap in its rim band;
+  a radial wall is a platinum fin (thickness 0.03·w, height h_k + 0.02) on the wedge's leading edge; a blocked wedge is
+  dark and opaque with a raised cross mark on its top. The pearl is a sphere of radius 0.3·w at its pocket's centre
+  (radius r_k + w/2, angle at the sector's middle), centre y = h_k + 0.3·w. The exit gap of the outer shell carries a
+  platinum arrow mark pointing outward at radius r_(n−1) + w + 0.06. The backdrop is a dark plane at y = 0. The camera is
+  a fixed authored perspective looking at the origin from the front (+z), pitched 50° down, fitted to the bounding sphere
+  of radius 1.1 (the crystal plus the arrow) with a 5 % margin for aspect 0.4 … 2.5. Facet highlights move with
+  presentation time only. Nothing drawn is consulted by the rules. Impact: FR-R02G0703-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): 3 bevel segments per edge, 3 highlight layers,
+  2 glow shells around the pearl and exit; `level-1`: 2 bevel segments, 2 highlight layers, 1 glow shell; `level-2`
+  (the design's "Tier 0, D3-safe"): 1 bevel segment, 1 highlight layer, no glow. Wedges, walls, pearl, exit, colours,
+  marks and positions are the same at every tier. Levels are ordered richest first; the presenter logs each tier change
+  with its reason. Impact: FR-R02G0703-004; SC-R02G0703-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects the pearl centre,
+  the exit arrow's centre and the top centre of every wedge through the same camera and gives the palette. Simulator
+  tests render offscreen at 1,152 × 768 and check that the pearl centre lies within 3 pixels of a pixel brighter than
+  the backdrop by at least 0.15 in luminance, that the exit arrow's centre (± 3 pixels) differs from the backdrop by at
+  least 0.1, that every open wedge's top centre (± 3 pixels) differs from the backdrop by at least 0.05, and that the
+  background matches the backdrop within 0.05 away from geometry. Palette: backdrop #0A0614, amethyst #8E4FD8, facet
+  highlight #E3CCFF, platinum #D6DCE6, blocked wedge #1E1426, pearl #F6F2FF, exit #B8F0FF, failure amber #FFB020.
+  Impact: FR-R02G0703-006; SC-R02G0703-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `AmethystEscapeSceneSnapshot` (sectors, every shell's apertures, walls, blocked wedges and offset, the pearl pocket,
+  the exit gap, stage, failure, moves spent, budget, level number and presentation time) made by the adapter; it never
+  holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the shared
+  unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion holds the
+  facet highlights at time 0; Reduce Flashing caps the glow gain. A failure in a blocked wedge tints that wedge amber
+  and the failure text names its shell and sector. Impact: FR-R02G0703-003, 007; SC-R02G0703-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g07.amethyst-escape` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/AmethystEscape/scenario-manifest.json`, no permissions, a summary of
+  at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's experience
+  registry link `AmethystEscapeExperience` as a candidate (`available: false` until X-R02-G07), opening at seed 0
+  (level 1); `AppModelTests` switches its unregistered example to the next round-two game (`r02-g08`'s id from the
+  catalog). The adapter (`AmethystEscapeExperienceCore`) prepares certified level (seed mod 100) + 1 (generated once per
+  process) and accepts `shell.rotate [shell, step]` (whole, 0 … shells − 1, −1 or +1), `pearl.advance`, `play.undo`,
+  `play.redo` and `level.next`; the kernel refuses everything out of range or out of stage; its digest is the level
+  number and the play's fingerprint (never the record history, so undo restores the earlier digest); snapshot schema 1
+  `{level, records}`. Impact: FR-R02G0703-005, 008, 009; SC-R02G0703-004.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See the amethyst crystal (Priority: P1) 🎯
