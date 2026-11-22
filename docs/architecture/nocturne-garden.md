@@ -67,3 +67,38 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g09.malformed`, `.
   move), the near miss (one action short: not won, shared cells below the need), the difficulty and the candidates
   skipped; decoding re-verifies provenance and replay and refuses damaged, newer or edited files (`r02-g09.witness`).
   The catalog digest is pinned in `NocturneGardenCatalogTests`.
+
+## Experience and renderer (feature 383, R02-G09-03)
+
+- **Adapter.** `NocturneGardenExperienceCore` opens certified level (seed mod 100) + 1 and accepts `bloom.plant [kind,
+  column, row, size]` (kind 0 … 5 in the kernel's order), `bloom.move [bloom, column, row]`, `bloom.resize [bloom,
+  size]`, `bloom.remove [bloom]`, `sun.set [elevation]`, `play.undo`, `play.redo` and `level.next`; values out of the
+  declared ranges or fractional and kernel refusals change nothing. Each level is certified once per process, directly
+  from its certified candidate (the witness's `skipped`, pinned by a test). Its digest is the level number and the play
+  fingerprint; snapshot schema 1 `{level, records}` restores by replay.
+- **Snapshot.** The presenter draws an immutable `NocturneGardenSceneSnapshot`: the bed size, the target, forbidden,
+  shadow (the kernel's exact mask) and leaking cells, the blooms, the allowed sizes, the sun, stage, failure, moves,
+  budget, level number and presentation time. The shadow drawn is the kernel's mask, never a shadow computed by the
+  graphics. The panel's picks (kind, column, row, size, bloom) are presentation state of the controls.
+- **Scene.** The bed stands upright as a pearlescent mist plane (cell size u = 2 / W, row 0 at the bottom); every mask
+  cell is a black shadow quad with a feathered edge along the shadow's boundary; the target's boundary carries a gold
+  rim, forbidden cells a coral hatch, leaking cells a cross after a leak failure. Each bloom stands in front of the mist
+  at z = 0.35: its head is its kind's outline at 0.35·size·u (the lantern magnifies, so the small flower hides little
+  of the large shadow it casts), extruded, dark with a glowing rim, on an L-system stem with leaf
+  pairs. The lantern's height follows the sun; a row of budget bars below the bed shows the moves spent. The camera
+  looks from +z, pitched 8° down, fitted per level to the bed widened by the largest head a bloom can have, the lantern
+  and the gauge, with a 5 % margin for aspects 0.4 … 2.5.
+- **Shaders.** GLSL ES 3.00 on the shared `ShaderMeshRenderer`: the garden program carries the material code (0 ground
+  … 11 head rim) and shade in uv (on shadow vertices, the cover across the feather band) and draws the drifting mist
+  layers, the shadow, the hatch and the botanical bodies with their rims, with a small sway; the glow program carries
+  the colour in the normal slot. Reduce Motion passes time 0, so mist and sway stand still; Reduce Flashing caps the
+  glow.
+- **Tiers.** level-0: 3 mist layers, stem depth 3, feather 0.3 cell, 2 glow shells; level-1: 2, 2, 0.15, 1; level-2: 1,
+  1, hard edges, none. Cells, heads, colours, the gauge and the camera never change between tiers; each tier change is
+  logged with its reason. A program that fails to compile draws the level-2 geometry unlit and keeps its reason.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest ce13750a…52dd) and linked into the one
+  app; it stays unavailable until X-R02-G09. Its scenario manifest has the standard scenarios, `full-playthrough`,
+  `hero`, three fixtures and the 80 acceptance rows R2-G09-QA-001 … 080 (row r opens level (7 × (r − 1)) mod 100 + 1);
+  its scripted actions other than certified ones are a neutral plant (the first supplied kind at the smallest size at
+  the first anchor that keeps the play in play) and sun moves, derived by playing them.
+

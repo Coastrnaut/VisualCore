@@ -495,3 +495,10 @@ seeded `NocturneGardenGenerator`, `NocturneGardenSolver` (a winning sequence of 
 move when needed plus ⌈needed cells / single-plant cover⌉ plants, found with coverage pruning and counted work),
 `NocturneGardenDifficulty`, `NocturneGardenWitness` with the 100 witness files in `docs/games/nocturne-garden/levels/`
 and the pinned catalog digest.
+
+Feature 383 (R02-G09-03) adds the experience: `NocturneGardenExperienceCore` (the adapter, certifying each level from
+its recorded candidate), `NocturneGardenSceneSnapshot`, `NocturneGardenSceneGeometry` (the upright mist bed, the
+kernel's exact shadow cells, the target rim, the forbidden hatch, the grown blooms, the lantern and the gauge, with the
+camera and the CPU projection reference), `NocturneGardenShaders` and the scenario manifest in the Core, and the
+iOS-only `NocturneGardenExperience` target (presenter, garden scene, controls); the experience is a registered
+candidate until X-R02-G09.

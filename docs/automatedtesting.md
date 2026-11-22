@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-02: Nocturne Garden catalog, baselines on a held-aside tree, compliance tokens).
+Last updated: 2026-11-22 (R02-G09-03: Nocturne Garden renderer, frame checks skip cells behind blooms).
 
 ## 1. What is tested, and where
 
@@ -394,6 +394,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   cell of the whole bed (not only the bounding box) against a separate even-odd ray cast on exact rationals with its own
   on-segment test, and the boundary deviation against an all-pairs brute force. A timing baseline taken right after the
   round-two suite failed under a load average of 13 and passed when rerun: run timing baselines on a quiet machine.
+- **Frame checks skip what stands in front** (R02-G09-03, 2026-11-22). Nocturne Garden's blooms stand in front of the
+  mist bed, so a bloom's head and stem can hide shadow, target or forbidden cells behind it. The CPU reference gives each
+  bloom's pixel box (`NocturneGardenSceneGeometry.bloomPixelBox`), and the simulator frame checks sample only cell
+  centres outside every box. The shadow drawn is the kernel's own mask (one quad per cell), never a GPU shadow, so the
+  frame checks and the verdict name the same cells. The scenario manifest's neutral moves (a plant that keeps the play
+  going, sun moves on an empty bed for the budget-out fixture) are derived by playing them on a core, as Faceted Forge's
+  neutral cuts are.
 - **Baselines on the committed tree; tokens the scans match** (R02-G09-02, 2026-11-22). The feature's first code was
   written while the previous gate's chain ran, so its baselines were taken with that work held aside (`git stash push -u
   -- <paths>`, then `git stash pop`), keeping the baseline a measure of the tree before the feature. A kernel test's list
