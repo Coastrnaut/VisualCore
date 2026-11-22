@@ -1415,7 +1415,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "WaveKnotKeeperCore", "WaveKnotKeeperExperience",
                                     # Feature 333 (R02-G04-03): Hue Compass, integrated at X-R02-G04.
                                     "HueCompassCore", "HueCompassExperience",
-                                    # Feature 343 (R02-G05-03): Colorfall Canyons, a candidate until X-R02-G05.
+                                    # Feature 343 (R02-G05-03): Colorfall Canyons, integrated at X-R02-G05.
                                     "ColorfallCanyonsCore", "ColorfallCanyonsExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

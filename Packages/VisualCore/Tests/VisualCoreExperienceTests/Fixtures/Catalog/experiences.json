@@ -1075,7 +1075,7 @@
         "catalog_sha256": "68eec7b5df5790cd52979d6f01fdcad576fefe02436c2c0b655813fc8f55f019",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g06.chrono-constellator",

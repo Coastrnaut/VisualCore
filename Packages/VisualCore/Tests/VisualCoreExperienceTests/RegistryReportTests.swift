@@ -61,7 +61,8 @@ import Testing
                          "r02-g01.aurora-loom",
                          "r02-g02.lissajous-labyrinth",
                          "r02-g03.wave-knot-keeper",
-                         "r02-g04.hue-compass"].compactMap(ExperienceID.init(rawValue:))
+                         "r02-g04.hue-compass",
+                         "r02-g05.colorfall-canyons"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }

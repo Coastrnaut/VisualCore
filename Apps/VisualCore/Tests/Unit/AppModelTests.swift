@@ -42,7 +42,7 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // A01–A25 and R02-G01 … G04 are integrated (X-A01 to X-A25 and X-R02-G01 … G04 pass): registered and
+        // A01–A25 and R02-G01 … G05 are integrated (X-A01 to X-A25 and X-R02-G01 … G05 pass): registered and
         // available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
         XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
@@ -59,7 +59,8 @@ final class AppModelTests: XCTestCase {
                                                      "a23.visual-programming-lab", "a24.graphics-benchmark-lab",
                                                      "a25.effects-composer", "r02-g01.aurora-loom",
                                                      "r02-g02.lissajous-labyrinth", "r02-g03.wave-knot-keeper",
-                                                     "r02-g04.hue-compass"])
+                                                     "r02-g04.hue-compass",
+                                                     "r02-g05.colorfall-canyons"])
         XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
@@ -85,7 +86,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
         // Any catalog experience before its X gate works as a candidate; R02-G06 is one (unavailable, not in `all`, not yet
-        // registered; R02-G01 … R02-G04 were real candidates until their X gates, and R02-G05 is one since R02-G05-03).
+        // registered; R02-G01 … R02-G05 were real candidates until their X gates).
         // The synthetic debug registration stands in for one.
         let id = try XCTUnwrap(ExperienceID(rawValue: "r02-g06.chrono-constellator"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
@@ -485,7 +486,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 29, "A01–A25 and R02-G01 … G04 are integrated")
+        XCTAssertEqual(ExperienceRegistry.all.count, 30, "A01–A25 and R02-G01 … G05 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.
@@ -1219,10 +1220,12 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(try lissajousLabyrinthRegistration().openingSeed, 0)
         XCTAssertEqual(try waveKnotKeeperRegistration().openingSeed, 0)
         XCTAssertEqual(try hueCompassRegistration().openingSeed, 0)
+        XCTAssertEqual(try colorfallCanyonsRegistration().openingSeed, 0)
         let puzzles: Set<String> = [AuroraLoomExperienceCore.experienceID,
                                     LissajousLabyrinthExperienceCore.experienceID,
                                     WaveKnotKeeperExperienceCore.experienceID,
-                                    HueCompassExperienceCore.experienceID]
+                                    HueCompassExperienceCore.experienceID,
+                                    ColorfallCanyonsExperienceCore.experienceID]
         for other in ExperienceRegistry.all where !puzzles.contains(other.id.rawValue) {
             XCTAssertNil(other.openingSeed, "\(other.id.rawValue) keeps its stable seed")
         }
@@ -1550,10 +1553,10 @@ final class AppModelTests: XCTestCase {
     // MARK: Colorfall Canyons in the app (feature 349, R02-G05-09; T-R02G0509-005, FR-R02G0509-003,
     // FR-R02G0509-006; SC-R02G0509-002)
 
-    /// Colorfall Canyons's registration: a candidate until X-R02-G05.
+    /// Colorfall Canyons's registration (a candidate until X-R02-G05, integrated since 2026-11-21).
     private func colorfallCanyonsRegistration() throws -> ExperienceRegistration {
         let id = try ExperienceID(ColorfallCanyonsExperienceCore.experienceID)
-        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Colorfall Canyons is a candidate")
+        return try XCTUnwrap(ExperienceRegistry.all.first { $0.id == id }, "Colorfall Canyons is integrated")
     }
 
     /// FR-R02G0509-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
@@ -1570,25 +1573,24 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(problems, [], "\(registration.id)")
     }
 
-    /// FR-R02G0509-006: without `-vcCandidates` Colorfall Canyons is a candidate only: in `candidates`, outside `all`,
-    /// listed in the bundled catalog as not available, without a tile and not opened.
-    func testColorfallCanyonsIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+    /// X-R02-G05 (2026-11-21): Colorfall Canyons is integrated: in `all`, not a candidate, available in the bundled
+    /// catalog, shown and opened without `-vcCandidates` (FR-R02G0509-006 held until then).
+    func testColorfallCanyonsIsIntegratedAndAvailableWithoutTheCandidatesArgument() async throws {
         let id = try ExperienceID(ColorfallCanyonsExperienceCore.experienceID)
         XCTAssertEqual(id.rawValue, "r02-g05.colorfall-canyons")
-        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
-        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertTrue(ExperienceRegistry.all.map(\.id).contains(id))
         let categories = try CategoryList(data: bundled("categories"))
         let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
-        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
-        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available")
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
                                                               categories: try bundled("categories"),
                                                               registry: ExperienceRegistry.all))
-        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "a tile")
         let opened = await model.open(id)
-        XCTAssertFalse(opened)
-        XCTAssertNil(model.session.experience)
+        XCTAssertTrue(opened)
+        XCTAssertNotNil(model.session.experience)
     }
 
     /// FR-R02G0509-003, SC-R02G0509-002: with `-vcCandidates` Colorfall Canyons is shown, opens through the registry
@@ -1609,7 +1611,7 @@ final class AppModelTests: XCTestCase {
         let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
         XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
         let model = AppModel(environment: environment)
-        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows it")
         let controls = registration.controls.map(\.id)
         for control in ["canyon.carve", "canyon.valve", "time.step", "level.next"] {
             XCTAssertTrue(controls.contains(control), control)

@@ -245,9 +245,17 @@
       "name": "Hue Compass",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G05",
+      "id": "r02-g05.colorfall-canyons",
+      "name": "Colorfall Canyons",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "e6fac305734b5417073d49cadc8c5675b5cccb35c65e47cb6c780bf1acd258ce",
+  "ledger_sha256": "93cbc7566fbbe46654fcd13746c8db8b5453e3b28b97c75362e945282b0fcbc6",
   "privacy_answers": "unproven",
   "schema": 1
 }

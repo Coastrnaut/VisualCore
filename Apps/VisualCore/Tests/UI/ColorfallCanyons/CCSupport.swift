@@ -1,6 +1,6 @@
 // CCSupport — feature 349 (R02-G05-09) T-R02G0509-004 (FR-R02G0509-001, 002; clarifications Q1, Q2): helpers of the
-// interface tests of Colorfall Canyons (R02-G05) inside the one app, modelled on `HCSupport`. Colorfall Canyons is a
-// candidate until X-R02-G05; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become
+// interface tests of Colorfall Canyons (R02-G05) inside the one app, modelled on `HCSupport`. Colorfall Canyons was a
+// candidate until X-R02-G05 (2026-11-21); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become
 // available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the
 // welcome and opens the experience directly with `-openExperience r02-g05.colorfall-canyons`; a relaunch (`CC.reopen`)
 // backgrounds the app first (its save point), terminates it and starts again without the reset, so the stored progress

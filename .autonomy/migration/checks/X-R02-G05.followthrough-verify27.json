@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g05.colorfall-canyons",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g05.colorfall-canyons --runtime 27",
+  "elapsed_seconds": 227.028,
+  "exit_code": 0,
+  "finished": "2026-11-22T01:57:54+00:00",
+  "gate": "X-R02-G05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G05.followthrough-verify27.log",
+  "log_sha256": "a497131aab51170ffa2935c277b8634abab7a5ccf3a3461e9d33c4d2cf90324e",
+  "name": "followthrough-verify27",
+  "started": "2026-11-22T01:54:07+00:00",
+  "timed_out": false
+}
