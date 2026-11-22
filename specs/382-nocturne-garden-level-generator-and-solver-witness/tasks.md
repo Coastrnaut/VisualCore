@@ -37,14 +37,14 @@ logic); no GLSL in this feature.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0902-004 [US2] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenGenerator.swift` (NocturneGardenBandProfile "band 1: 16 × 12,
-  sizes {2}, elevations {2, 3}, 1 … 2 blooms, ring 1 kept 1/2, match 4/5, allowance 2, no decoy; band 2: 20 × 14, {1, 2},
-  {2, 3}, 2 … 3, ring 1 · 1/2, 17/20, 2, no; band 3: 24 × 16, {1, 2, 3}, {1 … 4}, 3 … 4, ring 2 · 3/4, 9/10, 1, decoy;
-  band 4: 28 × 20, all, all, 4 … 5, ring 2 · 3/4, 19/20, 1, decoy; band 5: 32 × 24, all, all, 5 … 6, ring 2 · 3/4, 1/1, 0,
+- [ ] T-R02G0902-004 [US2] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenGenerator.swift` (NocturneGardenBandProfile "band 1: 16 × 12, smallest 2 … 3,
+  sizes {2}, elevations {2, 3}, 1 … 2 blooms, ring 1 kept 1/2, match 4/5, allowance 2, no decoy; band 2: 20 × 14, 3 … 4, {1, 2},
+  {2, 3}, 2 … 3, ring 1 · 1/2, 17/20, 2, no; band 3: 24 × 16, 4 … 5, {1, 2, 3}, {1 … 4}, 3 … 4, ring 2 · 3/4, 9/10, 1, decoy;
+  band 4: 28 × 20, 5 … 6, all, all, 4 … 5, ring 2 · 3/4, 19/20, 1, decoy; band 5: 32 × 24, 6 … 7, all, all, 5 … 6, ring 2 · 3/4, 1/1, 0,
   decoy", `candidate(_:index:)` drawing in the order of clarification Q1 from `SeededRandom(seed:
-  SeedDerivation.derive(seed, index: k))`, each bloom wholly in the bed adding at least 3 new cells, target = their
+  SeedDerivation.derive(seed, index: k))`, one size per candidate, each bloom wholly in the bed adding at least 3 new cells, target = their
   exact mask, NocturneGardenGenerated, `generate` with k = 0 … 255 keeping a candidate only when the solver certifies it
-  within the budget, id `nocturne-garden-NNN`, budget = manifest budget, tutorial for 1 … 3, difficulty = band,
+  in the band's smallest range and within the budget, id `nocturne-garden-NNN`, budget = manifest budget, tutorial for 1 … 3, difficulty = band,
   `.generation(number)` beyond 256; `catalogDigest` via `PuzzleCatalog.digest(id: "nocturne-garden", identities:)`)
   and, after it, agent C's `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenGeneratorTests.swift` (determinism; band profiles; filters;
   budget; the solution wins; skipped recorded and re-checked; an impossible profile refused); `--name host-3`

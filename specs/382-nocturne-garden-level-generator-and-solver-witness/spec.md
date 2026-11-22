@@ -45,13 +45,15 @@ leak allowance), `NocturneGardenBloom` (exact cells), `NocturneGardenMask`, `Noc
   SeedDerivation.derive(plannedSeed, index: k))`, in this order: the bed by band (16 × 12, 20 × 14, 24 × 16, 28 × 20, 32
   × 24); the allowed sizes (band 1: {2}; band 2: {1, 2}; bands 3 … 5: {1, 2, 3}) and elevations (bands 1 … 2: {2, 3};
   bands 3 … 5: {1, 2, 3, 4}); a construction sun; the bloom count b by band (1 … 2; 2 … 3; 3 … 4; 4 … 5; 5 … 6) and b
-  blooms, each a drawn kind, size and anchor whose cast lies wholly in the bed and adds at least 3 new cells; the target
+  blooms at one size drawn per candidate from the band's sizes (so single-plant covers stay comparable), each a
+  drawn kind and anchor whose cast lies wholly in the bed and adds at least 3 new cells; the target
   is their exact mask; the forbidden cells are the cells outside the target within Chebyshev distance 1 (bands 1 … 2) or
   2 (bands 3 … 5) of it, each kept with probability 1/2 (bands 1 … 2) or 3/4 (bands 3 … 5); the required match is 4/5,
   17/20, 9/10, 19/20, 1/1 by band; the leak allowance 2, 2, 1, 1, 0 by band; the supply is the kinds of the b blooms
   plus, from band 3 on, one decoy of another kind; the opening sun is drawn from the allowed elevations (so a sun move
-  may be needed). A candidate is kept when the solver certifies it within its work bound with a smallest move count at
-  most the manifest budget; otherwise k grows, at most 256 candidates, then `generation(n)`. Ids `nocturne-garden-NNN`;
+  may be needed). A candidate is kept when the solver certifies it within its work bound with a smallest move count in
+  the band's range (2 … 3, 3 … 4, 4 … 5, 5 … 6, 6 … 7; analyze finding C1, so neighbours keep the progression rule) and
+  at most the manifest budget; otherwise k grows, at most 256 candidates, then `generation(n)`. Ids `nocturne-garden-NNN`;
   tutorial flag on levels 1 … 3; difficulty = band; budget = manifest budget. Impact: FR-R02G0902-001, 006;
   SC-R02G0902-001, 003, 004.
 - Q: How does the solver decide the smallest move count, and what proves it? → A: for each allowed elevation e (in
