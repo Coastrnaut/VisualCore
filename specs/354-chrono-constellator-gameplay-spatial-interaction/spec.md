@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G06-04 (migration ledger, game feature of experience R02-G06) · ID namespace FR-R02G0604-###,
 SC-R02G0604-###, T-R02G0604-###
@@ -27,6 +27,56 @@ Canonical overrides:
   analytic picking), R02-F26 (input and accessibility contract), the experience host's pointer events, and the kernel,
   content, adapter and renderer of R02-G06-01 … 03.
 
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): Colorfall Canyons's feature 344 solved the same problem with a host-tested
+`ColorfallCanyonsGestureController` taking `PointerEvent`s (id, phase began/moved/ended/cancelled, location in view
+points with the origin top-left, timestamp) with the view size and the drawn snapshot and orbit, an analytic picker and a
+clamped `ColorfallCanyonsOrbit` (yaw ±40°, pitch 25° … 70°); Chrono Constellator's camera
+(`ChronoConstellatorSceneGeometry.camera(_:aspect:)`) looks from +z pitched 55° down; its scene draws star nodes at
+0.25·u, loops at the cell centres on the field (y = 0) and the current-tick bar 0.02 … 0.06·u inside the near edge; its
+adapter accepts `star.phase [star, phase]` (phase = index on the loop of the cell the star stands on at tick 0),
+`star.hold [star, start, length]`, `star.release [star, start]`, `time.step [ticks]`, `time.rewind`, `play.undo`,
+`play.redo` and `level.next`; edits are accepted only at tick 0 and a won play is final.
+
+- Q: How does a drag become a start-phase change? → A: a one-finger touch is picked at touch-down; if the pick is a star
+  node, the play is in stage `playing` and the tick is 0, the gesture is a star drag; while it moves, the loop cell of
+  that star under the finger (the touch ray meets the field plane y = 0 inside one of the star's loop cells, or else the
+  star's loop cell whose projected centre is nearest within 22 points) is the candidate; when the finger lifts after
+  having moved at least 16 points, exactly one `star.phase [star, index of the candidate on the loop]` is sent if a
+  candidate exists and differs from the current start phase; otherwise nothing. A touch that moves less than 10 points
+  is a tap. Impact: FR-R02G0604-001, 004; SC-R02G0604-001.
+- Q: How does scrubbing map to ticks and actions? → A: a one-finger touch whose field-plane hit lies within the
+  timeline band (the strip 0 … 0.25·u inside the near edge, across the grid's width) or whose projected point lies within
+  22 points of the current-tick bar's line starts a scrub, in stages `playing` and `failed`; the target tick is
+  round(tickLimit × (x − left edge) / grid width) clamped to 0 … tickLimit, x being the hit's field-plane coordinate on
+  release; on release (after any travel) the controller sends `time.step [t′ − t]` when t′ > t, `time.rewind` followed
+  by `time.step [t′]` (when t′ > 0) when t′ < t, and nothing when t′ = t: at most two actions per gesture, which the
+  kernel may stop at the deciding tick. A won play scrubs nothing (it is final). Impact: FR-R02G0604-002; SC-R02G0604-003.
+- Q: Which gesture records and removes a hold? → A: a long press — a touch on a star node that stays within 10 points for
+  at least 0.5 s (measured from the event timestamps) — at tick 0 while playing toggles the panel's standard hold of that
+  star (start 1, length 10 ticks): `star.hold [star, 1, 10]` when the star has no hold starting at tick 1, otherwise
+  `star.release [star, 1]`. The kernel's budget and overlap rules still apply and refusals are shown with their code.
+  Rewind, undo and redo stay panel buttons (unambiguous, never a gesture). Impact: FR-R02G0604-003; SC-R02G0604-001.
+- Q: What can the camera do? → A: two-finger orbit of yaw (±40° about the y axis, 90° per view width) and pitch (30° …
+  75° down from the horizon, authored 55°, 60° per view height); a second finger cancels a drag, scrub or press (nothing
+  sent); a third re-bases the midpoint; a double tap on empty space (`.ended` timestamps at most 0.35 s apart) or "Reset
+  view" returns to the authored view; the distance refits so the bounding sphere stays inside the view with a 5 % margin
+  at every orbit and aspect 0.4 … 2.5. Presentation only: never in the digest, the snapshot or the kernel; not saved, so
+  the snapshot schema stays 1. Impact: FR-R02G0604-005; SC-R02G0604-004.
+- Q: How are drags previewed, taps used and everything tested? → A: during a star drag the candidate cell is outlined
+  (pearl ring at the field) and the description reads "Star n (shape) would start at row r, column c"; during a scrub
+  the description reads "Scrub to tick t of T"; a tap on a star selects it in the panel's star picker (presentation only,
+  no action); a tap elsewhere sends nothing. The Core gesture controller takes pointer events with the view size and the
+  drawn snapshot and orbit and returns at most two actions per gesture plus the highlight; host tests feed 500 seeded
+  drags, scrubs, presses and taps on certified levels at several sizes and orbits and compare with an independent pick
+  computed in the test; simulator tests send the same touches through the experience's pointer entry; a host test wins
+  all 100 certified levels through panel actions (star picker, phase − and +, Run). Refused actions are logged with
+  their reason code. Impact: FR-R02G0604-006 … 008; SC-R02G0604-001 … 005.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Drag a star's start marker (Priority: P1) 🎯
@@ -46,8 +96,8 @@ independent picking computation predicts, or none.
    **Then** exactly one start-phase change of that star to that cell's loop position is sent on release.
 2. **Given** a drag that starts on empty space, a target or a track, or ends off the star's loop, **When** it is
    released, **Then** no start-phase change is sent.
-3. **Given** a replay in progress (tick above 0), **When** a star is dragged, **Then** nothing is sent and the player is
-   told that edits are made at tick 0 (rewind first).
+3. **Given** a replay in progress (tick above 0), **When** a star is dragged, **Then** nothing is sent and the description
+   says that edits are made at tick 0 (rewind first).
 
 ### User Story 2 - Scrub the timeline (Priority: P1)
 
@@ -91,7 +141,8 @@ and remove, steps, run, rewind, undo, redo, next level), including winning every
 
 ### Edge Cases
 
-- **A touch that never moves far enough:** a tap; it selects the star under it in the panel and sends nothing.
+- **A touch that never moves far enough:** a tap; it selects the star under it in the panel and sends nothing; two taps
+  on empty space within 0.35 s reset the view.
 - **A second finger during a drag or scrub:** cancels it (nothing sent) and orbits.
 - **A cancelled touch:** sends nothing.
 - **Won or failed play:** star drags and holds send nothing; scrubbing and rewind follow the kernel's rules (a won play
@@ -104,16 +155,22 @@ and remove, steps, run, rewind, undo, redo, next level), including winning every
 
 ### Functional Requirements
 
-- **FR-R02G0604-001**: At tick 0, a drag that starts on a star and ends over another cell of that star's loop MUST send
-  exactly one start-phase change of that star on release; any other drag MUST send no phase change.
-- **FR-R02G0604-002**: A drag along the timeline bar MUST move the replay to the tick under the finger on release by
-  stepping forward or by rewinding and stepping; the resulting state MUST equal a plain replay to that tick.
-- **FR-R02G0604-003**: A hold gesture on a star at tick 0 MUST record or remove a hold for that star with the kernel's
-  hold and release actions; rewind, undo and redo MUST be reachable without gestures.
+- **FR-R02G0604-001**: At tick 0 while playing, a drag that starts on a star node, moves at least 16 points and ends
+  over another cell of that star's loop (or within 22 points of one) MUST send exactly one `star.phase` of that star to
+  that cell's loop index on release; any other drag MUST send no phase change; a touch under 10 points is a tap.
+- **FR-R02G0604-002**: A touch starting in the timeline band (0 … 0.25·u inside the near edge, or within 22 points of
+  the tick bar) MUST, on release, move the replay to round(tickLimit × x-fraction) by `time.step` forward or by
+  `time.rewind` then `time.step` (at most two actions), in stages `playing` and `failed`; the resulting state MUST equal
+  a plain replay to that tick (or the deciding tick).
+- **FR-R02G0604-003**: A long press (within 10 points for at least 0.5 s by event timestamps) on a star at tick 0
+  while playing MUST toggle that star's standard hold (start 1, length 10) with `star.hold` or `star.release`; rewind,
+  undo and redo MUST stay panel buttons.
 - **FR-R02G0604-004**: Picking MUST be analytic and deterministic: the touch ray through the drawn camera against the
-  star nodes, the loop cells and the timeline bar, with a minimum touch target.
-- **FR-R02G0604-005**: Two-finger orbit MUST stay within bounded yaw and pitch, keep the scene inside the view at every
-  aspect 0.4 … 2.5 and never enter the digest, the snapshot or the kernel; a reset returns to the authored view.
+  star nodes (spheres of radius 0.3·u at 0.25·u), the field plane (loop cells, timeline band), with a 22-point minimum
+  touch target; the nearest star hit wins.
+- **FR-R02G0604-005**: Two-finger orbit MUST stay within yaw ±40° and pitch 30° … 75° (authored 0°, 55°), keep the
+  scene inside the view with a 5 % margin at every aspect 0.4 … 2.5 and never enter the digest, the snapshot or the
+  kernel; a double tap on empty space or "Reset view" returns to the authored view.
 - **FR-R02G0604-006**: While dragging, the candidate cell or tick MUST be highlighted and described; nothing changes in
   the kernel until release.
 - **FR-R02G0604-007**: The panel MUST keep every action available without gestures and gain "Reset view"; every
