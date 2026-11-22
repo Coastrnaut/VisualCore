@@ -208,3 +208,19 @@ rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unle
   after each close and memory warning.
 - **Where it runs.** CI's host job has a named "Amethyst Escape regression (host)" step; locally,
   `python3 scripts/amethyst_escape_regression.py` runs the host and simulator parts with one summary line each.
+
+## In-app integration (feature 369, R02-G07-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g07.amethyst-escape.<name>`
+  (`AmethystEscapeControls.identifierNames`, 23 names: turn-down, turn-up, advance, undo, redo, next-level,
+  show-all-layers, reset-view, hint, dismiss-tutorial, failure-undo, retry, campaign, daily, practice, play-level,
+  replay, replay-step, replay-stop, shell-picker, level-picker, sound, summary).
+- **Interface tests.** `AEPlayUITests` wins level 1 through the panel (its certified solution: Turn − once on the
+  innermost shell, then Advance twice: "The pearl escaped through the exit gap", "Stars: 3 of 3", level 2 open) and
+  keeps the progress over a relaunch; `AEReplayUITests` replays the win (three actions) to its end and stops. They run
+  as serial chunk `p3`, each under 90 s. Level 1's certified actions, smallest move count and starting shell are pinned
+  in `AE` and checked against the Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`AmethystEscapeSchemaExamples`), which
+  the app restores into schema 3 (a schema-2 result without a trace is kept, unverified); Amethyst Escape stays a
+  candidate (not available without `-vcCandidates`) until X-R02-G07.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.

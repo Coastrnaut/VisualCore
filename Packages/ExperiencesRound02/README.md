@@ -416,3 +416,7 @@ alterations, `AmethystEscapeGolden` (test builds only) with 16 pinned golden fra
 `AmethystEscape/golden-frames.json` (`AMETHYST_ESCAPE_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and memory
 tests, a CI step and `scripts/amethyst_escape_regression.py`.
 
+Feature 369 (R02-G07-09) adds Amethyst Escape's in-app integration: panel identifiers
+(`AmethystEscapeControls.identifierNames`), the stored schema-1 and schema-2 examples (`AmethystEscapeSchemaExamples`),
+app unit tests, and the interface tests `AEPlayUITests` and `AEReplayUITests` in serial chunk `p3`.
+
