@@ -64,11 +64,13 @@ import VisualCoreExperienceHost
         #expect(experience.frameProbes.isEmpty, "no probes before a frame")
     }
 
-    @Test func theControlsAreTheEightActions() {
+    /// The eight play actions and, since feature 385 (R02-G09-05), the five teaching and progression actions.
+    @Test func theControlsAreTheThirteenActions() {
         var ids: [String] = []
         for control in NocturneGardenExperienceCore.controls { ids.append(control.id) }
         #expect(ids == ["bloom.plant", "bloom.move", "bloom.resize", "bloom.remove", "sun.set", "play.undo",
-                        "play.redo", "level.next"])
+                        "play.redo", "level.next", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss"])
         #expect(ids == NocturneGardenExperienceCore.actionIDs)
     }
 
@@ -183,7 +185,11 @@ import VisualCoreExperienceHost
         #expect(core.play.stage == .failed)
         #expect(core.play.failure == .leak(found.actions.count - 1))
         #expect(core.outcome?.code == NocturneGardenExperienceCore.failedCode)
-        let reason: String = try #require(core.play.failureReason)
+        // Since feature 385 (R02-G09-05) the description gives the failure explanation: the kernel's reason
+        // sentence-cased, then "Undo the last move or retry the level."
+        let reason: String = try #require(NocturneGardenFailureExplanation(play: core.play)?.text)
+        let kernelReason: String = try #require(core.play.failureReason)
+        #expect(reason.lowercased().contains(kernelReason.lowercased()), "\(reason)")
         let text: String = shell.presenter.describe(core)
         #expect(text.contains(reason), "\(text)")
         #expect(text.contains("Nocturne Garden level \(found.level)."), "\(text)")

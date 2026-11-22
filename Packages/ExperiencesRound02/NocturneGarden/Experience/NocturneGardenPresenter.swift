@@ -12,6 +12,11 @@
 // described, a pinch resizes, a lantern drag changes the sun, two fingers orbit, a double tap or "Reset view" resets);
 // refused actions are shown and kept in `refusalLog` with their reason codes; the sun picker's "Set sun" reaches any
 // allowed elevation in one move.
+// Feature 385 (R02-G09-05) T-R02G0905-005 (FR-R02G0905-001 … 005): the mirror carries the tutorial instruction, the
+// hint revealed so far (`showHint()` reveals the next of three levels; the bounded search runs off the main actor and
+// any change of the play hides it), the failure explanation, the mode, the open levels with their stars and the goal;
+// `retry` starts the level again in its mode, `undoMove` takes back the last move, and the daily level is chosen from
+// the local calendar date read here (`playDaily(port:date:)`), never in the core.
 #if os(iOS)
 import Foundation
 import NocturneGardenCore
@@ -54,6 +59,22 @@ final class NocturneGardenMirror {
     var sunPick = 1
     /// The drag preview's words while a bloom is dragged (feature 384), or nil.
     var previewText: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 385).
+    var instruction: String?
+    /// The hint level revealed (0 … 3) and its text (feature 385).
+    var hintLevel = 0
+    var hintText: String?
+    /// The failure explanation while the play has failed (feature 385).
+    var failureText: String?
+    /// The mode (feature 385).
+    var mode: NocturneGardenMode = .campaign
+    /// The highest open level and the stars of each won level (feature 385).
+    var frontier = 1
+    var stars: [Int: Int] = [:]
+    /// The certified smallest move count of the current level (the goal, feature 385).
+    var smallest = 0
+    /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
+    var pickedLevel = 1
     /// The play the picks are clamped against (a copy; never sent anywhere).
     var play: NocturneGardenPlay?
     /// The text of the last refused change, if any.
@@ -173,6 +194,18 @@ final class NocturneGardenPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The latest core described (feature 385): hints and retry read it.
+    private(set) var latestCore: NocturneGardenExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 385).
+    private var hintKey: String?
+    /// The hint searched for a play, by that play's key: one search per play, every level from it (feature 385).
+    private var hintCache: (key: String, hints: [NocturneGardenHint?])?
+    /// The search under way, off the main actor, for the play of ``hintKey`` (feature 385).
+    private(set) var hintSearch: Task<Void, Never>?
+    /// The text shown while the search runs.
+    static let searchingText = "Finding a hint…"
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 385).
+    private(set) var dailyDate: DateComponents?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -247,6 +280,7 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbProgress(core)
         mirror.levelNumber = core.levelNumber
         mirror.moves = play.moves
         mirror.budget = level.budget
@@ -262,19 +296,23 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         switch play.stage {
         case .won, .result where play.failure == nil:
             text += "The shadow matches the target."
+            if let stars = mirror.stars[core.levelNumber] { text += " Stars: \(stars) of 3." }
             mirror.status = "Won"
         case .failed, .result:
-            let reason: String = play.failureReason ?? "The play failed."
+            let reason: String = mirror.failureText ?? play.failureReason ?? "The play failed."
             text += reason
             mirror.status = "Failed: " + reason
         default:
             mirror.status = play.moves == 0 ? "Ready" : "Playing"
         }
+        if let instruction = mirror.instruction { text += " Tutorial: " + instruction }
+        if let hint = mirror.hintText { text += " Hint: " + hint }
         return text
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(NocturneGardenControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() },
+        AnyView(NocturneGardenControls(port: port, mirror: mirror, presenter: self,
+                                       resetView: { [weak self] in self?.resetView() },
                                        sender: { [weak self] control, values in
                                            self?.send(control, values, port: port)
                                        }))
@@ -323,6 +361,132 @@ final class NocturneGardenPresenter: ExperiencePresenter {
                 break   // the controller has already returned to the authored orbit; the next frame draws it
             }
         }
+    }
+
+    // MARK: Teaching and progression (feature 385, R02-G09-05)
+
+    /// Takes the core's teaching and progress state into the mirror: the tutorial instruction, the failure
+    /// explanation, the mode, the open levels with their stars and the goal; a change of the play hides the hint.
+    private func absorbProgress(_ core: NocturneGardenExperienceCore) {
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) { clearHint() }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = NocturneGardenFailureExplanation(play: core.play)?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.smallest = core.certifiedSmallest
+    }
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: NocturneGardenExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Hides the hint shown and drops a search under way.
+    private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hintKey = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; the hint is hidden when the play has none (won).
+    /// Hints never change the state: no action is sent. The bounded search runs once per play in a detached task,
+    /// never on the frame: meanwhile the panel reads "Finding a hint…", and the result is shown only if the play it
+    /// belongs to is still the current one; later levels come from the cache.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let key: String = Self.hintKey(core)
+        let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        if let cached = hintCache, cached.key == key {
+            reveal(cached.hints, level: next, key: key)
+            return
+        }
+        guard hintSearch == nil || hintKey != key else { return }   // the search for this play is running
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        let play: NocturneGardenPlay = core.play
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            var hints: [NocturneGardenHint?] = []
+            for level in 1...3 { hints.append(NocturneGardenHints.hint(level: level, play: play)) }
+            await self?.finishSearch(hints, key: key)
+        }
+    }
+
+    /// Takes the three hint levels searched for the play of `key`: cached, and shown when that play is still current.
+    private func finishSearch(_ hints: [NocturneGardenHint?], key: String) {
+        // A search for a play that is no longer the hinted one (hidden or replaced since) owns nothing: it must not
+        // clear a newer search's handle or overwrite the cache.
+        guard hintKey == key else { return }
+        hintSearch = nil
+        hintCache = (key, hints)
+        guard let core = latestCore, Self.hintKey(core) == key else { return }
+        reveal(hints, level: mirror.hintLevel, key: key)
+    }
+
+    /// Shows `hints`' level `level` for the play of `key`, or hides the hint when the play has none.
+    private func reveal(_ hints: [NocturneGardenHint?], level: Int, key: String) {
+        guard hints.indices.contains(level - 1), let hint = hints[level - 1] else {
+            clearHint()
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = level
+        mirror.hintText = hint.text
+    }
+
+    /// Ends the tutorial of the current level.
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Takes back the last move (`play.undo`); after a failure this returns the play to playing.
+    @discardableResult
+    func undoMove(port: ExperienceActionPort) -> ActionResult {
+        send("play.undo", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = NocturneGardenPresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort, date: DateComponents = NocturneGardenPresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
 
     /// Returns the camera to the authored view ("Reset view"; presentation only).

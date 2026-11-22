@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "NocturneGardenExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing NocturneGardenExperienceTests",
+  "elapsed_seconds": 21.391,
+  "exit_code": 0,
+  "finished": "2026-11-22T22:15:30+00:00",
+  "gate": "R02-G09-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G09-05.sim-27-2.log",
+  "log_sha256": "b5d63cd014842397185abfacfc28eb3e54aa3143f5c1c9712d6a2472d9a8d7e9",
+  "name": "sim-27-2",
+  "started": "2026-11-22T22:15:08+00:00",
+  "timed_out": false
+}

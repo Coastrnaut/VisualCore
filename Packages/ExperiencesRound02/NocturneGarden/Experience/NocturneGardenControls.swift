@@ -2,7 +2,9 @@
 // control panel: labelled pickers for the kind, the column, the row, the size and the bloom (presentation state only),
 // plant, move, resize and remove (kernel actions through the action port), a sun picker (Sun − and +) with "Set sun"
 // (feature 384: one move reaches any allowed elevation), undo, redo, next level and "Reset view", each with an
-// accessibility label and value. Dragging stems, pinching to scale and sliding the sun come in R02-G09-04;
+// accessibility label and value. Feature 385 (R02-G09-05) T-R02G0905-005: the tutorial instruction with Dismiss, Hint
+// (each press reveals the next level), the failure explanation with Undo and Retry, the goal and stars, Campaign / Daily /
+// Practice and a picker of the open levels; all as wrapping text in the panel, never over the garden. Dragging stems, pinching to scale and sliding the sun come in R02-G09-04;
 // full accessibility in R02-G09-06.
 #if os(iOS)
 import NocturneGardenCore
@@ -13,6 +15,8 @@ import VisualCoreExperienceHost
 struct NocturneGardenControls: View {
     let port: ExperienceActionPort
     let mirror: NocturneGardenMirror
+    /// The presenter (feature 385): hints, retry, undo and the daily level.
+    let presenter: NocturneGardenPresenter
     /// Returns the camera to the authored view (feature 384).
     let resetView: () -> Void
     /// Sends a control the way the presenter does (refusals shown and logged).
@@ -22,9 +26,11 @@ struct NocturneGardenControls: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
                 header
+                teaching
                 pickRow
                 bloomRow
                 playRow
+                progressRows
             }
             .padding()
         }
@@ -127,6 +133,78 @@ struct NocturneGardenControls: View {
                 Button("Reset view") { resetView() }
                     .accessibilityLabel("Return the camera to the authored view")
             }
+        }
+    }
+
+    /// The tutorial instruction, the hint and the failure explanation (feature 385).
+    @ViewBuilder private var teaching: some View {
+        if let instruction = mirror.instruction {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
+                Button("Dismiss") { presenter.dismissTutorial(port: port) }
+                    .accessibilityLabel("Dismiss the tutorial")
+            }
+        }
+        HStack(spacing: 12) {
+            Button("Hint") { presenter.showHint() }
+                .accessibilityLabel("Show a hint")
+                .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+            Text("Goal: match in \(mirror.smallest) moves; budget \(mirror.budget)")
+                .font(.footnote)
+        }
+        if let hint = mirror.hintText {
+            Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true)
+        }
+        if let failure = mirror.failureText {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 12) {
+                    Button("Undo") { presenter.undoMove(port: port) }
+                        .accessibilityLabel("Undo the last move")
+                    Button("Retry") { presenter.retry(port: port) }
+                        .accessibilityLabel("Start the level again")
+                }
+            }
+        }
+    }
+
+    /// The mode buttons and the picker of open levels with their bands and stars (feature 385).
+    @ViewBuilder private var progressRows: some View {
+        HStack(spacing: 12) {
+            Button("Campaign") { send("mode.campaign") }
+                .accessibilityLabel("Play the campaign")
+                .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+            Button("Daily") { presenter.playDaily(port: port) }
+                .accessibilityLabel("Play today's daily level")
+                .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+            Button("Practice") { send("mode.practice") }
+                .accessibilityLabel("Practise this level with a larger move budget")
+                .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+        }
+        HStack(spacing: 12) {
+            Stepper(levelLabel(mirror.pickedLevel),
+                    onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
+                    onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
+                .accessibilityLabel("Level to play")
+                .accessibilityValue(levelLabel(mirror.pickedLevel))
+            Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
+                .accessibilityLabel("Play the picked level")
+        }
+    }
+
+    /// "Level n, band b" with its stars when won.
+    private func levelLabel(_ level: Int) -> String {
+        let band = NocturneGardenProgress.band(of: level)
+        if let stars = mirror.stars[level] { return "Level \(level), band \(band), \(stars) stars" }
+        return "Level \(level), band \(band)"
+    }
+
+    /// The mode's name: campaign, daily or practice.
+    static func modeName(_ mode: NocturneGardenMode) -> String {
+        switch mode {
+        case .campaign: "campaign"
+        case .practice: "practice"
+        case .daily: "daily"
         }
     }
 
