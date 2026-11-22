@@ -25,7 +25,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   plants, moves, resizes, removes, sun changes, undos, redos, refusals of every code, wins in campaign and practice,
   leak and budget failures and level changes compare texts, kinds and haptics exactly; a move that ends the play plans
   only the outcome; picker changes and previews plan nothing); agent A; `--name host-2`
-- [ ] T-R02G0906-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenLights.swift`
+- [X] T-R02G0906-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenLights.swift` — Verified 2026-11-22: host-3 (NocturneGardenLightsTests, NocturneGardenSoundRecipeTests, invariant) exit 0, rerun by the lead; lights and recipe exempted from the kernel scan as presentation; two slow-type-check literals split by the lead
   ("glow 0.7 playing / 1 won / 0.35 failed; leak 1 while the failure is a leak, else 0", eased linearly over 0.15 s,
   0.45 s under Reduce Flashing, no reversal mid-fade under Reduce Flashing; `maxHalfRangeCrossingsPerSecond`) and
   `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSoundRecipe.swift` ("root 110 Hz × (1, 9/8, 5/4, 4/3)

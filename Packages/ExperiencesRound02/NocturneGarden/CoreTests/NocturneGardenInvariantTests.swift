@@ -280,6 +280,9 @@ import VisualCoreSimulation
         // Feature 384 (R02-G09-04): the picker, the drag preview and the gesture controller (touch geometry in Doubles,
         // pointer events); presentation only, covered by their own tests and the renderer-purity tests.
         "NocturneGardenPicker.swift", "NocturneGardenDragPreview.swift", "NocturneGardenGestureController.swift",
+        // Feature 386 (R02-G09-06): the eased lights and the ambient recipe (presentation levels and frequencies in
+        // Doubles); presentation only, covered by their own tests.
+        "NocturneGardenLights.swift", "NocturneGardenSoundRecipe.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, less the presentation

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "NocturneGarden(Lights|SoundRecipe|Invariant)Tests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'NocturneGarden(Lights|SoundRecipe|Invariant)Tests'",
+  "elapsed_seconds": 4.942,
+  "exit_code": 0,
+  "finished": "2026-11-22T22:42:03+00:00",
+  "gate": "R02-G09-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G09-06.host-3.log",
+  "log_sha256": "ade17846f2df3130fe53788cc59227afd2272b0560bc9c5fd7aec89d5d17db56",
+  "name": "host-3",
+  "started": "2026-11-22T22:41:58+00:00",
+  "timed_out": false
+}
