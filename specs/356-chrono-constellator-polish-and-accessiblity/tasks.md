@@ -15,7 +15,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 2: Story 1 — VoiceOver play (P1) 🎯
 
-- [ ] T-R02G0606-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorFeedbackPlan.swift` ("after(old:new:)" texts and
+- [X] T-R02G0606-002 [P] [US1] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorFeedbackPlan.swift` ("after(old:new:)" texts and — Verified 2026-11-21: 2026-11-21: host (ChronoConstellatorFeedbackPlanTests, 7 tests: exact texts, kinds and haptics for edits, steps, rewinds, undo/redo, every refusal code, wins with stars, failures, level and mode changes; summary) exit 0, lead retest
   kinds of clarification Q1: phase "Star k (shape) starts at row r, column c. n edits left."; hold "Star k holds from tick
   s for l ticks." and release "Star k's hold from tick s removed." with the same suffix; step "Tick t of T. m of N stars
   on target."; rewind "Rewound to tick 0."; "Undone. " / "Redone. " + "Tick t of T. n edits left."; "picked(star:)"
