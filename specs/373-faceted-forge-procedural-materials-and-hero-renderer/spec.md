@@ -152,6 +152,8 @@ it as available, and the experience package, registry, catalog and content check
   named by number, share and face count, so no information is carried by hue only.
 - **A sliver failure:** the thin piece is marked distinctly and the failure shown names it and the cut.
 - **A won level:** the pieces open fully and the cut faces are lit; the frame checks use the opened positions.
+- **A piece centred on the crystal's centre:** a piece whose centroid lies within 1e-9 of the crystal's centroid (the
+  uncut crystal, or a central piece) is not moved by the opening; the uncut crystal is drawn whole and unopened.
 - **Memory warning:** caches are released and rebuilt on the next frame.
 - **Reduce Motion:** the interior shimmer and the opening stand still; Reduce Flashing caps the glow to the shared
   limit.
