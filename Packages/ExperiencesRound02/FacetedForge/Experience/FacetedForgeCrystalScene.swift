@@ -86,6 +86,16 @@ final class FacetedForgeCrystalScene {
         geometryKey = nil
     }
 
+    /// The number of GPU objects the scene holds: the crystal and glow shader renderers and the fallback mesh
+    /// renderers. It is 0 after ``release()`` (memory warning, teardown) and positive after a frame was drawn
+    /// (feature 378, T-R02G0808-005).
+    var liveObjectCount: Int {
+        var count: Int = fallbackRenderers.count
+        if crystalRenderer != nil { count += 1 }
+        if glowRenderer != nil { count += 1 }
+        return count
+    }
+
     /// The glow limit passed as `u_glowLimit`.
     var glowLimit: Double { FacetedForgeShaders.glowLimit(reduceFlashing: reducedFlash) }
 

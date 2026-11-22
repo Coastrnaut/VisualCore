@@ -39,7 +39,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G0808-005 [US2] [US3] Edit `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgeCrystalScene.swift` (`liveObjectCount`: GPU
+- [X] T-R02G0808-005 [US2] [US3] Edit `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgeCrystalScene.swift` (`liveObjectCount`: GPU — Verified 2026-11-22: sim-27 (FacetedForgeExperienceTests, 63 tests on iOS 27.2 incl. the 16 golden frames rendered and checked against their descriptions with the feature-373 tolerances, 12 open-draw-warn-close memory cycles with liveObjectCount 0 after each close and warning, a closed scene rebuilt on the next open) exit 0; an unrecorded run passed first
   objects held, 0 after release) and create
   `Packages/ExperiencesRound02/FacetedForge/ExperienceTests/FacetedForgeRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/FacetedForge/ExperienceTests/FacetedForgeRegressionMemoryTests.swift` (agent C: the
