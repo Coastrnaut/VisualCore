@@ -11,6 +11,9 @@
 // carry a drag's preview cells, drawn as a pale dashed outline. Reduce Flashing passes `NocturneGardenShaders.glowLimit(reduceFlashing:)` as
 // `u_glowLimit`. If a program fails, the scene falls back to the level-2 geometry drawn unlit with the shared
 // `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason; nothing here can reach the kernel.
+// Feature 386 (R02-G09-06) T-R02G0906-005: the presenter's eased lights scale the glow gain (`lights.glow`) and shade the
+// leak crosses (`lights.leak`, fading out over `fadingLeak` after an undo); the geometry is rebuilt only while a fade
+// runs (the eased leak level is part of the geometry key; the glow level is a uniform).
 #if os(iOS)
 import Foundation
 import NocturneGardenCore
@@ -31,6 +34,11 @@ final class NocturneGardenGardenScene {
     var reduceMotion = false
     /// The camera orbit (presentation only), set by the presenter before each frame (feature 384, R02-G09-04).
     var orbit: NocturneGardenOrbit = .authored
+    /// The eased light levels (presentation only), set by the presenter before each frame (feature 386): the glow gain
+    /// is multiplied by `lights.glow` and the leak crosses are shaded by `lights.leak`; nil draws the full levels.
+    var lights: NocturneGardenLights?
+    /// The last leaking cells, where the crosses fade out after an undo (feature 386), set by the presenter.
+    var fadingLeak: [Int] = []
     /// The light direction of the garden (towards the lantern side, from the upper right front).
     static let lightDirection = SIMD3<Float>(0.45, 0.7, 0.55)
 
@@ -45,6 +53,8 @@ final class NocturneGardenGardenScene {
         let moves: Int
         let preview: [Int]
         let orbit: NocturneGardenOrbit
+        let leak: Double
+        let fadingLeak: [Int]
         let tier: Int
         let fallback: Bool
     }
@@ -110,7 +120,7 @@ final class NocturneGardenGardenScene {
         }
         let time = Float(animate && !reduceMotion ? snapshot.time : 0)
         try drawGarden(camera, time: time, layers: NocturneGardenShaders.mistLayers(for: tier))
-        let gain = NocturneGardenShaders.glowGain(for: tier)
+        let gain = NocturneGardenShaders.glowGain(for: tier) * min(max(lights?.glow ?? 1, 0), 1)
         guard tier.glowShells > 0, gain > 0 else { return }
         try drawGlow(camera, gain: gain)
     }
@@ -118,7 +128,8 @@ final class NocturneGardenGardenScene {
     /// The geometry key of `snapshot` at `tier` in the current mode.
     private func key(_ s: NocturneGardenSceneSnapshot, tier: NocturneGardenTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, shadow: s.shadow, blooms: s.blooms, sun: s.sun, stage: s.stage,
-                    failure: s.failure, moves: s.moves, preview: s.preview, orbit: orbit, tier: tier.index,
+                    failure: s.failure, moves: s.moves, preview: s.preview, orbit: orbit, leak: lights?.leak ?? 1,
+                    fadingLeak: fadingLeak, tier: tier.index,
                     fallback: fallbackReason != nil)
     }
 
@@ -130,7 +141,8 @@ final class NocturneGardenGardenScene {
         if fallbackReason == nil {
             do {
                 let garden = try NocturneGardenSceneGeometry.gardenMesh(snapshot, tier: tier,
-                                                                         reduceMotion: reduceMotion)
+                                                                         reduceMotion: reduceMotion, lights: lights,
+                                                                         fadingLeak: fadingLeak)
                 gardenRenderer = try Self.renderer(garden, vertex: NocturneGardenShaders.gardenVertex,
                                                    fragment: gardenFragment, name: "nocturne-garden-garden",
                                                    registry: registry)

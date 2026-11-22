@@ -5,7 +5,10 @@
 // accessibility label and value. Feature 385 (R02-G09-05) T-R02G0905-005: the tutorial instruction with Dismiss, Hint
 // (each press reveals the next level), the failure explanation with Undo and Retry, the goal and stars, Campaign / Daily /
 // Practice and a picker of the open levels; all as wrapping text in the panel, never over the garden. Dragging stems, pinching to scale and sliding the sun come in R02-G09-04;
-// full accessibility in R02-G09-06.
+// full accessibility in R02-G09-06. Feature 386 (R02-G09-06) T-R02G0906-005 (FR-R02G0906-001, 005, 006; clarification
+// Q5): the summary element ("Garden"), adjustable kind, column, row, size, bloom and sun pickers (the sun picker is a
+// stepper over the allowed elevations), refusals in words, the Sound toggle (off by default), rows that become columns
+// at accessibility text sizes, wrapping text and a 520-point readable width.
 #if os(iOS)
 import NocturneGardenCore
 import SwiftUI
@@ -22,6 +25,14 @@ struct NocturneGardenControls: View {
     /// Sends a control the way the presenter does (refusals shown and logged).
     let sender: (String, [Double]) -> Void
 
+    /// The text size: rows become columns at accessibility sizes (feature 386).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the ambient loop plays only while it is.
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 386).
+    static let readableWidth: CGFloat = 520
+
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
@@ -31,26 +42,52 @@ struct NocturneGardenControls: View {
                 bloomRow
                 playRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 386).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 386; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Ambient sound")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
 
     /// The level, moves and stage lines.
     @ViewBuilder private var header: some View {
         Text("Level \(mirror.levelNumber) · moves \(mirror.moves) of \(mirror.budget)")
             .font(.headline)
+            .fixedSize(horizontal: false, vertical: true)
         Text(mirror.status).font(.subheadline)
-        Text(mirror.measureLabel).font(.footnote)
-        Text(mirror.targetLabel).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Garden")
+            .accessibilityValue(mirror.summary)
+        Text(mirror.measureLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let preview = mirror.previewText {
             // Feature 384 convergence (T-R02G0904-014): the drag's exact preview in words.
-            Text("Dragging: " + preview).font(.footnote)
+            Text("Dragging: " + preview).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityLabel("Drag preview")
                 .accessibilityValue(preview)
         }
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -95,7 +132,7 @@ struct NocturneGardenControls: View {
                     onDecrement: { mirror.pickBloom(-1) })
                 .accessibilityLabel("Planted bloom to change")
                 .accessibilityValue(mirror.bloomLabel)
-            HStack(spacing: 12) {
+            row {
                 Button("Move") {
                     send("bloom.move", [Double(mirror.bloom), Double(mirror.column), Double(mirror.row)])
                 }
@@ -111,19 +148,18 @@ struct NocturneGardenControls: View {
     /// Sun − and +, undo, redo and next level.
     @ViewBuilder private var playRow: some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 12) {
-                Button("Sun −") { mirror.stepSun(-1) }
-                    .accessibilityLabel("Pick a higher sun")
-                    .accessibilityValue(mirror.sunPickLabel)
-                Text(mirror.sunPickLabel).font(.footnote)
-                Button("Sun +") { mirror.stepSun(1) }
-                    .accessibilityLabel("Pick a lower sun")
+            row {
+                // Feature 386: the sun picker is adjustable (swipe up or down) over the allowed elevations.
+                Stepper(mirror.sunPickLabel,
+                        onIncrement: { mirror.stepSun(1) },
+                        onDecrement: { mirror.stepSun(-1) })
+                    .accessibilityLabel("Sun elevation to set")
                     .accessibilityValue(mirror.sunPickLabel)
                 Button("Set sun") { send("sun.set", [Double(mirror.sunPick)]) }
                     .accessibilityLabel("Move the sun to the picked elevation")
                     .accessibilityValue(mirror.sunLabel + "; picked " + mirror.sunPickLabel)
             }
-            HStack(spacing: 16) {
+            row {
                 Button("Undo") { send("play.undo") }
                     .accessibilityLabel("Undo the last move")
                 Button("Redo") { send("play.redo") }
@@ -145,12 +181,12 @@ struct NocturneGardenControls: View {
                     .accessibilityLabel("Dismiss the tutorial")
             }
         }
-        HStack(spacing: 12) {
+        row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
             Text("Goal: match in \(mirror.smallest) moves; budget \(mirror.budget)")
-                .font(.footnote)
+                .font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
         if let hint = mirror.hintText {
             Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true)
@@ -158,7 +194,7 @@ struct NocturneGardenControls: View {
         if let failure = mirror.failureText {
             VStack(alignment: .leading, spacing: 4) {
                 Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 12) {
+                row {
                     Button("Undo") { presenter.undoMove(port: port) }
                         .accessibilityLabel("Undo the last move")
                     Button("Retry") { presenter.retry(port: port) }
@@ -170,7 +206,7 @@ struct NocturneGardenControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 385).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
@@ -181,7 +217,7 @@ struct NocturneGardenControls: View {
                 .accessibilityLabel("Practise this level with a larger move budget")
                 .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })

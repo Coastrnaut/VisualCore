@@ -17,6 +17,15 @@
 // any change of the play hides it), the failure explanation, the mode, the open levels with their stars and the goal;
 // `retry` starts the level again in its mode, `undoMove` takes back the last move, and the daily level is chosen from
 // the local calendar date read here (`playDaily(port:date:)`), never in the core.
+// Feature 386 (R02-G09-06) T-R02G0906-005 (FR-R02G0906-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `NocturneGardenFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log; refusals are shown and announced in
+// words (`refused(code:)`), and a revealed hint is announced as `state`; picker changes and drag previews are not
+// announced (the pickers speak their values). The scene's lights (`NocturneGardenLights`: the blooms' glow and the leak
+// crosses) step toward the drawn snapshot every frame (0.15 s fades, 0.45 s under Reduce Flashing). The ambient loop
+// (`NocturneGardenSound`) is offered the recipe of the planted blooms, the sun and the stage (`NocturneGardenSoundRecipe`)
+// when a level or mode opens and when that recipe changes. The mirror carries the summary element's text and the sound
+// choice. Presentation only.
 #if os(iOS)
 import Foundation
 import NocturneGardenCore
@@ -26,6 +35,8 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
+import VisualCoreAudioDSP
 
 /// What the controls show and choose: the latest state the presenter described and the panel's picks.
 @MainActor
@@ -79,6 +90,10 @@ final class NocturneGardenMirror {
     var play: NocturneGardenPlay?
     /// The text of the last refused change, if any.
     var message: String?
+    /// The summary element's text (feature 386).
+    var summary = ""
+    /// Whether the ambient sound is on (feature 386; off by default).
+    var soundOn = false
 
     /// The picked kind in words.
     var kindLabel: String { "kind " + NocturneGardenKind.allCases[min(max(kind, 0), 5)].name }
@@ -100,9 +115,12 @@ final class NocturneGardenMirror {
         let at: Int = allowed.firstIndex(of: sunPick) ?? (allowed.firstIndex(of: sun) ?? 0)
         sunPick = allowed[min(max(at + delta, 0), allowed.count - 1)]
     }
-    /// The picked bloom in words.
+    /// The picked bloom in words, its first letter upper case ("Bloom 1: rose at column 2, row 3, size 1"; feature 386:
+    /// only the first letter, so VoiceOver reads the name as written).
     var bloomLabel: String {
-        bloomNames.indices.contains(bloom) ? bloomNames[bloom].capitalized : "no bloom planted"
+        guard bloomNames.indices.contains(bloom) else { return "no bloom planted" }
+        let name: String = bloomNames[bloom]
+        return name.prefix(1).uppercased() + name.dropFirst()
     }
 
     /// Moves the kind pick by `delta` over the kinds the level supplies, wrapping.
@@ -207,7 +225,22 @@ final class NocturneGardenPresenter: ExperiencePresenter {
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 385).
     private(set) var dailyDate: DateComponents?
 
+    /// The feedback route of announcements and haptics (feature 386; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 386; tests and diagnostics).
+    private(set) var feedbackLog: [NocturneGardenFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 386).
+    private(set) var lights: NocturneGardenLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient sound (feature 386).
+    let sound: NocturneGardenSound
+    /// The last leaking cells drawn, so their crosses can fade out after an undo (feature 386).
+    private(set) var fadingLeak: [Int] = []
+
     init(reduceMotion: Bool, reduceFlashing: Bool) {
+        lights = NocturneGardenLights(reducedFlash: reduceFlashing)
+        sound = NocturneGardenSound(recipe: NocturneGardenSoundRecipe.recipe(blooms: 0, sun: 1, stage: .loading))
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         scene.reducedFlash = reduceFlashing
@@ -246,6 +279,21 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
         lastPlay = core.play
+        // The lights settle on the very first frame only; every later change, a level change included, fades.
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        // The crosses fade out where the leak was after an undo (the last leaking cells).
+        if snapshot.leakFailure {
+            fadingLeak = snapshot.leaking
+        } else if lights.leak <= 0 {
+            fadingLeak = []
+        }
+        scene.lights = lights
+        scene.fadingLeak = fadingLeak
         scene.orbit = gestures.orbit
         let shown: NocturneGardenSceneSnapshot
         if let preview = gestures.preview {
@@ -280,7 +328,17 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        let previous: NocturneGardenExperienceCore? = latestCore
         absorbProgress(core)
+        if let previous {
+            route(NocturneGardenFeedbackPlan.after(old: previous, new: core))
+            let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
+        mirror.summary = NocturneGardenFeedbackPlan.summaryText(core: core)
         mirror.levelNumber = core.levelNumber
         mirror.moves = play.moves
         mirror.budget = level.budget
@@ -436,9 +494,11 @@ final class NocturneGardenPresenter: ExperiencePresenter {
             clearHint()
             return
         }
+        let revealed: Bool = mirror.hintLevel != level || mirror.hintText != hint.text
         hintKey = key
         mirror.hintLevel = level
         mirror.hintText = hint.text
+        if revealed { route(NocturneGardenFeedbackPlan.hint(text: hint.text)) }   // feature 386: announced as state
     }
 
     /// Ends the tutorial of the current level.
@@ -501,7 +561,9 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(result.code)"
+            let plan = NocturneGardenFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(result.code)
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
@@ -509,5 +571,37 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         }
         return result
     }
+
+    // MARK: Feedback and sound (feature 386)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: NocturneGardenFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its planted blooms, its sun and its stage.
+    static func recipe(_ core: NocturneGardenExperienceCore) -> AmbientLoopRecipe {
+        NocturneGardenSoundRecipe.recipe(blooms: core.play.blooms.count, sun: core.play.elevation,
+                                         stage: core.play.stage)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current garden.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 }
 #endif

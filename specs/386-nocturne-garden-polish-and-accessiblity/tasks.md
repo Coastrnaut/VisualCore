@@ -39,7 +39,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Wiring — geometry, presenter, scene, sound and panel
 
-- [ ] T-R02G0906-005 [US1] [US2] [US3] Edit
+- [X] T-R02G0906-005 [US1] [US2] [US3] Edit — Verified 2026-11-22: host-4 (swift test --filter NocturneGarden, incl. the leak-cross lights geometry test) exit 0; sim-27 exit=65 (the leak frame was drawn before the crosses faded in; the render test now draws 1 s later and checks the leak level), sim-27-2 exit=0 (53 simulator tests incl. NocturneGardenAccessibilityTests 8, iOS 27.2); bloom picker value now capitalises only its first letter; refusals shown in words (two tests updated); agent C's tests retested by the lead
   `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSceneGeometry.swift` (optional `lights:` on
   gardenPart/gardenMesh: the leak crosses' shade from the lights; without lights the output is unchanged, with tests in
   `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenSceneGeometryTests.swift`), create

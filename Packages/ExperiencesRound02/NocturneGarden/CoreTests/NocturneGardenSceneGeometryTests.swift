@@ -382,6 +382,33 @@ import VisualCoreScenes
         #expect(quiet.uvs.allSatisfy { Int($0.x.rounded()) != cross })
     }
 
+    /// Feature 386 (R02-G09-06) T-R02G0906-005: with the eased lights the leak crosses take the leak level as their
+    /// shade; settled on the leak failure the mesh equals the one without lights; after an undo the crosses fade out
+    /// over the last leaking cells (`fadingLeak`) at the eased level and vanish once it reaches 0; without lights
+    /// `fadingLeak` draws nothing.
+    @Test func leakCrossesFollowTheEasedLeakLevel() throws {
+        let cross: Int = Int(NocturneGardenShaders.leakCrossMaterial)
+        let tier: NocturneGardenTier = NocturneGardenTier.all[1]
+        let failed: Snapshot = try Self.crowdedLeak()
+        var lights = NocturneGardenLights(reducedFlash: false)
+        lights.settle(to: failed)
+        #expect(lights.leak == 1)
+        #expect(try Geometry.gardenMesh(failed, tier: tier, lights: lights) == Geometry.gardenMesh(failed, tier: tier))
+        let quiet: Snapshot = try Self.emptyBed()
+        lights.step(toward: quiet, elapsed: NocturneGardenLights.normalDuration / 2)
+        #expect(lights.leak > 0.4 && lights.leak < 0.6, "\(lights.leak)")
+        let fading: Mesh = try Geometry.gardenMesh(quiet, tier: tier, lights: lights, fadingLeak: [20])
+        let shades: [Double] = fading.uvs.filter { Int($0.x.rounded()) == cross }.map { Double($0.y) }
+        #expect(!shades.isEmpty)
+        #expect(shades.allSatisfy { abs($0 - lights.leak) < 1e-6 }, "\(shades)")
+        let unlit: Mesh = try Geometry.gardenMesh(quiet, tier: tier, fadingLeak: [20])
+        #expect(unlit.uvs.allSatisfy { Int($0.x.rounded()) != cross }, "no lights: no fading crosses")
+        lights.step(toward: quiet, elapsed: NocturneGardenLights.normalDuration)
+        #expect(lights.leak == 0)
+        let gone: Mesh = try Geometry.gardenMesh(quiet, tier: tier, lights: lights, fadingLeak: [20])
+        #expect(gone.uvs.allSatisfy { Int($0.x.rounded()) != cross }, "faded out")
+    }
+
     // MARK: Orbit and preview outline (feature 384)
 
     @Test func orbitClampsToItsBounds() {

@@ -185,7 +185,9 @@ import VisualCoreMath
         #expect(shell.presenter.mirror.status.hasPrefix("Failed: "), "\(shell.presenter.mirror.status)")
         // Level-2 draws no glow shells, so nothing additive lies over the crosses.
         NocturneGardenTest.pin(session, shell, tier: 2)
-        let rgba: [UInt8] = try NocturneGardenTest.still(session)
+        // Feature 386: the crosses fade in over 0.15 s of presentation time, so the frame is drawn 1 s later.
+        let rgba: [UInt8] = try NocturneGardenTest.still(session, time: 1)
+        #expect(shell.presenter.lights.leak == 1, "the crosses have faded in")
         let snapshot: NocturneGardenSceneSnapshot = try #require(shell.presenter.lastSnapshot)
         #expect(snapshot.leakFailure)
         #expect(!snapshot.leaking.isEmpty)

@@ -748,7 +748,9 @@ enum NocturneGardenGestureScript {
         #expect(shell.presenter.refusalLog.last == expected.result.code)
         #expect(shell.presenter.refusalLog.last?.hasSuffix("r02-g09.supply") == true)
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message.contains(expected.result.code), "\(message)")
+        // Feature 386: the refusal is shown in words (clarification Q1), not as its code.
+        #expect(message == NocturneGardenFeedbackPlan.refusalText(code: expected.result.code), "\(message)")
+        #expect(message == "No bloom of that kind is left.", "\(message)")
         #expect(try NocturneGardenTest.digest(shell) == digest, "a refused plant changes nothing")
         #expect(try NocturneGardenTest.core(shell).play.blooms.isEmpty)
     }

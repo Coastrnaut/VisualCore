@@ -17,6 +17,9 @@
 // painter's order. Mist drift and bloom sway move by uniforms only: no position depends on the time or Reduce Motion,
 // and positions, colours and marks are the same at every tier (tiers change only the feather band, the stem's segments
 // and leaves, and the glow shells). Doubles are used for drawing only; nothing here is consulted by the rules.
+// Feature 386 (R02-G09-06) T-R02G0906-005: given the presenter's eased `lights`, the leak crosses take their shade from
+// the eased leak level, and after an undo they fade out over `fadingLeak` (the last leaking cells); without lights the
+// output is unchanged.
 //
 // Feature 384 (R02-G09-04) T-R02G0904-003 (FR-R02G0904-002, 003, 005; SC-R02G0904-002, 004; clarifications Q2, Q3):
 // the player's orbit (`NocturneGardenOrbit`: yaw ±35° about +y, pitch 0° … 30° down from the horizon, authored yaw 0
@@ -366,11 +369,14 @@ public enum NocturneGardenSceneGeometry {
     /// border (z = 0.0035, preview material, shade 1, as wide as the rim; nothing when `preview` is empty); after a
     /// leak failure a cross on every leaking cell (z = 0.004); every bloom in canonical order (stem segments and leaf
     /// pairs at z = 0.37, the head's back face at z = 0.35, side walls, front face at z = 0.39); the lantern sphere;
-    /// the gauge bars. `reduceMotion` changes nothing here: drift and sway are uniforms of the shaders.
+    /// the gauge bars. `reduceMotion` changes nothing here: drift and sway are uniforms of the shaders. With `lights`
+    /// (feature 386) the crosses' shade is the eased leak level; while the snapshot shows no leak failure but that level
+    /// is still above 0, the crosses are drawn on `fadingLeak` (the last leaking cells) at that level.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func gardenPart(_ snapshot: NocturneGardenSceneSnapshot, tier: NocturneGardenTier,
-                                  reduceMotion: Bool = false) throws(MeshError) -> NocturneGardenColouredMesh {
+                                  reduceMotion: Bool = false, lights: NocturneGardenLights? = nil,
+                                  fadingLeak: [Int] = []) throws(MeshError) -> NocturneGardenColouredMesh {
         typealias M = NocturneGardenSceneGeometry.Material
         var parts: Parts = Parts(lit: true)
         let u: Double = cellSize(snapshot)
@@ -432,16 +438,25 @@ public enum NocturneGardenSceneGeometry {
                                    a - along + out * half], normal: front, uv: Vec2(M.preview, 1))
             }
         }
-        // Leak crosses.
+        // Leak crosses (feature 386: shaded by the eased leak level, fading out over the last leaking cells).
+        let crossCells: [Int]
         if snapshot.leakFailure {
+            crossCells = snapshot.leaking
+        } else if let lights, lights.leak > 0 {
+            crossCells = fadingLeak
+        } else {
+            crossCells = []
+        }
+        if !crossCells.isEmpty {
+            let shade: Double = lights.map { min(max($0.leak, 0), 1) } ?? 1
             let d1: SIMD3<Double> = unit(SIMD3(1, 1, 0))
             let d2: SIMD3<Double> = unit(SIMD3(1, -1, 0))
-            for cell in snapshot.leaking where cell >= 0 && cell < count {
+            for cell in crossCells where cell >= 0 && cell < count {
                 let c: SIMD3<Double> = cellCentre(cell, snapshot) + SIMD3(0, 0, crossZ)
                 try parts.bar(centre: c, along: d1, across: d2, halfLength: crossArm * u,
-                              halfWidth: crossHalfWidth * u, normal: front, uv: Vec2(M.leakCross, 1))
+                              halfWidth: crossHalfWidth * u, normal: front, uv: Vec2(M.leakCross, shade))
                 try parts.bar(centre: c, along: d2, across: d1, halfLength: crossArm * u,
-                              halfWidth: crossHalfWidth * u, normal: front, uv: Vec2(M.leakCross, 1))
+                              halfWidth: crossHalfWidth * u, normal: front, uv: Vec2(M.leakCross, shade))
             }
         }
         // Blooms.
@@ -461,12 +476,13 @@ public enum NocturneGardenSceneGeometry {
         return parts.built()
     }
 
-    /// The garden mesh (see ``gardenPart(_:tier:reduceMotion:)``).
+    /// The garden mesh (see ``gardenPart(_:tier:reduceMotion:lights:fadingLeak:)``).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func gardenMesh(_ snapshot: NocturneGardenSceneSnapshot, tier: NocturneGardenTier,
-                                  reduceMotion: Bool = false) throws(MeshError) -> Mesh {
-        try gardenPart(snapshot, tier: tier, reduceMotion: reduceMotion).mesh
+                                  reduceMotion: Bool = false, lights: NocturneGardenLights? = nil,
+                                  fadingLeak: [Int] = []) throws(MeshError) -> Mesh {
+        try gardenPart(snapshot, tier: tier, reduceMotion: reduceMotion, lights: lights, fadingLeak: fadingLeak).mesh
     }
 
     /// The glow (glow program, colour in the normal slot, uv (weight, 0)): for k = `tier.glowShells` … 1, every head's

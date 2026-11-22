@@ -305,7 +305,7 @@ enum NocturneGardenTeaching {
         let locked: ActionResult = presenter.send("level.select", [3], port: shell.port)
         #expect(locked == .rejected(.rule(code: NocturneGardenExperienceRule.locked)), "\(locked.code)")
         #expect(locked.code.contains("r02-g09.locked"))
-        #expect(presenter.mirror.message?.contains("r02-g09.locked") == true,
+        #expect(presenter.mirror.message == "That level is not open yet.",   // feature 386: in words
                 "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == locked.code)
         #expect(presenter.refusalLog.count == 1)
