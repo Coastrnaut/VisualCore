@@ -33,7 +33,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   names; glow gain cap; palette constants equal to the CPU's) with `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenShaderSourceTests.swift`
   (version line, declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants
   match); agent A; `--name host-2`
-- [ ] T-R02G0903-004 [P] [US1] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSceneGeometry.swift` (the bed upright at z = 0 with cell
+- [X] T-R02G0903-004 [P] [US1] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSceneGeometry.swift` (the bed upright at z = 0 with cell — Verified 2026-11-22: host-3 exit=0 (NocturneGardenSceneGeometryTests 12: finite and bounded for the empty bed and a 32x24 bed of 12 size-3 blooms ending in a leak, every place inside the view with margin at 7 aspects, the clarified formulas, positions equal at every tier, time and Reduce Motion, shadow quads equal the mask, bloom vertices inside their boxes, gauge bars, glow empty at level-2, head triangulation, leak crosses only after a leak; agent B's files retested by the lead)
   size u = 2 / W, cell (c, r) from x = −1 + c·u, y = r·u; a shadow quad per mask cell with a feather band along
   boundary edges of the tier's width; gold rim on the target's boundary edges; coral hatch on forbidden cells; a cross
   on leaking cells after a leak failure; each bloom at z = 0.35: its kind's outline at size·u anchored at the anchor
