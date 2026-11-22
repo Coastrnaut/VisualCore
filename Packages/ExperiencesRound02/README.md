@@ -478,3 +478,14 @@ unit tests, and the interface tests `FFPlayUITests` and `FFReplayUITests` in ser
 Feature 380 (R02-G08-10) prepares Faceted Forge's device campaign without touching a device:
 `docs/apps/faceted-forge/device-rows.json` (rows FF-D1 … FF-D8, all pending), the written plan
 `docs/apps/faceted-forge/device-campaign.md`, and the release step `device-rows-r02-g08`.
+
+## Nocturne Garden (R02-G09, `r02-g09.nocturne-garden`, free)
+
+`NocturneGardenCore` (feature 381, R02-G09-01) is the playable rule kernel: the six named bloom kinds as fixed lattice
+outlines (`NocturneGardenKind`), blooms with a kind, anchor cell and size whose shadows are stretched by the sun and
+turned into bed cells by an exact integer test (`NocturneGardenBloom`), the shadow mask with its match, leak and boundary
+deviation (`NocturneGardenMask`, `NocturneGardenRatio`), `NocturneGardenLevel` (immutable, fingerprinted, JSON schema
+1), the play state `NocturneGardenPlay` with `NocturneGardenAction`, `NocturneGardenStage`, `NocturneGardenEvent`,
+`NocturneGardenFailure` and append-only `NocturneGardenRecord`s, and `NocturneGardenRules` for the R02-F23 puzzle
+contract. Refusals are `NocturneGardenError` with `r02-g09.*` codes. Rules:
+[docs/architecture/nocturne-garden.md](../../docs/architecture/nocturne-garden.md).

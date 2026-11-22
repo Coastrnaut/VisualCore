@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (X-R02-G08: the round-two package run reached 553 s; split it from X-R02-G09).
+Last updated: 2026-11-22 (R02-G09-01: Nocturne Garden kernel, exact cells against an independent ray cast).
 
 ## 1. What is tested, and where
 
@@ -389,6 +389,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the
   enumeration guard caught (0/3 declared tests). The level-1 journey is one Turn − and two Advances, and its pinned
   values are checked against the Core by an app unit test.
+- **Exact cells against an independent ray cast** (R02-G09-01, 2026-11-22). Nocturne Garden's shadow cells are decided by
+  an integer winding number on doubled coordinates with boundary centres counted inside; the bloom tests check every
+  cell of the whole bed (not only the bounding box) against a separate even-odd ray cast on exact rationals with its own
+  on-segment test, and the boundary deviation against an all-pairs brute force. A timing baseline taken right after the
+  round-two suite failed under a load average of 13 and passed when rerun: run timing baselines on a quiet machine.
 - **Split the X-gate round-two package run** (X-R02-G08, 2026-11-22). The X gate's `host` check (the whole
   `ExperiencesRound02-Package` on the iOS 27.2 simulator) took 368, 390, 417 and then 553 s at X-R02-G05 … G08: past
   the 540 s per-command rule, and `xcodebuild_package.py` has no timeout of its own, so a hang there would not be cut
