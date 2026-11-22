@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-10: Faceted Forge device rows and release step device-rows-r02-g08).
+Last updated: 2026-11-22 (X-R02-G08: the round-two package run reached 553 s; split it from X-R02-G09).
 
 ## 1. What is tested, and where
 
@@ -389,6 +389,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the
   enumeration guard caught (0/3 declared tests). The level-1 journey is one Turn − and two Advances, and its pinned
   values are checked against the Core by an app unit test.
+- **Split the X-gate round-two package run** (X-R02-G08, 2026-11-22). The X gate's `host` check (the whole
+  `ExperiencesRound02-Package` on the iOS 27.2 simulator) took 368, 390, 417 and then 553 s at X-R02-G05 … G08: past
+  the 540 s per-command rule, and `xcodebuild_package.py` has no timeout of its own, so a hang there would not be cut
+  off. Nothing hung, but from X-R02-G09 on the run is split into chunks of whole test bundles with `--only-testing`
+  (`host-1`, `host-2`), and every attestation's `elapsed_seconds` is read after a check: anything above about 450 s is
+  split before the next gate. The one failed attempt of that gate (sim26) came from an outside
+  `simctl shutdown all && simctl erase all`, not from the code.
 - **Faceted Forge device rows** (R02-G08-10, 2026-11-22). `python3 scripts/check_device_rows.py --experience
   r02-g08.faceted-forge` (release step `device-rows-r02-g08`) checks the definition against the scenario manifest, the
   ledger's DEV rows and the open {device} tasks of features 371 … 379; `FacetedForgeDeviceRowsCheckTests` in

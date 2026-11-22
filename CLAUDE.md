@@ -59,7 +59,7 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    test files of one feature, read-heavy audits, and experiences that touch different files run in parallel
    agents; coupled design steps stay with the lead. At most ten concurrent agents and one writer per file. Agents
    do not commit, push or run heavy builds; the lead invokes every Spec Kit skill, runs the builds in the
-   foreground (10 minutes or less per command, split with `--only`/`--skip`), retests every agent result
+   foreground (under 540 s each; split a run nearing it by `--only`), retests every agent result
    before a task is ticked (an agent's report is not evidence) and commits.
    **More parallel agents, gates unchanged** (owner, 2026-11-13): never consolidate the planned gates;
    by default fan independent files of a task (tools, tests, sources, docs, audits) out to up to ten agents. Shared
