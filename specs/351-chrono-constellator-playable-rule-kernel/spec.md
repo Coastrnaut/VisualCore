@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G06-01 (migration ledger, game feature of experience R02-G06) · ID namespace FR-R02G0601-###,
 SC-R02G0601-###, T-R02G0601-###
@@ -28,6 +28,48 @@ Canonical overrides:
   0.008333 s timestep), so every device decides the same; nothing is integrated in floating point.
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract, so
   R02-G06-02 can certify levels).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): `Packages/ExperiencesRound02` holds Aurora Loom, Lissajous Labyrinth, Wave Knot Keeper, Hue
+Compass and Colorfall Canyons as the pattern (Core with level, play, records with previous and next fingerprints, rules as
+R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.*` reason codes); no `ChronoConstellator*` name exists; the
+catalog sets the timestep at 0.008333 s (1/120 s) and the content at 78 stages.
+
+- Q: What exactly are the sky, the stars and their loops? → A: a grid of 5 … 12 columns by 5 … 10 rows; 2 … 5 stars,
+  each with a loop of 4 … 32 distinct cells in which consecutive cells (and the last and the first) are 4-neighbours,
+  a default start phase 0 … L − 1 and a target cell that lies on its loop; targets are pairwise distinct; loops may share
+  cells (that is where stars can collide); an edit budget 1 … 20 and a tick limit 1 … 1,200 (10 s at the fixed 1/120 s
+  tick). Stars are named "star 1" … "star 5", each with a fixed shape (ring, cross, diamond,
+  triangle, square), so they are told apart without colour. Impact: FR-R02G0601-001, 013;
+  SC-R02G0601-001.
+- Q: How does a star move on a tick, exactly? → A: star i stands at tick t on loop_i[(φ_i + t − h_i(t)) mod L_i], where φ_i
+  is its start phase and h_i(t) the number of its held ticks among ticks 1 … t; a hold (star, start s, length k) holds the
+  star on ticks s … s + k − 1 (k 1 … 60, s ≥ 1, s + k − 1 ≤ tick limit); a star's holds never overlap or touch (a gap of at
+  least one tick). Positions follow from this formula alone, so the replay at any tick is computed directly and stepping
+  equals the formula. Impact: FR-R02G0601-002, 003; SC-R02G0601-003.
+- Q: What do the actions do and what do they cost? → A: `phase(star, offset)` sets a start phase (refused when equal to
+  the current one); `hold(star, start, length)` adds a hold; `release(star, start)` removes the hold that starts there. The
+  edits in use are the number of stars whose phase differs from the level's default plus the number of holds; an edit that
+  would bring them above the budget is refused (`r02-g06.budget`), and releasing or restoring a default phase lowers them.
+  Edits are allowed only at tick 0. `step(n)` advances n = 1 … 1,200 ticks, stopping at the first tick that ends the level;
+  `rewind` returns to tick 0 with the timeline kept. Stepping and rewinding spend nothing. Impact: FR-R02G0601-004;
+  SC-R02G0601-001.
+- Q: In which order are collision, win and time decided, and from which stages can the player go back? → A: after every
+  tick t ≥ 1: collision first (two stars on the same cell: failed, naming both stars and the cell), then win (every star
+  on its own target: won), then time (t equals the tick limit: failed). Undo and redo restore the exact earlier state for
+  every accepted phase, hold, release, step and rewind; a new action clears the redo stack. Undo works in playing and
+  paused; from failed, undo or rewind returns to playing (an honest retry, recorded); a won level is final and refuses
+  undo and rewind. Impact: FR-R02G0601-005, 007, 008; SC-R02G0601-002, 004.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G05-01: every accepted action appends a record
+  (schema, level seed, tick, kind, operands, previous and next fingerprints); the play fingerprint is the SHA-256 of the
+  schema, level fingerprint, tick, start phases, holds, edits in use, stage and failure (positions follow from these); the
+  timeline's own fingerprint (phases and holds) is the signed snapshot replays are compared by; levels are JSON schema 1
+  with sorted keys and a fingerprint, re-checked on decode; reason codes `r02-g06.level`, `.action`, `.stage`, `.stale`,
+  `.budget`, `.newer-schema`, `.malformed`. Impact: FR-R02G0601-006 … 011; SC-R02G0601-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -72,14 +114,16 @@ refused.
 
 ### Edge Cases
 
-- **A hold at the very end:** a hold that would run past the tick limit is refused when it is entered.
+- **A hold at the very end:** a hold that would run past the tick limit, or overlap or touch another hold of the same
+  star, is refused when it is entered.
 - **Two stars meet on targets:** stars on their own (distinct) targets never collide; two stars cannot share a target.
 - **Crossing on an edge:** two stars swapping neighbouring cells on one tick do not collide (only the same cell on the
   same tick counts), so the rule is decided from cells alone.
 - **Win and collision on the same tick:** a complete constellation has every star on a distinct target, so a collision
   and a win never coincide.
 - **Zero-time:** a level is never won at tick 0, even when the start phases already place every star on its target.
-- **Editing during a replay:** refused until the timeline is rewound to the start.
+- **Editing during a replay:** refused until the timeline is rewound to tick 0.
+- **Start phases that already collide:** nothing is judged at tick 0; the first tick decides.
 
 ## Requirements *(mandatory)*
 
@@ -115,7 +159,7 @@ refused.
 
 - **Level**: grid size, stars (loop, target), edit budget, tick limit, tutorial flag, fingerprint.
 - **Timeline**: start phase per star and the holds (star, tick, length), with the edits spent.
-- **Action**: phase (star, offset), hold (star, tick, length), release (hold), step (ticks), rewind, undo, redo.
+- **Action**: phase (star, offset), hold (star, start, length), release (star, start), step (ticks), rewind, undo, redo.
 - **Play**: stage, tick, timeline, star positions, edits spent, records, undo and redo stacks.
 
 ## Success Criteria *(mandatory)*
