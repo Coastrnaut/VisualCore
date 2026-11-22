@@ -33,7 +33,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeShaderSourceTests.swift` (version line, declared
   uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match); agent A;
   `--name host-2`
-- [ ] T-R02G0803-004 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneGeometry.swift`
+- [X] T-R02G0803-004 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneGeometry.swift` — Verified 2026-11-22: 2026-11-22: host-3 (FacetedForgeSceneGeometryTests, 9 tests) exit 0, rerun by the lead; preview rim carries rim coordinate 0; mark bars at y = -0.45 to fit the view
   (each piece from its exact faces, fan-triangulated in the kernel's corner order, edges bevelled with an inset of 0.02
   and the tier's segments; opening along the crystal-centroid-to-piece-centroid direction by 0.12, 0.2 when won, eased
   over 0.4 s of presentation time, full without easing under Reduce Motion, no move for a piece centred within 1e-9; cut

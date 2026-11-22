@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgeSceneGeometry"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgeSceneGeometry",
+  "elapsed_seconds": 3.049,
+  "exit_code": 0,
+  "finished": "2026-11-22T13:09:12+00:00",
+  "gate": "R02-G08-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-03.host-3.log",
+  "log_sha256": "d3aa3effded64175cfc83fb33bb34882a6b77992f26e61a4538276491c3680ba",
+  "name": "host-3",
+  "started": "2026-11-22T13:09:09+00:00",
+  "timed_out": false
+}
