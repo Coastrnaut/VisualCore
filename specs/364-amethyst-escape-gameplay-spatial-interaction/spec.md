@@ -57,7 +57,7 @@ towards +z (clockwise from above, the kernel's +1); the pearl is a sphere of rad
 - Q: What does isolating a layer do? → A: a double tap (two taps whose `.ended` timestamps are at most 0.35 s apart and
   22 points apart) on a shell toggles its isolation: while isolated, every other shell's wedges, fins and marks are drawn
   at shade 0.25 (darker, still opaque where they were) so the isolated shell and the pearl stand out; double-tapping the
-  isolated shell or any shell again re-isolates or clears; "Show all layers" clears; `level.next` clears. A double tap on
+  isolated shell clears it, double-tapping another shell isolates that one instead; "Show all layers" clears; `level.next` clears. A double tap on
   empty space resets the view. Isolation is presentation only: never in the digest, the snapshot or the kernel. Impact:
   FR-R02G0704-003; SC-R02G0704-003.
 - Q: What can the camera do? → A: two-finger orbit of yaw (±40° about the y axis, 90° per view width) and pitch (30° …
