@@ -72,3 +72,38 @@ directions 0 … 12, depths ascending.
   every cut, the play fingerprints, the smallest cut count with its lower bound, the near miss (one cut short, not won),
   the difficulty and the candidates skipped; decoding re-verifies and refuses damaged, newer or edited files
   (`r02-g08.witness`). The catalog digest is pinned in `FacetedForgeCatalogTests`.
+
+## Experience and renderer (feature 373, R02-G08-03)
+
+- **Adapter.** `FacetedForgeExperienceCore` opens certified level (seed mod 100) + 1 and accepts `piece.cut [piece,
+  direction, depth]` (declared 0 … 20, 0 … 12, −24 … 24; a play has at most budget + 1 pieces), `play.undo`,
+  `play.redo` and `level.next`; values out of range or fractional and kernel refusals change nothing. Each level is
+  certified once per process, directly from its certified candidate (the witness's `skipped`, pinned by a catalog test),
+  so opening a level runs the solver once. Its digest is the level number and the play fingerprint; snapshot schema 1
+  `{level, records}` restores by replay.
+- **Snapshot.** The presenter draws an immutable `FacetedForgeSceneSnapshot`: every piece's corners in world space (the
+  crystal's corner centroid subtracted, divided by its largest centroid-to-corner distance, so every crystal fits the
+  unit sphere), its faces in the kernel's corner order with a cut flag (a face whose plane is not one of the crystal's
+  half-spaces), the preview choice and the chosen piece's cross-section, stage, failure, cuts, budget, level number and
+  presentation time. The preview choice (piece, direction, depth) is presentation state of the controls: it starts at
+  piece 0, direction 0 and the middle crossing depth and is clamped to the play after every change.
+- **Scene.** Each piece is a bevelled convex solid built from its exact faces and moved away from the crystal's centre
+  towards its own centroid by 0.12 (0.2 when won), eased over 0.4 s (at once under Reduce Motion), so the crystal opens
+  like a blossom; cut faces glow amber to ruby under a lattice, original faces are ice glass; the preview is a ruby
+  polygon with a dashed rim; a sliver piece carries a cross; a row of budget bars (spent ones ruby) sits in front of the
+  crystal at y = −0.45, raised from the ground plane (y = −1.3) so the row fits the view. The camera looks from +z,
+  pitched 30° down, fitted to a bounding sphere of radius 1.45 with a 5 % margin for aspects 0.4 … 2.5.
+- **Shaders.** GLSL ES 3.00 on the shared `ShaderMeshRenderer`: the crystal program carries the material code and shade
+  in uv (on the preview, the rim coordinate) and draws translucent ice glass with fresnel and up to three faux-dispersion
+  bands moving with presentation time, incandescent cut faces with a procedural lattice and the dashed preview rim; the
+  glow program carries the colour in the normal slot. Reduce Motion holds the shimmer still; Reduce Flashing caps the
+  glow.
+- **Tiers.** level-0: 3 bevel segments, 3 dispersion layers, 2 glow shells; level-1: 2, 2, 1; level-2: 1, 1, 0. Pieces,
+  faces, the preview, marks and the camera never change between tiers; each tier change is logged with its reason. A
+  program that fails to compile draws the level-2 geometry unlit and keeps its reason. Depth testing is off on this
+  path, so pieces and their faces are emitted back to front and back faces are culled.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest ceb59042…a924c) and linked into the one
+  app; it stays unavailable until X-R02-G08. Its scenario manifest has the standard scenarios, `full-playthrough`,
+  `hero`, three fixtures and the 80 acceptance rows R2-G08-QA-001 … 080 (row r opens level (7 × (r − 1)) mod 100 + 1);
+  its scripted cuts other than certified ones are neutral cuts (the largest piece at its middle crossing depth, kept only
+  when the play stays in play), derived by playing them.

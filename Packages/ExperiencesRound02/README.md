@@ -438,3 +438,11 @@ Feature 372 (R02-G08-02) adds the content pipeline: `FacetedForgeManifest` (100 
 seeded `FacetedForgeGenerator`, `FacetedForgeSolver` (a winning sequence of exactly target pieces − 1 cuts, the lower
 bound, found with partition pruning and counted work), `FacetedForgeDifficulty`, `FacetedForgeWitness` with the 100
 witness files in `docs/games/faceted-forge/levels/` and the pinned catalog digest.
+
+Feature 373 (R02-G08-03) adds the experience: in the Core the adapter `FacetedForgeExperienceCore` (levels certified
+directly from their witnesses' candidate indices, the generator as fallback), the immutable `FacetedForgeSceneSnapshot`
+with `FacetedForgePalette`, `FacetedForgeTier` and the preview choice `FacetedForgePreviewChoice`, the geometry and CPU
+reference `FacetedForgeSceneGeometry` (pieces emitted back to front, `FacetedForgeColouredMesh` parts for the fallback),
+the GLSL sources `FacetedForgeShaders` and the scenario manifest `FacetedForgeScenarios` (`scenario-manifest.json`;
+`UPDATE_SCENARIO_MANIFEST=1` rewrites it); the iOS-only target `FacetedForgeExperience` (presenter, GL crystal scene
+with fallback, control panel) and its simulator tests. A registered candidate until X-R02-G08.

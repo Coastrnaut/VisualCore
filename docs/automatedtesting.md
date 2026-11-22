@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-02: Faceted Forge catalog certified in groups of 5, light decode for whole-catalog tests).
+Last updated: 2026-11-22 (R02-G08-03: Faceted Forge hero renderer, certified candidates instead of regeneration).
 
 ## 1. What is tested, and where
 
@@ -292,6 +292,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Two games, one tilt direction** (R02-G07-04, 2026-11-22). Amethyst Escape's gesture agent followed its brief
   (`pitch += dy`), the opposite of Chrono Constellator's orbit; the lead chose Chrono's direction so a two-finger drag
   tilts every round-two crystal and sky the same way, and the orbit test's expected values moved with it.
+- **Certify the known candidate, not the whole search** (R02-G08-03, 2026-11-22). Faceted Forge's scenario manifest
+  opens 83 levels; generating them reran every rejected candidate's solver search (up to 20,000 cut evaluations each)
+  and took about 12 s per test. The adapter now keeps each level's certified candidate index (the witness files'
+  `skipped`) and certifies only that candidate, with the generator as fallback; a catalog test in 10 parallel groups
+  pins the table against the witnesses. The manifest tests dropped to about 7 s.
+- **A kernel scan meets presentation code** (R02-G08-03, 2026-11-22). Faceted Forge's invariant test forbids `Double`
+  in every Core source; the renderer's snapshot, geometry, shaders, adapter and scenarios live in the Core too, so the
+  first baseline run (with the uncommitted snapshot present) failed. The scan now lists the presentation sources it
+  skips, and baselines run on the committed tree.
 - **Agents in isolated copies, one merged retest** (R02-G07-03, 2026-11-22). Amethyst Escape's shader, geometry and
   adapter agents each worked in their own scratchpad package (only the Core and its tests, separate scratch paths), so
   the repository stayed free for the previous gate's evidence chain; the lead merged the three into one copy and ran all
