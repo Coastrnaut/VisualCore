@@ -55,8 +55,19 @@ final class FacetedForgeMirror {
     /// The chosen direction in words.
     var directionLabel: String { "direction " + FacetedForgeDirection.all[choice.direction].name }
 
-    /// The chosen depth in words.
-    var depthLabel: String { "depth \(choice.depth)" }
+    /// The chosen depth in words, or that the plane misses the chosen piece (feature 374, T-R02G0804-013).
+    var depthLabel: String { misses ? "the plane misses this piece" : "depth \(choice.depth)" }
+
+    /// Whether no depth of the chosen direction crosses the chosen piece: the plane is not drawn and a commit sends
+    /// nothing.
+    var misses: Bool {
+        guard let play, play.pieces.indices.contains(choice.piece) else { return false }
+        for depth in FacetedForgeHalfSpace.depths
+        where play.pieces[choice.piece].isCrossed(direction: choice.direction, depth: depth) {
+            return false
+        }
+        return true
+    }
 
     /// Moves the piece pick by `delta`, wrapping; the depth moves to the middle crossing depth of the new piece.
     func pickPiece(_ delta: Int) {
@@ -321,8 +332,13 @@ final class FacetedForgePresenter: ExperiencePresenter {
         text += "\(play.cuts) of \(level.budget) cuts spent. Target: \(level.targetDescription()). "
         text += "\(play.pieces.count) " + (play.pieces.count == 1 ? "piece: " : "pieces: ")
         text += mirror.pieceNames.joined(separator: "; ") + ". "
-        text += "Next cut: piece \(choice.piece + 1), direction \(FacetedForgeDirection.all[choice.direction].name), "
-        text += "depth \(choice.depth). "
+        if mirror.misses {
+            text += "The cut plane misses piece \(choice.piece + 1) in direction "
+            text += "\(FacetedForgeDirection.all[choice.direction].name). "
+        } else {
+            text += "Next cut: piece \(choice.piece + 1), direction "
+            text += "\(FacetedForgeDirection.all[choice.direction].name), depth \(choice.depth). "
+        }
         switch play.stage {
         case .won, .result where play.failure == nil:
             text += "The pieces match the target."

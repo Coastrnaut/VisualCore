@@ -608,5 +608,44 @@ enum FacetedForgeGestureScript {
         #expect(shell.presenter.refusalLog.isEmpty)
         #expect(shell.presenter.gestures.state == .idle)
     }
+
+    /// 8. T-R02G0804-013: when no depth of the chosen direction crosses the chosen piece, the panel's depth label and
+    /// the description say the plane misses it, the snapshot has no preview and a choice that crosses reads normally.
+    @Test func aPlaneThatMissesThePieceIsNamed() async throws {
+        var found: (seed: UInt64, piece: Int, direction: Int)?
+        var seed: UInt64 = 0
+        while found == nil && seed < 30 {
+            let core: Core = try FacetedForgeTest.advanced(Core.levelNumber(forSeed: seed))
+            for piece in core.play.pieces.indices where found == nil {
+                for direction in FacetedForgeDirection.all.indices where found == nil {
+                    if FacetedForgeTest.crossingDepths(core.play.pieces[piece], direction: direction).isEmpty {
+                        found = (seed, piece, direction)
+                    }
+                }
+            }
+            seed += 1
+        }
+        let miss = try #require(found, "a piece and direction that no plane crosses within 30 levels")
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await Script.open(session, seed: miss.seed)
+        #expect(try FacetedForgeTest.advance(shell) == 1)
+        _ = try Script.drawn(shell)
+        let core: Core = try FacetedForgeTest.core(shell)
+        let digest: String = try FacetedForgeTest.digest(shell)
+        shell.presenter.mirror.choice = Choice(piece: miss.piece, direction: miss.direction, depth: 0)
+        #expect(shell.presenter.mirror.misses)
+        #expect(shell.presenter.mirror.depthLabel == "the plane misses this piece")
+        let text: String = shell.presenter.describe(core)
+        let name: String = FacetedForgeDirection.all[miss.direction].name
+        #expect(text.contains("The cut plane misses piece \(miss.piece + 1) in direction \(name)."), "\(text)")
+        #expect(!text.contains("Next cut:"), "\(text)")
+        let snapshot: FacetedForgeSceneSnapshot = core.snapshot(choice: shell.presenter.mirror.choice, time: 1)
+        #expect(snapshot.preview.isEmpty, "no plane is drawn")
+        shell.presenter.mirror.choice = Choice.initial(core.play).clamped(to: core.play)
+        #expect(!shell.presenter.mirror.misses)
+        #expect(shell.presenter.describe(core).contains("Next cut:"))
+        #expect(try FacetedForgeTest.digest(shell) == digest, "naming the miss changes nothing")
+    }
 }
 #endif

@@ -87,7 +87,7 @@ lead. MVP: Stories 1, 2, 3 and 5.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0804-013 Say when the plane misses the chosen piece per the Spec's edge case "A direction whose plane crosses
+- [X] T-R02G0804-013 Say when the plane misses the chosen piece per the Spec's edge case "A direction whose plane crosses — Verified 2026-11-22: 2026-11-22: sim-27-2 (39 tests incl. aPlaneThatMissesThePieceIsNamed) exit 0; it overlapped the chain's rendering-26 for 12 s on another simulator (rule breach noted, rendering-26 read separately)
   the chosen piece at no integer depth" (partial): in `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift`
   the mirror's depth label reads "the plane misses this piece" and the description says "The cut plane misses piece N in
   direction …" when no depth of the chosen direction crosses the chosen piece; cover it in
