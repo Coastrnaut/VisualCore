@@ -38,7 +38,9 @@ share and 4 … 26 faces), `FacetedForgePiece` (exact cut, canonical order), `Fa
 R02-F24's `PuzzleCatalog.digest(id:identities:)` and `ProgressionRule.standard` (drop at most 1, jump at most 3);
 `SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (`planning_index.py levels
 --experience R02-G08`: bands 1 … 5 × 20, move budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19). A cut with both
-halves costs about 0.13 ms in a debug host build (6,962 cuts of 50 fixture crystals in 0.89 s, 2026-11-22).
+halves costs about 0.13 ms in a debug host build (6,962 cuts of 50 fixture crystals in 0.89 s, 2026-11-22). A
+prototype of these rules (2026-11-22, debug host build) certified all 100 manifest levels in 52 s, at most 41
+candidates skipped for one level, at most 16,431 cut evaluations for one search and at most 4.5 s for one level.
 
 - Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
   table in `FacetedForgeManifest` with their provenance. Candidate k of entry n draws from
@@ -47,7 +49,8 @@ halves costs about 0.13 ms in a debug host build (6,962 cuts of 50 fixture cryst
   b = a + 1 … 3a − 2; band 4 an octahedron |x|+|y|+|z| ≤ a, a = 5 … 6, written with the four body diagonals; band 5 a
   cube a = 5 … 6 with two opposite corners cut, x+y+z ≤ b and x+y+z ≥ −b); the number of cuts c by band (2 … 3; 3 … 4;
   4 … 5; 5 … 6; 6 … 7); then c cuts, each of a drawn piece (canonical order), a drawn direction (bands 1 … 2 the axes
-  and face diagonals, bands 3 … 5 all 13) and a drawn depth among those that cross it. The target is the resulting
+  and face diagonals, bands 3 … 5 all 13) and a drawn depth among the middle half of those that cross it (the outer quarter on each
+  side is left out, so pieces stay large enough). The target is the resulting
   multiset of (share, face count); the sliver limit is 1/64 for every level. A candidate is kept when every piece's
   share is at least 1/32, bands 3 … 5 use at least one body diagonal, and the solver certifies it within its work bound;
   otherwise k grows, at most 256 candidates, then `generation(n)`. Ids `faceted-forge-NNN`; tutorial flag on levels
