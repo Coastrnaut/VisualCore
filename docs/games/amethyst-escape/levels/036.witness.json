@@ -1,0 +1,160 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    7,
+    24,
+    59,
+    122
+  ],
+  "difficulty" : {
+    "advances" : 3,
+    "explored" : 158,
+    "sectors" : 6,
+    "shells" : 3,
+    "smallest" : 5,
+    "turns" : 2
+  },
+  "digests" : [
+    "990ffd29f3eb23a1",
+    "b9376ec20e00014c",
+    "273635163e9b6060",
+    "e56b2e867c7dbefd",
+    "e56b2e867c7dbefd"
+  ],
+  "fingerprints" : [
+    "59e52f13a973f052b07fa636f64be8936863ca757ff0a08fd5c04d1bb9adc750",
+    "b9d73c275c0652a6be4023acb3b270aa42d69c18b8bfa3ec689c1414733273fb",
+    "84a366ccd3a28ebfe30d7b03b7dc48b03551cffdc75fa207959e7c361ba0bbe0",
+    "c4e5552201ad80665c77f9ce3857a25e91ec66a8bcfa68788fb5bb5959c47853",
+    "c8709d57991cdfe966b2443dc894ebcada70dbce8c20d54525902790987ab0f9",
+    "70424978ee16326eb3b48842b43ed1b7ff8e3b17f3eb77bd8fe756c46a4d3c6a"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 2,
+    "fingerprint" : "3917c6afb05f07f2f0623602562fe5cf3a3e3607efdc38f29c72b1c8d59a2235",
+    "id" : "amethyst-escape-036",
+    "schema" : 1,
+    "sectors" : 6,
+    "seed" : 13142246771046142208,
+    "shells" : [
+      {
+        "apertures" : [
+          1
+        ],
+        "blocked" : [
+          0
+        ],
+        "walls" : [
+          2
+        ]
+      },
+      {
+        "apertures" : [
+          3,
+          5
+        ],
+        "blocked" : [
+          0,
+          2
+        ],
+        "walls" : [
+          0,
+          2,
+          3
+        ]
+      },
+      {
+        "apertures" : [
+          0
+        ],
+        "blocked" : [
+          3
+        ],
+        "walls" : [
+          3,
+          5
+        ]
+      }
+    ],
+    "start" : 1,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 4,
+    "outcome" : "open"
+  },
+  "number" : 36,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 5,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 2,
+    "outcome" : "wedge"
+  }
+}

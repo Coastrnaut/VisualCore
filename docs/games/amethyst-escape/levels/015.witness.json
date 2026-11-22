@@ -1,0 +1,121 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : -1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    5,
+    17
+  ],
+  "difficulty" : {
+    "advances" : 2,
+    "explored" : 14,
+    "sectors" : 6,
+    "shells" : 2,
+    "smallest" : 3,
+    "turns" : 1
+  },
+  "digests" : [
+    "ea32e48feee6991b",
+    "32980656971b714a",
+    "32980656971b714a"
+  ],
+  "fingerprints" : [
+    "e0d9724795b0a884cd439f926462c5705519872152ec53d6fa33f62374d26a9a",
+    "f3da64562ca0d8a8a1547d793aeb8d3dc0966c35cec5be40164f2de89900b0ca",
+    "9f9ea2979bd0b16b08e88c0b805d3565c44c3f521b2488e1580827c9520052db",
+    "dd65bdb3917119bcdcbf14f0963b866f98786b605e0c971640d82290b184382b"
+  ],
+  "level" : {
+    "budget" : 11,
+    "difficulty" : 1,
+    "fingerprint" : "8e190701d1a64edccea05e4f976faa9ea29acc838aac316ce3e03139283580e0",
+    "id" : "amethyst-escape-015",
+    "schema" : 1,
+    "sectors" : 6,
+    "seed" : 2608347867268389402,
+    "shells" : [
+      {
+        "apertures" : [
+          0,
+          1
+        ],
+        "blocked" : [
+          2,
+          4,
+          5
+        ],
+        "walls" : [
+          0,
+          2
+        ]
+      },
+      {
+        "apertures" : [
+          0
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          2,
+          4
+        ]
+      }
+    ],
+    "start" : 1,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : -1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 2,
+    "outcome" : "open"
+  },
+  "number" : 15,
+  "schema" : 1,
+  "skipped" : 16,
+  "smallest" : 3,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 2,
+    "outcome" : "stuck"
+  }
+}

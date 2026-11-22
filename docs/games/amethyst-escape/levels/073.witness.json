@@ -1,0 +1,248 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    9,
+    43,
+    148,
+    397,
+    871,
+    1627,
+    2673,
+    3980
+  ],
+  "difficulty" : {
+    "advances" : 4,
+    "explored" : 5930,
+    "sectors" : 8,
+    "shells" : 4,
+    "smallest" : 9,
+    "turns" : 5
+  },
+  "digests" : [
+    "3cc2e62b236892db",
+    "a19d6d5cc25390fc",
+    "3b5ebdaad46c883e",
+    "e5e20a0e03aff281",
+    "031426a9049e3e34",
+    "f0d238e53d28a8f0",
+    "afc6e314008f70ea",
+    "e5f94e9f90d4b7d3",
+    "e5f94e9f90d4b7d3"
+  ],
+  "fingerprints" : [
+    "3912baa1f8f8e09c135b713dd4b0f1609ab37f1777625cc0797ebb87c2f67c24",
+    "86cb832326898a3f3abf4986942df042db8e5923126bcb9564ac218dd11fe245",
+    "16b71805646c5ecf1f9bf949ac2ba4ce2a00635f5a221493abd31efecdce0abb",
+    "831cd07e93797495f850edaa34d4d7b12fbdd71b31821157ebfc65e3b2250768",
+    "860199aec67d646a009a281f51135227ccb85252c85e064e465c64e0515aa182",
+    "864fcde9b20ad6b736e6fe33d17d40f991069641e79ac73461a14d27e54e1e43",
+    "e5b8194d55fe3c0efc1b466503d1f791637e115e647042165723aae82c30ee76",
+    "e2641af102e1d0dcb502f0e23453342fb33f893147dcdc05b5f5f18b8d9373f5",
+    "512a2033f17598d87d3c6a6abf5455b05d1346d4641a4732cd1c705591ab8fdf",
+    "a057306fde90e2ebd040ccaeb99389c978561a5c5d2dddd2494464b3b31d766c"
+  ],
+  "level" : {
+    "budget" : 15,
+    "difficulty" : 4,
+    "fingerprint" : "6525e03953d65a9258850a34be2871f0c12a43b5ed545fe8dd586482f7a86670",
+    "id" : "amethyst-escape-073",
+    "schema" : 1,
+    "sectors" : 8,
+    "seed" : 8140349635633501168,
+    "shells" : [
+      {
+        "apertures" : [
+          2,
+          6
+        ],
+        "blocked" : [
+          1
+        ],
+        "walls" : [
+          0,
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          6
+        ],
+        "blocked" : [
+          1,
+          5
+        ],
+        "walls" : [
+          0,
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          1,
+          7
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          0,
+          5
+        ]
+      },
+      {
+        "apertures" : [
+          6
+        ],
+        "blocked" : [
+          2
+        ],
+        "walls" : [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "start" : 2,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : -1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 8,
+    "outcome" : "open"
+  },
+  "number" : 73,
+  "schema" : 1,
+  "skipped" : 3,
+  "smallest" : 9,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 4,
+    "outcome" : "wedge"
+  }
+}

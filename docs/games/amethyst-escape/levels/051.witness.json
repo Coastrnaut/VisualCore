@@ -1,0 +1,192 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    7,
+    25,
+    66,
+    144,
+    279,
+    489
+  ],
+  "difficulty" : {
+    "advances" : 4,
+    "explored" : 804,
+    "sectors" : 8,
+    "shells" : 3,
+    "smallest" : 7,
+    "turns" : 3
+  },
+  "digests" : [
+    "bd605c45efaea915",
+    "e79f86635481f019",
+    "87cc0aaa76d43f3b",
+    "6270f48d24a7b10d",
+    "fee9b9f6ab86f792",
+    "7cd3718391c59f13",
+    "7cd3718391c59f13"
+  ],
+  "fingerprints" : [
+    "72e6ecf0bb4733bea273d00bb1b21c8f53c0c36b7d804ef682fe423a7c843d3e",
+    "e0c81a8a5881542bf1d4e3c2e01e8ab21f97ed66bc39b0f81bda0bdca04e29a4",
+    "c2ce9c73e5ef15584cafd5cdc235eb16389b7e17a6eba631d05f10ed7bc319e2",
+    "4d1377c5e0f175bb09ba79646c6ae35040ec1c2337814912fdac7c0992455108",
+    "7320c4080550a25c248396182b43ac75054b740d064cf2cab635c5046e134afd",
+    "03e28ec73cfa63327bc41e40d6e84bb663bcfaa8b1692174d3fac27695ad0f21",
+    "6fed837f93694b59672291878660737ff5a873748699c1ffaf74fc079f1277c6",
+    "f028cbb660ae162d41e18f485b6c39587c1d52c238bce4fae582c53c5dc4868a"
+  ],
+  "level" : {
+    "budget" : 15,
+    "difficulty" : 3,
+    "fingerprint" : "dc51f55e8c75598988f112a4a2511ba62519d03518c76adba085d64a763eb36b",
+    "id" : "amethyst-escape-051",
+    "schema" : 1,
+    "sectors" : 8,
+    "seed" : 16307181663944442820,
+    "shells" : [
+      {
+        "apertures" : [
+          1,
+          5
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          2,
+          3,
+          5,
+          6
+        ]
+      },
+      {
+        "apertures" : [
+          4
+        ],
+        "blocked" : [
+          1,
+          7
+        ],
+        "walls" : [
+          1,
+          3,
+          5,
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          2
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          1,
+          3
+        ]
+      }
+    ],
+    "start" : 4,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 6,
+    "outcome" : "open"
+  },
+  "number" : 51,
+  "schema" : 1,
+  "skipped" : 3,
+  "smallest" : 7,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 2,
+    "outcome" : "stuck"
+  }
+}

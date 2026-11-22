@@ -1,0 +1,269 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    9,
+    41,
+    133,
+    351,
+    799,
+    1618,
+    2980,
+    5052,
+    7926,
+    11566
+  ],
+  "difficulty" : {
+    "advances" : 5,
+    "explored" : 22576,
+    "sectors" : 10,
+    "shells" : 4,
+    "smallest" : 11,
+    "turns" : 6
+  },
+  "digests" : [
+    "d6e8432cf49cacec",
+    "a20a015671db3f97",
+    "f159098245b299f8",
+    "a35d0b2fe24da152",
+    "8ec9183059f30cec",
+    "422718ab7927fc71",
+    "338dfc4f6b2f9359",
+    "151db56b6faf58cb",
+    "6d5113ce41aa4bb4",
+    "1950f65b48e3e7d4",
+    "1950f65b48e3e7d4"
+  ],
+  "fingerprints" : [
+    "f6b4165ee82591142d80ca0fb1c325bda6b147229f65eb76e6a1d4544b2f36d0",
+    "a87c00286570f77ee44c3a2760a542bc64af4e07bc7380eefb81d6b35727d744",
+    "cee4a65b273413e1073c590006ca2fe07477e5577370fffe8c43f9b34975193b",
+    "7b842d297856060d2bdd842af573a5d047aa5dadb70d531915857b2babbda71c",
+    "3ac9eb3c07bd5a843ac3a0a16bfd6077f8270a2eba1a02c8243fbd4364db43d6",
+    "dfc1c81b863567b2369eef43cfa878f237f8947a48d7fe8a907656ec2019bbbf",
+    "4ae8c7d312b56f29e8b9926f3af3df468a24474361e5bbd70988dd191cb33a5e",
+    "47ff3379b0f649d86f889c0f8f6d005f835140cf247f4bdb74c29ec9f48bcbd1",
+    "eb2728d339dbcf088d3622ed8454cebb9ecde9af1408275e9a6f709147bb824e",
+    "3ef0eb9b2dfa8bd6c160b23b0637404c0db8c0342b7340b0f3513a650975282b",
+    "4009d945d80af8f03f885d94cc1e203358604e89b0c183fae548d6e6286f93e7",
+    "85bbf16b1aefab644a9f034779803af412fdbc2b9ff22ae99fab826b04a52679"
+  ],
+  "level" : {
+    "budget" : 17,
+    "difficulty" : 5,
+    "fingerprint" : "8105477626971ceb9760725df5296be69851861085080b1e6df47da22c756c97",
+    "id" : "amethyst-escape-081",
+    "schema" : 1,
+    "sectors" : 10,
+    "seed" : 14475656550601377944,
+    "shells" : [
+      {
+        "apertures" : [
+          0,
+          2
+        ],
+        "blocked" : [
+          1
+        ],
+        "walls" : [
+          4,
+          5
+        ]
+      },
+      {
+        "apertures" : [
+          2
+        ],
+        "blocked" : [
+          6
+        ],
+        "walls" : [
+          1,
+          3,
+          6,
+          9
+        ]
+      },
+      {
+        "apertures" : [
+          6
+        ],
+        "blocked" : [
+          2
+        ],
+        "walls" : [
+          3,
+          4,
+          7,
+          9
+        ]
+      },
+      {
+        "apertures" : [
+          6
+        ],
+        "blocked" : [
+          1,
+          5,
+          8
+        ],
+        "walls" : [
+          0,
+          2,
+          8
+        ]
+      }
+    ],
+    "start" : 9,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 10,
+    "outcome" : "open"
+  },
+  "number" : 81,
+  "schema" : 1,
+  "skipped" : 13,
+  "smallest" : 11,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 3,
+    "outcome" : "stuck"
+  }
+}

@@ -1,0 +1,242 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 3,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    9,
+    45,
+    162,
+    454,
+    1055,
+    2107,
+    3671,
+    5671
+  ],
+  "difficulty" : {
+    "advances" : 4,
+    "explored" : 10158,
+    "sectors" : 8,
+    "shells" : 4,
+    "smallest" : 9,
+    "turns" : 5
+  },
+  "digests" : [
+    "c159fe5512087928",
+    "dd51d4d5baa0ee78",
+    "e639b935ad38544c",
+    "a136dd12e0f301f7",
+    "d42df54e91149cfa",
+    "e1a09f0d540fcd69",
+    "ba1ffceccffae841",
+    "9a8276a6fc875126",
+    "9a8276a6fc875126"
+  ],
+  "fingerprints" : [
+    "9de3e52cc9d3c1dee8db7149848898454e11d1c0788f603118912a9a0664bf7b",
+    "7b7a9651608dcaf000fa795e379cd28e343d8341908e34f76abf4e0d34b30946",
+    "1cf66800f8c679ca518e6500c1754719a5a26d0fcfa15b49700da8bb5b0c1076",
+    "1e7bd4c493d302bdb2df383436b50606ae47b826b9e0e3f0b5f79037717eecc6",
+    "00dd6377d9b343775aa4e6da9711ff945335345ff185ca69f1f93d3e941bd1ad",
+    "7072e0b1097c8e6aee1afa3897c671b8738235dc927505eed5b658e72e0981fe",
+    "584e73f452e3b4463358ebfe4ae7774f24ee8d0788cd1bd5a2d06c308a988026",
+    "ebc41795f2b89039ca2a095c9fb031953a74756d35377d3791af2c41951ad659",
+    "a40e8437b93f2e3f4f38036e73ffb1a159e4e4193d50cd8c3ceebda49f8cd18b",
+    "481345712879127811902d67c57b033a84cfb0b5956aebaed432a8261c2f8398"
+  ],
+  "level" : {
+    "budget" : 17,
+    "difficulty" : 4,
+    "fingerprint" : "41d8644af154c20c6ea2179f9103a5d505107f974ddafaa0eb310fe9c44cb2d7",
+    "id" : "amethyst-escape-075",
+    "schema" : 1,
+    "sectors" : 8,
+    "seed" : 16297403286408524612,
+    "shells" : [
+      {
+        "apertures" : [
+          0,
+          3
+        ],
+        "blocked" : [
+          4,
+          5
+        ],
+        "walls" : [
+          6
+        ]
+      },
+      {
+        "apertures" : [
+          1
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          0,
+          1,
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          3,
+          4
+        ],
+        "blocked" : [
+          0,
+          5
+        ],
+        "walls" : [
+          1,
+          4
+        ]
+      },
+      {
+        "apertures" : [
+          0
+        ],
+        "blocked" : [
+          1,
+          2,
+          4
+        ],
+        "walls" : [
+          5,
+          6,
+          7
+        ]
+      }
+    ],
+    "start" : 3,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 3,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 8,
+    "outcome" : "open"
+  },
+  "number" : 75,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 9,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 3,
+    "outcome" : "stuck"
+  }
+}

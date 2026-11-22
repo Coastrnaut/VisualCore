@@ -1,0 +1,115 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    5,
+    16
+  ],
+  "difficulty" : {
+    "advances" : 2,
+    "explored" : 10,
+    "sectors" : 6,
+    "shells" : 2,
+    "smallest" : 3,
+    "turns" : 1
+  },
+  "digests" : [
+    "10d4b343fa8b869c",
+    "ea4e790442c609d5",
+    "ea4e790442c609d5"
+  ],
+  "fingerprints" : [
+    "a331ebf821fa81e14dd0b1776319faec6c74777845d0ddb3ee993ef7d9a2dcfe",
+    "dbd52431eef258e3bab35f0dc5170f46eb78a851fa1b6e8308a9aa08df664c59",
+    "1a8fa3e707a317cfa3b43f57dec4b2de1b56be4b10afa516c2df9f0c926f0269",
+    "909db3e11f65dd110814985ef6bd87c9874c22f633afbe6f678fbe2e3994d779"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 1,
+    "fingerprint" : "0a6b2a3b4df48ea09ff4928b5929e976b99415001e0dfc4fa102e39dfce47bd5",
+    "id" : "amethyst-escape-002",
+    "schema" : 1,
+    "sectors" : 6,
+    "seed" : 13718784806217006347,
+    "shells" : [
+      {
+        "apertures" : [
+          2,
+          3
+        ],
+        "blocked" : [
+          5
+        ],
+        "walls" : [
+          1,
+          2
+        ]
+      },
+      {
+        "apertures" : [
+          3
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          1,
+          2,
+          3
+        ]
+      }
+    ],
+    "start" : 2,
+    "tutorial" : true
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 2,
+    "outcome" : "open"
+  },
+  "number" : 2,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 3,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 1,
+    "outcome" : "stuck"
+  }
+}

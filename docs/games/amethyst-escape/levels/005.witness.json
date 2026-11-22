@@ -1,0 +1,120 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    5,
+    16
+  ],
+  "difficulty" : {
+    "advances" : 2,
+    "explored" : 10,
+    "sectors" : 6,
+    "shells" : 2,
+    "smallest" : 3,
+    "turns" : 1
+  },
+  "digests" : [
+    "85c3f04c506cc9d7",
+    "01cf53229704f2af",
+    "01cf53229704f2af"
+  ],
+  "fingerprints" : [
+    "8cd118f79064bc9fc161b14431f190d6264514936a2d2fb5168fd6fa8aae0f35",
+    "63e216fae6f444a6740752628dd7c19d581700662aa0eef64c6cc8eacdf128fe",
+    "5867ad5dbd778dbee0fcb4e01795a47236ac6b461ec66fb16efbfa4c6965d069",
+    "b864111b721c90472f4ff3004c69e1fd68773ea78248164b1c8eac91618f53ba"
+  ],
+  "level" : {
+    "budget" : 9,
+    "difficulty" : 1,
+    "fingerprint" : "f0af7d78dc1188aa78b007daea1d6acf347f92fe544d0105845a3a740887b751",
+    "id" : "amethyst-escape-005",
+    "schema" : 1,
+    "sectors" : 6,
+    "seed" : 16552555566511748503,
+    "shells" : [
+      {
+        "apertures" : [
+          0,
+          5
+        ],
+        "blocked" : [
+          1,
+          2,
+          3,
+          4
+        ],
+        "walls" : [
+          1,
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "apertures" : [
+          0
+        ],
+        "blocked" : [
+          3
+        ],
+        "walls" : [
+          0,
+          3,
+          5
+        ]
+      }
+    ],
+    "start" : 5,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 2,
+    "outcome" : "open"
+  },
+  "number" : 5,
+  "schema" : 1,
+  "skipped" : 5,
+  "smallest" : 3,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 1,
+    "outcome" : "stuck"
+  }
+}

@@ -1,0 +1,231 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    9,
+    42,
+    140,
+    372,
+    834,
+    1624,
+    2787,
+    4273
+  ],
+  "difficulty" : {
+    "advances" : 4,
+    "explored" : 6679,
+    "sectors" : 8,
+    "shells" : 4,
+    "smallest" : 9,
+    "turns" : 5
+  },
+  "digests" : [
+    "0364ee999c8094b8",
+    "6d0ddf176aa5411a",
+    "d45146f19548d710",
+    "d7673e8cd0bdfdff",
+    "b3b0054bd8c38f51",
+    "198702bba7c4b407",
+    "047fba98a7f1dc43",
+    "20b56deab06b6771",
+    "20b56deab06b6771"
+  ],
+  "fingerprints" : [
+    "7bee8313e9f07c15f5fbba74c44fa3df10d7fb2f1f8915832a8b80d85d2a5da1",
+    "ae28d6d5c1a16b63d29c00d2591fae8f2ef6e0c5db7f3fa7589d29aa95801239",
+    "0f11e9d4e68804c53b1fc9ccd4a093293fef3d8078cbe1e6cbb1413ffe95ef1b",
+    "3f5dbc009cf25de2beddf216607e0684d9060c1283dee094ed506b7dbdd9ae1e",
+    "aa2c7a95bbfb6fa4ec0bcf4c5d9e205c2fe10bc0e86b8cd3c73c81ed91b775e8",
+    "b76d114662b537678085febdcb3885603dc0f0243088b2a2eb57c93bc5123c99",
+    "06dc2234c81e635a4fdcbe0ee25cd832d0df62c06afa96a6ad16b40447ae7412",
+    "af78633ae4c9c47dff4607edcb1f2d8ee6f9cbb308c0a73542b6236a78848f85",
+    "1abe8a8a3e3892e85c597e0fb88b779a718f681cc8cc2b4c6f870aa53f7dcb19",
+    "d681f491ed28ea7dde29a41e68f5e4c801914aa6c1903db9ebb2fa9c3b0efe8a"
+  ],
+  "level" : {
+    "budget" : 15,
+    "difficulty" : 4,
+    "fingerprint" : "b28a9618e1de1651ee54ca9ef8482541bd18dedbe9e71d09399107caa3afbad8",
+    "id" : "amethyst-escape-077",
+    "schema" : 1,
+    "sectors" : 8,
+    "seed" : 9087128143268447240,
+    "shells" : [
+      {
+        "apertures" : [
+          3,
+          6
+        ],
+        "blocked" : [
+          0
+        ],
+        "walls" : [
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          5
+        ],
+        "blocked" : [
+          4,
+          6
+        ],
+        "walls" : [
+          1,
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          0,
+          1
+        ],
+        "blocked" : [
+          5,
+          6,
+          7
+        ],
+        "walls" : [
+          1
+        ]
+      },
+      {
+        "apertures" : [
+          6
+        ],
+        "blocked" : [
+          4
+        ],
+        "walls" : [
+          2,
+          5
+        ]
+      }
+    ],
+    "start" : 3,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : -1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 8,
+    "outcome" : "open"
+  },
+  "number" : 77,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 9,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 2,
+    "outcome" : "wedge"
+  }
+}

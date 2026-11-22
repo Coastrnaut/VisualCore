@@ -1,0 +1,247 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    9,
+    45,
+    164,
+    471,
+    1124,
+    2297,
+    4108,
+    6527
+  ],
+  "difficulty" : {
+    "advances" : 4,
+    "explored" : 13552,
+    "sectors" : 8,
+    "shells" : 4,
+    "smallest" : 9,
+    "turns" : 5
+  },
+  "digests" : [
+    "64729fd469d3c23b",
+    "6f3c1f6e47eaf2f3",
+    "75ef1642d61a92d1",
+    "7da155d590bd7161",
+    "3200c168df4342d4",
+    "cad8e98288c8d61a",
+    "5ae1cc4f84294a33",
+    "e86231cd4fe0d685",
+    "e86231cd4fe0d685"
+  ],
+  "fingerprints" : [
+    "df12722408a389a453ab95c7d36800d1d7f94fc30df0596f78c9ea33a981a8e4",
+    "eb4e3672fb2f88b0567955f330c72805fee3f92f36338076cd46feb57adb95c5",
+    "1f8d1d8c36f2db417ad51ad680156e8f4e61f407ab43bbea2f8b65e0d3c0e4f4",
+    "2f17b7665827c7bb0004ed9cb8ce82784cb187f1df3f9167b4ed8b746d036695",
+    "438a2a8e099637fd48d70ddb22d21c0b12748314c9c99bb9224f44ef3e931907",
+    "4b60460790261536e4b666a71e433d2d2ad1ba47bf45b430c8213ea28d4762b3",
+    "164f4c426696664054c3fe3c3192bc16323fb7c9c8a68bc482437110665d9f5b",
+    "51f39ea1119d9766d394be1b78d964edceab88bae7be9ab42f148502364c43ad",
+    "76e76758ef052e116073952e11cb6260d63b30471a7584bf978c7b3f63e6cce1",
+    "c6c2f0506364508374b2305219bdcdddfbc4f118862bfcb5a7167731ab893973"
+  ],
+  "level" : {
+    "budget" : 15,
+    "difficulty" : 4,
+    "fingerprint" : "144b48b6b93c553e70fcb7f638e58e67adbb355652273071b925a9b2b1707dc6",
+    "id" : "amethyst-escape-065",
+    "schema" : 1,
+    "sectors" : 8,
+    "seed" : 6419708800677920816,
+    "shells" : [
+      {
+        "apertures" : [
+          1,
+          5
+        ],
+        "blocked" : [
+          3,
+          6,
+          7
+        ],
+        "walls" : [
+          0,
+          1,
+          2,
+          5
+        ]
+      },
+      {
+        "apertures" : [
+          0,
+          7
+        ],
+        "blocked" : [
+          6
+        ],
+        "walls" : [
+          0,
+          3,
+          6,
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          5,
+          6
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          0,
+          2,
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          3
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6
+        ]
+      }
+    ],
+    "start" : 1,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : -1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 8,
+    "outcome" : "open"
+  },
+  "number" : 65,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 9,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 3,
+    "outcome" : "stuck"
+  }
+}

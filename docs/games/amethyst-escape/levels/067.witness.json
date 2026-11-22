@@ -1,0 +1,243 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : -1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    9,
+    45,
+    159,
+    426,
+    938,
+    1789,
+    3060,
+    4834
+  ],
+  "difficulty" : {
+    "advances" : 4,
+    "explored" : 8531,
+    "sectors" : 8,
+    "shells" : 4,
+    "smallest" : 9,
+    "turns" : 5
+  },
+  "digests" : [
+    "a804098659426be8",
+    "f73f9b81fff003d9",
+    "a5eebbbcfb71a8f5",
+    "f876ef5d1edbed40",
+    "53c08ec8089ab279",
+    "adacfcae8586db87",
+    "f2bc7be26ad334d6",
+    "47f7b9adb5e97de2",
+    "47f7b9adb5e97de2"
+  ],
+  "fingerprints" : [
+    "057da11ad9b2f65433ad87530abb7b71b7d44045d37912a009789abb197edcf2",
+    "e74f2a3fcd24f057868aa535ee8a58b492ae31808bfee12becd29b2fb03fd7fd",
+    "b290a555440e335ed6793f787725d54a63a8226bc38188ae47e1e6b852e926aa",
+    "5fa47c8302e9ce28ab13019342b99f92695a4aad8442a1100d37ca5ed713e40c",
+    "5f92021178d89667aedb3ce9165e9b33962847a5c337a2ecc1781ca203ad66e7",
+    "7282f8102b0914b33a54b9c796a56e3a893d86ebc9a45b43151db7cf43dade76",
+    "1a07e54f7d8a43c7cb3467a0e88be66166d86d584f77b1bfed61080423d82bfc",
+    "0ebc83ae833b043062016cfa39a1e164dd1d8d917fcd9a97b25512403ace132e",
+    "ae674af5142541d2fd8f9370e704774488d72c466756725932f8600b14767e53",
+    "8bd305263458c623386e48c4955ba69948e4c0a45842847bdf7e20dd5a80d1e5"
+  ],
+  "level" : {
+    "budget" : 17,
+    "difficulty" : 4,
+    "fingerprint" : "3d1590674162add64026a011fe59ad1733fd51894aeee85fe672b26477d74c76",
+    "id" : "amethyst-escape-067",
+    "schema" : 1,
+    "sectors" : 8,
+    "seed" : 10097160486590398002,
+    "shells" : [
+      {
+        "apertures" : [
+          2,
+          6
+        ],
+        "blocked" : [
+          1
+        ],
+        "walls" : [
+          2,
+          3
+        ]
+      },
+      {
+        "apertures" : [
+          0,
+          2
+        ],
+        "blocked" : [
+          1,
+          3,
+          4
+        ],
+        "walls" : [
+          3
+        ]
+      },
+      {
+        "apertures" : [
+          4,
+          6
+        ],
+        "blocked" : [
+          0,
+          5
+        ],
+        "walls" : [
+          0,
+          1,
+          3
+        ]
+      },
+      {
+        "apertures" : [
+          3
+        ],
+        "blocked" : [
+          7
+        ],
+        "walls" : [
+          5
+        ]
+      }
+    ],
+    "start" : 6,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : -1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 1,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : -1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 8,
+    "outcome" : "open"
+  },
+  "number" : 67,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 9,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 4,
+    "outcome" : "wedge"
+  }
+}

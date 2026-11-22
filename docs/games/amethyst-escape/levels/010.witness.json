@@ -1,0 +1,132 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    4,
+    10,
+    19
+  ],
+  "difficulty" : {
+    "advances" : 2,
+    "explored" : 19,
+    "sectors" : 6,
+    "shells" : 2,
+    "smallest" : 4,
+    "turns" : 2
+  },
+  "digests" : [
+    "85c3f04c506cc9d7",
+    "90d855ccaac73702",
+    "5dd2600ce3ce45ee",
+    "5dd2600ce3ce45ee"
+  ],
+  "fingerprints" : [
+    "82049c14329f3718566d82cc86a1c4b7271810625f7d84929ec3933ea32207b3",
+    "830aea9f52e613cc13c36428288bd4a488d5a8dfc4c35236179864691150a6ad",
+    "6eabcbd8768fc61d5726b3cc7c55be69cecbddf203f85135f8877b2af48e269a",
+    "6e8059b74099b7a1236fcc133a219d8eb68909f3f27f8beb7ccfc85c2f0e66bf",
+    "874e5b56829a8d88e13ac91a7178de464dba35b62cb600b2ea6261345e58f77b"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 1,
+    "fingerprint" : "1476de01115b3d7556d1206e5792a9f8ea465db451dcd206ba1eaf550e0fe416",
+    "id" : "amethyst-escape-010",
+    "schema" : 1,
+    "sectors" : 6,
+    "seed" : 4436654630602198649,
+    "shells" : [
+      {
+        "apertures" : [
+          5
+        ],
+        "blocked" : [
+          0,
+          1
+        ],
+        "walls" : [
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "apertures" : [
+          1
+        ],
+        "blocked" : [
+          3,
+          4,
+          5
+        ],
+        "walls" : [
+          0,
+          2
+        ]
+      }
+    ],
+    "start" : 5,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 3,
+    "outcome" : "open"
+  },
+  "number" : 10,
+  "schema" : 1,
+  "skipped" : 4,
+  "smallest" : 4,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 1,
+    "outcome" : "wedge"
+  }
+}

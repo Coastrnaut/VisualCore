@@ -1,0 +1,283 @@
+{
+  "actions" : [
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "rotate" : {
+        "_0" : 2,
+        "_1" : 1
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    },
+    {
+      "advance" : {
+
+      }
+    }
+  ],
+  "depths" : [
+    1,
+    9,
+    41,
+    129,
+    321,
+    678,
+    1265,
+    2172,
+    3540
+  ],
+  "difficulty" : {
+    "advances" : 6,
+    "explored" : 5286,
+    "sectors" : 8,
+    "shells" : 4,
+    "smallest" : 9,
+    "turns" : 3
+  },
+  "digests" : [
+    "c4c82325d675c3d5",
+    "f159098245b299f8",
+    "9d6def19ff00051b",
+    "a7f4e615c9cdcac5",
+    "7cf585a1f811db74",
+    "085be18810e1be74",
+    "63606a6df1c6a3ad",
+    "4f82b37270e28b52",
+    "4f82b37270e28b52"
+  ],
+  "fingerprints" : [
+    "d3f6566b347f95cd4f01d374f9c58479d74e27328bdb5ee3d308494afbfe7e3b",
+    "cbd5b2c6e0a3ee8197312bd26966bdbd0a2f7fc398ed48c4004ffe57113a0973",
+    "24850876cd7e19ded4077042b3b2db73405d4c5e7f7505a1e352c2bf954101ad",
+    "cc748508ea1492c96cc89f2099fbe82c4a6d059851c23a5f2360ce4b1e47295e",
+    "d8f3954913c087eb6f266111488bc97c0e0539be26942b576a17259af9571613",
+    "b17146bc65c67510aeb844ea23520bc876a97ab6d66f92718e2d878c45311010",
+    "0223c1f050372e95d5ce9a46e0134db5c640292c1fd5ecadafc7130cea2f7c89",
+    "9968866218845384b6be06ce96a213f20fb4ecbe102463317b69bff39d950398",
+    "7fe0703d8425672e4f0160ece70bf9f1e2856a78213ff5dcae903a921c8e2c59",
+    "e795acd32d5d18a89f3a61ca5f787455809a87857f9c885cf856a4fe7c299afd"
+  ],
+  "level" : {
+    "budget" : 16,
+    "difficulty" : 4,
+    "fingerprint" : "bb554c7c84e7186a00093d2577d352b9fee16d914d73876b30ed1cc034d056f4",
+    "id" : "amethyst-escape-078",
+    "schema" : 1,
+    "sectors" : 8,
+    "seed" : 4066272464572407415,
+    "shells" : [
+      {
+        "apertures" : [
+          2
+        ],
+        "blocked" : [
+          3,
+          4
+        ],
+        "walls" : [
+          5
+        ]
+      },
+      {
+        "apertures" : [
+          4,
+          7
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          0,
+          4,
+          6,
+          7
+        ]
+      },
+      {
+        "apertures" : [
+          3,
+          7
+        ],
+        "blocked" : [
+
+        ],
+        "walls" : [
+          0,
+          2
+        ]
+      },
+      {
+        "apertures" : [
+          4
+        ],
+        "blocked" : [
+          1,
+          2,
+          3,
+          5
+        ],
+        "walls" : [
+          1,
+          3,
+          5,
+          6
+        ]
+      }
+    ],
+    "start" : 0,
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 0,
+          "_1" : 1
+        }
+      },
+      {
+        "rotate" : {
+          "_0" : 2,
+          "_1" : 1
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 8,
+    "outcome" : "open"
+  },
+  "number" : 78,
+  "schema" : 1,
+  "skipped" : 6,
+  "smallest" : 9,
+  "unedited" : {
+    "actions" : [
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      },
+      {
+        "advance" : {
+
+        }
+      }
+    ],
+    "move" : 12,
+    "outcome" : "wedge"
+  }
+}

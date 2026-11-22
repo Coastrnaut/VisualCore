@@ -56,7 +56,7 @@ logic); no GLSL in this feature.
   `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeWitnessTests.swift` (round trip byte for byte; edited
   actions, digests, fingerprints, level, counterexamples and difficulty refused; newer schema and damaged JSON refused; the
   counterexamples behave as recorded) by agent B; `--name host-4`
-- [ ] T-R02G0702-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeCatalogTests.swift`
+- [X] T-R02G0702-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeCatalogTests.swift` — Verified 2026-11-22: host-5 exit=0 (AmethystEscapeCatalogTests: 100 entries, pinned digest e65c4529…, progression, all witnesses win, independent search on 1, 11, … 91, 100 files byte for byte)
   (100 entries, 20 per band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on
   the smallest count; band means never fall; on levels 1, 11, 21, … 91 the solver equals the brute force (SC-R02G0702-002);
   all 100 witnesses replay to a win; each witness equals `docs/games/amethyst-escape/levels/NNN.witness.json` byte for byte,
