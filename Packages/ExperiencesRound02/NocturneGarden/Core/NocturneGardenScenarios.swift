@@ -30,6 +30,8 @@
 // rejection also refuses the progression controls' wrong value counts (`level.select`, `mode.daily`, `mode.practice`,
 // `mode.campaign`, `tutorial.dismiss`); the manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`).
 #if DEBUG || VISUALCORE_AUTOMATION
+// Feature 387 (R02-G09-07) T-R02G0907-003: the digests are schema 3's ("…v3": the same parts with traced results), the
+// controls gain replay and the sound setting; the manifest was regenerated.
 import Foundation
 import VisualCoreExperience
 

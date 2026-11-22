@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G0907-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenExperienceCore.swift` (schema 3, migration 2 → 3
+- [X] T-R02G0907-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenExperienceCore.swift` (schema 3, migration 2 → 3 — Verified 2026-11-22: host-2 (swift test --filter NocturneGarden: schema 3, migrations 1 to 3 and 2 to 3 incl. engine envelopes, reconciliation on restore, replay rules and codes, sound setting not digested, replay refusal words and a replayed win without stars, campaign results carry verified traces; regenerated manifest) exit 0, lead retest; the replay mode's switches in the panel, presenter and feedback plan extended
   "results with an empty trace and verified false, sound off", digest v3; a campaign or daily win records the winning
   effective-move trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start
   [1…100]" (`r02-g09.no-replay` without a verified traced result), "replay.step" (`r02-g09.replay-end` after the last

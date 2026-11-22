@@ -90,8 +90,16 @@ public struct NocturneGardenFeedbackPlan: Sendable, Equatable {
     /// (`r02-g09.date`), "That move is not possible here." (`r02-g09.action`), "No bloom of that kind is left."
     /// (`r02-g09.supply`), "That changes nothing." (`r02-g09.noop`), "The level has ended." (`r02-g09.stage`),
     /// "That value must be a whole number." (`r02-g09.not-whole`), otherwise (`r02-g09.stale`, `r02-g09.malformed`,
-    /// the engine's own codes such as `action.out-of-range`) "That move was refused.".
+    /// the engine's own codes such as `action.out-of-range`) "That move was refused."; feature 387 adds "There is no
+    /// saved solution to replay for this level." (`r02-g09.no-replay`), "The replay is over." (`r02-g09.replay-end`)
+    /// and "Stop the replay first." (`r02-g09.replay`).
     public static func refusalText(code: String) -> String {
+        // Feature 387: the replay codes; `no-replay` and `replay-end` first, since both contain `r02-g09.replay`.
+        if code.contains(NocturneGardenExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        if code.contains(NocturneGardenExperienceRule.replayEnd) { return "The replay is over." }
+        if code.contains(NocturneGardenExperienceRule.replay) { return "Stop the replay first." }
         if code.contains(NocturneGardenExperienceRule.locked) { return "That level is not open yet." }
         if code.contains(NocturneGardenExperienceRule.date) { return "That date cannot be used." }
         if code.contains(NocturneGardenError.action("").reasonCode) { return "That move is not possible here." }
@@ -128,6 +136,7 @@ public struct NocturneGardenFeedbackPlan: Sendable, Equatable {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 

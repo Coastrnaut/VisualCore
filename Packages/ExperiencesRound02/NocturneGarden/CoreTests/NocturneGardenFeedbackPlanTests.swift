@@ -273,4 +273,53 @@ import VisualCoreSimulation
         let plan: Plan = Plan.hint(text: hint.text)
         #expect(plan.text == hint.text && plan.kind == .state && plan.haptic == nil)
     }
+
+    /// Feature 387 (clarification Q4): the replay refusals in words (raw and prefixed codes), the replay mode's name,
+    /// and a replayed win that claims no stars; a replay step is announced like the move it plays.
+    @Test func replayWordsAndAReplayedWin() throws {
+        let words: [(code: String, text: String)] = [
+            (code: "r02-g09.no-replay", text: "There is no saved solution to replay for this level."),
+            (code: "r02-g09.replay-end", text: "The replay is over."),
+            (code: "r02-g09.replay", text: "Stop the replay first."),
+        ]
+        for entry in words {
+            #expect(Plan.refusalText(code: entry.code) == entry.text)
+            #expect(Plan.refusalText(code: "action.rule." + entry.code) == entry.text)
+            let plan: Plan = Plan.refused(code: entry.code)
+            #expect(plan.kind == .rejection && plan.haptic == .error && plan.text == entry.text)
+        }
+        #expect(Plan.modeName(.replay(level: 4)) == "replay")
+        let actions: [NocturneGardenAction] = try Core.generated(number: 1).solution.actions
+        var core: Core = try Core.opening(number: 1)
+        for action in actions { #expect(core.apply(Self.replayAct(action)) == .accepted) }
+        #expect(core.apply(ExperienceAction(control: "replay.start", values: [1], step: 0)) == .accepted)
+        var last: Plan = .none
+        for _ in actions {
+            let before: Core = core
+            #expect(core.apply(ExperienceAction(control: "replay.step", values: [], step: 0)) == .accepted)
+            last = Plan.after(old: before, new: core)
+        }
+        let text: String = try #require(last.text)
+        #expect(last.kind == .outcome && last.haptic == .success)
+        #expect(text.hasPrefix("The shadow matches the target.") && !text.contains("stars"), "\(text)")
+    }
+
+    /// The experience action that issues kernel move `action`.
+    static func replayAct(_ action: NocturneGardenAction) -> ExperienceAction {
+        switch action {
+        case let .plant(kind, column, row, size):
+            ExperienceAction(control: "bloom.plant", values: [Double(kind.order), Double(column), Double(row),
+                                                              Double(size)], step: 0)
+        case let .move(bloom, column, row):
+            ExperienceAction(control: "bloom.move", values: [Double(bloom), Double(column), Double(row)], step: 0)
+        case let .resize(bloom, size):
+            ExperienceAction(control: "bloom.resize", values: [Double(bloom), Double(size)], step: 0)
+        case let .remove(bloom):
+            ExperienceAction(control: "bloom.remove", values: [Double(bloom)], step: 0)
+        case let .sun(elevation):
+            ExperienceAction(control: "sun.set", values: [Double(elevation)], step: 0)
+        default:
+            ExperienceAction(control: "play.undo", values: [], step: 0)
+        }
+    }
 }

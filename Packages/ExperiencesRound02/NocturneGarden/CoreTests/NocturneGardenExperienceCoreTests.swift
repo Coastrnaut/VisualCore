@@ -118,13 +118,15 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g09.nocturne-garden" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g09.nocturne-garden.v2")
+        #expect(Core.experienceID == "r02-g09.nocturne-garden" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g09.nocturne-garden.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["bloom.plant", "bloom.move", "bloom.resize", "bloom.remove", "sun.set", "play.undo",
                              "play.redo", "level.next", "level.select", "mode.daily", "mode.practice",
-                             "mode.campaign", "tutorial.dismiss"]
+                             "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step", "replay.stop",
+                             "settings.sound"]
         #expect(Core.actionIDs == ids)
+        #expect(Core.controls[13].ranges == [1...100] && Core.controls[16].ranges == [0...1])
         #expect(Core.controls[0].ranges == [0...5, 0...31, 0...23, 1...3])
         #expect(Core.controls[1].ranges == [0...11, 0...31, 0...23])
         #expect(Core.controls[2].ranges == [0...11, 1...3])
@@ -132,11 +134,11 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(Core.controls[4].ranges == [1...4])
         #expect(Core.controls[8].ranges == [1...100])
         #expect(Core.controls[9].ranges == [1...9_999, 1...12, 1...31])
-        let plainIndices: [Int] = [5, 6, 7, 10, 11, 12]
+        let plainIndices: [Int] = [5, 6, 7, 10, 11, 12, 14, 15]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         for kind in NocturneGardenKind.allCases { #expect(Core.kind(kind.order) == kind) }
         #expect(Core.kind(-1) == nil && Core.kind(6) == nil)
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 3)
         #expect(Core.practiceBudget == 40 && Core.practiceBudget == NocturneGardenMode.practiceBudget)
         #expect(NocturneGardenExperienceRule.locked == "r02-g09.locked")
         #expect(NocturneGardenExperienceRule.date == "r02-g09.date")
@@ -471,8 +473,15 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         return NocturneGardenProgress.movesMade(core.play)
     }
 
+    /// Whether `result` has `movesMade` and `stars` and is verified with a non-empty trace (feature 387: a campaign win
+    /// records its winning trace).
+    static func isVerified(_ result: NocturneGardenProgress.Result?, movesMade: Int, stars: Int) -> Bool {
+        guard let result else { return false }
+        return result.movesMade == movesMade && result.stars == stars && result.verified && !result.trace.isEmpty
+    }
+
     /// Feature 385 (clarification Q3): a campaign win records the moves made (undone moves included) and its stars,
-    /// keeps the better result and opens the next level.
+    /// keeps the better result and opens the next level; since feature 387 with its verified trace.
     @Test func aCampaignWinRecordsStarsByMovesMade() throws {
         let first: NocturneGardenGenerated = try Core.generated(number: 1)
         let second: NocturneGardenGenerated = try Core.generated(number: 2)
@@ -482,7 +491,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         // Two detours: smallest + 2 moves made, 2 stars; level 2 opens.
         let twoDetours: Int = Self.win(&core, actions: first.solution.actions, detours: 2)
         #expect(twoDetours == smallest + 2 && core.play.moves == smallest)
-        #expect(core.progress.solved[1] == NocturneGardenProgress.Result(movesMade: smallest + 2, stars: 2))
+        #expect(Self.isVerified(core.progress.solved[1], movesMade: smallest + 2, stars: 2))
         #expect(core.progress.frontier == 2 && core.outcome?.code == Core.wonCode)
         #expect(core.apply(Self.act("level.next")) == .accepted)
         #expect(core.levelNumber == 2 && core.mode == .campaign && core.play.records.isEmpty)
@@ -490,17 +499,17 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         let noDetour: Int = Self.win(&core, actions: first.solution.actions, detours: 0)
         #expect(noDetour == smallest)
-        #expect(core.progress.solved[1] == NocturneGardenProgress.Result(movesMade: smallest, stars: 3))
+        #expect(Self.isVerified(core.progress.solved[1], movesMade: smallest, stars: 3))
         // A worse result (three detours, 1 star) keeps it.
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         let threeDetours: Int = Self.win(&core, actions: first.solution.actions, detours: 3)
         #expect(threeDetours == smallest + 3)
-        #expect(core.progress.solved[1] == NocturneGardenProgress.Result(movesMade: smallest, stars: 3))
+        #expect(Self.isVerified(core.progress.solved[1], movesMade: smallest, stars: 3))
         #expect(core.progress.frontier == 2)
         // Level 2 with three detours: 1 star; level 3 opens.
         #expect(core.apply(Self.act("level.next")) == .accepted)
         let secondMoves: Int = Self.win(&core, actions: second.solution.actions, detours: 3)
-        #expect(core.progress.solved[2] == NocturneGardenProgress.Result(movesMade: secondMoves, stars: 1))
+        #expect(Self.isVerified(core.progress.solved[2], movesMade: secondMoves, stars: 1))
         #expect(secondMoves == second.solution.smallest + 3 && core.progress.frontier == 3)
     }
 
@@ -654,7 +663,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(throws: NocturneGardenRestoreRefusal.damaged) {
             try Core.migratedToSchemaTwo(["level": 7])
         }
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
     }
 
     /// Feature 385: an engine restores a schema-1 envelope through the migration chain.
@@ -825,14 +834,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(engine.handle(control: "sun.set", values: [Double(target)]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -884,5 +893,190 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         }
         core.shedCaches()
         #expect(try Self.digest(core) == digest && core == before)
+    }
+
+    /// Feature 387: a won campaign play records its effective moves as a verified result (an undone detour left out but
+    /// counted in the moves made); replay plays the trace move by move, refuses other play actions, ends with replay-end
+    /// and never changes progress; stop returns to campaign.
+    @Test func replayPlaysTheStoredTraceAndChangesNothing() throws {
+        var core: Core = try Core.opening(number: 1)
+        let certified: NocturneGardenGenerated = try Core.generated(number: 1)
+        let actions: [NocturneGardenAction] = certified.solution.actions
+        #expect(core.apply(Self.act("replay.start", [1])) == .rejected(.rule(code: "r02-g09.no-replay")))
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: "r02-g09.no-replay")))
+        #expect(core.apply(Self.act("replay.stop")) == .rejected(.rule(code: "r02-g09.no-replay")))
+        // A detour that is undone stays out of the trace but counts as a move made.
+        #expect(core.apply(Self.act(actions[0])) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for action in actions { #expect(core.apply(Self.act(action)) == .accepted) }
+        #expect(core.play.stage == .won)
+        let result: NocturneGardenProgress.Result = try #require(core.progress.solved[1])
+        #expect(result.verified && result.trace == actions && result.movesMade == actions.count + 1)
+        let progress: NocturneGardenProgress = core.progress
+        #expect(core.apply(Self.act("replay.start", [2])) == .rejected(.rule(code: "r02-g09.no-replay")))
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.tutorial == .done && core.play.records.isEmpty)
+        let refusedControls: [String] = ["bloom.plant", "bloom.move", "bloom.resize", "bloom.remove", "sun.set",
+                                         "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
+                                         "mode.practice", "mode.campaign"]
+        let refusedValues: [[Double]] = [[0, 0, 0, 1], [0, 0, 0], [0, 1], [0], [1], [], [], [], [1], [2026, 11, 22],
+                                         [], []]
+        for index in refusedControls.indices {
+            let before: Core = core
+            #expect(core.apply(Self.act(refusedControls[index], refusedValues[index]))
+                == .rejected(.rule(code: "r02-g09.replay")), "\(refusedControls[index])")
+            #expect(core == before)
+        }
+        #expect(core.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted)
+        var reference: NocturneGardenPlay = try Core.freshPlay(of: certified.level)
+        for action in actions {
+            #expect(core.apply(Self.act("replay.step")) == .accepted)
+            try reference.apply(action, expecting: reference.fingerprint)
+            #expect(core.play.fingerprint == reference.fingerprint)
+        }
+        #expect(core.play.stage == .won && core.progress == progress)
+        #expect(core.outcome == ExperienceOutcome(code: Core.wonCode))
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: "r02-g09.replay-end")))
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: "r02-g09.replay-end")))
+        // A saved replay round-trips.
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(restored == core && restored.reconciliationDropped == 0)
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.soundOn && core.progress == progress)
+        #expect(core.play.records.isEmpty)
+        #expect(core.apply(Self.act("replay.stop")) == .rejected(.rule(code: "r02-g09.no-replay")))
+        // A replay stopped before its end returns to campaign with the progress unchanged.
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.apply(Self.act("replay.step")) == .accepted)
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.progress == progress)
+    }
+
+    /// Feature 387: the sound choice is snapshotted and in `==`, never in the digest; reset turns it off.
+    @Test func theSoundChoiceIsSavedButNotDigested() throws {
+        var core: Core = try Core.opening(number: 4)
+        let before: StateDigest = try Self.digest(core)
+        #expect(!core.soundOn)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        #expect(try Self.digest(core) == before)
+        #expect(core.apply(Self.act("settings.sound", [0.5])) == .rejected(.rule(code: "r02-g09.not-whole")))
+        let payload: Data = try core.snapshotPayload()
+        #expect(String(decoding: payload, as: UTF8.self).contains("\"sound\":true"))
+        let restored: Core = try Core.restore(payload: payload, seed: 3)
+        #expect(restored.soundOn && restored == core)
+        var off: Core = core
+        #expect(off.apply(Self.act("settings.sound", [0])) == .accepted && !off.soundOn)
+        #expect(off != core)
+        #expect(try Self.digest(off) == before)
+        core.reset()
+        #expect(!core.soundOn)
+    }
+
+    /// A schema-2 object (as feature 385 wrote it: results without `trace` or `verified`) of level 3 with level 1 won
+    /// with 4 moves made (smallest 3: 2 stars) and the frontier at 5.
+    static func schemaTwoObject() throws -> [String: Any] {
+        var progress: NocturneGardenProgress = NocturneGardenProgress()
+        progress.record(level: 1, movesMade: 4, smallest: 3, mode: .campaign)
+        progress.open(through: 5)
+        var progressObject: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(progress)) as? [String: Any])
+        var solved: [[String: Any]] = try #require(progressObject["solved"] as? [[String: Any]])
+        for index in solved.indices {
+            solved[index].removeValue(forKey: "trace")
+            solved[index].removeValue(forKey: "verified")
+        }
+        progressObject["solved"] = solved
+        return ["level": 3, "records": [Any](), "progress": progressObject, "mode": ["mode": "campaign"],
+                "tutorial": "done"]
+    }
+
+    /// Feature 387: a schema-2 object migrates to schema 3 (empty traces, unverified, sound off) and restores with its
+    /// progress; a schema-1 object migrates through 2 to 3; the engine restores schema-1 and schema-2 envelopes.
+    @Test func schemaOneAndTwoMigrateToThree() async throws {
+        let two: [String: Any] = try Self.schemaTwoObject()
+        let three: [String: Any] = try Core.migratedToSchemaThree(two)
+        #expect(three["sound"] as? Bool == false)
+        let progressThree: [String: Any] = try #require(three["progress"] as? [String: Any])
+        let solvedThree: [[String: Any]] = try #require(progressThree["solved"] as? [[String: Any]])
+        #expect(solvedThree.count == 1 && solvedThree[0]["verified"] as? Bool == false)
+        #expect((solvedThree[0]["trace"] as? [Any])?.isEmpty == true)
+        let restored: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: three, options: [.sortedKeys]), seed: 2)
+        #expect(restored.progress.frontier == 5 && restored.reconciliationDropped == 0)
+        #expect(restored.progress.solved[1] == NocturneGardenProgress.Result(movesMade: 4, stars: 2))
+        #expect(!restored.soundOn && restored.levelNumber == 3 && restored.mode == .campaign)
+        #expect(throws: NocturneGardenRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+        #expect(throws: NocturneGardenRestoreRefusal.damaged) {
+            try Core.migratedToSchemaThree(["level": 1, "progress": ["frontier": 1]])
+        }
+        // 1 → 3: no won levels, the levels up to the saved level open, campaign, sound off.
+        let one: [String: Any] = ["level": 6, "records": [Any]()]
+        let oneToThree: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(one))
+        let fromOne: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: oneToThree, options: [.sortedKeys]), seed: 0)
+        #expect(fromOne.levelNumber == 6 && fromOne.progress.frontier == 6 && fromOne.progress.solved.isEmpty)
+        #expect(!fromOne.soundOn && fromOne.mode == .campaign && fromOne.reconciliationDropped == 0)
+        // The engine applies the chain to schema-1 and schema-2 envelopes.
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        var engine = ExperienceEngine<Core>(id: id)
+        try await engine.prepare(seed: 2)
+        try engine.activate()
+        let saved: ExperienceSnapshot = try engine.snapshot()
+        let twoData: Data = try JSONSerialization.data(withJSONObject: two, options: [.sortedKeys])
+        let envelopeTwo = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+                                                 stepIndex: saved.stepIndex, digest: try Self.digest(restored),
+                                                 payload: twoData)
+        try engine.restore(envelopeTwo)
+        #expect(try engine.digest() == Self.digest(restored))
+        let oneData: Data = try JSONSerialization.data(withJSONObject: one, options: [.sortedKeys])
+        let envelopeOne = try ExperienceSnapshot(experience: id, schemaVersion: 1, seed: saved.seed,
+                                                 stepIndex: saved.stepIndex, digest: try Self.digest(fromOne),
+                                                 payload: oneData)
+        try engine.restore(envelopeOne)
+        #expect(try engine.digest() == Self.digest(fromOne))
+    }
+
+    /// Feature 387: an edited verified result is dropped on restore and counted, the frontier kept as saved; an honest
+    /// one survives; a saved replay of a dropped result returns to campaign at that level.
+    @Test func editedResultsAreDroppedOnRestore() throws {
+        let certified: NocturneGardenGenerated = try Core.generated(number: 2)
+        let trace: [NocturneGardenAction] = certified.solution.actions
+        let smallest: Int = certified.solution.smallest
+        var honest: NocturneGardenProgress = NocturneGardenProgress()
+        honest.open(through: 7)
+        honest.record(level: 2, movesMade: trace.count, smallest: smallest, trace: trace)
+        var edited: NocturneGardenProgress = honest
+        // The same trace claimed with one move fewer than it holds.
+        edited.drop(level: 2)
+        edited.record(level: 2, movesMade: trace.count - 1, smallest: smallest, trace: trace)
+        var core: Core = try Core.opening(number: 2)
+        #expect(core.apply(Self.act(trace[0])) == .accepted)
+        var object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: try core.snapshotPayload()) as? [String: Any])
+        object["progress"] = try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(honest))
+        let kept: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), seed: 1)
+        #expect(kept.reconciliationDropped == 0 && kept.progress == honest)
+        object["progress"] = try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(edited))
+        let checked: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), seed: 1)
+        #expect(checked.reconciliationDropped == 1 && checked.progress.solved[2] == nil)
+        #expect(checked.progress.frontier == 7 && checked.play == core.play)
+        // The dropped count is not state: not in the digest or `==`.
+        #expect(try Self.digest(checked) == Self.digest(try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), seed: 1)))
+        // A saved replay of the edited result: the result is dropped, so the restore is campaign at level 2.
+        object["mode"] = ["mode": "replay", "level": 2]
+        object["records"] = [Any]()
+        let replay: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), seed: 1)
+        #expect(replay.mode == .campaign && replay.levelNumber == 2 && replay.reconciliationDropped == 1)
+        // A replay mode naming another level is damaged.
+        object["mode"] = ["mode": "replay", "level": 3]
+        #expect(throws: NocturneGardenRestoreRefusal.damaged) {
+            try Core.restore(payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]),
+                             seed: 1)
+        }
     }
 }
