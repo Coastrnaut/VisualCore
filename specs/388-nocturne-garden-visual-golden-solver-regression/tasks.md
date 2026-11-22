@@ -39,7 +39,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G0908-005 [US2] [US3] Create `Packages/ExperiencesRound02/NocturneGarden/ExperienceTests/NocturneGardenRegressionGoldenFrameTests.swift` and
+- [X] T-R02G0908-005 [US2] [US3] Create `Packages/ExperiencesRound02/NocturneGarden/ExperienceTests/NocturneGardenRegressionGoldenFrameTests.swift` and — Verified 2026-11-22: sim-27 (NocturneGardenExperienceTests, 62 tests on iOS 27.2 incl. the 16 golden frames rendered and checked against their descriptions with the feature-383 tolerances, 12 open-draw-warn-close memory cycles with liveObjectCount 0 after each close and warning) exit 0; agent C's tests retested by the lead
   `Packages/ExperiencesRound02/NocturneGarden/ExperienceTests/NocturneGardenRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked against
   their descriptions with the feature-383 tolerances (plain shadow cells within 3 px of a pixel 0.15 darker than the
   mist reference, forbidden cells near a coral pixel, target cells near a gold brightening, the first gauge bar at least
