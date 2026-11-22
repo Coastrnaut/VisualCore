@@ -8,7 +8,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0608-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing`
+- [X] T-R02G0608-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing` — Verified 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit=0 (.autonomy/migration/checks/R02-G06-08.baseline-*.json)
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
