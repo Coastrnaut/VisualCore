@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-04: Nocturne Garden gestures, the panel wins at the smallest move count).
+Last updated: 2026-11-22 (R02-G09-05: Nocturne Garden hints from the current state, schema 2).
 
 ## 1. What is tested, and where
 
@@ -394,6 +394,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   cell of the whole bed (not only the bounding box) against a separate even-odd ray cast on exact rationals with its own
   on-segment test, and the boundary deviation against an all-pairs brute force. A timing baseline taken right after the
   round-two suite failed under a load average of 13 and passed when rerun: run timing baselines on a quiet machine.
+- **Hints are tested from the opening and from seeded states** (R02-G09-05, 2026-11-22). Nocturne Garden's hint search
+  starts at the current blooms and sun; the host tests follow exact hints from the opening of all 100 levels (they must
+  reproduce the certified move count) and from 200 seeded reachable states, and explain 500 seeded failures. The
+  presenter computes the three hint levels off the main actor and caches them per play, so a simulator test awaits the
+  search task before reading the panel.
 - **A panel win test should also count the moves** (R02-G09-04, 2026-11-22). Nocturne Garden's first panel had
   single-step Sun − and +: the panel still won all 100 levels, but certified solutions that move the sun by two or three
   elevations cost up to two extra moves on 35 levels, so a player without gestures could not reach the smallest move

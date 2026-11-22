@@ -118,3 +118,21 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g09.malformed`, `.
 - **Panel.** Every action stays in the panel; the sun is a picker with "Set sun", so the panel wins all 100 certified
   levels in their smallest move counts.
 
+## Teaching and progression (feature 385, R02-G09-05)
+
+- **Hints.** `NocturneGardenHints` plans from the current state with a solver entry point that starts at the planted
+  blooms and the sun and looks for the fewest further moves within the moves and supply left: plants at the current
+  sun, then a sun move first, then the removal of one bloom first, all within the solver's bound. The first move of the
+  plan is the hint, in three levels: what to do ("Plant a rose"), with size and sun, then the exact cell. From the
+  opening it reproduces the certified search, so following exact hints wins every level. The presenter runs the search
+  off the main actor; any change of the play hides the hint.
+- **Failures.** `NocturneGardenFailureExplanation` explains a leak with the kernel's own reason (the move, the action and
+  the cells against the allowance) and a budget run with the moves and the match against the requirement, each with
+  "Undo the last move or retry the level."
+- **Tutorial.** Levels 1 … 3 show three instructions (plant; shape with moves, sizes and the lantern while avoiding the
+  coral cells; reach the match before the moves run out), each advancing on accepted moves; it can be dismissed.
+- **Progress.** Stars count the moves made, undone ones included (3 at the certified smallest count, 2 within two more);
+  a campaign win opens the next level; `level.select`, `level.next`, `mode.daily [y, m, d]` (the level (days from
+  2026-01-01 × 71) mod 100 + 1, from a date the presenter reads), `mode.practice` (budget 40, no stars or unlocks) and
+  `mode.campaign`. Progress and mode are in the digest; the snapshot is schema 2 with a migration from schema 1.
+
