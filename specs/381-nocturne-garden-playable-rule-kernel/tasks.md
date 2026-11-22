@@ -31,7 +31,7 @@ in this feature (the blooms and the mask are the CPU reference the renderer of R
 
 ## Phase 3: Story 1 — cast the target silhouette (P1) 🎯
 
-- [ ] T-R02G0901-003 [P] [US1] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenBloomTests.swift` (agent A: on 500 seeded blooms and
+- [X] T-R02G0901-003 [P] [US1] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenBloomTests.swift` (agent A: on 500 seeded blooms and — Verified 2026-11-22: host-2 (NocturneGardenBloomTests 7 functions / 12 cases: 500 seeded blooms incl. clipped ones, every bed cell against an independent even-odd ray cast on exact rationals with on-segment boundary, cast polygons vertex by vertex, 200 gardens with mask, shared/either, leak, match decisions and boundary deviation against brute force, outlines simple and counter-clockwise) exit 0, lead retest
   elevations every cell decision equals an independent even-odd ray casting on rational coordinates with boundary
   points counted inside; the mask equals the union recomputed from scratch; match, leak and boundary deviation equal
   brute force over all cells and cell pairs; every outline is simple and within its stated bounds); `--name host-2`
