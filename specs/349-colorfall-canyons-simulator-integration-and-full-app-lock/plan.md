@@ -12,7 +12,7 @@ every panel control (the cell picker, Carve, the valve buttons and Run exist sin
 examples (comment corrected); app unit tests restore them, pin level 1's certified actions and carvable-cell order against the Core, open
 the candidate through the registry and engine and confirm it is not available; interface tests `CCPlayUITests` and
 `CCReplayUITests` (namespace `CC`) in a new serial chunk `n3`; the Release simulator build and symbol check run as
-evidence (`ColorfallCanyonsGolden` and `acceptanceScenarios` are already forbidden). Feature 338's regression is re-run
+evidence (`ColorfallCanyonsGolden` and `acceptanceScenarios` are already forbidden). Feature 348's regression is re-run
 for all-level solvability. Research: [research.md](research.md). Data: [data-model.md](data-model.md). Contract:
 [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstart.md).
 
@@ -22,7 +22,7 @@ for all-level solvability. Research: [research.md](research.md). Data: [data-mod
 **Primary dependencies**: ColorfallCanyonsCore and ColorfallCanyonsExperience; VisualCoreExperience
 (`MigrationExample`, `ExperienceSnapshot`, `DigestBuilder`); the app's registry, `DebugLaunch` and UI test support.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02`; `release_check.py --only
-app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-n3 app-release-build app-release-symbols`; the 338 regression.
+app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-n3 app-release-build app-release-symbols`; the 348 regression.
 **Constraints**: no new target; Colorfall Canyons stays in `candidates`; interface tests each under 90 s; no device.
 
 No NEEDS CLARIFICATION remains.
