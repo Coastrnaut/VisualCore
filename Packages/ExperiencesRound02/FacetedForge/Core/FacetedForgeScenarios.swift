@@ -26,6 +26,8 @@
 // `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`;
 // rejection also refuses the progression controls' wrong value counts (`level.select`, `mode.daily`, `mode.practice`,
 // `mode.campaign`, `tutorial.dismiss`); the manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`).
+// Feature 377 (R02-G08-07) T-R02G0807-003: the digests are schema 3's ("…v3": the same parts with traced results), the
+// controls gain replay and the sound setting; the manifest was regenerated.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience

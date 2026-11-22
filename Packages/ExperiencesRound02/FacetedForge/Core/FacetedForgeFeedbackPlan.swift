@@ -30,6 +30,11 @@
 //      ``FacetedForgeFeedbackPlan/none``.
 // Changes of the preview choice (piece, direction, depth) are presentation only and plan nothing: the adjustable
 // pickers speak their own values.
+//
+// Feature 377 (R02-G08-07) T-R02G0807-003 (clarification Q4): the replay refusals have their own words ("There is no
+// saved solution to replay for this level.", "The replay is over.", "Stop the replay first."); a replay step adds one
+// record, so it is announced like the cut it replays (case 2), and a replayed win claims no stars (replay does not
+// award stars, as practice); starting or stopping a replay is a mode change (case 1, "… replay.").
 import Foundation
 import VisualCoreSimulation
 
@@ -87,8 +92,16 @@ public struct FacetedForgeFeedbackPlan: Sendable, Equatable {
     /// (`r02-g08.date`), "That cut is not possible here." (`r02-g08.action`), "That plane misses the piece."
     /// (`r02-g08.miss`), "The level has ended." (`r02-g08.stage`), "That value must be a whole number."
     /// (`r02-g08.not-whole`), otherwise (`r02-g08.stale`, `r02-g08.malformed`, the engine's own codes such as
-    /// `action.out-of-range`) "That move was refused.".
+    /// `action.out-of-range`) "That move was refused.". Feature 377: "There is no saved solution to replay for this
+    /// level." (`r02-g08.no-replay`), "The replay is over." (`r02-g08.replay-end`) and "Stop the replay first."
+    /// (`r02-g08.replay`).
     public static func refusalText(code: String) -> String {
+        // Feature 377: the replay refusals ("…replay-end" before "…replay", which it contains).
+        if code.contains(FacetedForgeExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        if code.contains(FacetedForgeExperienceRule.replayEnd) { return "The replay is over." }
+        if code.contains(FacetedForgeExperienceRule.replay) { return "Stop the replay first." }
         if code.contains(FacetedForgeExperienceRule.locked) { return "That level is not open yet." }
         if code.contains(FacetedForgeExperienceRule.date) { return "That date cannot be used." }
         if code.contains(FacetedForgeError.action("").reasonCode) { return "That cut is not possible here." }

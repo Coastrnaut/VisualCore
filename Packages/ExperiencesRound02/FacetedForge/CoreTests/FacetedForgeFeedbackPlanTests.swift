@@ -192,12 +192,14 @@ import VisualCoreSimulation
         // The words alone, raw and prefixed, and the codes without words of their own.
         let codes: [String] = ["r02-g08.locked", "r02-g08.date", "r02-g08.action", "r02-g08.miss", "r02-g08.stage",
                                "r02-g08.not-whole", "r02-g08.stale", "r02-g08.malformed", "action.out-of-range",
-                               "action.unknown-control", ""]
+                               "action.unknown-control", "", "r02-g08.no-replay", "r02-g08.replay-end",
+                               "r02-g08.replay"]
         let words: [String] = ["That level is not open yet.", "That date cannot be used.",
                                "That cut is not possible here.", "That plane misses the piece.",
                                "The level has ended.", "That value must be a whole number.", "That move was refused.",
                                "That move was refused.", "That move was refused.", "That move was refused.",
-                               "That move was refused."]
+                               "That move was refused.", "There is no saved solution to replay for this level.",
+                               "The replay is over.", "Stop the replay first."]
         for index in codes.indices {
             #expect(Plan.refusalText(code: codes[index]) == words[index], "\(codes[index])")
             #expect(Plan.refusalText(code: "action.rule." + codes[index]) == words[index], "\(codes[index])")
@@ -259,5 +261,38 @@ import VisualCoreSimulation
             + "6 faces; piece 2: a third of the crystal, 6 faces. Target: 3 pieces: a third of the crystal with 6 "
             + "faces; a third of the crystal with 6 faces; a third of the crystal with 6 faces. Next cut: piece 1, "
             + "direction x, depth 1.")
+    }
+
+    /// Feature 377: a replay of level 1's certified solution after a campaign win: start and stop are level plans, each
+    /// step is announced like the cut it replays, and the replayed win claims no stars.
+    @Test func aReplayIsAnnouncedLikePlayAndClaimsNoStars() throws {
+        var core: Core = try Core.opening(number: 1)
+        #expect(Self.refused(&core, "replay.start", [1], code: "r02-g08.no-replay")
+            == Self.rejection("There is no saved solution to replay for this level."))
+        #expect(Self.refused(&core, "replay.step", [], code: "r02-g08.no-replay")
+            == Self.rejection("There is no saved solution to replay for this level."))
+        let actions: [FacetedForgeAction] = try Core.generated(number: 1).solution.actions
+        var played: [Plan] = []
+        for action in actions {
+            guard case .cut(let piece, let direction, let depth) = action else { continue }
+            played.append(Self.accepted(&core, "piece.cut", [Double(piece), Double(direction), Double(depth)]))
+        }
+        #expect(core.play.stage == .won)
+        #expect(Self.accepted(&core, "replay.start", [1]) == Self.level("Level 1, band 1, replay."))
+        #expect(Self.refused(&core, "piece.cut", [0, 0, 0], code: "r02-g08.replay")
+            == Self.rejection("Stop the replay first."))
+        for index in actions.indices {
+            let plan: Plan = Self.accepted(&core, "replay.step")
+            if index < actions.count - 1 {
+                #expect(plan == played[index], "step \(index)")
+            } else {
+                #expect(plan == Self.won("The pieces match the target. Level won with "
+                    + FacetedForgeFeedbackPlan.cuts(actions.count) + " made."))
+            }
+        }
+        #expect(Self.refused(&core, "replay.step", [], code: "r02-g08.replay-end")
+            == Self.rejection("The replay is over."))
+        let stop: Plan = Self.accepted(&core, "replay.stop")
+        #expect(stop.kind == .level && stop.text?.hasPrefix("Level 1, band 1, campaign.") == true)
     }
 }
