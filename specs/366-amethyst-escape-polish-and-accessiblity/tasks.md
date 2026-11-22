@@ -23,7 +23,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   turns, advances, undos, redos, refusals of every code, wins in campaign and practice, wedge and budget failures and
   level changes compare texts, kinds and haptics exactly; a move that ends the play plans only the outcome); agent A;
   `--name host-2`
-- [ ] T-R02G0706-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeLights.swift` ("pearl 1 playing / 0.6 failed; exit 0.5
+- [X] T-R02G0706-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeLights.swift` ("pearl 1 playing / 0.6 failed; exit 0.5 — Verified 2026-11-22: 2026-11-22: host-3 (LightsTests 7 + SoundRecipeTests 4: scripted win and five flicker patterns within 3 crossings per second and fades of at least 0.4 s under Reduce Flashing; level changes fade; recipe pure and distinct, won loop swells twice) exit 0, lead retest
   / 1 won; wedge 0 / 1 failed in a wedge", eased linearly over 0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade
   under Reduce Flashing; `maxHalfRangeCrossingsPerSecond`) and `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSoundRecipe.swift` ("root 98 Hz;
   one partial per shell passed at 98 × (5/4, 3/2, 2, 5/2); octave when won; halved gains when failed; 12-second loop")

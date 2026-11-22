@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AmethystEscapeLights|AmethystEscapeSoundRecipe"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'AmethystEscapeLights|AmethystEscapeSoundRecipe'",
+  "elapsed_seconds": 3.092,
+  "exit_code": 0,
+  "finished": "2026-11-22T09:46:18+00:00",
+  "gate": "R02-G07-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-06.host-3.log",
+  "log_sha256": "8b3611b9889ead18a1a49947e5dd57462a7d85450e8d429d45412bf7a1977b4b",
+  "name": "host-3",
+  "started": "2026-11-22T09:46:15+00:00",
+  "timed_out": false
+}
