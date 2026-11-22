@@ -14,7 +14,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0602-002 Add `generation(Int)` ("r02-g06.generation") and `witness(String)` ("r02-g06.witness") to
+- [X] T-R02G0602-002 Add `generation(Int)` ("r02-g06.generation") and `witness(String)` ("r02-g06.witness") to — Verified 2026-11-21: 2026-11-21 host exit 0: the 45 ChronoConstellator tests unchanged with the new error cases (generation, witness), the 100-entry manifest (copied from the planning index, numbers 1 … 100, 20 per band) and the difficulty type (.autonomy/migration/checks/R02-G06-02.host.json); lead run
   `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorError.swift`; create
   `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorManifest.swift` (ChronoConstellatorManifestEntry
   "number 1 … 100, seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py

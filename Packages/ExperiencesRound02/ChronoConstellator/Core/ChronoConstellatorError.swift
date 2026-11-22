@@ -1,6 +1,7 @@
 // ChronoConstellatorError — feature 351 (R02-G06-01) T-R02G0601-002 (FR-R02G0601-011; clarification Q5). The refusals of
 // Chrono Constellator's rule kernel, each with a stable reason code `r02-g06.*` that the experience logs with the level id
 // and tick.
+// Feature 352 (R02-G06-02) T-R02G0602-002 (FR-R02G0602-006; clarification Q5): `generation` and `witness`.
 
 /// A refusal of a Chrono Constellator level, action or event.
 public enum ChronoConstellatorError: Error, Equatable, Sendable {
@@ -19,6 +20,10 @@ public enum ChronoConstellatorError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of the manifest level (the payload is its number) met its band within 512 candidates (feature 352).
+    case generation(Int)
+    /// A witness is damaged, edited or no longer replays; the payload names the part (feature 352).
+    case witness(String)
 
     /// The stable reason code, `r02-g06.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +35,8 @@ public enum ChronoConstellatorError: Error, Equatable, Sendable {
         case .budget: "r02-g06.budget"
         case .newerSchema: "r02-g06.newer-schema"
         case .malformed: "r02-g06.malformed"
+        case .generation: "r02-g06.generation"
+        case .witness: "r02-g06.witness"
         }
     }
 }
