@@ -474,3 +474,7 @@ tests, a CI step and `scripts/faceted_forge_regression.py`.
 Feature 379 (R02-G08-09) adds Faceted Forge's in-app integration: panel identifiers
 (`FacetedForgeControls.identifierNames`), the stored schema-1 and schema-2 examples (`FacetedForgeSchemaExamples`), app
 unit tests, and the interface tests `FFPlayUITests` and `FFReplayUITests` in serial chunk `q3`.
+
+Feature 380 (R02-G08-10) prepares Faceted Forge's device campaign without touching a device:
+`docs/apps/faceted-forge/device-rows.json` (rows FF-D1 … FF-D8, all pending), the written plan
+`docs/apps/faceted-forge/device-campaign.md`, and the release step `device-rows-r02-g08`.

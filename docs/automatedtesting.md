@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-09: Faceted Forge interface chunk q3; PosterBoard crashes on the UI-test phone).
+Last updated: 2026-11-22 (R02-G08-10: Faceted Forge device rows and release step device-rows-r02-g08).
 
 ## 1. What is tested, and where
 
@@ -389,6 +389,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the
   enumeration guard caught (0/3 declared tests). The level-1 journey is one Turn − and two Advances, and its pinned
   values are checked against the Core by an app unit test.
+- **Faceted Forge device rows** (R02-G08-10, 2026-11-22). `python3 scripts/check_device_rows.py --experience
+  r02-g08.faceted-forge` (release step `device-rows-r02-g08`) checks the definition against the scenario manifest, the
+  ledger's DEV rows and the open {device} tasks of features 371 … 379; `FacetedForgeDeviceRowsCheckTests` in
+  `test_scripts.py` proves it fails by name on a removed scenario, a missing field and an uncovered task.
 - **PosterBoard crashes on the UI-test phone** (R02-G08-09, 2026-11-22). "PosterBoard quit unexpectedly" dialogs came
   from one simulator, the iOS 27.2 iPhone that `xcodebuild_app.py --kind phone` picks: its poster database was
   corrupt (`PRPosterDescriptor _initWithPath` in the StandBy role), and every Home press of a relaunch test crashed
