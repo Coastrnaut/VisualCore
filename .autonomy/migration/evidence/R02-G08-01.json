@@ -1,0 +1,143 @@
+{
+  "branch": "main",
+  "dirty": true,
+  "dirty_paths": [
+    "README.md"
+  ],
+  "failed_attempts": [],
+  "gate": "R02-G08-01",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:15:15+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.baseline-host.log",
+      "log_sha256": "7d6b31ec98976cd90d321961ef95c3555df1749d09cd977adb7c517fc512b1d3",
+      "name": "baseline-host"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:18:42+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.baseline-round02.log",
+      "log_sha256": "cba3be0e6a68accb37d8a6460f2c33f4c63c69459ff1f8b89ac4e93d863a5459",
+      "name": "baseline-round02"
+    },
+    {
+      "command": "env VC_TIMING_ASSERTS=1 swift test --package-path Packages/VisualCore --filter 'aMeshAtTheBudgetBuildsAndValidates|analysisTimingLevelZeroMeanBelowBudget|wholeRunForTheSampleTakesLessThanTenSeconds|aPreparationOverItsLimitTimesOut|aCancelledPreparationEndsWithinOneSecond'",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:15:19+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.baseline-timing.log",
+      "log_sha256": "3fe924d5e92c77b1008199b17f212f296cd978d9d698b6d8a6ad3b6c141c458b",
+      "name": "baseline-timing"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:31:30+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.experiences.log",
+      "log_sha256": "2cd391136fb1e8041dba2c854757fd4d434e96f0e543041eca6f588b2df30ac0",
+      "name": "experiences"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgePieceTests",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:19:24+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.host-2.log",
+      "log_sha256": "b44f10e08cae560a538dd0da34bb1c72607f682d60005cff1fd97e900b98740f",
+      "name": "host-2"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgePlayTests",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:19:31+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.host-3.log",
+      "log_sha256": "0d44123c26d56fba41d936d51200e1be551ff7b97c5a91ee86926df05f7d53e8",
+      "name": "host-3"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgeRules",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:19:37+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.host-4.log",
+      "log_sha256": "c48fb6f53a74c40b257c5513bb442849b589de12f892bd9d1b0caee8577aef5a",
+      "name": "host-4"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgeInvariantTests",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:19:43+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.host-5.log",
+      "log_sha256": "5e550a2874b775e0fb54ea838fb61822f35567b78e445cc6b3b2b1aecf52bb43",
+      "name": "host-5"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:32:08+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.host-full.log",
+      "log_sha256": "176c835b532e5a790ebc2ab08e242dbbd1f0d812609cac67899a6fb24051c820",
+      "name": "host-full"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForgeFractionTests|FacetedForgeLevelTests'",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:19:06+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.host.log",
+      "log_sha256": "62f28f25d778306a685db29d3669bcdee9c7c1bbd4fe40638dac97cc92f15653",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:32:33+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.reference-1.log",
+      "log_sha256": "5c7dd4be661cdc8fbe65141e1ff0077068c64024157b7dcfab77ad277bcf9d5b",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:32:58+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.reference-2.log",
+      "log_sha256": "0de6dc962eb98d4fae5ca77ef16ca29aa52cd8607a9f5c0d2598db776ef2bedb",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:25:12+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.rendering-26.log",
+      "log_sha256": "5627e3996e5db7658c9344661e2c7a5be1d3f26598e52056038ac6150ce77c2e",
+      "name": "rendering-26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:24:26+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.rendering-27.log",
+      "log_sha256": "e01cdb62a8658cfa0ecc535c23e1804f01764ecfcdb2cf34d71ac8dee3e11621",
+      "name": "rendering-27"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:23:27+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.round02-host.log",
+      "log_sha256": "540f575d48bcd4f346c0431ffb5af79aeda260ba51c0945fed7b1337d316db59",
+      "name": "round02-host"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-22T12:34:06+00:00",
+      "log": ".autonomy/logs/migration/R02-G08-01.script-tests.log",
+      "log_sha256": "5c584adbddb3088cc0b51203bfdf52003c1730b58aade100113acd1437343b81",
+      "name": "script-tests"
+    }
+  ],
+  "revision": "c03c30d711dee5f6e08d78c8532a74b5ba44e1fb",
+  "revision_number": 1,
+  "sealed": "2026-11-22T12:34:28+00:00"
+}
