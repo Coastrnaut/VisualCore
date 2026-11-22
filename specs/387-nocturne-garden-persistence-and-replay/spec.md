@@ -55,7 +55,7 @@ presenter holds the sound choice (off by default) since R02-G09-06.
   fresh play (campaign budget) replays the trace (each move legal), and the result is kept only if the play ends won,
   the trace's length is at most `movesMade`, and `stars` equals the stars rule for `movesMade` and the level's
   certified smallest move count; otherwise it is dropped. (A lowered `movesMade` can never claim fewer moves than the
-  trace proves; a raised one only worsens the score.) The adapter exposes the number dropped and the presenter
+  trace proves; a raised one only worsens the score.) The adapter exposes the number dropped (never in the digest) and the presenter
   announces it once as `state` ("n saved results could not be checked and were removed.", "1 saved result could not
   be checked and was removed."). Results without a trace (schema 1 or 2) are kept, marked unverified. The frontier is
   restored as saved. Impact: FR-R02G0907-003; SC-R02G0907-003.
