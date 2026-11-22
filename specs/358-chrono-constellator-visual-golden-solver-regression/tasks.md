@@ -62,7 +62,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 - [X] T-R02G0608-007 Docs: `docs/architecture/chrono-constellator.md` (regression net), — Verified 2026-11-22: round02-host exit=0; docs/architecture/chrono-constellator.md regression net, ExperiencesRound02 README feature 358, docs/automatedtesting.md entry
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0608-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0608-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-22: rendering-27, rendering-26, experiences, host-full, app-unit exit=0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0608-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0608-010 Reference regression chunk 2 (`--name reference-2`)
