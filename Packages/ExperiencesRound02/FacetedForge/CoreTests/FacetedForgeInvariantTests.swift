@@ -225,6 +225,8 @@ import Testing
         "FacetedForgeSceneSnapshot.swift", "FacetedForgeSceneGeometry.swift", "FacetedForgeShaders.swift",
         "FacetedForgeExperienceCore.swift", "FacetedForgeScenarios.swift", "FacetedForgePicker.swift",
         "FacetedForgeGestureController.swift", "FacetedForgeLights.swift", "FacetedForgeSoundRecipe.swift",
+        // Feature 378 (R02-G08-08): the golden frames, presentation and test code only.
+        "FacetedForgeGolden.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, less the presentation

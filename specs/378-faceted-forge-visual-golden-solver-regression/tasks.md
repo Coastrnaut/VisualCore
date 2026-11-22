@@ -23,7 +23,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G0808-003 [US2] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G0808-003 [US2] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-22: FacetedForgeGolden (16 frames: levels 1, 21, 41, 61, 81 x tiers 0-2 after 2 certified cuts at 1 s, plus the hero frame) and golden-frames.json written with FACETED_FORGE_WRITE_GOLDEN=1 (md5 99bc118c5b9f405d81d393a43a73f91f, unchanged by the later run without the switch); FacetedForgeGolden added to RELEASE_FORBIDDEN and to the invariant test's presentation sources; verified by host-2 exit 0, lead retest
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 1 s after the witness's first min(smallest − 1, 2) cuts, plus the
   hero frame at tier 0; at 1,152 × 768 with the authored camera and the initial preview choice: every piece centre
   (canonical order) and the preview centre, positions rounded to 1/8 px and an off-screen point null; the cuts spent and
