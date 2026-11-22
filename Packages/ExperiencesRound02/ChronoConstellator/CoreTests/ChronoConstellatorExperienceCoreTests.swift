@@ -71,18 +71,21 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g06.chrono-constellator" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g06.chrono-constellator.v1")
+        #expect(Core.experienceID == "r02-g06.chrono-constellator" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g06.chrono-constellator.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         #expect(Core.actionIDs == ["star.phase", "star.hold", "star.release", "time.step", "time.rewind", "play.undo",
-                                   "play.redo", "level.next"])
+                                   "play.redo", "level.next", "level.select", "mode.daily", "mode.practice",
+                                   "mode.campaign", "tutorial.dismiss"])
         #expect(Core.controls[0].ranges == [0...4, 0...31])
         #expect(Core.controls[1].ranges == [0...4, 1...1_200, 1...60])
         #expect(Core.controls[2].ranges == [0...4, 1...1_200])
         #expect(Core.controls[3].ranges == [1...1_200])
-        let plainIndices: [Int] = [4, 5, 6, 7]
+        #expect(Core.controls[8].ranges == [1...100])
+        #expect(Core.controls[9].ranges == [1...9_999, 1...12, 1...31])
+        let plainIndices: [Int] = [4, 5, 6, 7, 10, 11, 12]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 1)
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == ChronoConstellatorTier.all.map(\.name))
@@ -290,24 +293,120 @@ import VisualCoreExperience
         }
     }
 
-    @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+    /// Feature 355: `level.next` moves to the next open level only (a locked next level is refused, 100 does not wrap);
+    /// a selected open level opens fresh; reset returns to the seed's opening state, progress included.
+    @Test func nextLevelNeedsAnOpenLevelAndResetReturnsToTheSeedsLevel() async throws {
         var core: Core = try await Core.prepare(seed: 38)
-        #expect(core.levelNumber == 39)
+        #expect(core.levelNumber == 39 && core.progress.frontier == 39)
         #expect(core.apply(Self.act("time.step", [3])) == .accepted)
+        let before: StateDigest = try Self.digest(core)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: ChronoConstellatorExperienceRule.locked)))
+        #expect(try Self.digest(core) == before)
+        #expect(core.apply(Self.act("level.select", [40])) == .rejected(.rule(code: "r02-g06.locked")))
+        #expect(core.apply(Self.act("level.select", [12])) == .accepted)
+        #expect(core.levelNumber == 12 && core.play.records.isEmpty && core.mode == .campaign)
         #expect(core.apply(Self.act("level.next")) == .accepted)
-        #expect(core.levelNumber == 40 && core.play.records.isEmpty && core.play.stage == .playing)
+        #expect(core.levelNumber == 13 && core.play.stage == .playing)
         core.reset()
         let fresh: Core = try await Core.prepare(seed: 38)
         let resetDigest: StateDigest = try Self.digest(core)
         let freshDigest: StateDigest = try Self.digest(fresh)
         #expect(core == fresh && resetDigest == freshDigest)
-        // The wrap: level 100 → 1.
+        // No wrap: level 100 has no next level.
         var last: Core = try Core.opening(number: 100)
-        #expect(last.apply(Self.act("level.next")) == .accepted)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(last.levelNumber == 1 && last == first)
-        last.reset()
+        #expect(last.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g06.locked")))
         #expect(last.levelNumber == 100)
+    }
+
+    /// Feature 355: daily and practice modes, the date refusal, the tutorial dismissal, stars and unlocks on a win.
+    @Test func modesProgressAndTheTutorial() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.tutorial == .shift && core.mode == .campaign)
+        #expect(core.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(core.tutorial == .done)
+        #expect(core.apply(Self.act("mode.daily", [2027, 2, 29])) == .rejected(.rule(code: "r02-g06.date")))
+        let daily: Int = try #require(ChronoConstellatorProgress.dailyLevel(year: 2026, month: 11, day: 21))
+        #expect(core.apply(Self.act("mode.daily", [2026, 11, 21])) == .accepted)
+        #expect(core.mode == .daily(level: daily) && core.levelNumber == daily && core.progress.frontier == 1)
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.mode == .practice && core.play.level.budget == Core.practiceBudget)
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1)
+        // A campaign win records stars and opens level 2.
+        let certified: ChronoConstellatorGenerated = try Core.generated(number: 1)
+        for action in ChronoConstellatorWitness.actions(for: certified.solution, level: certified.level) {
+            switch action {
+            case .phase(let star, let phase):
+                #expect(core.apply(Self.act("star.phase", [Double(star), Double(phase)])) == .accepted)
+            case .step(let ticks):
+                #expect(core.apply(Self.act("time.step", [Double(ticks)])) == .accepted)
+            default:
+                Issue.record("unexpected witness action \(action)")
+            }
+        }
+        #expect(core.play.stage == .won && core.progress.frontier == 2)
+        #expect(core.progress.solved[1]?.stars == 3)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        #expect(core.levelNumber == 2 && core.tutorial == .shift)
+    }
+
+    /// Feature 355 (SC-R02G0605-001): on levels 1 … 3 a scripted player following each instruction and the exact hints
+    /// wins, and each instruction matches the state it was shown in.
+    @Test func aPlayerFollowingTheTutorialAndHintsWinsLevelsOneToThree() throws {
+        for number in 1...3 {
+            var core: Core = try Core.opening(number: number)
+            var seen: [ChronoConstellatorTutorialStep] = [core.tutorial]
+            var guardCount: Int = 0
+            while core.play.stage != .won && guardCount < 40 {
+                guardCount += 1
+                let hint: ChronoConstellatorHint = try #require(core.hint(level: 3), "level \(number)")
+                let result: ActionResult
+                switch hint.kind {
+                case .phase:
+                    #expect(core.tutorial == .shift, "level \(number)")
+                    let star: Int = try #require(hint.star)
+                    let phase: Int = try #require(hint.phase)
+                    result = core.apply(Self.act("star.phase", [Double(star), Double(phase)]))
+                case .run:
+                    // The first run hint shows "replay"; after a step the instruction is "align".
+                    #expect(core.tutorial == .replay || core.tutorial == .align, "level \(number)")
+                    result = core.apply(Self.act("time.step", [1]))
+                case .release:
+                    result = core.apply(Self.act("star.release", [Double(hint.star ?? 0), Double(hint.start ?? 1)]))
+                case .rewind:
+                    result = core.apply(Self.act("time.rewind"))
+                case .stuck:
+                    Issue.record("level \(number) stuck")
+                    return
+                }
+                #expect(result == .accepted, "level \(number) \(hint.kind)")
+                if seen.last != core.tutorial { seen.append(core.tutorial) }
+            }
+            #expect(core.play.stage == .won && core.tutorial == .done, "level \(number)")
+            #expect(seen.first == .shift && seen.contains(.replay) && seen.last == .done, "level \(number): \(seen)")
+        }
+    }
+
+    /// Feature 355: a schema-1 payload migrates to schema 2 (the levels up to the saved level open, campaign mode, the
+    /// tutorial at its initial step).
+    @Test func aSchemaOnePayloadMigrates() throws {
+        var core: Core = try Core.opening(number: 7)
+        #expect(core.apply(Self.act("time.step", [2])) == .accepted)
+        let records: Data = try JSONEncoder().encode(core.play.records)
+        let recordsText: String = String(decoding: records, as: UTF8.self)
+        let schemaOne: String = "{\"level\":7,\"records\":" + recordsText + "}"
+        let object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: Data(schemaOne.utf8)) as? [String: Any])
+        let migrated: [String: Any] = try Core.migratedToSchemaTwo(object)
+        let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 6)
+        #expect(restored.levelNumber == 7 && restored.play == core.play)
+        #expect(restored.progress.frontier == 7 && restored.mode == .campaign && restored.tutorial == .done)
+        #expect(throws: ChronoConstellatorRestoreRefusal.damaged) {
+            try Core.migratedToSchemaTwo(["level": "7"])
+        }
+        // The declared chain carries the step 1 → 2.
+        #expect(Core.migrations.currentVersion == 2)
     }
 
     @Test func snapshotRestoreRoundTripAndRefusals() async throws {
@@ -320,7 +419,7 @@ import VisualCoreExperience
         let payload: Data = try core.snapshotPayload()
         #expect(try core.snapshotPayload() == payload)
         let text: String = try #require(String(data: payload, encoding: .utf8))
-        #expect(text.hasPrefix("{\"level\":32,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":32,\"mode\":"))
         let restored: Core = try Core.restore(payload: payload, seed: 31)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -347,10 +446,12 @@ import VisualCoreExperience
             try Core.restore(payload: Data("{\"level\":\"32\",\"records\":[]}".utf8), seed: 31)
         }
         #expect(throws: ChronoConstellatorRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":0").utf8),
+                             seed: 31)
         }
         #expect(throws: ChronoConstellatorRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":101").utf8),
+                             seed: 31)
         }
         // The same records on another level: the first record's previous fingerprint is stale there.
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":1").utf8)
@@ -380,14 +481,14 @@ import VisualCoreExperience
         #expect(engine.handle(control: "time.step", values: [4]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)

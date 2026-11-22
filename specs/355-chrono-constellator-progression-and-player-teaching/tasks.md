@@ -43,7 +43,7 @@ R02-G06-03 are unchanged).
 
 ## Phase 4: Adapter, scenarios and panel
 
-- [ ] T-R02G0605-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorExperienceCore.swift` (controls "level.select
+- [X] T-R02G0605-004 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorExperienceCore.swift` (controls "level.select — Verified 2026-11-21: 2026-11-21: host-3 (swift test --filter ChronoConstellator, 180 tests in 19 suites: adapter schema 2 with migration, modes, locked/date refusals, tutorial+hints player wins levels 1-3, regenerated manifest) exit 0
   [1 … 100], mode.daily [year, month, day], mode.practice, mode.campaign, tutorial.dismiss"; practice budget 20; daily
   wins record results without opening levels and a locked daily level is playable; level.next to the next open level,
   refused when none; the tutorial on levels 1 … 3 in every mode; progress and mode in the digest, the tutorial step in

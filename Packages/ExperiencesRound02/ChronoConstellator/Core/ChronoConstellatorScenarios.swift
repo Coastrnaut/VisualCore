@@ -21,6 +21,9 @@
 // certified witness actions) and then one illegal action — a step of 1,201 ticks, refused as out of range, on odd rows; a
 // step of 0 ticks, also out of range, on even rows. The expected digests are derived by playing the entries on a core
 // exactly as the engine plays them.
+// Feature 355 (R02-G06-05) T-R02G0605-004: the digests are now schema 2's ("…v2": level, play, progress and mode), and
+// `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`; the
+// manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`).
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
