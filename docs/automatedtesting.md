@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G07-04: Amethyst Escape touch controls; zsh word splitting in loops).
+Last updated: 2026-11-22 (R02-G07-05: Amethyst Escape hints checked against an independent search).
 
 ## 1. What is tested, and where
 
@@ -265,6 +265,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
   timelines everywhere, one added hold on small levels). Witness files are generated in a separate write run: the
   byte-compare and decode tests run in parallel, so a first run with the write flag fails until the files exist.
+- **Hints proved by a second search** (R02-G07-05, 2026-11-22). Amethyst Escape's hint is the first action of the
+  solver's shortest escape from the current crystal. Its tests compare the shortest escape length on 200 seeded states
+  with an independent breadth-first search written in the test on whole crystal values (no packed states), so a state
+  that gets the "no escape" hint is proved to have none in the moves left, and following hints is replayed to a win on
+  every state that has one. The agent also removed an array allocation from the solver's inner loop (same order, same
+  digest), which made debug hints about three times faster.
 - **A quoted command in a zsh loop is one word** (R02-G07-04, 2026-11-22). A post-record loop `for c in
   "planning_index.py build" …; do python3 scripts/$c; done` ran `python3 "scripts/planning_index.py build"`, a missing
   file, and printed exit 2 for the index build and the catalog check; the other steps passed, so the failure looked

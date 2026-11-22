@@ -120,3 +120,27 @@ rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unle
 - **Tests.** The analytic picker is checked against an independent pick on 2,500 seeded points; the gesture controller
   on 500 seeded scripts against an independent angle and rounding; all 100 certified levels are won through panel
   actions alone; simulator tests send touches through the experience's pointer entry.
+
+## Teaching and progression (feature 365, R02-G07-05)
+
+- **Hints.** `AmethystEscapeSolver.solve(_:from:maxDepth:)` runs the same packed breadth-first search from any crystal;
+  `AmethystEscapeHints` takes the first action of the shortest escape that fits in the moves left. Level 1 says what to
+  do ("Turn a shell", "Roll the pearl"), level 2 which shell, level 3 the exact turn ("one sector clockwise") or "Roll
+  the pearl one pocket". A failed play's hint is "Undo the last move or retry the level."; a state with no escape left
+  says so. Hints never change the state, are unlimited and reset after any change of the play. Because the hint is a
+  shortest escape, following hints wins whenever any escape fits; tests check this on all 100 levels and on 200 seeded
+  states against an independent search.
+- **Failures.** `AmethystEscapeFailureExplanation` names the blocked wedge (shell in words, "sector s of N", the move)
+  or the moves spent and the pearl's pocket, followed by "Undo the last move or retry the level."
+- **Tutorial.** Levels 1 … 3 show three instructions in turn (move, roll the pearl, leave through the exit gap); step 1
+  advances on any move, step 2 on an advance, step 3 when the level ends; Dismiss ends it; undo never moves it back.
+- **Progress.** Level 1 open; a campaign win opens the next and records the fewest moves with stars (3 at the certified
+  smallest move count, 2 within two more, else 1). `level.select` opens any open level (`r02-g07.locked` otherwise),
+  `level.next` the next open one (no wrap). The daily level is (days from 2026-01-01 × 61) mod 100 + 1 from a date the
+  presenter sends (`mode.daily [y, m, d]`, `r02-g07.date` for an impossible date); daily opens nothing. Practice replays
+  the level with the budget raised to 60 and records nothing.
+- **Snapshot schema 2.** `{level, mode, progress, records, tutorial}`; progress and mode are digested
+  ("r02-g07.amethyst-escape.v2"), the tutorial step is not; schema-1 payloads migrate (levels up to the saved one open,
+  campaign mode, the tutorial at its first step).
+- **Panel.** The tutorial with Dismiss, Hint (each press reveals the next level), the failure text with Undo and Retry,
+  the goal and stars, Campaign / Daily / Practice and a picker of open levels, all as wrapping text below the crystal.

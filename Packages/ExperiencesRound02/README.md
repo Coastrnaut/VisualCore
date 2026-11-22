@@ -395,3 +395,9 @@ isolation and view reset, orbit); in the experience the presenter's pointer entr
 "Reset view"; host tests with an independent pick and angle, all 100 levels won through the panel, and simulator wiring
 tests.
 
+Feature 365 (R02-G07-05) adds teaching and progression: the solver's search from any crystal
+(`AmethystEscapeSolver.solve(_:from:maxDepth:)`), `AmethystEscapeHints` (`AmethystEscapePlan`, `AmethystEscapeHint`) and
+`AmethystEscapeFailureExplanation`, `AmethystEscapeProgress` with `AmethystEscapeMode` and `AmethystEscapeTutorialStep`;
+the adapter gains `level.select`, `mode.daily`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` and snapshot
+schema 2 with a migration from 1; the panel shows the tutorial, hints, failure text, goal, stars and modes.
+
