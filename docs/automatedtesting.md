@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G07-07: Amethyst Escape persistence; agents built on one merged copy).
+Last updated: 2026-11-22 (R02-G07-08: Amethyst Escape regression net and local command).
 
 ## 1. What is tested, and where
 
@@ -338,6 +338,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Chrono Constellator in the app** (R02-G06-09, 2026-11-22). Serial chunk `o3` holds `CRPlayUITests` and
   `CRReplayUITests` (54.7, 73.4 and 44.1 s on the iOS 27.2 phone); the key was checked unique before use. The level-1
   journey needs one Phase + press and Run, and its pinned values are checked against the Core by an app unit test.
+- **Amethyst Escape regression** (R02-G07-08, 2026-11-22). `python3 scripts/amethyst_escape_regression.py` runs the
+  host filter `AmethystEscapeRegression` (solver regression over 100 witnesses in tests of 10, twelve named alterations,
+  golden descriptions) and then the simulator golden-frame and memory classes with
+  `TEST_RUNNER_AMETHYST_ESCAPE_MEMORY_ISOLATED=1`; CI runs the host part as a named step. Golden frames stop one move
+  short of the escape (at most 3 moves) so the pearl and the move bar are inside every level baseline; the simulator
+  frames reuse the feature-363 frame-check helpers unchanged.
 - **Chrono Constellator regression** (R02-G06-08, 2026-11-22). `python3 scripts/chrono_constellator_regression.py`
   runs the host filter `ChronoConstellatorRegression` (solver regression over 100 witnesses in tests of 10, twelve named
   alterations, golden descriptions) and then the simulator golden-frame and memory classes with

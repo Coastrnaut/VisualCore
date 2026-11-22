@@ -411,3 +411,8 @@ Feature 367 (R02-G07-07) adds persistence and replay: results carry their winnin
 snapshot schema 3 with a 2 → 3 migration, adds `replay.start`, `replay.step`, `replay.stop` and `settings.sound`; the
 panel gains Replay, Step and Stop and announces dropped results once.
 
+Feature 368 (R02-G07-08) adds the regression net: solver and witness checks for all 100 levels with twelve named
+alterations, `AmethystEscapeGolden` (test builds only) with 16 pinned golden frame descriptions in
+`AmethystEscape/golden-frames.json` (`AMETHYST_ESCAPE_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and memory
+tests, a CI step and `scripts/amethyst_escape_regression.py`.
+

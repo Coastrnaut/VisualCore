@@ -186,3 +186,25 @@ rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unle
 - **Settings and determinism.** `settings.sound [0 … 1]` saves the sound choice, applied when the experience opens. The
   state reads no clock or random source: the seed, the certified catalog, the date given to `mode.daily` and the
   recorded actions decide everything, so a save restores and replays identically on every device.
+
+## Regression net (feature 368, R02-G07-08)
+
+- **Solver.** For all 100 levels, in tests of 10: the generated level equals its witness's level, the witness's actions
+  replay to a win in its smallest move count within the budget with its per-move digests and fingerprints, and the
+  solver returns exactly the witness's actions, smallest move count and depths; its work stays within the state count.
+  Twelve kinds of alteration (a shell's aperture or wall, a blocked wedge, the sector count, the start sector, the
+  budget, a solution action, a witness action, per-move digest or fingerprint, the smallest move count, the depths) each
+  fail naming the level and the part. Work is counted, never timed.
+- **Golden frames.** `AmethystEscapeGolden` (test builds only; forbidden in the Release binary) describes 16 frames —
+  levels 1, 21, 41, 61, 81 at three tiers after their witness's first min(smallest − 1, 3) actions, plus the hero frame
+  — at 1,152 × 768: the projected pearl, exit-arrow and wedge-top centres (to 1/8 px, null off screen, each wedge marked
+  open or blocked), the move count, the move bar's length (to 1/1,024), the tier's detail and the palette. The
+  descriptions and SHA-256 digests are pinned in `golden-frames.json`; a recomputed description passes on an equal
+  digest or within one quantum with everything else equal, and the file is rewritten only with
+  `AMETHYST_ESCAPE_WRITE_GOLDEN=1`. The simulator renders the same frames and checks them with the feature-363 frame
+  tolerances.
+- **Memory.** Twelve open-draw-warn-close cycles on the simulator keep the footprint within 16 MB of the first cycle
+  (bound applied when the class runs alone) and leave the crystal scene holding no GPU objects (`liveObjectCount` 0)
+  after each close and memory warning.
+- **Where it runs.** CI's host job has a named "Amethyst Escape regression (host)" step; locally,
+  `python3 scripts/amethyst_escape_regression.py` runs the host and simulator parts with one summary line each.
