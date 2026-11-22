@@ -91,7 +91,8 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
 - **Scene.** The grid lies in the xz-plane with cell size u = 2 / max(columns, rows): the indigo field (#0B0A24) with
   faint grid lines, silver tracks (0.08·u wide) along each loop, star nodes (radius 0.3·u at height 0.25·u) drawn with
   their shapes (ring, cross, diamond, triangle, square), rose target rings (outer radius 0.42·u) with the same shape,
-  lit while the star stands on them, hold bars, and an amber diagonal cross on a collision cell. Each star trails a
+  lit while the star stands on them, hold bars, an amber diagonal cross on a collision cell, and the current-tick mark
+  (a silver bar along the near edge, tick / tick limit of the grid's width). Each star trails a
   history ribbon over the tier's last R ticks, rising 0.04·u per tick of age, its alpha 1 − age/R, with a gentle shimmer
   from presentation time only. The camera looks from +z, pitched 55° down, fitted to the bounding sphere of the grid and
   the ribbons' full height with a 5 % margin for aspects 0.4 … 2.5.
