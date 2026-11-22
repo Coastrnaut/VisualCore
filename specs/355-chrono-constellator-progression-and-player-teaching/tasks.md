@@ -9,7 +9,7 @@ R02-G06-03 are unchanged).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0605-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0605-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21: baseline-host, baseline-timing, baseline-round02 exit 0; rendering baseline = R02-G06-04 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G06-04's rendering runs (exit 0)
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanations (P1) 🎯
