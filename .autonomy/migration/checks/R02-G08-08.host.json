@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgeRegressionSolverTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgeRegressionSolverTests",
+  "elapsed_seconds": 23.439,
+  "exit_code": 0,
+  "finished": "2026-11-22T16:27:09+00:00",
+  "gate": "R02-G08-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-08.host.log",
+  "log_sha256": "06a488842d24d3049890928054d85dafd20d5365ee06cca4574c55bcbd237845",
+  "name": "host",
+  "started": "2026-11-22T16:26:46+00:00",
+  "timed_out": false
+}

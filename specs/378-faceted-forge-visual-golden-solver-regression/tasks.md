@@ -12,7 +12,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G0808-002 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G0808-002 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-22: host (FacetedForgeRegressionSolverTests, 14 tests / 108 cases: all 100 levels in ten groups — generated level equals the witness, witness cuts replay to a win with per-cut digests and fingerprints, solve returns exactly the witness cuts with smallest = lowerBound and work <= workBound; ten named alterations each yield exactly their part) exit 0, lead retest
   level in ten groups of 10, "the generated level equals its witness's level; the witness's cuts replay to a win in
   exactly its smallest cut count within the budget, with its per-cut digests and fingerprints; solve returns exactly
   the witness's cuts with smallest equal to the witness's and to lowerBound(level), with work ≤ workBound"; ten named
