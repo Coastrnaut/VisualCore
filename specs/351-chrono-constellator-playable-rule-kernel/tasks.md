@@ -49,7 +49,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G0601-005 [P] [US4] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorRules.swift`
+- [X] T-R02G0601-005 [P] [US4] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorRules.swift` — Verified 2026-11-21: 2026-11-21 host-4 exit 0: ChronoConstellatorRulesTests 6 tests in 0.75 s (move order, terminal positions, agreement with the play on 200 walks, known solutions) (.autonomy/migration/checks/R02-G06-01.host-4.json); lead retest
   (agent C: `PuzzleRules`: State = position (timeline, tick, outcome), Move = ChronoConstellatorAction; legal moves at tick
   0 phase(i, o) for each star and offset ≠ current in order, then hold(i, s, k) for each star, "start 1 … 32 and length 1 … 32"
   in that order skipping refused ones, then release(i, s) for each hold, then step(tick limit); after tick 0 only rewind)
