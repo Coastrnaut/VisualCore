@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G06-08: Chrono Constellator regression net and local command).
+Last updated: 2026-11-22 (R02-G06-09: Chrono Constellator interface chunk o3 and stored examples).
 
 ## 1. What is tested, and where
 
@@ -291,6 +291,9 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   24 s of app teardown after the last step, and every `waitFor` costs at least a second even for an element already on
   screen. Revealing the replay's Step button once and tapping the same element, and skipping the bounded wait when the
   element already exists, brought them to 64, 72 and 60 s. The chunk key `m3` was checked unique before use.
+- **Chrono Constellator in the app** (R02-G06-09, 2026-11-22). Serial chunk `o3` holds `CRPlayUITests` and
+  `CRReplayUITests` (54.7, 73.4 and 44.1 s on the iOS 27.2 phone); the key was checked unique before use. The level-1
+  journey needs one Phase + press and Run, and its pinned values are checked against the Core by an app unit test.
 - **Chrono Constellator regression** (R02-G06-08, 2026-11-22). `python3 scripts/chrono_constellator_regression.py`
   runs the host filter `ChronoConstellatorRegression` (solver regression over 100 witnesses in tests of 10, twelve named
   alterations, golden descriptions) and then the simulator golden-frame and memory classes with

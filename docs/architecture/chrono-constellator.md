@@ -209,3 +209,19 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
 - **Where it runs.** CI's host job has a named "Chrono Constellator regression (host)" step; locally,
   `python3 scripts/chrono_constellator_regression.py` runs the host and simulator parts with one summary line each.
 
+## In-app integration (feature 359, R02-G06-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g06.chrono-constellator.<name>`
+  (`ChronoConstellatorControls.identifierNames`, 28 names: phase-down, phase-up, add-hold, remove-hold, step-1, step-10,
+  run, rewind, undo, redo, next-level, reset-view, hint, dismiss-tutorial, failure-undo, failure-rewind, retry,
+  campaign, daily, practice, play-level, replay, replay-step, replay-stop, star-picker, level-picker, sound, summary).
+- **Interface tests.** `CRPlayUITests` wins level 1 through the panel (its certified solution: Phase + once on star 1,
+  from phase 7 to 8 of its 10-cell loop, then Run; the win comes on tick 3: "Every star stands on its target",
+  "Stars: 3 of 3", level 2 open) and keeps the progress over a relaunch; `CRReplayUITests` replays the win (two actions)
+  to its end and stops. They run as serial chunk `o3`, each under 90 s. Level 1's certified phase changes, default
+  phases and loop lengths are pinned in `CR` and checked against the Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`ChronoConstellatorSchemaExamples`),
+  which the app restores into schema 3 (a schema-2 result without a trace is kept, unverified); Chrono Constellator
+  stays a candidate (not available without `-vcCandidates`) until X-R02-G06.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
+

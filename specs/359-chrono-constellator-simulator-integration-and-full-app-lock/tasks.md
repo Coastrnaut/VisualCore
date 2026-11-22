@@ -58,7 +58,7 @@ change (the shaders and reference of R02-G06-03 are unchanged and re-proven by t
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0609-007 Docs: `docs/architecture/chrono-constellator.md` (in-app integration),
+- [X] T-R02G0609-007 Docs: `docs/architecture/chrono-constellator.md` (in-app integration), — Verified 2026-11-22: round02-host and script-tests (alone) exit=0; chrono-constellator.md in-app integration, ExperiencesRound02 README feature 359, automatedtesting.md chunk o3 entry
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name script-tests` (alone)
 - [X] T-R02G0609-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-22: rendering-27, rendering-26, experiences, host-full exit=0 (app-unit and app-ui are this gate's own runs)
   `--name host-full` (app-unit and app-ui are this gate's own runs)

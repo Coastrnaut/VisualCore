@@ -349,3 +349,8 @@ Feature 358 (R02-G06-08) adds the regression net: solver and witness checks for 
 alterations, `ChronoConstellatorGolden` (test builds only) with 16 pinned golden frame descriptions in
 `ChronoConstellator/golden-frames.json` (`CHRONO_CONSTELLATOR_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and
 memory tests, a CI step and `scripts/chrono_constellator_regression.py`.
+
+Feature 359 (R02-G06-09) adds Chrono Constellator's in-app integration: panel identifiers
+(`ChronoConstellatorControls.identifierNames`), the stored schema-1 and schema-2 examples
+(`ChronoConstellatorSchemaExamples`), app unit tests, and the interface tests `CRPlayUITests` and `CRReplayUITests` in
+serial chunk `o3`.
