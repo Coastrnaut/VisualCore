@@ -24,7 +24,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G0703-003 [P] [US1] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeShaders.swift`
+- [X] T-R02G0703-003 [P] [US1] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeShaders.swift` — Verified 2026-11-22: 2026-11-22: host-2 (AmethystEscapeShaderSourceTests, 13 tests) exit 0, rerun by the lead
   (crystal and glow sources, GLSL ES 3.00; translucent amethyst facets alpha 0.55 with up to 3 shifting specular
   highlight layers driven by `u_time`; uniform names; glow gain cap; palette constants equal to the CPU's) with
   `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeShaderSourceTests.swift` (version line, declared

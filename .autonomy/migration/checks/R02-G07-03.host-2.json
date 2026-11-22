@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AmethystEscapeShaderSource"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AmethystEscapeShaderSource",
+  "elapsed_seconds": 2.768,
+  "exit_code": 0,
+  "finished": "2026-11-22T08:21:23+00:00",
+  "gate": "R02-G07-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-03.host-2.log",
+  "log_sha256": "1e2e079e76a6caa252d66dd57af78930cabbda788be212825ec9f2393436a8b4",
+  "name": "host-2",
+  "started": "2026-11-22T08:21:20+00:00",
+  "timed_out": false
+}
