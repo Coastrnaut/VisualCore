@@ -1,0 +1,65 @@
+{
+  "bundle": null,
+  "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+  "device_type": "com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro",
+  "experience": "r02-g05.colorfall-canyons",
+  "results": [
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "81c080df04bfdfcf89ea67b7297aa9bdb7ffe4b7684e92dafeda9bfb3729065b",
+      "result": "pass",
+      "scenario": "launch-first-frame"
+    },
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "a4ea113c993cadec48ed2608978a1f70a341854457ee92a0fcfd8cbf8fb2149c",
+      "result": "pass",
+      "scenario": "input-response"
+    },
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "532084a1ad6b341e74540e1f299138570f855b3c83306280e5cc226aa92f9b72",
+      "result": "pass",
+      "scenario": "completion"
+    },
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "ceda380c6b7e8c5f4d7ad36f2a45e3c6961092fc765f8f658fc1b135b177bdd5",
+      "result": "pass",
+      "scenario": "rejection"
+    },
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "69d97f04db1c2591849938fdc578655f7949e05d48ebf865057806ea176644f4",
+      "result": "pass",
+      "scenario": "save-restore"
+    },
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "b99194f03bf8fe2bbdc15d889bc9b3373c16e0b582ce2b052cdf90b12bb9caea",
+      "result": "pass",
+      "scenario": "reset"
+    },
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "db44bddadf86e8fb950916daa9103af2acdf96c02d2457081bf52d4833994186",
+      "result": "pass",
+      "scenario": "suspend-resume"
+    },
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "47ad26873d9c80bf5961aea606bbe4051a8bba159d930721a42445cad4260b2f",
+      "result": "pass",
+      "scenario": "teardown-reentry"
+    },
+    {
+      "commit": "7fda3e2b64556035d6eaf70e6c3ebb8bdfb2238f",
+      "record_sha256": "ca75bbd5772e24e440c024f8648093095d5115c5dd1ffc7e0d82cba931396b63",
+      "result": "pass",
+      "scenario": "cancel-prepare"
+    }
+  ],
+  "runtime": "27.2",
+  "runtime_build": "24B91016s",
+  "schema": 1
+}

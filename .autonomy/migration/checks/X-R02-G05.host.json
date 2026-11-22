@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xr02g05-host"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g05-host",
+  "elapsed_seconds": 368.421,
+  "exit_code": 0,
+  "finished": "2026-11-22T01:40:32+00:00",
+  "gate": "X-R02-G05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G05.host.log",
+  "log_sha256": "8e8bf84e58675d994549c7c8ca9a13e2d26f2c44cb8f04c908aa34c8b0aa2986",
+  "name": "host",
+  "started": "2026-11-22T01:34:23+00:00",
+  "timed_out": false
+}
