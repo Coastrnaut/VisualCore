@@ -406,3 +406,8 @@ the shared `ExperienceFeedback`), `AmethystEscapeLights` (eased glows and amber 
 `AmethystEscapeSoundRecipe` in the Core; the geometry draws the eased levels; the experience gains `AmethystEscapeSound`
 (the ambient loop), a feedback log, an adjustable shell picker, a summary element, a Sound toggle and Dynamic Type layout.
 
+Feature 367 (R02-G07-07) adds persistence and replay: results carry their winning trace and `verified`;
+`AmethystEscapeReconciliation` replays every trace on restore and drops results that do not verify; the adapter writes
+snapshot schema 3 with a 2 → 3 migration, adds `replay.start`, `replay.step`, `replay.stop` and `settings.sound`; the
+panel gains Replay, Step and Stop and announces dropped results once.
+

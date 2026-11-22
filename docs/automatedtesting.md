@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G07-06: Amethyst Escape polish; a fade meets a still frame).
+Last updated: 2026-11-22 (R02-G07-07: Amethyst Escape persistence; agents built on one merged copy).
 
 ## 1. What is tested, and where
 
@@ -265,6 +265,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
   timelines everywhere, one added hold on small levels). Witness files are generated in a separate write run: the
   byte-compare and decode tests run in parallel, so a first run with the write flag fails until the files exist.
+- **Agents stacked on one merged copy** (R02-G07-07, 2026-11-22). Amethyst Escape's persistence was written by four
+  agents in sequence on one scratchpad package: traces and reconciliation, then the adapter (schema 3, replay) on top,
+  then the persistence tests and the presenter against the finished adapter. The repository stayed free for the
+  previous gate's evidence chain; the lead copied each task's files in and ran its named check in the repository. The
+  panel and replay simulator tests passed on their first compile.
 - **A fade meets a still frame** (R02-G07-06, 2026-11-22). Once the failed wedge's amber eased in over 0.15 s, an
   earlier simulator test that took its still frame at time 0 right after the failure found no amber: no time had
   passed. The test now renders a still at 0 s and checks one at 1 s. Any check of a drawn state change must give the
