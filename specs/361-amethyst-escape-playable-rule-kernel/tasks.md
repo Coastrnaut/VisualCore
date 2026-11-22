@@ -36,7 +36,7 @@ in this feature (the crystal state is the CPU reference the renderer of R02-G07-
 
 ## Phase 4: Stories 2 and 3 — wedge, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G0701-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapePlay.swift`
+- [X] T-R02G0701-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapePlay.swift` — Verified 2026-11-22: host-3 exit=0 (AmethystEscapePlayTests 11/11: exact win, wedge and budget moves, budget ±1, 500 replays, undo fingerprints, every refusal)
   (agent B: stages "loading, tutorial, playing, paused, won, failed, result"; actions validated for stage, previous
   fingerprint, range, stuck; each accepted rotate and advance spends one move; after a move exit, then wedge, then budget;
   failures wedge (shell, sector) and budget; records with previous and next fingerprints; full undo and redo (from failed
