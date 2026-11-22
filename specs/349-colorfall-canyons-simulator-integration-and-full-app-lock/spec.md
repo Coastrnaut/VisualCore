@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G05-09 (migration ledger, game feature of experience R02-G05) · ID namespace FR-R02G0509-###,
 SC-R02G0509-###, T-R02G0509-###
@@ -23,6 +23,51 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 339 (Hue Compass's simulator integration and full app lock).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+339's answers. Facts checked in code (read-only, 2026-11-21): feature 339 (Hue Compass) is the model
+(`Apps/VisualCore/Tests/UI/HueCompass`, namespace `HC`, serial chunk `m3`; identifiers through `port.identifier(name)`;
+`HueCompassSchemaExamples.swift`); Colorfall Canyons's panel (`ColorfallCanyonsControls`) has labels and values but no
+identifiers, with two Undo buttons (the failure section's and the play row's) and one valve button per spring; its
+registration in `Apps/VisualCore/App/ExperienceRegistry.swift` still says "Snapshot schema 1, so no earlier example is
+stored yet" although the snapshot is schema 3 since feature 347; the canvas description names the level, the tick, the
+actions left, every spring and basin and, when won, "Every basin is filled with its colours. Stars: k of 3.";
+`RELEASE_FORBIDDEN` already holds `ColorfallCanyonsGolden` (feature 348); the UI chunk keys in `release_check.py` use
+up to `m3` and not `n3`; no `CC` namespace exists in the app's tests.
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g05.colorfall-canyons.<name>` through `port.identifier(name)`: the buttons `carve`, `valve-0`,
+  `valve-1`, `valve-2` (one per spring present), `step-1`, `step-10`, `run`, `undo`, `redo`, `next-level`, `reset-view`,
+  `hint`, `dismiss-tutorial`, `failure-undo`, `retry`, `campaign`, `daily`, `practice`, `play-level`, `replay`,
+  `replay-step`, `replay-stop`, the steppers `cell-picker` and `level-picker`, the toggle `sound` and the summary
+  element `summary`. The tests read the canvas description for the level, the win and the stars, and the replay step's
+  value for the replay position. Impact: FR-R02G0509-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `CC` in
+  `Apps/VisualCore/Tests/UI/ColorfallCanyons/CCSupport.swift`; `CCPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g05.colorfall-canyons`: dismiss the tutorial, play level 1's
+  certified solution with the cell picker (stepping to each certified carve cell), Carve, the valve buttons and Run,
+  read "Every basin is filled" and "Stars: 3 of 3", the level picker shows level 2 open; relaunch without reset: the
+  stars and level 2 are kept) and `CCReplayUITests` (after the win, Replay, Step until the replay ends won, Stop back to
+  the campaign). They run as a new serial chunk `n3` of `release_check.py` (its key checked unique); each test stays
+  under 90 s. Level 1's certified actions and the carvable-cell order used by the picker are pinned in `CC` and checked
+  against the Core by an app unit test. Impact: FR-R02G0509-002, 007; SC-R02G0509-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `ColorfallCanyonsExperienceCore.schemaOneExample()` (the schema-1 saved state of a seeded play of level 1 with one
+  carve that does not win) and `schemaTwoExample()` (schema 2 with progress and level 1 solved, no trace), both
+  `MigrationExample`s built in the Core (`ColorfallCanyonsSchemaExamples.swift`, modelled on
+  `HueCompassSchemaExamples`), registered with `examples:`; the app's migration check restores both into schema 3 with
+  progress kept. The registration's comment is corrected. Impact: FR-R02G0509-003; SC-R02G0509-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `ColorfallCanyonsGolden` is already forbidden, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G0509-004;
+  SC-R02G0509-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g05.colorfall-canyons` as not available and the launcher cannot open it; the registry's candidates list contains
+  it and `all` does not. Impact: FR-R02G0509-006; SC-R02G0509-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
