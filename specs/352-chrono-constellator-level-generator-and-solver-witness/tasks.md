@@ -51,7 +51,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0602-005 [P] [US4] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorWitness.swift`
+- [X] T-R02G0602-005 [P] [US4] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorWitness.swift` — Verified 2026-11-21: 2026-11-21 host-4 exit 0: ChronoConstellatorWitnessTests 16 tests in 0.35 s (byte round trip, digests and fingerprints from replay, counterexamples fail as recorded, every edited part and newer, damaged JSON refused) (.autonomy/migration/checks/R02-G06-02.host-4.json); lead retest
   (schema 1; actions: the solution's phase changes in star order, then step(tick limit); built by replaying them on a
   `ChronoConstellatorPlay`: win tick, the 16-hex position digest after every tick up to the win, fingerprints after begin
   and each action; the lower bound, window, windows and blocked; unedited and near-miss counterexamples (reason, tick);
