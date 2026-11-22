@@ -270,13 +270,22 @@ import VisualCoreSimulation
         neighbourFixture(index).level
     }
 
-    /// The Swift sources of the kernel (the Core directory next to this test directory).
+    /// The presentation sources of the Core (feature 383, R02-G09-03: the scene snapshot, geometry, shaders,
+    /// experience adapter and scenarios), which read the kernel and turn its cells into Doubles for drawing; they are
+    /// not kernel sources, and the renderer-purity tests of feature 383 cover them.
+    static let presentationSources: Set<String> = [
+        "NocturneGardenSceneSnapshot.swift", "NocturneGardenSceneGeometry.swift", "NocturneGardenShaders.swift",
+        "NocturneGardenExperienceCore.swift", "NocturneGardenScenarios.swift",
+    ]
+
+    /// The Swift sources of the kernel (the Core directory next to this test directory, less the presentation
+    /// sources).
     static func kernelSources() throws -> [(name: String, text: String)] {
         let tests: URL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
         let core: URL = tests.deletingLastPathComponent().appendingPathComponent("Core")
         let names: [String] = try FileManager.default.contentsOfDirectory(atPath: core.path).sorted()
         var sources: [(name: String, text: String)] = []
-        for name in names where name.hasSuffix(".swift") {
+        for name in names where name.hasSuffix(".swift") && !presentationSources.contains(name) {
             let text: String = try String(contentsOf: core.appendingPathComponent(name), encoding: .utf8)
             sources.append((name, text))
         }

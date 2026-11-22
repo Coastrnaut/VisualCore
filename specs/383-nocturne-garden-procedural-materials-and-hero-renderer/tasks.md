@@ -11,7 +11,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G0903-001 Baselines on the committed tree: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit=0 on the committed tree; rendering baseline is R02-G09-02's rendering runs (exit 0)
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G09-02's
   rendering runs (exit 0)
-- [ ] T-R02G0903-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes,
+- [X] T-R02G0903-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes, — Verified 2026-11-22: host exit=0 (87 Nocturne Garden tests: kernel suites unchanged; Core gains VisualCoreScenes, Experience, Diagnostics, Persistence; the invariant tests' kernel scan skips the five presentation sources; snapshot, palette and tiers)
   VisualCoreExperience, VisualCoreDiagnostics, VisualCorePersistence now; `NocturneGardenExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); make the kernel scan of
   `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenInvariantTests.swift` skip the presentation sources (snapshot, geometry, shaders,
