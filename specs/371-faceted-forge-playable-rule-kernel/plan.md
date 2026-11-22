@@ -26,8 +26,8 @@ such planes (Cramer's rule, determinant at most 4 in size), so numerators and de
 operation is checked and an overflow refuses the action. No floating point in the rules.
 **Seeds**: fixtures use `SeededRandom(seed: 2_371)`; neighbouring-input checks seed 2_376.
 **Testing**: `swift test --package-path Packages/ExperiencesRound02 --filter FacetedForge`; regression as for 361.
-**Performance**: a piece has at most 14 + 8 = 22 planes; its corners come from at most C(22, 3) = 1,540 triples, each
-checked against 22 planes; a cut is well under a millisecond; a 500-trace test stays under 10 s.
+**Performance**: a piece has at most 14 + 12 = 26 planes; its corners come from at most C(26, 3) = 2,600 triples,
+each checked against 26 planes; a cut is well under a millisecond; a 500-trace test stays under 10 s.
 **Constraints**: additive; reason codes `r02-g08.*`; denylisted names (ProjectM, PresetLibrary, MilkDrop …) avoided.
 **CI**: the existing `swift test` step of ExperiencesRound02 covers the new targets; no workflow change.
 
