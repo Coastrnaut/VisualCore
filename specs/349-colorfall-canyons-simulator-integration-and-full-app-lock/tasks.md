@@ -14,7 +14,7 @@ change (the shaders and reference of R02-G05-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0509-002 Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSchemaExamples.swift`
+- [X] T-R02G0509-002 Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsSchemaExamples.swift` — Verified 2026-11-21: 2026-11-21 host exit 0: schema examples 7 tests (both restore to schema 3 with level 1, the carve and progress kept; digests match; versions 0/3/4 nil; deterministic) + experience core and persistence suites (.autonomy/migration/checks/R02-G05-09.host.json); registry stores both examples, comment corrected; lead retest
   (contracts/api.md; data-model: schema 1 "a seeded play of level 1 with one carve that does not win, seed 7"; schema 2
   "campaign mode, progress {frontier 2, solved [level 1, best units, stars]}, tutorial", "the result is kept, unverified,
   without a trace"; the envelope of `HueCompassSchemaExamples`) with

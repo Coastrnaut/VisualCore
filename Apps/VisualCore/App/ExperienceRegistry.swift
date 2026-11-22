@@ -113,11 +113,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [colorfallCanyons].compactMap { $0 }
 
-    /// R02-G05 Colorfall Canyons (feature 343, R02-G05-03): a candidate until X-R02-G05. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G05 Colorfall Canyons (features 341–349, R02-G05-01…09): a candidate until X-R02-G05. Snapshot schema 3
+    /// (feature 347), so the schema-1 and schema-2 examples are stored (feature 349, R02-G05-09).
     fileprivate static var colorfallCanyons: ExperienceRegistration? {
         guard let id = ColorfallCanyonsExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: ColorfallCanyonsExperienceCore.self) { launch in
+        let examples = [ColorfallCanyonsExperienceCore.schemaOneExample(),
+                        ColorfallCanyonsExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: ColorfallCanyonsExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return ColorfallCanyonsExperience.make(
                 id: id, storage: launch.storage,
