@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G06-03 (migration ledger, game feature of experience R02-G06) · ID namespace FR-R02G0603-###,
 SC-R02G0603-###, T-R02G0603-###
@@ -30,6 +30,62 @@ Canonical overrides:
 - **Shared features used:** R02-F05 (generated meshes), R02-F07 (emissive and glow passes), R02-F10 (quality tiers and
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G06-01 and -02.
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+343's answers. Facts checked in code (read-only, 2026-11-21): Colorfall Canyons's experience (R02-G05-03 … 10) is the
+pattern in this package — a Core adapter with a per-process cache of generated levels, an immutable scene snapshot, a CPU
+projection reference, GLSL sources in the Core, an iOS-only experience target (`…Experience.swift`, presenter, scene,
+controls), a scenario manifest with 80 acceptance scenarios, a registration with content facts in
+`Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Chrono Constellator kernel provides the level,
+timeline, evaluation, play, rules and the certified catalog with its pinned digest (6483b20e…6ffc); `AppModelTests` uses
+`r02-g06.chrono-constellator` as its example of an unregistered candidate; the catalog's design gives the palette
+"indigo, silver and rose" and the geometry "polyline history cache with predictable alpha decay".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the grid lies in the xz-plane with
+  cell size u = 2 / max(columns, rows), column c at x = (c − (columns − 1)/2)·u and row r at z = (r − (rows − 1)/2)·u, y up.
+  The field is an indigo plane at y = 0 with faint grid lines; each star's loop is a silver track (width 0.08·u, y =
+  0.004·u) through its cells' centres; each star is a glowing node (radius 0.3·u, centre y = 0.25·u) drawn with its shape
+  (ring, cross, diamond, triangle, square); each target is a rose ring (outer radius 0.42·u, y = 0.006·u) with its
+  star's shape inside; a star on its target lights the ring. Each star's history ribbon joins its cells over the last R
+  ticks (R by tier), each tick's point raised by 0.04·u per tick of age above the node height, so older paths float up
+  like staves of a score, with alpha 1 − age / R (the predictable decay); holds draw as a short vertical bar at the held
+  cell; a collision cell gets an amber cross. The camera is a fixed authored perspective looking at the grid centre from
+  the front (+z), pitched 55° down, fitted to the bounding sphere of the grid with the ribbons' full height plus 0.1, with
+  a 5 % margin for aspect 0.4 … 2.5. Ribbon shimmer moves with presentation time only. Nothing drawn is consulted by the
+  rules. Impact: FR-R02G0603-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): ribbons of R = 24 ticks, 4 segments per tick, 2
+  glow shells; `level-1`: R = 12, 2 segments, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): R = 6, 1 segment,
+  no glow. Stars, targets, tracks, colours, shapes and marks sit at the same places at every tier. Levels are ordered
+  richest first; the presenter logs each tier change with its reason. Impact: FR-R02G0603-004; SC-R02G0603-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every star node
+  centre, every target centre and every loop cell centre through the same camera and gives the palette. Simulator tests
+  render offscreen at 1,152 × 768 and check that each star centre lies within 3 pixels of a pixel brighter than the field
+  by at least 0.15 in luminance, that each target centre's ring (sampled at 0.42·u from the centre in screen space, ± 3
+  pixels) differs from the field by at least 0.1, and that the background matches the field within 0.05 away from
+  geometry. Palette: field indigo #0B0A24, grid #1C1A44, silver #C9CED8, star #F2F4FF, rose #FF5C8A, collision amber
+  #FFB020. Impact: FR-R02G0603-006; SC-R02G0603-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `ChronoConstellatorSceneSnapshot` (grid, every star's loop, target, current cell and the cells of its last 24 ticks, the
+  timeline's phases and holds, stage, failure, tick, level number and presentation time) made by the adapter; it never
+  holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the shared
+  unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion holds the
+  ribbon shimmer at time 0; Reduce Flashing caps the glow gain. Impact: FR-R02G0603-003, 007; SC-R02G0603-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g06.chrono-constellator` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/ChronoConstellator/scenario-manifest.json`, no permissions, a summary of
+  at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's experience
+  registry link `ChronoConstellatorExperience` as a candidate (`available: false` until X-R02-G06), opening at seed 0
+  (level 1); `AppModelTests` switches its unregistered example to the next round-two game (`r02-g07.amethyst-escape`).
+  The adapter (`ChronoConstellatorExperienceCore`) prepares certified level (seed mod 100) + 1 (generated once per
+  process) and accepts `star.phase [star, offset]` (whole, 0 … 4, 0 … 31), `star.hold [star, start, length]` (whole, 0 … 4,
+  1 … 1,200, 1 … 60), `star.release [star, start]`, `time.step [ticks]` (whole, 1 … 1,200), `time.rewind`, `play.undo`,
+  `play.redo` and `level.next`; the kernel refuses everything out of range or out of stage; its digest is the level number
+  and the play's fingerprint (never the record history, so undo restores the earlier digest); snapshot schema 1
+  `{level, records}`. Impact: FR-R02G0603-005, 008, 009; SC-R02G0603-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
