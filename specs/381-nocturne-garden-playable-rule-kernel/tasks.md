@@ -49,7 +49,7 @@ in this feature (the blooms and the mask are the CPU reference the renderer of R
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G0901-005 [P] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenRules.swift` (agent C: `PuzzleRules`: State = position
+- [X] T-R02G0901-005 [P] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenRules.swift` (agent C: `PuzzleRules`: State = position — Verified 2026-11-22: host-4 (swift test --filter NocturneGarden, 37 tests incl. NocturneGardenRulesTests 7: move order and counts by formula, fixture actions legal and winning, terminal positions, leak and budget agreement, 200 seeded walks agreeing with the play at every step, >10,000 acceptance checks) exit 0, lead retest
   (blooms, sun, moves, outcome), Move = NocturneGardenAction; legal moves while playing "plant by kind, row, column,
   size; then move, resize, remove by bloom; then sun") with `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenRulesTests.swift` (agreement
   with the play on 200 walks); `--name host-4`
