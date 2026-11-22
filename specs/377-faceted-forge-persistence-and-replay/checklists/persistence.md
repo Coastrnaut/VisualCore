@@ -15,10 +15,11 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-22; failu
 
 ## Deterministic invariants
 
-- [x] CHK002 Is the trace defined exactly (effective cuts, no undo or redo; cuts made still counting undone cuts) and when a result is replaced?
-  [Clarity, Spec §Clarifications Q1]
+- [x] CHK002 Is the trace defined exactly (effective cuts, no undo or redo; cuts made still counting undone cuts) and
+  when a result is replaced? [Clarity, Spec §Clarifications Q1]
 - [x] CHK003 Is the reconciliation rule stated as a checkable condition (wins, trace no longer than the recorded cuts
-  made, stars matching the stars rule) with the frontier kept as saved? [Measurability, Spec §FR-R02G0807-003; Clarifications Q2]
+  made, stars matching the stars rule) with the frontier kept as saved? [Measurability, Spec §FR-R02G0807-003;
+  Clarifications Q2]
 - [x] CHK004 Are the inputs of the state listed so determinism is testable (seed, catalog, date action, actions; no
   clock)? [Clarity, Spec §FR-R02G0807-005; Clarifications Q5]
 - [x] CHK005 Is it stated that the sound choice and the dropped count never enter the digest? [Consistency, Spec

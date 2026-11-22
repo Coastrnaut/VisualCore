@@ -327,12 +327,14 @@ public enum FacetedForgeSceneGeometry {
     /// painter's order, the preview's facing side and the camera-facing sliver cross and mark bars follow the eye of
     /// `orbit` (``frame(_:)``); the default, the authored orbit, gives the output of R02-G08-03 bit for bit. With
     /// `lights` (feature 376, R02-G08-06) the sliver cross's shade is the eased sliver level; without them the output
-    /// is unchanged.
+    /// is unchanged. While the snapshot has no failure piece but the sliver level is still fading out, the cross is
+    /// drawn at `fadingSliver`, the last sliver piece's opened centre (T-R02G0806-013).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func crystalPart(_ snapshot: FacetedForgeSceneSnapshot, tier: FacetedForgeTier,
                                    reduceMotion: Bool = false, orbit: FacetedForgeOrbit = .authored,
-                                   lights: FacetedForgeLights? = nil) throws(MeshError) -> FacetedForgeColouredMesh {
+                                   lights: FacetedForgeLights? = nil,
+                                   fadingSliver: SIMD3<Double>? = nil) throws(MeshError) -> FacetedForgeColouredMesh {
         let view: (eye: SIMD3<Double>, up: SIMD3<Double>, right: SIMD3<Double>) = frame(orbit)
         var parts: Parts = Parts(lit: true)
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
@@ -346,8 +348,14 @@ public enum FacetedForgeSceneGeometry {
             try addPiece(snapshot.pieces[index], shift: shift, segments: segments, eye: view.eye, to: &parts)
         }
         try addPreview(snapshot, reduceMotion: reduceMotion, eye: view.eye, to: &parts)
+        // T-R02G0806-013: after an undo the cross fades out at the last sliver piece's opened centre (`fadingSliver`).
+        var crossCentre: SIMD3<Double>?
         if let sliver = snapshot.failurePiece, snapshot.pieces.indices.contains(sliver) {
-            let centre: SIMD3<Double> = pieceCentre(sliver, snapshot, reduceMotion: reduceMotion)
+            crossCentre = pieceCentre(sliver, snapshot, reduceMotion: reduceMotion)
+        } else if let fading = fadingSliver, let lights, lights.sliver > 0 {
+            crossCentre = fading
+        }
+        if let centre = crossCentre {
             let a: SIMD3<Double> = unit(view.right + view.up)
             let b: SIMD3<Double> = unit(view.right - view.up)
             // Feature 376 (R02-G08-06): the cross's shade is the eased sliver level when lights are given.
@@ -372,8 +380,10 @@ public enum FacetedForgeSceneGeometry {
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func crystalMesh(_ snapshot: FacetedForgeSceneSnapshot, tier: FacetedForgeTier,
                                    reduceMotion: Bool = false, orbit: FacetedForgeOrbit = .authored,
-                                   lights: FacetedForgeLights? = nil) throws(MeshError) -> Mesh {
-        try crystalPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit, lights: lights).mesh
+                                   lights: FacetedForgeLights? = nil,
+                                   fadingSliver: SIMD3<Double>? = nil) throws(MeshError) -> Mesh {
+        try crystalPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit, lights: lights,
+                        fadingSliver: fadingSliver).mesh
     }
 
     /// The glow (glow program, colour in the normal slot, uv (weight, 0)): for k = `tier.glowShells` … 1, a copy of

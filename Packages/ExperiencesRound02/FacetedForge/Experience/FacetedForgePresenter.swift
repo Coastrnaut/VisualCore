@@ -198,6 +198,8 @@ final class FacetedForgePresenter: ExperiencePresenter {
     private var lastFrameTime: Double?
     /// The ambient sound (feature 376).
     let sound: FacetedForgeSound
+    /// The opened centre of the last sliver piece drawn, so its cross can fade out after an undo (T-R02G0806-013).
+    private(set) var fadingSliver: SIMD3<Double>?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         lights = FacetedForgeLights(reducedFlash: reduceFlashing)
@@ -247,7 +249,13 @@ final class FacetedForgePresenter: ExperiencePresenter {
             lights.settle(to: snapshot)
         }
         lastFrameTime = frame.time
+        if let piece = snapshot.failurePiece, snapshot.pieces.indices.contains(piece) {
+            fadingSliver = FacetedForgeSceneGeometry.pieceCentre(piece, snapshot, reduceMotion: reduceMotion)
+        } else if lights.sliver <= 0 {
+            fadingSliver = nil
+        }
         scene.lights = lights
+        scene.fadingSliver = fadingSliver
         scene.orbit = gestures.orbit
         let shown: FacetedForgeSceneSnapshot
         if let candidate = gestures.candidate {

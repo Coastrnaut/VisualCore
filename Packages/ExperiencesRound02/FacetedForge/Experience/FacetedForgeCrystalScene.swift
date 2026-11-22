@@ -36,6 +36,8 @@ final class FacetedForgeCrystalScene {
     /// The eased light levels (presentation only), set by the presenter before each frame (feature 376): the glow gain
     /// is multiplied by `lights.glow` and the sliver cross is shaded by `lights.sliver`; nil draws the full levels.
     var lights: FacetedForgeLights?
+    /// Where a sliver cross fades out after an undo (T-R02G0806-013), set by the presenter before each frame.
+    var fadingSliver: SIMD3<Double>?
     /// The light direction of the crystal (towards the light, from the upper left front).
     static let lightDirection = SIMD3<Float>(-0.35, 0.8, 0.5)
 
@@ -131,7 +133,7 @@ final class FacetedForgeCrystalScene {
             do {
                 let crystal = try FacetedForgeSceneGeometry.crystalMesh(snapshot, tier: tier,
                                                                        reduceMotion: reduceMotion, orbit: orbit,
-                                                                       lights: lights)
+                                                                       lights: lights, fadingSliver: fadingSliver)
                 crystalRenderer = try Self.renderer(crystal, vertex: FacetedForgeShaders.crystalVertex,
                                                     fragment: crystalFragment, name: "faceted-forge-crystal",
                                                     registry: registry)

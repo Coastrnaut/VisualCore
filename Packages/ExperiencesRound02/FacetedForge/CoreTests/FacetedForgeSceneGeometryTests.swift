@@ -567,4 +567,32 @@ import VisualCoreScenes
         #expect(!shades.isEmpty)
         for shade in shades { #expect(abs(shade - fading.sliver) < 1e-6) }
     }
+
+    /// T-R02G0806-013: after an undo the snapshot has no failure piece; while the sliver level fades out the cross is
+    /// drawn at the given centre with that level, and once the level reaches 0 it is gone.
+    @Test func anUndoneSliverFadesItsCrossOut() throws {
+        let failed: Snapshot = try Self.sliver()
+        let undone: Snapshot = try Self.snapshot(try Self.play(try Self.openCube(budget: 3)), time: 1)
+        let tier: FacetedForgeTier = FacetedForgeTier.of(0)
+        let centre: SIMD3<Double> = SIMD3(0.4, 0.1, 0.2)
+        var lights: FacetedForgeLights = FacetedForgeLights(reducedFlash: true)
+        lights.settle(to: failed)
+        lights.step(toward: undone, elapsed: 0.2)
+        #expect(lights.sliver > 0 && lights.sliver < 1)
+        let fading: FacetedForgeColouredMesh = try Geometry.crystalPart(undone, tier: tier, lights: lights,
+                                                                        fadingSliver: centre)
+        var shades: [Double] = []
+        for uv in fading.mesh.uvs where uv.x == FacetedForgeMaterial.sliverCross { shades.append(Double(uv.y)) }
+        #expect(!shades.isEmpty, "the cross is still drawn while it fades out")
+        for shade in shades { #expect(abs(shade - lights.sliver) < 1e-6) }
+        lights.step(toward: undone, elapsed: 1)
+        #expect(lights.sliver == 0)
+        let gone: FacetedForgeColouredMesh = try Geometry.crystalPart(undone, tier: tier, lights: lights,
+                                                                      fadingSliver: centre)
+        var left: Int = 0
+        for uv in gone.mesh.uvs where uv.x == FacetedForgeMaterial.sliverCross { left += 1 }
+        #expect(left == 0, "a faded-out cross is no longer drawn")
+        let plain: FacetedForgeColouredMesh = try Geometry.crystalPart(undone, tier: tier)
+        #expect(gone == plain)
+    }
 }
