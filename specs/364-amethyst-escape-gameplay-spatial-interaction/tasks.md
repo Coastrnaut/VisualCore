@@ -73,7 +73,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G0704-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: 2026-11-22: reference-2 exit 0
 - [X] T-R02G0704-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-22: 2026-11-22: script-tests (run alone) exit 0
 - [ ] T-R02G0704-012 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G0704-007)
-- [ ] T-R02G0704-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0704-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-22: 2026-11-22: converge round 2 clean; sealed and recorded pass
 
 ## Dependencies and parallel work
 
