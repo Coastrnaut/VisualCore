@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G07-03: Amethyst Escape hero renderer, agents in isolated copies).
+Last updated: 2026-11-22 (R02-G07-04: Amethyst Escape touch controls; zsh word splitting in loops).
 
 ## 1. What is tested, and where
 
@@ -265,6 +265,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
   timelines everywhere, one added hold on small levels). Witness files are generated in a separate write run: the
   byte-compare and decode tests run in parallel, so a first run with the write flag fails until the files exist.
+- **A quoted command in a zsh loop is one word** (R02-G07-04, 2026-11-22). A post-record loop `for c in
+  "planning_index.py build" …; do python3 scripts/$c; done` ran `python3 "scripts/planning_index.py build"`, a missing
+  file, and printed exit 2 for the index build and the catalog check; the other steps passed, so the failure looked
+  like a flaky check. Write each pipeline command out (or use `${=c}`), and read every exit code before pushing.
+- **Two games, one tilt direction** (R02-G07-04, 2026-11-22). Amethyst Escape's gesture agent followed its brief
+  (`pitch += dy`), the opposite of Chrono Constellator's orbit; the lead chose Chrono's direction so a two-finger drag
+  tilts every round-two crystal and sky the same way, and the orbit test's expected values moved with it.
 - **Agents in isolated copies, one merged retest** (R02-G07-03, 2026-11-22). Amethyst Escape's shader, geometry and
   adapter agents each worked in their own scratchpad package (only the Core and its tests, separate scratch paths), so
   the repository stayed free for the previous gate's evidence chain; the lead merged the three into one copy and ran all

@@ -387,3 +387,11 @@ GLSL sources `AmethystEscapeShaders` and the scenario manifest `AmethystEscapeSc
 `UPDATE_SCENARIO_MANIFEST=1` rewrites it); the iOS-only target `AmethystEscapeExperience` (presenter, GL crystal scene
 with fallback, control panel) and its simulator tests. A registered candidate until X-R02-G07.
 
+Feature 364 (R02-G07-04) adds touch controls: in the Core the constrained `AmethystEscapeOrbit` with
+`AmethystEscapeSceneGeometry.camera(_:aspect:orbit:)` and the isolation shade (`crystalMesh(_:tier:isolated:)`), the
+analytic `AmethystEscapePicker` (`AmethystEscapePick`), the drag preview `AmethystEscapeSceneSnapshot.previewing(shell:sectors:)`
+and `AmethystEscapeGestureController` (`AmethystEscapeGestureAction`: shell drags, pearl taps, shell picks, double-tap
+isolation and view reset, orbit); in the experience the presenter's pointer entry, the preview and "Show all layers" and
+"Reset view"; host tests with an independent pick and angle, all 100 levels won through the panel, and simulator wiring
+tests.
+

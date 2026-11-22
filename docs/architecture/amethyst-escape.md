@@ -101,3 +101,22 @@ rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unle
 - **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest e65c4529…94e6) and linked into the one
   app; it stays unavailable until X-R02-G07. Its scenario manifest has the standard scenarios, `full-playthrough`,
   `hero`, three fixtures and the 80 acceptance rows R2-G07-QA-001 … 080 (row r opens level (7 × (r − 1)) mod 100 + 1).
+
+## Touch controls (feature 364, R02-G07-04)
+
+- **Turn a shell.** A one-finger drag that starts on a shell (picked at touch-down: the pearl first, then the shells'
+  top planes from the innermost outward, else the nearest top-ring midline within 22 points) sums the unwrapped angle
+  change of the touch on that shell's plane; on release after at least 16 points it sends one `shell.rotate [k, ±1]`
+  per whole sector swept (rounded, the shortest way round, at most ⌊S/2⌋). While dragging, the scene draws the snapshot
+  with that shell turned (`AmethystEscapeSceneSnapshot.previewing(shell:sectors:)`) and the description says "Shell k
+  would turn n sectors clockwise". Only while playing; a finished play sends nothing and says so.
+- **Advance and pick.** A tap (under 10 points, at most 0.5 s) on the pearl sends `pearl.advance`; a tap on a shell
+  picks it in the panel; travel between 10 and 16 points sends nothing.
+- **Isolate a layer.** A double tap (0.35 s, 22 points) on a shell darkens every other shell to shade 0.25; again on the
+  same shell, "Show all layers" or `level.next` clears it. Presentation only.
+- **Camera.** Two fingers orbit (yaw ±40°, pitch 30° … 75°, authored 50°; the same tilt direction as Chrono
+  Constellator); a double tap on empty space or "Reset view" returns to the authored view. Orbit and isolation never
+  reach the digest, the snapshot or the kernel; the snapshot schema stays 1.
+- **Tests.** The analytic picker is checked against an independent pick on 2,500 seeded points; the gesture controller
+  on 500 seeded scripts against an independent angle and rounding; all 100 certified levels are won through panel
+  actions alone; simulator tests send touches through the experience's pointer entry.
