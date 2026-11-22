@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0706-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0706-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: 2026-11-22: baseline-host exit 1 once (performanceRecordWritesExactlyTheKeysOfTheTableSorted flaky in the parallel run, passes alone 3 of 3), baseline-host-2 exit 0, baseline-timing and baseline-round02 exit 0; rendering baseline = R02-G07-05 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G07-05's rendering runs (exit 0)
 - [ ] T-R02G0706-002 Edit `Packages/ExperiencesRound02/Package.swift` (`AmethystEscapeCore` and its tests gain
   VisualCoreAudioDSP; `AmethystEscapeExperience` gains VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as
