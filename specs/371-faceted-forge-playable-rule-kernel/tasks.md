@@ -63,7 +63,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0801-007 Docs: `docs/architecture/faceted-forge.md` (new: rules), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0801-007 Docs: `docs/architecture/faceted-forge.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-22: round02-host exit=0; docs/architecture/faceted-forge.md (new: rules), ExperiencesRound02 README Faceted Forge section, docs/automatedtesting.md entry
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0801-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

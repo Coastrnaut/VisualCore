@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G07-10: Amethyst Escape device rows and release step device-rows-r02-g07).
+Last updated: 2026-11-22 (R02-G08-01: Faceted Forge kernel, exact geometry against an independent reference).
 
 ## 1. What is tested, and where
 
@@ -338,6 +338,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Chrono Constellator in the app** (R02-G06-09, 2026-11-22). Serial chunk `o3` holds `CRPlayUITests` and
   `CRReplayUITests` (54.7, 73.4 and 44.1 s on the iOS 27.2 phone); the key was checked unique before use. The level-1
   journey needs one Phase + press and Run, and its pinned values are checked against the Core by an app unit test.
+- **Exact geometry checked against an independent reference** (R02-G08-01, 2026-11-22). Faceted Forge's piece tests
+  rebuild every piece's corners by brute force over all plane triples and its volume by an origin-based fan, a
+  different decomposition from the kernel's apex fan, after every cut of 500 fixtures; the kernel was again written in
+  an isolated copy while an X gate ran and copied in after its record.
 - **Amethyst Escape device rows** (R02-G07-10, 2026-11-22). `python3 scripts/check_device_rows.py --experience
   r02-g07.amethyst-escape` (release step `device-rows-r02-g07`) checks the definition against the scenario manifest,
   the ledger's DEV rows and the open {device} tasks of features 361 … 369; `AmethystEscapeDeviceRowsCheckTests` in

@@ -424,3 +424,12 @@ Feature 370 (R02-G07-10) prepares Amethyst Escape's device campaign without touc
 `docs/apps/amethyst-escape/device-rows.json` (rows AE-D1 … AE-D8, all pending), the written plan
 `docs/apps/amethyst-escape/device-campaign.md`, and the release step `device-rows-r02-g07`.
 
+## Faceted Forge (R02-G08, `r02-g08.faceted-forge`, free)
+
+`FacetedForgeCore` (feature 371, R02-G08-01) is the playable rule kernel: exact fractions (`FacetedForgeFraction`), the
+13 named plane directions and half-spaces, convex pieces with exact corners, ordered faces, edges and volume
+(`FacetedForgePiece`), `FacetedForgeLevel` with `FacetedForgeTargetPiece` (immutable, fingerprinted, JSON schema 1), the
+play state `FacetedForgePlay` with `FacetedForgeAction`, `FacetedForgeStage`, `FacetedForgeEvent`, `FacetedForgeFailure`
+and append-only `FacetedForgeRecord`s, and `FacetedForgeRules` for the R02-F23 puzzle contract. Refusals are
+`FacetedForgeError` with `r02-g08.*` codes. Rules:
+[docs/architecture/faceted-forge.md](../../docs/architecture/faceted-forge.md).
