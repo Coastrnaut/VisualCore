@@ -62,7 +62,7 @@ change (the shaders and reference of R02-G05-03 are unchanged and re-proven by t
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name script-tests` (alone)
 - [X] T-R02G0509-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G05-09.*.json); app-unit and app-ui are this gate's own runs
   `--name host-full` (app-unit and app-ui are this gate's own runs)
-- [ ] T-R02G0509-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0509-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0 (.autonomy/migration/checks/R02-G05-09.reference-1.json)
 - [ ] T-R02G0509-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0509-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G0509-006; feature 350
   prepares them)
