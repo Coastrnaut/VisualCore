@@ -21,7 +21,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G0508-003 [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G0508-003 [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/Core/ColorfallCanyonsGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-21: 2026-11-21 ColorfallCanyonsGolden (16 frames: levels 1/21/41/61/81 x tiers 0-2 after certified edits and 12 ticks, plus hero; positions to 1/8 px, 8-bit colours, SHA-256) and golden-frames.json generated with COLORFALL_CANYONS_WRITE_GOLDEN=1; ColorfallCanyonsGolden added to RELEASE_FORBIDDEN; host-2 exit 0 (.autonomy/migration/checks/R02-G05-08.host-2.json)
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 0 after the witness's edits and 12 ticks, plus the hero frame; at 1,152 × 768
   with the authored camera: every cell's top centre, every spring emitter top, every basin centre and every wet cell's
   sheet top centre, the night, sandstone, rock, pearl, cyan, coral and yellow colours and each wet cell's fluid mix; positions rounded to 1/8 px; colours 8-bit sRGB; JSON with sorted
