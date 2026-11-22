@@ -15,13 +15,14 @@ near miss, the catalog digest and the progression check. Research: [research.md]
 
 ## Technical Context
 
-**Language/Version**: Swift 6. **Primary dependencies**: VisualCoreSimulation (`SeededRandom`, `SeedDerivation`,
+**Language/Version**: Swift 6. **Primary dependencies**: VisualCoreSimulation (`SeededRandom`, `SeedDerivation`, `PuzzleCatalog.digest(id:identities:)`,
 `PuzzleCatalog`, `ProgressionRule`, `PuzzleDifficulty`) and VisualCoreMath (`StableHash`). No GPU or UI code; no new
 target.
 **Numbers**: a level has at most 7 supplied blooms; a plant candidate set is at most 6 kinds × 3 sizes × 768 anchors
 before filtering to plants that touch the target; work is counted in plant evaluations (bound 20,000 per level).
 **Seeds**: candidate k of entry n uses `SeedDerivation.derive(plannedSeed, index: k)`; fixtures seed 2_382.
-**Testing**: `swift test --package-path Packages/ExperiencesRound02 --filter NocturneGarden`; catalog tests in groups of 5.
+**Testing**: `swift test --package-path Packages/ExperiencesRound02 --filter NocturneGarden`; catalog tests in
+groups of 5.
 **Performance**: measured per group locally (under 10 s on a debug host build); not asserted on CI.
 **Constraints**: additive; R02-G09-01's types unchanged except two new error cases; witness files written only with
 `NOCTURNE_GARDEN_WRITE_WITNESSES=1`.
