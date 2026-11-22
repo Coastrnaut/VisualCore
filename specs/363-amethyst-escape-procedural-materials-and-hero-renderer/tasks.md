@@ -55,7 +55,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks pass.
 
-- [ ] T-R02G0703-006 [US3] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapeExperience.swift`,
+- [X] T-R02G0703-006 [US3] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapeExperience.swift`, — Verified 2026-11-22: 2026-11-22: sim-27 (AmethystEscapeExperienceTests, 29 tests on iOS 27.2) exit 0, packages exit 0, catalog-search exit 0, host-5 (swift test --filter AmethystEscape incl. scenario tests) exit 0
   `…Presenter.swift`, `…CrystalScene.swift` (GL scene with `ShaderMeshRenderer`; translucent facets drawn after opaque
   geometry with depth writes off; fallback; tier log; Reduce Motion and Reduce Flashing; the presenter declares
   `probes(_:)` — two backdrop corners, as the round-two X gates require — and its quality levels equal the Core's

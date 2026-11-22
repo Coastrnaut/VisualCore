@@ -148,7 +148,9 @@ enum CatalogFixture {
                                // Feature 343 (R02-G05-03); integrated at X-R02-G05.
                                "r02-g05.colorfall-canyons",
                                // Feature 353 (R02-G06-03); integrated at X-R02-G06.
-                               "r02-g06.chrono-constellator"],
+                               "r02-g06.chrono-constellator",
+                               // Feature 363 (R02-G07-03); a candidate until X-R02-G07.
+                               "r02-g07.amethyst-escape"],
                 "the registrations of Catalog/registrations.json")
     }
 

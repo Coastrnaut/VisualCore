@@ -774,6 +774,34 @@
       "manifest": "Packages/ExperiencesRound02/ChronoConstellator/scenario-manifest.json",
       "permissions": [],
       "summary": "Set where each star starts on its loop and when it waits, then replay the timeline: every star must reach its own target on the same tick without two stars meeting on one cell. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g07.amethyst-escape": {
+      "capabilities": [
+        "Turn nested crystal shells",
+        "Roll a pearl to the exit gap",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#0A0614",
+        "#8E4FD8",
+        "#D6DCE6",
+        "#F6F2FF",
+        "#B8F0FF"
+      ],
+      "content": {
+        "catalog_sha256": "e65c452967b32b37446b6bff95faa9e7c728931d9af0457b3ddd5bc0772394e6",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/AmethystEscape/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Turn the nested shells of an amethyst crystal one sector at a time to line up openings, then roll the pearl outward pocket by pocket past walls and blocked wedges until it leaves through the exit gap within the move budget. 100 certified levels. Drawn in code; offline."
     }
   }
 }

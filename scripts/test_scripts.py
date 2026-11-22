@@ -1428,7 +1428,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 343 (R02-G05-03): Colorfall Canyons, integrated at X-R02-G05.
                                     "ColorfallCanyonsCore", "ColorfallCanyonsExperience",
                                     # Feature 353 (R02-G06-03): Chrono Constellator, integrated at X-R02-G06.
-                                    "ChronoConstellatorCore", "ChronoConstellatorExperience"])
+                                    "ChronoConstellatorCore", "ChronoConstellatorExperience",
+                                    # Feature 363 (R02-G07-03): Amethyst Escape, a candidate until X-R02-G07.
+                                    "AmethystEscapeCore", "AmethystEscapeExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

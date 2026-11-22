@@ -36,6 +36,8 @@ import ColorfallCanyonsCore
 import ColorfallCanyonsExperience
 import ChronoConstellatorCore
 import ChronoConstellatorExperience
+import AmethystEscapeCore
+import AmethystEscapeExperience
 import HueCompassCore
 import HueCompassExperience
 import VisualCoreExperience
@@ -113,7 +115,26 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [amethystEscape].compactMap { $0 }
+
+    /// R02-G07 Amethyst Escape (feature 363, R02-G07-03): a candidate until X-R02-G07. Snapshot schema 1, so no
+    /// earlier example is stored yet.
+    fileprivate static var amethystEscape: ExperienceRegistration? {
+        guard let id = AmethystEscapeExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: AmethystEscapeExperienceCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return AmethystEscapeExperience.make(
+                id: id, storage: launch.storage,
+                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        // Seed 0 opens certified level 1, as for the other round-two puzzles.
+        registration.openingSeed = 0
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = AmethystEscapeExperienceCore.manifest(for: id)
+        #endif
+        return registration
+    }
 
     /// R02-G06 Chrono Constellator (features 351–360, R02-G06-01…10): integrated at X-R02-G06 (2026-11-22). Snapshot schema 3
     /// (feature 357), so the schema-1 and schema-2 examples are stored (feature 359, R02-G06-09).

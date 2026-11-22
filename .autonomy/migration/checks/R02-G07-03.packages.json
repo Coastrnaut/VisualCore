@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_experience_packages.py"
+  ],
+  "command": "python3 scripts/check_experience_packages.py",
+  "elapsed_seconds": 0.03,
+  "exit_code": 0,
+  "finished": "2026-11-22T08:27:32+00:00",
+  "gate": "R02-G07-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-03.packages.log",
+  "log_sha256": "fd0ff9f0f3a9f1b132d12de86d609ce2e9b536b819b666c43e3d6e8ac219fd7d",
+  "name": "packages",
+  "started": "2026-11-22T08:27:32+00:00",
+  "timed_out": false
+}

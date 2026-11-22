@@ -1120,7 +1120,7 @@
       "id": "r02-g07.amethyst-escape",
       "code": "R02-G07",
       "title": "Amethyst Escape",
-      "summary": "Rotate crystalline layers to open a route for a rolling pearl",
+      "summary": "Turn the nested shells of an amethyst crystal one sector at a time to line up openings, then roll the pearl outward pocket by pocket past walls and blocked wedges until it leaves through the exit gap within the move budget. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1129,11 +1129,30 @@
         "crystal-solids"
       ],
       "order": 32,
-      "palette": [],
+      "palette": [
+        "#0A0614",
+        "#8E4FD8",
+        "#D6DCE6",
+        "#F6F2FF",
+        "#B8F0FF"
+      ],
       "tile_seed": 3542326232,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Turn nested crystal shells",
+        "Roll a pearl to the exit gap",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "e65c452967b32b37446b6bff95faa9e7c728931d9af0457b3ddd5bc0772394e6",
+        "levels": 100
+      },
       "available": false
     },
     {
