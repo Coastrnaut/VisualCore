@@ -42,3 +42,28 @@ equal to the budget: failed). A win on the last move counts, and nothing is won 
 Levels are JSON schema 1 with sorted keys (bed, target and forbidden cells, supply, sizes, elevations, opening sun,
 budget, required match, leak allowance, tutorial, seed, id) and their fingerprint; decoding re-checks every rule and the
 fingerprint and refuses damaged, edited and newer forms (`r02-g09.malformed`, `.newer-schema`).
+
+## Content pipeline (feature 382, R02-G09-02)
+
+- **Manifest.** `NocturneGardenManifest` holds the 100 planned levels of the archived design (number, planned seed, band
+  1 … 5, move budget 8 … 19). The kernel's ranges already cover every generated level; only the refusals
+  `r02-g09.generation` and `r02-g09.witness` were added.
+- **Generator.** Candidate k of a level draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`:
+  one bloom size from the band's sizes, a construction sun, the bloom count, the blooms (kind and anchor; each cast
+  wholly in the bed and adding at least 3 new cells), the kept cells of the forbidden ring, a decoy kind (bands 3 … 5)
+  and the opening sun. The target is the blooms' exact mask. Band profiles: beds 16 × 12 … 32 × 24, required match 4/5,
+  17/20, 9/10, 19/20, 1/1, leak allowance 2, 2, 1, 1, 0, smallest move count 2 … 3, 3 … 4, 4 … 5, 5 … 6, 6 … 7 (so
+  neighbouring levels keep the progression rule). A candidate is kept when the solver certifies it in its band's range
+  and within the budget; at most 256 candidates, then `r02-g09.generation`.
+- **Solver.** A winning mask needs at least `needed` = ⌈p·|T|/q⌉ target cells dark; one plant at sun e darkens at most
+  `cover(e)` of them without leaking beyond the allowance on its own, so a win under sun e needs at least
+  ⌈needed/cover(e)⌉ plants, plus a sun move when e is not the opening sun. `NocturneGardenSolver` takes the least of
+  these over the allowed elevations as the lower bound L and finds a sequence of exactly L moves depth-first (sun move
+  first, then plants by shape score), pruning on coverage, leak and the cells outside the target the match tolerates.
+  A plant's cells are its kind's stamp shifted by the anchor (equal to the kernel's cells, checked by the tests). Work
+  is counted in plant evaluations and bounded at 20,000. The whole catalog certifies in about 11 s on a debug host build.
+- **Witnesses.** `docs/games/nocturne-garden/levels/NNN.witness.json` holds each level, its actions, the mask digest
+  after every action, the play fingerprints, the smallest move count with its bound (elevation, needed, cover, sun
+  move), the near miss (one action short: not won, shared cells below the need), the difficulty and the candidates
+  skipped; decoding re-verifies provenance and replay and refuses damaged, newer or edited files (`r02-g09.witness`).
+  The catalog digest is pinned in `NocturneGardenCatalogTests`.

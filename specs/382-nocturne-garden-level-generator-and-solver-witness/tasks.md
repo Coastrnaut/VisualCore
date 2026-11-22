@@ -66,7 +66,7 @@ logic); no GLSL in this feature.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0902-007 Docs: `docs/architecture/nocturne-garden.md` (content pipeline),
+- [X] T-R02G0902-007 Docs: `docs/architecture/nocturne-garden.md` (content pipeline), — Verified 2026-11-22: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; docs/architecture/nocturne-garden.md content pipeline, ExperiencesRound02 README feature 382, docs/automatedtesting.md entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0902-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-01: Nocturne Garden kernel, exact cells against an independent ray cast).
+Last updated: 2026-11-22 (R02-G09-02: Nocturne Garden catalog, baselines on a held-aside tree, compliance tokens).
 
 ## 1. What is tested, and where
 
@@ -394,6 +394,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   cell of the whole bed (not only the bounding box) against a separate even-odd ray cast on exact rationals with its own
   on-segment test, and the boundary deviation against an all-pairs brute force. A timing baseline taken right after the
   round-two suite failed under a load average of 13 and passed when rerun: run timing baselines on a quiet machine.
+- **Baselines on the committed tree; tokens the scans match** (R02-G09-02, 2026-11-22). The feature's first code was
+  written while the previous gate's chain ran, so its baselines were taken with that work held aside (`git stash push -u
+  -- <paths>`, then `git stash pop`), keeping the baseline a measure of the tree before the feature. A kernel test's list
+  of forbidden imports spelled out `import MetalKit`, which the compliance scan (`check_compliance.py`, run by the script
+  tests' audit) reads as a direct Metal renderer: a test that names forbidden tokens must not contain the scan's own
+  patterns (`import Metal` alone covers the kit by prefix). Nocturne Garden's catalog check recomputes the lower bound
+  of two levels per band by brute force over every plant with the kernel's bloom cells, independent of the solver's
+  shifted stamps.
 - **Split the X-gate round-two package run** (X-R02-G08, 2026-11-22). The X gate's `host` check (the whole
   `ExperiencesRound02-Package` on the iOS 27.2 simulator) took 368, 390, 417 and then 553 s at X-R02-G05 … G08: past
   the 540 s per-command rule, and `xcodebuild_package.py` has no timeout of its own, so a hang there would not be cut

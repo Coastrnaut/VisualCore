@@ -489,3 +489,9 @@ deviation (`NocturneGardenMask`, `NocturneGardenRatio`), `NocturneGardenLevel` (
 `NocturneGardenFailure` and append-only `NocturneGardenRecord`s, and `NocturneGardenRules` for the R02-F23 puzzle
 contract. Refusals are `NocturneGardenError` with `r02-g09.*` codes. Rules:
 [docs/architecture/nocturne-garden.md](../../docs/architecture/nocturne-garden.md).
+
+Feature 382 (R02-G09-02) adds the content pipeline: `NocturneGardenManifest` (100 planned levels), the band profiles and
+seeded `NocturneGardenGenerator`, `NocturneGardenSolver` (a winning sequence of exactly the lower bound of moves: a sun
+move when needed plus ⌈needed cells / single-plant cover⌉ plants, found with coverage pruning and counted work),
+`NocturneGardenDifficulty`, `NocturneGardenWitness` with the 100 witness files in `docs/games/nocturne-garden/levels/`
+and the pinned catalog digest.
