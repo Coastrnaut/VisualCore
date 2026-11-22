@@ -12,7 +12,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G0908-002 [P] [US1] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G0908-002 [P] [US1] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-22: host (NocturneGardenRegressionSolverTests, 14 tests: all 100 levels in ten groups - generated level equals the witness, witness moves replay to a win with per-move digests and fingerprints, solve returns exactly the witness's moves with smallest equal to the bound and work within the work bound; ten alterations named on levels 1 and 41) exit 0, lead retest
   level in ten groups of 10, "the generated level equals its witness's level; the witness's moves replay to a win in
   exactly its smallest move count within the budget, with its per-move digests and fingerprints; solve returns exactly
   the witness's moves with smallest equal to the witness's and to the lower bound's, with work ≤ workBound"; ten named
