@@ -13,7 +13,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 2: Story 1 — the campaign knows what to run (P1) 🎯
 
-- [ ] T-R02G0810-002 [US1] Create `docs/apps/faceted-forge/device-rows.json` (data-model.md: "schema 1, sorted
+- [X] T-R02G0810-002 [US1] Create `docs/apps/faceted-forge/device-rows.json` (data-model.md: "schema 1, sorted — Verified 2026-11-22: device-rows (check_device_rows.py --experience r02-g08.faceted-forge: PASS, 8 rows FF-D1 … FF-D8, 12 scenarios, every {device} task of 371–379 covered) exit 0; release step device-rows-r02-g08 added
   keys"; devices D1 → DEV1-R02-G08, D2 → DEV2-R02-G08, D3 → DEV3-R02-G08; the 12 scenarios of clarification Q2; rows
   FF-D1 … FF-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false
   only for FF-D6), covers, owner_steps, status "pending device campaign"; no result field); edit

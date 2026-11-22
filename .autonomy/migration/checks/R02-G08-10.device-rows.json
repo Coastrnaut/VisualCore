@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g08.faceted-forge"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g08.faceted-forge",
+  "elapsed_seconds": 0.032,
+  "exit_code": 0,
+  "finished": "2026-11-22T17:52:19+00:00",
+  "gate": "R02-G08-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-10.device-rows.log",
+  "log_sha256": "b4a7a4dcb914034044bc55ed733de058f5b43d48a8e44e2321f9a3122918e532",
+  "name": "device-rows",
+  "started": "2026-11-22T17:52:19+00:00",
+  "timed_out": false
+}

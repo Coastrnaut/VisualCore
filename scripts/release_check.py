@@ -154,6 +154,8 @@ def steps(stamp: str) -> list[Step]:
         Step("device-rows-r02-g06", [PY, "scripts/check_device_rows.py", "--experience", "r02-g06.chrono-constellator"]),
         # Feature 370 (R02-G07-10): Amethyst Escape's device rows, checked like the earlier round-two games'.
         Step("device-rows-r02-g07", [PY, "scripts/check_device_rows.py", "--experience", "r02-g07.amethyst-escape"]),
+        # Feature 380 (R02-G08-10): Faceted Forge's device rows, checked like the earlier round-two games'.
+        Step("device-rows-r02-g08", [PY, "scripts/check_device_rows.py", "--experience", "r02-g08.faceted-forge"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),
