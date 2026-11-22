@@ -124,12 +124,13 @@ public struct FacetedForgeFeedbackPlan: Sendable, Equatable {
         return text
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay".
     public static func modeName(_ mode: FacetedForgeMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 

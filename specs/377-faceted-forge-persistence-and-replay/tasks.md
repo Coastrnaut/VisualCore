@@ -12,7 +12,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G0807-002 [P] [US2] Edit `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeProgress.swift` (Result gains "trace:
+- [X] T-R02G0807-002 [P] [US2] Edit `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeProgress.swift` (Result gains "trace: — Verified 2026-11-22: host (swift test --filter FacetedForge incl. ReconciliationTests 16 cases: all 100 certified witnesses verify as traces, 8 edited results dropped and counted, raised cutsMade with matching stars kept, untraced kept, frontier unchanged, netTrace over undo/redo incl. 60 seeded sequences; manifest regenerated) exit 0, lead retest
   [FacetedForgeAction]" (effective cuts) and "verified: Bool"; `record(level:cutsMade:smallest:mode:trace:)` stores a verified result,
   replacing only when better (ties keep the earlier trace); `drop(level:)`; encoding keeps old payloads decodable
   (missing trace = empty, missing verified = false); mode "replay(level:)" that awards no stars and opens nothing) and
