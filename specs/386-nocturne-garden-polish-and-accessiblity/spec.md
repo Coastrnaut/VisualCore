@@ -48,8 +48,9 @@ adapter's refusal codes are `r02-g09.action`, `supply`, `noop`, `stage`, `stale`
   the tutorial instruction when shown; a refusal (`rejection`) in words: `r02-g09.locked` "That level is not open yet.",
   `r02-g09.date` "That date cannot be used.", `r02-g09.action` "That move is not possible here.", `r02-g09.supply` "No
   bloom of that kind is left.", `r02-g09.noop` "That changes nothing.", `r02-g09.stage` "The level has ended.",
-  `r02-g09.not-whole` "That value must be a whole number.", any other code "That move was refused." Picker changes and
-  drag previews are not announced (the adjustable pickers speak their own values). Texts are a pure function of the old
+  `r02-g09.not-whole` "That value must be a whole number.", any other code "That move was refused." A revealed hint is announced (`state`) with
+  its text, so a VoiceOver player hears it without searching the panel. Picker changes and drag previews are not
+  announced (the adjustable pickers speak their own values). Texts are a pure function of the old
   and new core (and the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact:
   FR-R02G0906-002; SC-R02G0906-002.
 - Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted move, undo or redo; `success` for
