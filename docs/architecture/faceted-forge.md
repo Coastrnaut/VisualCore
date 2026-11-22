@@ -146,3 +146,23 @@ directions 0 … 12, depths ascending.
   2026-01-01 × 67) mod 100 + 1 from the local date the presenter sends; practice replays a copy of the level with the
   budget raised to 20 and records nothing. Snapshot schema 2 `{level, mode, progress, records, tutorial}` with a
   migration from schema 1.
+
+## Polish and accessibility (feature 376, R02-G08-06)
+
+- **VoiceOver.** Every accepted cut, undo and redo is announced with the pieces now and the cuts left ("Piece 1 cut in
+  direction z at depth 0: 2 pieces now. 9 cuts left."); a win or failure as an outcome (stars, or the failure
+  explanation); level and mode changes with the band and the tutorial; refusals in words. Preview choices are not
+  announced: the piece, direction and depth pickers are adjustable elements that speak their values, and a "Crystal"
+  summary element reads the cuts left, every piece, the target and the next cut. Texts are a pure function of the
+  core before and after (`FacetedForgeFeedbackPlan`), so tests compare them exactly.
+- **Haptics.** Selection for a cut, undo or redo; success for a win; warning for a failure; error for a refusal; a cut
+  that ends the play plans only its outcome; all through the shared route and the person's switch.
+- **Comfort.** The cut-face glow (0.7 playing, 1 won, 0.35 failed) and the sliver cross (0 or 1) ease in presentation
+  time, 0.15 s or 0.45 s under Reduce Flashing without turning back mid-fade (`FacetedForgeLights`); the dispersion
+  shimmer stays below 0.4 cycles per second and is still under Reduce Motion with the opening at rest. The glow is
+  measured over its whole 0 … 1 gain range.
+- **Sound.** An optional ambient loop, off by default: a 110 Hz root and one just-intonation partial per piece beyond
+  the first (up to four), an octave and a second swell when won, halved when failed, 12 s with whole cycles; it plays
+  only while wanted, on screen and active (`FacetedForgeSoundRecipe`, `FacetedForgeSound`).
+- **Panel.** System text styles that grow to the largest accessibility size, rows that become columns there, wrapping
+  text, a 520-point readable width on iPad.

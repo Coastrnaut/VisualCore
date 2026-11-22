@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-05: Faceted Forge hints by bounded search, stars by cuts made, redo and the tutorial).
+Last updated: 2026-11-22 (R02-G08-06: Faceted Forge polish, measuring a gain over its whole range).
 
 ## 1. What is tested, and where
 
@@ -292,6 +292,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Two games, one tilt direction** (R02-G07-04, 2026-11-22). Amethyst Escape's gesture agent followed its brief
   (`pitch += dy`), the opposite of Chrono Constellator's orbit; the lead chose Chrono's direction so a two-finger drag
   tilts every round-two crystal and sky the same way, and the orbit test's expected values moved with it.
+- **Measure a light over its whole range** (R02-G08-06, 2026-11-22). Faceted Forge's glow plays at 0.7, wins at 1 and
+  fails at 0.35; normalised to 0.35 … 1, the playing level sits just above the midpoint, so a sliver failure undone
+  every frame crossed the midpoint in close pairs and the flicker measure counted 4 crossings a second although every
+  fade lasted 0.45 s. The glow is a gain from 0, so its test samples it over 0 … 1, where crossings are at least
+  0.386 s apart.
 - **A bounded search is a hint budget** (R02-G08-05, 2026-11-22). Faceted Forge's hints rerun the certifying search
   from the current pieces; at a level's opening that can cost the whole 20,000-evaluation bound (about 2 s in a debug
   build, more when tests share cores), so the follow-the-hints test runs in 20 groups of 5 levels and the presenter

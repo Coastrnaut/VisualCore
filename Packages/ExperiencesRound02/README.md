@@ -456,3 +456,7 @@ Feature 375 (R02-G08-05) adds teaching and progression: `FacetedForgeHints` (pla
 `solve(_:from:cutsLeft:workBound:)`, three hint levels, failure explanations), `FacetedForgeProgress` with
 `FacetedForgeTutorialStep` and `FacetedForgeMode` (stars by cuts made, daily × 67, practice budget 20), the adapter's
 progression controls and snapshot schema 2, and the panel's Hint, tutorial, failure, mode and level rows.
+
+Feature 376 (R02-G08-06) adds polish and accessibility: `FacetedForgeFeedbackPlan` (announcements, haptics, refusal
+words, the summary element), `FacetedForgeLights` (eased glow and sliver levels), `FacetedForgeSoundRecipe` and the
+experience's `FacetedForgeSound` loop, adjustable pickers and Dynamic Type layout in the panel.
