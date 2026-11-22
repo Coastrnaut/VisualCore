@@ -25,7 +25,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G0602-003 [US1] Implement `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSolver.swift`
+- [X] T-R02G0602-003 [US1] Implement `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSolver.swift` — Verified 2026-11-21: 2026-11-21 host-2 exit 0: ChronoConstellatorSolverTests 15 tests in 1.2 s (hand-built levels needing 1, 2, 3 edits; unedited win and all-blocked levels give nil; window phases and blocked check against an independent tick check; witness replays through the play; phase-only brute force on generated, raw and random levels and single-hold brute force on m* ≤ 3 levels find no smaller win) (.autonomy/migration/checks/R02-G06-02.host-2.json); lead retest
   (clarification Q2: `misaligned(_:at:)` m(T); the lower bound m* = min m(T) over T = 1 … tick limit, nil when 0; the
   windows T with m(T) = m* in order; `windowPhases` "(index of target − T) mod L" for each star off target, default
   otherwise; `isBlocked` when two stars share a cell on a tick 1 … T under the window's phase-only timeline; the first
