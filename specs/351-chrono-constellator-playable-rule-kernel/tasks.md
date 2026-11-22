@@ -31,7 +31,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
 
 ## Phase 3: Story 1 — align the stars (P1) 🎯
 
-- [ ] T-R02G0601-003 [P] [US1] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorTimelineTests.swift`
+- [X] T-R02G0601-003 [P] [US1] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorTimelineTests.swift` — Verified 2026-11-21: 2026-11-21 host-2 exit 0: ChronoConstellatorTimelineTests 15 tests in 0.37 s (positions equal an independent step-by-step reference on 500 seeded levels and timelines; held counts; edits in use; every edit refusal; collision names the lowest pair and cell; collision before win before time; swaps are no collision; nothing at tick 0; timeline fingerprint) (.autonomy/migration/checks/R02-G06-01.host-2.json); lead retest
   (agent A: positions on every tick equal an independent step-by-step reference written in the test on 500 seeded levels
   and timelines run to their tick limit; holds count exactly; the edits-in-use count; evaluation order collision, win,
   time; swaps on an edge are not collisions; nothing judged at tick 0); `--name host-2`
