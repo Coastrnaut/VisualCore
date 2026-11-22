@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/colorfall_canyons_regression.py"
+  ],
+  "command": "python3 scripts/colorfall_canyons_regression.py",
+  "elapsed_seconds": 23.378,
+  "exit_code": 0,
+  "finished": "2026-11-22T00:39:07+00:00",
+  "gate": "R02-G05-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G05-09.regression.log",
+  "log_sha256": "bc5566e4afe12dabafe060bd440c92a3156c26407f2bce49a91e3f0694177265",
+  "name": "regression",
+  "started": "2026-11-22T00:38:43+00:00",
+  "timed_out": false
+}
