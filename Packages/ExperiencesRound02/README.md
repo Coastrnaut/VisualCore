@@ -451,3 +451,8 @@ Feature 374 (R02-G08-04) adds the gestures: `FacetedForgeOrbit` and `camera(_:as
 meshes emitted back to front for the orbit's eye), the analytic `FacetedForgePicker` (rim, plane, pieces, tilt, depth
 steps) and `FacetedForgeGestureController` (choose, tilt, slide, commit, orbit, reset) in the Core; the presenter's
 pointer entry, the candidate preview and "Reset view" in the experience; the plane faces the camera by default.
+
+Feature 375 (R02-G08-05) adds teaching and progression: `FacetedForgeHints` (plans from any state by the solver's new
+`solve(_:from:cutsLeft:workBound:)`, three hint levels, failure explanations), `FacetedForgeProgress` with
+`FacetedForgeTutorialStep` and `FacetedForgeMode` (stars by cuts made, daily × 67, practice budget 20), the adapter's
+progression controls and snapshot schema 2, and the panel's Hint, tutorial, failure, mode and level rows.

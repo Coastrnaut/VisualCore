@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-04: Faceted Forge gestures, rounding on rational points, an edge-on default).
+Last updated: 2026-11-22 (R02-G08-05: Faceted Forge hints by bounded search, stars by cuts made, redo and the tutorial).
 
 ## 1. What is tested, and where
 
@@ -292,6 +292,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Two games, one tilt direction** (R02-G07-04, 2026-11-22). Amethyst Escape's gesture agent followed its brief
   (`pitch += dy`), the opposite of Chrono Constellator's orbit; the lead chose Chrono's direction so a two-finger drag
   tilts every round-two crystal and sky the same way, and the orbit test's expected values moved with it.
+- **A bounded search is a hint budget** (R02-G08-05, 2026-11-22). Faceted Forge's hints rerun the certifying search
+  from the current pieces; at a level's opening that can cost the whole 20,000-evaluation bound (about 2 s in a debug
+  build, more when tests share cores), so the follow-the-hints test runs in 20 groups of 5 levels and the presenter
+  computes a hint only when asked. Where a state has no plan, the test confirms it independently only when one or two
+  cuts are missing (an exhaustive search of its own); larger gaps rely on the bound, and the text says "was found".
+- **A redo is not a new step** (R02-G08-05, 2026-11-22). The adapter first advanced the tutorial on a redo, so cut,
+  undo, redo moved it on without a second real cut; the progress agent's tests caught the mismatch with the step's
+  rule, and only a new accepted cut advances it now.
 - **Round with a snap on rational points** (R02-G08-04, 2026-11-22). Faceted Forge's rim tilt rounds n·c for the
   preview centre c, a rational point; in 112 of 500 seeded tilts the product was exactly x.5, so the Double rounding
   flipped with the last bit. The picker snaps to 1e-6 before rounding half away from zero, and the test counts halves.

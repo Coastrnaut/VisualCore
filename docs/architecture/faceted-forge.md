@@ -128,3 +128,21 @@ directions 0 … 12, depths ascending.
   front for the orbit's eye, since depth testing is off.
 - **Panel.** Every gesture has a panel path (piece and direction pickers, depth − and +, Cut, Reset view); a host test
   wins all 100 certified levels through panel presses alone.
+
+## Teaching and progression (feature 375, R02-G08-05)
+
+- **Tutorial.** Levels 1 … 3 show one instruction at a time in the panel: aim and cut, then match the target's shares
+  and face counts without a sliver, then finish within the cuts; each advances on an accepted new cut (a redo or an
+  undo never moves it) and ends with the level; Dismiss ends it. The step is snapshotted but not digested.
+- **Hints.** "Hint" reveals three levels for the current play: which piece, then the direction, then the exact depth.
+  The plan is the first cut of a winning continuation of exactly the missing pieces, found by the solver's bounded
+  depth-first search started at the current pieces (`FacetedForgeSolver.solve(_:from:cutsLeft:workBound:)`), so
+  following hints wins every certified level; a state with no continuation found in the cuts left says so. A hint can
+  take the solver up to its work bound, so it is computed only when asked and cached for the shown play.
+- **Failures.** A sliver names its cut, piece and share against the 1/64 limit; a budget failure names the cuts spent
+  and the pieces against the target; both offer Undo and Retry.
+- **Progress.** Level 1 open, a campaign win opens the next; stars by cuts made (undone ones included, since every win
+  spends exactly the lower bound): 3 at the certified smallest, 2 within + 2, else 1. The daily level is (days since
+  2026-01-01 × 67) mod 100 + 1 from the local date the presenter sends; practice replays a copy of the level with the
+  budget raised to 20 and records nothing. Snapshot schema 2 `{level, mode, progress, records, tutorial}` with a
+  migration from schema 1.

@@ -62,7 +62,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G0805-006 Docs: `docs/architecture/faceted-forge.md` (teaching and progression),
+- [X] T-R02G0805-006 Docs: `docs/architecture/faceted-forge.md` (teaching and progression), — Verified 2026-11-22: 2026-11-22: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0805-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`
