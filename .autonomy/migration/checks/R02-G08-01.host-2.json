@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgePieceTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgePieceTests",
+  "elapsed_seconds": 5.101,
+  "exit_code": 0,
+  "finished": "2026-11-22T12:19:24+00:00",
+  "gate": "R02-G08-01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-01.host-2.log",
+  "log_sha256": "b44f10e08cae560a538dd0da34bb1c72607f682d60005cff1fd97e900b98740f",
+  "name": "host-2",
+  "started": "2026-11-22T12:19:19+00:00",
+  "timed_out": false
+}

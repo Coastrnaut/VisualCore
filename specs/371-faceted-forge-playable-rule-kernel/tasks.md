@@ -32,7 +32,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
 
 ## Phase 3: Story 1 — cut the crystal into the target pieces (P1) 🎯
 
-- [ ] T-R02G0801-003 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgePieceTests.swift`
+- [X] T-R02G0801-003 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgePieceTests.swift` — Verified 2026-11-22: host-2 exit=0 (FacetedForgePieceTests 5: corners and volume against an independent brute force and origin fan after every cut of 500 fixtures plus seeded cuts, halves partition, edges on two faces, degenerate planes refused)
   (agent A: after every cut the corners equal an independent brute force over all plane triples and the volume equals an
   independent divergence-theorem computation over the faces, on 500 seeded crystals and cut sequences; volumes sum to
   the crystal's; every edge lies on exactly two faces; the two halves partition the piece; degenerate planes are
