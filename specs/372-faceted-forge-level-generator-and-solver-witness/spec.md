@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G08-02 (migration ledger, game feature of experience R02-G08) · ID namespace FR-R02G0802-###,
 SC-R02G0802-###, T-R02G0802-###
@@ -26,6 +26,63 @@ Canonical overrides:
   a milestone figure, as for the earlier round-two games.
 - **Model:** feature 362 (Amethyst Escape's content pipeline) for manifest, generator, witness files, digest and
   progression.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+362's answers where the games agree. Facts checked in code (read-only, 2026-11-22): R02-G08-01's `FacetedForgeLevel`
+(crystal 4 … 14 half-spaces in the box −6 … 6, budget 1 … 12, sliver 0 < s < 1/2, target 2 … budget + 1 entries of a
+share and 4 … 26 faces), `FacetedForgePiece` (exact cut, canonical order), `FacetedForgePlay` and `FacetedForgeRules`;
+R02-F24's `PuzzleCatalog.digest(id:identities:)` and `ProgressionRule.standard` (drop at most 1, jump at most 3);
+`SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (`planning_index.py levels
+--experience R02-G08`: bands 1 … 5 × 20, move budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19). A cut with both
+halves costs about 0.13 ms in a debug host build (6,962 cuts of 50 fixture crystals in 0.89 s, 2026-11-22).
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
+  table in `FacetedForgeManifest` with their provenance. Candidate k of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`, in this order: the crystal by band (band 1 a cube
+  −a … a, a = 3 … 6; band 2 a box with each face at ±2 … 6; band 3 a cube a = 4 … 6 with one corner cut by x+y+z ≤ b,
+  b = a + 1 … 3a − 2; band 4 an octahedron |x|+|y|+|z| ≤ a, a = 5 … 6, written with the four body diagonals; band 5 a
+  cube a = 5 … 6 with two opposite corners cut, x+y+z ≤ b and x+y+z ≥ −b); the number of cuts c by band (2 … 3; 3 … 4;
+  4 … 5; 5 … 6; 6 … 7); then c cuts, each of a drawn piece (canonical order), a drawn direction (bands 1 … 2 the axes
+  and face diagonals, bands 3 … 5 all 13) and a drawn depth among those that cross it. The target is the resulting
+  multiset of (share, face count); the sliver limit is 1/64 for every level. A candidate is kept when every piece's
+  share is at least 1/32, bands 3 … 5 use at least one body diagonal, and the solver certifies it within its work bound;
+  otherwise k grows, at most 256 candidates, then `generation(n)`. Ids `faceted-forge-NNN`; tutorial flag on levels
+  1 … 3; difficulty = band; budget = manifest budget. To hold the manifest budgets, the kernel's ranges widen
+  additively: budget 1 … 20 and target face counts 4 … 34 (14 crystal planes + 20 cuts); every earlier level stays
+  valid. Impact: FR-R02G0802-001, 006; SC-R02G0802-001, 003, 004.
+- Q: How does the solver decide the smallest cut count, and what proves it? → A: each accepted cut turns one piece into
+  two, so a target of P pieces needs at least P − 1 cuts: that is the lower bound, and any winning sequence of P − 1 cuts
+  proves it is the smallest. The solver searches depth-first for such a sequence from the crystal alone (not from the
+  generator's cuts), in the rules' fixed order (pieces in canonical order, directions 0 … 12, depths ascending), keeping
+  a cut only when both halves are at least the sliver limit and the pieces can still be partitioned into the remaining
+  target (each piece's share is the sum of a sub-multiset of the target, and a piece given one entry already has that
+  entry's face count); it never continues from a failed state. Work = cuts evaluated, counted and bounded at 20,000 per
+  level; a candidate whose search exceeds the bound is skipped. The witness is the first sequence found, replayed
+  through the kernel's play. Impact: FR-R02G0802-002; SC-R02G0802-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `FacetedForgeDifficulty` holds the
+  smallest cut count, the distinct directions and the body or face diagonals of the witness, the crystal's face count,
+  the target's piece count and the solver work. The catalog in manifest order keeps R02-F24's standard
+  `ProgressionRule` (drop at most 1, jump at most 3) on the smallest cut count; the band ranges make band means
+  non-decreasing. Impact: FR-R02G0802-003, 005; SC-R02G0802-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/faceted-forge/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the cuts, the state digest after every cut (16 hex
+  characters of the SHA-256 of the pieces' canonical corners), the play fingerprints after `begin` and after each cut,
+  the smallest cut count with the lower-bound argument (pieces needed), the near miss (the witness minus its last cut:
+  not won, its piece count one short), the difficulty and the candidates skipped. A test rebuilds every witness and
+  compares bytes; it writes the files only with `FACETED_FORGE_WRITE_WITNESSES=1`. Decoding refuses newer schemas,
+  damaged files and witnesses that no longer replay. Impact: FR-R02G0802-004; SC-R02G0802-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<FacetedForgeRules>.digest(id: "faceted-forge", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split into groups of 5 levels so each runs under 10
+  seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New
+  refusals: `generation(Int)` (`r02-g08.generation`) and `witness(String)` (`r02-g08.witness`). The independent check
+  of SC-R02G0802-002 recounts the pieces of each sampled witness and replays it on a fresh play, and a bounded
+  breadth-first search over the first P − 2 cuts of band-1 levels confirms none wins. Impact: FR-R02G0802-002, 005,
+  006; SC-R02G0802-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -79,6 +136,7 @@ file is refused.
 - **A target that some sliver-making sequence also reaches:** never a solution; the search never continues from a failed
   state.
 - **A level whose smallest cut count exceeds its budget:** not emitted.
+- **A search over its work bound:** the candidate is skipped (counted work, never timed).
 - **Damaged, newer or edited witness files:** refused with a named reason.
 
 ## Requirements *(mandatory)*
