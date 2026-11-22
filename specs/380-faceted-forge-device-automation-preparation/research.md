@@ -1,10 +1,10 @@
 # Research: R02-G08-10
 
-- **R1 — Form of the contract.** Decision: feature 310's JSON definition plus a written plan. Rationale: UA-F13's
-  script needs data, the owner needs prose; the check keeps them tied. Alternatives: a new format (rejected: one
-  campaign script must read every experience alike).
-- **R2 — Coverage source.** Decision: the open `{device}` task lines of `specs/37[1-9]-faceted-forge-*/tasks.md`
-  plus the six UA-F13 measurement names, as the check already computes for R02-G08. Rationale: every Faceted Forge device
+- **R1 — Form of the contract.** Decision: feature 310's JSON definition plus a written plan. Rationale: UA-F13's script
+  needs data, the owner needs prose; the check keeps them tied. Alternatives: a new format (rejected: one campaign
+  script must read every experience alike).
+- **R2 — Coverage source.** Decision: the open `{device}` task lines of `specs/37[1-9]-faceted-forge-*/tasks.md` plus
+  the six UA-F13 measurement names, as the check already computes for R02-G08. Rationale: every Faceted Forge device
   promise, including R02-G08-06's hearing, feeling and VoiceOver, is a task line (T-R02G0806-011), so no extra items are
   added to the check's table.
 - **R3 — Scenario set.** Decision: 11 standard and game scenarios plus `fixture-level-1-solved`. Rationale: they

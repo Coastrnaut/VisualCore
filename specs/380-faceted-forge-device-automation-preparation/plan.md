@@ -5,15 +5,15 @@
 
 ## Summary
 
-Write Faceted Forge's device contract without touching a device: `docs/apps/faceted-forge/device-rows.json`
-(schema 1 of feature 310: the device scenario set of 12 scenarios, the devices D1, D2, D3 tied to the ledger's
-DEV1/2/3-R02-G08 rows, and rows FF-D1 … FF-D8 with procedure, measurements, pass condition, gating, covered tasks, owner
-steps and status "pending device campaign") and the written plan `docs/apps/faceted-forge/device-campaign.md`
-modelled on Amethyst Escape's (`docs/apps/amethyst-escape/device-campaign.md`). The existing generic
-`scripts/check_device_rows.py` validates it against the scenario manifest, the ledger and the open {device} tasks of features 371–379; `scripts/test_scripts.py` gains tests on the real
-Faceted Forge definition and `release_check.py` a step `device-rows-r02-g08`. Research: [research.md](research.md). Data:
-[data-model.md](data-model.md). Contract: [contracts/device-rows.md](contracts/device-rows.md). Quickstart:
-[quickstart.md](quickstart.md).
+Write Faceted Forge's device contract without touching a device: `docs/apps/faceted-forge/device-rows.json` (schema 1 of
+feature 310: the device scenario set of 12 scenarios, the devices D1, D2, D3 tied to the ledger's DEV1/2/3-R02-G08 rows,
+and rows FF-D1 … FF-D8 with procedure, measurements, pass condition, gating, covered tasks, owner steps and status
+"pending device campaign") and the written plan `docs/apps/faceted-forge/device-campaign.md` modelled on Amethyst
+Escape's (`docs/apps/amethyst-escape/device-campaign.md`). The existing generic `scripts/check_device_rows.py` validates
+it against the scenario manifest, the ledger and the open {device} tasks of features 371–379; `scripts/test_scripts.py`
+gains tests on the real Faceted Forge definition and `release_check.py` a step `device-rows-r02-g08`. Research:
+[research.md](research.md). Data: [data-model.md](data-model.md). Contract:
+[contracts/device-rows.md](contracts/device-rows.md). Quickstart: [quickstart.md](quickstart.md).
 
 ## Technical Context
 
