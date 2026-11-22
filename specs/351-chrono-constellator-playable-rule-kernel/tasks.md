@@ -76,3 +76,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
 001 → 002 (lead) → {003 (agent A), 004 (agent B), 005 (agent C), 006 (agent D)} → 007 … 012. Agents C and D code
 against the play contract in contracts/api.md; shared files (package, error, level, timeline, fixtures, docs) stay with
 the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0601-013 Bring `specs/351-chrono-constellator-playable-rule-kernel/contracts/api.md` and `specs/351-chrono-constellator-playable-rule-kernel/data-model.md` in line with the code: stars are described by `ChronoConstellatorLevel.description(ofStar:)` (not a star property), and the public `isNeighbour`, `place(_:)`, `shape(of:)`, `ChronoConstellatorTimeline.isHeld(star:on:)`, `ChronoConstellatorHold.end` and its star-then-start order, `ChronoConstellatorFailure.code`, `ChronoConstellatorPlay.positions` and `spent`, and `ChronoConstellatorRules.Position`, `Outcome`, `holdStarts`, `holdLengths` are listed per plan: contracts (partial)
