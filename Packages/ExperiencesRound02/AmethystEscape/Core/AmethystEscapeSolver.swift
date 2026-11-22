@@ -5,8 +5,9 @@
 // moves in the rules' fixed order — rotate(r, +1), rotate(r, −1) for each shell r in order, then advance unless it is
 // stuck — never continuing from a blocked wedge; the first escape found is at the smallest depth m, and its path is the
 // witness. Every state reachable in fewer than m moves was expanded and none escapes: that is the proof, recorded as the
-// number of states first reached at each depth 0 … m − 1. Work counts the states expanded. Integers only; no clock, no
-// random source.
+// number of states first reached at each depth 0 … m − 1. Work counts the states expanded. Feature 365 (R02-G07-05)
+// T-R02G0705-002 starts the same search at any given crystal (`solve(_:from:maxDepth:)`) for the hints; the opening
+// search is that search from the opening crystal. Integers only; no clock, no random source.
 
 /// The certified result of the search.
 public struct AmethystEscapeSolution: Sendable, Equatable, Hashable, Codable {
@@ -95,6 +96,19 @@ public enum AmethystEscapeSolver {
     /// whose shortest route is longer is refused without searching the rest of its states. The search works on the packed
     /// integers directly (shell lists as bit masks), applying the same rules as `AmethystEscapeCrystal`.
     public static func solve(_ level: AmethystEscapeLevel, maxDepth: Int = Int.max) -> AmethystEscapeSolution? {
+        solve(level, from: AmethystEscapeCrystal(level: level), maxDepth: maxDepth)
+    }
+
+    /// The shortest escape from `crystal` (feature 365 T-R02G0705-002; clarification Q1), or nil when no sequence of at
+    /// most `maxDepth` moves escapes. The same packed breadth-first search as ``solve(_:maxDepth:)``, which is this search
+    /// from the opening crystal: the moves are expanded in the rules' order, so the first escape found is the shortest
+    /// and, among those, the first in that order. The solution's depths count the states first reached at each depth from
+    /// `crystal` and its work the states expanded. A crystal whose pearl already lies in a blocked wedge (a failed state)
+    /// has no escape and is not searched; neither is any crystal when `maxDepth` is less than 1. The offsets and the
+    /// pearl are taken as given (the caller keeps them in range).
+    public static func solve(_ level: AmethystEscapeLevel, from crystal: AmethystEscapeCrystal,
+                             maxDepth: Int) -> AmethystEscapeSolution? {
+        guard maxDepth >= 1, !crystal.isBlocked(crystal.pearl, level: level) else { return nil }
         let n: Int = level.sectors
         let k: Int = level.shells.count
         let count: Int = stateCount(level)
@@ -114,7 +128,7 @@ public enum AmethystEscapeSolver {
             wallMask.append(wall)
             blockedMask.append(blocked)
         }
-        let start: Int = encode(AmethystEscapeCrystal(level: level), level: level)
+        let start: Int = encode(crystal, level: level)
         var seen: [Bool] = Array(repeating: false, count: count)
         var parent: [Int32] = Array(repeating: -1, count: count)
         var via: [UInt8] = Array(repeating: 0, count: count)
@@ -136,7 +150,8 @@ public enum AmethystEscapeSolver {
                 // Rotations, in the rules' order.
                 for r in 0..<k {
                     let offset: Int = (offsets / power[r]) % n
-                    for (stepIndex, step) in [1, -1].enumerated() {
+                    for stepIndex in 0..<2 {
+                        let step: Int = stepIndex == 0 ? 1 : -1
                         let turned: Int = (offset + step + n) % n
                         let newOffsets: Int = offsets + (turned - offset) * power[r]
                         let newSector: Int = shell == r ? (sector + step + n) % n : sector
@@ -182,7 +197,7 @@ public enum AmethystEscapeSolver {
         return nil
     }
 
-    /// The solution whose path leads from the opening state to `state`, then `final`.
+    /// The solution whose path leads from the search's starting state to `state`, then `final`.
     static func solution(level: AmethystEscapeLevel, from state: Int, depths: [Int], work: Int, parent: [Int32],
                          via: [UInt8], moves: [AmethystEscapeAction], final: AmethystEscapeAction) -> AmethystEscapeSolution {
         var path: [AmethystEscapeAction] = [final]

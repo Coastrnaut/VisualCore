@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G0705-002 [P] [US2] [US3] Add `solve(_:from:maxDepth:)` to `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSolver.swift` (the same
+- [X] T-R02G0705-002 [P] [US2] [US3] Add `solve(_:from:maxDepth:)` to `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSolver.swift` (the same — Verified 2026-11-22: 2026-11-22: host-2 (HintsTests 19 cases: exact hints win all 100 levels in the certified count, 200 seeded states vs an independent search, 500 failures; plus Catalog/Solver/Witness/Generator unchanged with the solver's new entry point) exit 0, lead retest
   packed breadth-first search started at a given crystal; `solve(_:maxDepth:)` equals it from the opening crystal) and
   create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeHints.swift` (`AmethystEscapePlan`, `AmethystEscapeHint` with levels 1 … 3 and the texts
   of clarification Q1, `AmethystEscapeHints.plan`/`hint`, `AmethystEscapeFailureExplanation` with the texts of
