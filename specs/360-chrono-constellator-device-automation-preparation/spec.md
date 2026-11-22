@@ -152,7 +152,9 @@ number.
 - UA-F13's campaign script will read the definition; until it exists, the check and the written plan are the contract.
 - Pass conditions use the experience's own budgets (frame pacing, memory) where a budget exists and otherwise "recorded"
   (a measurement taken and reported, not judged).
-- Feature 350 (Chrono Constellator) is the model: the same definition schema, check and plan layout.
+- Feature 350 (Colorfall Canyons) is the model: the same definition schema, check and plan layout.
+- This feature adds no code, visuals or layout: the code-only graphics, their licensing and the iPhone and iPad layout
+  stay those of features 353, 356 and 359; simulator proof of the game is features 358 and 359.
 
 ## Traceability
 
