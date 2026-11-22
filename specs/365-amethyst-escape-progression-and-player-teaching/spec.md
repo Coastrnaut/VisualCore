@@ -48,8 +48,8 @@ schema 1; the core may not read a clock.
   and reset to level 1 after any change of the play. "A state that can still win" means one whose plan exists. Impact:
   FR-R02G0705-002; SC-R02G0705-002.
 - Q: What does the tutorial show, and when does it advance? → A: on levels 1 … 3, three instructions in order: (1)
-  "Drag a shell round the centre (or use Turn − and +) to line an opening up with the pearl; a hint shows which" — it
-  advances once a turn has been accepted; (2) "Tap the pearl (or Advance) to roll it one pocket: out through an opening,
+  "Drag a shell round the centre (or use Turn − and +) to line an opening up with the pearl, or roll the pearl when its
+  way is open; a hint shows which" — it advances once any move (a turn or an advance) has been accepted; (2) "Tap the pearl (or Advance) to roll it one pocket: out through an opening,
   else clockwise until a wall stops it" — until an advance is accepted; (3) "Lead the pearl out through the exit gap of
   the outer shell before the moves run out; dark wedges with a cross end the play" — until the level ends.
   `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G0705-001; SC-R02G0705-001.
