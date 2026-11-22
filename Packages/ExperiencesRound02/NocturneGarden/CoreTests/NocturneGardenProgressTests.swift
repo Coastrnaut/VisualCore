@@ -398,8 +398,14 @@ import VisualCoreSimulation
         #expect(decoded == progress)
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
-        #expect(text == "{\"frontier\":3,\"solved\":[{\"level\":1,\"movesMade\":6,\"stars\":2},"
-            + "{\"level\":2,\"movesMade\":19,\"stars\":1},{\"level\":70,\"movesMade\":9,\"stars\":3}]}")
+        // Feature 387: every result also writes its trace and whether it is verified (untraced here).
+        #expect(text == "{\"frontier\":3,\"solved\":[{\"level\":1,\"movesMade\":6,\"stars\":2,\"trace\":[],"
+            + "\"verified\":false},{\"level\":2,\"movesMade\":19,\"stars\":1,\"trace\":[],\"verified\":false},"
+            + "{\"level\":70,\"movesMade\":9,\"stars\":3,\"trace\":[],\"verified\":false}]}")
+        // A payload written before feature 387 (no trace, no verified) still decodes, untraced and unverified.
+        let old: String = "{\"frontier\":2,\"solved\":[{\"level\":1,\"movesMade\":6,\"stars\":2}]}"
+        let oldProgress: Progress = try JSONDecoder().decode(Progress.self, from: Data(old.utf8))
+        #expect(oldProgress.solved[1]?.trace.isEmpty == true && oldProgress.solved[1]?.verified == false)
         let bad: [String] = ["{\"frontier\":0,\"solved\":[]}", "{\"frontier\":101,\"solved\":[]}",
                              "{\"frontier\":1,\"solved\":[{\"movesMade\":1,\"level\":1,\"stars\":4}]}",
                              "{\"frontier\":1,\"solved\":[{\"movesMade\":1,\"level\":0,\"stars\":1}]}",
@@ -409,7 +415,8 @@ import VisualCoreSimulation
         for json in bad {
             #expect(throws: DecodingError.self) { try JSONDecoder().decode(Progress.self, from: Data(json.utf8)) }
         }
-        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 100)]
+        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 100), .replay(level: 1),
+                             .replay(level: 100)]
         for mode in modes {
             let encoded: Data = try JSONEncoder().encode(mode)
             #expect(try JSONDecoder().decode(Mode.self, from: encoded) == mode)
@@ -421,7 +428,8 @@ import VisualCoreSimulation
         #expect(String(decoding: try encoder.encode(Mode.practice), as: UTF8.self) == "{\"mode\":\"practice\"}")
         #expect(String(decoding: try encoder.encode(Mode.campaign), as: UTF8.self) == "{\"mode\":\"campaign\"}")
         let badModes: [String] = ["{\"mode\":\"daily\",\"level\":0}", "{\"mode\":\"daily\",\"level\":101}",
-                                  "{\"mode\":\"daily\"}", "{\"mode\":\"replay\",\"level\":1}"]
+                                  "{\"mode\":\"daily\"}", "{\"mode\":\"replay\",\"level\":0}",
+                                  "{\"mode\":\"replay\",\"level\":101}", "{\"mode\":\"replay\"}"]
         for json in badModes {
             #expect(throws: DecodingError.self) { try JSONDecoder().decode(Mode.self, from: Data(json.utf8)) }
         }
