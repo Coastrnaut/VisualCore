@@ -115,11 +115,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [chronoConstellator].compactMap { $0 }
 
-    /// R02-G06 Chrono Constellator (feature 353, R02-G06-03): a candidate until X-R02-G06. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G06 Chrono Constellator (features 351–359, R02-G06-01…09): a candidate until X-R02-G06. Snapshot schema 3
+    /// (feature 357), so the schema-1 and schema-2 examples are stored (feature 359, R02-G06-09).
     fileprivate static var chronoConstellator: ExperienceRegistration? {
         guard let id = ChronoConstellatorExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: ChronoConstellatorExperienceCore.self) { launch in
+        let examples = [ChronoConstellatorExperienceCore.schemaOneExample(),
+                        ChronoConstellatorExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: ChronoConstellatorExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return ChronoConstellatorExperience.make(
                 id: id, storage: launch.storage,
