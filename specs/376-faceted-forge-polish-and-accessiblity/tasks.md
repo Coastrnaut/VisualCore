@@ -75,7 +75,7 @@ with the lead. MVP: Stories 1 and 2.
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G0806-013 Fade the sliver cross out as well as in per FR-R02G0806-004 and SC-R02G0806-003 (partial): in
+- [X] T-R02G0806-013 Fade the sliver cross out as well as in per FR-R02G0806-004 and SC-R02G0806-003 (partial): in — Verified 2026-11-22: host-4 (geometry, presenter and scene: the sliver cross fades out at the undone cut) exit 0 and sim-27-2 (FacetedForgeExperienceTests on iOS 27.2) exit 0; the code landed in 6798240b2 through a mislabelled git commit -a (history not rewritten), lead retest
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneGeometry.swift` accept the centre of a fading cross
   (`fadingSliver: SIMD3<Double>?`) drawn with the eased sliver level when the snapshot has no failure piece; in
   `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift` remember the opened centre of the

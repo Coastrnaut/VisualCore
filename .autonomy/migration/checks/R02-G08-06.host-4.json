@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgeSceneGeometry|FacetedForgeLights|FacetedForgeFeedbackPlan"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForgeSceneGeometry|FacetedForgeLights|FacetedForgeFeedbackPlan'",
+  "elapsed_seconds": 4.463,
+  "exit_code": 0,
+  "finished": "2026-11-22T15:31:46+00:00",
+  "gate": "R02-G08-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-06.host-4.log",
+  "log_sha256": "26247649ae490124e5f9d69008d9ea8ecda36b43b7a3bc7307aab8b27c09517b",
+  "name": "host-4",
+  "started": "2026-11-22T15:31:41+00:00",
+  "timed_out": false
+}
