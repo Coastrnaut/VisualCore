@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G06-02 (migration ledger, game feature of experience R02-G06) · ID namespace FR-R02G0602-###,
 SC-R02G0602-###, T-R02G0602-###
@@ -30,6 +30,59 @@ Canonical overrides:
 - **Shared features used:** R02-F23 (puzzle contract: `ChronoConstellatorRules` from R02-G06-01) and R02-F24 (catalog
   digest, difficulty and progression rule); R02-F03 numbers.
 - **Model:** feature 342 (Colorfall Canyons's generator and solver witness).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time. Facts checked in
+code (read-only, 2026-11-21): R02-G06-01's `ChronoConstellatorLevel` (grid 5 … 12 × 5 … 10, 2 … 5 stars on closed loops of
+4 … 32 cells, distinct targets, budget 1 … 20, tick limit 1 … 1,200), `ChronoConstellatorTimeline` (closed-form
+positions, edits in use), `ChronoConstellatorEvaluation`, `ChronoConstellatorPlay` and `ChronoConstellatorRules`;
+R02-F24's `PuzzleCatalog.digest(id:identities:)` and `ProgressionRule.standard` (drop at most 1, jump at most 3);
+`SeedDerivation.derive(_:index:)` and `SeededRandom`; the archived manifest's 100 entries (bands 1 … 5 × 20, move
+budgets 8 … 19). Feature 342 is the pattern. A Python prototype (2026-11-21, the 100 manifest seeds, the rules below with
+Python's own generator) certified 100 of 100 levels in 0.3 s, at most 107 candidates for one level, smallest edit counts
+1, 2, 2, 3 and 3 … 4 by band and 3 … 160 blocked windows per level from band 2 on.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
+  table in `ChronoConstellatorManifest` with their provenance. Candidate k of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`, in this order: the profile by band (grid 6 × 5 with
+  2 stars; 6 × 5 with 3; 7 × 6 with 3; 7 × 6 with 4; 8 × 7 with 5); for each star a rectangle loop of width draw(2 … 5) and
+  height draw(2 … 4) (each capped by the grid) at a drawn position, travelled clockwise or, with chance 1/2, reversed; for
+  each star in order a target drawn among its loop's cells not already a target (none left: the candidate is skipped);
+  each star's default phase draw(0 … L − 1); the tick limit draw(120 … 360); the budget is the manifest budget. A
+  candidate is kept when the solver certifies it with a smallest edit count in the band's range (1; 2; 2; 3; 3 … 4) and at
+  least the band's number of blocked windows (0; 1; 2; 2; 3); otherwise k grows, at most 512 candidates, then
+  `generation(n)`. Ids `chrono-constellator-NNN`; tutorial flag on levels 1 … 3; difficulty = band. Impact:
+  FR-R02G0602-001; SC-R02G0602-001, 003.
+- Q: How does the solver decide the smallest edit count, and what proves it? → A: the "integer-tick phase search": for
+  every tick T = 1 … tick limit, m(T) is the number of stars whose default timeline does not put them on their target at T.
+  Every edit (a phase change or a hold) acts on one star, and a star off its target at T needs at least one edit on it, so
+  any timeline winning at T has at least m(T) edits: the lower bound is m* = min over T of m(T) (m* = 0 refuses the
+  candidate). The windows are the ticks T with m(T) = m*, in order; a window's phase-only timeline sets each star that is
+  off its target to phase (index of its target − T) mod L. A window is blocked when that timeline puts two stars on one cell
+  on some tick 1 … T. The first unblocked window gives the witness, so the smallest edit count is exactly m*; a level whose
+  windows are all blocked is not certified. The witness timeline is then replayed through the kernel and its win tick (the
+  first aligned tick, which may come before T) recorded. Work = ticks scanned + positions evaluated, bounded by tick limit ×
+  stars × (1 + tick limit) for the window checks. Impact: FR-R02G0602-002; SC-R02G0602-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `ChronoConstellatorDifficulty` holds the
+  smallest edit count, the win tick, the star count, the loop lengths, the windows considered and the windows blocked. The
+  catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on the smallest
+  edit count; the band ranges make band means non-decreasing. Impact: FR-R02G0602-003, 005; SC-R02G0602-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/chrono-constellator/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the actions (the witness's phase changes in star order, then
+  `step(tick limit)`), the win tick, the position digest after every tick up to the win (16 hex characters of the SHA-256 of
+  the star cells), the play fingerprints after `begin` and after each action, the lower bound m* with the first window and
+  the windows considered and blocked, the unedited counterexample (its failure reason and tick), the near miss (the witness
+  minus its last edit, which fails, with reason and tick), the difficulty and the candidates skipped. A test rebuilds every
+  witness and compares bytes; it writes the files only with `CHRONO_CONSTELLATOR_WRITE_WITNESSES=1`. Decoding refuses newer
+  schemas, damaged files and witnesses that no longer replay. Impact: FR-R02G0602-004; SC-R02G0602-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<ChronoConstellatorRules>.digest(id: "chrono-constellator", identities:)` over the 100 level fingerprints
+  in manifest order, pinned in a test. Certification tests are split by band so each runs under 10 seconds on a debug host
+  build (measured locally, not asserted on CI). New refusals: `generation(Int)` (`r02-g06.generation`) and
+  `witness(String)` (`r02-g06.witness`). Impact: FR-R02G0602-005, 006; SC-R02G0602-006.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -80,7 +133,8 @@ file is refused.
 
 - **A seed whose candidate is unsolvable, too easy or too hard for its band:** the generator moves to the next candidate
   deterministically (bounded) and records how many it skipped; no candidate within the bound is a named refusal.
-- **More than one smallest timeline:** allowed; the witness picks one by a stated tie rule.
+- **More than one smallest timeline:** allowed; the witness is the phase-only timeline of the first unblocked window
+  (clarification Q2).
 - **A level won with no edit:** never emitted.
 - **An alignment window blocked by a collision:** it does not count as a solution of that size; the witness's window is
   collision-free.
