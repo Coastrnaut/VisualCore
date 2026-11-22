@@ -14,7 +14,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0601-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `ChronoConstellatorCore`,
+- [X] T-R02G0601-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `ChronoConstellatorCore`, — Verified 2026-11-21: 2026-11-21 host exit 0: 7 level tests (ranges and loop rules refused by name, stored form round-trips and refuses damage, reason codes, star descriptions, 200 fixtures win exactly at their win tick) (.autonomy/migration/checks/R02-G06-01.host.json); package, error, level, timeline, fixtures; play source written by the lead so agents C and D compile against it; lead run
   `ChronoConstellatorCoreTests`, product); create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorError.swift`
   (codes "r02-g06.level, .action, .stage, .stale, .budget, .newer-schema, .malformed"),
   `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorLevel.swift` (shapes ring, cross, diamond, triangle,

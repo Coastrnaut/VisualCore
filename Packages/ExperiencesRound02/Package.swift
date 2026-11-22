@@ -27,6 +27,8 @@ let package = Package(
         .library(name: "HueCompassCore", targets: ["HueCompassCore"]),
         // Feature 341 (R02-G05-01): Colorfall Canyons's rule kernel, a candidate until X-R02-G05.
         .library(name: "ColorfallCanyonsCore", targets: ["ColorfallCanyonsCore"]),
+        // Feature 351 (R02-G06-01): Chrono Constellator's rule kernel, a candidate until X-R02-G06.
+        .library(name: "ChronoConstellatorCore", targets: ["ChronoConstellatorCore"]),
         // Feature 343 (R02-G05-03): Colorfall Canyons's experience (iOS only; a registered candidate until X-R02-G05).
         .library(name: "ColorfallCanyonsExperience", targets: ["ColorfallCanyonsExperience"]),
         // Feature 323 (R02-G03-03): Wave Knot Keeper's experience (iOS only; a registered candidate until X-R02-G03).
@@ -218,6 +220,16 @@ let package = Package(
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "WaveKnotKeeper/ExperienceTests"),
         // Feature 341 (R02-G05-01): Colorfall Canyons's pure rule kernel.
+        // Feature 351 (R02-G06-01): Chrono Constellator's pure rule kernel.
+        .target(name: "ChronoConstellatorCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "ChronoConstellator/Core"),
+        .testTarget(name: "ChronoConstellatorCoreTests",
+                    dependencies: ["ChronoConstellatorCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "ChronoConstellator/CoreTests"),
         .target(name: "ColorfallCanyonsCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
                                .product(name: "VisualCoreMath", package: visualCore),
