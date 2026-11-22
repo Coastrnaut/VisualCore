@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "build",
+    "--package-path",
+    "Packages/ExperiencesRound02"
+  ],
+  "command": "swift build --package-path Packages/ExperiencesRound02",
+  "elapsed_seconds": 2.072,
+  "exit_code": 0,
+  "finished": "2026-11-22T04:50:20+00:00",
+  "gate": "R02-G06-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G06-06.package.log",
+  "log_sha256": "81260910059774f7f6ffe9150cf7651f53860a2bfaf2e4ade91e6124adf6cea0",
+  "name": "package",
+  "started": "2026-11-22T04:50:18+00:00",
+  "timed_out": false
+}

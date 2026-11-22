@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0606-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing`; add the
+- [X] T-R02G0606-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing`; add the — Verified 2026-11-21: 2026-11-21: baseline-round02, baseline-host, baseline-timing exit 0; VisualCoreAudioDSP added to ChronoConstellatorCore and tests, VisualCoreAudio to the experience; package (swift build) exit 0
   `VisualCoreAudioDSP` product to the `ChronoConstellatorCore` target and its test target and `VisualCoreAudio` (iOS) to
   `ChronoConstellatorExperience` in `Packages/ExperiencesRound02/Package.swift`; `--name package -- swift build
   --package-path Packages/ExperiencesRound02`
