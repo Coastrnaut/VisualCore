@@ -19,20 +19,18 @@ undo, redo and replay; and the rules as an R02-F23 `PuzzleRules`. Research: [res
 ## Technical Context
 
 **Language/Version**: Swift 6. **Primary dependencies**: VisualCoreSimulation (`PuzzleRules`, `SeededRandom`) and
-VisualCoreMath (`StableHash`), as the existing round-two Cores use them. No GPU, UIKit, Objective-C++ or GLSL code in this
-feature (the shader interfaces come in R02-G09-03); no new package; one new target pair.
-**Package**: `Packages/ExperiencesRound02/Package.swift` gains `NocturneGardenCore` (path `NocturneGarden/Core`), its
-tests (`NocturneGarden/CoreTests`) and the product.
-**Numbers**: bed at most 32 × 24 cells; outlines at most 3 × 6 cells at size 1, scaled by at most 3 and stretched by at
-most 2, so every doubled coordinate stays below 2^10 and every cross product below 2^22: plain `Int` arithmetic is
-exact. No floating point in the rules.
-**Seeds**: fixtures use `SeededRandom(seed: 2_381)`; neighbouring-input checks seed 2_386.
-**Testing**: `swift test --package-path Packages/ExperiencesRound02 --filter NocturneGarden`; regression as for 371.
-**Performance**: a mask is at most 768 cells; a bloom's shadow tests at most the cells of its bounding box (at most
-9 × 36); an action recomputes the union from scratch (at most a few dozen blooms) well under a millisecond; a 500-trace
-test stays under 10 s.
-**Constraints**: additive; reason codes `r02-g09.*`; denylisted names (ProjectM, PresetLibrary, MilkDrop …) avoided.
-**CI**: the existing `swift test` step of ExperiencesRound02 covers the new targets; no workflow change.
+VisualCoreMath (`StableHash`), as the existing round-two Cores use them. No GPU, UIKit, Objective-C++ or GLSL code in
+this feature (the shader interfaces come in R02-G09-03); no new package; one new target pair. **Package**:
+`Packages/ExperiencesRound02/Package.swift` gains `NocturneGardenCore` (path `NocturneGarden/Core`), its tests
+(`NocturneGarden/CoreTests`) and the product. **Numbers**: bed at most 32 × 24 cells; outlines at most 3 × 6 cells at
+size 1, scaled by at most 3 and stretched by at most 2, so every doubled coordinate stays below 2^10 and every cross
+product below 2^22: plain `Int` arithmetic is exact. No floating point in the rules. **Seeds**: fixtures use
+`SeededRandom(seed: 2_381)`; neighbouring-input checks seed 2_386. **Testing**: `swift test --package-path
+Packages/ExperiencesRound02 --filter NocturneGarden`; regression as for 371. **Performance**: a mask is at most 768
+cells; a bloom's shadow tests at most the cells of its bounding box (at most 9 × 36); an action recomputes the union
+from scratch (at most a few dozen blooms) well under a millisecond; a 500-trace test stays under 10 s. **Constraints**:
+additive; reason codes `r02-g09.*`; denylisted names (ProjectM, PresetLibrary, MilkDrop …) avoided. **CI**: the existing
+`swift test` step of ExperiencesRound02 covers the new targets; no workflow change.
 
 No NEEDS CLARIFICATION remains.
 

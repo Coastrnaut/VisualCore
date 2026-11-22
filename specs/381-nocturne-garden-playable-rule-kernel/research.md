@@ -13,10 +13,11 @@
   becomes one action with four exact outcomes; the solver's branching stays small.
 - **R4 Match by cross multiplication.** Decision: match = |M ∩ T| / |M ∪ T| ≥ p / q tested as |M ∩ T|·q ≥ p·|M ∪ T|.
   Rationale: "IoU exceeds requirement" with no rounding; an empty union never wins.
-- **R5 Leak, then win, then budget.** Decision: judged after each accepted action in that order; nothing before the first
-  bloom. Rationale: a leak beyond the allowance is always a failure; a win on the last move counts.
+- **R5 Leak, then win, then budget.** Decision: judged after each accepted action in that order; nothing before the
+  first bloom. Rationale: a leak beyond the allowance is always a failure; a win on the last move counts.
 - **R6 Boundary deviation as the truth metric.** Decision: the symmetric Chebyshev Hausdorff distance between the two
   sets of boundary cells, reported after every action and never deciding. Rationale: the catalog's "contour Hausdorff
   proxy" on the same exact grid; independent of the win rule.
 - **R7 Fingerprints as the signed snapshot.** Decision: the play fingerprint (SHA-256 of schema, level fingerprint,
-  blooms in canonical order, sun, moves, stage, failure) and records with previous and next fingerprints, as feature 371.
+  blooms in canonical order, sun, moves, stage, failure) and records with previous and next fingerprints, as feature
+  371.

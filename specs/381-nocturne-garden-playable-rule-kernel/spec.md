@@ -51,20 +51,20 @@ elevation".
   is one of four steps, 1 (high) … 4 (low), and stretches every shadow vertically by the factor f = e / 2 (1/2, 1, 3/2,
   2) about the bloom's foot: a vertex (x, y) of the scaled outline casts (c + x, r + f·y). Impact: FR-R02G0901-001, 002,
   003, 013; SC-R02G0901-001.
-- Q: How does a shadow become cells, exactly? → A: a cell (c, r) of the bed is dark for a bloom when its centre
-  (c + 1/2, r + 1/2) lies inside the bloom's cast polygon or on its boundary; with every coordinate doubled (and the
-  factor's denominator cleared) the test is an exact integer winding-number test with boundary points counted as inside.
-  The garden's shadow mask is the union over all planted blooms, clipped to the bed. The match is |M ∩ T| / |M ∪ T|
-  over the mask M and target T (0 when both are empty), compared with the required fraction p / q by cross
-  multiplication; the leak is |M ∩ F| over the forbidden cells F. Impact: FR-R02G0901-003, 005, 014; SC-R02G0901-003.
-- Q: Which actions exist, what does each cost, and when is one refused? → A: `plant(kind, col, row, size)`,
-  `move(bloom, col, row)`, `resize(bloom, size)`, `remove(bloom)` and `sun(elevation)`; each accepted action spends one
-  move. Refused without change: an anchor outside the bed or a size or elevation out of range (`r02-g09.action`); a kind
-  whose supply is used up (`r02-g09.supply`); a bloom number that does not exist (`r02-g09.action`); an action that
-  changes nothing (moving to the same cell, the same size, the same elevation: `r02-g09.noop`); a wrong stage
-  (`r02-g09.stage`) or a stale fingerprint (`r02-g09.stale`). Two blooms may share an anchor. Blooms are kept in
-  canonical order (row, then column, then kind, then size) and named "bloom 1" … in that order with their kind, cell and
-  size; removing a bloom returns it to the supply. Impact: FR-R02G0901-002, 004, 006, 011, 013.
+- Q: How does a shadow become cells, exactly? → A: a cell (c, r) of the bed is dark for a bloom when its centre (c +
+  1/2, r + 1/2) lies inside the bloom's cast polygon or on its boundary; with every coordinate doubled (and the factor's
+  denominator cleared) the test is an exact integer winding-number test with boundary points counted as inside. The
+  garden's shadow mask is the union over all planted blooms, clipped to the bed. The match is |M ∩ T| / |M ∪ T| over the
+  mask M and target T (0 when both are empty), compared with the required fraction p / q by cross multiplication; the
+  leak is |M ∩ F| over the forbidden cells F. Impact: FR-R02G0901-003, 005, 014; SC-R02G0901-003.
+- Q: Which actions exist, what does each cost, and when is one refused? → A: `plant(kind, col, row, size)`, `move(bloom,
+  col, row)`, `resize(bloom, size)`, `remove(bloom)` and `sun(elevation)`; each accepted action spends one move. Refused
+  without change: an anchor outside the bed or a size or elevation out of range (`r02-g09.action`); a kind whose supply
+  is used up (`r02-g09.supply`); a bloom number that does not exist (`r02-g09.action`); an action that changes nothing
+  (moving to the same cell, the same size, the same elevation: `r02-g09.noop`); a wrong stage (`r02-g09.stage`) or a
+  stale fingerprint (`r02-g09.stale`). Two blooms may share an anchor. Blooms are kept in canonical order (row, then
+  column, then kind, then size) and named "bloom 1" … in that order with their kind, cell and size; removing a bloom
+  returns it to the supply. Impact: FR-R02G0901-002, 004, 006, 011, 013.
 - Q: In which order are leak, win and budget decided, and from which stages can the player go back? → A: after an
   accepted action: leak first (a leak above the allowance fails the level, naming the action and its bloom, or the sun),
   then win (match at least p / q and leak within the allowance: won), then budget (moves spent equal to the budget:
@@ -79,8 +79,8 @@ elevation".
   SHA-256 of the schema, the level fingerprint, the blooms in canonical order, the sun elevation, the moves spent, the
   stage and the failure; levels are JSON schema 1 with sorted keys (bed size, target and forbidden cells as sorted
   row-major indices, supply, size and elevation ranges, budget, required match as a fraction, leak allowance, opening
-  sun elevation, tutorial flag, seed, id) and a fingerprint, re-checked on decode; reason codes `r02-g09.level`, `.action`,
-  `.supply`, `.noop`, `.stage`, `.stale`, `.newer-schema`, `.malformed`. Impact: FR-R02G0901-006 … 011;
+  sun elevation, tutorial flag, seed, id) and a fingerprint, re-checked on decode; reason codes `r02-g09.level`,
+  `.action`, `.supply`, `.noop`, `.stage`, `.stale`, `.newer-schema`, `.malformed`. Impact: FR-R02G0901-006 … 011;
   SC-R02G0901-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -223,4 +223,3 @@ refused.
 
 - No rendering, gestures, generator, solver certification, adapter, catalog registration or persistence in this
   feature; no soft shadows in the rules; no device run before ImplementationLock-100.
-
