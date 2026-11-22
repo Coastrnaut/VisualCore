@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G06-06: a fading mark keeps its cell after the state that placed it is gone).
+Last updated: 2026-11-22 (R02-G06-07: a new mode case reaches iOS-only switches; build the iOS target first).
 
 ## 1. What is tested, and where
 
@@ -214,6 +214,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **A fading mark needs its place remembered** (R02-G06-06, 2026-11-21). Chrono Constellator's collision cross is drawn
   at the failure's cell, but a rewind clears the failure, so a Reduce Flashing fade-out had nowhere to draw. The lights
   now keep the last collision cell until the mark is dark, and a geometry test checks the cross fading at that cell.
+- **A new enum case breaks every exhaustive switch** (R02-G06-07, 2026-11-22). Adding `replay(level:)` to Chrono
+  Constellator's mode broke `modeName` in the Core (caught by the agent's host build) and the presenter's `retryAction`
+  and the panel's `modeName` (iOS-only, caught only by the lead's simulator build) — and the identity test's list of
+  controls. Build the iOS target before the simulator run whenever a shared enum grows.
 - **Compare picks with an independent ray test** (R02-G05-04, 2026-11-21). Colorfall Canyons's picker and gesture tests
   compute the expected cell or spring in the test with their own plane and box intersections (only the ray is shared)
   over seeded points, sizes and orbits, and each was shown to fail by changing one threshold; a panel test wins all 100

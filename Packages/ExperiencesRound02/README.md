@@ -340,3 +340,7 @@ Feature 356 (R02-G06-06) adds polish and accessibility: in the Core `ChronoConst
 haptics), `ChronoConstellatorLights` (eased fades, slower under Reduce Flashing) and `ChronoConstellatorSoundRecipe`
 (a synthesized ambient loop); in the experience `ChronoConstellatorSound`, the feedback route, the lights in the scene
 and an accessible panel (labels, values, summary, Sound toggle, large-text layout).
+
+Feature 357 (R02-G06-07) adds persistence and replay: results with winning traces and `ChronoConstellatorReconciliation`
+(replay-verified scores on restore), snapshot schema 3 with the 2 → 3 migration, the replay mode (`replay.start`,
+`replay.step`, `replay.stop`) and the saved sound choice (`settings.sound`); the panel's Replay, Step and Stop.

@@ -167,3 +167,23 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
 - **Panel.** Every control has a label and a value; a summary element reads the tick, the edits left and every star; the
   star picker is adjustable and announces its pick; rows become columns at accessibility text sizes and the panel keeps
   a 520-point readable width on iPad.
+
+## Persistence and replay (feature 357, R02-G06-07)
+
+- **Saves.** The one app's shared store writes the experience's snapshot atomically; Chrono Constellator's payload is
+  schema 3 `{level, mode, progress, records, sound, tutorial}`, migrating 1 → 2 → 3 (2 → 3: every result an empty
+  trace and unverified, the sound off). The digest (v3) covers the level, the play, the progress with its traces and the
+  mode; never the tutorial step, the sound choice or the count of dropped results. The state reads no clock and no
+  random source: the seed, the certified catalog, the date given to `mode.daily` and the recorded actions decide it.
+- **Reconcilable scores.** A campaign or daily win stores the winning trace — the net actions of the play
+  (`ChronoConstellatorReconciliation.netTrace`: phase changes, holds, releases, steps and rewinds, an undone action
+  left out unless redone) — as a verified result, replacing a stored one only when better. On restore every traced
+  result is replayed on a fresh play of its certified level and kept only when it wins with exactly the recorded edits
+  and stars (a trace over 64 actions or with an illegal action never verifies); untraced results from older saves are
+  kept unverified; the frontier is restored as saved. The presenter announces the number dropped once.
+- **Replay.** `replay.start [level]` replays a verified trace action by action (`replay.step`) and `replay.stop`
+  returns to campaign; during replay other play actions are refused (`r02-g06.replay`), nothing is recorded and a
+  replayed win claims no stars (`r02-g06.no-replay`, `r02-g06.replay-end` for the other refusals). The panel shows
+  Replay, Step and Stop with the position.
+- **Settings.** The sound choice (`settings.sound [0 … 1]`) is saved in the snapshot and applied when the experience
+  opens.
