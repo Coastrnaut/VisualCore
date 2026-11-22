@@ -23,7 +23,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G0608-003 [US2] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G0608-003 [US2] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-22: ChronoConstellatorGolden compiles in the round-two baseline; golden-frames.json written with CHRONO_CONSTELLATOR_WRITE_GOLDEN=1 (16 frames) and reproduced byte for byte; RELEASE_FORBIDDEN lists ChronoConstellatorGolden
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 0 after the witness's phase changes and min(win tick, 6) ticks, plus
   the hero frame at tier 0; at 1,152 × 768 with the authored camera: every star node centre, every target centre and
   every distinct loop cell centre (ascending index), positions rounded to 1/8 px and an off-screen point null; the tick
