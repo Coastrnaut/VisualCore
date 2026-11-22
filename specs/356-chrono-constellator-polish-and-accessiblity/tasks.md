@@ -72,7 +72,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [X] T-R02G0606-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-22: 2026-11-22: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G0606-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0606-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-22: 2026-11-22: reference-1 exit 0
 - [ ] T-R02G0606-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0606-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0606-012 {device} After ImplementationLock-100, on D1, D2 and D3: hear the ambient sound, feel the haptics,
