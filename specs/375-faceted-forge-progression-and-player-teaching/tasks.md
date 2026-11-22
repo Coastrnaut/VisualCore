@@ -39,7 +39,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G0805-004 Edit `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeExperienceCore.swift` (controls
+- [X] T-R02G0805-004 Edit `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeExperienceCore.swift` (controls — Verified 2026-11-22: 2026-11-22: host-4 (all FacetedForge host tests, 179) exit 0; schema 2 with migration, new controls, manifest regenerated; a redo never advances the tutorial (agent finding)
   `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`; codes
   `r02-g08.locked`, `r02-g08.date`; practice budget 20 on a copy of the level, no stars, no unlocks; daily opens
   nothing; progress and mode in the digest, the tutorial step snapshotted but not digested; snapshot schema 2 `{level,

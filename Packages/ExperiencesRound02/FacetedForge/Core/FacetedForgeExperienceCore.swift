@@ -29,6 +29,27 @@
 // 1 … 100 or a trace the kernel refuses (a record of a newer schema among them). An envelope of a newer schema is
 // refused by the engine before the core sees it.
 //
+// Feature 375 (R02-G08-05) T-R02G0805-004 (FR-R02G0805-001 … 005, 007; clarifications Q1–Q5): the core also holds the
+// player's progress (`FacetedForgeProgress`: won levels with the fewest cuts made and stars, the open frontier), the
+// mode (campaign, practice with the budget raised to the kernel's maximum 20, daily) and the tutorial step. New
+// actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g08.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g08.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 20;
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing daily or practice drops the left level's records (the play starts fresh). `level.next` moves to the next
+// open level in campaign mode and is refused with `r02-g08.locked` when there is none (100 does not wrap). A win (the
+// play reaching `won` on an accepted cut or redo) records `progress.record(level:cutsMade:smallest:mode:)` with the
+// cuts made (the play's cut records, undone ones included) and the certified smallest cut count (campaign opens the
+// next level; daily never does; practice records nothing). The tutorial starts at
+// `FacetedForgeTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and advances after each
+// accepted new cut (a redo only ends it when it wins); undo and redo never move it otherwise. Digest
+// "r02-g08.faceted-forge.v2": level, play fingerprint, progress and mode (never the tutorial step).
+// Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}`; schema-1 payloads migrate (no won levels,
+// the levels up to the saved level open, campaign mode, the tutorial at its initial step).
+//
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `FacetedForgeTier.of(t)`: level-0 = 3 bevel segments, 3 dispersion layers, 2 glow
 // shells; level-1 = 2, 2, 1; level-2 = 1, 1, 0. Outcome: `won` or `failed` while the play is in that stage, else nil.
@@ -42,11 +63,16 @@ import VisualCorePersistence
 public enum FacetedForgeExperienceRule {
     /// A value that must be a whole number (piece, direction, depth) and is not.
     public static let notWhole = "r02-g08.not-whole"
+    /// A level that is not open yet, or no next open level (feature 375).
+    public static let locked = "r02-g08.locked"
+    /// An impossible calendar date (feature 375).
+    public static let date = "r02-g08.date"
 }
 
 /// Why a saved Faceted Forge state was refused on restore (feature 373). A refused restore changes nothing.
 public enum FacetedForgeRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress or the mode is
+    /// invalid (feature 375).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -54,16 +80,19 @@ public enum FacetedForgeRestoreRefusal: Error, Equatable, Sendable {
     case kernel(FacetedForgeError)
 }
 
-/// The state of Faceted Forge as an experience (see the file header). Snapshot schema 1.
+/// The state of Faceted Forge as an experience (see the file header). Snapshot schema 2.
 public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g08.faceted-forge"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g08.faceted-forge.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g08.faceted-forge.v2"
     /// The action ids in declaration order.
-    public static let actionIDs = ["piece.cut", "play.undo", "play.redo", "level.next"]
+    public static let actionIDs = ["piece.cut", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`FacetedForgeMode.practiceBudget`, 20).
+    public static let practiceBudget = FacetedForgeMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a piece index: a play has at most budget + 1 pieces (`FacetedForgeLevel.budgets`).
@@ -79,22 +108,48 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: FacetedForgePlay
+    /// The player's progress (feature 375): in the digest and the snapshot.
+    public private(set) var progress: FacetedForgeProgress
+    /// The mode (feature 375): in the digest and the snapshot.
+    public private(set) var mode: FacetedForgeMode
+    /// The tutorial step (feature 375): in the snapshot, not in the digest.
+    public private(set) var tutorial: FacetedForgeTutorialStep
+    /// The certified smallest cut count of the current level (stars). Derived from the level number.
+    public private(set) var certifiedSmallest: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: FacetedForgePlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
+
+    /// What a reset restores (feature 375).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: FacetedForgePlay
+        /// The opening progress: the levels up to the opening level open, none won.
+        let progress: FacetedForgeProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: FacetedForgeTutorialStep
+        /// The opening level's certified smallest cut count.
+        let certifiedSmallest: Int
+    }
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber`, whose reset returns to `openingPlay` of `openingNumber`.
-    init(levelNumber: Int, play: FacetedForgePlay, openingNumber: Int, openingPlay: FacetedForgePlay) {
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial`, whose reset returns to
+    /// `opening` of `openingNumber`.
+    init(levelNumber: Int, play: FacetedForgePlay, progress: FacetedForgeProgress, mode: FacetedForgeMode,
+         tutorial: FacetedForgeTutorialStep, certifiedSmallest: Int, openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedSmallest = certifiedSmallest
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
@@ -163,12 +218,39 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
         try FacetedForgePlay.replay(level: level, records: [])
     }
 
-    /// The opening state of manifest number `number`.
+    /// The practice copy of `level` (feature 375): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: FacetedForgeLevel) throws(FacetedForgeError) -> FacetedForgeLevel {
+        try FacetedForgeLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, planes: level.planes,
+                              budget: FacetedForgeMode.practice.budget(base: level.budget), sliver: level.sliver,
+                              target: level.target, tutorial: level.tutorial)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: FacetedForgeGenerated,
+                            mode: FacetedForgeMode) throws(FacetedForgeError) -> FacetedForgeLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: campaign mode, the levels up to `number` open, none won, the
+    /// tutorial at its initial step.
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(FacetedForgeError) -> FacetedForgeExperienceCore {
-        let play = try freshPlay(of: try level(number: number))
-        return FacetedForgeExperienceCore(levelNumber: number, play: play, openingNumber: number, openingPlay: play)
+        let certified = try generated(number: number)
+        let play = try freshPlay(of: certified.level)
+        var progress = FacetedForgeProgress()
+        progress.open(through: number)
+        let tutorial = FacetedForgeTutorialStep.initial(level: number)
+        let smallest = certified.solution.smallest
+        let opening = Opening(play: play, progress: progress, tutorial: tutorial, certifiedSmallest: smallest)
+        return FacetedForgeExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                          tutorial: tutorial, certifiedSmallest: smallest, openingNumber: number,
+                                          opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -220,15 +302,43 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the quality tier or
+    /// the opening level).
     public static func == (lhs: FacetedForgeExperienceCore, rhs: FacetedForgeExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 375): no won levels with the levels up
+    /// to the saved level open, campaign mode, no tutorial key (restore starts the tutorial at its initial step).
+    ///
+    /// - Throws: ``FacetedForgeRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw FacetedForgeRestoreRefusal.damaged
+        }
+        var progress = FacetedForgeProgress()
+        progress.open(through: level)
+        var migrated = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(FacetedForgeMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the piece, direction and depth ranges as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -237,6 +347,11 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.undo"),
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(FacetedForgeProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -244,7 +359,8 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The four controls with their declared ranges (see the file header); all but `piece.cut` take no values.
+    /// The nine controls with their declared ranges (see the file header); all but `piece.cut`, `level.select` and
+    /// `mode.daily` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -281,15 +397,36 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
             switch action.control {
             case "piece.cut":
                 try play.apply(.cut(values[0], values[1], values[2]), expecting: play.fingerprint)
+                advanceTutorial()
+                recordIfWon()
             case "play.undo":
                 try play.undo()
             case "play.redo":
                 try play.redo()
-            default:   // level.next
-                let next = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
+                advanceTutorial()
+                recordIfWon()
+            case "level.next":
+                guard let next = progress.nextOpen(after: levelNumber) else {
+                    return .rejected(.rule(code: FacetedForgeExperienceRule.locked))
+                }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(values[0]) else {
+                    return .rejected(.rule(code: FacetedForgeExperienceRule.locked))
+                }
+                try open(number: values[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = FacetedForgeProgress.dailyLevel(year: values[0], month: values[1],
+                                                                  day: values[2]) else {
+                    return .rejected(.rule(code: FacetedForgeExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            default:   // tutorial.dismiss
+                tutorial = tutorial.dismissed()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
@@ -303,10 +440,44 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose; the quality tier, which is not state, is kept.
+    /// Advances the tutorial step after an accepted cut or redo (`FacetedForgeTutorialStep.advanced(afterCut:ended:)`):
+    /// a new cut moves it on, the end of the level ends it; an undo or a redo never moves the step (a redo only ends it
+    /// when it wins).
+    private mutating func advanceTutorial() {
+        guard tutorial != .done else { return }
+        let ended = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterCut: play.records.last?.kind == .cut, ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's initial
+    /// tutorial step; the records of the level left are dropped. Changes nothing when the kernel refuses.
+    private mutating func open(number: Int, mode: FacetedForgeMode) throws(FacetedForgeError) {
+        let certified = try Self.generated(number: number)
+        let fresh = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedSmallest = certified.solution.smallest
+        tutorial = FacetedForgeTutorialStep.initial(level: number)
+    }
+
+    /// After an accepted action that won the play: records the cuts made against the certified smallest cut count in
+    /// the current mode (campaign opens the next level; daily does not; practice records nothing). A won play is
+    /// final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, cutsMade: FacetedForgeProgress.cutsMade(play), smallest: certifiedSmallest,
+                        mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included); the quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedSmallest = opening.certifiedSmallest
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -318,35 +489,41 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g08.faceted-forge.v1", then the level number and the play's fingerprint (level, pieces, cuts, stage,
-    /// failure).
+    /// "r02-g08.faceted-forge.v2", then the level number, the play's fingerprint (level, pieces, cuts, stage,
+    /// failure), the progress and the mode (their sorted JSON); never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly.
         builder.add(play.fingerprint)
+        let encoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         var level: Int
+        var mode: FacetedForgeMode
+        var progress: FacetedForgeProgress
         var records: [FacetedForgeRecord]
+        var tutorial: FacetedForgeTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level; a reset returns to the level
-    /// `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the initial step when absent); a reset returns
+    /// to the opening state `seed` chooses.
     ///
-    /// - Throws: ``FacetedForgeRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level or
-    ///   trace the kernel refuses.
+    /// - Throws: ``FacetedForgeRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or a daily
+    ///   mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> FacetedForgeExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw FacetedForgeRestoreRefusal.damaged
@@ -354,15 +531,20 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw FacetedForgeRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw FacetedForgeRestoreRefusal.damaged
+        }
         do throws(FacetedForgeError) {
-            let saved = try level(number: decoded.level)
-            let play = try FacetedForgePlay.replay(level: saved, records: decoded.records)
-            let openingNumber = levelNumber(forSeed: seed)
-            let openingPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return FacetedForgeExperienceCore(levelNumber: decoded.level, play: play,
-                                              openingNumber: openingNumber, openingPlay: openingPlay)
+            let certified = try generated(number: decoded.level)
+            let play = try FacetedForgePlay.replay(level: try playedLevel(of: certified, mode: decoded.mode),
+                                                   records: decoded.records)
+            let tutorial = decoded.tutorial ?? FacetedForgeTutorialStep.initial(level: decoded.level)
+            let openingCore = try opening(number: levelNumber(forSeed: seed))
+            return FacetedForgeExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                              mode: decoded.mode, tutorial: tutorial,
+                                              certifiedSmallest: certified.solution.smallest,
+                                              openingNumber: openingCore.openingNumber,
+                                              opening: openingCore.opening)
         } catch {
             throw FacetedForgeRestoreRefusal.kernel(error)
         }
