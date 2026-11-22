@@ -74,7 +74,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 - [X] T-R02G0602-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G06-02.*.json)
   `--name host-full`
 - [X] T-R02G0602-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0 (.autonomy/migration/checks/R02-G06-02.reference-1.json)
-- [ ] T-R02G0602-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G0602-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21 reference-2 exit 1 (projectm-reference-ios26 square preset within8 0.9695 vs required 0.9696, run-to-run variance; kept in evidence), reference-2-2 exit 0 (0.9752 vs 0.9675) (.autonomy/migration/checks/R02-G06-02.reference-2.json, .autonomy/migration/checks/R02-G06-02.reference-2-2.json); testing doc lesson added
 - [ ] T-R02G0602-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0602-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 

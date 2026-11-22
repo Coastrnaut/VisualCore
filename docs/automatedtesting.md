@@ -236,6 +236,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
   opens the next one, so the tests do not cap the frontier.
+- **The ProjectM baseline compares against its own noise floor** (R02-G06-02, 2026-11-21). `projectm-reference-ios26`
+  failed once by 0.0001 (square preset within8 0.9695 against a required floor − 0.01 = 0.9696) in a gate that touched
+  only game logic; the rerun passed at 0.9752 against 0.9675. The threshold is measured from three engine runs in the same
+  process, so a near-miss on the simulator is run-to-run variance: rerun the chunk under a new check name
+  (`reference-2-2`), keep the failed attempt in the evidence, and investigate only a repeated or larger miss.
 - **Certify by a lower bound, not by enumeration** (R02-G06-02, 2026-11-21). Chrono Constellator's timelines (phases
   and holds) are too many to enumerate, so the solver proves its count with an argument (each edit moves one star) and a
   collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
