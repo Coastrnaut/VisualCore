@@ -56,7 +56,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
   non-degenerate cut, pieces in order, directions 0 … 12, depths ascending") with
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeRulesTests.swift` (agreement with the play on 200
   walks); `--name host-4`
-- [ ] T-R02G0801-006 [P] Create `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeInvariantTests.swift`
+- [X] T-R02G0801-006 [P] Create `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeInvariantTests.swift` — Verified 2026-11-22: host-5 exit=0 (FacetedForgeInvariantTests 9: time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity, each with seeded neighbouring inputs)
   (agent D: `testFacetedForgeTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
   with a seeded neighbouring-input check, seed 2_376); `--name host-5`
