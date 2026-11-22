@@ -253,9 +253,17 @@
       "name": "Colorfall Canyons",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G06",
+      "id": "r02-g06.chrono-constellator",
+      "name": "Chrono Constellator",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "93cbc7566fbbe46654fcd13746c8db8b5453e3b28b97c75362e945282b0fcbc6",
+  "ledger_sha256": "1686e6605d9dae6eefca26b14636e3de6eb4ad779bc9078c679c62305ea8fcfd",
   "privacy_answers": "unproven",
   "schema": 1
 }

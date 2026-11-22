@@ -1427,7 +1427,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "HueCompassCore", "HueCompassExperience",
                                     # Feature 343 (R02-G05-03): Colorfall Canyons, integrated at X-R02-G05.
                                     "ColorfallCanyonsCore", "ColorfallCanyonsExperience",
-                                    # Feature 353 (R02-G06-03): Chrono Constellator, a candidate until X-R02-G06.
+                                    # Feature 353 (R02-G06-03): Chrono Constellator, integrated at X-R02-G06.
                                     "ChronoConstellatorCore", "ChronoConstellatorExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

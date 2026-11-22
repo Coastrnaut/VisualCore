@@ -1114,7 +1114,7 @@
         "catalog_sha256": "6483b20ee7d44efad49b5cc0607c8c62d38a177ace8a5390fceb9b637a986ffc",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g07.amethyst-escape",

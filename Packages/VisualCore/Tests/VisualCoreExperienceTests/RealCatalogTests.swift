@@ -29,7 +29,7 @@ enum CatalogFixture {
     }
 
     @Test func onlyExperiencesWithAPassingIntegrationGateAreAvailable() throws {
-        // X-A01 to X-A25 and X-R02-G01 … G05 are pass in the migration ledger (2026-11-13 to 2026-11-21); the build tool
+        // X-A01 to X-A25 and X-R02-G01 … G06 are pass in the migration ledger (2026-11-13 to 2026-11-22); the build tool
         // is the only writer of this flag.
         #expect(try CatalogFixture.manifest().available.map(\.id.rawValue) == ["a01.generative-art-studio", "a02.fluid-art-playground", "a03.fractal-explorer",
                          "a04.particle-universe", "a05.infinite-geometry", "a06.visualcore-music-lab",
@@ -49,7 +49,8 @@ enum CatalogFixture {
                          "r02-g02.lissajous-labyrinth",
                          "r02-g03.wave-knot-keeper",
                          "r02-g04.hue-compass",
-                         "r02-g05.colorfall-canyons"])
+                         "r02-g05.colorfall-canyons",
+                         "r02-g06.chrono-constellator"])
     }
 
     @Test func everyIdIsInTheGoldenListAndWellFormed() throws {
@@ -146,7 +147,7 @@ enum CatalogFixture {
                                "r02-g04.hue-compass",
                                // Feature 343 (R02-G05-03); integrated at X-R02-G05.
                                "r02-g05.colorfall-canyons",
-                               // Feature 353 (R02-G06-03); a candidate until X-R02-G06.
+                               // Feature 353 (R02-G06-03); integrated at X-R02-G06.
                                "r02-g06.chrono-constellator"],
                 "the registrations of Catalog/registrations.json")
     }

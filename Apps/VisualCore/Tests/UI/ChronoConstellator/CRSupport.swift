@@ -1,7 +1,7 @@
 // CRSupport — feature 359 (R02-G06-09) T-R02G0609-004 (FR-R02G0609-001, 002; SC-R02G0609-001; clarifications Q1, Q2):
 // helpers of the interface tests of Chrono Constellator (R02-G06) inside the one app, modelled on `CCSupport`.
-// Chrono Constellator is a candidate; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog
-// entries become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved),
+// Chrono Constellator was a candidate until X-R02-G06 (2026-11-22); every launch still carries `-vcCandidates`
+// (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved),
 // skips the welcome and opens the experience directly with `-openExperience r02-g06.chrono-constellator`; a relaunch
 // (`CR.reopen`) backgrounds the app first (its save point), terminates it and starts again without the reset, so the
 // stored progress (solved levels, stars, the frontier, the verified winning trace) survives.
