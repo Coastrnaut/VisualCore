@@ -31,7 +31,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Stories 1 and 2 — turn a shell, advance the pearl (P1) 🎯
 
-- [ ] T-R02G0704-004 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeGestureController.swift` (states idle, shellDrag,
+- [X] T-R02G0704-004 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeGestureController.swift` (states idle, shellDrag, — Verified 2026-11-22: 2026-11-22: host-4 (GestureControllerTests, 7 tests: 500 seeded scripts vs independent expectation over 3 sizes and 3 orbits, 0 mismatches; second fingers, cancels and finished plays send no turn or advance; 10-16 points send nothing; isolation toggles; orbit and isolation keep the digest) exit 0, lead retest; pitch sign matches Chrono
   pearlPress, orbiting, cancelled; a shell drag while playing: unwrapped swept angle, n = round(swept / (2π/S)) reduced to
   −⌊S/2⌋ … ⌊S/2⌋, |n| `turn(shell, sign(n))` after ≥ 16 points, nothing when n = 0; a tap (< 10 points, ≤ 0.5 s) on
   the pearl while playing: `advance`; a tap on a shell: `select(shell)`; a double tap (≤ 0.35 s, ≤ 22 points) on a

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AmethystEscapeGestureController"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AmethystEscapeGestureController",
+  "elapsed_seconds": 6.553,
+  "exit_code": 0,
+  "finished": "2026-11-22T08:54:21+00:00",
+  "gate": "R02-G07-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-04.host-4.log",
+  "log_sha256": "9a0590b0a63f677b3bf481cad5f0a643a906e02f37879dbd1cbcaa325098e187",
+  "name": "host-4",
+  "started": "2026-11-22T08:54:15+00:00",
+  "timed_out": false
+}
