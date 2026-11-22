@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g06.chrono-constellator"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g06.chrono-constellator",
+  "elapsed_seconds": 0.031,
+  "exit_code": 0,
+  "finished": "2026-11-22T06:43:24+00:00",
+  "gate": "R02-G06-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G06-10.device-rows.log",
+  "log_sha256": "5e450f3bfd16cdaddfe96b2d9f2d320218364bbc21b883377e0cbc9e9eb316e1",
+  "name": "device-rows",
+  "started": "2026-11-22T06:43:24+00:00",
+  "timed_out": false
+}
