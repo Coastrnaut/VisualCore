@@ -23,7 +23,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G0908-003 [US2] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G0908-003 [US2] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-22: NocturneGardenGolden (16 frames: levels 1, 21, 41, 61, 81 x tiers 0-2 after at most 2 certified moves at time 0, plus the hero frame) and golden-frames.json written with NOCTURNE_GARDEN_WRITE_GOLDEN=1 (md5 50d52ade651fd67981915a83e744c2df), stable when rerun without the switch; listed as presentation source in the invariant scan; NocturneGardenGolden added to RELEASE_FORBIDDEN
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 0 after the witness's first min(smallest − 1, 2) moves, plus the hero
   frame at tier 0; at 1,152 × 768 with the authored camera: every bloom head's centre (canonical order) and the
   lantern's centre, positions rounded to 1/8 px and an off-screen point null; the shadow cell count; the moves spent and

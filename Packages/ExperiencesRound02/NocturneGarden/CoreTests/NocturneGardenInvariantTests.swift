@@ -283,6 +283,9 @@ import VisualCoreSimulation
         // Feature 386 (R02-G09-06): the eased lights and the ambient recipe (presentation levels and frequencies in
         // Doubles); presentation only, covered by their own tests.
         "NocturneGardenLights.swift", "NocturneGardenSoundRecipe.swift",
+        // Feature 388 (R02-G09-08): the golden frame descriptions (projected pixel positions in Doubles; debug and
+        // automation builds only, forbidden in the Release binary); presentation only, covered by their own tests.
+        "NocturneGardenGolden.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, less the presentation
