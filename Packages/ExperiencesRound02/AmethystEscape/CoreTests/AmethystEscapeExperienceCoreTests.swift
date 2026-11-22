@@ -15,6 +15,13 @@
 // level, a daily win opens nothing and practice (budget 60) records nothing; a player following the tutorial and the
 // exact hints wins levels 1 … 3; the schema-2 round trip, the migration of a schema-1 payload, damaged progress or mode
 // refused and an envelope of a newer schema (3) refused.
+//
+// Feature 367 (R02-G07-07) T-R02G0707-003: schema 3 (digest "…v3", the controls `replay.start`, `replay.step`,
+// `replay.stop` and `settings.sound`); the schema-3 round trip with traced results and the sound choice; the
+// migrations 1 → 3 (through 2) and 2 → 3 (empty traces, unverified, sound off) and the engine restoring schema-1 and
+// schema-2 envelopes; reconciliation on restore (an edited verified result is dropped and counted, the frontier kept);
+// the replay rules and codes (`r02-g07.no-replay`, `r02-g07.replay-end`, `r02-g07.replay`; replay never records);
+// the sound choice saved and in `==` but never digested; an envelope of a newer schema (4) refused.
 import Foundation
 import Testing
 @testable import AmethystEscapeCore
@@ -75,17 +82,20 @@ import VisualCoreSimulation
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g07.amethyst-escape" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g07.amethyst-escape.v2")
+        #expect(Core.experienceID == "r02-g07.amethyst-escape" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g07.amethyst-escape.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         #expect(Core.actionIDs == ["shell.rotate", "pearl.advance", "play.undo", "play.redo", "level.next",
-                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                                   "replay.start", "replay.step", "replay.stop", "settings.sound"])
         #expect(Core.controls[0].ranges == [0...4, -1...1])
         #expect(Core.controls[5].ranges == [1...100])
         #expect(Core.controls[6].ranges == [1...9_999, 1...12, 1...31])
-        let plainIndices: [Int] = [1, 2, 3, 4, 7, 8, 9]
+        #expect(Core.controls[10].ranges == [1...100])
+        #expect(Core.controls[13].ranges == [0...1])
+        let plainIndices: [Int] = [1, 2, 3, 4, 7, 8, 9, 11, 12]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 3)
         #expect(Core.practiceBudget == 60)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
@@ -101,6 +111,9 @@ import VisualCoreSimulation
         #expect(AmethystEscapeExperienceRule.notWhole == "r02-g07.not-whole")
         #expect(AmethystEscapeExperienceRule.locked == "r02-g07.locked")
         #expect(AmethystEscapeExperienceRule.date == "r02-g07.date")
+        #expect(AmethystEscapeExperienceRule.noReplay == "r02-g07.no-replay")
+        #expect(AmethystEscapeExperienceRule.replayEnd == "r02-g07.replay-end")
+        #expect(AmethystEscapeExperienceRule.replay == "r02-g07.replay")
     }
 
     @Test func theSeedPicksTheLevelDeterministically() async throws {
@@ -417,8 +430,8 @@ import VisualCoreSimulation
         #expect(throws: AmethystEscapeRestoreRefusal.damaged) {
             try Core.migratedToSchemaTwo(["level": 7])
         }
-        // The declared chain carries the step 1 → 2.
-        #expect(Core.migrations.currentVersion == 2)
+        // The declared chain carries the steps 1 → 2 and 2 → 3.
+        #expect(Core.migrations.currentVersion == 3)
     }
 
     /// Feature 365: an engine restores a schema-1 envelope through the migration chain.
@@ -541,14 +554,14 @@ import VisualCoreSimulation
         #expect(engine.handle(control: "shell.rotate", values: [1, 1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -582,5 +595,187 @@ import VisualCoreSimulation
         }
         core.shedCaches()
         #expect(try Self.digest(core) == digest && core == before)
+    }
+
+    /// Feature 367: a won campaign play records its net trace as a verified result; replay plays it action by action,
+    /// refuses other play actions, ends with replay-end and never changes progress; stop returns to campaign.
+    @Test func replayPlaysTheStoredTraceAndChangesNothing() throws {
+        var core: Core = try Core.opening(number: 1)
+        let certified: AmethystEscapeGenerated = try Core.generated(number: 1)
+        let actions: [AmethystEscapeAction] = certified.solution.actions
+        #expect(core.apply(Self.act("replay.start", [1])) == .rejected(.rule(code: "r02-g07.no-replay")))
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: "r02-g07.no-replay")))
+        #expect(core.apply(Self.act("replay.stop")) == .rejected(.rule(code: "r02-g07.no-replay")))
+        // A detour that is undone stays out of the trace.
+        #expect(core.apply(Self.act("shell.rotate", [1, 1])) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for action in actions { #expect(core.apply(Self.act(action)) == .accepted) }
+        #expect(core.play.stage == .won)
+        let result: AmethystEscapeProgress.Result = try #require(core.progress.solved[1])
+        #expect(result.verified && result.trace == actions && result.bestMoves == actions.count)
+        let progress: AmethystEscapeProgress = core.progress
+        #expect(core.apply(Self.act("replay.start", [2])) == .rejected(.rule(code: "r02-g07.no-replay")))
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.tutorial == .done && core.play.records.isEmpty)
+        let refusedControls: [String] = ["shell.rotate", "pearl.advance", "play.undo", "play.redo", "level.next",
+                                         "level.select", "mode.daily", "mode.practice", "mode.campaign"]
+        let refusedValues: [[Double]] = [[0, 1], [], [], [], [], [1], [2026, 11, 22], [], []]
+        for index in refusedControls.indices {
+            let before: Core = core
+            #expect(core.apply(Self.act(refusedControls[index], refusedValues[index]))
+                == .rejected(.rule(code: "r02-g07.replay")), "\(refusedControls[index])")
+            #expect(core == before)
+        }
+        #expect(core.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted)
+        var reference: AmethystEscapePlay = try Core.freshPlay(of: certified.level)
+        for action in actions {
+            #expect(core.apply(Self.act("replay.step")) == .accepted)
+            try reference.apply(action, expecting: reference.fingerprint)
+            #expect(core.play.fingerprint == reference.fingerprint)
+        }
+        #expect(core.play.stage == .won && core.progress == progress)
+        #expect(core.outcome == ExperienceOutcome(code: Core.wonCode))
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: "r02-g07.replay-end")))
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: "r02-g07.replay-end")))
+        // A saved replay round-trips.
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
+        #expect(restored == core && restored.reconciliationDropped == 0)
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.soundOn && core.progress == progress)
+        #expect(core.play.records.isEmpty)
+        #expect(core.apply(Self.act("replay.stop")) == .rejected(.rule(code: "r02-g07.no-replay")))
+        // A replay stopped before its end returns to campaign with the progress unchanged.
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.apply(Self.act("replay.step")) == .accepted)
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.progress == progress)
+    }
+
+    /// Feature 367: the sound choice is snapshotted and in `==`, never in the digest; reset turns it off.
+    @Test func theSoundChoiceIsSavedButNotDigested() throws {
+        var core: Core = try Core.opening(number: 4)
+        let before: StateDigest = try Self.digest(core)
+        #expect(!core.soundOn)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        #expect(try Self.digest(core) == before)
+        #expect(core.apply(Self.act("settings.sound", [0.5])) == .rejected(.rule(code: "r02-g07.not-whole")))
+        let payload: Data = try core.snapshotPayload()
+        #expect(String(decoding: payload, as: UTF8.self).contains("\"sound\":true"))
+        let restored: Core = try Core.restore(payload: payload, seed: 3)
+        #expect(restored.soundOn && restored == core)
+        var off: Core = core
+        #expect(off.apply(Self.act("settings.sound", [0])) == .accepted && !off.soundOn)
+        #expect(off != core)
+        #expect(try Self.digest(off) == before)
+        core.reset()
+        #expect(!core.soundOn)
+    }
+
+    /// A schema-2 object (as feature 365 wrote it: results without `trace` or `verified`) of level 3 with level 1 won
+    /// in 4 moves and the frontier at 5.
+    static func schemaTwoObject() throws -> [String: Any] {
+        var progress: AmethystEscapeProgress = AmethystEscapeProgress()
+        progress.record(level: 1, moves: 4, smallest: 3)
+        progress.open(through: 5)
+        var progressObject: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(progress)) as? [String: Any])
+        var solved: [[String: Any]] = try #require(progressObject["solved"] as? [[String: Any]])
+        for index in solved.indices {
+            solved[index].removeValue(forKey: "trace")
+            solved[index].removeValue(forKey: "verified")
+        }
+        progressObject["solved"] = solved
+        return ["level": 3, "records": [Any](), "progress": progressObject, "mode": ["mode": "campaign"],
+                "tutorial": "done"]
+    }
+
+    /// Feature 367: a schema-2 object migrates to schema 3 (empty traces, unverified, sound off) and restores with its
+    /// progress; a schema-1 object migrates through 2 to 3; the engine restores schema-1 and schema-2 envelopes.
+    @Test func schemaOneAndTwoMigrateToThree() async throws {
+        let two: [String: Any] = try Self.schemaTwoObject()
+        let three: [String: Any] = try Core.migratedToSchemaThree(two)
+        #expect(three["sound"] as? Bool == false)
+        let progressThree: [String: Any] = try #require(three["progress"] as? [String: Any])
+        let solvedThree: [[String: Any]] = try #require(progressThree["solved"] as? [[String: Any]])
+        #expect(solvedThree.count == 1 && solvedThree[0]["verified"] as? Bool == false)
+        #expect((solvedThree[0]["trace"] as? [Any])?.isEmpty == true)
+        let restored: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: three, options: [.sortedKeys]), seed: 2)
+        #expect(restored.progress.frontier == 5 && restored.reconciliationDropped == 0)
+        #expect(restored.progress.solved[1] == AmethystEscapeProgress.Result(bestMoves: 4, stars: 2))
+        #expect(!restored.soundOn && restored.levelNumber == 3 && restored.mode == .campaign)
+        #expect(throws: AmethystEscapeRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+        #expect(throws: AmethystEscapeRestoreRefusal.damaged) {
+            try Core.migratedToSchemaThree(["level": 1, "progress": ["frontier": 1]])
+        }
+        // 1 → 3: no won levels, the levels up to the saved level open, campaign, sound off.
+        let one: [String: Any] = ["level": 6, "records": [Any]()]
+        let oneToThree: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(one))
+        let fromOne: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: oneToThree, options: [.sortedKeys]), seed: 0)
+        #expect(fromOne.levelNumber == 6 && fromOne.progress.frontier == 6 && fromOne.progress.solved.isEmpty)
+        #expect(!fromOne.soundOn && fromOne.mode == .campaign && fromOne.reconciliationDropped == 0)
+        // The engine applies the chain to schema-1 and schema-2 envelopes.
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        var engine = ExperienceEngine<Core>(id: id)
+        try await engine.prepare(seed: 2)
+        try engine.activate()
+        let saved: ExperienceSnapshot = try engine.snapshot()
+        let twoData: Data = try JSONSerialization.data(withJSONObject: two, options: [.sortedKeys])
+        let envelopeTwo = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+                                                 stepIndex: saved.stepIndex, digest: try Self.digest(restored),
+                                                 payload: twoData)
+        try engine.restore(envelopeTwo)
+        #expect(try engine.digest() == Self.digest(restored))
+        let oneData: Data = try JSONSerialization.data(withJSONObject: one, options: [.sortedKeys])
+        let envelopeOne = try ExperienceSnapshot(experience: id, schemaVersion: 1, seed: saved.seed,
+                                                 stepIndex: saved.stepIndex, digest: try Self.digest(fromOne),
+                                                 payload: oneData)
+        try engine.restore(envelopeOne)
+        #expect(try engine.digest() == Self.digest(fromOne))
+    }
+
+    /// Feature 367: an edited verified result is dropped on restore and counted, the frontier kept as saved; an honest
+    /// one survives; a saved replay of a dropped result returns to campaign at that level.
+    @Test func editedResultsAreDroppedOnRestore() throws {
+        let certified: AmethystEscapeGenerated = try Core.generated(number: 2)
+        let trace: [AmethystEscapeAction] = certified.solution.actions
+        let smallest: Int = certified.solution.smallest
+        var honest: AmethystEscapeProgress = AmethystEscapeProgress()
+        honest.open(through: 7)
+        honest.record(level: 2, moves: trace.count, smallest: smallest, trace: trace)
+        var edited: AmethystEscapeProgress = honest
+        // The same trace claimed with one move fewer: it does not replay to that count.
+        edited.drop(level: 2)
+        edited.record(level: 2, moves: trace.count - 1, smallest: smallest, trace: trace)
+        var core: Core = try Core.opening(number: 2)
+        #expect(core.apply(Self.act("shell.rotate", [0, 1])) == .accepted)
+        var object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: try core.snapshotPayload()) as? [String: Any])
+        object["progress"] = try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(honest))
+        let kept: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), seed: 1)
+        #expect(kept.reconciliationDropped == 0 && kept.progress == honest)
+        object["progress"] = try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(edited))
+        let checked: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), seed: 1)
+        #expect(checked.reconciliationDropped == 1 && checked.progress.solved[2] == nil)
+        #expect(checked.progress.frontier == 7 && checked.play == core.play)
+        // The dropped count is not state: not in the digest or `==`.
+        #expect(try Self.digest(checked) == Self.digest(try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), seed: 1)))
+        // A saved replay of the edited result: the result is dropped, so the restore is campaign at level 2.
+        object["mode"] = ["mode": "replay", "level": 2]
+        object["records"] = [Any]()
+        let replay: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]), seed: 1)
+        #expect(replay.mode == .campaign && replay.levelNumber == 2 && replay.reconciliationDropped == 1)
+        // A replay mode naming another level is damaged.
+        object["mode"] = ["mode": "replay", "level": 3]
+        #expect(throws: AmethystEscapeRestoreRefusal.damaged) {
+            try Core.restore(payload: try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys]),
+                             seed: 1)
+        }
     }
 }

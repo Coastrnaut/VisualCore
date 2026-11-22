@@ -48,6 +48,22 @@
 // tutorial step). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}`; schema-1 payloads migrate
 // (no won levels, the levels up to the saved level open, campaign mode, the tutorial at its initial step).
 //
+// Feature 367 (R02-G07-07) T-R02G0707-003 (FR-R02G0707-001 … 007; clarifications Q1–Q5; research R2–R6): a campaign or
+// daily win records its winning trace (`AmethystEscapeReconciliation.netTrace` of the play's records: turns and
+// advances, an undone action left out unless redone) as a verified result; restore reconciles every result
+// (`AmethystEscapeReconciliation.reconcile`, the frontier as saved) and exposes `reconciliationDropped` (not digested,
+// not in `==`); the replay mode `replay(level)` plays a verified trace action by action:
+//   replay.start [1…100]  a fresh play of that level in mode `replay(level)` with the tutorial done
+//                         (`r02-g07.no-replay` without a verified result with a trace);
+//   replay.step           the next action of the trace (`r02-g07.replay-end` after the last or once the play ended;
+//                         `r02-g07.no-replay` outside replay);
+//   replay.stop           campaign at that level, the frontier when it is not open (`r02-g07.no-replay` outside replay);
+//   settings.sound [0…1]  the sound choice (FR-R02G0707-007): 1 on, 0 off; whole; allowed in every mode.
+// In replay every other action except `tutorial.dismiss` and `settings.sound` is refused with `r02-g07.replay`, and
+// nothing is recorded. Digest "r02-g07.amethyst-escape.v3" (the same parts as v2; never the sound choice or the dropped
+// count); snapshot schema 3 `{"level", "mode", "progress", "records", "sound", "tutorial"}` (results carry `trace` and
+// `verified`), migrating 1 → 2 → 3 (2 → 3: every result an empty trace and `verified` false, sound off).
+//
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget may
 // rise). Host tier `t` draws `AmethystEscapeTier.of(t)`: level-0 = 3 bevel segments, 3 highlight layers, 2 glow shells;
 // level-1 = 2, 2, 1; level-2 = 1, 1, 0. Outcome: `won` or `failed` while the play is in that stage, otherwise nil.
@@ -65,6 +81,12 @@ public enum AmethystEscapeExperienceRule {
     public static let locked = "r02-g07.locked"
     /// An impossible calendar date (feature 365).
     public static let date = "r02-g07.date"
+    /// No verified result with a trace to replay, or a replay control outside replay (feature 367).
+    public static let noReplay = "r02-g07.no-replay"
+    /// The replay has no further action: the trace is over or the play ended (feature 367).
+    public static let replayEnd = "r02-g07.replay-end"
+    /// An action that is not allowed during replay (feature 367).
+    public static let replay = "r02-g07.replay"
 }
 
 /// Why a saved Amethyst Escape state was refused on restore (feature 363). A refused restore changes nothing.
@@ -78,17 +100,20 @@ public enum AmethystEscapeRestoreRefusal: Error, Equatable, Sendable {
     case kernel(AmethystEscapeError)
 }
 
-/// The state of Amethyst Escape as an experience (see the file header). Snapshot schema 2.
+/// The state of Amethyst Escape as an experience (see the file header). Snapshot schema 3.
 public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g07.amethyst-escape"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g07.amethyst-escape.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g07.amethyst-escape.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["shell.rotate", "pearl.advance", "play.undo", "play.redo", "level.next",
-                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                                   "replay.start", "replay.step", "replay.stop", "settings.sound"]
+    /// The declared range of `settings.sound`: 0 off, 1 on (feature 367).
+    public static let soundRange: ClosedRange<Int> = 0...1
     /// The budget of a practice play: the kernel's maximum (`AmethystEscapeMode.practiceBudget`, 60).
     public static let practiceBudget = AmethystEscapeMode.practiceBudget
     /// The level numbers of the catalog.
@@ -114,6 +139,12 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
     public private(set) var tutorial: AmethystEscapeTutorialStep
     /// The certified smallest move count of the current level (stars). Derived from the level number.
     public private(set) var certifiedSmallest: Int
+    /// How many saved results the last restore dropped because they did not verify (feature 367); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
+    /// The player's sound choice (feature 367, FR-R02G0707-007), set by `settings.sound`: in the snapshot (key
+    /// `"sound"`) and `==`, never in the digest; off at an opening, after a reset and in a migrated save.
+    public private(set) var soundOn = false
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
     /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
@@ -265,18 +296,45 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the quality tier or
-    /// the opening level).
+    /// Equal states: the level number, the play, the progress, the mode, the tutorial step and the sound choice (not the
+    /// quality tier, the opening level or the dropped count).
     public static func == (lhs: AmethystEscapeExperienceCore, rhs: AmethystEscapeExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial && lhs.soundOn == rhs.soundOn
     }
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object (feature 367): every won result gains an empty `trace` and `verified`
+    /// false, and the sound choice is off.
+    ///
+    /// - Throws: ``AmethystEscapeRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw AmethystEscapeRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated = object
+        migrated["progress"] = progress
+        migrated["sound"] = false
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 365): no won levels with the levels up
@@ -315,6 +373,10 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
+        ExperienceControl(id: "settings.sound", ranges: [declared(soundRange)]),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -322,8 +384,8 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The ten controls with their declared ranges (see the file header); all but `shell.rotate`, `level.select` and
-    /// `mode.daily` take no values.
+    /// The fourteen controls with their declared ranges (see the file header); all but `shell.rotate`, `level.select`,
+    /// `mode.daily`, `replay.start` and `settings.sound` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`, campaign mode, the levels up to it open; no
@@ -356,6 +418,9 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
                 return .rejected(.rule(code: AmethystEscapeExperienceRule.notWhole))
             }
             values.append(whole)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: AmethystEscapeExperienceRule.replay))
         }
         do throws(AmethystEscapeError) {
             switch action.control {
@@ -393,6 +458,29 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
                 try open(number: levelNumber, mode: .practice)
             case "mode.campaign":
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "replay.start":
+                guard let result = progress.solved[values[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: AmethystEscapeExperienceRule.noReplay))
+                }
+                try open(number: values[0], mode: .replay(level: values[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: AmethystEscapeExperienceRule.noReplay))
+                }
+                // Replay never undoes, so each trace action made exactly one record.
+                let index = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: AmethystEscapeExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: AmethystEscapeExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
+            case "settings.sound":
+                soundOn = values[0] == 1
             default:   // tutorial.dismiss
                 tutorial = tutorial.dismissed()
             }
@@ -434,8 +522,19 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
     /// final, so a win is recorded once.
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
-        progress.record(level: levelNumber, moves: play.moves, smallest: certifiedSmallest, mode: mode)
+        if case .replay = mode { return }
+        progress.record(level: levelNumber, moves: play.moves, smallest: certifiedSmallest, mode: mode,
+                        trace: winningTrace)
     }
+
+    /// The controls accepted during replay (feature 367); the shell pick, isolation and the camera are presentation
+    /// only and send no action.
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "settings.sound"]
+
+    /// The winning trace of the current play (feature 367): its net actions in order
+    /// (``AmethystEscapeReconciliation/netTrace(_:)``), never an undo or a redo.
+    var winningTrace: [AmethystEscapeAction] { AmethystEscapeReconciliation.netTrace(play.records) }
 
     /// Back to the opening state the seed chose (progress included); the quality tier, which is not state, is kept.
     public mutating func reset() {
@@ -445,6 +544,7 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
         mode = .campaign
         tutorial = opening.tutorial
         certifiedSmallest = opening.certifiedSmallest
+        soundOn = false
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -456,8 +556,9 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g07.amethyst-escape.v2", then the level number, the play's fingerprint (level, offsets, pearl, moves,
-    /// stage, failure), the progress and the mode (their sorted JSON); never the tutorial step.
+    /// "r02-g07.amethyst-escape.v3", then the level number, the play's fingerprint (level, offsets, pearl, moves,
+    /// stage, failure), the progress (with traces) and the mode (their sorted JSON); never the tutorial step, the sound
+    /// choice or the dropped count.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
@@ -470,28 +571,33 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload and `sound` (absent means
+    /// off) is written by every schema-3 payload and by the 2 → 3 migration.
     private struct Payload: Codable {
         var level: Int
         var mode: AmethystEscapeMode
         var progress: AmethystEscapeProgress
         var records: [AmethystEscapeRecord]
+        var sound: Bool?
         var tutorial: AmethystEscapeTutorialStep?
     }
 
-    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "sound", "tutorial"}` with sorted keys and unescaped
+    /// slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
-                                                 records: play.records, tutorial: tutorial))
+                                                 records: play.records, sound: soundOn, tutorial: tutorial))
     }
 
-    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
-    /// practice mode) with the saved progress, mode and tutorial step (the initial step when absent); a reset returns
-    /// to the opening state `seed` chooses.
+    /// The core of `payload` (schema 3): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the reconciled progress (``AmethystEscapeReconciliation/reconcile(_:)``, the frontier as
+    /// saved, the number dropped in ``reconciliationDropped``), the saved mode, tutorial step (the initial step when
+    /// absent) and sound choice (off when absent); a saved replay whose result did not survive the check returns to
+    /// campaign at that level (the frontier when it is not open). A reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``AmethystEscapeRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or a daily
-    ///   mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel
-    ///   refuses.
+    /// - Throws: ``AmethystEscapeRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode, or a daily
+    ///   or replay mode naming another level among them), a level number outside 1 … 100 or a level or trace the
+    ///   kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> AmethystEscapeExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw AmethystEscapeRestoreRefusal.damaged
@@ -502,17 +608,30 @@ public struct AmethystEscapeExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw AmethystEscapeRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw AmethystEscapeRestoreRefusal.damaged
+        }
         do throws(AmethystEscapeError) {
             let certified = try generated(number: decoded.level)
             let play = try AmethystEscapePlay.replay(level: try playedLevel(of: certified, mode: decoded.mode),
                                                      records: decoded.records)
             let tutorial = decoded.tutorial ?? AmethystEscapeTutorialStep.initial(level: decoded.level)
             let openingCore = try opening(number: levelNumber(forSeed: seed))
-            return AmethystEscapeExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                                mode: decoded.mode, tutorial: tutorial,
-                                                certifiedSmallest: certified.solution.smallest,
-                                                openingNumber: openingCore.openingNumber,
-                                                opening: openingCore.opening)
+            // Feature 367: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = AmethystEscapeReconciliation.reconcile(decoded.progress)
+            var core = AmethystEscapeExperienceCore(levelNumber: decoded.level, play: play,
+                                                    progress: reconciled.progress, mode: decoded.mode,
+                                                    tutorial: tutorial,
+                                                    certifiedSmallest: certified.solution.smallest,
+                                                    openingNumber: openingCore.openingNumber,
+                                                    opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            core.soundOn = decoded.sound ?? false
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw AmethystEscapeRestoreRefusal.kernel(error)
         }

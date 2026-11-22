@@ -15,6 +15,9 @@
 // advances); its first advance falls into the blocked wedge of shell 2 (outer), sector 5. The daily level of 2026-11-22
 // is level 26. The expected texts are written out here, not built with the plan's helpers. Explicit types, plain loops,
 // short runs.
+// Feature 367 (R02-G07-07) T-R02G0707-003: the replay refusal words (raw and prefixed, as the core reports them) and a
+// replay of level 1's certified solution: start and stop are level plans, each step is announced like the action it
+// replays, and the replayed win claims no stars.
 import Foundation
 import Testing
 @testable import AmethystEscapeCore
@@ -181,12 +184,14 @@ import VisualCoreSimulation
         // The words alone, raw and prefixed, and the codes without words of their own.
         let codes: [String] = ["r02-g07.locked", "r02-g07.date", "r02-g07.action", "r02-g07.stuck", "r02-g07.stage",
                                "r02-g07.not-whole", "r02-g07.stale", "r02-g07.malformed", "action.out-of-range",
-                               "action.unknown-control", ""]
+                               "action.unknown-control", "", "r02-g07.no-replay", "r02-g07.replay-end",
+                               "r02-g07.replay"]
         let words: [String] = ["That level is not open yet.", "That date cannot be used.",
                                "That move is not allowed here.", "A wall stops the pearl: turn a shell first.",
                                "The level has ended.", "That value must be a whole number.", "That move was refused.",
                                "That move was refused.", "That move was refused.", "That move was refused.",
-                               "That move was refused."]
+                               "That move was refused.", "There is no saved solution to replay for this level.",
+                               "The replay is over.", "Stop the replay first."]
         for index in codes.indices {
             #expect(Plan.refusalText(code: codes[index]) == words[index], "\(codes[index])")
             #expect(Plan.refusalText(code: "action.rule." + codes[index]) == words[index], "\(codes[index])")
@@ -231,6 +236,29 @@ import VisualCoreSimulation
         #expect(Self.accepted(&second, "pearl.advance")
             == Self.won("The pearl escaped. Level won in 5 moves, 2 of 3 stars."))
         #expect(Self.accepted(&second, "level.next") == Self.level("Level 2, band 1, campaign. " + Self.turn))
+    }
+
+    /// Feature 367: a replay of level 1's certified solution (shell 1 −1, two advances) after a 3-star campaign win.
+    @Test func aReplayIsAnnouncedLikePlayAndClaimsNoStars() throws {
+        var core: Core = try Core.opening(number: 1)
+        #expect(Self.refused(&core, "replay.start", [1], code: "r02-g07.no-replay")
+            == Self.rejection("There is no saved solution to replay for this level."))
+        #expect(Self.refused(&core, "replay.step", [], code: "r02-g07.no-replay")
+            == Self.rejection("There is no saved solution to replay for this level."))
+        _ = Self.accepted(&core, "shell.rotate", [0, -1])
+        _ = Self.accepted(&core, "pearl.advance")
+        #expect(Self.accepted(&core, "pearl.advance") == Self.won("The pearl escaped. Level won in 3 moves, 3 of 3 stars."))
+        #expect(Self.accepted(&core, "replay.start", [1]) == Self.level("Level 1, band 1, replay."))
+        #expect(Self.refused(&core, "shell.rotate", [0, 1], code: "r02-g07.replay")
+            == Self.rejection("Stop the replay first."))
+        #expect(Self.accepted(&core, "replay.step")
+            == Self.state("Shell 1 (inner) turned one sector anticlockwise. 8 moves left."))
+        #expect(Self.accepted(&core, "replay.step")
+            == Self.state("The pearl rolled to shell 2 (outer), sector 4 of 6. 7 moves left."))
+        #expect(Self.accepted(&core, "replay.step") == Self.won("The pearl escaped. Level won in 3 moves."))
+        #expect(Self.refused(&core, "replay.step", [], code: "r02-g07.replay-end")
+            == Self.rejection("The replay is over."))
+        #expect(Self.accepted(&core, "replay.stop") == Self.level("Level 1, band 1, campaign. " + Self.turn))
     }
 
     @Test func aPracticeWinHasNoStars() throws {

@@ -29,6 +29,11 @@
 //      ``AmethystEscapeFeedbackPlan/none``.
 // A multi-sector drag is planned once, after its last turn, by `drag(old:new:shell:sectors:)`: "<Shell> turned k sectors
 // clockwise. n moves left." (one selection haptic), or only the outcome when a turn of the drag ended the play.
+//
+// Feature 367 (R02-G07-07) T-R02G0707-003 (clarification Q4): the replay refusals have their own words ("There is no
+// saved solution to replay for this level.", "The replay is over.", "Stop the replay first."); a replay step adds one
+// record, so it is announced like the action it replays (case 2), and a replayed win claims no stars (replay does not
+// award stars, as practice); starting or stopping a replay is a mode change (case 1, "… replay.").
 import Foundation
 import VisualCoreSimulation
 
@@ -123,8 +128,16 @@ public struct AmethystEscapeFeedbackPlan: Sendable, Equatable {
     /// (`r02-g07.date`), "That move is not allowed here." (`r02-g07.action`), "A wall stops the pearl: turn a shell
     /// first." (`r02-g07.stuck`), "The level has ended." (`r02-g07.stage`), "That value must be a whole number."
     /// (`r02-g07.not-whole`), otherwise (`r02-g07.stale`, `r02-g07.malformed`, the engine's own codes such as
-    /// `action.out-of-range`) "That move was refused.".
+    /// `action.out-of-range`) "That move was refused.". Feature 367: "There is no saved solution to replay for this
+    /// level." (`r02-g07.no-replay`), "The replay is over." (`r02-g07.replay-end`) and "Stop the replay first."
+    /// (`r02-g07.replay`).
     public static func refusalText(code: String) -> String {
+        // Feature 367: the replay refusals ("…replay-end" before "…replay", which it contains).
+        if code.contains(AmethystEscapeExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        if code.contains(AmethystEscapeExperienceRule.replayEnd) { return "The replay is over." }
+        if code.contains(AmethystEscapeExperienceRule.replay) { return "Stop the replay first." }
         if code.contains(AmethystEscapeExperienceRule.locked) { return "That level is not open yet." }
         if code.contains(AmethystEscapeExperienceRule.date) { return "That date cannot be used." }
         if code.contains(AmethystEscapeError.action("").reasonCode) { return "That move is not allowed here." }
