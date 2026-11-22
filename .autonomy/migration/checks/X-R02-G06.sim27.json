@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g06.chrono-constellator",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g06.chrono-constellator --runtime 27",
+  "elapsed_seconds": 235.632,
+  "exit_code": 0,
+  "finished": "2026-11-22T07:04:37+00:00",
+  "gate": "X-R02-G06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G06.sim27.log",
+  "log_sha256": "b6e18551761618d8483133cc92f36659f77a518ff55be1f7df55fcbcbf4bdb97",
+  "name": "sim27",
+  "started": "2026-11-22T07:00:42+00:00",
+  "timed_out": false
+}
