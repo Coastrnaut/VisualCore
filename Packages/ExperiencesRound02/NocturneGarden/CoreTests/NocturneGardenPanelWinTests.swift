@@ -6,13 +6,13 @@
 // the level's allowed sizes, clamped; the bloom picker moves by ±1 wrapping over the planted blooms; after every
 // action, undo or redo the sun follows the play and the bloom pick is clamped to the blooms planted. Plant sends
 // `bloom.plant [kind, column, row, size]`, Move `bloom.move [bloom, column, row]`, Resize `bloom.resize [bloom, size]`,
-// Remove `bloom.remove [bloom]`, Sun − and + `sun.set [sun ∓ 1]`, Undo `play.undo`, Redo `play.redo`. For each action
-// of the level's certified solution (`NocturneGardenExperienceCore.generated(number:).solution.actions`) only picker
-// buttons are pressed (at most 64 per action) until the picks are the action's values, then its button. A sun action
-// of k elevation steps is k Sun − or + presses, each a `sun.set` that spends a move and must be accepted: levels 1 … 40
-// allow elevations {2, 3} and 41 … 100 all of 1 … 4, so no intermediate elevation is refused, and the extra moves (at
-// most 2 per level, 35 levels) stay within every budget and pass no leak, so each play still ends won. Every press of
-// an action button must be accepted and the play must end in stage `won` with outcome `won`. The levels
+// Remove `bloom.remove [bloom]`, Undo `play.undo`, Redo `play.redo`; Sun − and + move the sun pick over the level's
+// allowed elevations (clamped) and Set sun sends `sun.set [pick]` (the panel as corrected during implementation: a first
+// version whose Sun ± sent single steps spent up to 2 extra moves on 35 levels, so the panel could not play the
+// smallest move count). For each action of the level's certified solution
+// (`NocturneGardenExperienceCore.generated(number:).solution.actions`) only picker buttons are pressed (at most 64 per
+// action) until the picks are the action's values, then its button. Every press of an action button must be accepted,
+// the play must end in stage `won` with outcome `won`, and it must spend exactly the certified smallest move count. The levels
 // are certified concurrently into the adapter's per-process cache and split into ten groups of ten so each test stays
 // short. A last test: panel Undo after a plant on level 1 restores the digest from before it and Redo the digest after
 // it. No randomness. Host-run (`swift test`); explicit types, plain loops.
@@ -53,6 +53,8 @@ private struct NocturneGardenPanelModel {
     var bloom: Int = 0
     /// The current sun elevation.
     var sun: Int
+    /// The picked sun elevation (Set sun sends it).
+    var sunPick: Int
     /// The picker buttons pressed so far.
     var presses: Int = 0
 
@@ -62,6 +64,15 @@ private struct NocturneGardenPanelModel {
         self.kind = Self.suppliedKinds(play.level).first ?? 0
         self.size = play.level.sizes.min() ?? 1
         self.sun = play.elevation
+        self.sunPick = play.elevation
+    }
+
+    /// Sun − (delta −1) or Sun + (delta +1): the sun pick moves over the level's allowed elevations, clamped.
+    mutating func stepSun(_ delta: Int) {
+        presses += 1
+        let allowed: [Int] = play.level.elevations.sorted()
+        let at: Int = allowed.firstIndex(of: sunPick) ?? 0
+        sunPick = allowed[Swift.min(Swift.max(at + delta, 0), allowed.count - 1)]
     }
 
     /// The kind indices (kernel order) the level supplies, ascending.
@@ -111,6 +122,7 @@ private struct NocturneGardenPanelModel {
     /// Takes the play after an action, undo or redo: the sun follows it and the bloom pick is clamped.
     mutating func follow(_ next: NocturneGardenPlay) {
         play = next
+        if sun != next.elevation { sunPick = next.elevation }
         sun = next.elevation
         bloom = min(bloom, max(next.blooms.count - 1, 0))
     }
@@ -175,8 +187,7 @@ private struct NocturneGardenPanelModel {
 }
 
 /// Lines the panel up for `action` with picker presses and returns the button press it ends with (control and values),
-/// or nil when the picks cannot be reached. A sun action is Sun − or + toward its elevation (one step from the current
-/// sun; the caller presses again until the elevation is reached).
+/// or nil when the picks cannot be reached. A sun action is Sun − or + until the pick is its elevation, then Set sun.
 private func panelPress(_ action: NocturneGardenAction,
                         _ panel: inout NocturneGardenPanelModel) -> (control: String, values: [Double])? {
     let start: Int = panel.presses
@@ -195,9 +206,11 @@ private func panelPress(_ action: NocturneGardenAction,
         guard panel.lineUpBloom(bloom, start: start) else { return nil }
         return ("bloom.remove", [Double(panel.bloom)])
     case let .sun(elevation):
-        if elevation < panel.sun { return ("sun.set", [Double(panel.sun - 1)]) }   // Sun −
-        if elevation > panel.sun { return ("sun.set", [Double(panel.sun + 1)]) }   // Sun +
-        return nil
+        while panel.sunPick != elevation {
+            if panel.presses - start >= 64 { return nil }
+            panel.stepSun(elevation < panel.sunPick ? -1 : 1)
+        }
+        return ("sun.set", [Double(panel.sunPick)])
     }
 }
 
@@ -218,24 +231,21 @@ private func panelProblems(level number: Int) throws -> [String] {
     var panel: NocturneGardenPanelModel = NocturneGardenPanelModel(play: core.play)
     var index: Int = 0
     for action in actions {
-        // A sun change of k elevation steps is k Sun − or + presses, each a `sun.set` the kernel must accept.
-        var pressesLeft: Int = NocturneGardenExperienceCore.elevationRange.count
-        while pressesLeft > 0 {
-            pressesLeft -= 1
-            guard let press = panelPress(action, &panel) else {
-                return ["level \(number): action \(index) \(action) not reached by the panel (sun \(panel.sun))"]
-            }
-            let result: ActionResult = core.apply(panelAction(press.control, press.values))
-            if result != .accepted {
-                return ["level \(number): action \(index) \(action): \(press.control) \(press.values) gave \(result)"]
-            }
-            panel.follow(core.play)
-            guard case .sun(let elevation) = action, elevation != panel.sun else { break }
+        guard let press = panelPress(action, &panel) else {
+            return ["level \(number): action \(index) \(action) not reached by the panel (sun \(panel.sun))"]
         }
+        let result: ActionResult = core.apply(panelAction(press.control, press.values))
+        if result != .accepted {
+            return ["level \(number): action \(index) \(action): \(press.control) \(press.values) gave \(result)"]
+        }
+        panel.follow(core.play)
         index += 1
     }
     var problems: [String] = []
     if core.play.stage != .won { problems.append("level \(number): stage \(core.play.stage)") }
+    if core.play.moves != actions.count {
+        problems.append("level \(number): \(core.play.moves) moves, certified \(actions.count)")
+    }
     let outcome: String? = core.outcome?.code
     if outcome != NocturneGardenExperienceCore.wonCode {
         problems.append("level \(number): outcome \(outcome ?? "none")")

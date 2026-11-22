@@ -137,8 +137,9 @@ changes.
 ### User Story 5 - Every move without gestures (Priority: P1)
 
 A player who cannot drag precisely can do everything through the labelled panel (kind, column, row, size and bloom
-pickers, plant, move, resize, remove, sun − and +, undo, redo, next level, "Reset view"), including winning every
-certified level.
+pickers, plant, move, resize, remove, a sun picker with "Set sun", undo, redo, next level, "Reset view"), including
+winning every certified level in its smallest move count (corrected during implementation, 2026-11-22: single-step
+Sun − and + spent up to 2 extra moves on 35 levels).
 
 **Independent Test**: all 100 certified solutions are replayed through panel actions on the host and win.
 

@@ -7,6 +7,11 @@
 // action, undo or redo; they never reach the kernel except through the declared controls. A memory warning releases
 // the GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the
 // kernel (renderer purity). Its probes (two ground corners) let the verification runner check a frame.
+// Feature 384 (R02-G09-04): `pointer(_:viewSize:port:)` routes canvas touches through `NocturneGardenGestureController`
+// (a tap on the bed plants the panel's kind and size, a bloom drag moves or removes it with the exact preview drawn and
+// described, a pinch resizes, a lantern drag changes the sun, two fingers orbit, a double tap or "Reset view" resets);
+// refused actions are shown and kept in `refusalLog` with their reason codes; the sun picker's "Set sun" reaches any
+// allowed elevation in one move.
 #if os(iOS)
 import Foundation
 import NocturneGardenCore
@@ -15,6 +20,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show and choose: the latest state the presenter described and the panel's picks.
 @MainActor
@@ -44,6 +50,10 @@ final class NocturneGardenMirror {
     var bloom = 0
     /// The current sun elevation.
     var sun = 1
+    /// The picked sun elevation (feature 384): "Set sun" sends it.
+    var sunPick = 1
+    /// The drag preview's words while a bloom is dragged (feature 384), or nil.
+    var previewText: String?
     /// The play the picks are clamped against (a copy; never sent anywhere).
     var play: NocturneGardenPlay?
     /// The text of the last refused change, if any.
@@ -59,6 +69,16 @@ final class NocturneGardenMirror {
     var sizeLabel: String { "size \(size)" }
     /// The sun in words.
     var sunLabel: String { NocturneGardenLevel.sunName(sun) }
+    /// The picked sun in words.
+    var sunPickLabel: String { "picked " + NocturneGardenLevel.sunName(sunPick) }
+
+    /// Moves the sun pick by `delta` over the level's allowed elevations, clamped (feature 384).
+    func stepSun(_ delta: Int) {
+        guard let play else { return }
+        let allowed: [Int] = play.level.elevations.sorted()
+        let at: Int = allowed.firstIndex(of: sunPick) ?? (allowed.firstIndex(of: sun) ?? 0)
+        sunPick = allowed[min(max(at + delta, 0), allowed.count - 1)]
+    }
     /// The picked bloom in words.
     var bloomLabel: String {
         bloomNames.indices.contains(bloom) ? bloomNames[bloom].capitalized : "no bloom planted"
@@ -103,8 +123,10 @@ final class NocturneGardenMirror {
     /// Takes the new `play`: a new level resets the picks; otherwise the bloom pick is clamped to the blooms planted.
     func follow(_ play: NocturneGardenPlay) {
         let changedLevel: Bool = self.play?.level.id != play.level.id
+        let sunChanged: Bool = sun != play.elevation
         self.play = play
         sun = play.elevation
+        if changedLevel || sunChanged { sunPick = play.elevation }
         if changedLevel {
             kind = Self.suppliedKinds(play.level).first ?? 0
             column = 0
@@ -141,8 +163,16 @@ final class NocturneGardenPresenter: ExperiencePresenter {
     let scene = NocturneGardenGardenScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G0903-004).
     private(set) var tierLog: [NocturneGardenTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot drawn (tests and the description); never carries a drag's preview.
     private(set) var lastSnapshot: NocturneGardenSceneSnapshot?
+    /// The play last drawn (the gestures read it).
+    private(set) var lastPlay: NocturneGardenPlay?
+    /// The gesture controller (feature 384): plant, drag with preview, pinch, sun, orbit.
+    private(set) var gestures = NocturneGardenGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -182,7 +212,17 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
-        try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
+        lastPlay = core.play
+        scene.orbit = gestures.orbit
+        let shown: NocturneGardenSceneSnapshot
+        if let preview = gestures.preview {
+            shown = snapshot.withPreview(preview.cells)
+            mirror.previewText = preview.text
+        } else {
+            shown = snapshot
+            mirror.previewText = nil
+        }
+        try scene.render(shown, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
     func teardown(_ context: RenderContext) {
@@ -233,7 +273,76 @@ final class NocturneGardenPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(NocturneGardenControls(port: port, mirror: mirror))
+        AnyView(NocturneGardenControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() },
+                                       sender: { [weak self] control, values in
+                                           self?.send(control, values, port: port)
+                                       }))
+    }
+
+    // MARK: Touch controls (feature 384, R02-G09-04)
+
+    /// The canvas gestures send plants, moves, removals, resizes and sun changes.
+    var gestureActions: Set<String> { ["bloom.plant", "bloom.move", "bloom.remove", "bloom.resize", "sun.set"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(NocturneGardenExperienceCore.actionIDs) }
+
+    /// What a gesture that would change a finished play shows.
+    static let finishedMessage = "The play is over: undo or go to the next level"
+
+    /// Routes a canvas touch through the gesture controller with the panel's kind and size and applies what it
+    /// returns, in order: a chosen bloom goes to the mirror, every other action is sent through the port; a gesture that
+    /// would change a finished play explains that the play is over.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot, let play = lastPlay else { return }
+        let kind: NocturneGardenKind = NocturneGardenKind.allCases[min(max(mirror.kind, 0), 5)]
+        let wasPlaying: Bool = play.stage == .playing
+        let before: NocturneGardenGestureController.State = gestures.state
+        let actions: [NocturneGardenGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot,
+                                                                     play: play, kind: kind, size: mirror.size)
+        if event.phase == .ended, !wasPlaying, actions.isEmpty,
+           [.bedPress, .bloomDrag, .lanternDrag, .pinch].contains(before) {
+            mirror.message = Self.finishedMessage
+        }
+        for action in actions {
+            switch action {
+            case let .plant(kind, column, row, size):
+                send("bloom.plant", [Double(kind.order), Double(column), Double(row), Double(size)], port: port)
+            case let .move(bloom, column, row):
+                send("bloom.move", [Double(bloom), Double(column), Double(row)], port: port)
+            case let .remove(bloom):
+                send("bloom.remove", [Double(bloom)], port: port)
+            case let .resize(bloom, size):
+                send("bloom.resize", [Double(bloom), Double(size)], port: port)
+            case let .sun(elevation):
+                send("sun.set", [Double(elevation)], port: port)
+            case let .choose(bloom):
+                mirror.bloom = bloom
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+    }
+
+    /// Sends `control` with `values`, shows a refusal in the panel and keeps its code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(result.code)"
+            refusalLog.append(result.code)
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        return result
     }
 }
 #endif

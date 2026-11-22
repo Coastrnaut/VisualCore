@@ -7,7 +7,8 @@
 // the lantern with the glow program, additive (level-0 two, level-1 one, level-2 none). Depth testing is off on this
 // path, so the order the geometry emits is the layering; back faces are culled on every draw. Geometry is rebuilt only
 // when the level, the cells, the blooms, the sun, the stage, the failure, the moves, the tier or the mode change; drift
-// and sway move by uniforms. Reduce Flashing passes `NocturneGardenShaders.glowLimit(reduceFlashing:)` as
+// and sway move by uniforms. Feature 384 (R02-G09-04): the camera follows the presenter's orbit and the snapshot may
+// carry a drag's preview cells, drawn as a pale dashed outline. Reduce Flashing passes `NocturneGardenShaders.glowLimit(reduceFlashing:)` as
 // `u_glowLimit`. If a program fails, the scene falls back to the level-2 geometry drawn unlit with the shared
 // `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason; nothing here can reach the kernel.
 #if os(iOS)
@@ -28,6 +29,8 @@ final class NocturneGardenGardenScene {
     var reducedFlash = false
     /// Whether the mist drift and the sway stand still (Reduce Motion).
     var reduceMotion = false
+    /// The camera orbit (presentation only), set by the presenter before each frame (feature 384, R02-G09-04).
+    var orbit: NocturneGardenOrbit = .authored
     /// The light direction of the garden (towards the lantern side, from the upper right front).
     static let lightDirection = SIMD3<Float>(0.45, 0.7, 0.55)
 
@@ -40,6 +43,8 @@ final class NocturneGardenGardenScene {
         let stage: NocturneGardenStage
         let failure: NocturneGardenFailure?
         let moves: Int
+        let preview: [Int]
+        let orbit: NocturneGardenOrbit
         let tier: Int
         let fallback: Bool
     }
@@ -95,7 +100,7 @@ final class NocturneGardenGardenScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = NocturneGardenSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = NocturneGardenSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let key = key(snapshot, tier: tier)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = self.key(snapshot, tier: tier)
@@ -113,7 +118,8 @@ final class NocturneGardenGardenScene {
     /// The geometry key of `snapshot` at `tier` in the current mode.
     private func key(_ s: NocturneGardenSceneSnapshot, tier: NocturneGardenTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, shadow: s.shadow, blooms: s.blooms, sun: s.sun, stage: s.stage,
-                    failure: s.failure, moves: s.moves, tier: tier.index, fallback: fallbackReason != nil)
+                    failure: s.failure, moves: s.moves, preview: s.preview, orbit: orbit, tier: tier.index,
+                    fallback: fallbackReason != nil)
     }
 
     private func rebuild(_ snapshot: NocturneGardenSceneSnapshot, tier: NocturneGardenTier) throws {

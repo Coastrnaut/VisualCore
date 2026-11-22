@@ -57,7 +57,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G0904-006 [US4] Wire `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenPresenter.swift` (`pointer(_:viewSize:port:)` routing
+- [X] T-R02G0904-006 [US4] Wire `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenPresenter.swift` (`pointer(_:viewSize:port:)` routing — Verified 2026-11-22: sim-27 exit=0 (NocturneGardenExperienceTests, 40 tests in 5 suites on iOS 27.2, incl. 8 gesture wiring tests: tap plants, drag moves with the exact preview, drag off the bed removes, lantern drag steps the sun, pinch resizes, orbit and reset change no digest, a finished play says so, a refused gesture is shown and logged); host-5 exit=0 (155 Nocturne Garden host tests); the panel's sun became a picker with Set sun so the panel wins all 100 levels in their certified move counts (spec US5 corrected); the invariant scan skips the three new presentation sources; agent E's tests retested by the lead
   through the gesture controller with the mirror's kind and size; `choose` setting the mirror's bloom; actions sent
   through the port; `resetView()`; the preview drawn and described while dragging; for an action on a finished play,
   "The play is over: undo or go to the next level"; a refused gesture action shown in the mirror message and logged with

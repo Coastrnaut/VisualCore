@@ -271,11 +271,15 @@ import VisualCoreSimulation
     }
 
     /// The presentation sources of the Core (feature 383, R02-G09-03: the scene snapshot, geometry, shaders,
-    /// experience adapter and scenarios), which read the kernel and turn its cells into Doubles for drawing; they are
-    /// not kernel sources, and the renderer-purity tests of feature 383 cover them.
+    /// experience adapter and scenarios; feature 384: the picker, drag preview and gesture controller), which read the
+    /// kernel and turn its cells into Doubles for drawing; they are not kernel sources, and the renderer-purity tests
+    /// of feature 383 cover them.
     static let presentationSources: Set<String> = [
         "NocturneGardenSceneSnapshot.swift", "NocturneGardenSceneGeometry.swift", "NocturneGardenShaders.swift",
         "NocturneGardenExperienceCore.swift", "NocturneGardenScenarios.swift",
+        // Feature 384 (R02-G09-04): the picker, the drag preview and the gesture controller (touch geometry in Doubles,
+        // pointer events); presentation only, covered by their own tests and the renderer-purity tests.
+        "NocturneGardenPicker.swift", "NocturneGardenDragPreview.swift", "NocturneGardenGestureController.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, less the presentation

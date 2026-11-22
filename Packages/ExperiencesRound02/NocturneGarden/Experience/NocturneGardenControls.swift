@@ -1,7 +1,8 @@
 // NocturneGardenControls — feature 383 (R02-G09-03) T-R02G0903-006 (FR-R02G0903-005; clarification Q5). The minimal
 // control panel: labelled pickers for the kind, the column, the row, the size and the bloom (presentation state only),
-// plant, move, resize and remove (kernel actions through the action port), sun − and +, undo, redo and next level,
-// each with an accessibility label and value. Dragging stems, pinching to scale and sliding the sun come in R02-G09-04;
+// plant, move, resize and remove (kernel actions through the action port), a sun picker (Sun − and +) with "Set sun"
+// (feature 384: one move reaches any allowed elevation), undo, redo, next level and "Reset view", each with an
+// accessibility label and value. Dragging stems, pinching to scale and sliding the sun come in R02-G09-04;
 // full accessibility in R02-G09-06.
 #if os(iOS)
 import NocturneGardenCore
@@ -12,6 +13,10 @@ import VisualCoreExperienceHost
 struct NocturneGardenControls: View {
     let port: ExperienceActionPort
     let mirror: NocturneGardenMirror
+    /// Returns the camera to the authored view (feature 384).
+    let resetView: () -> Void
+    /// Sends a control the way the presenter does (refusals shown and logged).
+    let sender: (String, [Double]) -> Void
 
     var body: some View {
         ScrollView(.vertical) {
@@ -95,13 +100,16 @@ struct NocturneGardenControls: View {
     @ViewBuilder private var playRow: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 12) {
-                Button("Sun −") { send("sun.set", [Double(mirror.sun - 1)]) }
-                    .accessibilityLabel("Raise the sun one step")
-                    .accessibilityValue(mirror.sunLabel)
-                Text(mirror.sunLabel).font(.footnote)
-                Button("Sun +") { send("sun.set", [Double(mirror.sun + 1)]) }
-                    .accessibilityLabel("Lower the sun one step")
-                    .accessibilityValue(mirror.sunLabel)
+                Button("Sun −") { mirror.stepSun(-1) }
+                    .accessibilityLabel("Pick a higher sun")
+                    .accessibilityValue(mirror.sunPickLabel)
+                Text(mirror.sunPickLabel).font(.footnote)
+                Button("Sun +") { mirror.stepSun(1) }
+                    .accessibilityLabel("Pick a lower sun")
+                    .accessibilityValue(mirror.sunPickLabel)
+                Button("Set sun") { send("sun.set", [Double(mirror.sunPick)]) }
+                    .accessibilityLabel("Move the sun to the picked elevation")
+                    .accessibilityValue(mirror.sunLabel + "; picked " + mirror.sunPickLabel)
             }
             HStack(spacing: 16) {
                 Button("Undo") { send("play.undo") }
@@ -110,14 +118,15 @@ struct NocturneGardenControls: View {
                     .accessibilityLabel("Redo the move")
                 Button("Next level") { send("level.next") }
                     .accessibilityLabel("Go to the next level")
+                Button("Reset view") { resetView() }
+                    .accessibilityLabel("Return the camera to the authored view")
             }
         }
     }
 
-    /// Sends `control` and shows a refusal.
+    /// Sends `control` through the presenter, which shows and logs a refusal.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        sender(control, values)
     }
 }
 #endif
