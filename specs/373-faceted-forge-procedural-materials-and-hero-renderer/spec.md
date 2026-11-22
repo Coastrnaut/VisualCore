@@ -30,6 +30,69 @@ Canonical overrides:
 - **Model:** feature 363 (Amethyst Escape's hero renderer) for the adapter, snapshot, geometry, CPU reference,
   scenarios, presenter, scene, fallback and registration.
 
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+363's answers. Facts checked in code (read-only, 2026-11-22): Amethyst Escape's experience (R02-G07-03 … 10) is the
+pattern in this package — a Core adapter with a per-process cache of generated levels, an immutable scene snapshot, a
+CPU projection reference, GLSL sources in the Core, an iOS-only experience target (`…Experience.swift`, presenter,
+scene, controls), a scenario manifest with 80 acceptance scenarios, a registration with content facts in
+`Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Faceted Forge kernel provides the level (crystal
+half-spaces in the box −6 … 6, budget, sliver limit, target multiset), pieces (exact corners, faces with their planes,
+volume, canonical order), play (`cut(piece, direction, depth)`, undo, redo, stages, failure) and the certified catalog
+with its pinned digest (ceb59042…a924c); `AppModelTests` uses `r02-g08.faceted-forge` as its example of an
+unregistered candidate and the next round-two game is `r02-g09.nocturne-garden`; the catalog's design gives the palette
+"ice glass, ruby, inner amber" and the geometry "half-space clipping generates per-piece indexed meshes".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: kernel coordinates map to world
+  space by subtracting the crystal's centroid (the mean of its corners) and dividing by R, the largest distance from it
+  to a crystal corner, so the crystal fits the unit sphere; y is up. Each piece is drawn from its exact faces (fan
+  triangulation of each face's ordered corners) with every edge bevelled by an inset of 0.02, and is moved away from
+  the centre along the direction from the crystal's centroid to the piece's centroid by 0.12 (0.2 when won; the
+  opening eases over 0.4 s of presentation time and stands still under Reduce Motion). A face is a cut face when its
+  plane is not one of the crystal's half-spaces; cut faces get the amber interior with a lattice, the others ice glass.
+  The preview plane is the chosen piece's cross-section by the chosen direction and depth (a ruby polygon with a
+  dashed rim), drawn only when that plane crosses the piece. The cut mark is a row of `budget` small bars along the
+  near edge (z = 1.3, x from −0.9 to 0.9), spent ones lit ruby. The ground is a dark plane at y = −1.3. The camera is a
+  fixed authored perspective looking at the origin from the front (+z), pitched 30° down, fitted to the bounding sphere
+  of radius 1.45 (the opened crystal plus the mark) with a 5 % margin for aspect 0.4 … 2.5. Dispersion shimmer moves
+  with presentation time only. Nothing drawn is consulted by the rules. Impact: FR-R02G0803-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): 3 bevel segments per edge, 3 dispersion layers,
+  2 glow shells around cut faces; `level-1`: 2 bevel segments, 2 dispersion layers, 1 glow shell; `level-2` (the
+  design's "Tier 0, D3-safe"): 1 bevel segment, 1 dispersion layer, no glow. Pieces, faces, preview plane, colours,
+  marks and positions are the same at every tier. Levels are ordered richest first; the presenter logs each tier change
+  with its reason. Impact: FR-R02G0803-004; SC-R02G0803-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every piece's
+  opened centroid, the centre of every cut face and the preview plane's centre through the same camera and gives the
+  palette. Simulator tests render offscreen at 1,152 × 768 and check that every piece centroid (± 3 pixels) differs
+  from the ground by at least 0.1 in luminance, that every cut face's centre (± 3 pixels) is warmer than the ground
+  (red minus blue at least 0.15), that the preview plane's centre (± 3 pixels) differs from the ground by at least
+  0.05, and that the background matches the ground within 0.05 away from geometry. Palette: ground #07090F, ice glass
+  #BFE6F5, ice highlight #F2FBFF, ruby #C8163C, inner amber #FFB347, lattice #FFE2A8, sliver cross #FF4D6D, spent mark
+  #C8163C, unspent mark #3A4558. Impact: FR-R02G0803-006; SC-R02G0803-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `FacetedForgeSceneSnapshot` (every piece's corners and faces as Doubles in world space before opening, which faces
+  are cuts, the chosen piece, direction and depth, stage, failure with its piece, cuts spent, budget, level number and
+  presentation time) made by the adapter; it never holds the kernel. If a program fails to compile or link, the scene
+  draws the level-2 geometry unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier
+  changes go to its `tierLog`. Reduce Motion holds the shimmer and the opening at their rest values; Reduce Flashing
+  caps the glow gain. A sliver failure marks the thin piece with a sliver-cross colour and the failure text names the
+  piece and the cut. Impact: FR-R02G0803-003, 007; SC-R02G0803-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g08.faceted-forge` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/FacetedForge/scenario-manifest.json`, no permissions, a summary of at
+  most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's experience
+  registry link `FacetedForgeExperience` as a candidate (`available: false` until X-R02-G08), opening at seed 0
+  (level 1); `AppModelTests` switches its unregistered example to the next round-two game (`r02-g09.nocturne-garden`).
+  The adapter (`FacetedForgeExperienceCore`) prepares certified level (seed mod 100) + 1 (generated once per process)
+  and accepts `piece.cut [piece, direction, depth]` (whole; piece 0 … pieces − 1, direction 0 … 12, depth −24 … 24),
+  `play.undo`, `play.redo` and `level.next`; the kernel refuses everything out of range or out of stage; its digest is
+  the level number and the play's fingerprint (never the record history, so undo restores the earlier digest); snapshot
+  schema 1 `{level, records}`. The preview choice (piece, direction, depth) is presentation state of the controls, not
+  kernel state. Impact: FR-R02G0803-005, 008, 009; SC-R02G0803-004.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See the glowing crystal open like a blossom (Priority: P1) 🎯
