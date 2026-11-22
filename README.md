@@ -79,7 +79,7 @@ evidence**: no physical-device test of the unified app has been run.
 | R02-G03 Wave Knot Keeper | integrated (X-R02-G03 pass, 2026-11-21) — a free puzzle of a glass rope of lattice control points moved one step at a time until its projected crossings and writhe match the target, strands passing each other only inside sapphire gates: 100 solver-certified levels with witness files, handle drags, orbit and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/wave-knot-keeper.md) |
 | R02-G04 Hue Compass | integrated (X-R02-G04 pass, 2026-11-21) — a free deduction puzzle of a spectral compass: turn a glass needle over a 96-bearing hue wheel, probe for clues by hue gap and fog depth (grayscale glyphs carry the same information), then select the hidden bearing and hue band within the allowance: 100 solver-certified levels with witness files, swipe, hub-tap, orbit and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/hue-compass.md) |
 | R02-G05 Colorfall Canyons | integrated (X-R02-G05 pass, 2026-11-21) — a free puzzle of neon light-fluid: carve canyon cells and switch spring valves so cyan, coral and yellow fluid fills every basin with its colours, without contamination, overflow or running out of time: 100 solver-certified levels with witness files, drag-to-carve, valve taps, orbit and panel play, hints, stars, daily and practice modes, replay of the best solution, verified on the iOS 27.2 and 26.5 simulators | [architecture](docs/architecture/colorfall-canyons.md) |
-| R02-G06 Chrono Constellator | in progress — rule kernel done (R02-G06-01, 2026-11-21): two to five stars travel round their own loops of sky cells at 1/120 s ticks; the player sets each star's start phase and records holds on a timeline, then replays it, winning when every star stands on its own target on the same tick and failing on a collision or the tick limit; exact closed-form positions, edits-in-use budget, undo, redo, rewind and replay; 100 certified levels (R02-G06-02) next | [architecture](docs/architecture/chrono-constellator.md) |
+| R02-G06 Chrono Constellator | in progress — rule kernel done (R02-G06-01, 2026-11-21): two to five stars travel round their own loops of sky cells at 1/120 s ticks; the player sets each star's start phase and records holds on a timeline, then replays it, winning when every star stands on its own target on the same tick and failing on a collision or the tick limit; exact closed-form positions, edits-in-use budget, undo, redo, rewind and replay; 100 seeded levels certified by an integer-tick phase search that proves the smallest edit count and counts collision-blocked windows, with witness files (R02-G06-02); the shader-drawn renderer (R02-G06-03) next | [architecture](docs/architecture/chrono-constellator.md) |
 | Other games of Rounds 2–4 | planned | [catalog](docs/catalog/experience-catalog.json) |
 | Games of Rounds 5–12 | backlog | [catalog](docs/catalog/experience-catalog.json) |
 | Physical-device testing | none run; waits for `ImplementationLock-100` | [support matrix](docs/release/support-matrix.md) |
@@ -87,7 +87,7 @@ evidence**: no physical-device test of the unified app has been run.
 
 Ledger totals today: the legacy ledger records **185 of 263** gates as passed (F00–F09 and the app phases
 A01-P00 … A19-P06, A20-P00 … A20-P06, A21-P00 … A21-P06, A22-P00 … A22-P06, A23-P00 … A23-P06, A24-P00 … A24-P06, A25-P00 … A25-P06); the unified-app ledger has 1,233 gates, with 30 experience gates (X-A01 … X-A25, X-R02-G01 … X-R02-G05), 11 unified-app features,
-24 shared round features, both governance milestones and fifty-one round-two game features (R02-G01-01 … 10: Aurora Loom's rule
+24 shared round features, both governance milestones and fifty-two round-two game features (R02-G01-01 … 10: Aurora Loom's rule
 kernel, its 100 solver-certified levels with witness files, its shader-drawn hero renderer, its touch controls and its
 teaching and progression (hints, failure explanations, tutorial, stars, daily and practice modes) and its polish and
 accessibility (announcements, haptics, Dynamic Type, slow fades, ambient sound) and its persistence and replay
@@ -130,7 +130,8 @@ persistence and replay (schema 3, reconciled traces, replay, saved sound choice)
 (solver re-certification, code-computed golden frames, memory cycles); R02-G05-09: its simulator integration and full app
 lock (identifiers, stored schema examples, interface tests in chunk `n3`, a Release build); R02-G05-10: its device automation preparation (eight device
 rows, a campaign plan and a rows check), integrated at X-R02-G05; R02-G06-01: Chrono Constellator's rule kernel
-(star loops, a timeline of start phases and holds, exact same-tick alignment, collisions, replay)) passed.
+(star loops, a timeline of start phases and holds, exact same-tick alignment, collisions, replay); R02-G06-02: its 100
+seeded levels with a phase-search solver, lower-bound proofs and witness files) passed.
 
 ```bash
 python3 Tools/python/desktop_runbook.py status   # legacy gates: framework and app phases

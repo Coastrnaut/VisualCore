@@ -76,7 +76,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 - [X] T-R02G0602-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0 (.autonomy/migration/checks/R02-G06-02.reference-1.json)
 - [X] T-R02G0602-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21 reference-2 exit 1 (projectm-reference-ios26 square preset within8 0.9695 vs required 0.9696, run-to-run variance; kept in evidence), reference-2-2 exit 0 (0.9752 vs 0.9675) (.autonomy/migration/checks/R02-G06-02.reference-2.json, .autonomy/migration/checks/R02-G06-02.reference-2-2.json); testing doc lesson added
 - [X] T-R02G0602-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21 script-tests exit 0, run alone after the chain (.autonomy/migration/checks/R02-G06-02.script-tests.json)
-- [ ] T-R02G0602-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0602-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21 converge round 1 appended T-013 (contract), implemented; converge round 2 clean; sealed 17 passing, 1 failed attempt kept; recorded pass (.autonomy/migration/evidence/R02-G06-02.json); README updated
 
 ## Dependencies and parallel work
 
