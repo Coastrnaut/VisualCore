@@ -147,3 +147,23 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
   20 and never records. The adapter adds `level.select`, `mode.daily`, `mode.practice`, `mode.campaign` and
   `tutorial.dismiss` (`r02-g06.locked`, `r02-g06.date`); `level.next` moves to the next open level. Snapshot schema 2
   `{level, mode, progress, records, tutorial}` with a migration from schema 1; digest v2 adds progress and mode.
+
+## Polish and accessibility (feature 356, R02-G06-06)
+
+- **Feedback.** `ChronoConstellatorFeedbackPlan.after(old:new:)` derives one announcement and one haptic from the old and
+  new state: phase changes, holds, releases, steps, rewinds, undo and redo as `state` with a selection haptic ("Star k
+  (shape) starts at row r, column c. n edits left." …), wins and failures as `outcome` (success or warning; a step that
+  ends the level plans only the outcome), level and mode changes as `level`, refusals in words as `rejection` with an
+  error haptic. The presenter routes plans through the shared `ExperienceFeedback` (the person's haptics switch, the
+  shared rate limits) and keeps a feedback log; the panel shows refusals in the same words.
+- **Comfort.** `ChronoConstellatorLights` eases each target ring (1 lit, 0.5 unlit), each star node (1 on target, 0.7
+  off), the win glow and the collision mark over 0.15 s, or 0.45 s under Reduce Flashing where a started fade finishes
+  before it turns back; the geometry draws the eased levels and the collision mark fades out at its remembered cell.
+  The ribbon shimmer (0.35 Hz) is still under Reduce Motion; the glow is capped at 0.5 under Reduce Flashing. None of it
+  reaches the state or the digest.
+- **Sound.** `ChronoConstellatorSoundRecipe` builds a 12-second ambient loop from the stars on target and the stage (a
+  110 Hz root, one partial per star on target, an octave on a win, halved gains on a failure); `ChronoConstellatorSound`
+  plays it only while the Sound toggle is on, the panel is on screen and the scene is active.
+- **Panel.** Every control has a label and a value; a summary element reads the tick, the edits left and every star; the
+  star picker is adjustable and announces its pick; rows become columns at accessibility text sizes and the panel keeps
+  a 520-point readable width on iPad.

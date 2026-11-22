@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G06-05: a hint is offered only when the state it leads to can still win).
+Last updated: 2026-11-21 (R02-G06-06: a fading mark keeps its cell after the state that placed it is gone).
 
 ## 1. What is tested, and where
 
@@ -211,6 +211,9 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tick 0 and "remove the first hold" at tick 0 unconditionally; the agent's 200 seeded states found 8 where that led to
   a state with no win, so following hints got stuck. A rewind or release is now offered only when the state after it
   has a plan, keeping "a plan exists exactly when following hints wins"; the spec records the change.
+- **A fading mark needs its place remembered** (R02-G06-06, 2026-11-21). Chrono Constellator's collision cross is drawn
+  at the failure's cell, but a rewind clears the failure, so a Reduce Flashing fade-out had nowhere to draw. The lights
+  now keep the last collision cell until the mark is dark, and a geometry test checks the cross fading at that cell.
 - **Compare picks with an independent ray test** (R02-G05-04, 2026-11-21). Colorfall Canyons's picker and gesture tests
   compute the expected cell or spring in the test with their own plane and box intersections (only the ray is shared)
   over seeded points, sizes and orbits, and each was shown to fail by changing one threshold; a panel test wins all 100

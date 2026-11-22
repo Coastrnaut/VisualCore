@@ -335,3 +335,8 @@ Feature 355 (R02-G06-05) adds teaching and progression: `ChronoConstellatorHints
 `ChronoConstellatorMode` and `ChronoConstellatorTutorialStep`; the adapter's level, mode and tutorial controls and
 snapshot schema 2 with a migration from 1; the panel's instruction, hints, failure text with Undo, Rewind and Retry,
 modes and level picker.
+
+Feature 356 (R02-G06-06) adds polish and accessibility: in the Core `ChronoConstellatorFeedbackPlan` (announcements and
+haptics), `ChronoConstellatorLights` (eased fades, slower under Reduce Flashing) and `ChronoConstellatorSoundRecipe`
+(a synthesized ambient loop); in the experience `ChronoConstellatorSound`, the feedback route, the lights in the scene
+and an accessible panel (labels, values, summary, Sound toggle, large-text layout).
