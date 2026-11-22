@@ -148,6 +148,8 @@ def steps(stamp: str) -> list[Step]:
         Step("device-rows-r02-g03", [PY, "scripts/check_device_rows.py", "--experience", "r02-g03.wave-knot-keeper"]),
         # Feature 340 (R02-G04-10): Hue Compass's device rows, checked like the earlier round-two games'.
         Step("device-rows-r02-g04", [PY, "scripts/check_device_rows.py", "--experience", "r02-g04.hue-compass"]),
+        # Feature 350 (R02-G05-10): Colorfall Canyons's device rows, checked like the earlier round-two games'.
+        Step("device-rows-r02-g05", [PY, "scripts/check_device_rows.py", "--experience", "r02-g05.colorfall-canyons"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),
