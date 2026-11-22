@@ -14,6 +14,13 @@
 // draws the turn it would make and the description begins "Shell k would turn n sectors clockwise"; a gesture on a
 // finished play says "The play is over: undo or go to the next level". A refused action is shown in the panel and its
 // code kept in ``AmethystEscapePresenter/refusalLog``.
+// Feature 365 (R02-G07-05) T-R02G0705-005 (FR-R02G0705-001 … 005; clarifications Q1–Q5): the mirror carries the
+// tutorial instruction, the hint revealed so far (`showHint()` reveals the next of three levels for the current play;
+// the hint level is presentation only and any change of the play — level, mode or play fingerprint — hides it), the
+// failure explanation, the mode, the open levels with their stars and the goal (moves spent, budget and certified
+// smallest move count); `retry` starts the level again in its mode, `undoMove` takes back the last move, and the daily
+// level is chosen from the local calendar date read here (`playDaily(port:date:)`, sent as `mode.daily [year, month,
+// day]`), never in the core.
 #if os(iOS)
 import AmethystEscapeCore
 import Foundation
@@ -46,6 +53,22 @@ final class AmethystEscapeMirror {
     var pickedShell = 0
     /// The text of the last refused change, if any.
     var message: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 365).
+    var instruction: String?
+    /// The hint level revealed (0 … 3) and its text (feature 365).
+    var hintLevel = 0
+    var hintText: String?
+    /// The failure explanation while the play has failed (feature 365).
+    var failureText: String?
+    /// The mode (feature 365).
+    var mode: AmethystEscapeMode = .campaign
+    /// The highest open level and the stars of each won level (feature 365).
+    var frontier = 1
+    var stars: [Int: Int] = [:]
+    /// The certified smallest move count of the current level (the goal, feature 365).
+    var smallest = 0
+    /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
+    var pickedLevel = 1
 
     /// The picked shell's name, or "none".
     var pickedShellLabel: String {
@@ -145,6 +168,90 @@ final class AmethystEscapePresenter: ExperiencePresenter {
 
     /// What a turn or advance gesture on a finished play shows.
     static let finishedMessage = "The play is over: undo or go to the next level"
+
+    /// The latest core described (feature 365): hints and retry read it.
+    private(set) var latestCore: AmethystEscapeExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 365).
+    private var hintKey: String?
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 365).
+    private(set) var dailyDate: DateComponents?
+
+    // MARK: Teaching and progression (feature 365)
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: AmethystEscapeExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Hides the hint shown.
+    private func clearHint() {
+        hintKey = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; the hint is hidden when the play has none (won, or
+    /// not started). Hints never change the state: no action is sent.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let key: String = Self.hintKey(core)
+        let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        guard let hint = core.hint(level: next) else {
+            clearHint()
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = hint.text
+    }
+
+    /// Ends the tutorial of the current level.
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Takes back the last move (`play.undo`); after a failure this returns the play to playing.
+    @discardableResult
+    func undoMove(port: ExperienceActionPort) -> ActionResult {
+        send("play.undo", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = AmethystEscapePresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort, date: DateComponents = AmethystEscapePresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
 
     /// The touch-down of the current one-finger touch: its point and what it picked (for the finished-play message).
     private var touchDown: (id: Int, point: Vec2, pick: AmethystEscapePick)?
@@ -257,7 +364,18 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         let snapshot = core.snapshot(time: 0)
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
         mirror.levelNumber = core.levelNumber
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) { clearHint() }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.smallest = core.certifiedSmallest
         mirror.moves = snapshot.moves
         mirror.budget = snapshot.budget
         mirror.sectors = snapshot.sectors
@@ -290,6 +408,7 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         switch play.stage {
         case .won, .result where play.failure == nil:
             text += "The pearl escaped through the exit gap."
+            if let stars = mirror.stars[core.levelNumber] { text += " Stars: \(stars) of 3." }
             mirror.status = "Won"
         case .failed, .result:
             let reason: String
@@ -300,6 +419,7 @@ final class AmethystEscapePresenter: ExperiencePresenter {
             case .budget, .none: reason = "The move budget ran out before the pearl escaped."
             }
             text += reason
+            if let explanation = mirror.failureText { text += " " + explanation }
             mirror.status = "Failed: " + reason
         default:
             mirror.status = snapshot.moves == 0 ? "Ready" : "Playing"

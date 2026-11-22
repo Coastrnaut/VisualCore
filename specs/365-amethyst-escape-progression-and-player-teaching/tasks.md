@@ -45,7 +45,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
   `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeScenarios.swift` entries where needed and `Packages/ExperiencesRound02/AmethystEscape/scenario-manifest.json`
   (`UPDATE_SCENARIO_MANIFEST=1`); lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter
   AmethystEscape`
-- [ ] T-R02G0705-005 Edit `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapePresenter.swift` (the tutorial instruction, the hint at its current
+- [X] T-R02G0705-005 Edit `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapePresenter.swift` (the tutorial instruction, the hint at its current — Verified 2026-11-22: 2026-11-22: sim-27 (AmethystEscapeExperienceTests, 44 tests on iOS 27.2 incl. 6 teaching tests: tutorial to a win, dismiss, three hint levels, hints win, budget failure with undo and retry, picker refusal and modes) exit 0
   level — "Hint" raises the level 1 → 2 → 3, any play change resets it — and the failure explanation as panel text; the
   description includes them) and `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapeControls.swift` (Hint, Dismiss tutorial, level picker for
   open levels, Practice, Daily (today's local date from the presenter), Campaign); agent D writes

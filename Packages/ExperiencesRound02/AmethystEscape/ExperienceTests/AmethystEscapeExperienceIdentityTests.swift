@@ -1,6 +1,6 @@
 // AmethystEscapeExperienceIdentityTests — feature 363 (R02-G07-03) T-R02G0703-006 (FR-R02G0703-004, 005, 008;
 // clarifications Q2, Q3, Q5). The experience's id is the catalog id, the factory (with and without storage) builds a
-// shell around the presenter (with the accessibility settings passed through), the controls are the five declared
+// shell around the presenter (with the accessibility settings passed through), the controls are the ten declared
 // actions in order, the quality profile's levels are the catalog tiers level-0 … level-2 and equal the presenter's,
 // the palette is the clarification's colours and the catalog's five hex strings, and the description names the level,
 // the moves, the pearl, the exit gap and every shell, a won play's escape and a failure with its reason. iOS only, as
@@ -60,10 +60,12 @@ import VisualCoreExperienceHost
         #expect(experience.frameProbes.isEmpty, "no probes before a frame")
     }
 
-    @Test func theControlsAreTheFiveActions() {
+    /// The five play actions (feature 363) and the five progression actions (feature 365), in order.
+    @Test func theControlsAreTheTenActions() {
         var ids: [String] = []
         for control in AmethystEscapeExperienceCore.controls { ids.append(control.id) }
-        #expect(ids == ["shell.rotate", "pearl.advance", "play.undo", "play.redo", "level.next"])
+        #expect(ids == ["shell.rotate", "pearl.advance", "play.undo", "play.redo", "level.next", "level.select",
+                        "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
         #expect(ids == AmethystEscapeExperienceCore.actionIDs)
     }
 
