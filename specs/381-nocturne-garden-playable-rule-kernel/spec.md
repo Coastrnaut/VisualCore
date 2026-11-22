@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G09-01 (migration ledger, game feature of experience R02-G09) · ID namespace FR-R02G0901-###,
 SC-R02G0901-###, T-R02G0901-###
@@ -30,6 +30,58 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract, so
   R02-G09-02 can certify levels).
 - **Model:** feature 371 (Faceted Forge's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+371's answers where the games agree. Facts checked in code (read-only, 2026-11-22): `Packages/ExperiencesRound02` holds
+Aurora Loom … Faceted Forge as the pattern (Core with level, play, records with previous and next fingerprints, rules
+as R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.*` reason codes); no `NocturneGarden*` name exists; the
+catalog sets the timestep at 0.016667 s, the content at 76 stages and the controls "drag stems, pinch scale, slide sun
+elevation".
+
+- Q: What are the bed, the blooms, their outlines, sizes and the sun, exactly? → A: the bed is a grid of W × H cells, W
+  in 16 … 32 and H in 12 … 24, cell (c, r) with c counted from the left and r from the ground row upward. There are six
+  bloom kinds, each named in words (tulip, bell, star, fern, rose, lily), each a fixed simple polygon with integer
+  vertices in a local frame whose origin is the stem's foot, the stem rising along +y, at most 16 vertices, at most 3
+  cells wide and 6 cells tall at size 1. A bloom is planted at an anchor cell (its foot at that cell's bottom-left
+  corner, so the foot is the lattice point (c, r)) with a size s in 1 … 3 (the outline scaled by s). The sun elevation e
+  is one of four steps, 1 (high) … 4 (low), and stretches every shadow vertically by the factor f = e / 2 (1/2, 1, 3/2,
+  2) about the bloom's foot: a vertex (x, y) of the scaled outline casts (c + x, r + f·y). Impact: FR-R02G0901-001, 002,
+  003, 013; SC-R02G0901-001.
+- Q: How does a shadow become cells, exactly? → A: a cell (c, r) of the bed is dark for a bloom when its centre
+  (c + 1/2, r + 1/2) lies inside the bloom's cast polygon or on its boundary; with every coordinate doubled (and the
+  factor's denominator cleared) the test is an exact integer winding-number test with boundary points counted as inside.
+  The garden's shadow mask is the union over all planted blooms, clipped to the bed. The match is |M ∩ T| / |M ∪ T|
+  over the mask M and target T (0 when both are empty), compared with the required fraction p / q by cross
+  multiplication; the leak is |M ∩ F| over the forbidden cells F. Impact: FR-R02G0901-003, 005, 014; SC-R02G0901-003.
+- Q: Which actions exist, what does each cost, and when is one refused? → A: `plant(kind, col, row, size)`,
+  `move(bloom, col, row)`, `resize(bloom, size)`, `remove(bloom)` and `sun(elevation)`; each accepted action spends one
+  move. Refused without change: an anchor outside the bed or a size or elevation out of range (`r02-g09.action`); a kind
+  whose supply is used up (`r02-g09.supply`); a bloom number that does not exist (`r02-g09.action`); an action that
+  changes nothing (moving to the same cell, the same size, the same elevation: `r02-g09.noop`); a wrong stage
+  (`r02-g09.stage`) or a stale fingerprint (`r02-g09.stale`). Two blooms may share an anchor. Blooms are kept in
+  canonical order (row, then column, then kind, then size) and named "bloom 1" … in that order with their kind, cell and
+  size; removing a bloom returns it to the supply. Impact: FR-R02G0901-002, 004, 006, 011, 013.
+- Q: In which order are leak, win and budget decided, and from which stages can the player go back? → A: after an
+  accepted action: leak first (a leak above the allowance fails the level, naming the action and its bloom, or the sun),
+  then win (match at least p / q and leak within the allowance: won), then budget (moves spent equal to the budget:
+  failed). Undo and redo restore the exact earlier state; a new action clears the redo stack. Undo works in playing and
+  paused; from failed, undo returns to playing (an honest retry, recorded); a won level is final and refuses undo. The
+  boundary deviation (truth metric) is the symmetric grid Hausdorff distance in Chebyshev cells between the boundary
+  cells of M and of T (a boundary cell is a cell of the set with a 4-neighbour outside it or at the bed's edge); it is
+  reported after every action and never decides the outcome. Impact: FR-R02G0901-004, 005, 007, 008, 014;
+  SC-R02G0901-002, 004.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G08-01: every accepted action appends a
+  record (schema, level seed, move index, kind, operands, previous and next fingerprints); the play fingerprint is the
+  SHA-256 of the schema, the level fingerprint, the blooms in canonical order, the sun elevation, the moves spent, the
+  stage and the failure; levels are JSON schema 1 with sorted keys (bed size, target and forbidden cells as sorted
+  row-major indices, supply, size and elevation ranges, budget, required match as a fraction, leak allowance, opening sun
+  elevation, tutorial flag, seed, id) and a fingerprint, re-checked on decode; reason codes `r02-g09.level`, `.action`,
+  `.supply`, `.noop`, `.stage`, `.stale`, `.newer-schema`, `.malformed`. Impact: FR-R02G0901-006 … 011;
+  SC-R02G0901-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -74,7 +126,9 @@ refused.
 ### Edge Cases
 
 - **A bloom placed partly outside the bed:** only the cells inside the bed count; a placement whose anchor lies outside
-  the bed is refused.
+  the bed is refused (`r02-g09.action`).
+- **An action that changes nothing:** moving a bloom to its own cell, resizing to its own size or setting the same sun
+  elevation is refused (`r02-g09.noop`) and spends nothing.
 - **Overlapping blooms:** shadows combine as a union; a cell is dark once whatever number of shadows cover it.
 - **A match exactly at the requirement:** a match equal to the required fraction wins; one below does not.
 - **A leak exactly at the allowance:** a leak equal to the allowance is allowed; one cell more fails the level.
