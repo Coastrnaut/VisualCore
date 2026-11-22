@@ -17,7 +17,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipe (P1, P2) 🎯
 
-- [ ] T-R02G0906-003 [P] [US1] [US3] Create
+- [X] T-R02G0906-003 [P] [US1] [US3] Create — Verified 2026-11-22: host-2 (NocturneGardenFeedbackPlanTests 8 + invariant) exit 0, rerun by the lead; texts of clarification Q1 exact, outcome-only for an ending move, refusal words raw and prefixed, hint(text:) state
   `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenFeedbackPlan.swift` (texts and kinds of clarification
   Q1 word for word, including the revealed hint as `state` (`hint(text:)`); haptics of Q2; `after(old:new:)`, `refused(code:)`,
   `refusalText(code:)`, `summaryText(core:)` of Q5) with
