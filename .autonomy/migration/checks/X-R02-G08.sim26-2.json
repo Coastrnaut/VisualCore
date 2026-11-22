@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g08.faceted-forge",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g08.faceted-forge --runtime 26",
+  "elapsed_seconds": 146.22,
+  "exit_code": 0,
+  "finished": "2026-11-22T18:22:17+00:00",
+  "gate": "X-R02-G08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G08.sim26-2.log",
+  "log_sha256": "7610c40fef7f886773f3d6bf27146a77efd00f219dce330cd301f33e2fcd4271",
+  "name": "sim26-2",
+  "started": "2026-11-22T18:19:51+00:00",
+  "timed_out": false
+}
