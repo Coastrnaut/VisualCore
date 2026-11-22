@@ -26,7 +26,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G0803-003 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeShaders.swift`
+- [X] T-R02G0803-003 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeShaders.swift` — Verified 2026-11-22: 2026-11-22: host-2 (FacetedForgeShaderSourceTests, 14 tests) exit 0, rerun by the lead
   (crystal and glow sources, GLSL ES 3.00; ice glass with fresnel highlights and up to 3 faux-dispersion layers driven
   by `u_time`; incandescent amber-to-ruby cut faces with a lattice pattern; translucent ruby preview; uniform names;
   glow gain cap; palette constants equal to the CPU's) with
