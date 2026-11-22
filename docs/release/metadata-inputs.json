@@ -269,9 +269,17 @@
       "name": "Amethyst Escape",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G08",
+      "id": "r02-g08.faceted-forge",
+      "name": "Faceted Forge",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "7db179d09b4b5a65b97f6942c1a857439311f152aad4358c4e1bd73b761c17e2",
+  "ledger_sha256": "4471ef8f4297dfc002bbbc0f94478cdbbd80d82065ea11af6ff6b4f72cc8bf35",
   "privacy_answers": "unproven",
   "schema": 1
 }

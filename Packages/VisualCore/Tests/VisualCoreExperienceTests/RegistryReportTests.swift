@@ -64,7 +64,8 @@ import Testing
                          "r02-g04.hue-compass",
                          "r02-g05.colorfall-canyons",
                          "r02-g06.chrono-constellator",
-                         "r02-g07.amethyst-escape"].compactMap(ExperienceID.init(rawValue:))
+                         "r02-g07.amethyst-escape",
+                         "r02-g08.faceted-forge"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }

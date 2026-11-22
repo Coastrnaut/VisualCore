@@ -1,7 +1,7 @@
 // FFSupport — feature 379 (R02-G08-09) T-R02G0809-004 (FR-R02G0809-002; SC-R02G0809-001; clarifications Q1, Q2):
 // helpers of the interface tests of Faceted Forge (R02-G08) inside the one app, modelled on `AESupport` (feature 369).
-// Every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are
-// registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens the
+// Faceted Forge was a candidate until X-R02-G08 (2026-11-22); every launch still carries `-vcCandidates`
+// (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens the
 // experience directly with `-openExperience r02-g08.faceted-forge`; a relaunch (`FF.reopen`) backgrounds the app first
 // (its save point), terminates it and starts again without the reset, so the stored progress (solved levels, stars,
 // the frontier, the verified winning trace) survives.

@@ -1457,7 +1457,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "ChronoConstellatorCore", "ChronoConstellatorExperience",
                                     # Feature 363 (R02-G07-03): Amethyst Escape, integrated at X-R02-G07.
                                     "AmethystEscapeCore", "AmethystEscapeExperience",
-                                    # Feature 373 (R02-G08-03): Faceted Forge, a candidate until X-R02-G08.
+                                    # Feature 373 (R02-G08-03): Faceted Forge, integrated at X-R02-G08.
                                     "FacetedForgeCore", "FacetedForgeExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

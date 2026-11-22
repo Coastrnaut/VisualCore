@@ -1192,7 +1192,7 @@
         "catalog_sha256": "ceb59042752490ceef76b62163e9f05414950788c74d2a95d80ef337a28a924c",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g09.nocturne-garden",
