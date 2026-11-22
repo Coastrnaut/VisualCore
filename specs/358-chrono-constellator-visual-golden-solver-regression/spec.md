@@ -23,6 +23,62 @@ Canonical overrides:
   ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 348 (Colorfall Canyons's visual golden and solver regression).
 
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+348's answers where the games agree. Facts checked in code (read-only audit, 2026-11-22): `ChronoConstellatorSolver.solve`
+scans every tick 1 … tick limit for the misaligned count m(T), takes the lower bound m* as the smallest, walks the windows
+(ticks with m(T) = m*) in order and returns the first unblocked one with its phase-only timeline, the window count, the
+blocked count and `work` (ticks scanned plus window ticks checked); the 100 witness files hold the level, the actions, the
+win tick, per-tick digests and fingerprints, the lower bound, the window, the windows, the blocked count, the unedited run,
+the near miss, the difficulty and the skipped count, and are byte-checked by `ChronoConstellatorCatalogTests` one band of
+20 levels per test; the catalog digest is pinned there; the simulator frame checks of feature 353 compare rendered frames
+with the CPU reference at 1,152 × 768 (each star centre within 3 px of a pixel at least 0.15 brighter than the field, each
+target ring sampled at 0.42·u ± 3 px at least 0.1 from the field, the background within 0.05 of the field away from
+geometry); `ChronoConstellatorSkyScene.release()` frees every GPU object and the next draw rebuilds them (memory warning,
+teardown); the CI host job runs all round-two host tests and has a named regression step per earlier round-two game;
+`scripts/xcodebuild_package.py` runs simulator tests with `--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win at exactly its win tick with exactly its per-tick digests and fingerprints; and `solve` returns exactly
+  the witness's phase changes (the certified smallest set, of size the lower bound), with the lower bound, the window,
+  the windows and the blocked count equal to the witness's; `work` is at most tick limit + the sum of the window ticks
+  (counted, never timed). The run is split into tests of 10 levels so each stays short. Impact: FR-R02G0608-001;
+  SC-R02G0608-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a star's loop cell, a star's start phase, a star's
+  target, the budget, the tick limit, the grid size; a solution phase; a witness action, a per-tick digest, a per-tick
+  fingerprint; the lower bound; the window. Impact: FR-R02G0608-002; SC-R02G0608-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after its witness's phase changes and the witness's actions up
+  to tick min(win tick, 6) so trails show, at presentation time 0 and the authored camera, plus the hero frame of the
+  scenario manifest's hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the projected pixel
+  positions of every star node centre, every target centre, every loop cell centre and the current-tick mark's two ends,
+  rounded to 1/8 pixel, and the expected colours as 8-bit sRGB (field, grid, silver, star, rose, amber); serialized as
+  JSON with sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
+  `Packages/ExperiencesRound02/ChronoConstellator/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every colour must be
+  equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal the digest
+  of its pinned description. The file is rewritten only when `CHRONO_CONSTELLATOR_WRITE_GOLDEN=1` is set. The simulator
+  test renders the 16 frames and checks them against the same descriptions with the feature-353 tolerances. Impact:
+  FR-R02G0608-003, 004; SC-R02G0608-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_CHRONO_CONSTELLATOR_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU
+  objects of its own (a test-visible count is 0) and the next frame rebuilds them. An unavailable footprint fails with a
+  named reason. Impact: FR-R02G0608-005; SC-R02G0608-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's host job keeps running all round-two host
+  tests and adds a named step "Chrono Constellator regression (host)" that runs the Chrono Constellator regression filter
+  alone. The local command `python3 scripts/chrono_constellator_regression.py` runs the host regression filter and then
+  the simulator regression test classes through `xcodebuild_package.py --only-testing`, and prints one summary line per
+  part with pass or fail and the first failing name; its exit code is non-zero on any failure. Nothing is timed against
+  the wall clock. Impact: FR-R02G0608-006, 007; SC-R02G0608-005.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Every level stays solvable as certified (Priority: P1) 🎯
