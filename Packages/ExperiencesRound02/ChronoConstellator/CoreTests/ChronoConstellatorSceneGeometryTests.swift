@@ -256,6 +256,47 @@ import VisualCoreScenes
         }
     }
 
+    /// The current-tick mark (converge T-R02G0603-014): absent at tick 0, half the grid's width at half the tick limit,
+    /// the whole width at the limit; a silver bar of the field program near the field's near edge, clear of the target
+    /// rings; the same at every tier.
+    @Test func theCurrentTickMarkFollowsTheTick() throws {
+        let lvl: ChronoConstellatorLevel = try Self.level(columns: 6, rows: 5, count: 2, tickLimit: 40)
+        let width: Double = 6 * Geometry.cellSize(Snapshot(play: try Self.play(lvl, ticks: 0), levelNumber: 1, time: 0))
+        let expected: [(ticks: Int, length: Double)] = [(0, 0), (20, width / 2), (40, width)]
+        var counts: [Int] = []
+        for entry in expected {
+            let s: Snapshot = Snapshot(play: try Self.play(lvl, ticks: entry.ticks, hold: false), levelNumber: 1, time: 0)
+            #expect(s.tick == entry.ticks)
+            let length: Double = Geometry.tickBarLength(s)
+            #expect(length.isFinite && abs(length - entry.length) < 1e-9, "tick \(entry.ticks): \(length)")
+            let u: Double = Geometry.cellSize(s)
+            let nearEdge: Double = Double(s.rows) * u / 2
+            let field: ChronoConstellatorColouredMesh = try Geometry.fieldPart(s, tier: .of(0))
+            counts.append(field.mesh.positions.count)
+            var barXs: [Double] = []
+            for (k, q) in field.mesh.positions.enumerated() {
+                let inBand: Bool = abs(Double(q.z) - (nearEdge - Geometry.tickBarInset * u)) <= Geometry.tickBarWidth * u / 2
+                    + 1e-9
+                let onTrackHeight: Bool = abs(Double(q.y) - Geometry.trackLift * u) < 1e-9
+                if inBand && onTrackHeight && field.mesh.uvs[k].x == Geometry.trackCode {
+                    barXs.append(Double(q.x))
+                }
+            }
+            if entry.ticks == 0 {
+                #expect(barXs.isEmpty)
+            } else {
+                let minX: Double = barXs.min() ?? .nan
+                let maxX: Double = barXs.max() ?? .nan
+                #expect(abs(minX + 3 * u) < 1e-6 && abs(maxX - minX - entry.length) < 1e-6, "\(minX) \(maxX)")
+            }
+            #expect(Geometry.tickBarInset + Geometry.tickBarWidth / 2 < 0.5 - Geometry.targetOuter)
+            for index in 1..<ChronoConstellatorTier.all.count {
+                #expect(try Geometry.fieldPart(s, tier: .of(index)) == field)
+            }
+        }
+        #expect(counts[1] == counts[0] + 4 && counts[2] == counts[1])
+    }
+
     @Test func shapesFollowTheStarIndex() {
         let shapes: [ChronoConstellatorShape] = [.ring, .cross, .diamond, .triangle, .square]
         for (i, shape) in shapes.enumerated() { #expect(Geometry.shape(i) == shape) }

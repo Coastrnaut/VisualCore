@@ -256,7 +256,9 @@ public enum ChronoConstellatorSceneGeometry {
     /// shape inside (radius 0.22·u), code 4, shade 1 when the star stands on it and 0.5 otherwise; every hold as a
     /// two-sided vertical bar (0.5·u tall, 0.06·u wide) at its held cell, code 2, shade 1 while active and 0.5 otherwise;
     /// and, when the play failed by a collision, an amber diagonal cross (arms 0.4·u, width 0.08·u) at y = 0.27·u on the
-    /// collision cell, code 5. Colours: ``materialColour(_:)`` times the shade. The same at every tier.
+    /// collision cell, code 5; and the current-tick mark, a silver bar (code 2, width 0.04·u, centred 0.04·u inside the
+    /// near edge at y = 0.004·u) from the left edge for ``tickBarLength(_:)``. Colours: ``materialColour(_:)`` times the
+    /// shade. The same at every tier.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func fieldPart(_ snapshot: ChronoConstellatorSceneSnapshot,
@@ -324,6 +326,15 @@ public enum ChronoConstellatorSceneGeometry {
                 try parts.quad(p, slot: normal, front: normal, uv: uv, colour: silver * shade)
             }
         }
+        let progress: Double = tickBarLength(snapshot)
+        if progress > 0 {
+            let z: Double = halfDepth - tickBarInset * u
+            let w: Double = tickBarWidth * u / 2
+            let y: Double = trackY
+            try parts.quad([SIMD3(-halfWidth, y, z - w), SIMD3(-halfWidth + progress, y, z - w),
+                            SIMD3(-halfWidth + progress, y, z + w), SIMD3(-halfWidth, y, z + w)],
+                           slot: up, front: up, uv: trackUV, colour: silver)
+        }
         if case .collision(_, _, let cell) = snapshot.failure {
             let centre: SIMD3<Double> = cellCentre(cell, snapshot) + SIMD3(0, collisionLift * u, 0)
             let r: Double = collisionRadius * u / 2.0.squareRoot()
@@ -335,6 +346,21 @@ public enum ChronoConstellatorSceneGeometry {
                           slot: up, uv: uv, colour: colour)
         }
         return parts.built()
+    }
+
+    /// The distance of the current-tick mark's centre line from the field's near edge, in cells (feature 353, converge
+    /// T-R02G0603-014): with its width it spans 0.02 … 0.06·u, clear of the target rings, which end 0.08·u from the edge.
+    public static let tickBarInset: Double = 0.04
+    /// The width of the current-tick mark, in cells.
+    public static let tickBarWidth: Double = 0.04
+
+    /// The length of the current-tick mark: tick / tickLimit of the grid's width (columns·u), clamped to 0 … the width;
+    /// 0 at tick 0 or with a non-positive limit. The same at every tier.
+    public static func tickBarLength(_ snapshot: ChronoConstellatorSceneSnapshot) -> Double {
+        guard snapshot.tickLimit > 0 else { return 0 }
+        let width: Double = Double(max(snapshot.columns, 1)) * cellSize(snapshot)
+        let fraction: Double = min(max(Double(snapshot.tick) / Double(snapshot.tickLimit), 0), 1)
+        return width * fraction
     }
 
     /// The field mesh (see ``fieldPart(_:tier:)``).
