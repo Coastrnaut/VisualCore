@@ -30,7 +30,7 @@ R02-G06-03 are unchanged).
 
 ## Phase 3: Stories 1 and 4 — tutorial, progress, daily, practice (P1, P2)
 
-- [ ] T-R02G0605-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorProgress.swift` (ChronoConstellatorTutorialStep
+- [X] T-R02G0605-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorProgress.swift` (ChronoConstellatorTutorialStep — Verified 2026-11-21: 2026-11-21: host-2 (ChronoConstellatorProgressTests, 9 tests: tutorial on levels 1-3 via certified solutions, 100-level progress, stars, daily for 4,018 dates, impossible dates, Codable) exit 0, lead retest
   "shift → replay (a phase change was accepted and the plan is a run — the caller passes `planIsRun`) → align (an
   accepted step) → done (the level ends); dismiss → done; undo never moves it back" with the texts of clarification Q2;
   ChronoConstellatorMode "campaign, practice, daily(level)"; ChronoConstellatorProgress "level 1 open; a campaign win
