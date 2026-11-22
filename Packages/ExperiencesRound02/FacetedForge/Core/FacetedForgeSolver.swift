@@ -6,7 +6,9 @@
 // limit and the pieces can still be partitioned into the target (`canPartition`: every target entry is given to one
 // piece, each piece's share is the sum of its entries' shares, and a piece given one entry already has that entry's
 // face count). It never continues from a failed state. Work is the number of cuts evaluated, counted and bounded; a
-// search over its bound gives nil. Pure and deterministic: exact fractions, no clock, no random source.
+// search over its bound gives nil. Feature 375 (R02-G08-05) T-R02G0805-002 adds the entry point from any pieces with
+// any number of cuts left (the hint plan, clarification Q1); the certifying entry point calls it from the crystal, so
+// its results are unchanged. Pure and deterministic: exact fractions, no clock, no random source.
 
 /// A certified solution: the smallest cut count, a winning cut sequence of that length and the work spent.
 public struct FacetedForgeSolution: Sendable, Equatable, Hashable, Codable {
@@ -116,17 +118,28 @@ public enum FacetedForgeSolver {
     }
 
     /// A winning sequence of exactly ``lowerBound(_:)`` cuts found from the crystal alone, or nil when none is found
-    /// within `workBound` cut evaluations.
+    /// within `workBound` cut evaluations: ``solve(_:from:cutsLeft:workBound:)`` from `[level.crystal]`.
     public static func solve(_ level: FacetedForgeLevel, workBound: Int = workBound) -> FacetedForgeSolution? {
-        let crystal: FacetedForgeFraction = level.crystal.volume
         let cuts: Int = lowerBound(level)
-        guard cuts >= 1, cuts <= level.budget else { return nil }
+        guard cuts <= level.budget else { return nil }
+        return solve(level, from: [level.crystal], cutsLeft: cuts, workBound: workBound)
+    }
+
+    /// A winning continuation of exactly `cutsLeft` more cuts from `pieces` (in canonical order), found by the same
+    /// bounded depth-first search as ``solve(_:workBound:)`` (same order, same pruning, same sliver rule; feature 375
+    /// (R02-G08-05) T-R02G0805-002, clarification Q1), or nil when `cutsLeft` is below 1 or none is found within
+    /// `workBound` cut evaluations. The solution's `smallest` is `cutsLeft`; its piece indices are canonical indices at
+    /// the time of each cut, starting from `pieces`.
+    public static func solve(_ level: FacetedForgeLevel, from pieces: [FacetedForgePiece], cutsLeft: Int,
+                             workBound: Int = workBound) -> FacetedForgeSolution? {
+        guard cutsLeft >= 1 else { return nil }
+        let crystal: FacetedForgeFraction = level.crystal.volume
         var work: Int = 0
         var actions: [FacetedForgeAction] = []
-        let found: Bool = search([level.crystal], cutsLeft: cuts, level: level, crystal: crystal, bound: workBound,
+        let found: Bool = search(pieces, cutsLeft: cutsLeft, level: level, crystal: crystal, bound: workBound,
                                  work: &work, actions: &actions)
         guard found else { return nil }
-        return FacetedForgeSolution(smallest: cuts, actions: actions, work: work)
+        return FacetedForgeSolution(smallest: cutsLeft, actions: actions, work: work)
     }
 
     /// The depth-first search: one more cut of some piece, in the rules' order, pruned as in the file header.

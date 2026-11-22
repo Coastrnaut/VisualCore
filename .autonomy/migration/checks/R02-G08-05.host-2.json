@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgeHints|FacetedForgeSolver|FacetedForgeInvariant|FacetedForgeCatalog"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForgeHints|FacetedForgeSolver|FacetedForgeInvariant|FacetedForgeCatalog'",
+  "elapsed_seconds": 75.376,
+  "exit_code": 0,
+  "finished": "2026-11-22T14:33:52+00:00",
+  "gate": "R02-G08-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-05.host-2.log",
+  "log_sha256": "108180dadac01fbe4c1221f750b61e326ff27c6bfdbe1682ef6a7d295c86c137",
+  "name": "host-2",
+  "started": "2026-11-22T14:32:37+00:00",
+  "timed_out": false
+}

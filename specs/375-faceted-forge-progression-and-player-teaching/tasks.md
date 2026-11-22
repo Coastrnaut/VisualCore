@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G0805-002 [P] [US2] [US3] Add `solve(_:from:cutsLeft:workBound:)` to
+- [X] T-R02G0805-002 [P] [US2] [US3] Add `solve(_:from:cutsLeft:workBound:)` to — Verified 2026-11-22: 2026-11-22: host-2 (FacetedForgeHintsTests 7 tests/42 cases incl. all 100 levels won by hints, solver, invariant and catalog tests: 35 tests) exit 0, rerun by the lead; catalog digest and witnesses unchanged
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSolver.swift` (the same bounded depth-first search started
   at given pieces, looking for exactly `cutsLeft` more cuts; `solve(_:workBound:)` equals it from the crystal) and
   create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeHints.swift` (`FacetedForgePlan`, `FacetedForgeHint`
