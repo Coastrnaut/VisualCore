@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G0905-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenProgress.swift` (`NocturneGardenTutorialStep` plant →
+- [X] T-R02G0905-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenProgress.swift` (`NocturneGardenTutorialStep` plant → — Verified 2026-11-22: host-3 exit=0 (NocturneGardenProgressTests 11: tutorial steps on levels 1-3, undo and redo never move the step back, stars by moves made, a 100-level progress script, every day of 2026-2036 maps into 1-100 and is stable, negative day counts wrap, impossible dates refused, Codable round trips; agent C's files retested by the lead)
   shape → finish → done with the texts of clarification Q2; `NocturneGardenProgress` "3 when at most the certified
   smallest move count, 2 when at most that + 2, else 1" by moves made (action records, undone ones included), frontier,
   best moves made; `dailyLevel(year:month:day:)` "(days from 2026-01-01 × 71) mod 100 + 1, negative day counts
