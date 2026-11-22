@@ -42,9 +42,11 @@ multipliers are 37, 41, 43, 47, 53, 59, 61 and 67.
 - Q: How is a hint computed and what does each level reveal? → A: the plan comes from the current state. A won play has
   no hint; a failed play's hint is "Undo the last move or retry the level." While playing: the solver's bounded search
   (a new entry point) from the current blooms and sun, looking for the fewest further moves that win within the moves
-  left and the supply left: first plants only at the current sun, then a sun move followed by plants, then the removal of
-  one planted bloom (in canonical order) followed by those; within each, sequences of increasing length up to the moves
-  left. Its first move is the plan: level 1 names the move ("Plant a rose", "Set the sun to 3 of 4", "Remove bloom 2"),
+  left and the supply left: for each total length from 1 up to the moves left: the allowed elevations ascending as the
+  certification orders them (the current sun with plants only, another with a sun move first), then the removal of one
+  planted bloom (canonical order) followed by those (corrected during implementation, 2026-11-22: the literal order —
+  all plants-only lengths before any sun move — spent over the work bound on levels 36, 38 and 40; the fewest moves
+  are still found). Its first move is the plan: level 1 names the move ("Plant a rose", "Set the sun to 3 of 4", "Remove bloom 2"),
   level 2 adds the size and sun ("Plant a rose of size 2 under sun 3 of 4"), level 3 adds the exact cell ("… at column
   5, row 1"). When no plan is found within the bound: "No way to match the target was found in the moves left: undo the
   last move or retry the level." Hints never change the state, are unlimited, do not affect stars and reset to level 1

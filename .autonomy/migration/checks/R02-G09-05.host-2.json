@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "NocturneGardenHintsTests|NocturneGardenSolverTests|NocturneGardenInvariantTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'NocturneGardenHintsTests|NocturneGardenSolverTests|NocturneGardenInvariantTests'",
+  "elapsed_seconds": 20.634,
+  "exit_code": 0,
+  "finished": "2026-11-22T22:13:37+00:00",
+  "gate": "R02-G09-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G09-05.host-2.log",
+  "log_sha256": "9013ba1dd93fbeb8c4803df3a7fdafe952a0d0be7f85a851a128c80c9e1c3f56",
+  "name": "host-2",
+  "started": "2026-11-22T22:13:17+00:00",
+  "timed_out": false
+}

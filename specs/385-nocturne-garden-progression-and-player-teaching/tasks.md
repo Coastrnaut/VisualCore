@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G0905-002 [P] [US2] [US3] Add `solve(_:from:sun:movesLeft:supplyLeft:workBound:)` to
+- [X] T-R02G0905-002 [P] [US2] [US3] Add `solve(_:from:sun:movesLeft:supplyLeft:workBound:)` to — Verified 2026-11-22: host-2 exit=0 (25 tests: NocturneGardenHintsTests 7 — following exact hints from the opening wins all 100 levels at their certified move counts (max work 12,404), 200 seeded states get legal hints that win where a plan exists, a spoiling bloom is hinted away, hint texts per level, hints follow the stage, 500 seeded failures explained; solver and invariant suites unchanged; the search orders elevations as certification does (spec Q1 corrected); agent B's files retested by the lead)
   `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSolver.swift` (the solver's bounded depth-first search started at the given blooms and sun,
   looking for the fewest further moves within the moves and supply left: plants at the current sun, then a sun move
   first, then the removal of one planted bloom (canonical order) first; `solve(_:workBound:)` unchanged) and create
