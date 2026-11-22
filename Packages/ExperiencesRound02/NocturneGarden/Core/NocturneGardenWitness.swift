@@ -117,13 +117,15 @@ public struct NocturneGardenWitness: Sendable, Equatable, Codable {
 
     /// Decodes a stored witness and re-verifies it: the stored actions are replayed on a fresh play, the lower bound is
     /// recomputed with ``NocturneGardenSolver/lowerBound(_:)``, the difficulty is recomputed with the stored solver
-    /// work, and every stored value must equal the rebuilt one.
+    /// work, every stored value must equal the rebuilt one, and the solver run again must find the stored actions with
+    /// the stored work.
     ///
     /// - Throws: `.newerSchema(s)` above ``schema``; `.malformed("schema")` for a schema below 1;
     ///   `.malformed("unreadable")` for damaged JSON, missing keys or values of the wrong type; `.witness("level")` for
     ///   a level the level rules refuse (an edited field breaks its fingerprint); any part ``make(_:)`` names; and
     ///   `.witness(part)` with `"digests"`, `"fingerprints"`, `"smallest"`, `"bound"`, `"near-miss"` or `"difficulty"`
-    ///   for a stored value the rebuild does not reproduce.
+    ///   for a stored value the rebuild does not reproduce; `.witness("solution")` when the solver, run again on the
+    ///   level, does not find exactly the stored actions with the stored work.
     public static func decode(_ data: Data) throws(NocturneGardenError) -> Self {
         struct Probe: Decodable { let schema: Int }
         let probe: Probe
@@ -146,6 +148,10 @@ public struct NocturneGardenWitness: Sendable, Equatable, Codable {
         guard rebuilt.bound == stored.bound else { throw .witness("bound") }
         guard rebuilt.nearMiss == stored.nearMiss else { throw .witness("near-miss") }
         guard rebuilt.difficulty == stored.difficulty else { throw .witness("difficulty") }
+        // The solver's own result (feature 382 convergence, T-R02G0902-013): the stored actions and work must be what
+        // the solver finds on the level, so an edited work count or another winning sequence is refused too.
+        guard let solution = NocturneGardenSolver.solve(stored.level), solution.actions == stored.actions,
+              solution.work == stored.difficulty.work else { throw .witness("solution") }
         return stored
     }
 

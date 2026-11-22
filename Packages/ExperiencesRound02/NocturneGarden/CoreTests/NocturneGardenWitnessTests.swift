@@ -297,6 +297,40 @@ struct NocturneGardenWitnessTests {
         #expect(refusal(edited(w) { $0.skipped = w.skipped + 1 }) == .witness("candidate"))
     }
 
+    /// Feature 382 convergence (T-R02G0902-013): decoding re-runs the solver, so an edited solver work count and a
+    /// different winning sequence of the same length (the witness's plants in another order) are refused.
+    @Test("an edited solver result is refused")
+    func editedSolverResultRefused() {
+        let w: NocturneGardenWitness = fixtures.cases[0].witness
+        let d: NocturneGardenDifficulty = w.difficulty
+        let work = NocturneGardenDifficulty(smallest: d.smallest, kinds: d.kinds, sizes: d.sizes,
+                                            sunChange: d.sunChange, targetCells: d.targetCells,
+                                            forbiddenCells: d.forbiddenCells, required: d.required, work: d.work + 1)
+        #expect(refusal(edited(w) { $0.difficulty = work }) == .witness("solution"))
+        var reordered: NocturneGardenWitness?
+        for witness in fixtures.cases.map(\.witness) where reordered == nil {
+            var plants: [NocturneGardenAction] = []
+            var others: [NocturneGardenAction] = []
+            for action in witness.actions {
+                if case .plant = action { plants.append(action) } else { others.append(action) }
+            }
+            guard plants.count >= 2 else { continue }
+            let swapped: [NocturneGardenAction] = others + plants.reversed()
+            // A consistent witness of the reordered actions: replayed digests, fingerprints and near miss, the same
+            // difficulty (the same kinds, sizes and sun change), so only the solver re-run can tell it apart.
+            guard let run = NocturneGardenWitness.replay(witness.level, actions: swapped), run.play.stage == .won,
+                  !run.endedEarly,
+                  let near = NocturneGardenWitness.counterexample(witness.level, actions: Array(swapped.dropLast()))
+            else { continue }
+            reordered = NocturneGardenWitness(number: witness.number, level: witness.level, actions: swapped,
+                                              digests: run.digests, fingerprints: run.fingerprints,
+                                              smallest: witness.smallest, bound: witness.bound, nearMiss: near,
+                                              difficulty: witness.difficulty, skipped: witness.skipped)
+        }
+        #expect(reordered != nil, "no fixture witness has two plants to reorder")
+        if let reordered { #expect(refusal(reordered) == .witness("solution")) }
+    }
+
     @Test("newer and damaged stored forms are refused")
     func newerAndDamagedRefused() {
         let w: NocturneGardenWitness = fixtures.cases[0].witness

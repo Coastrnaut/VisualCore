@@ -83,7 +83,7 @@ MVP: Story 1.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0902-013 Make `NocturneGardenWitness.decode` re-run `NocturneGardenSolver.solve` on the decoded level and
+- [X] T-R02G0902-013 Make `NocturneGardenWitness.decode` re-run `NocturneGardenSolver.solve` on the decoded level and — Verified 2026-11-22: host-6 exit=0 (93 Nocturne Garden tests; decode re-runs the solver: an edited work count and a consistent reordered witness are refused as solution; the catalog's per-band full decodes pass)
   refuse a witness whose actions or solver work differ from the solver's (`.witness("solution")`), with a test that an
   edited `difficulty.work` and a different winning sequence are refused, in
   `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenWitness.swift` and
