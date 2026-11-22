@@ -10,7 +10,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0603-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21: baseline-host, baseline-timing, baseline-round02 exit 0; rendering baseline = R02-G06-02 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G06-02's rendering runs (exit 0)
-- [ ] T-R02G0603-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `ChronoConstellatorExperience`
+- [X] T-R02G0603-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies; `ChronoConstellatorExperience` — Verified 2026-11-21: 2026-11-21: host (swift test --filter ChronoConstellator) exit 0; Core dependencies now, the Experience targets join with their sources in T-006 (as in feature 343)
   and its tests with iOS-conditioned rendering dependencies; the product) and create
   `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSceneSnapshot.swift` (snapshot per data-model.md
   with the last 24 ticks of each star's cells; `ChronoConstellatorTier` "ribbon 24/12/6 ticks, segments 4/2/1, glow shells
