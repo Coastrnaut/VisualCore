@@ -12,7 +12,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G0508-002 [P] [US1] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G0508-002 [P] [US1] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-21: 2026-11-21 host exit 0: 24 solver regression tests (100 levels in 20 groups of 5: witness level, replay with per-tick digests and fingerprints, exact certified edit set, smaller, work and win tick at the generator's depth; 12 alterations named) (.autonomy/migration/checks/R02-G05-08.host.json); lead retest
   level in ten groups of 10, "the generated level equals its witness's level; the witness's actions replay to a win at
   exactly its win tick with its per-tick digests and fingerprints; solve returns exactly the witness's edit set with its
   `smaller` count"; twelve named alterations of clarification Q2 each fail naming
