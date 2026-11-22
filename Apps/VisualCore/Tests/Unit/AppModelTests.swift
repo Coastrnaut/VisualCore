@@ -3,6 +3,7 @@
 // tiles in three sections for the fixture; a premium tile gives the notice and no session; the quality override
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
 import AuroraLoomCore
+import ChronoConstellatorCore
 import ColorfallCanyonsCore
 import Foundation
 import HueCompassCore
@@ -1670,6 +1671,138 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(carvable, pinnedCarvable, "level 1 carvable cells at the start")
         XCTAssertEqual(level.columns, pinnedColumns, "level 1 columns")
         XCTAssertEqual(ColorfallCanyonsExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Chrono Constellator in the app (feature 359, R02-G06-09; T-R02G0609-005, FR-R02G0609-003,
+    // FR-R02G0609-006; SC-R02G0609-002)
+
+    /// Chrono Constellator's registration: a candidate until X-R02-G06.
+    private func chronoConstellatorRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(ChronoConstellatorExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Chrono Constellator is a candidate")
+    }
+
+    /// FR-R02G0609-003, clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore
+    /// to their digests through the migrations (the app's migration check).
+    func testTheChronoConstellatorRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try chronoConstellatorRegistration()
+        XCTAssertEqual(ChronoConstellatorExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(ChronoConstellatorExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(ChronoConstellatorExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G0609-006, clarification Q5: without `-vcCandidates` Chrono Constellator is a candidate only: in
+    /// `candidates`, outside `all`, listed in the bundled catalog as not available, without a tile and not opened.
+    func testChronoConstellatorIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(ChronoConstellatorExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g06.chrono-constellator")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G0609-003, SC-R02G0609-002: with `-vcCandidates` Chrono Constellator is shown, opens through the registry
+    /// and engine with seed 0 (level 1), and level 1 is won by its certified witness actions
+    /// (`ChronoConstellatorExperienceCore.certifiedActions(1)`) sent as `star.phase [star, phase]` and
+    /// `time.step [ticks]`; the win opens level 2 and `level.next` plays it.
+    func testChronoConstellatorOpensAsACandidateAndLevelOneIsWonByItsCertifiedWitness() async throws {
+        let registration = try chronoConstellatorRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["star.phase", "time.step", "level.next"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(ChronoConstellatorExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<ChronoConstellatorExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        let actions: [ChronoConstellatorAction] = ChronoConstellatorExperienceCore.certifiedActions(1)
+        XCTAssertFalse(actions.isEmpty)
+        for action in actions {
+            let control: String
+            let values: [Double]
+            switch action {
+            case .phase(let star, let phase):
+                control = "star.phase"
+                values = [Double(star), Double(phase)]
+            case .step(let ticks):
+                control = "time.step"
+                values = [Double(ticks)]
+            default:
+                XCTFail("level 1's certified actions are phase changes and one step, not \(action)")
+                return
+            }
+            XCTAssertEqual(engine.handle(control: control, values: values), .accepted, "\(control) \(values)")
+        }
+        XCTAssertEqual(engine.outcome?.code, ChronoConstellatorExperienceCore.wonCode)
+        XCTAssertEqual(ChronoConstellatorExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, ChronoConstellatorStage.won)
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `CR` (their own literals, which this
+    /// target cannot import); the same literals equal the Core's certified level 1: witness actions phase(0, 8),
+    /// step 145; certified smallest 1; two stars with default phases 7 and 3, loop lengths 10 and 6, certified phases
+    /// 8 and 3; 6 columns; tick limit 145. Seed 0 opens level 1.
+    func testChronoConstellatorLevelOneEqualsTheCore() throws {
+        let pinnedActions: [ChronoConstellatorAction] = [.phase(0, 8), .step(145)]
+        let pinnedSmallest: Int = 1
+        let pinnedDefaultPhases: [Int] = [7, 3]
+        let pinnedLoopLengths: [Int] = [10, 6]
+        let pinnedCertifiedPhases: [Int] = [8, 3]
+        let pinnedColumns: Int = 6
+        let pinnedTickLimit: Int = 145
+        let certified = try ChronoConstellatorExperienceCore.generated(number: 1)
+        let level = certified.level
+        XCTAssertEqual(ChronoConstellatorExperienceCore.certifiedActions(1), pinnedActions, "level 1 witness actions")
+        XCTAssertEqual(certified.solution.lowerBound, pinnedSmallest, "level 1 smallest")
+        var defaultPhases: [Int] = []
+        var loopLengths: [Int] = []
+        for star in level.stars {
+            defaultPhases.append(star.phase)
+            loopLengths.append(star.length)
+        }
+        XCTAssertEqual(defaultPhases, pinnedDefaultPhases, "level 1 default phases")
+        XCTAssertEqual(loopLengths, pinnedLoopLengths, "level 1 loop lengths")
+        XCTAssertEqual(certified.solution.phases, pinnedCertifiedPhases, "level 1 certified phases")
+        XCTAssertEqual(level.columns, pinnedColumns, "level 1 columns")
+        XCTAssertEqual(level.tickLimit, pinnedTickLimit, "level 1 tick limit")
+        XCTAssertEqual(ChronoConstellatorExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
