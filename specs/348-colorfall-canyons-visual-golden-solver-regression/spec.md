@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-21
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G05-08 (migration ledger, game feature of experience R02-G05) · ID namespace FR-R02G0508-###,
 SC-R02G0508-###, T-R02G0508-###
@@ -21,6 +21,59 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** frame time and memory on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 338 (Hue Compass's visual golden and solver regression).
+
+## Clarifications
+
+### Session 2026-11-21
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+338's answers where the games agree. Facts checked in code (read-only audit, 2026-11-21): `ColorfallCanyonsSolver.solve`
+tries edit sets of size 0 … 3 in a fixed order, counting distinct routings simulated (`work`) and those of fewer edits
+than the smallest (`smaller`); the 100 witness files hold the level, the actions, per-tick digests, fingerprints, the
+win tick, `smaller`, the near miss, the unedited run, totals and the difficulty, and are byte-checked by
+`ColorfallCanyonsCatalogTests` (a band of 20 levels' solver runs took 3 … 15 s on the debug host, so those tests run in
+halves); the simulator frame checks of feature 343 compare rendered frames with the CPU reference at 1,152 × 768 (each
+flowing emitter top lit within 3 px by at least 0.15 over night, every dry front-row open cell's top centre and at least
+80 % of all open cells at least 0.1 in luminance from night, the corners within 0.05 of night); a memory warning
+releases the scene's GPU objects; the CI host job runs all round-two host tests and has a named regression step per
+earlier round-two game; `scripts/xcodebuild_package.py` runs simulator tests with `--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win at exactly its win tick with exactly its per-tick digests and fingerprints; and `solve` returns exactly
+  the witness's edit set (the certified smallest), with `smaller` equal to the witness's count and the win tick equal.
+  Work is counted, never timed. The run is split into tests of 10 levels so each stays short. Impact: FR-R02G0508-001;
+  SC-R02G0508-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a cell height, a cell ground, a spring's colour, the
+  flow rate, the budget, the tick limit, a basin's target share, a basin's wrong-mass tolerance; a solution edit; a
+  witness action, a per-tick digest; the level fingerprint. Impact: FR-R02G0508-002; SC-R02G0508-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after its witness's edits and 12 ticks so fluid shows, at
+  presentation time 0 and the authored camera, plus the hero frame of the scenario manifest's hero scenario at tier 0:
+  16 frames) the Core computes, at 1,152 × 768, the projected pixel positions of every cell's top centre, every spring
+  emitter top, every basin centre and every wet cell's sheet top centre, rounded to 1/8 pixel, and the expected colours
+  as 8-bit sRGB (night, sandstone, rock, pearl, cyan, coral, yellow and each wet cell's fluid mix); serialized as JSON
+  with sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
+  `Packages/ExperiencesRound02/ColorfallCanyons/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every colour must be
+  equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal the digest
+  of its pinned description. The file is rewritten only when `COLORFALL_CANYONS_WRITE_GOLDEN=1` is set. The simulator
+  test renders the 16 frames and checks them against the same descriptions with the feature-343 tolerances. Impact:
+  FR-R02G0508-003, 004; SC-R02G0508-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_COLORFALL_CANYONS_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no renderers
+  of its own (a test-visible count is 0) and the next frame rebuilds them. An unavailable footprint fails with a named
+  reason. Impact: FR-R02G0508-005; SC-R02G0508-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's host job keeps running all round-two host
+  tests and adds a named step "Colorfall Canyons regression (host)" that runs the Colorfall Canyons regression filter
+  alone. The local command `python3 scripts/colorfall_canyons_regression.py` runs the host regression filter and then the
+  simulator regression test classes through `xcodebuild_package.py --only-testing`, and prints one summary line per part
+  with pass or fail and the first failing name; its exit code is non-zero on any failure. Nothing is timed against the
+  wall clock. Impact: FR-R02G0508-006, 007; SC-R02G0508-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -126,7 +179,7 @@ simulator parts and reports one summary.
 
 - **SC-R02G0508-001**: All 100 levels replay their witnesses and re-solve to their certified smallest edit set with
   exactly the certified work (distinct routings simulated); 100 of 100.
-- **SC-R02G0508-002**: Each kind of alteration of clarification Q2 is detected and named.
+- **SC-R02G0508-002**: Each of the 12 kinds of alteration of clarification Q2 is detected and named.
 - **SC-R02G0508-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry (equal digest, or
   within one 1/8-pixel quantum with equal colours).
