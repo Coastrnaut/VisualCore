@@ -38,7 +38,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G0905-004 Edit `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenExperienceCore.swift` (controls `level.select [1 … 100]`, `mode.daily
+- [X] T-R02G0905-004 Edit `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenExperienceCore.swift` (controls `level.select [1 … 100]`, `mode.daily — Verified 2026-11-22: host-4 exit=0 (179 Nocturne Garden host tests: adapter controls level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss with r02-g09.locked and r02-g09.date, practice budget 40, campaign win opens the next level with stars, daily records without unlocking, schema 2 round trip and migration from schema 1, newer schema refused, digest carries progress and mode but not the tutorial; scenario manifest regenerated; agent F's files retested by the lead)
   [year, month, day]`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`; codes `r02-g09.locked`,
   `r02-g09.date`; practice budget 40 on a copy of the level, no stars, no unlocks; a daily win records the level's best
   result and stars and opens nothing; progress and mode in the digest, the tutorial step snapshotted but not digested;

@@ -4,11 +4,21 @@
 // levels 1, 2, 100 and 1); every control is accepted when legal and refused with the state unchanged otherwise (the
 // engine's range checks, `r02-g09.not-whole`, the kernel's `r02-g09.action`, `supply`, `noop` and `stage`); undo
 // restores the earlier digest exactly and redo the later one; the certified solution wins, a leak and the budget fail,
-// undo returns a failed play to playing; `level.next` wraps 100 to 1 and reset returns; the snapshot round trip and
-// refused payloads (damaged, level out of range, a trace of another level, a record of a newer schema, an envelope of a
-// newer schema); the certified-candidate table equals the 100 stored witnesses' `skipped` and the directly certified
-// levels equal the stored ones; `snapshot(time:)` mirrors the play. Fixture seed 2_383. Levels are certified once per
-// process, so the run stays short. Explicit types, plain loops.
+// undo returns a failed play to playing; `level.next` wrapped 100 to 1 (feature 385: no longer) and reset returns; the
+// snapshot round trip and refused payloads (damaged, level out of range, a trace of another level, a record of a newer
+// schema, an envelope of a newer schema); the certified-candidate table equals the 100 stored witnesses' `skipped` and
+// the directly certified levels equal the stored ones; `snapshot(time:)` mirrors the play. Fixture seed 2_383. Levels
+// are certified once per process, so the run stays short. Explicit types, plain loops.
+//
+// Feature 385 (R02-G09-05) T-R02G0905-004: schema 2 and the progression controls — `level.select`, `mode.daily`,
+// `mode.practice`, `mode.campaign` and `tutorial.dismiss` with their refusals (`r02-g09.locked`, `r02-g09.date`, wrong
+// value counts); `level.next` moves to the next open level only (100 no longer wraps); a campaign win records stars by
+// moves made (move-and-undo detours included) and opens the next level, a daily win opens nothing (a locked daily level
+// is playable) and practice (budget 40, a fresh play) records nothing; `mode.campaign` returns; the tutorial is
+// dismissed and advances on accepted moves, never back on undo, and is not digested; the schema-2 round trip, the
+// migration of a schema-1 payload (directly and through the engine's migration chain), damaged progress or mode (a
+// daily mode naming another level among them) refused and an envelope of a newer schema (3) refused. Fixture seed
+// 2_385 for this feature.
 import Foundation
 import Testing
 @testable import NocturneGardenCore
@@ -27,6 +37,8 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
 
     /// The fixture seed of this feature.
     static let fixtureSeed: UInt64 = 2_383
+    /// The fixture seed of feature 385.
+    static let progressionSeed: UInt64 = 2_385
 
     /// The digest of `core` as the engine computes it.
     static func digest(_ core: Core) throws -> StateDigest {
@@ -73,8 +85,8 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
 
     @Test func conformance() async throws {
         let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
-        // Levels 1 and 2 (and 2 and 3 for the restore engine): a sun change, undo and redo, another sun change, undo,
-        // a plant, then level.next and a sun change.
+        // Levels 1 and 2: a sun change, undo and redo, another sun change, undo, a plant, then level.next (refused
+        // since feature 385 while the next level is locked) and a sun change.
         let actions: [ScriptedAction] = [ScriptedAction("sun.set", [3]),
                                          ScriptedAction("play.undo"), ScriptedAction("play.redo"),
                                          ScriptedAction("sun.set", [2]), ScriptedAction("play.undo"),
@@ -95,7 +107,10 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
                                           ScriptedAction("bloom.remove", [0]),
                                           ScriptedAction("sun.set", [1]), ScriptedAction("sun.set", [2]),
                                           ScriptedAction("play.undo"), ScriptedAction("play.redo"),
-                                          ScriptedAction("level.next", [1]), ScriptedAction("bogus")]
+                                          ScriptedAction("level.next", [1]), ScriptedAction("level.select", []),
+                                          ScriptedAction("mode.daily", [2026, 1]),
+                                          ScriptedAction("mode.practice", [1]), ScriptedAction("mode.campaign", [1]),
+                                          ScriptedAction("tutorial.dismiss", [1]), ScriptedAction("bogus")]
         let plan = ConformancePlan(seeds: [0, 1], stepsPerSegment: 2, actions: actions, rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
         #expect(report.entries.count == ConformanceCheck.allCases.count)
@@ -103,22 +118,28 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g09.nocturne-garden" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g09.nocturne-garden.v1")
+        #expect(Core.experienceID == "r02-g09.nocturne-garden" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g09.nocturne-garden.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["bloom.plant", "bloom.move", "bloom.resize", "bloom.remove", "sun.set", "play.undo",
-                             "play.redo", "level.next"]
+                             "play.redo", "level.next", "level.select", "mode.daily", "mode.practice",
+                             "mode.campaign", "tutorial.dismiss"]
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [0...5, 0...31, 0...23, 1...3])
         #expect(Core.controls[1].ranges == [0...11, 0...31, 0...23])
         #expect(Core.controls[2].ranges == [0...11, 1...3])
         #expect(Core.controls[3].ranges == [0...11])
         #expect(Core.controls[4].ranges == [1...4])
-        let plainIndices: [Int] = [5, 6, 7]
+        #expect(Core.controls[8].ranges == [1...100])
+        #expect(Core.controls[9].ranges == [1...9_999, 1...12, 1...31])
+        let plainIndices: [Int] = [5, 6, 7, 10, 11, 12]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         for kind in NocturneGardenKind.allCases { #expect(Core.kind(kind.order) == kind) }
         #expect(Core.kind(-1) == nil && Core.kind(6) == nil)
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 1)
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
+        #expect(Core.practiceBudget == 40 && Core.practiceBudget == NocturneGardenMode.practiceBudget)
+        #expect(NocturneGardenExperienceRule.locked == "r02-g09.locked")
+        #expect(NocturneGardenExperienceRule.date == "r02-g09.date")
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == NocturneGardenTier.all.map(\.name))
@@ -200,7 +221,13 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
                                            Self.act("sun.set", [5]), Self.act("sun.set", [2.5]),
                                            Self.act("play.undo"), Self.act("play.redo"),
                                            Self.act("play.undo", [1]), Self.act("level.next", [1]),
-                                           Self.act("nope")]
+                                           Self.act("level.next"), Self.act("level.select", [2]),
+                                           Self.act("level.select", [0]), Self.act("level.select", [1.5]),
+                                           Self.act("level.select", []), Self.act("mode.daily", [2027, 2, 29]),
+                                           Self.act("mode.daily", [2026, 13, 1]), Self.act("mode.daily", [2026, 4, 31]),
+                                           Self.act("mode.daily", [2026, 1, 0]), Self.act("mode.daily", [2026, 11]),
+                                           Self.act("mode.practice", [1]), Self.act("mode.campaign", [1]),
+                                           Self.act("tutorial.dismiss", [1]), Self.act("nope")]
         for action in illegal {
             var copy: Core = core
             let result: ActionResult = copy.apply(action)
@@ -220,7 +247,29 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(probe.apply(Self.act("bloom.remove")) == .rejected(.wrongValueCount(expected: 1, found: 0)))
         #expect(probe.apply(Self.act("play.undo", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
         #expect(probe.apply(Self.act("level.next", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        #expect(probe.apply(Self.act("level.select", [])) == .rejected(.wrongValueCount(expected: 1, found: 0)))
+        #expect(probe.apply(Self.act("level.select", [1, 2])) == .rejected(.wrongValueCount(expected: 1, found: 2)))
+        #expect(probe.apply(Self.act("level.select", [101])) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.act("level.select", [0])) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.act("mode.daily", [2026, 11])) == .rejected(.wrongValueCount(expected: 3, found: 2)))
+        #expect(probe.apply(Self.act("mode.daily", [2026, 13, 1])) == .rejected(.outOfRange(index: 1)))
+        #expect(probe.apply(Self.act("mode.daily", [2026, 1, 32])) == .rejected(.outOfRange(index: 2)))
+        #expect(probe.apply(Self.act("mode.daily", [0, 1, 1])) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.act("mode.practice", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        #expect(probe.apply(Self.act("mode.campaign", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        #expect(probe.apply(Self.act("tutorial.dismiss", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        let locked: ActionResult = .rejected(.rule(code: NocturneGardenExperienceRule.locked))
+        #expect(probe.apply(Self.act("level.next")) == locked)
+        #expect(probe.apply(Self.act("level.select", [2])) == locked)
+        let date: ActionResult = .rejected(.rule(code: NocturneGardenExperienceRule.date))
+        #expect(probe.apply(Self.act("mode.daily", [2027, 2, 29])) == date)
+        #expect(probe.apply(Self.act("mode.daily", [2026, 4, 31])) == date)
+        #expect(probe.apply(Self.act("mode.daily", [2026, 2, 30])) == date)
+        // Day 0 lies outside the declared day range 1 … 31: the engine refuses it before the calendar check.
+        #expect(probe.apply(Self.act("mode.daily", [2026, 1, 0])) == .rejected(.outOfRange(index: 2)))
         let notWhole: ActionResult = .rejected(.rule(code: NocturneGardenExperienceRule.notWhole))
+        #expect(probe.apply(Self.act("level.select", [1.5])) == notWhole)
+        #expect(probe.apply(Self.act("mode.daily", [2026, 1, 1.5])) == notWhole)
         #expect(probe.apply(Self.act("bloom.plant", [0, 0.5, 0, 2])) == notWhole)
         #expect(probe.apply(Self.act("bloom.resize", [0, 1.5])) == notWhole)
         #expect(probe.apply(Self.act("sun.set", [2.5])) == notWhole)
@@ -335,9 +384,15 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
             #expect(core.apply(Self.act("play.redo")) == stageCode)
             #expect(core.apply(Self.act("sun.set", [Double(level.sun)])) == stageCode)
             #expect(core == won)
-            #expect(core.apply(Self.act("level.next")) == .accepted)
-            let next: Int = number % 100 + 1
-            #expect(core.play.stage == .playing && core.levelNumber == next && core.outcome == nil)
+            // Feature 385: the campaign win opened the next level; level 100 has none (no wrap).
+            if number < 100 {
+                #expect(core.progress.frontier == number + 1)
+                #expect(core.apply(Self.act("level.next")) == .accepted)
+                #expect(core.play.stage == .playing && core.levelNumber == number + 1 && core.outcome == nil)
+            } else {
+                #expect(core.progress.frontier == 100)
+                #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: NocturneGardenExperienceRule.locked)))
+            }
             core.reset()
             #expect(core.levelNumber == number && core.play.records.isEmpty && core.play.stage == .playing)
         }
@@ -369,25 +424,287 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(failed.play.stage == .playing && failed.play.failure == nil && retried == before)
     }
 
-    @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+    /// Feature 385: `level.next` moves to the next open level only (a locked next level is refused, 100 does not wrap);
+    /// a selected open level opens fresh; reset returns to the seed's opening state, progress included.
+    @Test func nextLevelNeedsAnOpenLevelAndResetReturnsToTheSeedsLevel() async throws {
         var core: Core = try await Core.prepare(seed: 40)
-        #expect(core.levelNumber == 41)
+        #expect(core.levelNumber == 41 && core.progress.frontier == 41 && core.mode == .campaign)
         let sun: ExperienceAction = try #require(Self.neutralSun(core))
         #expect(core.apply(sun) == .accepted)
+        let before: StateDigest = try Self.digest(core)
+        let locked: ActionResult = .rejected(.rule(code: NocturneGardenExperienceRule.locked))
+        let moved: Core = core
+        #expect(core.apply(Self.act("level.next")) == locked)
+        #expect(core.apply(Self.act("level.select", [42])) == locked)
+        let lockedDigest: StateDigest = try Self.digest(core)
+        #expect(core == moved && lockedDigest == before)
+        #expect(core.apply(Self.act("level.select", [12])) == .accepted)
+        #expect(core.levelNumber == 12 && core.play.records.isEmpty && core.mode == .campaign)
+        let twelve: NocturneGardenLevel = try Core.level(number: 12)
+        #expect(core.play.level == twelve && core.tutorial == .done)
         #expect(core.apply(Self.act("level.next")) == .accepted)
-        #expect(core.levelNumber == 42 && core.play.records.isEmpty && core.play.stage == .playing)
+        #expect(core.levelNumber == 13 && core.play.stage == .playing && core.play.records.isEmpty)
         core.reset()
         let fresh: Core = try await Core.prepare(seed: 40)
         let resetDigest: StateDigest = try Self.digest(core)
         let freshDigest: StateDigest = try Self.digest(fresh)
         #expect(core == fresh && resetDigest == freshDigest)
-        // The wrap: level 100 → 1.
+        // No wrap: level 100 has no next level.
         var last: Core = try Core.opening(number: 100)
-        #expect(last.apply(Self.act("level.next")) == .accepted)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(last.levelNumber == 1 && last == first)
+        #expect(last.progress.frontier == 100)
+        #expect(last.apply(Self.act("level.next")) == locked)
         last.reset()
         #expect(last.levelNumber == 100)
+    }
+
+    /// Applies `actions` to `core`, each accepted, after `detours` detours of (the first action, undo); returns the
+    /// moves made.
+    static func win(_ core: inout Core, actions: [NocturneGardenAction], detours: Int) -> Int {
+        guard let first = actions.first else { return 0 }
+        for _ in 0..<detours {
+            #expect(core.apply(Self.act(first)) == .accepted)
+            #expect(core.play.stage == .playing)
+            #expect(core.apply(Self.act("play.undo")) == .accepted)
+        }
+        for action in actions { #expect(core.apply(Self.act(action)) == .accepted) }
+        #expect(core.play.stage == .won)
+        return NocturneGardenProgress.movesMade(core.play)
+    }
+
+    /// Feature 385 (clarification Q3): a campaign win records the moves made (undone moves included) and its stars,
+    /// keeps the better result and opens the next level.
+    @Test func aCampaignWinRecordsStarsByMovesMade() throws {
+        let first: NocturneGardenGenerated = try Core.generated(number: 1)
+        let second: NocturneGardenGenerated = try Core.generated(number: 2)
+        let smallest: Int = first.solution.smallest
+        var core: Core = try Core.opening(number: 1)
+        #expect(core.certifiedSmallest == smallest && core.progress.solved.isEmpty && core.progress.frontier == 1)
+        // Two detours: smallest + 2 moves made, 2 stars; level 2 opens.
+        let twoDetours: Int = Self.win(&core, actions: first.solution.actions, detours: 2)
+        #expect(twoDetours == smallest + 2 && core.play.moves == smallest)
+        #expect(core.progress.solved[1] == NocturneGardenProgress.Result(movesMade: smallest + 2, stars: 2))
+        #expect(core.progress.frontier == 2 && core.outcome?.code == Core.wonCode)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        #expect(core.levelNumber == 2 && core.mode == .campaign && core.play.records.isEmpty)
+        // Level 1 again without a detour: the better result (3 stars) replaces the stored one.
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
+        let noDetour: Int = Self.win(&core, actions: first.solution.actions, detours: 0)
+        #expect(noDetour == smallest)
+        #expect(core.progress.solved[1] == NocturneGardenProgress.Result(movesMade: smallest, stars: 3))
+        // A worse result (three detours, 1 star) keeps it.
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
+        let threeDetours: Int = Self.win(&core, actions: first.solution.actions, detours: 3)
+        #expect(threeDetours == smallest + 3)
+        #expect(core.progress.solved[1] == NocturneGardenProgress.Result(movesMade: smallest, stars: 3))
+        #expect(core.progress.frontier == 2)
+        // Level 2 with three detours: 1 star; level 3 opens.
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        let secondMoves: Int = Self.win(&core, actions: second.solution.actions, detours: 3)
+        #expect(core.progress.solved[2] == NocturneGardenProgress.Result(movesMade: secondMoves, stars: 1))
+        #expect(secondMoves == second.solution.smallest + 3 && core.progress.frontier == 3)
+    }
+
+    /// Feature 385 (clarification Q4): daily mode opens nothing and plays a locked level; practice is a fresh play with
+    /// the budget 40 that records nothing; `mode.campaign` returns.
+    @Test func dailyPracticeAndCampaignModes() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.mode == .campaign && core.progress.frontier == 1 && core.tutorial == .plant)
+        let date: ActionResult = .rejected(.rule(code: NocturneGardenExperienceRule.date))
+        let opening: Core = core
+        #expect(core.apply(Self.act("mode.daily", [2027, 2, 29])) == date)
+        #expect(core == opening)
+        let daily: Int = try #require(NocturneGardenProgress.dailyLevel(year: 2026, month: 1, day: 2))
+        #expect(daily == 72)
+        #expect(core.apply(Self.act("mode.daily", [2026, 1, 2])) == .accepted)
+        #expect(core.mode == .daily(level: daily) && core.levelNumber == daily && core.progress.frontier == 1)
+        #expect(!core.progress.isOpen(daily) && core.tutorial == .done && core.play.records.isEmpty)
+        let dailyCertified: NocturneGardenGenerated = try Core.generated(number: daily)
+        #expect(core.play.level == dailyCertified.level && core.certifiedSmallest == dailyCertified.solution.smallest)
+        // A daily win on a locked level records its stars but opens nothing.
+        var dailyWin: Core = core
+        _ = Self.win(&dailyWin, actions: dailyCertified.solution.actions, detours: 0)
+        #expect(dailyWin.progress.solved[daily]?.stars == 3 && dailyWin.progress.frontier == 1)
+        #expect(dailyWin.apply(Self.act("level.next")) == .rejected(.rule(code: NocturneGardenExperienceRule.locked)))
+        // Practice of the daily level: the same level fresh with the budget 40.
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.mode == .practice && core.levelNumber == daily && core.play.level.budget == Core.practiceBudget)
+        // Campaign returns to the frontier when the current level is not open.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.tutorial == .plant)
+
+        // Practice on level 1 after a move: a fresh play of the practice copy; a win records nothing, opens nothing.
+        let certified: NocturneGardenGenerated = try Core.generated(number: 1)
+        let sun: ExperienceAction = try #require(Self.neutralSun(core))
+        #expect(core.apply(sun) == .accepted)
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.play.records.isEmpty && core.play.moves == 0 && core.play.stage == .playing)
+        let practiced: NocturneGardenLevel = core.play.level
+        #expect(practiced.budget == 40 && certified.level.budget < 40)
+        #expect(practiced.target == certified.level.target && practiced.forbidden == certified.level.forbidden)
+        #expect(practiced.supply == certified.level.supply && practiced.sizes == certified.level.sizes)
+        #expect(practiced.elevations == certified.level.elevations && practiced.sun == certified.level.sun)
+        #expect(practiced.required == certified.level.required && practiced.id == certified.level.id)
+        #expect(practiced.leakAllowance == certified.level.leakAllowance && practiced.tutorial == certified.level.tutorial)
+        #expect(core.tutorial == .plant && core.levelNumber == 1)
+        #expect(core.snapshot(time: 0).budget == 40)
+        _ = Self.win(&core, actions: certified.solution.actions, detours: 0)
+        #expect(core.progress.solved.isEmpty && core.progress.frontier == 1)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: NocturneGardenExperienceRule.locked)))
+        // Campaign returns to level 1 with its certified budget, fresh.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.play.level == certified.level && core.play.records.isEmpty)
+        #expect(core.levelNumber == 1 && core.progress.solved.isEmpty)
+        // The progression seed: daily mode from level 86 (seed 2_385) to the date's level, practice keeps the level.
+        var seeded: Core = try await Core.prepare(seed: Self.progressionSeed)
+        #expect(seeded.levelNumber == 86 && seeded.progress.frontier == 86)
+        #expect(seeded.apply(Self.act("mode.practice")) == .accepted)
+        #expect(seeded.levelNumber == 86 && seeded.play.level.budget == 40 && seeded.mode == .practice)
+        #expect(seeded.apply(Self.act("level.select", [86])) == .accepted)
+        let eightySix: NocturneGardenLevel = try Core.level(number: 86)
+        #expect(seeded.mode == .campaign && seeded.play.level == eightySix)
+    }
+
+    /// Feature 385 (clarification Q2): the tutorial starts on levels 1 … 3, advances on accepted moves, ends with the
+    /// level, never moves back on undo or redo, can be dismissed, and is not part of the digest.
+    @Test func theTutorialAdvancesIsDismissedAndIsNotDigested() async throws {
+        for number in 1...3 {
+            let generated: NocturneGardenGenerated = try Core.generated(number: number)
+            var core: Core = try Core.opening(number: number)
+            #expect(core.tutorial == .plant, "level \(number)")
+            var seen: [NocturneGardenTutorialStep] = [core.tutorial]
+            for action in generated.solution.actions {
+                #expect(core.apply(Self.act(action)) == .accepted)
+                if seen.last != core.tutorial { seen.append(core.tutorial) }
+            }
+            var expected: [NocturneGardenTutorialStep] = [.plant, .shape, .finish, .done]
+            if generated.solution.actions.count == 2 { expected = [.plant, .shape, .done] }
+            if generated.solution.actions.count == 1 { expected = [.plant, .done] }
+            #expect(seen == expected, "level \(number): \(seen)")
+            #expect(core.play.stage == .won && core.tutorial == .done)
+        }
+        let four: Core = try Core.opening(number: 4)
+        #expect(four.tutorial == .done)
+        // Undo and redo never move the step; the digest ignores the step.
+        var core: Core = try Core.opening(number: 1)
+        let fresh: Core = core
+        let freshDigest: StateDigest = try Self.digest(fresh)
+        let sun: ExperienceAction = try #require(Self.neutralSun(core))
+        #expect(core.apply(sun) == .accepted)
+        #expect(core.tutorial == .shape)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        #expect(core.tutorial == .shape && core.play.elevation == fresh.play.elevation)
+        #expect(try Self.digest(core) == freshDigest)
+        #expect(core != fresh)
+        #expect(core.apply(Self.act("play.redo")) == .accepted)
+        #expect(core.tutorial == .shape)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        #expect(core.apply(sun) == .accepted)
+        #expect(core.tutorial == .finish)
+        // A failing end ends it: the budget spent on sun changes.
+        var failing: Core = try Core.opening(number: 2)
+        for _ in 0..<failing.play.level.budget {
+            let change: ExperienceAction = try #require(Self.neutralSun(failing))
+            #expect(failing.apply(change) == .accepted)
+        }
+        #expect(failing.play.stage == .failed && failing.tutorial == .done)
+        // Dismissal ends it; later moves keep it ended; the digest is unchanged by the dismissal.
+        var dismissed: Core = try await Core.prepare(seed: 0)
+        let before: StateDigest = try Self.digest(dismissed)
+        #expect(dismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        let dismissedDigest: StateDigest = try Self.digest(dismissed)
+        #expect(dismissed.tutorial == .done && dismissedDigest == before)
+        #expect(dismissed.apply(sun) == .accepted)
+        #expect(dismissed.tutorial == .done)
+        var undismissed: Core = try await Core.prepare(seed: 0)
+        #expect(undismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(undismissed.apply(sun) == .accepted && undismissed == dismissed)
+        // Reopening a tutorial level restarts the tutorial at its initial step.
+        #expect(dismissed.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(dismissed.tutorial == .plant)
+    }
+
+    /// Feature 385: a schema-1 payload migrates to schema 2 (the levels up to the saved level open, campaign mode, the
+    /// tutorial at its initial step).
+    @Test func aSchemaOnePayloadMigrates() throws {
+        var core: Core = try Core.opening(number: 7)
+        let sun: ExperienceAction = try #require(Self.neutralSun(core))
+        #expect(core.apply(sun) == .accepted)
+        let records: Data = try JSONEncoder().encode(core.play.records)
+        let recordsText: String = String(decoding: records, as: UTF8.self)
+        let schemaOne: String = "{\"level\":7,\"records\":" + recordsText + "}"
+        let object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: Data(schemaOne.utf8)) as? [String: Any])
+        let migrated: [String: Any] = try Core.migratedToSchemaTwo(object)
+        #expect(migrated["tutorial"] == nil)
+        let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 6)
+        #expect(restored.levelNumber == 7 && restored.play == core.play)
+        #expect(restored.progress.frontier == 7 && restored.progress.solved.isEmpty)
+        #expect(restored.mode == .campaign && restored.tutorial == .done)
+        #expect(try Self.digest(restored) == Self.digest(core))
+        // A tutorial level starts its tutorial at the initial step.
+        let emptyTwo: [String: Any] = try Core.migratedToSchemaTwo(["level": 2, "records": [Any]()])
+        let tutorialLevel: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: emptyTwo, options: [.sortedKeys]), seed: 0)
+        #expect(tutorialLevel.levelNumber == 2 && tutorialLevel.tutorial == .plant)
+        #expect(tutorialLevel.progress.frontier == 2)
+        #expect(throws: NocturneGardenRestoreRefusal.damaged) {
+            try Core.migratedToSchemaTwo(["level": "7"])
+        }
+        #expect(throws: NocturneGardenRestoreRefusal.damaged) {
+            try Core.migratedToSchemaTwo(["level": 7])
+        }
+        #expect(Core.migrations.currentVersion == 2)
+    }
+
+    /// Feature 385: an engine restores a schema-1 envelope through the migration chain.
+    @Test func theEngineMigratesASchemaOneEnvelope() async throws {
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        var engine = ExperienceEngine<Core>(id: id)
+        try await engine.prepare(seed: 4)
+        try engine.activate()
+        var expected: Core = try Core.opening(number: 5)
+        let sun: ExperienceAction = try #require(Self.neutralSun(expected))
+        #expect(engine.handle(control: sun.control, values: sun.values) == .accepted)
+        let saved: ExperienceSnapshot = try engine.snapshot()
+        #expect(expected.apply(sun) == .accepted)
+        let records: String = String(decoding: try JSONEncoder().encode(expected.play.records), as: UTF8.self)
+        let schemaOne: String = "{\"level\":5,\"records\":" + records + "}"
+        let old = try ExperienceSnapshot(experience: id, schemaVersion: 1, seed: saved.seed,
+                                         stepIndex: saved.stepIndex, digest: saved.digest,
+                                         payload: Data(schemaOne.utf8))
+        try engine.restore(old)
+        #expect(try engine.digest() == saved.digest)
+    }
+
+    /// Feature 385: the digest carries the progress and the mode but never the tutorial step.
+    @Test func theDigestCarriesProgressAndModeButNotTheTutorial() async throws {
+        let core: Core = try await Core.prepare(seed: 0)
+        let base: StateDigest = try Self.digest(core)
+        // Progress: a level-1 win and back to level 1 fresh differs from the opening only in progress.
+        var won: Core = core
+        _ = Self.win(&won, actions: try Core.generated(number: 1).solution.actions, detours: 0)
+        #expect(won.apply(Self.act("level.select", [1])) == .accepted)
+        #expect(won.play == core.play && won.mode == core.mode && won.progress != core.progress)
+        #expect(try Self.digest(won) != base)
+        // Mode: practice differs (its level is the practice copy); campaign back restores the digest.
+        var practice: Core = core
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        #expect(try Self.digest(practice) != base)
+        #expect(practice.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(try Self.digest(practice) == base && practice == core)
+        // Tutorial: dismissing changes `==` but not the digest.
+        var dismissed: Core = core
+        #expect(dismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        let dismissedDigest: StateDigest = try Self.digest(dismissed)
+        #expect(dismissed != core && dismissedDigest == base)
+        // The fixture seed of this feature: a reset returns the opening digest after progression actions.
+        var seeded: Core = try await Core.prepare(seed: Self.progressionSeed)
+        let seededDigest: StateDigest = try Self.digest(seeded)
+        #expect(seeded.apply(Self.act("mode.daily", [2026, 11, 22])) == .accepted)
+        #expect(try Self.digest(seeded) != seededDigest)
+        seeded.reset()
+        #expect(try Self.digest(seeded) == seededDigest && seeded.mode == .campaign)
     }
 
     @Test func snapshotRestoreRoundTripAndRefusals() async throws {
@@ -401,7 +718,9 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let payload: Data = try core.snapshotPayload()
         #expect(try core.snapshotPayload() == payload)
         let text: String = try #require(String(data: payload, encoding: .utf8))
-        #expect(text.hasPrefix("{\"level\":32,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":32,\"mode\":{\"mode\":\"campaign\"},\"progress\":"
+            + "{\"frontier\":32,\"solved\":[]},\"records\":["))
+        #expect(text.hasSuffix(",\"tutorial\":\"done\"}"))
         let restored: Core = try Core.restore(payload: payload, seed: 31)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -427,12 +746,60 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(throws: NocturneGardenRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":\"32\",\"records\":[]}".utf8), seed: 31)
         }
+        // A schema-1 payload is not a schema-2 one (it migrates only through the chain).
+        #expect(throws: NocturneGardenRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("{\"level\":32,\"records\":[]}".utf8), seed: 31)
+        }
         #expect(throws: NocturneGardenRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":0").utf8),
+                             seed: 31)
         }
         #expect(throws: NocturneGardenRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":101").utf8),
+                             seed: 31)
         }
+        // Damaged progress or mode: a frontier outside 1 … 100, an unknown mode, a daily mode naming another level, an
+        // unknown tutorial step.
+        let damaged: [String] = [
+            text.replacingOccurrences(of: "\"frontier\":32", with: "\"frontier\":0"),
+            text.replacingOccurrences(of: "\"frontier\":32", with: "\"frontier\":101"),
+            text.replacingOccurrences(of: "{\"mode\":\"campaign\"}", with: "{\"mode\":\"arcade\"}"),
+            text.replacingOccurrences(of: "{\"mode\":\"campaign\"}", with: "{\"level\":5,\"mode\":\"daily\"}"),
+            text.replacingOccurrences(of: "\"tutorial\":\"done\"", with: "\"tutorial\":\"later\""),
+        ]
+        for variant in damaged {
+            #expect(variant != text)
+            #expect(throws: NocturneGardenRestoreRefusal.damaged) {
+                try Core.restore(payload: Data(variant.utf8), seed: 31)
+            }
+        }
+        // A daily mode naming its own level restores (the level may be locked in the campaign).
+        let dailyLevel: Int = try #require(NocturneGardenProgress.dailyLevel(year: 2026, month: 11, day: 22))
+        var daily: Core = core
+        #expect(daily.apply(Self.act("mode.daily", [2026, 11, 22])) == .accepted)
+        #expect(daily.levelNumber == dailyLevel && daily.mode == .daily(level: dailyLevel))
+        let dailyRestored: Core = try Core.restore(payload: try daily.snapshotPayload(), seed: 31)
+        #expect(dailyRestored == daily && dailyRestored.certifiedSmallest == daily.certifiedSmallest)
+        #expect(try Self.digest(dailyRestored) == Self.digest(daily))
+        // A practice state round-trips with its budget.
+        var practice: Core = core
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        let practiceSun: ExperienceAction = try #require(Self.neutralSun(practice))
+        #expect(practice.apply(practiceSun) == .accepted)
+        let practiceRestored: Core = try Core.restore(payload: try practice.snapshotPayload(), seed: 31)
+        #expect(practiceRestored == practice && practiceRestored.play.level.budget == 40)
+        #expect(try Self.digest(practiceRestored) == Self.digest(practice))
+        // Progress with a won level and a tutorial step round-trip.
+        var winner: Core = try Core.opening(number: 2)
+        _ = Self.win(&winner, actions: try Core.generated(number: 2).solution.actions, detours: 1)
+        let winnerRestored: Core = try Core.restore(payload: try winner.snapshotPayload(), seed: 1)
+        #expect(winnerRestored == winner && winnerRestored.progress.solved[2]?.stars == 2)
+        #expect(winnerRestored.progress.frontier == 3 && winnerRestored.tutorial == .done)
+        var teaching: Core = try Core.opening(number: 3)
+        let teachingSun: ExperienceAction = try #require(Self.neutralSun(teaching))
+        #expect(teaching.apply(teachingSun) == .accepted && teaching.tutorial == .shape)
+        let teachingRestored: Core = try Core.restore(payload: try teaching.snapshotPayload(), seed: 2)
+        #expect(teachingRestored == teaching && teachingRestored.tutorial == .shape)
         // The same records on another level: the first record's previous fingerprint is not that play's.
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":1").utf8)
         #expect(wrongLevel != payload)
@@ -458,14 +825,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(engine.handle(control: "sun.set", values: [Double(target)]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
