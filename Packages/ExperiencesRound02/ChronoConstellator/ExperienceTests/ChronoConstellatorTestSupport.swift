@@ -314,6 +314,38 @@ enum ChronoConstellatorTest {
         return (checked, misses)
     }
 
+    /// The track check (converge T-R02G0603-015): for every loop cell centre that no star stands on and no target lies
+    /// on, a pixel within 3 px of its projection (at the track's height) differs from the field by at least `margin` in
+    /// luminance. Returns the cells checked and the misses.
+    static func trackMisses(_ rgba: [UInt8], snapshot: Snapshot, width: Int = width, height: Int = height,
+                            margin: Double = ringMargin) -> (checked: Int, misses: [String]) {
+        let cam: ChronoConstellatorCamera = camera(snapshot, width: width, height: height)
+        let lift: SIMD3<Double> = SIMD3<Double>(0, Geometry.trackLift * Geometry.cellSize(snapshot), 0)
+        var covered: Set<Int> = []
+        for star in snapshot.stars {
+            covered.insert(star.cell)
+            covered.insert(star.target)
+        }
+        var checked: Int = 0
+        var misses: [String] = []
+        for s in 0..<snapshot.stars.count {
+            for cell in snapshot.stars[s].loop where !covered.contains(cell) {
+                guard let p = Geometry.pixel(Geometry.cellCentre(cell, snapshot) + lift, camera: cam, width: width,
+                                             height: height) else {
+                    misses.append("track \(s) cell \(cell): no projection")
+                    continue
+                }
+                checked += 1
+                let found: Bool = anyPixel(rgba, near: p.x, p.y, radius: pointRadius, width: width, height: height,
+                                           minimum: margin, above: false, reference: fieldLuminance)
+                if !found {
+                    misses.append(String(format: "track %ld cell %ld at (%.1f, %.1f) is field", s, cell, p.x, p.y))
+                }
+            }
+        }
+        return (checked, misses)
+    }
+
     /// The background check: the pixels of the two probe corners are within 0.05 per channel of the field. Returns
     /// the number checked and the misses.
     static func backgroundMisses(_ rgba: [UInt8], width: Int = width,
@@ -352,7 +384,8 @@ enum ChronoConstellatorTest {
         return result
     }
 
-    /// Runs the checks of clarification Q3 on `rgba` against `snapshot`, recording an issue per failure.
+    /// Runs the checks of clarification Q3 (and the track check of converge T-R02G0603-015) on `rgba` against
+    /// `snapshot`, recording an issue per failure.
     static func checkFrame(_ rgba: [UInt8], snapshot: Snapshot, width: Int = width, height: Int = height,
                            _ what: String, sourceLocation: SourceLocation = #_sourceLocation) {
         #expect(rgba.count == width * height * 4, "\(what): picture size", sourceLocation: sourceLocation)
@@ -365,6 +398,9 @@ enum ChronoConstellatorTest {
         #expect(rings.checked == snapshot.stars.count * ringSamples, "\(what): ring samples \(rings.checked)",
                 sourceLocation: sourceLocation)
         #expect(rings.misses.isEmpty, "\(what): \(rings.misses.prefix(8))", sourceLocation: sourceLocation)
+        let tracks = trackMisses(rgba, snapshot: snapshot, width: width, height: height)
+        #expect(tracks.checked > 0, "\(what): track cells checked", sourceLocation: sourceLocation)
+        #expect(tracks.misses.isEmpty, "\(what): \(tracks.misses.prefix(8))", sourceLocation: sourceLocation)
         let background = backgroundMisses(rgba, width: width, height: height)
         #expect(background.checked == backgroundPoints.count, "\(what): background", sourceLocation: sourceLocation)
         #expect(background.misses.isEmpty, "\(what): \(background.misses)", sourceLocation: sourceLocation)

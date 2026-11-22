@@ -92,7 +92,7 @@ registration, docs) stay with the lead. MVP: Stories 1 and 2.
   along the field's near edge whose length is tick / tickLimit of the grid width (field program, track material), the same
   at every tier and inside the camera fit, with host tests in `ChronoConstellatorSceneGeometryTests.swift` (length at tick
   0, half and the limit; finite; in view); `--name host-6`; then the simulator run `--name sim-27-2`
-- [ ] T-R02G0603-015 Check track pixels against the CPU reference per SC-R02G0603-001 (partial): in
+- [X] T-R02G0603-015 Check track pixels against the CPU reference per SC-R02G0603-001 (partial): in — Verified 2026-11-21: 2026-11-21: sim-27-2 (track check in every checkFrame, 5 levels x 3 tiers) exit 0
   `Packages/ExperiencesRound02/ChronoConstellator/ExperienceTests/ChronoConstellatorRenderTests.swift` (with its support
   file) check that, for every loop cell centre no star or target covers, a pixel within 3 px differs from the field colour
   by at least 0.1 at each tier on the 5 levels; part of `--name sim-27-2`
