@@ -31,8 +31,8 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-22.
 
 - [x] CHK006 Are fade durations (0.15 s / 0.45 s), the no-reversal rule, the 3-per-second bound and the measuring method
   stated numerically? [Measurability, Spec §Clarifications Q3; SC-R02G0806-003]
-- [x] CHK007 Is the dispersion shimmer rate stated below 3 cycles per second and still under Reduce Motion? [Clarity, Spec
-  §Clarifications Q3]
+- [x] CHK007 Is the dispersion shimmer rate stated below 3 cycles per second and still under Reduce Motion? [Clarity,
+  Spec §Clarifications Q3]
 
 ## Source licence and code-only audio
 
