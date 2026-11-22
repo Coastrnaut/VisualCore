@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G09-05 (migration ledger, game feature of experience R02-G09) · ID namespace FR-R02G0905-###,
 SC-R02G0905-###, T-R02G0905-###
@@ -24,6 +24,58 @@ Canonical overrides:
   **Owner-only items:** none.
 - **Shared features used:** R02-F23 (puzzle contract: hints, failure explanation), R02-F24 (progression), R02-F26
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G09-01 … 04.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+375's answers where the games agree. Facts checked in code (read-only, 2026-11-22): `NocturneGardenSolver` certifies a
+level by a bounded depth-first search (20,000 plant evaluations) for a winning sequence of exactly its lower bound L of
+moves (a sun move when needed plus plants) from the empty bed; a play fails on a leak beyond the allowance
+(`leak(move)`, with the kernel's own reason text naming the move, the action and the cells) or when the moves spent
+reach the budget (`budget`); undo works in playing, paused and failed, a won play is final; levels 1 … 3 carry the
+tutorial flag; manifest budgets are 8 … 19 and the level's range 1 … 40; the adapter prepares level (seed mod 100) + 1
+and snapshots `{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily
+multipliers are 37, 41, 43, 47, 53, 59, 61 and 67.
+
+- Q: How is a hint computed and what does each level reveal? → A: the plan comes from the current state. A won play has
+  no hint; a failed play's hint is "Undo the last move or retry the level." While playing: the solver's bounded search
+  (a new entry point) from the current blooms and sun, looking for the fewest further moves that win within the moves
+  left and the supply left: first plants only at the current sun, then a sun move followed by plants, then the removal of
+  one planted bloom (in canonical order) followed by those; within each, sequences of increasing length up to the moves
+  left. Its first move is the plan: level 1 names the move ("Plant a rose", "Set the sun to 3 of 4", "Remove bloom 2"),
+  level 2 adds the size and sun ("Plant a rose of size 2 under sun 3 of 4"), level 3 adds the exact cell ("… at column
+  5, row 1"). When no plan is found within the bound: "No way to match the target was found in the moves left: undo the
+  last move or retry the level." Hints never change the state, are unlimited, do not affect stars and reset to level 1
+  after any change of the play. "A state that can still win" means one whose plan exists. Impact: FR-R02G0905-002;
+  SC-R02G0905-002.
+- Q: What does the tutorial show, and when does it advance? → A: on levels 1 … 3, three instructions in order: (1) "Tap
+  a cell of the mist to plant a bloom there (or use the panel); its black shadow falls on the mist — a hint shows where"
+  — it advances once a move has been accepted; (2) "Drag a bloom to move it, pinch it to resize it, drag the lantern to
+  lengthen every shadow; match the gold outline without letting the shadow touch the coral cells" — until a second move
+  is accepted or the level ends; (3) "Reach the required match before the moves run out" — until the level ends.
+  `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G0905-001; SC-R02G0905-001.
+- Q: What are the progress and star rules? → A: stars measure the moves made, undone ones included (the play's action
+  records): 3 when at most the certified smallest move count, 2 when at most that + 2, else 1; per level the best
+  (fewest) moves made of a won campaign play and its stars, a better result replacing a worse one; level 1 open; a
+  campaign win opens the next; `level.select [n]` opens any open level and refuses others (`r02-g09.locked`);
+  `level.next` moves to the next open level (refused when none, `r02-g09.locked`); the five bands of 20 are the
+  certified difficulty bands. Impact: FR-R02G0905-004; SC-R02G0905-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 71) mod 100 + 1, negative day counts wrapped into 0 … 99 (71 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g09.date`). Daily play follows campaign rules but does not open levels. `mode.practice` replays the
+  current level with the budget raised to the kernel's maximum (40); practice results never award stars or open levels;
+  `mode.campaign` returns. Impact: FR-R02G0905-005; SC-R02G0905-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 375: progress and
+  the mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the snapshot payload becomes schema 2
+  (`{level, records, progress, mode, tutorial}`) with a migration from schema 1 (level 1 open plus the restored level,
+  campaign mode, tutorial at its first step on tutorial levels). Failures are explained from the failing move: leak
+  "Move m (…the action…) leaked the shadow into k forbidden cells; a allowed." (the kernel's reason, sentence-cased);
+  budget "The moves ran out: b of b spent with a match of x/y; it needs p/q.", each followed by "Undo the last move or
+  retry the level." Impact: FR-R02G0905-003, 007; SC-R02G0905-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
