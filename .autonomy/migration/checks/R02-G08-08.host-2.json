@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgeRegressionGoldenTests|FacetedForgeInvariant"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForgeRegressionGoldenTests|FacetedForgeInvariant'",
+  "elapsed_seconds": 15.321,
+  "exit_code": 0,
+  "finished": "2026-11-22T16:27:37+00:00",
+  "gate": "R02-G08-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-08.host-2.log",
+  "log_sha256": "f41fb570d174ea108478883505eeb442caaffbece08f98999a78b2c782cede55",
+  "name": "host-2",
+  "started": "2026-11-22T16:27:21+00:00",
+  "timed_out": false
+}
