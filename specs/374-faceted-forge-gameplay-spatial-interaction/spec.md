@@ -140,6 +140,8 @@ A player who cannot drag precisely can do everything through the labelled panel 
   over (undo or next level); picking, tilting, sliding and orbit still work.
 - **A second finger during a drag:** cancels it (the choice returns to what it was at touch-down) and orbits.
 - **A cancelled touch:** changes nothing.
+- **A second tap on the plane soon after a commit:** a tap on the preview within 0.35 s of the previous commit sends
+  nothing, so a double tap never cuts twice.
 - **A direction whose plane crosses the chosen piece at no integer depth:** the plane is not drawn and a commit sends
   nothing; the panel says the direction misses the piece.
 - **A cut that makes a sliver or spends the last cut:** the kernel fails the play as its rules say; the failure is
