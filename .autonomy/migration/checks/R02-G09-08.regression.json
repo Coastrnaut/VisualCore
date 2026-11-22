@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/nocturne_garden_regression.py"
+  ],
+  "command": "python3 scripts/nocturne_garden_regression.py",
+  "elapsed_seconds": 33.803,
+  "exit_code": 0,
+  "finished": "2026-11-22T23:49:22+00:00",
+  "gate": "R02-G09-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G09-08.regression.log",
+  "log_sha256": "51ddacf201d6ef2cd464a4d1503645c6467243656eb88c40a30c97639181054a",
+  "name": "regression",
+  "started": "2026-11-22T23:48:48+00:00",
+  "timed_out": false
+}

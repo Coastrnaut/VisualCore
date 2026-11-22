@@ -143,6 +143,10 @@ jobs:
         # Feature 378 (R02-G08-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/faceted_forge_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgeRegression
+      - name: Nocturne Garden regression (host)
+        # Feature 388 (R02-G09-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/nocturne_garden_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter NocturneGardenRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase
