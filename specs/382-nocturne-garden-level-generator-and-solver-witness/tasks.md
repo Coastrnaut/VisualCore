@@ -80,3 +80,11 @@ logic); no GLSL in this feature.
 001 → 002 (lead) → 003 (lead; agent A tests) → 004 (lead; agent C tests) → {005 (agent B), 006 (lead)} → 007 … 012.
 Shared files (error, manifest, solver, difficulty, generator, catalog tests, witness files, docs) stay with the lead.
 MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0902-013 Make `NocturneGardenWitness.decode` re-run `NocturneGardenSolver.solve` on the decoded level and
+  refuse a witness whose actions or solver work differ from the solver's (`.witness("solution")`), with a test that an
+  edited `difficulty.work` and a different winning sequence are refused, in
+  `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenWitness.swift` and
+  `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenWitnessTests.swift` per FR-R02G0902-004 (partial)
