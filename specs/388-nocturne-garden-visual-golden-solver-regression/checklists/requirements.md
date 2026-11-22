@@ -31,4 +31,5 @@
 
 ## Notes
 
-- The solver checks, alteration kinds, golden frame descriptions and memory bound are settled by `/speckit-clarify`.
+- Validated 2026-11-22 by the lead; every item passes. The solver checks, alteration kinds, golden frame descriptions,
+  memory bound and CI reporting were settled by `/speckit-clarify` (five answers, 2026-11-22).
