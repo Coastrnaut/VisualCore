@@ -69,7 +69,7 @@ logic); no GLSL in this feature.
 
 - [X] T-R02G0802-007 Docs: `docs/architecture/faceted-forge.md` (content pipeline), — Verified 2026-11-22: round02-host exit=0; docs/architecture/faceted-forge.md content pipeline, ExperiencesRound02 README feature 372, docs/automatedtesting.md entry
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0802-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0802-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-22: 2026-11-22: rendering-27, rendering-26, experiences, host-full exit 0
   `--name host-full`
 - [ ] T-R02G0802-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0802-010 Reference regression chunk 2 (`--name reference-2`)
