@@ -67,7 +67,7 @@ change (the shaders and reference of R02-G08-03 are unchanged and re-proven by t
 - [X] T-R02G0809-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: reference-2-2 exit=0 after reference-2 exit 1 (projectm-reference-ios26 square preset within8 0.9703 vs required 0.9706: the documented run-to-run variance; rerun passed; failed attempt kept)
 - [ ] T-R02G0809-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G0809-006; feature 380
   prepares them)
-- [ ] T-R02G0809-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G0809-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-22: converge clean (no tasks appended); sealed and recorded pass; failed attempts app-ui and reference-2 kept
   after the record push, check its CI run with `gh run list`
 
 ## Dependencies and parallel work
