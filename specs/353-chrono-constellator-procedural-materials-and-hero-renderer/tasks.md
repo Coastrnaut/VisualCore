@@ -33,7 +33,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorSceneGeometryTests.swift` (finite and bounded
   for extreme settings; every star, target and track cell inside the view with margin at 7 aspects; same positions at
   every tier; alpha decays as stated); agent B; `--name host-3`
-- [ ] T-R02G0603-005 [P] [US2] Create
+- [X] T-R02G0603-005 [P] [US2] Create — Verified 2026-11-21: 2026-11-21: host-4 (ExperienceCoreTests + RendererPurityTests, 12 tests) exit 0, rerun by the lead
   `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorExperienceCore.swift` (controls "star.phase [0 … 4,
   0 … 31], star.hold [0 … 4, 1 … 1,200, 1 … 60], star.release [0 … 4, 1 … 1,200], time.step [1 … 1,200], time.rewind,
   play.undo, play.redo, level.next"; digest "level number and play fingerprint"; schema 1 `{level, records}`; quality
