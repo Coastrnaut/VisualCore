@@ -47,7 +47,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G0607-005 [US3] Edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorPresenter.swift` and
+- [X] T-R02G0607-005 [US3] Edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorPresenter.swift` and — Verified 2026-11-22: 2026-11-22: sim-27 (ChronoConstellatorExperienceTests, 48 tests in 8 suites on iOS 27.2 incl. 3 replay tests: replay reproduces the win's fingerprints step by step, refusals in words, dropped result announced once, saved sound choice applied) exit 0
   `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the Sound toggle sends `settings.sound` and the presenter applies the restored
   `soundOn` when the experience opens; the dropped results announced once: "n saved results could not be checked and

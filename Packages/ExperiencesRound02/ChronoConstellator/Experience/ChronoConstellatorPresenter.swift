@@ -26,6 +26,11 @@
 // feedback log, eases the scene's lights (`ChronoConstellatorLights`, 0.45 s fades under Reduce Flashing) and offers the
 // ambient loop (`ChronoConstellatorSound`) the recipe of the stars on target and the stage at level openings and changes
 // of either. The mirror carries the summary element's text and the sound choice. Presentation only.
+// Feature 357 (R02-G06-07) T-R02G0607-005 (FR-R02G0607-003, 004, 007; clarifications Q2, Q4, Q5): the mirror carries
+// whether a verified replay exists for the level and the replay position; `startReplay`, `stepReplay` and `stopReplay`
+// send `replay.start/step/stop`; the Sound toggle saves the choice through `settings.sound`, and the restored choice is
+// applied when the experience opens or the value changes; the results a restore dropped are announced once ("n saved
+// results could not be checked and were removed.").
 #if os(iOS)
 import ChronoConstellatorCore
 import Foundation
@@ -82,6 +87,12 @@ final class ChronoConstellatorMirror {
     var summary = ""
     /// Whether the ambient sound is on (feature 356; off by default).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 357).
+    var replayAvailable = false
+    /// Whether a replay is running, its position and its length (feature 357).
+    var replaying = false
+    var replayPosition = 0
+    var replayLength = 0
 
     /// The picked star's name, or "none".
     var pickedStarLabel: String {
@@ -317,6 +328,39 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
         mirror.soundOn = on
     }
 
+    /// Saves the sound choice through `settings.sound` (feature 357); the described change turns the loop on or off.
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    /// Starts the replay of the current level's best stored solution (`replay.start`; feature 357).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next action of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter).
+    private var droppedAnnounced = false
+
+    /// Whether `mode` is a replay (feature 357).
+    static func isReplay(_ mode: ChronoConstellatorMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
     /// The controls view appeared (the loop may play).
     func controlsAppeared() { sound.setOnScreen(true) }
 
@@ -390,6 +434,7 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])
         }
     }
 
@@ -436,6 +481,33 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
         }
         if mirror.pickedStar >= level.stars.count { mirror.pickedStar = 0 }
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        // Feature 357: the saved sound choice is applied when it first appears or changes.
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            let count = core.reconciliationDropped
+            let text = count == 1 ? "1 saved result could not be checked and was removed."
+                : "\(count) saved results could not be checked and were removed."
+            route(ChronoConstellatorFeedbackPlan(text: text, kind: .state, haptic: nil))
+        }
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
         if let previous = latestCore {
             route(ChronoConstellatorFeedbackPlan.after(old: previous, new: core))
             let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
