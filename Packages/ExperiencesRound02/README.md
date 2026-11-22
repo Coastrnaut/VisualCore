@@ -460,3 +460,8 @@ progression controls and snapshot schema 2, and the panel's Hint, tutorial, fail
 Feature 376 (R02-G08-06) adds polish and accessibility: `FacetedForgeFeedbackPlan` (announcements, haptics, refusal
 words, the summary element), `FacetedForgeLights` (eased glow and sliver levels), `FacetedForgeSoundRecipe` and the
 experience's `FacetedForgeSound` loop, adjustable pickers and Dynamic Type layout in the panel.
+
+Feature 377 (R02-G08-07) adds persistence and replay: results carry their winning trace (the effective cuts) and
+`verified`; `FacetedForgeReconciliation` replays every trace on restore and drops results that do not verify; the
+adapter writes snapshot schema 3 with a 2 → 3 migration, adds `replay.start`, `replay.step`, `replay.stop` and
+`settings.sound`; the panel gains Replay, Step and Stop and announces dropped results once.

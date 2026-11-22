@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-06: Faceted Forge polish, measuring a gain over its whole range).
+Last updated: 2026-11-22 (R02-G08-07: Faceted Forge persistence; a count that includes undone work).
 
 ## 1. What is tested, and where
 
@@ -292,6 +292,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Two games, one tilt direction** (R02-G07-04, 2026-11-22). Amethyst Escape's gesture agent followed its brief
   (`pitch += dy`), the opposite of Chrono Constellator's orbit; the lead chose Chrono's direction so a two-finger drag
   tilts every round-two crystal and sky the same way, and the orbit test's expected values moved with it.
+- **A score that counts undone work needs an inequality** (R02-G08-07, 2026-11-22). Faceted Forge's cuts made count
+  undone cuts, but a replayable trace holds only the effective cuts, so reconciliation checks that the trace is no
+  longer than the cuts made (and the stars match the cuts made) instead of equality; equality would drop every honest
+  win with an undo. Old tests that compared whole results failed once results carried traces; compare the new fields
+  explicitly. Spec edits were committed with `git commit -a` while the previous gate's code was uncommitted, which
+  swept that code into a spec commit: add explicit paths while another gate's work is open.
 - **Measure a light over its whole range** (R02-G08-06, 2026-11-22). Faceted Forge's glow plays at 0.7, wins at 1 and
   fails at 0.35; normalised to 0.35 … 1, the playing level sits just above the midpoint, so a sliver failure undone
   every frame crossed the midpoint in close pairs and the flicker measure counted 4 crossings a second although every

@@ -60,7 +60,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G0807-006 Docs: `docs/architecture/faceted-forge.md` (persistence and replay),
+- [X] T-R02G0807-006 Docs: `docs/architecture/faceted-forge.md` (persistence and replay), — Verified 2026-11-22: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; architecture persistence and replay, package README, testing lesson (a score that counts undone work needs an inequality); validate_docs and validate_autocreator pass
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0807-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`
