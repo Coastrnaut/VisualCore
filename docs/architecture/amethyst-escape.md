@@ -144,3 +144,25 @@ rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unle
   campaign mode, the tutorial at its first step).
 - **Panel.** The tutorial with Dismiss, Hint (each press reveals the next level), the failure text with Undo and Retry,
   the goal and stars, Campaign / Daily / Practice and a picker of open levels, all as wrapping text below the crystal.
+
+## Polish and accessibility (feature 366, R02-G07-06)
+
+- **Feedback.** `AmethystEscapeFeedbackPlan` derives every announcement and haptic from the old and new core: turns
+  ("Shell 2 turned one sector clockwise. 7 moves left."), advances, undo and redo (`state`, selection haptic), wins and
+  failures (`outcome`, success or warning, only the outcome when a move ends the play), level and mode changes (`level`)
+  and refusals in words (`rejection`, error). A drag that turns a shell several sectors is announced once after its last
+  turn. The presenter routes plans through the shared `ExperienceFeedback` and keeps a feedback log.
+- **Reduce Flashing.** `AmethystEscapeLights` eases the pearl glow (1 playing, 0.6 failed), the exit glow (0.5, 1 once
+  escaped) and the failed wedge's amber (0 or 1) over 0.15 s, 0.45 s under Reduce Flashing, where a fade that has
+  started finishes before it can turn back. The lights settle only on the first frame; every later change fades,
+  including a level change, so flipping levels cannot flash. Tests sample a scripted win and five flicker patterns
+  every 1/60 s: at most 3 half-range crossings per second and fades of at least 0.4 s. The facet highlights stay at
+  about 0.29 cycles per second and are still under Reduce Motion. None of this reaches the state or its digest.
+- **Sound.** `AmethystEscapeSoundRecipe` builds a 12-second loop from the pearl's progress: a 98 Hz root and one partial
+  per shell passed (5/4, 3/2, 2, 5/2); a won loop adds the octave and swells twice per loop (once otherwise), because the
+  octave equals the third shell's partial and a won chord would otherwise sound like a deeper level's playing chord; a
+  failed loop halves its gains. The loop plays only while the Sound toggle is on, the panel is on screen and the scene is
+  active.
+- **Panel.** Every control has a label and value; the shell picker is adjustable ("Shell to turn", "Shell 4 (outer),
+  turned 1 of 8"); a summary element reads the moves left, the pearl, the exit gap and every shell; rows become columns
+  at accessibility text sizes and the panel keeps a 520-point width on iPad.

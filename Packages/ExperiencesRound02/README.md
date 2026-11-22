@@ -401,3 +401,8 @@ Feature 365 (R02-G07-05) adds teaching and progression: the solver's search from
 the adapter gains `level.select`, `mode.daily`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` and snapshot
 schema 2 with a migration from 1; the panel shows the tutorial, hints, failure text, goal, stars and modes.
 
+Feature 366 (R02-G07-06) adds polish and accessibility: `AmethystEscapeFeedbackPlan` (announcements and haptics through
+the shared `ExperienceFeedback`), `AmethystEscapeLights` (eased glows and amber under Reduce Flashing) and
+`AmethystEscapeSoundRecipe` in the Core; the geometry draws the eased levels; the experience gains `AmethystEscapeSound`
+(the ambient loop), a feedback log, an adjustable shell picker, a summary element, a Sound toggle and Dynamic Type layout.
+

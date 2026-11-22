@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G07-05: Amethyst Escape hints checked against an independent search).
+Last updated: 2026-11-22 (R02-G07-06: Amethyst Escape polish; a fade meets a still frame).
 
 ## 1. What is tested, and where
 
@@ -265,6 +265,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
   timelines everywhere, one added hold on small levels). Witness files are generated in a separate write run: the
   byte-compare and decode tests run in parallel, so a first run with the write flag fails until the files exist.
+- **A fade meets a still frame** (R02-G07-06, 2026-11-22). Once the failed wedge's amber eased in over 0.15 s, an
+  earlier simulator test that took its still frame at time 0 right after the failure found no amber: no time had
+  passed. The test now renders a still at 0 s and checks one at 1 s. Any check of a drawn state change must give the
+  presentation time to reach it.
 - **A count bound that shrinks with progress** (R02-G07-05, 2026-11-22). A script test required more than 700 open
   gates to check; recording R02-G07-04 left exactly 700, so every later run failed. The script-tests check exited 1 and
   was ticked and recorded without its exit code being read; the bound now only guards against an empty loop, the check
