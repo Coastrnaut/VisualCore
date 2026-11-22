@@ -10,7 +10,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0806-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit 0; rendering baseline = R02-G08-05 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G08-05's rendering runs (exit 0)
-- [ ] T-R02G0806-002 Edit `Packages/ExperiencesRound02/Package.swift` (`FacetedForgeCore` and its tests gain
+- [X] T-R02G0806-002 Edit `Packages/ExperiencesRound02/Package.swift` (`FacetedForgeCore` and its tests gain — Verified 2026-11-22: 2026-11-22: host (swift test --filter FacetedForge) exit 0; Core and tests gain VisualCoreAudioDSP, Experience gains VisualCoreAudioDSP and VisualCoreAudio (iOS)
   VisualCoreAudioDSP; `FacetedForgeExperience` gains VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as
   Amethyst Escape's targets have); `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
   FacetedForge`
