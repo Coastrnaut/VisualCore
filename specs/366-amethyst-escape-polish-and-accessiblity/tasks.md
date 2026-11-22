@@ -17,7 +17,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Stories 1 and 3 — feedback plan and sound recipe (P1, P2) 🎯
 
-- [ ] T-R02G0706-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeFeedbackPlan.swift` (texts and kinds of clarification
+- [X] T-R02G0706-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeFeedbackPlan.swift` (texts and kinds of clarification — Verified 2026-11-22: 2026-11-22: host-2 (FeedbackPlanTests, 9 tests: every text, kind and haptic of scripted sequences, refusal words for every code, outcome-only endings, drag plans, summary) exit 0, lead retest
   Q1 word for word, haptics of Q2, `drag(old:new:shell:sectors:)` for a multi-sector drag, `picked`, `refused`,
   `refusalText`, `summaryText` of Q5) with `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeFeedbackPlanTests.swift` (scripted sequences of
   turns, advances, undos, redos, refusals of every code, wins in campaign and practice, wedge and budget failures and
