@@ -44,7 +44,7 @@ change (the shaders and reference of R02-G08-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G0809-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G0809-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-22: app-unit (release_check app-build-for-testing-ios27 + app-unit-ios27: both schema examples restore through the app's migration check, the candidate opens through registry and engine and wins level 1, without -vcCandidates it is not available or openable, FF's pinned level 1 cuts and start choice equal the Core's) exit 0
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `FF`'s pinned level 1 certified cuts and the
   pickers' starting choice (the convergence lesson of feature 319) equal the Core's); `--name app-unit -- python3
