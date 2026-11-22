@@ -17,7 +17,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipe (P1, P2) 🎯
 
-- [ ] T-R02G0806-003 [P] [US1] [US3] Create
+- [X] T-R02G0806-003 [P] [US1] [US3] Create — Verified 2026-11-22: 2026-11-22: host-2 (FacetedForgeFeedbackPlanTests 7 + invariant 9) exit 0, rerun by the lead
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeFeedbackPlan.swift` (texts and kinds of clarification Q1
   word for word, haptics of Q2, `after(old:new:)`, `refused`, `refusalText`, `summaryText(core:choice:)` of Q5) with
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeFeedbackPlanTests.swift` (scripted sequences of cuts,
