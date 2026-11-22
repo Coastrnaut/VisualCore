@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgeLights|FacetedForgeSoundRecipe|FacetedForgeInvariant"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForgeLights|FacetedForgeSoundRecipe|FacetedForgeInvariant'",
+  "elapsed_seconds": 10.959,
+  "exit_code": 0,
+  "finished": "2026-11-22T15:16:38+00:00",
+  "gate": "R02-G08-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-06.host-3.log",
+  "log_sha256": "83a29015bbcf0e9d100caf45ee6ad6904c25f2dd511b7f41e7090e95119a9204",
+  "name": "host-3",
+  "started": "2026-11-22T15:16:27+00:00",
+  "timed_out": false
+}

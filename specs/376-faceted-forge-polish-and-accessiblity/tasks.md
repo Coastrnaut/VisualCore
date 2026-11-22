@@ -24,7 +24,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   undos, redos, refusals of every code, wins in campaign and practice, sliver and budget failures and level changes
   compare texts, kinds and haptics exactly; a cut that ends the play plans only the outcome; preview choices plan
   nothing); agent A; `--name host-2`
-- [ ] T-R02G0806-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeLights.swift`
+- [X] T-R02G0806-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeLights.swift` — Verified 2026-11-22: 2026-11-22: host-3 (FacetedForgeLightsTests 8, FacetedForgeSoundRecipeTests 4, invariant 9) exit 0, rerun by the lead; the glow is measured over its 0 … 1 gain range
   ("glow 0.7 playing / 1 won / 0.35 failed; sliver 0 / 1 while the failure is a sliver", eased linearly over 0.15 s,
   0.45 s under Reduce Flashing, no reversal mid-fade under Reduce Flashing; `maxHalfRangeCrossingsPerSecond`) and
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSoundRecipe.swift` ("root 110 Hz; one partial per piece
