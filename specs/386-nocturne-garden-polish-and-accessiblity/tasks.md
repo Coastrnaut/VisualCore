@@ -64,7 +64,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G0906-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-22: rendering-27, rendering-26, experiences, host-full, app-unit exit=0
   `--name host-full`, `--name app-unit`
 - [X] T-R02G0906-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-22: reference-1 exit=0
-- [ ] T-R02G0906-009 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G0906-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: reference-2 exit=0
 - [ ] T-R02G0906-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0906-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G0906-006)
 - [ ] T-R02G0906-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
