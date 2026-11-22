@@ -344,3 +344,8 @@ and an accessible panel (labels, values, summary, Sound toggle, large-text layou
 Feature 357 (R02-G06-07) adds persistence and replay: results with winning traces and `ChronoConstellatorReconciliation`
 (replay-verified scores on restore), snapshot schema 3 with the 2 → 3 migration, the replay mode (`replay.start`,
 `replay.step`, `replay.stop`) and the saved sound choice (`settings.sound`); the panel's Replay, Step and Stop.
+
+Feature 358 (R02-G06-08) adds the regression net: solver and witness checks for all 100 levels with twelve named
+alterations, `ChronoConstellatorGolden` (test builds only) with 16 pinned golden frame descriptions in
+`ChronoConstellator/golden-frames.json` (`CHRONO_CONSTELLATOR_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and
+memory tests, a CI step and `scripts/chrono_constellator_regression.py`.

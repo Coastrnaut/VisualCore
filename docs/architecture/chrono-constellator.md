@@ -187,3 +187,25 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
   Replay, Step and Stop with the position.
 - **Settings.** The sound choice (`settings.sound [0 … 1]`) is saved in the snapshot and applied when the experience
   opens.
+
+## Regression net (feature 358, R02-G06-08)
+
+- **Solver.** For all 100 levels, in tests of 10: the generated level equals its witness's level, the witness's actions
+  replay to a win at its win tick with its per-tick digests and fingerprints, and the solver returns exactly the
+  witness's phase changes with its lower bound, window, windows and blocked count; its work stays within the tick limit
+  plus the window ticks. Twelve kinds of alteration (a star's loop cell, start phase or target, the budget, the tick
+  limit, the grid size, a solution phase, a witness action, per-tick digest or fingerprint, the lower bound, the window)
+  each fail naming the level and the part. Work is counted, never timed.
+- **Golden frames.** `ChronoConstellatorGolden` (test builds only; forbidden in the Release binary) describes 16 frames —
+  levels 1, 21, 41, 61, 81 at three tiers after their certified phase changes and 6 ticks, plus the hero frame — at
+  1,152 × 768: projected star, target and loop-cell centres (to 1/8 px, null off screen), the tick, the tick mark's
+  length (to 1/1,024 cell), the tier's detail and the palette. The descriptions and SHA-256 digests are pinned in
+  `golden-frames.json`; a recomputed description passes on an equal digest or within one quantum with everything else
+  equal, and the file is rewritten only with `CHRONO_CONSTELLATOR_WRITE_GOLDEN=1`. The simulator renders the same frames
+  and checks them with the feature-353 frame tolerances.
+- **Memory.** Twelve open-draw-warn-close cycles on the simulator keep the footprint within 16 MB of the first cycle
+  (bound applied when the class runs alone) and leave the sky scene holding no GPU objects (`liveObjectCount` 0) after
+  each close and memory warning.
+- **Where it runs.** CI's host job has a named "Chrono Constellator regression (host)" step; locally,
+  `python3 scripts/chrono_constellator_regression.py` runs the host and simulator parts with one summary line each.
+

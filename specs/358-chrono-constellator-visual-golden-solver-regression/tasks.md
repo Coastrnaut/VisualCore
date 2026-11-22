@@ -60,7 +60,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0608-007 Docs: `docs/architecture/chrono-constellator.md` (regression net),
+- [X] T-R02G0608-007 Docs: `docs/architecture/chrono-constellator.md` (regression net), — Verified 2026-11-22: round02-host exit=0; docs/architecture/chrono-constellator.md regression net, ExperiencesRound02 README feature 358, docs/automatedtesting.md entry
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0608-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

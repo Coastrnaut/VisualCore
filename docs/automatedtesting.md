@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G06-07: a new mode case reaches iOS-only switches; build the iOS target first).
+Last updated: 2026-11-22 (R02-G06-08: Chrono Constellator regression net and local command).
 
 ## 1. What is tested, and where
 
@@ -291,6 +291,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   24 s of app teardown after the last step, and every `waitFor` costs at least a second even for an element already on
   screen. Revealing the replay's Step button once and tapping the same element, and skipping the bounded wait when the
   element already exists, brought them to 64, 72 and 60 s. The chunk key `m3` was checked unique before use.
+- **Chrono Constellator regression** (R02-G06-08, 2026-11-22). `python3 scripts/chrono_constellator_regression.py`
+  runs the host filter `ChronoConstellatorRegression` (solver regression over 100 witnesses in tests of 10, twelve named
+  alterations, golden descriptions) and then the simulator golden-frame and memory classes with
+  `TEST_RUNNER_CHRONO_CONSTELLATOR_MEMORY_ISOLATED=1`; CI runs the host part as a named step. Golden frames show the
+  certified phase changes and 6 ticks so ribbons are part of every level baseline; the simulator frames reuse the
+  feature-353 frame-check helpers unchanged.
 - **Colorfall Canyons regression** (R02-G05-08, 2026-11-21). `python3 scripts/colorfall_canyons_regression.py` runs the
   host filter `ColorfallCanyonsRegression` (solver regression over 100 witnesses in tests of 10, twelve named
   alterations, golden descriptions) and then the simulator golden-frame and memory classes with
