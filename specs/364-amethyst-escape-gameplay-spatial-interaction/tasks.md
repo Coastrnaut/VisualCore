@@ -67,7 +67,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0704-007 Docs: `docs/architecture/amethyst-escape.md` (gestures), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-22: 2026-11-22: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; architecture touch controls, package README, testing lessons
   `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0704-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0704-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-22: 2026-11-22: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0704-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0704-010 Reference regression chunk 2 (`--name reference-2`)

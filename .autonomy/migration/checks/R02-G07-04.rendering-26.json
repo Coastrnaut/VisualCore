@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-26.5",
+    "--action",
+    "test"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test",
+  "elapsed_seconds": 46.617,
+  "exit_code": 0,
+  "finished": "2026-11-22T09:03:57+00:00",
+  "gate": "R02-G07-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-04.rendering-26.log",
+  "log_sha256": "98ab8c7bbe3cff818eae8b409fc851fd8b7ba268a3b5be4ab414d59bc7a072b6",
+  "name": "rendering-26",
+  "started": "2026-11-22T09:03:10+00:00",
+  "timed_out": false
+}
