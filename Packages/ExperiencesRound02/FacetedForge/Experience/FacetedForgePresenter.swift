@@ -168,6 +168,12 @@ final class FacetedForgePresenter: ExperiencePresenter {
     private(set) var latestCore: FacetedForgeExperienceCore?
     /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 375).
     private var hintKey: String?
+    /// The hint searched for a play, by that play's key (T-R02G0805-012): one search per play, every level from it.
+    private var hintCache: (key: String, hint: FacetedForgeHint?)?
+    /// The search under way, off the main actor, for the play of ``hintKey`` (T-R02G0805-012).
+    private(set) var hintSearch: Task<Void, Never>?
+    /// The text shown while the search runs.
+    static let searchingText = "Finding a hint…"
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 375).
     private(set) var dailyDate: DateComponents?
 
@@ -293,26 +299,55 @@ final class FacetedForgePresenter: ExperiencePresenter {
         "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
     }
 
-    /// Hides the hint shown.
+    /// Hides the hint shown and drops a search under way.
     private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
         hintKey = nil
         mirror.hintLevel = 0
         mirror.hintText = nil
     }
 
     /// Reveals the next hint level (up to 3) for the current play; the hint is hidden when the play has none (won, or
-    /// not started). Hints never change the state: no action is sent.
+    /// not started). Hints never change the state: no action is sent. The solver's bounded search runs once per play
+    /// in a detached task, never on the frame (T-R02G0805-012): meanwhile the panel reads "Finding a hint…", and the
+    /// result is shown only if the play it belongs to is still the current one; later levels come from the cache.
     func showHint() {
         guard let core = latestCore else { return }
         let key: String = Self.hintKey(core)
         let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
-        guard let hint = core.hint(level: next) else {
+        if let cached = hintCache, cached.key == key {
+            reveal(cached.hint, level: next, key: key)
+            return
+        }
+        guard hintSearch == nil || hintKey != key else { return }   // the search for this play is running
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        let play: FacetedForgePlay = core.play
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            let found: FacetedForgeHint? = FacetedForgeHints.hint(level: 3, play: play)
+            await self?.finishSearch(found, key: key)
+        }
+    }
+
+    /// Takes the result of the search for the play of `key`: cached, and shown when that play is still current.
+    private func finishSearch(_ hint: FacetedForgeHint?, key: String) {
+        hintSearch = nil
+        hintCache = (key, hint)
+        guard hintKey == key, let core = latestCore, Self.hintKey(core) == key else { return }
+        reveal(hint, level: mirror.hintLevel, key: key)
+    }
+
+    /// Shows `hint` at `level` for the play of `key`, or hides the hint when the play has none.
+    private func reveal(_ hint: FacetedForgeHint?, level: Int, key: String) {
+        guard let hint else {
             clearHint()
             return
         }
         hintKey = key
-        mirror.hintLevel = next
-        mirror.hintText = hint.text
+        mirror.hintLevel = max(level, 1)
+        mirror.hintText = hint.at(level: max(level, 1)).text
     }
 
     /// Ends the tutorial of the current level.

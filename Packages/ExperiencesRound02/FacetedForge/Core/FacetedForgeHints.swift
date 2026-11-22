@@ -84,6 +84,13 @@ public struct FacetedForgeHint: Sendable, Equatable {
         }
     }
 
+    /// The same hint revealed at `level` (clamped to 1 … 3): the suggestion is unchanged, only the text differs
+    /// (feature 375, T-R02G0805-012: a presenter caches one search per play and reveals the levels from it).
+    public func at(level: Int) -> FacetedForgeHint {
+        FacetedForgeHint(level: min(3, max(1, level)), kind: kind, piece: piece, direction: direction, depth: depth,
+                         pieceName: pieceName, failed: failed)
+    }
+
     /// The kernel action this hint names; nil for `stuck`.
     public var action: FacetedForgeAction? {
         guard kind == .cut, let piece, let direction, let depth else { return nil }
@@ -95,8 +102,9 @@ public struct FacetedForgeHint: Sendable, Equatable {
 public enum FacetedForgeHints {
     /// The plan of `play` while `playing` or `paused`: with need = target pieces − current pieces, a winning
     /// continuation of exactly need cuts from the current pieces
-    /// (``FacetedForgeSolver/solve(_:from:cutsLeft:workBound:)`` with the default work bound), searched only when need ≥ 1, need ≤ ``FacetedForgePlay/remaining`` and
-    /// ``FacetedForgeSolver/canPartition(_:into:crystal:)`` accepts the current pieces. Nil in every other stage and
+    /// (``FacetedForgeSolver/solve(_:from:cutsLeft:workBound:)`` with the default work bound), searched only when
+    /// need ≥ 1, need ≤ ``FacetedForgePlay/remaining`` and ``FacetedForgeSolver/canPartition(_:into:crystal:)``
+    /// accepts the current pieces. Nil in every other stage and
     /// when no continuation is found.
     public static func plan(_ play: FacetedForgePlay) -> FacetedForgePlan? {
         guard play.stage == .playing || play.stage == .paused else { return nil }

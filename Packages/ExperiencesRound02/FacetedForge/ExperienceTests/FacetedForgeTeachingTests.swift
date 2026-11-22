@@ -30,6 +30,12 @@ enum FacetedForgeTeaching {
     typealias Shell = ExperienceShell<FacetedForgePresenter>
     typealias Core = FacetedForgeExperienceCore
 
+    /// Presses Hint and waits for the search it started (T-R02G0805-012: the search runs off the main actor).
+    static func pressHint(_ presenter: FacetedForgePresenter) async {
+        presenter.showHint()
+        await presenter.hintSearch?.value
+    }
+
     /// The seeds searched for a level with a wanted property (seed = level − 1).
     static let searchedSeeds: Int = 30
 
@@ -139,7 +145,7 @@ enum FacetedForgeTeaching {
         #expect(third.kind == .cut, "level 1 has a plan from its opening")
 
         for level in 1...3 {
-            presenter.showHint()
+            await Teaching.pressHint(presenter)
             let want: FacetedForgeHint = try #require(opening.hint(level: level))
             #expect(presenter.mirror.hintLevel == level)
             #expect(presenter.mirror.hintText == want.text, "level \(level): \(presenter.mirror.hintText ?? "nil")")
@@ -150,7 +156,7 @@ enum FacetedForgeTeaching {
             #expect(now == digest, "hint \(level) leaves the state alone")
         }
         #expect(presenter.mirror.hintText?.hasPrefix("Cut the whole crystal in direction ") == true)
-        presenter.showHint()
+        await Teaching.pressHint(presenter)
         #expect(presenter.mirror.hintLevel == 3, "a fourth press stays at level 3")
         #expect(presenter.mirror.hintText == third.text)
         let text: String = presenter.describe(opening)
@@ -169,7 +175,7 @@ enum FacetedForgeTeaching {
 
         // The next press starts again at level 1 for the new play (when the play still has a hint).
         let after: Core = try Teaching.core(shell)
-        presenter.showHint()
+        await Teaching.pressHint(presenter)
         if let first = after.hint(level: 1) {
             #expect(presenter.mirror.hintLevel == 1)
             #expect(presenter.mirror.hintText == first.text)
@@ -180,6 +186,32 @@ enum FacetedForgeTeaching {
 
     /// The certified solution of level 1 sent through the presenter moves the tutorial on and wins with 3 stars, named
     /// in the description, and the frontier raised to level 2, which can then be picked.
+    /// T-R02G0805-012: a press returns at once with "Finding a hint…"; a cut before the search ends discards its result
+    /// (the hint belongs to the earlier play), and the next press searches the new play.
+    @Test func aHintSearchNeverBlocksAndACutDiscardsIt() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await Teaching.open(session, seed: 0)
+        let presenter: FacetedForgePresenter = shell.presenter
+        let opening: Core = try Teaching.core(shell)
+        presenter.showHint()
+        #expect(presenter.mirror.hintText == FacetedForgePresenter.searchingText || presenter.hintSearch == nil)
+        let third: FacetedForgeHint = try #require(opening.hint(level: 3))
+        let action: FacetedForgeAction = try #require(third.action)
+        let cut: ActionResult = Teaching.send(action, shell)
+        #expect(cut == .accepted, "\(cut.code)")
+        await presenter.hintSearch?.value
+        #expect(presenter.mirror.hintLevel == 0, "the earlier play's hint is not shown")
+        #expect(presenter.mirror.hintText == nil)
+        let after: Core = try Teaching.core(shell)
+        await Teaching.pressHint(presenter)
+        if let first = after.hint(level: 1) {
+            #expect(presenter.mirror.hintText == first.text)
+        } else {
+            #expect(presenter.mirror.hintText == nil, "a won play has no hint")
+        }
+    }
+
     @Test func winningLevelOneGivesThreeStarsAndOpensLevelTwo() async throws {
         let session = ExperienceSession()
         defer { session.close() }
@@ -213,7 +245,7 @@ enum FacetedForgeTeaching {
         let text: String = presenter.describe(won)
         #expect(text.contains("Stars: 3 of 3."), "\(text)")
         #expect(presenter.mirror.status == "Won")
-        presenter.showHint()
+        await Teaching.pressHint(presenter)
         #expect(presenter.mirror.hintLevel == 0, "a won play has no hint")
         #expect(presenter.mirror.hintText == nil)
         #expect(presenter.mirror.failureText == nil)
@@ -260,7 +292,7 @@ enum FacetedForgeTeaching {
         let text: String = presenter.describe(failed)
         #expect(text.contains(explanation.text), "\(text)")
 
-        presenter.showHint()
+        await Teaching.pressHint(presenter)
         #expect(presenter.mirror.hintLevel == 1)
         #expect(presenter.mirror.hintText == FacetedForgeHint.failedText)
 

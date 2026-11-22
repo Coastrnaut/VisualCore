@@ -79,7 +79,7 @@ files (adapter, scenarios, presenter, controls, docs) stay with the lead. MVP: S
 
 ## Phase 6: Convergence
 
-- [ ] T-R02G0805-012 Keep a hint search off the frame per the Spec's edge case "A hint search that would run long … it
+- [X] T-R02G0805-012 Keep a hint search off the frame per the Spec's edge case "A hint search that would run long … it — Verified 2026-11-22: 2026-11-22: sim-27-3 (47 tests incl. aHintSearchNeverBlocksAndACutDiscardsIt) exit 0; sim-27-2 failed to compile (a test used an undeclared type alias), fixed
   never stalls the frame" (partial): in `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift`
   compute `core.hint(level:)` in a detached task (the core is a value), show "Finding a hint…" in the mirror meanwhile,
   publish the result on the main actor only when the play it belongs to (level, mode, fingerprint) is still the current
