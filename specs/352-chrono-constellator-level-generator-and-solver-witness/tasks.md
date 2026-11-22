@@ -1,0 +1,83 @@
+# Tasks: R02-G06-02 — Chrono Constellator: level generator and solver witness
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate R02-G06-02 (migration ledger). Evidence:
+`python3 scripts/migration_ledger.py run-check --gate R02-G06-02 --name <check> -- <command>` (never a scratchpad path;
+recorded only after every agent has reported). Commit after every task with its check record (no trailers). No {owner}
+or {device} tasks (pure logic and host-generated content); no GLSL (R02-G06-01's closed-form positions and evaluation are
+the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each).
+
+## Phase 1: Setup
+
+- [ ] T-R02G0602-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+  --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G06-01's rendering runs (exit 0)
+
+## Phase 2: Foundational
+
+- [ ] T-R02G0602-002 Add `generation(Int)` ("r02-g06.generation") and `witness(String)` ("r02-g06.witness") to
+  `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorError.swift`; create
+  `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorManifest.swift` (ChronoConstellatorManifestEntry
+  "number 1 … 100, seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py
+  levels --experience R02-G06` with the source line) and
+  `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorDifficulty.swift` ("smallest, win tick, stars, loop
+  lengths, windows, blocked"); `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
+  ChronoConstellator` (existing tests unchanged)
+
+## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
+
+- [ ] T-R02G0602-003 [US1] Implement `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSolver.swift`
+  (clarification Q2: `misaligned(_:at:)` m(T); the lower bound m* = min m(T) over T = 1 … tick limit, nil when 0; the
+  windows T with m(T) = m* in order; `windowPhases` "(index of target − T) mod L" for each star off target, default
+  otherwise; `isBlocked` when two stars share a cell on a tick 1 … T under the window's phase-only timeline; the first
+  unblocked window is the solution, nil when every window is blocked; windows, blocked and work counted) and, after it,
+  agent A's `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorSolverTests.swift` (seed 2_352:
+  hand-built levels needing 1, 2 and 3 edits; a level won unedited gives nil; a level with every window blocked gives nil;
+  on seeded small levels an independent brute force over every timeline of fewer than m* edits (phase changes and holds
+  of starts 1 … T, lengths 1 … L) finds no win and one of m* edits wins; the solution replays to a win through the play;
+  determinism); `--name host-2`
+
+## Phase 4: Story 2 — levels come from their planned seeds (P1)
+
+- [ ] T-R02G0602-004 [US2] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGenerator.swift`
+  (ChronoConstellatorBandProfile "grid 6 × 5, 6 × 5, 7 × 6, 7 × 6, 8 × 7; stars 2, 3, 3, 4, 5; smallest 1, 2, 2, 3, 3 … 4;
+  blocked at least 0, 1, 2, 2, 3", `candidate(_:index:)` drawing in the order of clarification Q1 from
+  `SeededRandom(seed: SeedDerivation.derive(seed, index: k))` (rectangle loops, direction, distinct targets, phases,
+  tick limit 120 … 360), ChronoConstellatorGenerated, `generate` with k = 0 … 511, id `chrono-constellator-NNN`, budget =
+  manifest budget, tutorial for 1 … 3, difficulty = band, `.generation(number)` beyond 512; `catalogDigest`) and, after
+  it, agent C's `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorGeneratorTests.swift`
+  (determinism; band ranges; budget; the solution wins and the unedited level fails; skipped recorded and re-checked; an
+  impossible profile refused); `--name host-3`
+
+## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
+
+- [ ] T-R02G0602-005 [P] [US4] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorWitness.swift`
+  (schema 1; actions: the solution's phase changes in star order, then step(tick limit); built by replaying them on a
+  `ChronoConstellatorPlay`: win tick, the 16-hex position digest after every tick up to the win, fingerprints after begin
+  and each action; the lower bound, window, windows and blocked; unedited and near-miss counterexamples (reason, tick);
+  difficulty; skipped; sorted-key pretty JSON with a trailing newline; `decode` refuses newer, damaged and non-replaying
+  witnesses) with `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorWitnessTests.swift` (round
+  trip byte for byte; edited actions, digests, fingerprints, level, counterexamples and difficulty refused; newer schema and
+  damaged JSON refused; the counterexamples fail as recorded) by agent B; `--name host-4`
+- [ ] T-R02G0602-006 [US2] [US3] [US4] Create
+  `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorCatalogTests.swift` (100 entries, 20 per
+  band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest count;
+  band means never fall; on levels 1, 11, 21, … 91 the solver equals the brute force (SC-R02G0602-002); all 100 witnesses
+  replay to a win; each witness equals `docs/games/chrono-constellator/levels/NNN.witness.json` byte for byte, one test per
+  band, written only with `CHRONO_CONSTELLATOR_WRITE_WITNESSES=1`) and generate the 100 files; `--name host-5`
+
+## Phase 6: Regression, documentation and close
+
+- [ ] T-R02G0602-007 Docs: `docs/architecture/chrono-constellator.md` (content pipeline),
+  `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
+- [ ] T-R02G0602-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+  `--name host-full`
+- [ ] T-R02G0602-009 Reference regression chunk 1 (`--name reference-1`)
+- [ ] T-R02G0602-010 Reference regression chunk 2 (`--name reference-2`)
+- [ ] T-R02G0602-011 Script tests, run alone (`--name script-tests`)
+- [ ] T-R02G0602-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+
+## Dependencies and parallel work
+
+001 → 002 (lead) → 003 solver (lead) → {003 tests (agent A), 004 generator (lead) → 004 tests (agent C), 005 (agent B)} →
+006 (lead) → 007 … 012. Agent B codes against the solution contract with hand-made solutions; shared files (error,
+manifest, difficulty, solver, generator, catalog tests, witness files, docs) stay with the lead. MVP: Story 1.
