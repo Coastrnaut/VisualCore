@@ -322,7 +322,7 @@ import Testing
         }
         // Mesh streams: garden uv = (material code, shade); glow colour in the normal slot, uv = (glow, 0).
         let vertex: String = NocturneGardenShaders.gardenVertex
-        #expect(vertex.contains("float m = clamp(floor(a_uv.x + 0.5), 0.0, 11.0);"))
+        #expect(vertex.contains("float m = clamp(floor(a_uv.x + 0.5), 0.0, 12.0);"))
         #expect(vertex.contains("float shade = clamp(a_uv.y, 0.0, 1.0);"))
         #expect(vertex.contains("v_base = base * mix(shade, 1.0, isShadow);"))
         #expect(NocturneGardenShaders.glowVertex.contains("v_colour = clamp(a_normal, 0.0, 1.0);"))
@@ -430,7 +430,7 @@ import Testing
             #expect(Double(material.rawValue) == material.code)
             if material != .ground { #expect(material.colour != NocturneGardenPalette.ground) }
         }
-        #expect(codes == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+        #expect(codes == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
         #expect(Set(codes).count == codes.count)
         let named: [Double] = [
             NocturneGardenShaders.groundMaterial, NocturneGardenShaders.mistMaterial,
@@ -439,6 +439,7 @@ import Testing
             NocturneGardenShaders.bloomBodyMaterial, NocturneGardenShaders.leafStemMaterial,
             NocturneGardenShaders.lanternMaterial, NocturneGardenShaders.spentBarMaterial,
             NocturneGardenShaders.unspentBarMaterial, NocturneGardenShaders.headRimMaterial,
+            NocturneGardenShaders.previewMaterial,
         ]
         #expect(named == codes)
         #expect(Set(named).count == named.count)
@@ -454,6 +455,8 @@ import Testing
         #expect(Material.spentBar.colour == NocturneGardenPalette.spent)
         #expect(Material.unspentBar.colour == NocturneGardenPalette.unspent)
         #expect(Material.headRim.colour == NocturneGardenPalette.glow)
+        #expect(Material.preview.colour == NocturneGardenPalette.mistHighlight)
+        #expect(NocturneGardenShaders.previewMaterial == 12)
         // The vertex shader's selection chain covers every code with its palette constant, in code order.
         let vertex: String = NocturneGardenShaders.gardenVertex
         let selections: [String] = [
@@ -463,6 +466,8 @@ import Testing
             "base = mix(base, NG_BODY, isCode(m, 7.0));", "base = mix(base, NG_LANTERN, isCode(m, 8.0));",
             "base = mix(base, NG_SPENT, isCode(m, 9.0));", "base = mix(base, NG_UNSPENT, isCode(m, 10.0));",
             "base = mix(base, NG_GLOW, isCode(m, 11.0));",
+            // Feature 384 (R02-G09-04): the drag preview outline.
+            "base = mix(base, NG_MIST_HIGHLIGHT, isCode(m, 12.0));",
         ]
         for selection in selections { #expect(vertex.contains(selection), "\(selection)") }
         #expect(vertex.contains("float isShadow = isCode(m, 2.0);"))
@@ -473,10 +478,10 @@ import Testing
             if material.isEmissive { emissive.append(material.rawValue) }
             if material.sways { sways.append(material.rawValue) }
         }
-        #expect(emissive == [3, 4, 5, 8, 9, 11])
+        #expect(emissive == [3, 4, 5, 8, 9, 11, 12])
         #expect(sways == [6, 7, 11])
         let emissiveLine: String = "float emissive = isCode(m, 3.0) + isHatch + isCode(m, 5.0) + isCode(m, 8.0)"
-            + " + isCode(m, 9.0) + isCode(m, 11.0);"
+            + " + isCode(m, 9.0) + isCode(m, 11.0)\n        + isPreview;"
         #expect(NocturneGardenShaders.gardenFragment.contains(emissiveLine))
         #expect(vertex.contains("float sways = isCode(m, 6.0) + isCode(m, 7.0) + isCode(m, 11.0);"))
         let lit: SIMD3<Double> = NocturneGardenShaders.gardenShade(base: NocturneGardenPalette.unspent,

@@ -118,6 +118,12 @@ public enum NocturneGardenShaders {
     /// The material code of the glowing rim strip around a bloom's head outline, emissive glow colour; sways
     /// (`a_uv.x` = 11).
     public static let headRimMaterial: Double = GardenMaterial.headRim.code
+    /// The pale dashed outline of a drag's would-be shadow (feature 384, R02-G09-04).
+    public static let previewMaterial: Double = GardenMaterial.preview.code
+    /// The dash frequency of the preview outline along x − y, per model unit.
+    public static let previewDashFrequency: Double = 10
+    /// The brightness of a preview dash gap against a dash.
+    public static let previewGap: Double = 0.55
 
     // MARK: Constants
 
@@ -229,6 +235,8 @@ public enum NocturneGardenShaders {
         case unspentBar = 10
         /// The glowing rim strip around a bloom's head outline (emissive; sways).
         case headRim = 11
+        /// The pale dashed outline of a drag's would-be shadow cells (emissive; feature 384, R02-G09-04).
+        case preview = 12
 
         /// The `a_uv.x` value of the material.
         public var code: Double { Double(rawValue) }
@@ -248,13 +256,14 @@ public enum NocturneGardenShaders {
             case .spentBar: NocturneGardenShaders.spent
             case .unspentBar: NocturneGardenShaders.unspent
             case .headRim: NocturneGardenShaders.glow
+            case .preview: NocturneGardenShaders.mistHighlight
             }
         }
 
         /// Whether the material is mostly emissive (``NocturneGardenShaders/emission``) rather than lit.
         public var isEmissive: Bool {
             switch self {
-            case .targetRim, .forbiddenHatch, .leakCross, .lantern, .spentBar, .headRim: true
+            case .targetRim, .forbiddenHatch, .leakCross, .lantern, .spentBar, .headRim, .preview: true
             default: false
             }
         }
@@ -303,6 +312,7 @@ public enum NocturneGardenShaders {
     const vec3 NG_SPENT = \(vec3Literal(spent));
     const vec3 NG_UNSPENT = \(vec3Literal(unspent));
     const vec3 NG_GLOW = \(vec3Literal(glow));
+    const vec3 NG_MIST_HIGHLIGHT = \(vec3Literal(mistHighlight));
     const float NG_SWAY_AMPLITUDE = \(fixed(swayAmplitude));
     const float NG_SWAY_SPEED = \(fixed(swaySpeed));
     const float NG_SWAY_PHASE = \(fixed(swayPhase));
@@ -311,7 +321,7 @@ public enum NocturneGardenShaders {
         return 1.0 - step(0.5, abs(m - code));
     }
     void main() {
-        float m = clamp(floor(a_uv.x + 0.5), 0.0, 11.0);
+        float m = clamp(floor(a_uv.x + 0.5), 0.0, 12.0);
         float isShadow = isCode(m, 2.0);
         vec3 base = mix(NG_GROUND, NG_MIST, isCode(m, 1.0));
         base = mix(base, NG_SHADOW, isShadow);
@@ -324,6 +334,7 @@ public enum NocturneGardenShaders {
         base = mix(base, NG_SPENT, isCode(m, 9.0));
         base = mix(base, NG_UNSPENT, isCode(m, 10.0));
         base = mix(base, NG_GLOW, isCode(m, 11.0));
+        base = mix(base, NG_MIST_HIGHLIGHT, isCode(m, 12.0));
         float shade = clamp(a_uv.y, 0.0, 1.0);
         float sways = isCode(m, 6.0) + isCode(m, 7.0) + isCode(m, 11.0);
         float rise = clamp(a_position.y / NG_SWAY_HEIGHT, 0.0, 1.0);
@@ -377,6 +388,8 @@ public enum NocturneGardenShaders {
     const float NG_HATCH_FREQUENCY = \(fixed(hatchFrequency));
     const float NG_HATCH_WIDTH = \(fixed(hatchWidth));
     const float NG_HATCH_GAP_TINT = \(fixed(hatchGapTint));
+    const float NG_PREVIEW_DASH = \(fixed(previewDashFrequency));
+    const float NG_PREVIEW_GAP = \(fixed(previewGap));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
@@ -387,7 +400,9 @@ public enum NocturneGardenShaders {
         float isHatch = isCode(m, 4.0);
         float isBody = isCode(m, 6.0);
         float isStem = isCode(m, 7.0);
-        float emissive = isCode(m, 3.0) + isHatch + isCode(m, 5.0) + isCode(m, 8.0) + isCode(m, 9.0) + isCode(m, 11.0);
+        float isPreview = isCode(m, 12.0);
+        float emissive = isCode(m, 3.0) + isHatch + isCode(m, 5.0) + isCode(m, 8.0) + isCode(m, 9.0) + isCode(m, 11.0)
+            + isPreview;
         vec3 n = v_normal / max(length(v_normal), 0.0001);
         vec3 l = u_lightDir / max(length(u_lightDir), 0.0001);
         vec3 e = u_eye - v_position;
@@ -423,6 +438,8 @@ public enum NocturneGardenShaders {
         rgb = mix(rgb, shadowColour, isShadow);
         rgb = mix(rgb, hatchColour, isHatch);
         rgb = mix(rgb, bodyColour, clamp(isBody + isStem, 0.0, 1.0));
+        float dash = step(0.5, fract((v_position.x - v_position.y) * NG_PREVIEW_DASH));
+        rgb = mix(rgb, lit * mix(NG_PREVIEW_GAP, 1.0, dash), isPreview);
         rgb = clamp(rgb, 0.0, 1.0);
         float alpha = 1.0;
         color = vec4(rgb * alpha, alpha);

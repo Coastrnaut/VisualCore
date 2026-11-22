@@ -107,6 +107,9 @@ public struct NocturneGardenSceneSnapshot: Sendable, Equatable {
     public let levelNumber: Int
     /// The presentation time in seconds (mist drift and sway only).
     public let time: Double
+    /// The would-be shadow cells of a drag in progress, ascending (feature 384, R02-G09-04: the silhouette preview as
+    /// exact diagnostic); empty when no bloom is being dragged. Presentation only.
+    public private(set) var preview: [Int] = []
 
     /// The snapshot of `play` at `time` for catalog level `levelNumber`.
     public init(play: NocturneGardenPlay, levelNumber: Int, time: Double) {
@@ -126,6 +129,13 @@ public struct NocturneGardenSceneSnapshot: Sendable, Equatable {
         budget = level.budget
         self.levelNumber = levelNumber
         self.time = time.isFinite ? time : 0
+    }
+
+    /// This snapshot with `cells` (sorted, clipped to the bed) as the drag preview.
+    public func withPreview(_ cells: [Int]) -> NocturneGardenSceneSnapshot {
+        var copy: NocturneGardenSceneSnapshot = self
+        copy.preview = cells.filter { $0 >= 0 && $0 < width * height }.sorted()
+        return copy
     }
 
     /// Whether the play failed by a leak (the leaking cells are then crossed).

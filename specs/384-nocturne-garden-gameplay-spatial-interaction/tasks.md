@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Foundational — preview field, orbit and picking
 
-- [ ] T-R02G0904-002 Add the snapshot's `preview` cells ("sorted would-be cells; empty when none") and
+- [X] T-R02G0904-002 Add the snapshot's `preview` cells ("sorted would-be cells; empty when none") and — Verified 2026-11-22: host exit=0 (29 tests: NocturneGardenShaderSourceTests with the preview material 12 in the selection, emissive set and dashed outline; adapter suite unchanged); snapshot preview cells and withPreview
   `withPreview(_:)` to `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSceneSnapshot.swift` and the preview material (code 12, a pale dashed
   outline drawn from world coordinates) to `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenShaders.swift` with its source test in
   `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenShaderSourceTests.swift`; `--name host`
