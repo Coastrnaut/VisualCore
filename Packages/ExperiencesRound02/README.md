@@ -380,3 +380,10 @@ purpose with:
 AMETHYST_ESCAPE_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter AmethystEscapeCatalogTests
 ```
 
+Feature 363 (R02-G07-03) adds the experience: in the Core the adapter `AmethystEscapeExperienceCore`, the immutable
+`AmethystEscapeSceneSnapshot` with `AmethystEscapePalette` and `AmethystEscapeTier`, the geometry and CPU reference
+`AmethystEscapeSceneGeometry` (wedges emitted back to front, `AmethystEscapeColouredMesh` parts for the fallback), the
+GLSL sources `AmethystEscapeShaders` and the scenario manifest `AmethystEscapeScenarios` (`scenario-manifest.json`;
+`UPDATE_SCENARIO_MANIFEST=1` rewrites it); the iOS-only target `AmethystEscapeExperience` (presenter, GL crystal scene
+with fallback, control panel) and its simulator tests. A registered candidate until X-R02-G07.
+

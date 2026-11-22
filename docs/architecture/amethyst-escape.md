@@ -72,3 +72,32 @@ rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unle
   rewrites them only with `AMETHYST_ESCAPE_WRITE_WITNESSES=1`. The catalog digest is pinned and the standard progression
   rule holds.
 
+
+## Experience and renderer (feature 363, R02-G07-03)
+
+- **Adapter.** `AmethystEscapeExperienceCore` opens certified level (seed mod 100) + 1 (each level generated once per
+  process, on first use) and accepts `shell.rotate [shell, step]` (step −1 or +1), `pearl.advance`, `play.undo`,
+  `play.redo` and `level.next`; values out of range or fractional and kernel refusals change nothing. Its digest is the
+  level number and the play fingerprint; snapshot schema 1 `{level, records}` restores by replay.
+- **Snapshot.** The presenter draws an immutable `AmethystEscapeSceneSnapshot` (sectors, every shell's apertures, walls,
+  blocked wedges and offset, the pearl's pocket, the exit gap's world sector, stage, failure, moves, budget, level number
+  and presentation time); it never holds the kernel, so no drawing result can change the game.
+- **Scene.** The crystal lies in the xz-plane: with n shells, shell k is the annulus from 0.2 + k·w to 0.2 + (k + 1)·w,
+  w = 0.8 / n, and own sector s sits at world sector (s + offset) mod S, angles running from +x towards +z (clockwise
+  from above, the kernel's +1). Each wedge is a bevelled prism, taller towards the centre (h_k = 0.08 + 0.06·(n − 1 − k))
+  so the crystal rises like a gem cathedral; openings are gaps in a wedge's outer rim, a radial wall is a platinum fin
+  between own sectors i and i + 1, a blocked wedge is dark with a raised cross (amber when the pearl fell into it), the
+  pearl is the only sphere (radius 0.3·w, drawn on the exit arrow once it escaped), the exit carries a platinum arrow
+  and a platinum bar along the near edge shows moves / budget. The camera looks from +z, pitched 50° down, fitted to a
+  bounding sphere of radius 1.1 with a 5 % margin for aspects 0.4 … 2.5.
+- **Shaders.** GLSL ES 3.00 on the shared `ShaderMeshRenderer`: the crystal program carries the material code and shade
+  in uv and draws translucent amethyst facets (alpha 0.55) with shifting specular highlights from presentation time; the
+  glow program carries the colour in the normal slot. Reduce Motion holds the highlights still; Reduce Flashing caps the
+  glow.
+- **Tiers.** level-0: 3 bevel segments, 3 highlight layers, 2 glow shells; level-1: 2, 2, 1; level-2: 1, 1, 0. Wedges,
+  walls, pearl, exit and the camera never change between tiers; each tier change is logged with its reason. A program
+  that fails to compile draws the level-2 geometry unlit and keeps its reason. Depth testing is off on this path, so
+  wedges are emitted back to front and back faces are culled.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest e65c4529…94e6) and linked into the one
+  app; it stays unavailable until X-R02-G07. Its scenario manifest has the standard scenarios, `full-playthrough`,
+  `hero`, three fixtures and the 80 acceptance rows R2-G07-QA-001 … 080 (row r opens level (7 × (r − 1)) mod 100 + 1).
