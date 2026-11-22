@@ -161,9 +161,9 @@ a pure function of the blooms, the sun and the stage; the loop plays only while 
   `level`; refusals in words as `rejection`, through the shared route.
 - **FR-R02G0906-003**: Haptics MUST map selection → accepted move, undo or redo, success → win, warning → failure, error
   → refused action, through the shared route and the person's switch; they never change state.
-- **FR-R02G0906-004**: Reduce Flashing MUST cap the glow and turn every brightness change of the blooms' glow, the leak
-  crosses and the shadow into fades of at least 0.4 s, with the mist drift below 3 cycles per second; Reduce Motion
-  MUST hold the mist and the sway still; neither changes the state or its digest.
+- **FR-R02G0906-004**: Reduce Flashing MUST cap the glow and turn every brightness change of the blooms' glow and the
+  leak crosses into fades of at least 0.4 s, with the mist drift below 3 cycles per second; Reduce Motion MUST hold the
+  mist and the sway still; neither changes the state or its digest.
 - **FR-R02G0906-005**: The panel MUST support Dynamic Type up to the largest accessibility size and Increase Contrast on
   iPhone and iPad, scrolling instead of clipping.
 - **FR-R02G0906-006**: An optional ambient sound MUST be synthesized in code from the blooms, the sun and the stage,
