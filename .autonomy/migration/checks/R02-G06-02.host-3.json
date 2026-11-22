@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ChronoConstellatorGeneratorTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter ChronoConstellatorGeneratorTests",
+  "elapsed_seconds": 3.397,
+  "exit_code": 0,
+  "finished": "2026-11-22T02:37:37+00:00",
+  "gate": "R02-G06-02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G06-02.host-3.log",
+  "log_sha256": "37d1e12d6bf21d013dccf8de6a1f25e9f1dc338fe64aafe87983de965e4e8346",
+  "name": "host-3",
+  "started": "2026-11-22T02:37:33+00:00",
+  "timed_out": false
+}

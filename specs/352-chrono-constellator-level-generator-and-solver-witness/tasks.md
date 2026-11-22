@@ -39,7 +39,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0602-004 [US2] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGenerator.swift`
+- [X] T-R02G0602-004 [US2] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGenerator.swift` — Verified 2026-11-21: 2026-11-21 host-3 exit 0: ChronoConstellatorGeneratorTests 9 tests in 0.87 s (band profiles, rectangle loops, determinism, band shape, solutions in range and witness wins, skipped candidates truly fail, difficulty consistent, impossible entries refused) (.autonomy/migration/checks/R02-G06-02.host-3.json); lead retest
   (ChronoConstellatorBandProfile "grid 6 × 5, 6 × 5, 7 × 6, 7 × 6, 8 × 7; stars 2, 3, 3, 4, 5; smallest 1, 2, 2, 3, 3 … 4;
   blocked at least 0, 1, 2, 2, 3", `candidate(_:index:)` drawing in the order of clarification Q1 from
   `SeededRandom(seed: SeedDerivation.derive(seed, index: k))` (rectangle loops, direction, distinct targets, phases,
