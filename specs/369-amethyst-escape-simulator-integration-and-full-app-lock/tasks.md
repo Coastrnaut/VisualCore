@@ -14,7 +14,7 @@ change (the shaders and reference of R02-G07-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0709-002 Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSchemaExamples.swift`
+- [X] T-R02G0709-002 Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSchemaExamples.swift` — Verified 2026-11-22: host exit=0 (round-two host suite incl. AmethystEscapeSchemaExampleTests 7/7: both examples restore through migrations to schema 3, digests match, other versions nil); registry stores both examples, comment corrected
   (contracts/api.md; data-model: schema 1 "a seeded play of level 1 with one turn that does not win, seed 7";
   schema 2 "campaign mode, progress {frontier 2, solved [level 1, best moves, stars]}, tutorial", "the result is kept,
   unverified, without a trace"; the envelope of `ChronoConstellatorSchemaExamples`) with

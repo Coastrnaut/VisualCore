@@ -117,11 +117,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [amethystEscape].compactMap { $0 }
 
-    /// R02-G07 Amethyst Escape (feature 363, R02-G07-03): a candidate until X-R02-G07. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G07 Amethyst Escape (feature 363, R02-G07-03): a candidate until X-R02-G07. Snapshot schema 3 (feature 367),
+    /// so the schema-1 and schema-2 examples are stored (feature 369, R02-G07-09).
     fileprivate static var amethystEscape: ExperienceRegistration? {
         guard let id = AmethystEscapeExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: AmethystEscapeExperienceCore.self) { launch in
+        let examples = [AmethystEscapeExperienceCore.schemaOneExample(),
+                        AmethystEscapeExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: AmethystEscapeExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return AmethystEscapeExperience.make(
                 id: id, storage: launch.storage,
