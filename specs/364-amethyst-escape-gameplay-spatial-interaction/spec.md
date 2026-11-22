@@ -137,6 +137,9 @@ undo, redo, next level, "Show all layers", "Reset view"), including winning ever
 ### Edge Cases
 
 - **A touch that never moves far enough:** a tap (see US2); two taps on empty space within 0.35 s reset the view.
+- **A touch that moves 10 … 16 points:** neither a tap nor a drag; nothing is sent.
+- **A finished play (won, failed or showing the result):** drags and pearl taps send nothing; selection, isolation and
+  orbit still work.
 - **A second finger during a drag:** cancels it (nothing sent) and orbits.
 - **A cancelled touch:** sends nothing.
 - **A drag that sweeps more than half a turn:** the turn is the shortest equivalent (at most ⌊S/2⌋ sectors either way).
