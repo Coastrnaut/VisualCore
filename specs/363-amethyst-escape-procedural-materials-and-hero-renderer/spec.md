@@ -147,6 +147,8 @@ as available, and the experience package, registry, catalog and content checks p
   only.
 - **A pearl in a blocked wedge (a failure):** the wedge is marked distinctly and the failure shown names its shell and
   sector.
+- **A won level:** once the pearl has left through the exit gap, it is drawn on the exit arrow's centre (outside the
+  outer shell) and the exit glow is lit; the frame checks use that position.
 - **Memory warning:** caches are released and rebuilt on the next frame.
 - **Reduce Motion:** the facet highlights stand still; Reduce Flashing caps the glow to the shared limit.
 
