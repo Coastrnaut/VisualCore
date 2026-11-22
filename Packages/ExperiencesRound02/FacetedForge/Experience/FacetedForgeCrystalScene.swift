@@ -1,15 +1,18 @@
 // FacetedForgeCrystalScene — feature 373 (R02-G08-03) T-R02G0803-006 (FR-R02G0803-001 … 004, 007; clarifications
 // Q1–Q4). Draws one `FacetedForgeSceneSnapshot` at one tier through the real GL path: the ground clear; the crystal
-// (ground plane, the bevelled pieces opened about the crystal's centre and emitted back to front, the ruby preview plane
-// with its dashed rim, the sliver cross and the cut mark) with `FacetedForgeShaders.crystal*`, premultiplied alpha so
-// the ice glass and the preview are translucent while every other material is opaque, the dispersion shimmer following
-// `u_time` (held at 0 under Reduce Motion); and the tier's glow shells over the cut faces with the glow program, additive
-// (level-0 two, level-1 one, level-2 none). Depth testing is off on this path, so the order is the layering; back faces
-// are culled on every draw. Geometry is rebuilt only when the level, the pieces (cuts), the preview choice, the stage,
-// the failure, the opening while it eases, the tier or the mode change; the shimmer moves by a uniform. Reduce Motion
-// shows the opening at full distance without easing. Reduce Flashing passes `FacetedForgeShaders.glowLimit(
-// reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls back to the level-2 geometry drawn unlit with
-// the shared `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason; nothing here can reach the kernel.
+// (ground plane, the bevelled pieces opened about the crystal's centre and emitted back to front, the ruby preview
+// plane with its dashed rim, the sliver cross and the cut mark) with `FacetedForgeShaders.crystal*`, premultiplied
+// alpha so the ice glass and the preview are translucent while every other material is opaque, the dispersion shimmer
+// following `u_time` (held at 0 under Reduce Motion); and the tier's glow shells over the cut faces with the glow
+// program, additive (level-0 two, level-1 one, level-2 none). Depth testing is off on this path, so the order is the
+// layering; back faces are culled on every draw. Geometry is rebuilt only when the level, the pieces (cuts), the
+// preview choice, the stage, the failure, the opening while it eases, the tier or the mode change; the shimmer moves by
+// a uniform. Reduce Motion shows the opening at full distance without easing. Reduce Flashing passes
+// `FacetedForgeShaders.glowLimit(reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls back to the
+// level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason;
+// nothing here can reach the kernel.
+// Feature 374 (R02-G08-04): the camera follows the presenter's orbit (`camera(_:aspect:orbit:)`) and the pieces are
+// emitted back to front for that orbit's eye; the snapshot drawn may carry a gesture's candidate preview choice.
 #if os(iOS)
 import FacetedForgeCore
 import Foundation
@@ -28,6 +31,8 @@ final class FacetedForgeCrystalScene {
     var reducedFlash = false
     /// Whether the opening is shown at full distance without easing (Reduce Motion).
     var reduceMotion = false
+    /// The camera orbit (presentation only), set by the presenter before each frame (feature 374).
+    var orbit: FacetedForgeOrbit = .authored
     /// The light direction of the crystal (towards the light, from the upper left front).
     static let lightDirection = SIMD3<Float>(-0.35, 0.8, 0.5)
 
@@ -40,6 +45,7 @@ final class FacetedForgeCrystalScene {
         let stage: FacetedForgeStage
         let failure: FacetedForgeFailure?
         let opening: Double
+        let orbit: FacetedForgeOrbit
         let tier: Int
         let fallback: Bool
     }
@@ -87,7 +93,7 @@ final class FacetedForgeCrystalScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = FacetedForgeSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = FacetedForgeSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let key = key(snapshot, tier: tier)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = self.key(snapshot, tier: tier)
@@ -106,7 +112,8 @@ final class FacetedForgeCrystalScene {
     private func key(_ s: FacetedForgeSceneSnapshot, tier: FacetedForgeTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, cuts: s.cuts, corners: s.pieces.map(\.corners), choice: s.choice,
                     stage: s.stage, failure: s.failure,
-                    opening: FacetedForgeSceneGeometry.opening(s, reduceMotion: reduceMotion), tier: tier.index,
+                    opening: FacetedForgeSceneGeometry.opening(s, reduceMotion: reduceMotion), orbit: orbit,
+                    tier: tier.index,
                     fallback: fallbackReason != nil)
     }
 
@@ -117,11 +124,13 @@ final class FacetedForgeCrystalScene {
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let crystal = try FacetedForgeSceneGeometry.crystalMesh(snapshot, tier: tier, reduceMotion: reduceMotion)
+                let crystal = try FacetedForgeSceneGeometry.crystalMesh(snapshot, tier: tier,
+                                                                       reduceMotion: reduceMotion, orbit: orbit)
                 crystalRenderer = try Self.renderer(crystal, vertex: FacetedForgeShaders.crystalVertex,
                                                     fragment: crystalFragment, name: "faceted-forge-crystal",
                                                     registry: registry)
-                let glow = try FacetedForgeSceneGeometry.glowMesh(snapshot, tier: tier, reduceMotion: reduceMotion)
+                let glow = try FacetedForgeSceneGeometry.glowMesh(snapshot, tier: tier, reduceMotion: reduceMotion,
+                                                                  orbit: orbit)
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: FacetedForgeShaders.glowVertex,
                                                      fragment: FacetedForgeShaders.glowFragment,
@@ -137,10 +146,10 @@ final class FacetedForgeCrystalScene {
         let minimal = FacetedForgeTier.of(FacetedForgeTier.all.count - 1)
         let up = Vec3(0, 1, 0)
         let parts: [(part: FacetedForgeColouredMesh, colourInNormals: Bool)] = [
-            (part: try FacetedForgeSceneGeometry.crystalPart(snapshot, tier: minimal, reduceMotion: reduceMotion),
-             colourInNormals: false),
-            (part: try FacetedForgeSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: reduceMotion),
-             colourInNormals: true),
+            (part: try FacetedForgeSceneGeometry.crystalPart(snapshot, tier: minimal, reduceMotion: reduceMotion,
+                                                             orbit: orbit), colourInNormals: false),
+            (part: try FacetedForgeSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: reduceMotion,
+                                                          orbit: orbit), colourInNormals: true),
         ]
         for entry in parts where !entry.part.mesh.indices.isEmpty {
             var mesh = entry.part.mesh

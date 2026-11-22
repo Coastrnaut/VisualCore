@@ -2,7 +2,8 @@
 // control panel: a labelled piece picker, a direction picker, depth − and + (the preview choice, presentation state
 // only), cut (a kernel action through the action port), undo, redo and next level, each with an accessibility label and
 // value. Dragging the cut plane's rim, the depth slider, tap to commit and orbit come in R02-G08-04; full accessibility
-// in R02-G08-06.
+// in R02-G08-06. Feature 374 (R02-G08-04): "Reset view" returns the camera to the authored view; every action goes
+// through the presenter, which shows and logs a refusal like a gesture's.
 #if os(iOS)
 import FacetedForgeCore
 import SwiftUI
@@ -12,6 +13,8 @@ import VisualCoreExperienceHost
 struct FacetedForgeControls: View {
     let port: ExperienceActionPort
     let mirror: FacetedForgeMirror
+    /// The presenter, for "Reset view" (feature 374) and refusals shown and logged like the gestures' ones.
+    let presenter: FacetedForgePresenter
 
     var body: some View {
         ScrollView(.vertical) {
@@ -75,13 +78,14 @@ struct FacetedForgeControls: View {
                 .accessibilityLabel("Redo the cut")
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+            Button("Reset view") { presenter.resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
         }
     }
 
     /// Sends `control` and shows a refusal.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        presenter.send(control, values, port: port)
     }
 }
 #endif

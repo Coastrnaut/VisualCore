@@ -54,7 +54,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G0804-005 [US4] Wire `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift`
+- [X] T-R02G0804-005 [US4] Wire `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift` — Verified 2026-11-22: 2026-11-22: sim-27 (FacetedForgeExperienceTests, 38 tests incl. 7 gesture wiring tests, iOS 27.2) exit 0
   (`pointer(_:viewSize:port:)` routing through the gesture controller, `choose` setting the mirror's choice, `cut` sent
   through the port, `resetView()`, the descriptions "The cut plane would tilt to direction …" / "would move to depth …"
   and, for a commit on a finished play, "The play is over: undo or go to the next level"; a gesture's refused action

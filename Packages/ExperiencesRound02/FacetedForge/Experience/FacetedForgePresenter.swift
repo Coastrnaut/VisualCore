@@ -7,6 +7,14 @@
 // memory warning releases the GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no
 // drawing result reaches the kernel (renderer purity). Its probes (two ground corners) let the verification runner
 // check a frame.
+// Feature 374 (R02-G08-04) T-R02G0804-005 (FR-R02G0804-001 … 008; clarifications Q1–Q5): canvas touches go through
+// `FacetedForgeGestureController`: a tap on a piece chooses it, a drag on the preview's rim tilts the plane to the
+// nearest of the 13 directions, a drag on its interior (the depth slider) moves it by whole crossing depths, a tap on
+// the plane commits the cut (`piece.cut`, never twice within 0.35 s), two fingers orbit the camera and a double tap on
+// empty space or `resetView()` ("Reset view") returns to the authored view (presentation only: never in the digest,
+// the snapshot or the kernel). While a drag previews a choice the scene draws it and the description begins "The cut
+// plane would …"; a commit on a finished play says "The play is over: undo or go to the next level". A refused action
+// is shown in the panel and its code kept in ``FacetedForgePresenter/refusalLog``.
 #if os(iOS)
 import FacetedForgeCore
 import Foundation
@@ -15,6 +23,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show and choose: the latest state the presenter described and the preview choice.
 @MainActor
@@ -110,8 +119,17 @@ final class FacetedForgePresenter: ExperiencePresenter {
     let scene = FacetedForgeCrystalScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G0803-004).
     private(set) var tierLog: [FacetedForgeTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot of the kernel drawn with the mirror's choice (tests, the description and the gestures; never
+    /// a gesture's candidate).
     private(set) var lastSnapshot: FacetedForgeSceneSnapshot?
+    /// The play last drawn (the gestures' crossing depths).
+    private(set) var lastPlay: FacetedForgePlay?
+    /// The gesture controller (feature 374): piece choice, rim tilt, depth slide, commit, orbit.
+    private(set) var gestures = FacetedForgeGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -151,7 +169,108 @@ final class FacetedForgePresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(choice: choice(for: core), time: time)
         lastSnapshot = snapshot
-        try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
+        lastPlay = core.play
+        scene.orbit = gestures.orbit
+        let shown: FacetedForgeSceneSnapshot
+        if let candidate = gestures.candidate {
+            shown = core.snapshot(choice: candidate, time: time)
+        } else {
+            shown = snapshot
+        }
+        try scene.render(shown, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
+    }
+
+    // MARK: Touch controls (feature 374)
+
+    /// The canvas gestures send cuts.
+    var gestureActions: Set<String> { ["piece.cut"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(FacetedForgeExperienceCore.actionIDs) }
+
+    /// What a commit on a finished play shows.
+    static let finishedMessage = "The play is over: undo or go to the next level"
+
+    /// The touch-down of the current one-finger touch: its point and what it picked (for the finished-play message).
+    private var touchDown: (id: Int, point: Vec2, pick: FacetedForgePick)?
+    /// The fingers down now.
+    private var fingersDown: Set<Int> = []
+    /// Whether more than one finger has been down since the last time none was: such a gesture shows no message and
+    /// commits nothing.
+    private var multiTouch = false
+
+    /// Routes a canvas touch through the gesture controller and applies what it returns, in order: a chosen preview
+    /// goes to the mirror, a cut is sent through the port; a tap on the plane of a finished play explains that the play
+    /// is over.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot, let play = lastPlay else { return }
+        switch event.phase {
+        case .began:
+            fingersDown.insert(event.id)
+            if fingersDown.count == 1, !multiTouch {
+                let pick: FacetedForgePick = FacetedForgePicker.pick(
+                    SIMD2(Double(event.location.x), Double(event.location.y)),
+                    size: SIMD2(Double(viewSize.x), Double(viewSize.y)), snapshot: snapshot, orbit: gestures.orbit,
+                    reduceMotion: reduceMotion)
+                touchDown = (event.id, event.location, pick)
+            } else {
+                multiTouch = true   // a second (or later) finger: this gesture shows no message
+                touchDown = nil
+            }
+        case .cancelled:
+            touchDown = nil
+        default:
+            break
+        }
+        let actions: [FacetedForgeGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot,
+                                                                   play: play)
+        if event.phase == .ended, let down = touchDown, down.id == event.id, !multiTouch {
+            touchDown = nil
+            let travel: Double = Double((event.location - down.point).length)
+            let tapped: Bool = down.pick == .plane && travel < FacetedForgeGestureController.tapDistance
+            if tapped, actions.isEmpty, snapshot.stage != .playing { mirror.message = Self.finishedMessage }
+        }
+        if event.phase == .ended || event.phase == .cancelled {
+            fingersDown.remove(event.id)
+            if fingersDown.isEmpty { multiTouch = false }
+        }
+        for action in actions {
+            switch action {
+            case .choose(let choice):
+                mirror.choice = choice.clamped(to: play)
+            case .cut(let piece, let direction, let depth):
+                send("piece.cut", [Double(piece), Double(direction), Double(depth)], port: port)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+    }
+
+    /// Drops a touch in progress (the shell suspends the experience): a gesture under way is abandoned without an
+    /// action; the orbit is presentation only and returns to the authored view.
+    func cancelPointers() {
+        gestures.cancel()
+    }
+
+    /// Returns the camera to the authored view ("Reset view").
+    func resetView() {
+        gestures.resetView()
+    }
+
+    /// Sends `control` with `values`, shows a refusal in the panel and keeps its code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(result.code)"
+            refusalLog.append(result.code)
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        return result
     }
 
     func teardown(_ context: RenderContext) {
@@ -190,7 +309,15 @@ final class FacetedForgePresenter: ExperiencePresenter {
         mirror.budget = level.budget
         mirror.pieceNames = play.pieces.indices.map { Self.pieceName($0, play) }
         mirror.targetLabel = "Target: " + level.targetDescription()
-        var text = "Faceted Forge level \(core.levelNumber). "
+        var text = ""
+        if let candidate = gestures.candidate {
+            if gestures.state == .rimDrag {
+                text += "The cut plane would tilt to direction \(FacetedForgeDirection.all[candidate.direction].name). "
+            } else if gestures.state == .depthDrag {
+                text += "The cut plane would move to depth \(candidate.depth). "
+            }
+        }
+        text += "Faceted Forge level \(core.levelNumber). "
         text += "\(play.cuts) of \(level.budget) cuts spent. Target: \(level.targetDescription()). "
         text += "\(play.pieces.count) " + (play.pieces.count == 1 ? "piece: " : "pieces: ")
         text += mirror.pieceNames.joined(separator: "; ") + ". "
@@ -216,7 +343,7 @@ final class FacetedForgePresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(FacetedForgeControls(port: port, mirror: mirror))
+        AnyView(FacetedForgeControls(port: port, mirror: mirror, presenter: self))
     }
 }
 #endif
