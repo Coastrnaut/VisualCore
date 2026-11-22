@@ -25,7 +25,7 @@ change (the shaders and reference of R02-G08-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G0809-003 [US1] Edit `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgeControls.swift`:
+- [X] T-R02G0809-003 [US1] Edit `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgeControls.swift`: — Verified 2026-11-22: sim-27 (FacetedForgeExperienceTests, 66 tests on iOS 27.2 incl. FacetedForgeIdentifierTests: the 24 clarified names each once, lower-case tokens, every identifier experience.r02-g08.faceted-forge.<name> and unique) exit 0; 24 .accessibilityIdentifier modifiers added; an unrecorded run passed first
   identifiers `experience.r02-g08.faceted-forge.<name>` through `port.identifier` (spec Clarifications Q1 names:
   cut, undo, redo, next-level, depth-down, depth-up, reset-view, hint, dismiss-tutorial, failure-undo, retry,
   campaign, daily, practice, play-level, replay, replay-step, replay-stop, piece-picker, direction-picker, depth-picker,

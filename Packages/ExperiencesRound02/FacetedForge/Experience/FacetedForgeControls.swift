@@ -11,7 +11,9 @@
 // that become columns at accessibility text sizes and a 520-point readable width. Feature 377 (R02-G08-07)
 // T-R02G0807-005 (clarifications Q2, Q4, Q5): "Replay best solution" for a level with a verified stored solution, and
 // during replay its position ("Replay: cut k of n") with Step and Stop, each with a label and a value; the Sound toggle
-// saves the choice through `settings.sound`.
+// saves the choice through `settings.sound`. Feature 379 (R02-G08-09) T-R02G0809-003 (FR-R02G0809-001; clarification
+// Q1): every control also carries the stable identifier `experience.r02-g08.faceted-forge.<name>` (`port.identifier`),
+// the names listed in ``identifierNames``.
 #if os(iOS)
 import FacetedForgeCore
 import SwiftUI
@@ -28,6 +30,14 @@ struct FacetedForgeControls: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the ambient loop plays only while it is.
     @Environment(\.scenePhase) private var scenePhase
+
+    /// Every control's identifier name (clarification Q1 of feature 379), each once; the identifier is
+    /// `experience.r02-g08.faceted-forge.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "cut", "undo", "redo", "next-level", "depth-down", "depth-up", "reset-view", "hint", "dismiss-tutorial",
+        "failure-undo", "retry", "campaign", "daily", "practice", "play-level", "replay", "replay-step", "replay-stop",
+        "piece-picker", "direction-picker", "depth-picker", "level-picker", "sound", "summary",
+    ]
 
     /// The widest the panel's content grows, padding included (clarification Q5 of feature 376).
     static let readableWidth: CGFloat = 520
@@ -69,14 +79,17 @@ struct FacetedForgeControls: View {
                 Button("Step") { presenter.stepReplay(port: port) }
                     .accessibilityLabel("Play the next cut of the replay")
                     .accessibilityValue("Cut \(mirror.replayPosition) of \(mirror.replayLength)")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                 Button("Stop") { presenter.stopReplay(port: port) }
                     .accessibilityLabel("Stop the replay")
                     .accessibilityValue("\(mirror.replayLength) cuts")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
                 .accessibilityLabel("Replay your best solution of this level")
                 .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
         }
     }
 
@@ -90,6 +103,7 @@ struct FacetedForgeControls: View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
     }
 
     /// The level, cuts and stage lines.
@@ -102,6 +116,7 @@ struct FacetedForgeControls: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Crystal")
             .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
         Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
             Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
@@ -116,22 +131,27 @@ struct FacetedForgeControls: View {
                     onDecrement: { mirror.pickPiece(-1) })
                 .accessibilityLabel("Piece to cut")
                 .accessibilityValue(mirror.pieceLabel)
+                .accessibilityIdentifier(port.identifier("piece-picker"))
             Stepper(mirror.directionLabel,
                     onIncrement: { mirror.pickDirection(1) },
                     onDecrement: { mirror.pickDirection(-1) })
                 .accessibilityLabel("Direction of the cut")
                 .accessibilityValue(mirror.directionLabel)
+                .accessibilityIdentifier(port.identifier("direction-picker"))
             Stepper(mirror.depthLabel,
                     onIncrement: { mirror.stepDepth(1) },
                     onDecrement: { mirror.stepDepth(-1) })
                 .accessibilityLabel("Depth of the cut")
                 .accessibilityValue(mirror.depthLabel)
+                .accessibilityIdentifier(port.identifier("depth-picker"))
             row {
                 Button("Depth −") { mirror.stepDepth(-1) }
                     .accessibilityLabel("Move the cut plane one step back")
+                    .accessibilityIdentifier(port.identifier("depth-down"))
                     .accessibilityValue(mirror.depthLabel)
                 Button("Depth +") { mirror.stepDepth(1) }
                     .accessibilityLabel("Move the cut plane one step forward")
+                    .accessibilityIdentifier(port.identifier("depth-up"))
                     .accessibilityValue(mirror.depthLabel)
             }
         }
@@ -144,12 +164,14 @@ struct FacetedForgeControls: View {
                 Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
             }
         }
         row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+                .accessibilityIdentifier(port.identifier("hint"))
             Text("Goal: match the target in \(mirror.smallest) cuts; budget \(mirror.budget)")
                 .font(.footnote)
         }
@@ -162,8 +184,10 @@ struct FacetedForgeControls: View {
                 row {
                     Button("Undo") { presenter.undoCut(port: port) }
                         .accessibilityLabel("Undo the last cut")
+                        .accessibilityIdentifier(port.identifier("failure-undo"))
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
+                        .accessibilityIdentifier(port.identifier("retry"))
                 }
             }
         }
@@ -175,12 +199,15 @@ struct FacetedForgeControls: View {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
                 .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with a larger cut budget")
                 .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+                .accessibilityIdentifier(port.identifier("practice"))
         }
         row {
             Stepper(levelLabel(mirror.pickedLevel),
@@ -188,8 +215,10 @@ struct FacetedForgeControls: View {
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
                 .accessibilityLabel("Level to play")
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("level-picker"))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
+                .accessibilityIdentifier(port.identifier("play-level"))
         }
     }
 
@@ -219,14 +248,19 @@ struct FacetedForgeControls: View {
             }
             .accessibilityLabel("Cut the chosen piece with the shown plane")
             .accessibilityValue(mirror.pieceLabel + ", " + mirror.directionLabel + ", " + mirror.depthLabel)
+            .accessibilityIdentifier(port.identifier("cut"))
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last cut")
+                .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the cut")
+                .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityIdentifier(port.identifier("next-level"))
             Button("Reset view") { presenter.resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 
