@@ -42,34 +42,34 @@ leak allowance), `NocturneGardenBloom` (exact cells), `NocturneGardenMask`, `Noc
 
 - Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
   table in `NocturneGardenManifest` with their provenance. Candidate k of entry n draws from `SeededRandom(seed:
-  SeedDerivation.derive(plannedSeed, index: k))`, in this order: the bed by band (16 × 12, 20 × 14, 24 × 16, 28 × 20,
-  32 × 24); the allowed sizes (band 1: {2}; band 2: {1, 2}; bands 3 … 5: {1, 2, 3}) and elevations (bands 1 … 2: {2, 3};
+  SeedDerivation.derive(plannedSeed, index: k))`, in this order: the bed by band (16 × 12, 20 × 14, 24 × 16, 28 × 20, 32
+  × 24); the allowed sizes (band 1: {2}; band 2: {1, 2}; bands 3 … 5: {1, 2, 3}) and elevations (bands 1 … 2: {2, 3};
   bands 3 … 5: {1, 2, 3, 4}); a construction sun; the bloom count b by band (1 … 2; 2 … 3; 3 … 4; 4 … 5; 5 … 6) and b
   blooms, each a drawn kind, size and anchor whose cast lies wholly in the bed and adds at least 3 new cells; the target
-  is their exact mask; the forbidden cells are the cells outside the target within Chebyshev distance 1 (bands 1 … 2)
-  or 2 (bands 3 … 5) of it, each kept with probability 1/2 (bands 1 … 2) or 3/4 (bands 3 … 5); the required match is
-  4/5, 17/20, 9/10, 19/20, 1/1 by band; the leak allowance 2, 2, 1, 1, 0 by band; the supply is the kinds of the b
-  blooms plus, from band 3 on, one decoy of another kind; the opening sun is drawn from the allowed elevations (so a
-  sun move may be needed). A candidate is kept when the solver certifies it within its work bound with a smallest move
-  count at most the manifest budget; otherwise k grows, at most 256 candidates, then `generation(n)`. Ids
-  `nocturne-garden-NNN`; tutorial flag on levels 1 … 3; difficulty = band; budget = manifest budget. Impact:
-  FR-R02G0902-001, 006; SC-R02G0902-001, 003, 004.
+  is their exact mask; the forbidden cells are the cells outside the target within Chebyshev distance 1 (bands 1 … 2) or
+  2 (bands 3 … 5) of it, each kept with probability 1/2 (bands 1 … 2) or 3/4 (bands 3 … 5); the required match is 4/5,
+  17/20, 9/10, 19/20, 1/1 by band; the leak allowance 2, 2, 1, 1, 0 by band; the supply is the kinds of the b blooms
+  plus, from band 3 on, one decoy of another kind; the opening sun is drawn from the allowed elevations (so a sun move
+  may be needed). A candidate is kept when the solver certifies it within its work bound with a smallest move count at
+  most the manifest budget; otherwise k grows, at most 256 candidates, then `generation(n)`. Ids `nocturne-garden-NNN`;
+  tutorial flag on levels 1 … 3; difficulty = band; budget = manifest budget. Impact: FR-R02G0902-001, 006;
+  SC-R02G0902-001, 003, 004.
 - Q: How does the solver decide the smallest move count, and what proves it? → A: for each allowed elevation e (in
   ascending order) the needed shared cells are s(e) = the least s with s·q ≥ p·|T| (the union is at least the target),
-  and the cover c(e) = the largest |cells ∩ T| of any single plant (every kind in the supply, size and anchor) at e
-  with no leak beyond the allowance on its own; the lower bound is L = min over e of [e ≠ opening sun] + ⌈s(e) / c(e)⌉.
-  The solver searches depth-first, elevation by elevation, for a winning sequence of exactly L moves: a sun move first
-  when e differs from the opening, then plants among the grid-snapped candidates at e, ordered by shape score (cells in
-  T minus cells outside T, then the rules' plant order), pruning when shared + remaining plants · c(e) < s(e) or the leak
-  exceeds the allowance; it never continues from a failed state. A sequence of L moves found proves L is the smallest;
-  a candidate whose search finds none within the bound is skipped. Work = plants evaluated, counted and bounded at
-  20,000 per level. The witness is the first sequence found, replayed through the kernel's play. Impact:
-  FR-R02G0902-002; SC-R02G0902-001, 002, 005.
+  and the cover c(e) = the largest |cells ∩ T| of any single plant (every kind in the supply, size and anchor) at e with
+  no leak beyond the allowance on its own; the lower bound is L = min over e of [e ≠ opening sun] + ⌈s(e) / c(e)⌉. The
+  solver searches depth-first, elevation by elevation, for a winning sequence of exactly L moves: a sun move first when
+  e differs from the opening, then plants among the grid-snapped candidates at e, ordered by shape score (cells in T
+  minus cells outside T, then the rules' plant order), pruning when shared + remaining plants · c(e) < s(e) or the leak
+  exceeds the allowance; it never continues from a failed state. A sequence of L moves found proves L is the smallest; a
+  candidate whose search finds none within the bound is skipped. Work = plants evaluated, counted and bounded at 20,000
+  per level. The witness is the first sequence found, replayed through the kernel's play. Impact: FR-R02G0902-002;
+  SC-R02G0902-001, 002, 005.
 - Q: What difficulty metrics are stored and what progression is required? → A: `NocturneGardenDifficulty` holds the
   smallest move count, the distinct kinds and sizes of the witness, whether it changes the sun, the target's and the
   forbidden regions' cell counts, the required match and the solver work. The catalog in manifest order keeps R02-F24's
-  standard `ProgressionRule` (drop at most 1, jump at most 3) on the smallest move count; the band ranges make band means
-  non-decreasing. Impact: FR-R02G0902-003, 005; SC-R02G0902-004.
+  standard `ProgressionRule` (drop at most 1, jump at most 3) on the smallest move count; the band ranges make band
+  means non-decreasing. Impact: FR-R02G0902-003, 005; SC-R02G0902-004.
 - Q: What is in a witness file and how is it checked? → A: `docs/games/nocturne-garden/levels/NNN.witness.json`, JSON
   schema 1 with sorted keys: number, the level's stored form, the actions, the state digest after every action (16 hex
   characters of the SHA-256 of the mask's sorted cells), the play fingerprints after `begin` and after each action, the
@@ -80,11 +80,11 @@ leak allowance), `NocturneGardenBloom` (exact cells), `NocturneGardenMask`, `Noc
   005.
 - Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
   `PuzzleCatalog<NocturneGardenRules>.digest(id: "nocturne-garden", identities:)` over the 100 level fingerprints in
-  manifest order, pinned in a test. Certification tests are split into groups of 5 levels so each runs under 10
-  seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New
-  refusals: `generation(Int)` (`r02-g09.generation`) and `witness(String)` (`r02-g09.witness`). The independent check
-  of SC-R02G0902-002 recomputes the lower bound by brute force over all single plants on sampled levels (two per band)
-  and replays each witness on a fresh play. Impact: FR-R02G0902-002, 005, 006; SC-R02G0902-002, 006.
+  manifest order, pinned in a test. Certification tests are split into groups of 5 levels so each runs under 10 seconds
+  on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New refusals:
+  `generation(Int)` (`r02-g09.generation`) and `witness(String)` (`r02-g09.witness`). The independent check of
+  SC-R02G0902-002 recomputes the lower bound by brute force over all single plants on sampled levels (two per band) and
+  replays each witness on a fresh play. Impact: FR-R02G0902-002, 005, 006; SC-R02G0902-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
