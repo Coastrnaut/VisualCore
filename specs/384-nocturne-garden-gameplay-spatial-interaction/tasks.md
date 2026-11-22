@@ -50,7 +50,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G0904-005 [P] [US5] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenPanelWinTests.swift`: all 100 certified levels won
+- [X] T-R02G0904-005 [P] [US5] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenPanelWinTests.swift`: all 100 certified levels won — Verified 2026-11-22: host-4 exit=0 (NocturneGardenPanelWinTests: all 100 certified levels won through panel presses alone in 10 groups, panel undo and redo restore the digests; note: single-step Sun ± costs up to 2 extra moves on 35 levels, addressed in T-006 by a sun picker; agent D's file retested by the lead)
   through panel actions only (the kind, column, row and size pickers then Plant send `bloom.plant`; the bloom picker
   with Move, Resize and Remove; Sun − and + send `sun.set`), split so each test is under 10 s, plus panel Undo then
   Redo after a plant restoring the digests before and after it; agent D; `--name host-4`
