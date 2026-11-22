@@ -34,7 +34,7 @@ change (the shaders and reference of R02-G07-03 are unchanged and re-proven by t
   every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test --only-testing AmethystEscapeExperienceTests`
-- [ ] T-R02G0709-004 [US1] Create `Apps/VisualCore/Tests/UI/AmethystEscape/AESupport.swift`, `AEPlayUITests.swift`,
+- [X] T-R02G0709-004 [US1] Create `Apps/VisualCore/Tests/UI/AmethystEscape/AESupport.swift`, `AEPlayUITests.swift`, — Verified 2026-11-22: app-ui-2 exit=0 (p3: AEPlayUITests 54.9 s and 75.2 s, AEReplayUITests 58.3 s on the iOS 27.2 phone); first attempt app-ui exit=1 ran 0 tests before xcodegen generate picked up the new files; p3 key unique, release_check test added
   `AEReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 certified actions and the shell picker's starting
   shell pinned in `AE`; each turn played by stepping the shell picker to its shell, then Turn + or Turn −; each advance
   by Advance; read "The pearl escaped through the exit gap" and "Stars: 3 of 3"; background before terminate on

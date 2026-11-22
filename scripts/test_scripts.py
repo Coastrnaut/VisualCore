@@ -1149,6 +1149,18 @@ class ReleaseCheckTests(unittest.TestCase):
         start = argv.index("--only-testing") + 1
         self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/CRPlayUITests", "VisualCoreUITests/CRReplayUITests"])
 
+    def test_amethyst_escape_ui_chunk(self):
+        """Feature 369 R02-G07-09 (T-R02G0709-004): the serial chunk `p3` runs the Amethyst Escape interface
+        journeys."""
+        self.assertEqual(relcheck.UI_CHUNKS["p3"], ["AEPlayUITests", "AEReplayUITests"])
+        self.assertIn("p3", relcheck.SERIAL_CHUNKS)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-p3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2],
+                         ["VisualCoreUITests/AEPlayUITests", "VisualCoreUITests/AEReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""
