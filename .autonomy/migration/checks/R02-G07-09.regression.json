@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/amethyst_escape_regression.py"
+  ],
+  "command": "python3 scripts/amethyst_escape_regression.py",
+  "elapsed_seconds": 11.088,
+  "exit_code": 0,
+  "finished": "2026-11-22T11:07:56+00:00",
+  "gate": "R02-G07-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-09.regression.log",
+  "log_sha256": "7467219366c0f5928772df06ea35645f4c7de6042baf71c9e2842e0aff0de81a",
+  "name": "regression",
+  "started": "2026-11-22T11:07:45+00:00",
+  "timed_out": false
+}
