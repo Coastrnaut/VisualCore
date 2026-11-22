@@ -42,7 +42,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   extreme settings — 2 × 6 and 5 × 12; pearl, exit and every wedge top inside the view with margin at 7 aspects; same
   positions at every tier; world sector follows the offset; move bar length at 0, half and the budget); agent B;
   `--name host-3`
-- [ ] T-R02G0703-005 [P] [US2] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeExperienceCore.swift`
+- [X] T-R02G0703-005 [P] [US2] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeExperienceCore.swift` — Verified 2026-11-22: 2026-11-22: host-4 (ExperienceCoreTests + RendererPurityTests, 12 tests) exit 0, rerun by the lead
   (controls "shell.rotate [0 … shells − 1, −1 or +1], pearl.advance, play.undo, play.redo, level.next"; digest "level
   number and play fingerprint"; schema 1 `{level, records}`; quality profile of three levels; levels generated once per
   process; `snapshot(time:)`) with
