@@ -470,3 +470,7 @@ Feature 378 (R02-G08-08) adds the regression net: solver and witness checks for 
 alterations, `FacetedForgeGolden` (test builds only) with 16 pinned golden frame descriptions in
 `FacetedForge/golden-frames.json` (`FACETED_FORGE_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and memory
 tests, a CI step and `scripts/faceted_forge_regression.py`.
+
+Feature 379 (R02-G08-09) adds Faceted Forge's in-app integration: panel identifiers
+(`FacetedForgeControls.identifierNames`), the stored schema-1 and schema-2 examples (`FacetedForgeSchemaExamples`), app
+unit tests, and the interface tests `FFPlayUITests` and `FFReplayUITests` in serial chunk `q3`.

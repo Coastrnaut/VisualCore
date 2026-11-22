@@ -209,3 +209,19 @@ directions 0 … 12, depths ascending.
   after each close and memory warning.
 - **Where it runs.** CI's host job has a named "Faceted Forge regression (host)" step; locally,
   `python3 scripts/faceted_forge_regression.py` runs the host and simulator parts with one summary line each.
+
+## In-app integration (feature 379, R02-G08-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g08.faceted-forge.<name>`
+  (`FacetedForgeControls.identifierNames`, 24 names: cut, undo, redo, next-level, depth-down, depth-up, reset-view,
+  hint, dismiss-tutorial, failure-undo, retry, campaign, daily, practice, play-level, replay, replay-step, replay-stop,
+  piece-picker, direction-picker, depth-picker, level-picker, sound, summary).
+- **Interface tests.** `FFPlayUITests` wins level 1 through the panel (its certified solution: three cuts, each set by
+  stepping the piece, direction and depth pickers from their current values and tapping Cut: "The pieces match the
+  target", "Stars: 3 of 3", level 2 open) and keeps the progress over a relaunch; `FFReplayUITests` replays the win
+  (three cuts) to its end and stops. They run as serial chunk `q3`, each under 90 s. Level 1's certified cuts, smallest
+  cut count and the pickers' starting choice are pinned in `FF` and checked against the Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`FacetedForgeSchemaExamples`), which the
+  app restores into schema 3 (a schema-2 result without a trace is kept, unverified); Faceted Forge stays a candidate
+  (not available without `-vcCandidates`) until X-R02-G08.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.

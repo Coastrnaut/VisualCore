@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-08: Faceted Forge regression net and local command).
+Last updated: 2026-11-22 (R02-G08-09: Faceted Forge interface chunk q3; PosterBoard crashes on the UI-test phone).
 
 ## 1. What is tested, and where
 
@@ -389,6 +389,18 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the
   enumeration guard caught (0/3 declared tests). The level-1 journey is one Turn − and two Advances, and its pinned
   values are checked against the Core by an app unit test.
+- **PosterBoard crashes on the UI-test phone** (R02-G08-09, 2026-11-22). "PosterBoard quit unexpectedly" dialogs came
+  from one simulator, the iOS 27.2 iPhone that `xcodebuild_app.py --kind phone` picks: its poster database was
+  corrupt (`PRPosterDescriptor _initWithPath` in the StandBy role), and every Home press of a relaunch test crashed
+  PosterBoard again. The crash report's `coalitionName` names the simulator; moving that device's
+  `PRBPosterExtensionDataStore` and `com.apple.PosterKit` aside (simulator shut down) ended the crashes. The same
+  relaunch test could not tap the restored level picker: right after a relaunch a visible stepper inside the nested
+  scroll views reported not hittable, so `FF` waits up to 5 s and then taps a control whose frame lies inside the
+  visible list by coordinate; an unchanged value still fails the test.
+- **Faceted Forge in the app** (R02-G08-09, 2026-11-22). Serial chunk `q3` holds `FFPlayUITests` and `FFReplayUITests`
+  (the key was checked unique before use). Each cut is set by stepping the piece, direction and depth pickers from
+  their current values (read from the steppers), never from an assumed choice, because the panel keeps the player's
+  choice across cuts; `xcodegen generate` ran first so the new UI test files reach the target.
 - **Faceted Forge regression** (R02-G08-08, 2026-11-22). `python3 scripts/faceted_forge_regression.py` runs the host
   filter `FacetedForgeRegression` (solver regression over 100 witnesses in tests of 10, ten named alterations, golden
   descriptions) and then the simulator golden-frame and memory classes with
