@@ -24,7 +24,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   (field and glow sources; uniform names; ribbon alpha decay and shimmer from time; glow gain cap; palette constants
   equal to the CPU's) with `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorShaderSourceTests.swift`
   (version line, declared uniforms, no texture samplers, bounded loops, palette constants match); agent A; `--name host-2`
-- [ ] T-R02G0603-004 [P] [US1] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSceneGeometry.swift`
+- [X] T-R02G0603-004 [P] [US1] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSceneGeometry.swift` — Verified 2026-11-21: 2026-11-21: host-3 (ChronoConstellatorSceneGeometryTests, 7 tests) exit 0, rerun by the lead
   (cell size 2/max(columns, rows); field at y = 0 with faint grid lines; silver tracks width 0.08·u at y = 0.004·u; star
   nodes radius 0.3·u at y = 0.25·u with their shapes; rose target rings outer radius 0.42·u at y = 0.006·u with the star's
   shape, lit when the star is on it; history ribbons over the tier's R ticks rising 0.04·u per tick of age with alpha
