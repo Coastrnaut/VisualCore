@@ -38,7 +38,7 @@ logic); no GLSL in this feature.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0802-004 [US2] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeGenerator.swift`
+- [X] T-R02G0802-004 [US2] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeGenerator.swift` — Verified 2026-11-22: host-3 exit=0 (FacetedForgeGeneratorTests 11: manifest shape, band profiles, determinism, generated shape and filters, crystals by band, solutions win, skipped re-checked, difficulty, impossible entry refused)
   (FacetedForgeBandProfile "band 1 cube, 2 … 3 cuts, axes and face diagonals; 2 box, 3 … 4; 3 truncated cube, 4 … 5, all
   13; 4 octahedron, 5 … 6; 5 doubly truncated cube, 6 … 7", `candidate(_:index:)` drawing in the order of clarification
   Q1 from `SeededRandom(seed: SeedDerivation.derive(seed, index: k))`, sliver 1/64, shares at least 1/32, bands 3 … 5
