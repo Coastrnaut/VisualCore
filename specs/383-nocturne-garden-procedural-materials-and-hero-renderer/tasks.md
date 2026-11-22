@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G0903-003 [P] [US1] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenShaders.swift` (garden and glow sources, GLSL ES 3.00;
+- [X] T-R02G0903-003 [P] [US1] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenShaders.swift` (garden and glow sources, GLSL ES 3.00; — Verified 2026-11-22: host-2 exit=0 (NocturneGardenShaderSourceTests 16: version and precision, uniforms declared and used with types, at most 16 vec4 slots, no samplers or discard, constant loop bounds, palette constants equal the CPU's, material codes 0-11, feathered shadow, mist and sway on u_time alone, hatch, glow gain per tier and Reduce Flashing limit; agent A's files retested by the lead)
   pearlescent mist with up to 3 drifting layers driven by `u_time`; deep black shadow with a feathered edge;
   gold target rim; coral forbidden hatch and leak cross; dark botanical bodies with coral-gold rims; lantern; uniform
   names; glow gain cap; palette constants equal to the CPU's) with `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenShaderSourceTests.swift`
