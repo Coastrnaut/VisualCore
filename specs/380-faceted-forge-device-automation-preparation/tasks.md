@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for FF-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g08`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g08.faceted-forge`
-- [ ] T-R02G0810-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Faceted Forge definition passes; a
+- [X] T-R02G0810-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Faceted Forge definition passes; a — Verified 2026-11-22: script-tests exit 0 (run alone) incl. FacetedForgeDeviceRowsCheckTests 6: real definition passes, a removed scenario, FF-D1's missing pass field and an uncovered T-R02G0809-011 each fail by name, release step runs the check
   copy with a scenario removed, a copy with FF-D1's `pass` field removed and a copy with T-R02G0809-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g08` runs the check for
   `r02-g08.faceted-forge`); `--name script-tests` (alone)
