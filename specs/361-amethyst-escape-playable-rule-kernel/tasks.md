@@ -29,7 +29,7 @@ in this feature (the crystal state is the CPU reference the renderer of R02-G07-
 
 ## Phase 3: Story 1 — rotate and roll the pearl out (P1) 🎯
 
-- [ ] T-R02G0701-003 [P] [US1] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeCrystalTests.swift`
+- [X] T-R02G0701-003 [P] [US1] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeCrystalTests.swift` — Verified 2026-11-22: host-2 exit=0 (AmethystEscapeCrystalTests 8/8 against an independent pocket-graph reference on 500 levels)
   (agent A: after every move the offsets and the pearl equal an independent pocket-graph reference written in the test,
   on 500 seeded levels and action sequences; a full turn of N steps is the identity; the pearl turns only with its own
   shell; transition priority outward, clockwise, stuck; exit only from the outermost shell's gap); `--name host-2`
