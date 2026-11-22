@@ -85,12 +85,20 @@ public struct FacetedForgePreviewChoice: Sendable, Equatable, Hashable {
         self.depth = min(max(depth, FacetedForgeHalfSpace.depths.lowerBound), FacetedForgeHalfSpace.depths.upperBound)
     }
 
-    /// The default choice for `play`: piece 0, direction 0 and the middle depth among those whose plane crosses it.
+    /// The direction of the default choice: 2, the z axis, whose plane faces the authored camera (feature 374,
+    /// R02-G08-04: the x axis of feature 373 was seen edge-on, so a tap on the plane could not commit).
+    public static let facingDirection: Int = 2
+
+    /// The default choice for `play`: piece 0, ``facingDirection`` and the middle depth among those whose plane
+    /// crosses it.
     public static func initial(_ play: FacetedForgePlay) -> FacetedForgePreviewChoice {
-        guard let first = play.pieces.first else { return FacetedForgePreviewChoice(piece: 0, direction: 0, depth: 0) }
-        let crossing: [Int] = FacetedForgeSolver.crossingDepths(first, direction: 0)
+        let direction: Int = facingDirection
+        guard let first = play.pieces.first else {
+            return FacetedForgePreviewChoice(piece: 0, direction: direction, depth: 0)
+        }
+        let crossing: [Int] = FacetedForgeSolver.crossingDepths(first, direction: direction)
         let depth: Int = crossing.isEmpty ? 0 : crossing[crossing.count / 2]
-        return FacetedForgePreviewChoice(piece: 0, direction: 0, depth: depth)
+        return FacetedForgePreviewChoice(piece: 0, direction: direction, depth: depth)
     }
 
     /// This choice made valid for `play`: the piece clamped to the piece count and the depth moved to the nearest depth

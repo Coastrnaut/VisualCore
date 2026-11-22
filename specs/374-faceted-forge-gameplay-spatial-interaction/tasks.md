@@ -30,7 +30,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Stories 1 to 3 — choose, tilt, slide, commit (P1) 🎯
 
-- [ ] T-R02G0804-003 [US1] [US2] [US3] Create
+- [X] T-R02G0804-003 [US1] [US2] [US3] Create — Verified 2026-11-22: 2026-11-22: host-3 (all FacetedForge host tests, 157, incl. 8 gesture controller tests with 500 seeded scripts) exit 0, rerun by the lead; the default plane now faces the authored camera (direction z), added to the spec's edge cases
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeGestureController.swift` (states idle, rimDrag, depthDrag,
   planePress, piecePress, orbiting, cancelled; a tap (< 10 points, ≤ 0.5 s) on a piece outside the preview: `choose`
   that piece at the middle crossing depth of the current direction; a rim drag (≥ 16 points): the candidate tilt while

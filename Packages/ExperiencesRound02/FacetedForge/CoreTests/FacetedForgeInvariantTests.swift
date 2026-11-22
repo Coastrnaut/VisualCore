@@ -218,11 +218,13 @@ import Testing
     }
 
     /// The presentation sources of the Core (feature 373, R02-G08-03: the scene snapshot, geometry, shaders, experience
-    /// adapter and scenarios), which read the kernel and turn its exact values into Doubles for drawing; they are not
-    /// kernel sources, and the renderer-purity tests of feature 373 cover them.
+    /// adapter and scenarios; feature 374, R02-G08-04: the picker and the gesture controller), which read the kernel
+    /// and turn its exact values into Doubles for drawing; they are not kernel sources, and the renderer-purity tests
+    /// of feature 373 cover them.
     static let presentationSources: Set<String> = [
         "FacetedForgeSceneSnapshot.swift", "FacetedForgeSceneGeometry.swift", "FacetedForgeShaders.swift",
         "FacetedForgeExperienceCore.swift", "FacetedForgeScenarios.swift", "FacetedForgePicker.swift",
+        "FacetedForgeGestureController.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, less the presentation
