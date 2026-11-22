@@ -28,9 +28,9 @@ Canonical overrides:
 
 ### User Story 1 - The game works inside the real app (Priority: P1) 🎯
 
-A tester opens Faceted Forge from the one app on the simulator, plays level 1 with the panel's piece, direction and depth
-pickers and the Cut button to a win, sees the stars, opens the next level, replays the best solution and returns after
-closing the app to find the progress kept.
+A tester opens Faceted Forge from the one app on the simulator, plays level 1 with the panel's piece, direction and
+depth pickers and the Cut button to a win, sees the stars, opens the next level, replays the best solution and returns
+after closing the app to find the progress kept.
 
 **Why this priority**: the game only matters as part of the shipped app; this is the first end-to-end proof there.
 
@@ -40,8 +40,8 @@ visible, labelled controls and read the experience's spoken description.
 **Acceptance Scenarios**:
 
 1. **Given** a fresh app on the simulator, **When** the tester opens Faceted Forge, plays level 1's certified solution
-   with the piece, direction and depth pickers and Cut, **Then** the level is won, the stars are shown and the next level
-   opens.
+   with the piece, direction and depth pickers and Cut, **Then** the level is won, the stars are shown and the next
+   level opens.
 2. **Given** a won level, **When** the app is relaunched, **Then** the same progress, stars and open levels are shown.
 3. **Given** a solved level, **When** the tester taps Replay and steps through it, **Then** the replay ends won and Stop
    returns to the campaign.
