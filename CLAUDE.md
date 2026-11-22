@@ -69,6 +69,9 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    accessibility audits wait until device testing** (`VC_RUN_AUDITS=1` only there). A gate's interface evidence is
    one pass on the iOS 27.x phone. **Stopping a run:** TaskStop the whole loop; check `pgrep -fl xcodebuild` first.
    **No summary after a step** (2026-11-18/19): after a commit or a reply to the owner comes a tool call.
+   **A side question is not a stop** (2026-11-22): answer an owner question asked mid-loop in a line or two inside a
+   message that also makes the next tool call; a running background chain is waited on with a bounded loop, never by
+   ending the turn.
    **A gate boundary is never a turn end** (2026-11-14): after `record` the next action is `next`;
    wrap-up only at a §28 stop.
    **Faster gates** (owner ruling of 2026-11-14): iOS 27/26 runs in parallel; the next gate's Spec Kit steps start
