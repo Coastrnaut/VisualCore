@@ -31,7 +31,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   sRGB; JSON with sorted keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest
   self-check), generate `Packages/ExperiencesRound02/AmethystEscape/golden-frames.json` with
   `AMETHYST_ESCAPE_WRITE_GOLDEN=1`, and add `AmethystEscapeGolden` to `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G0708-004 [P] [US2] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G0708-004 [P] [US2] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-22: host-2 exit=0 (9 tests: fixed set, contents, determinism, pinned match, digest self-check, missing/unreadable/renamed/unknown/schema, quantum moves, palette/moves/tier, hand edit)
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a
   moved position beyond a quantum, a changed colour, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
