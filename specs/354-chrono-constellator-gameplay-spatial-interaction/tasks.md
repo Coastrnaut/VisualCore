@@ -77,3 +77,11 @@ program).
 001 → 002 (agent B) → {003 (agent C), 004 (agent D)} → 005 (lead; agent E writes the wiring tests) → 006 … 010, 012.
 004 needs only the adapter and may start with 002. 011 stays open until device testing. Shared files (presenter, scene,
 controls, docs) stay with the lead. MVP: Stories 1–3 and 5.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0604-013 Send nothing for a forward scrub on a failed play per FR-R02G0604-002 and the failed-play edge case
+  (partial): in `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGestureController.swift` a scrub
+  released at t′ > t while the stage is `failed` returns `[]` (the replay already stopped at its deciding tick, which a
+  plain replay to t′ also reaches), so no stage refusal is shown; backward scrubs keep `rewind` then `step`; cover it in
+  `ChronoConstellatorGestureControllerTests.swift`; `--name host-5`, then the simulator run `--name sim-27-2`
