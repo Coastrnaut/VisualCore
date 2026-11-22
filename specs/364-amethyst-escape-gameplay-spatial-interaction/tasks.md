@@ -80,3 +80,12 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → {002 (lead), 003 (agent B), 005 (agent D)} → 004 (agent C, on B's picker and the lead's preview) → 006 (lead;
 agent E writes the wiring tests) → 007 … 011, 013. 012 stays open until device testing. Shared files (snapshot,
 presenter, scene, controls, docs) stay with the lead. MVP: Stories 1, 2 and 5.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0704-014 Keep multi-finger gestures silent per the second-finger edge case and FR-R02G0704-008 (partial): in
+  `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapePresenter.swift` count the fingers down and keep
+  the touch-down record only while exactly one finger has been down since the last time none was, so a third finger
+  never re-arms the finished-play message; cover it in
+  `Packages/ExperiencesRound02/AmethystEscape/ExperienceTests/AmethystEscapeGestureWiringTests.swift` (on a finished
+  play, two fingers then a third that drags over a shell show no message); `--name sim-27-2`
