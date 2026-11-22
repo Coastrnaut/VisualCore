@@ -15,6 +15,13 @@
 // the snapshot or the kernel). While a drag previews a choice the scene draws it and the description begins "The cut
 // plane would …"; a commit on a finished play says "The play is over: undo or go to the next level". A refused action
 // is shown in the panel and its code kept in ``FacetedForgePresenter/refusalLog``.
+// Feature 375 (R02-G08-05) T-R02G0805-005 (FR-R02G0805-001 … 005; clarifications Q1–Q5): the mirror carries the
+// tutorial instruction, the hint revealed so far (`showHint()` reveals the next of three levels for the current play;
+// the hint level is presentation only and any change of the play — level, mode or play fingerprint — hides it; a hint
+// runs the solver's bounded search, so it is computed only when asked), the failure explanation, the mode, the open
+// levels with their stars and the goal (cuts spent, budget and certified smallest cut count); `retry` starts the level
+// again in its mode, `undoCut` takes back the last cut, and the daily level is chosen from the local calendar date read
+// here (`playDaily(port:date:)`, sent as `mode.daily [year, month, day]`), never in the core.
 #if os(iOS)
 import FacetedForgeCore
 import Foundation
@@ -46,6 +53,22 @@ final class FacetedForgeMirror {
     var play: FacetedForgePlay?
     /// The text of the last refused change, if any.
     var message: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 375).
+    var instruction: String?
+    /// The hint level revealed (0 … 3) and its text (feature 375).
+    var hintLevel = 0
+    var hintText: String?
+    /// The failure explanation while the play has failed (feature 375).
+    var failureText: String?
+    /// The mode (feature 375).
+    var mode: FacetedForgeMode = .campaign
+    /// The highest open level and the stars of each won level (feature 375).
+    var frontier = 1
+    var stars: [Int: Int] = [:]
+    /// The certified smallest cut count of the current level (the goal, feature 375).
+    var smallest = 0
+    /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
+    var pickedLevel = 1
 
     /// The chosen piece in words.
     var pieceLabel: String {
@@ -141,6 +164,12 @@ final class FacetedForgePresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The latest core described (feature 375): hints and retry read it.
+    private(set) var latestCore: FacetedForgeExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 375).
+    private var hintKey: String?
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 375).
+    private(set) var dailyDate: DateComponents?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -257,6 +286,83 @@ final class FacetedForgePresenter: ExperiencePresenter {
         }
     }
 
+    // MARK: Teaching and progression (feature 375)
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: FacetedForgeExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Hides the hint shown.
+    private func clearHint() {
+        hintKey = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; the hint is hidden when the play has none (won, or
+    /// not started). Hints never change the state: no action is sent.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let key: String = Self.hintKey(core)
+        let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        guard let hint = core.hint(level: next) else {
+            clearHint()
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = hint.text
+    }
+
+    /// Ends the tutorial of the current level.
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Takes back the last cut (`play.undo`); after a failure this returns the play to playing.
+    @discardableResult
+    func undoCut(port: ExperienceActionPort) -> ActionResult {
+        send("play.undo", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = FacetedForgePresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort, date: DateComponents = FacetedForgePresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
+
     /// Drops a touch in progress (the shell suspends the experience): a gesture under way is abandoned without an
     /// action; the orbit is presentation only and returns to the authored view.
     func cancelPointers() {
@@ -315,7 +421,18 @@ final class FacetedForgePresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         let choice = choice(for: core)
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
         mirror.levelNumber = core.levelNumber
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) { clearHint() }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.smallest = core.certifiedSmallest
         mirror.cuts = play.cuts
         mirror.budget = level.budget
         mirror.pieceNames = play.pieces.indices.map { Self.pieceName($0, play) }
@@ -342,6 +459,7 @@ final class FacetedForgePresenter: ExperiencePresenter {
         switch play.stage {
         case .won, .result where play.failure == nil:
             text += "The pieces match the target."
+            if let stars = mirror.stars[core.levelNumber] { text += " Stars: \(stars) of 3." }
             mirror.status = "Won"
         case .failed, .result:
             let reason: String
@@ -351,10 +469,13 @@ final class FacetedForgePresenter: ExperiencePresenter {
             case .budget, .none: reason = "The cut budget ran out before the pieces matched the target."
             }
             text += reason
+            if let explanation = mirror.failureText { text += " " + explanation }
             mirror.status = "Failed: " + reason
         default:
             mirror.status = play.cuts == 0 ? "Ready" : "Playing"
         }
+        if let instruction = mirror.instruction { text += " Tutorial: " + instruction }
+        if let hint = mirror.hintText { text += " Hint: " + hint }
         return text
     }
 

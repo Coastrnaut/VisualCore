@@ -64,10 +64,12 @@ import VisualCoreExperienceHost
         #expect(experience.frameProbes.isEmpty, "no probes before a frame")
     }
 
-    @Test func theControlsAreTheFourActions() {
+    /// The play controls of feature 373 and the progression controls of feature 375 (R02-G08-05), in order.
+    @Test func theControlsAreThePlayAndProgressionActions() {
         var ids: [String] = []
         for control in FacetedForgeExperienceCore.controls { ids.append(control.id) }
-        #expect(ids == ["piece.cut", "play.undo", "play.redo", "level.next"])
+        #expect(ids == ["piece.cut", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
+                        "mode.practice", "mode.campaign", "tutorial.dismiss"])
         #expect(ids == FacetedForgeExperienceCore.actionIDs)
     }
 

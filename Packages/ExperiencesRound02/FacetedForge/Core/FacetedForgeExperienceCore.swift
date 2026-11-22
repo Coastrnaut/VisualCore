@@ -253,6 +253,17 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
                                           opening: opening)
     }
 
+    /// The hint of `level` (1 … 3) for the current play (``FacetedForgeHints/hint(level:play:)``); nil when the play is
+    /// won (or not yet playing). Reads only; it may run the solver's bounded search, so callers ask on demand.
+    public func hint(level: Int) -> FacetedForgeHint? {
+        FacetedForgeHints.hint(level: level, play: play)
+    }
+
+    /// The explanation of the current play's failure; nil unless the play failed.
+    public var failureExplanation: FacetedForgeFailureExplanation? {
+        FacetedForgeFailureExplanation(play: play)
+    }
+
     // MARK: Scene snapshots
 
     /// An immutable copy of the play and the level number with the preview `choice` for drawing at the presenter's

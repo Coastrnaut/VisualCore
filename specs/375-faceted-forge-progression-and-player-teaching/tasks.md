@@ -50,7 +50,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeScenarios.swift` entries where needed and
   `Packages/ExperiencesRound02/FacetedForge/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); lead; `--name host-4
   -- swift test --package-path Packages/ExperiencesRound02 --filter FacetedForge`
-- [ ] T-R02G0805-005 Edit `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift` (the
+- [X] T-R02G0805-005 Edit `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift` (the — Verified 2026-11-22: 2026-11-22: sim-27 (FacetedForgeExperienceTests, 46 tests incl. 7 teaching tests, iOS 27.2) exit 0; an unrecorded first run failed only the identity test's four-control list, updated to the nine controls
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it —
   and the failure explanation as panel text; the description includes them) and
   `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgeControls.swift` (Hint, Dismiss tutorial, level picker

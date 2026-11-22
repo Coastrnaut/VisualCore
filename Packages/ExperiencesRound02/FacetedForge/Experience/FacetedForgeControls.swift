@@ -3,7 +3,10 @@
 // only), cut (a kernel action through the action port), undo, redo and next level, each with an accessibility label and
 // value. Dragging the cut plane's rim, the depth slider, tap to commit and orbit come in R02-G08-04; full accessibility
 // in R02-G08-06. Feature 374 (R02-G08-04): "Reset view" returns the camera to the authored view; every action goes
-// through the presenter, which shows and logs a refusal like a gesture's.
+// through the presenter, which shows and logs a refusal like a gesture's. Feature 375 (R02-G08-05) T-R02G0805-005
+// (FR-R02G0805-001 … 005): the tutorial instruction with Dismiss, Hint (each press reveals the next level), the failure
+// explanation with Undo and Retry, the goal and stars, Campaign / Daily / Practice and a picker of the open levels; all
+// as wrapping text in the panel, never over the crystal.
 #if os(iOS)
 import FacetedForgeCore
 import SwiftUI
@@ -20,8 +23,10 @@ struct FacetedForgeControls: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
                 header
+                teaching
                 choiceRow
                 playRow
+                progressRows
             }
             .padding()
         }
@@ -60,6 +65,78 @@ struct FacetedForgeControls: View {
                     .accessibilityLabel("Move the cut plane one step forward")
                     .accessibilityValue(mirror.depthLabel)
             }
+        }
+    }
+
+    /// The tutorial instruction, the hint and the failure explanation (feature 375).
+    @ViewBuilder private var teaching: some View {
+        if let instruction = mirror.instruction {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
+                Button("Dismiss") { presenter.dismissTutorial(port: port) }
+                    .accessibilityLabel("Dismiss the tutorial")
+            }
+        }
+        HStack(spacing: 12) {
+            Button("Hint") { presenter.showHint() }
+                .accessibilityLabel("Show a hint")
+                .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+            Text("Goal: match the target in \(mirror.smallest) cuts; budget \(mirror.budget)")
+                .font(.footnote)
+        }
+        if let hint = mirror.hintText {
+            Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true)
+        }
+        if let failure = mirror.failureText {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 12) {
+                    Button("Undo") { presenter.undoCut(port: port) }
+                        .accessibilityLabel("Undo the last cut")
+                    Button("Retry") { presenter.retry(port: port) }
+                        .accessibilityLabel("Start the level again")
+                }
+            }
+        }
+    }
+
+    /// The mode buttons and the picker of open levels with their bands and stars (feature 375).
+    @ViewBuilder private var progressRows: some View {
+        HStack(spacing: 12) {
+            Button("Campaign") { send("mode.campaign") }
+                .accessibilityLabel("Play the campaign")
+                .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+            Button("Daily") { presenter.playDaily(port: port) }
+                .accessibilityLabel("Play today's daily level")
+                .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+            Button("Practice") { send("mode.practice") }
+                .accessibilityLabel("Practise this level with a larger cut budget")
+                .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+        }
+        HStack(spacing: 12) {
+            Stepper(levelLabel(mirror.pickedLevel),
+                    onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
+                    onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
+                .accessibilityLabel("Level to play")
+                .accessibilityValue(levelLabel(mirror.pickedLevel))
+            Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
+                .accessibilityLabel("Play the picked level")
+        }
+    }
+
+    /// "Level n, band b" with its stars when won.
+    private func levelLabel(_ level: Int) -> String {
+        let band = FacetedForgeProgress.band(of: level)
+        if let stars = mirror.stars[level] { return "Level \(level), band \(band), \(stars) stars" }
+        return "Level \(level), band \(band)"
+    }
+
+    /// The mode's name: campaign, daily or practice.
+    static func modeName(_ mode: FacetedForgeMode) -> String {
+        switch mode {
+        case .campaign: "campaign"
+        case .practice: "practice"
+        case .daily: "daily"
         }
     }
 
