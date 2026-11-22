@@ -51,7 +51,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G0801-005 [P] [US4] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeRules.swift` (agent C:
+- [X] T-R02G0801-005 [P] [US4] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeRules.swift` (agent C: — Verified 2026-11-22: host-4 exit=0 (FacetedForgeRules 6: move order, fixture solutions legal and winning, terminal positions, 200 walks agree with the play)
   `PuzzleRules`: State = position (pieces, cuts, outcome), Move = FacetedForgeAction; legal moves while playing "every
   non-degenerate cut, pieces in order, directions 0 … 12, depths ascending") with
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeRulesTests.swift` (agreement with the play on 200
