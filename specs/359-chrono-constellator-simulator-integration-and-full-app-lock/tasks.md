@@ -9,7 +9,7 @@ change (the shaders and reference of R02-G06-03 are unchanged and re-proven by t
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0609-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0609-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit=0 (on 4aaa54d90, before this gate's edits); rendering baseline is R02-G06-08's runs (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G06-08's rendering runs (exit 0)
 
 ## Phase 2: Foundational
