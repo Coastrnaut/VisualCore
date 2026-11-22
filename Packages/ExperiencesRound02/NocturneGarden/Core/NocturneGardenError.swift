@@ -21,6 +21,11 @@ public enum NocturneGardenError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of a manifest entry was certified within the candidate bound (feature 382); the payload is the level
+    /// number.
+    case generation(Int)
+    /// A witness file is damaged, edited or no longer replays (feature 382); the payload names the part.
+    case witness(String)
 
     /// The stable reason code, `r02-g09.<kebab-case>`.
     public var reasonCode: String {
@@ -33,6 +38,8 @@ public enum NocturneGardenError: Error, Equatable, Sendable {
         case .stale: "r02-g09.stale"
         case .newerSchema: "r02-g09.newer-schema"
         case .malformed: "r02-g09.malformed"
+        case .generation: "r02-g09.generation"
+        case .witness: "r02-g09.witness"
         }
     }
 }

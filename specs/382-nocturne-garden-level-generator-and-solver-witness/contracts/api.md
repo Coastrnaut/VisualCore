@@ -16,8 +16,9 @@ public enum NocturneGardenSolver {
     public static let workBound: Int                                         // 20,000 plant evaluations
     public static func needed(_ level: NocturneGardenLevel) -> Int           // least shared count meeting p/q vs |T|
     public static func cover(_ level: NocturneGardenLevel, elevation: Int) -> Int
-    public static func lowerBound(_ level: NocturneGardenLevel) -> NocturneGardenBound
-    public static func solve(_ level: NocturneGardenLevel, workBound: Int = workBound) -> NocturneGardenSolution? }
+    public static func lowerBound(_ level: NocturneGardenLevel) -> NocturneGardenBound?   // nil: no plant reaches T
+    public static func solve(_ level: NocturneGardenLevel, workBound: Int = workBound) -> NocturneGardenSolution?
+    public static func wins(_ level: NocturneGardenLevel, actions: [NocturneGardenAction]) -> Bool }
 public struct NocturneGardenDifficulty: Sendable, Hashable, Codable { public let smallest, kinds, sizes, targetCells,
     forbiddenCells, work: Int; public let sunChange: Bool; public let required: NocturneGardenRatio
     public var puzzleDifficulty: PuzzleDifficulty { get } }

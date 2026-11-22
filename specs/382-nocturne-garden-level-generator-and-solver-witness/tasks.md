@@ -14,7 +14,7 @@ logic); no GLSL in this feature.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0902-002 Add `generation(Int)` ("r02-g09.generation") and `witness(String)` ("r02-g09.witness") to
+- [X] T-R02G0902-002 Add `generation(Int)` ("r02-g09.generation") and `witness(String)` ("r02-g09.witness") to — Verified 2026-11-22: host exit=0 (78 Nocturne Garden tests: kernel suites unchanged, generation and witness refusals, manifest of 100 entries, difficulty)
   `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenError.swift` (no other kernel change: generated levels stay inside R02-G09-01's ranges);
   create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenManifest.swift` (NocturneGardenManifestEntry "number 1 … 100, seed UInt64, band 1 … 5,
   budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py levels --experience R02-G09` with the
