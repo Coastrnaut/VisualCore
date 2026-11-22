@@ -55,7 +55,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
   in that order skipping refused ones, then release(i, s) for each hold, then step(tick limit); after tick 0 only rewind)
   with `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorRulesTests.swift` (agreement with the play
   on 200 walks); `--name host-4`
-- [ ] T-R02G0601-006 [P] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorInvariantTests.swift`
+- [X] T-R02G0601-006 [P] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorInvariantTests.swift` — Verified 2026-11-21: 2026-11-21 host-5 exit 0: ChronoConstellatorInvariantTests 9 tests in 2.1 s (time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity, each with a seeded neighbouring-input check, seed 2_356) (.autonomy/migration/checks/R02-G06-01.host-5.json); lead retest
   (agent D: `testChronoConstellatorTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each with a
   seeded neighbouring-input check, seed 2_356); `--name host-5`
