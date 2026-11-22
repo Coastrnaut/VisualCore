@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/faceted_forge_regression.py"
+  ],
+  "command": "python3 scripts/faceted_forge_regression.py",
+  "elapsed_seconds": 33.65,
+  "exit_code": 0,
+  "finished": "2026-11-22T16:29:16+00:00",
+  "gate": "R02-G08-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-08.regression.log",
+  "log_sha256": "9c6040a0c3b55d66f53c1d19c1065ba75761aea71a5f5be6ccab765b3a7f7794",
+  "name": "regression",
+  "started": "2026-11-22T16:28:43+00:00",
+  "timed_out": false
+}
