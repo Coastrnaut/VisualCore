@@ -44,7 +44,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G0704-005 [P] [US5] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapePanelWinTests.swift`: all 100 certified levels won
+- [X] T-R02G0704-005 [P] [US5] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapePanelWinTests.swift`: all 100 certified levels won — Verified 2026-11-22: 2026-11-22: host-5 (AmethystEscapePanelWinTests: all 100 levels won through panel actions in 4 groups; undo/redo digests) exit 0, lead retest
   through panel actions only (shell picker, turn − and + as `shell.rotate [k, ±1]`, advance as `pearl.advance`), split
   so each test is under 10 s, plus panel Undo then Redo after a turn restoring the digests before and after it; agent D;
   `--name host-5`
