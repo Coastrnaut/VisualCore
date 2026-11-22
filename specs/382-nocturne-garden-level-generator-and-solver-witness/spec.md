@@ -136,7 +136,7 @@ file is refused.
 
 - **A seed whose candidate is unsuitable for its band:** the generator moves to the next candidate deterministically
   (bounded) and records how many it skipped; no candidate within the bound is a named refusal.
-- **More than one winning sequence:** allowed; the witness is the first one the solver finds in its fixed cut order.
+- **More than one winning sequence:** allowed; the witness is the first one the solver finds in its fixed plant order.
 - **An arrangement that reaches the match only by leaking beyond the allowance:** never a solution; the search never
   continues from a failed state.
 - **A level whose smallest move count exceeds its budget:** not emitted.
