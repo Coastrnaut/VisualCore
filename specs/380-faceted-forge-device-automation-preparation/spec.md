@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G08-10 (migration ledger, game feature of experience R02-G08) · ID namespace FR-R02G0810-###,
 SC-R02G0810-###, T-R02G0810-###
@@ -25,6 +25,47 @@ Canonical overrides:
 - **Device rules:** devices in fixed order D1 iPhone 15, D2 iPad Pro 13-inch (M5), D3 iPad (A16) on iPadOS 26.5 (never
   updated); manual VoiceOver testing is non-gating (P-08). **Owner-only items:** every device handling step (unlock,
   trust, signing, settings, charging) is the owner's, written as such in the plan.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+370's answers. Facts checked (read-only, 2026-11-22): the ledger holds DEV1-R02-G08 (D1 iPhone 15), DEV2-R02-G08 (D2
+iPad Pro 13-inch (M5)) and DEV3-R02-G08 (D3 iPad (A16), iPadOS 26.5), each after ImplementationLock-100 and UA-F13;
+Faceted Forge's manifest has 94 scenarios (11 standard and game scenarios, 3 fixtures `fixture-level-1-solved`,
+`fixture-budget-out`, `fixture-undo-redo`, 80 acceptance rows); the open {device} tasks are T-R02G0803-012 (frame time
+per tier), T-R02G0804-011 (touch feel and latency), T-R02G0806-011 (ambient sound heard, haptics felt, VoiceOver and the
+largest text size), T-R02G0807-011 (a save across a real termination), T-R02G0808-012 (frame time and memory of the
+golden levels) and T-R02G0809-011 (the journeys); `scripts/check_device_rows.py` (feature 310) is generic over
+experience ids; `release_check.py` runs it as `device-rows` … `device-rows-r02-g08`; feature 370's plan is
+`docs/apps/faceted-forge/device-campaign.md` (rows FF-D1 … FF-D8).
+
+- Q: Which device rows exist and which tasks does each cover? → A: FF-D1 launch and first frame (UA-F13 launch,
+  first-frame); FF-D2 frame pacing and frame time per tier (T-R02G0803-012, T-R02G0808-012, UA-F13 frame-pacing); FF-D3
+  memory per tier and thermal state with the round-two stress session (T-R02G0808-012, UA-F13 memory, thermal, stress);
+  FF-D4 touch feel and touch-to-frame latency of piece taps, rim tilts, depth drags, tap-to-cut and orbit
+  (T-R02G0804-011); FF-D5 ambient sound and haptics heard and felt (T-R02G0806-011); FF-D6 VoiceOver walk-through at
+  the largest text size, non-gating (T-R02G0806-011, P-08); FF-D7 progress across a real termination (T-R02G0807-011);
+  FF-D8 panel journeys: win level 1 with the piece, direction and depth pickers and Cut, replay, relaunch
+  (T-R02G0809-011). All rows run on D1, D2, D3 in that order. Impact: FR-R02G0810-001, 003; SC-R02G0810-001.
+- Q: What is the device scenario set? → A: the 11 standard and game scenarios (`launch-first-frame`, `input-response`,
+  `completion`, `rejection`, `save-restore`, `reset`, `suspend-resume`, `teardown-reentry`, `cancel-prepare`,
+  `full-playthrough`, `hero`) and `fixture-level-1-solved`; the 80 acceptance rows and the other two fixtures stay
+  simulator-only. Impact: FR-R02G0810-001.
+- Q: What does the machine-readable definition look like? → A: `docs/apps/faceted-forge/device-rows.json`, the
+  schema of feature 310 (schema 1, sorted keys: `experience`, `devices` with the ledger row of each, `scenarios`, `rows`
+  with `id`, `title`, `devices`, `procedure`, `measurements`, `pass`, `gating` (true except FF-D6), `covers`,
+  `owner_steps`, `status` "pending device campaign"). Impact: FR-R02G0810-001; data model.
+- Q: Where does the check run? → A: the existing `scripts/check_device_rows.py --experience r02-g08.faceted-forge`
+  unchanged in its rules; `release_check.py` gains the step `device-rows-r02-g08`; `scripts/test_scripts.py` gains a
+  test that the real Faceted Forge definition passes and that removing a covered task or a scenario fails with a
+  named reason. Impact: FR-R02G0810-004; SC-R02G0810-001, 002.
+- Q: What pass conditions do the rows use? → A: those of features 310 … 370: the app's proposed budgets where they
+  exist (no shader compiled after interaction; 60 fps with automatic levels, 30 fps acceptable on the last level; memory
+  flat over the stress session; 200 samples per device), otherwise "recorded" or a stated observation (sound audible,
+  haptic felt, VoiceOver reads every control, progress kept, level 1 won with 3 stars). Every row stays "pending device
+  campaign". Impact: FR-R02G0810-002; SC-R02G0810-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
