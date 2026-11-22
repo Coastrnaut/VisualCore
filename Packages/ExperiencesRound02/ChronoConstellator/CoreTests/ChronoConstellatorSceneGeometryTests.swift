@@ -60,14 +60,19 @@ import VisualCoreScenes
         return result
     }
 
-    /// A 5 × 5 play that collides on cell 1 at tick 1.
-    static func collision() throws -> Snapshot {
+    /// The 5 × 5 level of ``collision()``.
+    static func collisionLevel() throws -> ChronoConstellatorLevel {
         let a: [Int] = ChronoConstellatorFixtures.rectangle(column: 0, row: 0, width: 2, height: 2, columns: 5)
         let b: [Int] = ChronoConstellatorFixtures.rectangle(column: 1, row: 0, width: 2, height: 2, columns: 5)
-        let lvl = try ChronoConstellatorLevel(id: "collide", seed: 2, difficulty: 1, columns: 5, rows: 5,
-                                              stars: [ChronoConstellatorStar(loop: a, phase: 0, target: a[3]),
-                                                      ChronoConstellatorStar(loop: b, phase: 3, target: b[1])],
-                                              budget: 2, tickLimit: 50)
+        return try ChronoConstellatorLevel(id: "collide", seed: 2, difficulty: 1, columns: 5, rows: 5,
+                                           stars: [ChronoConstellatorStar(loop: a, phase: 0, target: a[3]),
+                                                   ChronoConstellatorStar(loop: b, phase: 3, target: b[1])],
+                                           budget: 2, tickLimit: 50)
+    }
+
+    /// A 5 × 5 play that collides on cell 1 at tick 1.
+    static func collision() throws -> Snapshot {
+        let lvl: ChronoConstellatorLevel = try collisionLevel()
         var p = ChronoConstellatorPlay(level: lvl)
         try p.handle(.begin)
         try p.apply(.step(5), expecting: p.fingerprint)
@@ -299,6 +304,52 @@ import VisualCoreScenes
             }
         }
         #expect(counts[1] == counts[0] + 4 && counts[2] == counts[1])
+    }
+
+    /// Feature 356 (T-R02G0606-004): with lights the ring shades, the node colours and the collision mark follow the eased
+    /// levels; settled lights give the snapshot's own ring shades, and the mark fades out at its remembered cell after a
+    /// rewind; without lights the meshes are unchanged.
+    @Test func theLightsDriveRingsNodesAndTheCollisionMark() throws {
+        let c: Snapshot = try Self.collision()
+        var lights: ChronoConstellatorLights = ChronoConstellatorLights(reducedFlash: true)
+        lights.settle(to: c)
+        let plain: ChronoConstellatorColouredMesh = try Geometry.fieldPart(c, tier: .of(0))
+        let lit: ChronoConstellatorColouredMesh = try Geometry.fieldPart(c, tier: .of(0), lights: lights)
+        #expect(plain == lit)
+        #expect(lights.collisionCell != nil && lights.collision == 1)
+        let plainStars: ChronoConstellatorColouredMesh = try Geometry.starPart(c, tier: .of(0))
+        let litStars: ChronoConstellatorColouredMesh = try Geometry.starPart(c, tier: .of(0), lights: lights)
+        #expect(plainStars.mesh.positions == litStars.mesh.positions)
+        var dimmer: Bool = false
+        for (k, colour) in litStars.colours.enumerated() where colour.x < plainStars.colours[k].x - 1e-9 {
+            dimmer = true
+        }
+        #expect(dimmer == lights.nodes.contains { $0 < 1 })
+        // Rewind: the failure is gone, the mark fades at its remembered cell.
+        let lvl: ChronoConstellatorLevel = try Self.collisionLevel()
+        var p = ChronoConstellatorPlay(level: lvl)
+        try p.handle(.begin)
+        let rewound: Snapshot = Snapshot(play: p, levelNumber: 2, time: 0)
+        lights.step(toward: rewound, elapsed: 0.1)
+        #expect(lights.collision > 0 && lights.collision < 1 && lights.collisionCell != nil)
+        let fading: ChronoConstellatorColouredMesh = try Geometry.fieldPart(rewound, tier: .of(0), lights: lights)
+        var amber: Int = 0
+        for uv in fading.mesh.uvs where uv.x == Geometry.amberCode {
+            amber += 1
+            #expect(abs(uv.y - lights.collision) < 1e-12)
+        }
+        #expect(amber > 0)
+        lights.step(toward: rewound, elapsed: 1)
+        #expect(lights.collision == 0 && lights.collisionCell == nil)
+        let dark: ChronoConstellatorColouredMesh = try Geometry.fieldPart(rewound, tier: .of(0), lights: lights)
+        var after: Int = 0
+        for uv in dark.mesh.uvs where uv.x == Geometry.amberCode { after += 1 }
+        #expect(after == 0)
+        // Ring shades are the eased levels.
+        let shaded: ChronoConstellatorColouredMesh = try Geometry.fieldPart(rewound, tier: .of(0), lights: lights)
+        var roseShades: Set<Double> = []
+        for uv in shaded.mesh.uvs where uv.x == Geometry.roseCode { roseShades.insert(uv.y) }
+        #expect(roseShades.isSubset(of: Set(lights.rings)))
     }
 
     @Test func shapesFollowTheStarIndex() {

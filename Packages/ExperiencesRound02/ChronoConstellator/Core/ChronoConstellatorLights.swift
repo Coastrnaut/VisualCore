@@ -63,6 +63,9 @@ public struct ChronoConstellatorLights: Sendable, Equatable {
     public private(set) var glow: Double
     /// The collision mark 0 … 1.
     public private(set) var collision: Double
+    /// The cell of the last collision, kept while its mark fades out after a rewind or undo (feature 356 T-004); nil
+    /// before a collision and once the mark is dark.
+    public private(set) var collisionCell: Int?
 
     /// The fade of each ring.
     private var ringFades: [Fade]
@@ -128,6 +131,7 @@ public struct ChronoConstellatorLights: Sendable, Equatable {
         nodes = []
         glow = 0
         collision = 0
+        collisionCell = nil
         ringFades = []
         nodeFades = []
         glowFade = Fade.resting(0)
@@ -179,6 +183,7 @@ public struct ChronoConstellatorLights: Sendable, Equatable {
         glowFade = advance(glowFade, target: targets.glow, share: share)
         collisionFade = advance(collisionFade, target: targets.collision, share: share)
         publish()
+        rememberCollision(snapshot)
     }
 
     /// Jumps every level to its target for `snapshot`, resizing the rings and nodes to its star count: used for the
@@ -191,6 +196,17 @@ public struct ChronoConstellatorLights: Sendable, Equatable {
         collisionFade = Fade.resting(targets.collision)
         shape = Self.shape(snapshot)
         publish()
+        collisionCell = nil
+        rememberCollision(snapshot)
+    }
+
+    /// Keeps the cell of the current collision, and forgets it once the mark is dark.
+    private mutating func rememberCollision(_ snapshot: ChronoConstellatorSceneSnapshot) {
+        if case .collision(_, _, let cell) = snapshot.failure {
+            collisionCell = cell
+        } else if collision == 0 {
+            collisionCell = nil
+        }
     }
 
     /// Copies the fades' current levels into the public levels.

@@ -36,7 +36,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
   and undone every frame; steps of 1 tick; a rewind; a retry) at 60 Hz: at most 3 half-range crossings per second and
   every complete one-way fade over half the range ≥ 0.4 s under Reduce Flashing; normal mode reaches targets in 0.15 s;
   settle jumps); `--name host-2`
-- [ ] T-R02G0606-004 [US2] Edit `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSceneGeometry.swift` (fieldPart, fieldMesh, starPart and
+- [X] T-R02G0606-004 [US2] Edit `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSceneGeometry.swift` (fieldPart, fieldMesh, starPart and — Verified 2026-11-21: 2026-11-21: host-geometry (SceneGeometryTests incl. theLightsDriveRingsNodesAndTheCollisionMark + LightsTests) exit 0; no lights = unchanged meshes; lights gained collisionCell so the mark fades out after a rewind
   starMesh take optional lights: ring shade, node brightness and collision-mark shade from the lights; no lights =
   feature 353's meshes exactly) with tests in `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorSceneGeometryTests.swift`; `--name
   host-geometry`

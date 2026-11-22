@@ -310,8 +310,12 @@ public enum ChronoConstellatorSceneGeometry {
     /// shade. The same at every tier.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func fieldPart(_ snapshot: ChronoConstellatorSceneSnapshot,
-                                 tier: ChronoConstellatorTier) throws(MeshError) -> ChronoConstellatorColouredMesh {
+    /// - Parameter lights: the eased light levels (feature 356): each ring's shade is its eased level and the collision
+    ///   cross is drawn at the lights' remembered collision cell with the mark's eased level as its shade (nothing at
+    ///   0); nil draws the levels of the snapshot itself, exactly as before.
+    public static func fieldPart(_ snapshot: ChronoConstellatorSceneSnapshot, tier: ChronoConstellatorTier,
+                                 lights: ChronoConstellatorLights? = nil)
+        throws(MeshError) -> ChronoConstellatorColouredMesh {
         var parts: Parts = Parts()
         let u: Double = cellSize(snapshot)
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
@@ -351,7 +355,8 @@ public enum ChronoConstellatorSceneGeometry {
             }
         }
         for index in snapshot.stars.indices {
-            let shade: Double = snapshot.stars[index].onTarget ? 1 : unlit
+            var shade: Double = snapshot.stars[index].onTarget ? 1 : unlit
+            if let lights, lights.rings.indices.contains(index) { shade = lights.rings[index] }
             let uv: Vec2 = Vec2(roseCode, shade)
             let colour: SIMD3<Double> = materialColour(roseCode) * shade
             let centre: SIMD3<Double> = targetCentre(index, snapshot)
@@ -384,11 +389,19 @@ public enum ChronoConstellatorSceneGeometry {
                             SIMD3(-halfWidth + progress, y, z + w), SIMD3(-halfWidth, y, z + w)],
                            slot: up, front: up, uv: trackUV, colour: silver)
         }
-        if case .collision(_, _, let cell) = snapshot.failure {
-            let centre: SIMD3<Double> = cellCentre(cell, snapshot) + SIMD3(0, collisionLift * u, 0)
+        var mark: (cell: Int, shade: Double)?
+        if let lights {
+            if let cell = lights.collisionCell, lights.collision > 0, cell >= 0, cell < columns * rows {
+                mark = (cell, lights.collision)
+            }
+        } else if case .collision(_, _, let cell) = snapshot.failure {
+            mark = (cell, 1)
+        }
+        if let mark {
+            let centre: SIMD3<Double> = cellCentre(mark.cell, snapshot) + SIMD3(0, collisionLift * u, 0)
             let r: Double = collisionRadius * u / 2.0.squareRoot()
-            let uv: Vec2 = Vec2(amberCode, 1)
-            let colour: SIMD3<Double> = materialColour(amberCode)
+            let uv: Vec2 = Vec2(amberCode, mark.shade)
+            let colour: SIMD3<Double> = materialColour(amberCode) * mark.shade
             try parts.bar(from: centre + SIMD3(-r, 0, -r), to: centre + SIMD3(r, 0, r), width: collisionWidth * u,
                           slot: up, uv: uv, colour: colour)
             try parts.bar(from: centre + SIMD3(-r, 0, r), to: centre + SIMD3(r, 0, -r), width: collisionWidth * u,
@@ -456,9 +469,9 @@ public enum ChronoConstellatorSceneGeometry {
     /// The field mesh (see ``fieldPart(_:tier:)``).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func fieldMesh(_ snapshot: ChronoConstellatorSceneSnapshot,
-                                 tier: ChronoConstellatorTier) throws(MeshError) -> Mesh {
-        try fieldPart(snapshot, tier: tier).mesh
+    public static func fieldMesh(_ snapshot: ChronoConstellatorSceneSnapshot, tier: ChronoConstellatorTier,
+                                 lights: ChronoConstellatorLights? = nil) throws(MeshError) -> Mesh {
+        try fieldPart(snapshot, tier: tier, lights: lights).mesh
     }
 
     /// The glowing stars (glow program, colour in the normal slot, uv (age 0, weight 1)): every star's node, a disc of
@@ -467,19 +480,31 @@ public enum ChronoConstellatorSceneGeometry {
     /// 0.34 … 0.42·u) at y = 0.008·u. Colours: the stream colour. The same at every tier.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func starPart(_ snapshot: ChronoConstellatorSceneSnapshot,
-                                tier: ChronoConstellatorTier) throws(MeshError) -> ChronoConstellatorColouredMesh {
+    ///
+    /// - Parameter lights: the eased light levels (feature 356): a ring's glow copy is drawn while its eased level is
+    ///   above ``ChronoConstellatorLights/ringUnlit``, its colour scaled by how far it has risen, and each node's colour
+    ///   is scaled by its eased level; nil draws the snapshot's own levels, exactly as before.
+    public static func starPart(_ snapshot: ChronoConstellatorSceneSnapshot, tier: ChronoConstellatorTier,
+                                lights: ChronoConstellatorLights? = nil)
+        throws(MeshError) -> ChronoConstellatorColouredMesh {
         var parts: Parts = Parts()
-        try addStars(snapshot, to: &parts)
+        try addStars(snapshot, lights: lights, to: &parts)
         return parts.built()
     }
 
-    /// Adds the elements of ``starPart(_:tier:)`` to `parts`.
-    static func addStars(_ snapshot: ChronoConstellatorSceneSnapshot, to parts: inout Parts) throws(MeshError) {
+    /// Adds the elements of ``starPart(_:tier:lights:)`` to `parts`.
+    static func addStars(_ snapshot: ChronoConstellatorSceneSnapshot, lights: ChronoConstellatorLights? = nil,
+                         to parts: inout Parts) throws(MeshError) {
         let u: Double = cellSize(snapshot)
         let uv: Vec2 = Vec2(0, 1)
-        for index in snapshot.stars.indices where snapshot.stars[index].onTarget {
-            let rose: SIMD3<Double> = ChronoConstellatorPalette.rose
+        for index in snapshot.stars.indices {
+            var lit: Double = snapshot.stars[index].onTarget ? 1 : 0
+            if let lights, lights.rings.indices.contains(index) {
+                let unlit: Double = ChronoConstellatorLights.ringUnlit
+                lit = max(0, min(1, (lights.rings[index] - unlit) / (ChronoConstellatorLights.ringLit - unlit)))
+            }
+            guard lit > 0 else { continue }
+            let rose: SIMD3<Double> = ChronoConstellatorPalette.rose * lit
             let centre: SIMD3<Double> = cellCentre(snapshot.stars[index].target, snapshot)
                 + SIMD3(0, glowRingLift * u, 0)
             try parts.annulus(centre: centre, inner: targetInner * u, outer: targetOuter * u,
@@ -487,10 +512,12 @@ public enum ChronoConstellatorSceneGeometry {
         }
         for index in snapshot.stars.indices {
             let centre: SIMD3<Double> = starCentre(index, snapshot)
-            let disc: SIMD3<Double> = ChronoConstellatorPalette.star * nodeDisc
+            var level: Double = 1
+            if let lights, lights.nodes.indices.contains(index) { level = lights.nodes[index] }
+            let disc: SIMD3<Double> = ChronoConstellatorPalette.star * nodeDisc * level
             try parts.disc(centre: centre, radius: nodeRadius * u, segments: circleSegments, slot: disc, uv: uv,
                            colour: disc)
-            let star: SIMD3<Double> = ChronoConstellatorPalette.star
+            let star: SIMD3<Double> = ChronoConstellatorPalette.star * level
             try parts.shape(shape(index), centre: centre + SIMD3(0, shapeLift * u, 0), radius: nodeShapeRadius * u,
                             width: nodeShapeWidth * u, slot: star, uv: uv, colour: star)
         }
@@ -499,9 +526,9 @@ public enum ChronoConstellatorSceneGeometry {
     /// The star mesh (see ``starPart(_:tier:)``).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func starMesh(_ snapshot: ChronoConstellatorSceneSnapshot,
-                                tier: ChronoConstellatorTier) throws(MeshError) -> Mesh {
-        try starPart(snapshot, tier: tier).mesh
+    public static func starMesh(_ snapshot: ChronoConstellatorSceneSnapshot, tier: ChronoConstellatorTier,
+                                lights: ChronoConstellatorLights? = nil) throws(MeshError) -> Mesh {
+        try starPart(snapshot, tier: tier, lights: lights).mesh
     }
 
     /// The point of star `star`'s history ribbon `age` ticks old (0 … the history it has): the cell centre it stood on

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ChronoConstellatorSceneGeometryTests|ChronoConstellatorLightsTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'ChronoConstellatorSceneGeometryTests|ChronoConstellatorLightsTests'",
+  "elapsed_seconds": 7.385,
+  "exit_code": 0,
+  "finished": "2026-11-22T04:54:39+00:00",
+  "gate": "R02-G06-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G06-06.host-geometry.log",
+  "log_sha256": "450b74dc18839ded632b5c4c013e034cf05ddfdaf6065473f5b138890ddba7f3",
+  "name": "host-geometry",
+  "started": "2026-11-22T04:54:31+00:00",
+  "timed_out": false
+}
