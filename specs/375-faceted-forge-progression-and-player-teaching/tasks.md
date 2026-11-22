@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0805-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0805-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit 0 (committed tree); rendering baseline = R02-G08-04 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G08-04's rendering runs (exit 0)
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
