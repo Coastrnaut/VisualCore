@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G08-05 (migration ledger, game feature of experience R02-G08) · ID namespace FR-R02G0805-###,
 SC-R02G0805-###, T-R02G0805-###
@@ -24,6 +24,56 @@ Canonical overrides:
   **Owner-only items:** none.
 - **Shared features used:** R02-F23 (puzzle contract: hints, failure explanation), R02-F24 (progression), R02-F26
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G08-01 … 04.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+365's answers where the games agree. Facts checked in code (read-only, 2026-11-22): `FacetedForgeSolver` certifies a
+level by a bounded depth-first search (20,000 cut evaluations) for a winning sequence of exactly target pieces − 1 cuts
+from the crystal alone, pruned by `canPartition`; every accepted cut adds exactly one piece, so a won play always spent
+exactly the lower bound of cuts; a play fails on a sliver (`sliver(piece, cut)`, the new canonical index and the cuts
+spent before it) or when the cuts spent reach the budget (`budget`); undo works in playing, paused and failed, a won
+play is final; levels 1 … 3 carry the tutorial flag; manifest budgets are 8 … 19 and the level's range 1 … 20; the
+adapter prepares level (seed mod 100) + 1 and snapshots `{level, records}` as schema 1; the core may not read a clock;
+the other round-two games' daily multipliers are 37, 41, 43, 47, 53, 59 and 61.
+
+- Q: How is a hint computed and what does each level reveal? → A: the plan comes from the current state. A won play has
+  no hint; a failed play's hint is "Undo the last cut or retry the level." While playing: the same bounded depth-first
+  search as the solver (a new entry point from the current pieces), looking for exactly target pieces − current pieces
+  more cuts, which must fit in the cuts left and start from pieces that `canPartition` accepts; its first cut is the
+  plan: level 1 "Cut piece k" (piece k named in words: its share and face count), level 2 "Cut piece k in direction x",
+  level 3 "Cut piece k in direction x at depth d". When no plan is found: "No way to match the target was found in the
+  cuts left: undo the last cut or retry the level." Hints never change the state, are unlimited, do not affect stars and
+  reset to level 1 after any change of the play. "A state that can still win" means one whose plan exists. Impact:
+  FR-R02G0805-002; SC-R02G0805-002.
+- Q: What does the tutorial show, and when does it advance? → A: on levels 1 … 3, three instructions in order: (1)
+  "Choose a piece and aim the ruby plane — drag its rim to tilt it, drag inside it to slide it, or use the panel — then
+  tap the plane (or Cut) to split the piece; a hint shows where" — it advances once a cut has been accepted; (2) "Each
+  cut adds one piece: match the target's shares and face counts exactly; a piece thinner than 1/64 of the crystal ends
+  the play" — until a second cut is accepted or the level ends; (3) "Match every target piece before the cuts run out" —
+  until the level ends. `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G0805-001;
+  SC-R02G0805-001.
+- Q: What are the progress and star rules, given that every win spends exactly the lower bound of cuts? → A: stars
+  measure the cuts made, undone ones included (the play's cut records): 3 when at most the certified smallest cut count
+  (no cut undone), 2 when at most that + 2, else 1; per level the best (fewest) cuts made of a won campaign play and its
+  stars, a better result replacing a worse one; level 1 open; a campaign win opens the next; `level.select [n]` opens
+  any open level and refuses others (`r02-g08.locked`); `level.next` moves to the next open level (refused when none,
+  `r02-g08.locked`); the five bands of 20 are the certified difficulty bands. Impact: FR-R02G0805-004; SC-R02G0805-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 67) mod 100 + 1, negative day counts wrapped into 0 … 99 (67 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g08.date`). Daily play follows campaign rules but does not open levels. `mode.practice` replays the
+  current level with the budget raised to the kernel's maximum (20); practice results never award stars or open
+  levels; `mode.campaign` returns. Impact: FR-R02G0805-005; SC-R02G0805-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 365: progress and
+  the mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter); the snapshot payload becomes schema 2 (`{level, records, progress,
+  mode, tutorial}`) with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its
+  first step on tutorial levels). Failures are explained from the failing cut: sliver "Cut c left piece p at s of the
+  crystal, thinner than the sliver limit of 1/64."; budget "The cuts ran out: b of b spent with n pieces; the target
+  has m.", each followed by "Undo the last cut or retry the level." Impact: FR-R02G0805-003, 007; SC-R02G0805-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
