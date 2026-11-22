@@ -14,7 +14,7 @@ change (the shaders and reference of R02-G08-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0809-002 Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSchemaExamples.swift`
+- [X] T-R02G0809-002 Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSchemaExamples.swift` — Verified 2026-11-22: host (swift test --package-path Packages/ExperiencesRound02 incl. FacetedForgeSchemaExampleTests 7: both examples restore through migrations to schema 3 with level 1, the cut and progress kept, the schema-2 result unverified with its stars, expected digests match, other versions nil, SnapshotMigrationCheck reports no problems) exit 0; registration stores both examples, comment corrected; lead retest (the app-side restore is proven by app-unit in T-005)
   (contracts/api.md; data-model: schema 1 "a seeded play of level 1 with one cut that does not win, seed 7";
   schema 2 "campaign mode, progress {frontier 2, solved [level 1, cuts made, stars]}, tutorial", "the result is kept,
   unverified, without a trace"; the envelope of `AmethystEscapeSchemaExamples`) with

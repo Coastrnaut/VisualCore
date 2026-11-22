@@ -120,11 +120,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [facetedForge].compactMap { $0 }
 
-    /// R02-G08 Faceted Forge (feature 373, R02-G08-03): a candidate until X-R02-G08. Snapshot schema 1, so no earlier
-    /// example is stored yet.
+    /// R02-G08 Faceted Forge (feature 373, R02-G08-03): a candidate until X-R02-G08. Snapshot schema 3 (feature 377),
+    /// so the schema-1 and schema-2 examples are stored (feature 379, R02-G08-09).
     fileprivate static var facetedForge: ExperienceRegistration? {
         guard let id = FacetedForgeExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: FacetedForgeExperienceCore.self) { launch in
+        let examples = [FacetedForgeExperienceCore.schemaOneExample(),
+                        FacetedForgeExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: FacetedForgeExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return FacetedForgeExperience.make(
                 id: id, storage: launch.storage,
