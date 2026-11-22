@@ -250,7 +250,7 @@ import VisualCoreSimulation
             if let t = Picker.tick(at: SIMD2(p.x, p.y), size: size, snapshot: snapshot, orbit: orbit) { target = t }
         }
         guard let t = target else { return ([], nil) }
-        if t > snapshot.tick { return ([.step(t - snapshot.tick)], nil) }
+        if t > snapshot.tick { return (snapshot.stage == .failed ? [] : [.step(t - snapshot.tick)], nil) }
         if t < snapshot.tick { return (t > 0 ? [.rewind, .step(t)] : [.rewind], nil) }
         return ([], nil)
     }
@@ -620,5 +620,37 @@ import VisualCoreSimulation
         }
         #expect(checked >= 40)
         #expect(rewinds > 0)
+    }
+
+    /// Converge T-R02G0604-013: on a failed play a forward scrub sends nothing (no stage refusal), and a backward scrub
+    /// still rewinds and steps.
+    @Test func aForwardScrubOnAFailedPlaySendsNothing() throws {
+        let view: Vec2 = Vec2(1180, 820)
+        var checked: Int = 0
+        for number in [1, 41, 81] {
+            var core: Core = try Core.opening(number: number)
+            _ = core.apply(Self.action("time.step", [Double(core.play.level.tickLimit)]))
+            guard core.play.stage == .failed else { continue }
+            let snapshot: Snapshot = core.snapshot(time: 0)
+            let end: Vec2 = try #require(Self.bandPoint(1, depth: 0.12, snapshot: snapshot, view: view,
+                                                        orbit: .authored))
+            let size: SIMD2<Double> = SIMD2(view.x, view.y)
+            let far: Int = try #require(Picker.tick(at: SIMD2(end.x, end.y), size: size, snapshot: snapshot,
+                                                    orbit: .authored))
+            if far > snapshot.tick {
+                var forward: Controller = Controller()
+                let ahead: (actions: [Action], dragged: Int?, candidate: Int?) =
+                    Self.play(&forward, [end, end], [0, 0.1], view: view, snapshot: snapshot)
+                #expect(ahead.actions.isEmpty, "level \(number): \(ahead.actions)")
+            }
+            let start: Vec2 = try #require(Self.bandPoint(0, depth: 0.12, snapshot: snapshot, view: view,
+                                                          orbit: .authored))
+            var backward: Controller = Controller()
+            let back: (actions: [Action], dragged: Int?, candidate: Int?) =
+                Self.play(&backward, [start, start], [0, 0.1], view: view, snapshot: snapshot)
+            #expect(back.actions.first == .rewind, "level \(number): \(back.actions)")
+            checked += 1
+        }
+        #expect(checked >= 1)
     }
 }

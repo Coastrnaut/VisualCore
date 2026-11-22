@@ -121,7 +121,7 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
 - **Gestures.** `ChronoConstellatorGestureController` (host-tested, event timestamps only): a star dragged at least 16
   points at tick 0 sends one `star.phase` to the loop index under the finger; a touch in the timeline band (or within
   22 points of the tick bar) scrubs: `time.step` forward, or `time.rewind` then `time.step` back (a won play scrubs
-  nothing); a long press (0.5 s within 10 points) on a star at tick 0 toggles its standard hold (`star.hold [s, 1, 10]`
+  nothing, and a failed play only scrubs back); a long press (0.5 s within 10 points) on a star at tick 0 toggles its standard hold (`star.hold [s, 1, 10]`
   or `star.release [s, 1]`); a tap on a star picks it in the panel. A second finger or a cancelled touch sends nothing.
   While a star is dragged its candidate cell gets a silver ring drawn with the field program and the description names
   it; a star gesture after tick 0 says that edits are made at tick 0. Refused actions are shown and their codes kept.

@@ -20,7 +20,7 @@
 //   `[.hold(s, 1, 10)]` when the star has no hold starting at tick 1, else `[.release(s, 1)]`; any other travel
 //   < 10 points → `[.select(s)]` (every stage); 10 … 16 points → `[]`.
 // - Release of a scrub at t′ (the release point's tick, else the last scrub tick) from tick t: won → `[]`; t′ > t →
-//   `[.step(t′ − t)]`; t′ < t → `[.rewind]` then `[.step(t′)]` when t′ > 0; t′ = t → `[]`.
+//   `[.step(t′ − t)]` (`[]` on a failed play, converge T-R02G0604-013); t′ < t → `[.rewind]` then `[.step(t′)]` when t′ > 0; t′ = t → `[]`.
 // - Release of a press under 10 points: two such taps on empty space or a cell (not a star, not the timeline) whose
 //   `.ended` timestamps are at most 0.35 s apart → `[.resetView]` and the authored orbit, in every stage.
 // - A second finger cancels any star gesture, scrub or press (nothing sent, preview cleared) and orbits: yaw += Δx /
@@ -332,7 +332,9 @@ public struct ChronoConstellatorGestureController: Sendable {
     private static func scrubActions(to target: Int?,
                                      snapshot: ChronoConstellatorSceneSnapshot) -> [ChronoConstellatorGestureAction] {
         guard let target, snapshot.stage != .won else { return [] }
-        if target > snapshot.tick { return [.step(target - snapshot.tick)] }
+        // A failed play already stopped at its deciding tick, which a plain replay to any later tick also reaches, so
+        // a forward scrub sends nothing (converge T-R02G0604-013: no stage refusal is shown).
+        if target > snapshot.tick { return snapshot.stage == .failed ? [] : [.step(target - snapshot.tick)] }
         if target < snapshot.tick { return target > 0 ? [.rewind, .step(target)] : [.rewind] }
         return []
     }

@@ -80,7 +80,7 @@ controls, docs) stay with the lead. MVP: Stories 1–3 and 5.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0604-013 Send nothing for a forward scrub on a failed play per FR-R02G0604-002 and the failed-play edge case
+- [X] T-R02G0604-013 Send nothing for a forward scrub on a failed play per FR-R02G0604-002 and the failed-play edge case — Verified 2026-11-21: 2026-11-21: host-5 (swift test --filter ChronoConstellator incl. aForwardScrubOnAFailedPlaySendsNothing) exit 0; sim-27-2 exit 0
   (partial): in `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorGestureController.swift` a scrub
   released at t′ > t while the stage is `failed` returns `[]` (the replay already stopped at its deciding tick, which a
   plain replay to t′ also reaches), so no stage refusal is shown; backward scrubs keep `rewind` then `step`; cover it in
