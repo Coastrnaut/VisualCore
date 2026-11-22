@@ -25,7 +25,7 @@ change (the shaders and reference of R02-G07-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G0709-003 [US1] Edit `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapeControls.swift`:
+- [X] T-R02G0709-003 [US1] Edit `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapeControls.swift`: — Verified 2026-11-22: sim-27 exit=0 (AmethystEscapeExperienceTests on sim-27.2 incl. AmethystEscapeIdentifierTests: 23 clarified names once each, prefix experience.r02-g07.amethyst-escape.)
   identifiers `experience.r02-g07.amethyst-escape.<name>` through `port.identifier` (spec Clarifications Q1 names:
   turn-down, turn-up, advance, undo, redo, next-level, show-all-layers, reset-view, hint, dismiss-tutorial,
   failure-undo, retry, campaign, daily, practice, play-level, replay, replay-step, replay-stop, shell-picker,

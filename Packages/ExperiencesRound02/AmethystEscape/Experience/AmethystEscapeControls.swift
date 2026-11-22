@@ -16,6 +16,8 @@
 // Feature 367 (R02-G07-07) T-R02G0707-005 (clarifications Q2, Q4, Q5): "Replay best solution" for a level with a
 // verified stored solution, and during replay its position ("Replay: action k of n") with Step and Stop, each with a
 // label and a value; the Sound toggle saves the choice through `settings.sound`.
+// Feature 369 (R02-G07-09) T-R02G0709-003 (FR-R02G0709-001; clarification Q1): every control also carries the stable
+// identifier `experience.r02-g07.amethyst-escape.<name>` (`port.identifier`), the names listed in ``identifierNames``.
 #if os(iOS)
 import AmethystEscapeCore
 import SwiftUI
@@ -35,6 +37,14 @@ struct AmethystEscapeControls: View {
 
     /// The widest the panel's content grows, padding included (clarification Q5).
     static let readableWidth: CGFloat = 520
+
+    /// Every control's identifier name (clarification Q1 of feature 369), each once; the identifier is
+    /// `experience.r02-g07.amethyst-escape.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "turn-down", "turn-up", "advance", "undo", "redo", "next-level", "show-all-layers", "reset-view", "hint",
+        "dismiss-tutorial", "failure-undo", "retry", "campaign", "daily", "practice", "play-level", "replay",
+        "replay-step", "replay-stop", "shell-picker", "level-picker", "sound", "summary",
+    ]
 
     var body: some View {
         ScrollView(.vertical) {
@@ -90,14 +100,17 @@ struct AmethystEscapeControls: View {
                 .fixedSize(horizontal: false, vertical: true)
             row {
                 Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                     .accessibilityLabel("Play the next action of the replay")
                     .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
                 Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
                     .accessibilityLabel("Stop the replay")
                     .accessibilityValue("\(mirror.replayLength) actions")
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityIdentifier(port.identifier("replay"))
                 .accessibilityLabel("Replay your best solution of this level")
                 .accessibilityValue("Level \(mirror.levelNumber)")
         }
@@ -111,6 +124,7 @@ struct AmethystEscapeControls: View {
     /// The Sound toggle (feature 366; off by default; saved through `settings.sound` since feature 367).
     @ViewBuilder private var soundToggle: some View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
+            .accessibilityIdentifier(port.identifier("sound"))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
@@ -125,6 +139,7 @@ struct AmethystEscapeControls: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Crystal")
             .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
         if let message = mirror.message {
             Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
@@ -136,12 +151,15 @@ struct AmethystEscapeControls: View {
             Stepper(mirror.pickedShellLabel,
                     onIncrement: { presenter.pickShell(1) },
                     onDecrement: { presenter.pickShell(-1) })
+                .accessibilityIdentifier(port.identifier("shell-picker"))
                 .accessibilityLabel(Self.shellPickerLabel)
                 .accessibilityValue(Self.shellPickerValue(mirror))
             Button("Turn −") { send("shell.rotate", [Double(mirror.pickedShell), -1]) }
+                .accessibilityIdentifier(port.identifier("turn-down"))
                 .accessibilityLabel(Self.turnLabel(mirror, step: -1))
                 .accessibilityValue(Self.shellPickerValue(mirror))
             Button("Turn +") { send("shell.rotate", [Double(mirror.pickedShell), 1]) }
+                .accessibilityIdentifier(port.identifier("turn-up"))
                 .accessibilityLabel(Self.turnLabel(mirror, step: 1))
                 .accessibilityValue(Self.shellPickerValue(mirror))
         }
@@ -151,21 +169,27 @@ struct AmethystEscapeControls: View {
     @ViewBuilder private var playRow: some View {
         row {
             Button("Advance") { send("pearl.advance") }
+                .accessibilityIdentifier(port.identifier("advance"))
                 .accessibilityLabel("Roll the pearl one pocket")
                 .accessibilityValue(mirror.pearlLabel)
             Button("Undo") { send("play.undo") }
+                .accessibilityIdentifier(port.identifier("undo"))
                 .accessibilityLabel("Undo the last action")
                 .accessibilityValue(Self.progressValue(mirror))
             Button("Redo") { send("play.redo") }
+                .accessibilityIdentifier(port.identifier("redo"))
                 .accessibilityLabel("Redo the action")
                 .accessibilityValue(Self.progressValue(mirror))
             Button("Next level") { send("level.next") }
+                .accessibilityIdentifier(port.identifier("next-level"))
                 .accessibilityLabel("Go to the next level")
                 .accessibilityValue("Level \(mirror.levelNumber)")
             Button("Show all layers") { presenter.showAllLayers() }
+                .accessibilityIdentifier(port.identifier("show-all-layers"))
                 .accessibilityLabel("Show every shell of the crystal")
                 .accessibilityValue("layers")
             Button("Reset view") { presenter.resetView() }
+                .accessibilityIdentifier(port.identifier("reset-view"))
                 .accessibilityLabel("Return the camera to the starting view")
                 .accessibilityValue("camera")
         }
@@ -177,12 +201,14 @@ struct AmethystEscapeControls: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
                     .accessibilityLabel("Dismiss the tutorial")
                     .accessibilityValue(instruction)
             }
         }
         row {
             Button("Hint") { presenter.showHint() }
+                .accessibilityIdentifier(port.identifier("hint"))
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
             Text("Goal: escape in \(mirror.budget) moves; best possible \(mirror.smallest)")
@@ -197,9 +223,11 @@ struct AmethystEscapeControls: View {
                 Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
                 row {
                     Button("Undo") { presenter.undoMove(port: port) }
+                        .accessibilityIdentifier(port.identifier("failure-undo"))
                         .accessibilityLabel("Undo the last move")
                         .accessibilityValue(failure)
                     Button("Retry") { presenter.retry(port: port) }
+                        .accessibilityIdentifier(port.identifier("retry"))
                         .accessibilityLabel("Start the level again")
                         .accessibilityValue("Level \(mirror.levelNumber)")
                 }
@@ -211,12 +239,15 @@ struct AmethystEscapeControls: View {
     @ViewBuilder private var progressRows: some View {
         row {
             Button("Campaign") { send("mode.campaign") }
+                .accessibilityIdentifier(port.identifier("campaign"))
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
             Button("Daily") { presenter.playDaily(port: port) }
+                .accessibilityIdentifier(port.identifier("daily"))
                 .accessibilityLabel("Play today's daily level")
                 .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
             Button("Practice") { send("mode.practice") }
+                .accessibilityIdentifier(port.identifier("practice"))
                 .accessibilityLabel("Practise this level with a larger move budget")
                 .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
         }
@@ -224,9 +255,11 @@ struct AmethystEscapeControls: View {
             Stepper(levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
+                .accessibilityIdentifier(port.identifier("level-picker"))
                 .accessibilityLabel("Level to play")
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
+                .accessibilityIdentifier(port.identifier("play-level"))
                 .accessibilityLabel("Play the picked level")
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
         }
