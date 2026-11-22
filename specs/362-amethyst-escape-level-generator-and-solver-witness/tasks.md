@@ -24,7 +24,7 @@ logic); no GLSL in this feature.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G0702-003 [US1] Implement `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSolver.swift`
+- [X] T-R02G0702-003 [US1] Implement `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSolver.swift` — Verified 2026-11-22: host-2 exit=0 (AmethystEscapeSolverTests 9/9: hand-built routes, nil when inescapable, independent brute force on 30 levels and 40 fixtures, depths and work)
   (clarification Q2: packed states (offsets and pearl as one integer, `stateCount` N^K × K × N), breadth-first search in
   the rules' move order (rotate(r, +1), rotate(r, −1) for each shell, then advance unless stuck), wedge states dead, the
   first escape is the smallest; depths (states first reached at each depth below it), work (states expanded),
