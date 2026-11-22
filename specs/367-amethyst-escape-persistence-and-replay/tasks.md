@@ -39,7 +39,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
   "The replay is over.", "Stop the replay first."; a replay step announced like the action; a replayed win claims no
   stars) with `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and 2 → 3,
   reconciliation on restore, replay rules and codes, sound setting); `--name host-2`
-- [ ] T-R02G0707-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapePersistenceTests.swift` (agent B: 500 seeded
+- [X] T-R02G0707-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapePersistenceTests.swift` (agent B: 500 seeded — Verified 2026-11-22: 2026-11-22: host-3 (PersistenceTests 15: 500 seeded round trips with the sound choice never digested, 100 schema-1 and 100 schema-2 migrations, 200 traced saves with edited results dropped and counted exactly, restore twice and the daily level from the date only) exit 0, lead retest
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
   dropped and counted; FR-R02G0707-005: the same save restores to an equal digest twice and the daily level depends only
