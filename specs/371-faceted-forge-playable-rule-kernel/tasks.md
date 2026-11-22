@@ -68,7 +68,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
 - [X] T-R02G0801-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-22: rendering-27, rendering-26, experiences, host-full exit=0
   `--name host-full`
 - [X] T-R02G0801-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-22: reference-1 exit=0
-- [ ] T-R02G0801-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G0801-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: reference-2 exit=0
 - [ ] T-R02G0801-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0801-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
