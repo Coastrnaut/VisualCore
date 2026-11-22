@@ -1081,7 +1081,7 @@
       "id": "r02-g06.chrono-constellator",
       "code": "R02-G06",
       "title": "Chrono Constellator",
-      "summary": "Record and replay a constellation's motion until all stars align",
+      "summary": "Set where each star starts on its loop and when it waits, then replay the timeline: every star must reach its own target on the same tick without two stars meeting on one cell. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1090,11 +1090,30 @@
         "temporal-puzzles"
       ],
       "order": 31,
-      "palette": [],
+      "palette": [
+        "#0B0A24",
+        "#C9CED8",
+        "#F2F4FF",
+        "#FF5C8A",
+        "#FFB020"
+      ],
       "tile_seed": 362353603,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Edit a timeline, replay the stars",
+        "Glowing ribbons of star history",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "6483b20ee7d44efad49b5cc0607c8c62d38a177ace8a5390fceb9b637a986ffc",
+        "levels": 100
+      },
       "available": false
     },
     {

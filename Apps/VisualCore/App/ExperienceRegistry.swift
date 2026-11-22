@@ -34,6 +34,8 @@ import WaveKnotKeeperCore
 import WaveKnotKeeperExperience
 import ColorfallCanyonsCore
 import ColorfallCanyonsExperience
+import ChronoConstellatorCore
+import ChronoConstellatorExperience
 import HueCompassCore
 import HueCompassExperience
 import VisualCoreExperience
@@ -111,7 +113,26 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [chronoConstellator].compactMap { $0 }
+
+    /// R02-G06 Chrono Constellator (feature 353, R02-G06-03): a candidate until X-R02-G06. Snapshot schema 1, so no
+    /// earlier example is stored yet.
+    fileprivate static var chronoConstellator: ExperienceRegistration? {
+        guard let id = ChronoConstellatorExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: ChronoConstellatorExperienceCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return ChronoConstellatorExperience.make(
+                id: id, storage: launch.storage,
+                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        // Seed 0 opens certified level 1, as for the other round-two puzzles.
+        registration.openingSeed = 0
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = ChronoConstellatorExperienceCore.manifest(for: id)
+        #endif
+        return registration
+    }
 
     /// R02-G05 Colorfall Canyons (features 341–350, R02-G05-01…10): integrated at X-R02-G05 (2026-11-21). Snapshot schema 3
     /// (feature 347), so the schema-1 and schema-2 examples are stored (feature 349, R02-G05-09).

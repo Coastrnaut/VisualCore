@@ -45,7 +45,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Experience, registration and frames
 
-- [ ] T-R02G0603-006 Create `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorExperience.swift`,
+- [X] T-R02G0603-006 Create `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorExperience.swift`, — Verified 2026-11-21: 2026-11-21: sim-27 (ChronoConstellatorExperienceTests, 26 tests on iOS 27.2) exit 0, packages exit 0, catalog-search exit 0, host-5 (swift test --filter ChronoConstellator incl. scenario tests) exit 0
   `…Presenter.swift`, `…SkyScene.swift` (GL scene with `ShaderMeshRenderer`, back faces culled on every draw as in the
   Colorfall scene; fallback; tier log; Reduce Motion and Reduce
   Flashing; the presenter declares `probes(_:)` — two field corners, as the round-two X gates require — and its quality

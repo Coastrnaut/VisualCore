@@ -746,6 +746,34 @@
       "manifest": "Packages/ExperiencesRound02/ColorfallCanyons/scenario-manifest.json",
       "permissions": [],
       "summary": "Carve short sluices and open spring valves so cyan, coral and yellow light-fluid runs down a mesa canyon into its basins, each filled with its own mix and none overflowing or tainted. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g06.chrono-constellator": {
+      "capabilities": [
+        "Edit a timeline, replay the stars",
+        "Glowing ribbons of star history",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#0B0A24",
+        "#C9CED8",
+        "#F2F4FF",
+        "#FF5C8A",
+        "#FFB020"
+      ],
+      "content": {
+        "catalog_sha256": "6483b20ee7d44efad49b5cc0607c8c62d38a177ace8a5390fceb9b637a986ffc",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/ChronoConstellator/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Set where each star starts on its loop and when it waits, then replay the timeline: every star must reach its own target on the same tick without two stars meeting on one cell. 100 certified levels. Drawn in code; offline."
     }
   }
 }
