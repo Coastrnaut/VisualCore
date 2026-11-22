@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G09-09 (migration ledger, game feature of experience R02-G09) · ID namespace FR-R02G0909-###,
 SC-R02G0909-###, T-R02G0909-###
@@ -23,6 +23,54 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 379 (Nocturne Garden's simulator integration and full app lock).
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+379's answers. Facts checked in code (read-only, 2026-11-22): feature 379 (Faceted Forge) is the model
+(`Apps/VisualCore/Tests/UI/FacetedForge`, namespace `FF`, serial chunk `q3`; identifiers through
+`port.identifier(name)`; `FacetedForgeSchemaExamples.swift`); Nocturne Garden's panel (`NocturneGardenControls`) has
+labels and values on every control (feature 386) but no identifiers, with two Undo buttons (the play row's and the
+failure section's), adjustable steppers for the kind, the column, the row, the size, the bloom, the sun and the level,
+Plant, Move, Resize, Remove and Set sun; its registration in `Apps/VisualCore/App/ExperienceRegistry.swift` still says
+"Snapshot schema 1, so no earlier example is stored yet" although the snapshot is schema 3 since feature 387; the
+panel's "Garden" element carries the summary and, when won, the canvas description says "The shadow matches the
+target." followed by "Stars: k of 3."; the UI chunk keys in `release_check.py` include `q3` but not `r3`; no `NG`
+namespace exists among the UI test folders.
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g09.nocturne-garden.<name>` through `port.identifier(name)`: the buttons `plant`, `move`, `resize`,
+  `remove`, `set-sun`, `undo`, `redo`, `next-level`, `reset-view`, `hint`, `dismiss-tutorial`, `failure-undo`,
+  `retry`, `campaign`, `daily`, `practice`, `play-level`, `replay`, `replay-step`, `replay-stop`, the steppers
+  `kind-picker`, `column-picker`, `row-picker`, `size-picker`, `bloom-picker`, `sun-picker` and `level-picker`, the
+  toggle `sound` and the summary element `summary` (the "Garden" element). The tests read the canvas description for
+  the level, the win and the stars, and the replay step's value for the replay position. Impact: FR-R02G0909-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `NG` in
+  `Apps/VisualCore/Tests/UI/NocturneGarden/NGSupport.swift`; `NGPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g09.nocturne-garden`: dismiss the tutorial, play level 1's certified
+  solution by setting the kind, column, row and size steppers and tapping Plant for each plant, and the sun stepper and
+  Set sun for a sun move; read "The shadow matches the target" and "Stars: 3 of 3", the level picker shows level 2
+  open; relaunch without reset after sending the app to the background: the stars and level 2 are kept) and
+  `NGReplayUITests` (after the win, Replay best solution, Step until the replay ends won, Stop back to the campaign).
+  They run as a new serial chunk `r3` of `release_check.py` (its key checked unique); each test stays under 90 s. Level
+  1's certified moves are pinned in `NG` and checked against the Core by an app unit test. Impact: FR-R02G0909-002,
+  007; SC-R02G0909-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `NocturneGardenExperienceCore.schemaOneExample()` (the schema-1 saved state of a seeded play of level 1 with one plant
+  that does not win) and `schemaTwoExample()` (schema 2 with progress and level 1 solved, no trace), both
+  `MigrationExample`s built in the Core (`NocturneGardenSchemaExamples.swift`, modelled on
+  `FacetedForgeSchemaExamples`), registered with `examples:`; the app's migration check restores both into schema 3
+  with progress kept (a schema-2 result without a trace keeps its stars, as feature 387 reconciles). The
+  registration's comment is corrected. Impact: FR-R02G0909-003; SC-R02G0909-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `NocturneGardenGolden` is forbidden by feature 388, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G0909-004;
+  SC-R02G0909-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g09.nocturne-garden` as not available and the launcher cannot open it; the registry's candidates list contains
+  it and `all` does not. Impact: FR-R02G0909-006; SC-R02G0909-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
