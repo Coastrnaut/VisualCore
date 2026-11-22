@@ -1,0 +1,227 @@
+{
+  "devices": [
+    {
+      "ledger": "DEV1-R02-G07",
+      "name": "D1"
+    },
+    {
+      "ledger": "DEV2-R02-G07",
+      "name": "D2"
+    },
+    {
+      "ledger": "DEV3-R02-G07",
+      "name": "D3"
+    }
+  ],
+  "experience": "r02-g07.amethyst-escape",
+  "rows": [
+    {
+      "covers": [
+        "launch",
+        "first-frame"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "AE-D1",
+      "measurements": [
+        "launch",
+        "first-frame"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "No shader program is compiled after the experience became interactive; stage times recorded for 200 samples per device and tier (docs/performance/budgets.md, proposal).",
+      "procedure": "Open Amethyst Escape from the catalog with the testing argument, 200 times per device across the three host tiers; the campaign records preparation, shader set-up and first present as stage times.",
+      "status": "pending device campaign",
+      "title": "Launch and first frame"
+    },
+    {
+      "covers": [
+        "frame-pacing",
+        "T-R02G0703-012",
+        "T-R02G0708-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "AE-D2",
+      "measurements": [
+        "frame-pacing",
+        "frame-time-per-tier"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "60 frames per second with automatic levels (a documented 30 frames per second mode is acceptable on the last level), 200 samples per device; frame time per pinned tier recorded.",
+      "procedure": "Run the hero and full-playthrough scenarios pinned to tiers 0, 1 and 2 in turn, then with automatic levels; the campaign records each frame's interval.",
+      "status": "pending device campaign",
+      "title": "Frame pacing and frame time per tier"
+    },
+    {
+      "covers": [
+        "memory",
+        "thermal",
+        "stress",
+        "T-R02G0708-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "AE-D3",
+      "measurements": [
+        "memory",
+        "thermal",
+        "stress"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner keeps the device unplugged for the stress session and tells the campaign the starting battery level."
+      ],
+      "pass": "Memory flat within the declared resource budget over the session (the growth rule of feature 192), 200 samples per device; thermal state and any tier change recorded.",
+      "procedure": "Run the 30-minute round-two stress session of UA-F13 (levels opened, shells turned, the pearl advanced, layers isolated, moves undone, levels retried and replayed in a loop) at automatic levels; the campaign samples the footprint and the thermal state.",
+      "status": "pending device campaign",
+      "title": "Memory, thermal state and the round-two stress session"
+    },
+    {
+      "covers": [
+        "T-R02G0704-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "AE-D4",
+      "measurements": [
+        "touch-to-frame"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner drags shells by their bezels, taps to advance the pearl, double-taps a shell to isolate it and orbits with two fingers; the campaign does not synthesise touches on hardware."
+      ],
+      "pass": "Touch-to-frame latency recorded for 200 samples per device; a bezel drag turns the shell by whole sectors and exactly one turn per sector is sent on release; a tap sends exactly one advance; a double tap isolates one shell and Show all layers restores them.",
+      "procedure": "Drag a shell by its bezel to a new angle, tap to advance the pearl, double-tap a shell to isolate it and orbit the camera with two fingers on each device; the campaign records the interval from touch to the first frame showing the change.",
+      "status": "pending device campaign",
+      "title": "Touch feel and touch-to-frame latency"
+    },
+    {
+      "covers": [
+        "T-R02G0706-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "AE-D5",
+      "measurements": [
+        "sound-audible",
+        "haptics-felt"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner listens and feels, and sets the silent switch and the system haptics setting."
+      ],
+      "pass": "The loop is audible only while the sound is on, the panel is shown and the scene is active, and follows the silent switch; each planned haptic is felt (where the device has no haptic engine, the haptic part is recorded as not applicable).",
+      "procedure": "Turn the Sound toggle on and play a level to a win and to a failure with the haptics switch on, including one refused action; observe the ambient loop and the selection, success, warning and error haptics.",
+      "status": "pending device campaign",
+      "title": "Sound heard and haptics felt"
+    },
+    {
+      "covers": [
+        "T-R02G0706-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": false,
+      "id": "AE-D6",
+      "measurements": [
+        "voiceover-observation"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner turns VoiceOver and the text size on and off in Settings and performs the walk-through."
+      ],
+      "pass": "Every control and the summary element are read with their label and value; each shell pick, turn, advance, refusal and the escape are announced; the panel stays readable at the largest accessibility text size; recorded as an observation (non-gating, P-08).",
+      "procedure": "With VoiceOver on and the largest accessibility text size, pick a shell with the adjustable shell picker, turn it, advance the pearl and hear the escape; replay it.",
+      "status": "pending device campaign",
+      "title": "VoiceOver walk-through (manual, non-gating)"
+    },
+    {
+      "covers": [
+        "T-R02G0707-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "AE-D7",
+      "measurements": [
+        "progress-kept"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner ends the app from the app switcher."
+      ],
+      "pass": "Level 1 is solved with its stars, level 2 is open and the replay of level 1 is offered after the reopen; an unfinished level restores to the same shell angles, pearl pocket, moves and actions.",
+      "procedure": "Win level 1, leave the app to the background, end it from the app switcher, reopen Amethyst Escape.",
+      "status": "pending device campaign",
+      "title": "Progress across a real termination"
+    },
+    {
+      "covers": [
+        "T-R02G0709-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "AE-D8",
+      "measurements": [
+        "scenarios",
+        "journeys"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "Every scenario of the device set passes; level 1 is escaped in 3 moves with 3 of 3 stars, level 2 is open, progress survives the relaunch, the replay ends won.",
+      "procedure": "Run the device scenario set by id and the interface journeys of chunk p3 (win level 1 with the shell picker, Turn − and Advance, replay, relaunch).",
+      "status": "pending device campaign",
+      "title": "Panel journeys in the app"
+    }
+  ],
+  "scenarios": [
+    "launch-first-frame",
+    "input-response",
+    "completion",
+    "rejection",
+    "save-restore",
+    "reset",
+    "suspend-resume",
+    "teardown-reentry",
+    "cancel-prepare",
+    "full-playthrough",
+    "hero",
+    "fixture-level-1-solved"
+  ],
+  "schema": 1
+}

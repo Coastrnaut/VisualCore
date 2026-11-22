@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g07.amethyst-escape"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g07.amethyst-escape",
+  "elapsed_seconds": 0.03,
+  "exit_code": 0,
+  "finished": "2026-11-22T11:26:53+00:00",
+  "gate": "R02-G07-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-10.device-rows.log",
+  "log_sha256": "300ca41e7100e9fb0a4f238c0e0c04c0cd1705061b0708e13ee187cc8130d978",
+  "name": "device-rows",
+  "started": "2026-11-22T11:26:53+00:00",
+  "timed_out": false
+}
