@@ -5,6 +5,10 @@
 // the camera are identical at every tier; ribbon ages rise 0.04·u per tick and alpha decays as 1 − age / R; ribbon
 // vertex and triangle counts scale with the tier exactly; holds, lit targets and the collision cross are drawn; the held
 // cell agrees with the kernel. A handful of hand-made levels, explicit types, plain loops; well under 10 s.
+// Feature 354 (R02-G06-04) T-R02G0604-002 (FR-R02G0604-005; SC-R02G0604-004): at the authored orbit, both yaw limits,
+// both pitch limits and the four bound corners every element projects inside the view with a 5 % margin for aspects
+// 0.4 … 2.5; the authored camera is the authored orbit's camera bit for bit; `ChronoConstellatorOrbit.clamped()` keeps
+// the bounds; the candidate ring has the stated geometry and streams.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -301,5 +305,165 @@ import VisualCoreScenes
         let shapes: [ChronoConstellatorShape] = [.ring, .cross, .diamond, .triangle, .square]
         for (i, shape) in shapes.enumerated() { #expect(Geometry.shape(i) == shape) }
         #expect(Geometry.shape(-3) == .ring && Geometry.shape(9) == .square)
+    }
+
+    // MARK: Orbit (feature 354)
+
+    typealias Orbit = ChronoConstellatorOrbit
+
+    /// The authored orbit, both yaw limits, both pitch limits and the four corners of the orbit bounds.
+    static let orbits: [Orbit] = [
+        .authored,
+        Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.authored.pitch),
+        Orbit(yaw: Orbit.yawLimit, pitch: Orbit.authored.pitch),
+        Orbit(yaw: 0, pitch: Orbit.pitchRange.lowerBound),
+        Orbit(yaw: 0, pitch: Orbit.pitchRange.upperBound),
+        Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.pitchRange.lowerBound),
+        Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.pitchRange.upperBound),
+        Orbit(yaw: Orbit.yawLimit, pitch: Orbit.pitchRange.lowerBound),
+        Orbit(yaw: Orbit.yawLimit, pitch: Orbit.pitchRange.upperBound),
+    ]
+
+    @Test func everyElementInsideTheViewAtEveryOrbitBound() throws {
+        var all: [Snapshot] = try Self.snapshots()
+        all.append(try Self.collision())
+        let tier: ChronoConstellatorTier = .of(0)
+        for s in all {
+            var points: [SIMD3<Double>] = []
+            for part in try Self.meshes(s, tier) {
+                for p in part.mesh.positions { points.append(SIMD3(p.x, p.y, p.z)) }
+            }
+            for cell in 0..<(s.columns * s.rows) {
+                for p in try Geometry.candidatePart(cell, s).mesh.positions { points.append(SIMD3(p.x, p.y, p.z)) }
+            }
+            for orbit in Self.orbits {
+                for aspect in Self.aspects {
+                    let cam: ChronoConstellatorCamera = Geometry.camera(s, aspect: aspect, orbit: orbit)
+                    #expect(Geometry.length(cam.eye) - cam.radius > cam.near)
+                    var outside: Int = 0
+                    for p in points {
+                        guard let v = Geometry.project(p, camera: cam) else {
+                            outside += 1
+                            continue
+                        }
+                        if !(v.x >= 0.05 && v.x <= 0.95 && v.y >= 0.05 && v.y <= 0.95) { outside += 1 }
+                    }
+                    #expect(outside == 0, "\(s.columns)x\(s.rows) orbit \(orbit) aspect \(aspect)")
+                }
+            }
+        }
+    }
+
+    @Test func theOrbitCameraLooksFromTheOrbitDirection() throws {
+        for s in try Self.snapshots() {
+            for orbit in Self.orbits {
+                let cam: ChronoConstellatorCamera = Geometry.camera(s, aspect: 1, orbit: orbit)
+                let eye: SIMD3<Double> = cam.eye
+                let horizontal: Double = (eye.x * eye.x + eye.z * eye.z).squareRoot()
+                #expect(abs(atan2(eye.y, horizontal) - orbit.pitch) < 1e-12)
+                #expect(abs(atan2(eye.x, eye.z) - orbit.yaw) < 1e-12)
+                #expect(abs(Geometry.length(eye) - Geometry.length(Geometry.camera(s, aspect: 1).eye)) < 1e-12)
+                #expect(cam.radius == Geometry.boundingRadius(s))
+                let centre: SIMD2<Double>? = Geometry.project(.zero, camera: cam)
+                #expect(centre != nil)
+                if let centre { #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9) }
+            }
+        }
+    }
+
+    @Test func theAuthoredCameraIsTheAuthoredOrbit() throws {
+        #expect(Orbit.authored.yaw == 0)
+        #expect(Orbit.authored.pitch == Geometry.pitch)
+        #expect(Orbit.authored.eyeDirection == Geometry.eyeDirection)
+        let aspects: [Double] = [0.4, 0.6, 1, 1.333, 1.5, 2, 2.5, 0, .nan, 20]
+        var all: [Snapshot] = try Self.snapshots()
+        all.append(try Self.collision())
+        for s in all {
+            for aspect in aspects {
+                #expect(Geometry.camera(s, aspect: aspect) == Geometry.camera(s, aspect: aspect, orbit: .authored))
+            }
+        }
+    }
+
+    @Test func clampedKeepsTheOrbitBounds() throws {
+        let degree: Double = Double.pi / 180
+        #expect(abs(Orbit.yawLimit - 40 * degree) < 1e-15)
+        #expect(abs(Orbit.pitchRange.lowerBound - 30 * degree) < 1e-15)
+        #expect(abs(Orbit.pitchRange.upperBound - 75 * degree) < 1e-15)
+        #expect(abs(Orbit.authored.pitch - 55 * degree) < 1e-15)
+        #expect(Orbit.authored.clamped() == .authored)
+        let inside: Orbit = Orbit(yaw: 10 * degree, pitch: 35 * degree)
+        #expect(inside.clamped() == inside)
+        let low: Orbit = Orbit(yaw: -3, pitch: -1).clamped()
+        #expect(low.yaw == -Orbit.yawLimit && low.pitch == Orbit.pitchRange.lowerBound)
+        let high: Orbit = Orbit(yaw: 3, pitch: 2).clamped()
+        #expect(high.yaw == Orbit.yawLimit && high.pitch == Orbit.pitchRange.upperBound)
+        let odd: [Double] = [.nan, .infinity, -.infinity]
+        for value in odd {
+            #expect(Orbit(yaw: value, pitch: value).clamped() == .authored)
+            let yawOnly: Orbit = Orbit(yaw: value, pitch: 35 * degree).clamped()
+            #expect(yawOnly.yaw == 0 && yawOnly.pitch == 35 * degree)
+        }
+        for orbit in Self.orbits {
+            let e: SIMD3<Double> = orbit.eyeDirection
+            #expect(abs(Geometry.length(e) - 1) < 1e-12)
+        }
+        // The camera of an out-of-bounds orbit is the camera of its clamped orbit.
+        let s: Snapshot = try Self.snapshots()[0]
+        let wild: Orbit = Orbit(yaw: 2, pitch: 1.5)
+        #expect(Geometry.camera(s, aspect: 1, orbit: wild) == Geometry.camera(s, aspect: 1, orbit: wild.clamped()))
+    }
+
+    @Test func candidateRingOutlinesItsCell() throws {
+        var all: [Snapshot] = try Self.snapshots()
+        all.append(try Self.collision())
+        let up: Vec3 = Vec3(0, 1, 0)
+        for s in all {
+            let u: Double = Geometry.cellSize(s)
+            let outer: Double = 0.42 * u
+            let inner: Double = 0.36 * u
+            for cell in [0, s.columns - 1, s.columns * s.rows / 2, s.columns * s.rows - 1] {
+                let part: ChronoConstellatorColouredMesh = try Geometry.candidatePart(cell, s)
+                let m: Mesh = part.mesh
+                let centre: SIMD3<Double> = Geometry.cellCentre(cell, s)
+                #expect(m.triangleCount == 8)
+                #expect(part.colours.count == m.positions.count && m.normals.count == m.positions.count)
+                var area: Double = 0
+                var k: Int = 0
+                while k + 2 < m.indices.count {
+                    let a: Vec3 = m.positions[Int(m.indices[k])]
+                    let b: Vec3 = m.positions[Int(m.indices[k + 1])]
+                    let c: Vec3 = m.positions[Int(m.indices[k + 2])]
+                    let n: SIMD3<Double> = Geometry.cross(SIMD3(b.x - a.x, b.y - a.y, b.z - a.z),
+                                                          SIMD3(c.x - a.x, c.y - a.y, c.z - a.z))
+                    #expect(n.y > 0)
+                    area += Geometry.length(n) / 2
+                    k += 3
+                }
+                let expectedArea: Double = 4 * (outer * outer - inner * inner)
+                #expect(abs(area - expectedArea) < 1e-12, "area \(area) vs \(expectedArea)")
+                var maxRing: Double = 0
+                var minRing: Double = .infinity
+                for i in m.positions.indices {
+                    let p: Vec3 = m.positions[i]
+                    #expect(abs(p.y - 0.01 * u) < 1e-12)
+                    let ring: Double = max(abs(p.x - centre.x), abs(p.z - centre.z))
+                    maxRing = max(maxRing, ring)
+                    minRing = min(minRing, ring)
+                    #expect(ring >= inner - 1e-12 && ring <= outer + 1e-12)
+                    #expect(m.normals[i] == up)
+                    #expect(m.uvs[i] == Vec2(Geometry.trackCode, 1))
+                    let c: Vec4 = part.colours[i]
+                    let silver: SIMD3<Double> = ChronoConstellatorPalette.silver
+                    #expect(c == Vec4(silver.x, silver.y, silver.z, 1))
+                }
+                #expect(abs(maxRing - outer) < 1e-12 && abs(minRing - inner) < 1e-12)
+                #expect(try Geometry.candidatePart(cell, s) == part)
+            }
+            for bad in [-1, s.columns * s.rows, Int.max, Int.min] {
+                let empty: ChronoConstellatorColouredMesh = try Geometry.candidatePart(bad, s)
+                #expect(empty.mesh.positions.isEmpty && empty.mesh.indices.isEmpty && empty.colours.isEmpty)
+            }
+        }
     }
 }

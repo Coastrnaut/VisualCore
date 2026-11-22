@@ -13,13 +13,20 @@
 // for every aspect 0.4 … 2.5; the CPU projection is the reference that the simulator frame checks compare with rendered
 // pixels. Stars, targets, tracks, marks and the camera are the same at every tier; only the ribbons change. Doubles are
 // used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 354 (R02-G06-04) T-R02G0604-002 (FR-R02G0604-005; SC-R02G0604-004; research R5, R6): the orbit
+// (`ChronoConstellatorOrbit`: yaw ±40° about +y, pitch 30° … 75° down from the horizon, authored yaw 0 and pitch 55°)
+// and `camera(_:aspect:orbit:)`, which refits the same bounding sphere so the 5 % margin holds at every orbit; the
+// authored camera is the authored orbit's camera, bit for bit. `candidatePart(_:_:)` is the pearl ring that outlines
+// the candidate cell of a star drag: a thin square ring drawn by the field program with the track material.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
 /// The camera of the Chrono Constellator scene for one snapshot and aspect.
 ///
-/// Built only by ``ChronoConstellatorSceneGeometry/camera(_:aspect:)``. World positions are in grid units (the grid's
+/// Built only by ``ChronoConstellatorSceneGeometry/camera(_:aspect:orbit:)`` (and ``camera(_:aspect:)``, its authored
+/// orbit). World positions are in grid units (the grid's
 /// longer side is 2); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
 public struct ChronoConstellatorCamera: Sendable, Equatable {
     /// The eye position in world units.
@@ -42,6 +49,48 @@ public struct ChronoConstellatorCamera: Sendable, Equatable {
     public let projection: Mat4
     /// ``projection`` times ``view``.
     public let viewProjection: Mat4
+}
+
+/// The orbit of the Chrono Constellator camera: a yaw about the vertical axis and a pitch down from the horizon, both
+/// in radians (feature 354). Presentation only: never in the digest, the snapshot or the kernel, and not saved.
+///
+/// ``ChronoConstellatorSceneGeometry/camera(_:aspect:orbit:)`` uses the ``clamped()`` orbit, so the eye always stays in
+/// front of the grid and above it (no vertical singularity) and the whole sky stays in view.
+public struct ChronoConstellatorOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians: the angle of the eye direction above the horizon (the view looks down by it); allowed
+    /// ``pitchRange`` (30° … 75°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 55° (``ChronoConstellatorSceneGeometry/pitch``), the fixed camera of
+    /// R02-G06-03.
+    public static let authored = ChronoConstellatorOrbit(yaw: 0, pitch: ChronoConstellatorSceneGeometry.pitch)
+    /// The largest yaw either way, 40° in radians.
+    public static let yawLimit: Double = 40.0 * Double.pi / 180
+    /// The allowed pitches, 30° … 75° in radians.
+    public static let pitchRange: ClosedRange<Double> = (30.0 * Double.pi / 180)...(75.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −40° … 40° and pitch to 30° … 75°; a non-finite angle becomes the authored one.
+    public func clamped() -> ChronoConstellatorOrbit {
+        let y: Double = yaw.isFinite ? yaw : Self.authored.yaw
+        let p: Double = pitch.isFinite ? pitch : Self.authored.pitch
+        return ChronoConstellatorOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                       pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+
+    /// The unit direction from the grid centre to the eye at the clamped orbit: (sin y · cos p, sin p, cos y · cos p)
+    /// with y the yaw and p the pitch; exactly ``ChronoConstellatorSceneGeometry/eyeDirection`` at ``authored``.
+    public var eyeDirection: SIMD3<Double> {
+        let o: ChronoConstellatorOrbit = clamped()
+        return SIMD3(sin(o.yaw) * cos(o.pitch), sin(o.pitch), cos(o.yaw) * cos(o.pitch))
+    }
 }
 
 /// A mesh with one colour per vertex (sRGB RGBA 0 … 1, alpha 1), aligned with `mesh.positions`.
@@ -363,6 +412,47 @@ public enum ChronoConstellatorSceneGeometry {
         return width * fraction
     }
 
+    /// The inset of the candidate ring from its cell's edges, 0.08 · u (feature 354, research R6).
+    public static let candidateInset: Double = 0.08
+    /// The width of the candidate ring's stroke, 0.06 · u.
+    public static let candidateWidth: Double = 0.06
+    /// The height of the candidate ring above the field, 0.01 · u (above the tracks, targets and grid lines).
+    public static let candidateLift: Double = 0.01
+
+    /// The pearl ring that outlines the candidate cell of a star drag (feature 354, research R6), for the field
+    /// program: a thin square ring on `cell` whose outer edge lies 0.08·u inside the cell's edges (outer half-side
+    /// 0.42·u), with a stroke 0.06·u wide (inner half-side 0.36·u), at y = 0.01·u; four flat up-facing quads,
+    /// `a_normal` the real up normal, `a_uv` (``trackCode``, 1), colour silver (``materialColour(_:)`` of the track
+    /// code). An empty mesh for a cell outside the grid. Presentation only; the same at every tier.
+    ///
+    /// - Throws: `MeshError` from `MeshBuilder` (not expected).
+    public static func candidatePart(_ cell: Int,
+                                     _ snapshot: ChronoConstellatorSceneSnapshot)
+        throws(MeshError) -> ChronoConstellatorColouredMesh {
+        var parts: Parts = Parts()
+        guard snapshot.columns > 0, snapshot.rows > 0, (0..<(snapshot.columns * snapshot.rows)).contains(cell) else {
+            return parts.built()
+        }
+        let u: Double = cellSize(snapshot)
+        let up: SIMD3<Double> = SIMD3(0, 1, 0)
+        let centre: SIMD3<Double> = cellCentre(cell, snapshot) + SIMD3(0, candidateLift * u, 0)
+        let outer: Double = (0.5 - candidateInset) * u
+        let inner: Double = outer - candidateWidth * u
+        let uv: Vec2 = Vec2(trackCode, 1)
+        let silver: SIMD3<Double> = materialColour(trackCode)
+        // Near and far strips across the full outer width, then the left and right strips between them.
+        let strips: [(x0: Double, z0: Double, x1: Double, z1: Double)] = [
+            (-outer, -outer, outer, -inner), (-outer, inner, outer, outer),
+            (-outer, -inner, -inner, inner), (inner, -inner, outer, inner),
+        ]
+        for s in strips {
+            try parts.quad([centre + SIMD3(s.x0, 0, s.z0), centre + SIMD3(s.x1, 0, s.z0),
+                            centre + SIMD3(s.x1, 0, s.z1), centre + SIMD3(s.x0, 0, s.z1)],
+                           slot: up, front: up, uv: uv, colour: silver)
+        }
+        return parts.built()
+    }
+
     /// The field mesh (see ``fieldPart(_:tier:)``).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
@@ -531,16 +621,28 @@ public enum ChronoConstellatorSceneGeometry {
         return max(radius, 1e-3) / sin(atan(limit))
     }
 
-    /// The fixed authored camera for `snapshot` and `aspect` (width / height): the eye on ``eyeDirection`` (in front,
-    /// +z, pitched 55° down) from the grid centre at the distance that fits the sphere of ``boundingRadius(_:)``,
-    /// looking at the grid centre with +y up and a 45° vertical field of view. For aspects 0.4 … 2.5 every vertex of every
-    /// mesh projects inside the view with at least 5 % margin on every side. A zero, negative or non-finite aspect is
-    /// treated as 1; others are clamped to 0.1 … 10. Independent of the tier and of the tick.
+    /// The fixed authored camera for `snapshot` and `aspect` (width / height): ``camera(_:aspect:orbit:)`` at
+    /// ``ChronoConstellatorOrbit/authored``, so the eye lies on ``eyeDirection`` (in front, +z, pitched 55° down) from
+    /// the grid centre at the distance that fits the sphere of ``boundingRadius(_:)``, looking at the grid centre with
+    /// +y up and a 45° vertical field of view. For aspects 0.4 … 2.5 every vertex of every mesh projects inside the
+    /// view with at least 5 % margin on every side. A zero, negative or non-finite aspect is treated as 1; others are
+    /// clamped to 0.1 … 10. Independent of the tier and of the tick.
     public static func camera(_ snapshot: ChronoConstellatorSceneSnapshot, aspect: Double) -> ChronoConstellatorCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `snapshot`, `aspect` (width / height) and `orbit` (clamped, see
+    /// ``ChronoConstellatorOrbit/clamped()``): the eye on ``ChronoConstellatorOrbit/eyeDirection`` from the grid centre
+    /// at the distance that fits the sphere of ``boundingRadius(_:)`` (the fit does not depend on the direction, so the
+    /// 5 % margin holds at every orbit and aspect 0.4 … 2.5), looking at the grid centre with +y up (never parallel to
+    /// the view direction: the pitch is at most 75°) and a 45° vertical field of view. Aspects are made usable as in
+    /// ``camera(_:aspect:)``. Presentation only; independent of the tier and of the tick.
+    public static func camera(_ snapshot: ChronoConstellatorSceneSnapshot, aspect: Double,
+                              orbit: ChronoConstellatorOrbit) -> ChronoConstellatorCamera {
         let a: Double = usableAspect(aspect)
         let radius: Double = boundingRadius(snapshot)
         let d: Double = distance(radius: radius, aspect: a)
-        let eye: SIMD3<Double> = eyeDirection * d
+        let eye: SIMD3<Double> = orbit.eyeDirection * d
         let near: Double = max((d - radius) * 0.5, 1e-3)
         let far: Double = d + 2 * radius + 1
         let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: Vec3(0, 0, 0), up: Vec3(0, 1, 0))

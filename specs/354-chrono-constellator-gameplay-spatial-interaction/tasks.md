@@ -14,7 +14,7 @@ program).
 
 ## Phase 2: Foundational — orbit and picking
 
-- [ ] T-R02G0604-002 [P] Add `ChronoConstellatorOrbit` ("yaw ±40°, pitch 30° … 75°, authored (0, 55°)"),
+- [X] T-R02G0604-002 [P] Add `ChronoConstellatorOrbit` ("yaw ±40°, pitch 30° … 75°, authored (0, 55°)"), — Verified 2026-11-21: 2026-11-21: host-2 (PickerTests + SceneGeometryTests, 20 tests: 500 seeded points x 3 sizes x 5 orbits vs independent pick; orbit framing at 9 orbits x 7 aspects; authored camera bit-identical) exit 0, lead retest
   `camera(_:aspect:orbit:)` (distance refit to the bounding sphere with a 5 % margin; `camera(_:aspect:)` equals the
   authored orbit) and `candidatePart(_:_:)` (the pearl ring of research R6) to
   `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSceneGeometry.swift`; create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorPicker.swift` (touch ray through the
