@@ -43,7 +43,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 4: Story 3 — sound and haptics (P2)
 
-- [ ] T-R02G0606-005 [P] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSoundRecipe.swift` ("root 110 Hz; one partial per star
+- [X] T-R02G0606-005 [P] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorSoundRecipe.swift` ("root 110 Hz; one partial per star — Verified 2026-11-21: 2026-11-21: host-3 (ChronoConstellatorSoundRecipeTests: equal/distinct recipes for 32 patterns x 7 stages, valid bounds, 100 certified levels start and solution) exit 0, lead retest
   on target at 110 × (3/2, 5/4, 2, 5/3, 9/8)[star], base gain; the root alone with no star on target; won adds an octave,
   failed halves the gains, 12 s") with `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorSoundRecipeTests.swift` (agent B: equal for equal
   stars on target and stage; differs when they differ; every recipe valid for `AmbientLoopRecipe`'s bounds over every
