@@ -44,7 +44,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   (finite and bounded for extreme settings — the uncut crystal and a 20-piece play; every piece centre, cut-face centre
   and the preview centre inside the view with margin at 7 aspects; same positions at every tier; cut flags exact on a
   known cut; opening 0 for the uncut crystal; mark bars at 0, half and the budget); agent B; `--name host-3`
-- [ ] T-R02G0803-005 [P] [US2] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeExperienceCore.swift`
+- [X] T-R02G0803-005 [P] [US2] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeExperienceCore.swift` — Verified 2026-11-22: 2026-11-22: host-4 (ExperienceCoreTests + RendererPurityTests, 13 tests) exit 0, rerun by the lead
   (controls "piece.cut [0 … pieces − 1, 0 … 12, −24 … 24], play.undo, play.redo, level.next"; digest "level number and
   play fingerprint"; schema 1 `{level, records}`; quality profile of three levels; levels generated once per process
   from the certified catalog; `snapshot(chosen:direction:depth:time:)`) with
