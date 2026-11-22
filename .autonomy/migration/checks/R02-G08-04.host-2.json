@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgePicker|FacetedForgeSceneGeometry|FacetedForgeInvariant"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForgePicker|FacetedForgeSceneGeometry|FacetedForgeInvariant'",
+  "elapsed_seconds": 14.228,
+  "exit_code": 0,
+  "finished": "2026-11-22T13:50:46+00:00",
+  "gate": "R02-G08-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-04.host-2.log",
+  "log_sha256": "afd369a28e7b6ed4eafb5c85a1b3b93342c3672ea6cc62db119fa59100b75e58",
+  "name": "host-2",
+  "started": "2026-11-22T13:50:32+00:00",
+  "timed_out": false
+}

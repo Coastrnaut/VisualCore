@@ -9,18 +9,23 @@
 // neighbour across that edge to the face normal. Original faces are ice glass, cut faces amber, bevels highlight. The
 // preview polygon is ruby with a dashed rim; a sliver failure's piece carries a cross of two thin bars over its opened
 // centroid; the cut mark is a row of `budget` small bars along z = 1.3 from x = −0.9 to 0.9 (the first `cuts` spent),
-// tilted to face the camera. The ground is the plane y = −1.3. The fixed authored camera looks at the origin from the
-// front (+z), pitched 30° down, fitted to the bounding sphere of radius 1.45 with a 5 % margin for aspect 0.4 … 2.5.
-// Depth testing is off on this render path, so the crystal mesh is emitted in painter's order: the ground, the pieces
-// back to front (each piece's faces back to front), the preview, the sliver cross, the cut mark. Positions, colours and
-// marks are the same at every tier; tiers change only the bevel strips and the glow shells. Doubles are used for
-// drawing only; nothing here is consulted by the rules.
+// tilted to face the camera. The ground is the plane y = −1.3. The authored camera looks at the origin from the front
+// (+z), pitched 30° down, fitted to the framing sphere of radius 1.65 with a 5 % margin for aspect 0.4 … 2.5. Depth
+// testing is off on this render path, so the crystal mesh is emitted in painter's order: the ground, the pieces back to
+// front (each piece's faces back to front), the preview, the sliver cross, the cut mark. Positions, colours and marks
+// are the same at every tier; tiers change only the bevel strips and the glow shells. Doubles are used for drawing
+// only; nothing here is consulted by the rules.
+// Feature 374 (R02-G08-04) T-R02G0804-002 (FR-R02G0804-006; SC-R02G0804-004; clarification Q4): the orbit
+// (`FacetedForgeOrbit`: yaw ±40° about +y, pitch 10° … 60° down from the horizon, authored yaw 0 and pitch 30°) and
+// `camera(_:aspect:orbit:)`, which fits the framing sphere of radius 1.65 (was 1.45: the cut-mark row's bar ends lie
+// about 1.64 from the centre) so the 5 % margin holds at every orbit; the authored camera is the authored orbit's
+// camera, bit for bit.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
 /// The material codes of the crystal program, carried in `a_uv.x` of
-/// ``FacetedForgeSceneGeometry/crystalMesh(_:tier:reduceMotion:)``.
+/// ``FacetedForgeSceneGeometry/crystalMesh(_:tier:reduceMotion:orbit:)``.
 public enum FacetedForgeMaterial {
     /// The dark ground plane, 0.
     public static let ground = 0.0
@@ -56,8 +61,9 @@ public enum FacetedForgeMaterial {
 
 /// The camera of the Faceted Forge scene for one snapshot and aspect.
 ///
-/// Built only by ``FacetedForgeSceneGeometry/camera(_:aspect:)``. World positions are in crystal units (the crystal
-/// fits the unit sphere); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
+/// Built only by ``FacetedForgeSceneGeometry/camera(_:aspect:orbit:)`` (and
+/// ``FacetedForgeSceneGeometry/camera(_:aspect:)``, its authored orbit). World positions are in crystal units (the
+/// crystal fits the unit sphere); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
 public struct FacetedForgeCamera: Sendable, Equatable {
     /// The eye position in world units.
     public let eye: SIMD3<Double>
@@ -81,6 +87,47 @@ public struct FacetedForgeCamera: Sendable, Equatable {
     public let viewProjection: Mat4
 }
 
+/// The orbit of the Faceted Forge camera: a yaw about the vertical axis and a pitch down from the horizon, both in
+/// radians (feature 374). Presentation only: never in the digest, the snapshot or the kernel, and not saved.
+///
+/// ``FacetedForgeSceneGeometry/camera(_:aspect:orbit:)`` uses the ``clamped()`` orbit, so the eye always stays in front
+/// of the crystal and above it (no vertical singularity) and the whole scene stays in view.
+public struct FacetedForgeOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians: the angle of the eye direction above the horizon (the view looks down by it); allowed
+    /// ``pitchRange`` (10° … 60°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 30° (``FacetedForgeSceneGeometry/pitch``), the fixed camera of R02-G08-03.
+    public static let authored = FacetedForgeOrbit(yaw: 0, pitch: FacetedForgeSceneGeometry.pitch)
+    /// The largest yaw either way, 40° in radians.
+    public static let yawLimit: Double = 40.0 * Double.pi / 180
+    /// The allowed pitches, 10° … 60° in radians.
+    public static let pitchRange: ClosedRange<Double> = (10.0 * Double.pi / 180)...(60.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −40° … 40° and pitch to 10° … 60°; a non-finite angle becomes the authored one.
+    public func clamped() -> FacetedForgeOrbit {
+        let y: Double = yaw.isFinite ? yaw : Self.authored.yaw
+        let p: Double = pitch.isFinite ? pitch : Self.authored.pitch
+        return FacetedForgeOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                 pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+
+    /// The unit direction from the crystal centre to the eye at the clamped orbit: (sin y · cos p, sin p, cos y · cos
+    /// p) with y the yaw and p the pitch; exactly ``FacetedForgeSceneGeometry/eyeDirection`` at ``authored``.
+    public var eyeDirection: SIMD3<Double> {
+        let o: FacetedForgeOrbit = clamped()
+        return SIMD3(sin(o.yaw) * cos(o.pitch), sin(o.pitch), cos(o.yaw) * cos(o.pitch))
+    }
+}
+
 /// A mesh with one colour per vertex (sRGB RGBA 0 … 1, alpha 1), aligned with `mesh.positions`.
 ///
 /// The colours feed the shared unlit mesh renderer of the fallback path (the shader programs have no colour stream;
@@ -97,18 +144,18 @@ public struct FacetedForgeColouredMesh: Sendable, Equatable {
 ///
 /// **Vertex streams** (the contract with the shaders; attributes a_position, a_normal, a_uv as bound by
 /// `ShaderMeshRenderer`; positions are world units, identity model).
-/// - ``crystalMesh(_:tier:reduceMotion:)`` — crystal program: `a_normal` the unit shading normal (the face normal, or
-///   on a bevel strip the blend toward the neighbouring face); `a_uv` (material code, shade) with the codes of
-///   ``FacetedForgeMaterial``; shade 1 everywhere except ``previewShade`` on the preview fill and 0 (the shaders' rim
-///   coordinate) on the preview's dashed rim.
-/// - ``glowMesh(_:tier:reduceMotion:)`` — glow program: `a_normal` the colour (sRGB 0 … 1, amber); `a_uv`
+/// - ``crystalMesh(_:tier:reduceMotion:orbit:)`` — crystal program: `a_normal` the unit shading normal (the face
+///   normal, or on a bevel strip the blend toward the neighbouring face); `a_uv` (material code, shade) with the
+///   codes of ``FacetedForgeMaterial``; shade 1 everywhere except ``previewShade`` on the preview fill and 0 (the
+///   shaders' rim coordinate) on the preview's dashed rim.
+/// - ``glowMesh(_:tier:reduceMotion:orbit:)`` — glow program: `a_normal` the colour (sRGB 0 … 1, amber); `a_uv`
 ///   (glow weight 0 … 1, 0). Glow shell k = 1 … `tier.glowShells` has weight 0.5^k.
 /// ``FacetedForgeColouredMesh/colours`` gives each vertex's unlit colour for the fallback: on the crystal the material
 /// colour times the shade times 0.6 + 0.4 · max(normal · ``lightDirection``, 0), on the glow the stream colour times
 /// the weight.
 ///
 /// Every triangle is wound counter-clockwise seen from its front. Depth testing is off, so the crystal mesh is in
-/// painter's order (see ``pieceOrder(_:reduceMotion:)``).
+/// painter's order (see ``pieceOrder(_:reduceMotion:orbit:)``).
 public enum FacetedForgeSceneGeometry {
     // MARK: Constants (world units unless stated)
 
@@ -160,8 +207,9 @@ public enum FacetedForgeSceneGeometry {
     public static let glowLift = 0.004
     /// The glow weight of shell k is glowWeight^k (0.5).
     public static let glowWeight = 0.5
-    /// The radius of the bounding sphere the camera fits, 1.45 (the opened crystal plus the mark).
-    public static let boundingRadius = 1.45
+    /// The radius of the framing sphere every camera fits, 1.65: the opened crystal (reach 1.2) and the cut-mark row,
+    /// whose bar ends lie about 1.64 from the centre (feature 374; 1.45 before).
+    public static let boundingRadius = 1.65
     /// The camera's vertical field of view in radians (45°).
     public static let fieldOfView = Double.pi / 4
     /// The camera's pitch below the horizon in radians (30°).
@@ -228,15 +276,27 @@ public enum FacetedForgeSceneGeometry {
         return mean + offset(piece: snapshot.choice.piece, snapshot, reduceMotion: reduceMotion)
     }
 
-    /// The pieces in painter's order: farthest from the eye first (ascending opened centroid · ``eyeDirection``),
-    /// ties by index.
-    public static func pieceOrder(_ snapshot: FacetedForgeSceneSnapshot, reduceMotion: Bool = false) -> [Int] {
+    /// The pieces in painter's order for the eye of `orbit` (default the authored one): farthest from the eye first
+    /// (ascending opened centroid · `orbit.eyeDirection`), ties by index.
+    public static func pieceOrder(_ snapshot: FacetedForgeSceneSnapshot, reduceMotion: Bool = false,
+                                  orbit: FacetedForgeOrbit = .authored) -> [Int] {
+        let eye: SIMD3<Double> = frame(orbit).eye
         var keyed: [(index: Int, depth: Double)] = []
         for index in snapshot.pieces.indices {
-            keyed.append((index, dot(pieceCentre(index, snapshot, reduceMotion: reduceMotion), eyeDirection)))
+            keyed.append((index, dot(pieceCentre(index, snapshot, reduceMotion: reduceMotion), eye)))
         }
         keyed.sort { a, b in abs(a.depth - b.depth) > 1e-12 ? a.depth < b.depth : a.index < b.index }
         return keyed.map(\.index)
+    }
+
+    /// The eye direction, screen up and screen right unit vectors of the clamped `orbit`: exactly ``eyeDirection``,
+    /// ``screenUp`` and +x at the authored orbit; otherwise orbit.eyeDirection, (−sin p · sin y, cos p, −sin p · cos y)
+    /// and (cos y, 0, −sin y) for yaw y and pitch p (feature 374).
+    static func frame(_ orbit: FacetedForgeOrbit) -> (eye: SIMD3<Double>, up: SIMD3<Double>, right: SIMD3<Double>) {
+        let o: FacetedForgeOrbit = orbit.clamped()
+        if o == .authored { return (eyeDirection, screenUp, SIMD3(1, 0, 0)) }
+        return (o.eyeDirection, SIMD3(-sin(o.pitch) * sin(o.yaw), cos(o.pitch), -sin(o.pitch) * cos(o.yaw)),
+                SIMD3(cos(o.yaw), 0, -sin(o.yaw)))
     }
 
     /// The centre x of cut mark bar `bar` of `budget`: −0.9 + (bar + 0.5) · 1.8 / budget.
@@ -260,14 +320,18 @@ public enum FacetedForgeSceneGeometry {
     // MARK: Meshes
 
     /// The crystal (crystal program, real normals, uv (material code, shade)), in painter's order: the ground square
-    /// (half-side 3, y = −1.3); every piece of ``pieceOrder(_:reduceMotion:)`` with its faces back to front (each the
-    /// inset polygon, code 1 or 2 for a cut face, and its `tier.bevelSegments` bevel strips per edge, code 3); the
-    /// preview polygon (code 4, shade 0.7) with its dashed rim (code 4); the sliver cross over the failure piece
-    /// (code 5); the cut mark bars (codes 6 and 7). Colours: material colour × shade × (0.6 + 0.4 · max(n · light, 0)).
+    /// (half-side 3, y = −1.3); every piece of ``pieceOrder(_:reduceMotion:orbit:)`` with its faces back to front (each
+    /// the inset polygon, code 1 or 2 for a cut face, and its `tier.bevelSegments` bevel strips per edge, code 3); the
+    /// preview polygon (code 4, shade 0.7) with its dashed rim (code 4); the sliver cross over the failure piece (code
+    /// 5); the cut mark bars (codes 6 and 7). Colours: material colour × shade × (0.6 + 0.4 · max(n · light, 0)). The
+    /// painter's order, the preview's facing side and the camera-facing sliver cross and mark bars follow the eye of
+    /// `orbit` (``frame(_:)``); the default, the authored orbit, gives the output of R02-G08-03 bit for bit.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func crystalPart(_ snapshot: FacetedForgeSceneSnapshot, tier: FacetedForgeTier,
-                                   reduceMotion: Bool = false) throws(MeshError) -> FacetedForgeColouredMesh {
+                                   reduceMotion: Bool = false,
+                                   orbit: FacetedForgeOrbit = .authored) throws(MeshError) -> FacetedForgeColouredMesh {
+        let view: (eye: SIMD3<Double>, up: SIMD3<Double>, right: SIMD3<Double>) = frame(orbit)
         var parts: Parts = Parts(lit: true)
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
         let g: Double = groundHalf
@@ -275,47 +339,50 @@ public enum FacetedForgeSceneGeometry {
         try parts.polygon([SIMD3(-g, y, -g), SIMD3(-g, y, g), SIMD3(g, y, g), SIMD3(g, y, -g)], normal: up,
                           uv: Vec2(FacetedForgeMaterial.ground, 1))
         let segments: Int = max(tier.bevelSegments, 1)
-        for index in pieceOrder(snapshot, reduceMotion: reduceMotion) {
+        for index in pieceOrder(snapshot, reduceMotion: reduceMotion, orbit: orbit) {
             let shift: SIMD3<Double> = offset(piece: index, snapshot, reduceMotion: reduceMotion)
-            try addPiece(snapshot.pieces[index], shift: shift, segments: segments, to: &parts)
+            try addPiece(snapshot.pieces[index], shift: shift, segments: segments, eye: view.eye, to: &parts)
         }
-        try addPreview(snapshot, reduceMotion: reduceMotion, to: &parts)
+        try addPreview(snapshot, reduceMotion: reduceMotion, eye: view.eye, to: &parts)
         if let sliver = snapshot.failurePiece, snapshot.pieces.indices.contains(sliver) {
             let centre: SIMD3<Double> = pieceCentre(sliver, snapshot, reduceMotion: reduceMotion)
-            let right: SIMD3<Double> = SIMD3(1, 0, 0)
-            let a: SIMD3<Double> = unit(right + screenUp)
-            let b: SIMD3<Double> = unit(right - screenUp)
+            let a: SIMD3<Double> = unit(view.right + view.up)
+            let b: SIMD3<Double> = unit(view.right - view.up)
             let uv: Vec2 = Vec2(FacetedForgeMaterial.sliverCross, 1)
             try parts.bar(centre: centre, along: a, across: b, halfLength: crossArm, halfWidth: crossHalfWidth,
-                          normal: eyeDirection, uv: uv)
+                          normal: view.eye, uv: uv)
             try parts.bar(centre: centre, along: b, across: a, halfLength: crossArm, halfWidth: crossHalfWidth,
-                          normal: eyeDirection, uv: uv)
+                          normal: view.eye, uv: uv)
         }
         let codes: [Double] = markCodes(snapshot)
         let slot: Double = (markEnd - markStart) / Double(max(codes.count, 1))
         let halfWidth: Double = min(markFill * slot, markMaxWidth) / 2
         for (bar, code) in codes.enumerated() {
-            try parts.bar(centre: markBarCentre(bar, budget: codes.count), along: SIMD3(1, 0, 0), across: screenUp,
-                          halfLength: halfWidth, halfWidth: markHalfHeight, normal: eyeDirection, uv: Vec2(code, 1))
+            try parts.bar(centre: markBarCentre(bar, budget: codes.count), along: view.right, across: view.up,
+                          halfLength: halfWidth, halfWidth: markHalfHeight, normal: view.eye, uv: Vec2(code, 1))
         }
         return parts.built()
     }
 
-    /// The crystal mesh (see ``crystalPart(_:tier:reduceMotion:)``).
+    /// The crystal mesh (see ``crystalPart(_:tier:reduceMotion:orbit:)``).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func crystalMesh(_ snapshot: FacetedForgeSceneSnapshot, tier: FacetedForgeTier,
-                                   reduceMotion: Bool = false) throws(MeshError) -> Mesh {
-        try crystalPart(snapshot, tier: tier, reduceMotion: reduceMotion).mesh
+                                   reduceMotion: Bool = false,
+                                   orbit: FacetedForgeOrbit = .authored) throws(MeshError) -> Mesh {
+        try crystalPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit).mesh
     }
 
     /// The glow (glow program, colour in the normal slot, uv (weight, 0)): for k = `tier.glowShells` … 1, a copy of
     /// every opened cut face scaled by 1 + 0.08·k about its centre and pushed 0.004·k out along its normal, amber,
-    /// weight 0.5^k. Empty when the tier has no glow shells (level-2) or there are no cut faces.
+    /// weight 0.5^k. Empty when the tier has no glow shells (level-2) or there are no cut faces. The shells are
+    /// additive, so their order does not depend on `orbit` (accepted for symmetry with the crystal; any orbit gives
+    /// the same mesh).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func glowPart(_ snapshot: FacetedForgeSceneSnapshot, tier: FacetedForgeTier,
-                                reduceMotion: Bool = false) throws(MeshError) -> FacetedForgeColouredMesh {
+                                reduceMotion: Bool = false,
+                                orbit: FacetedForgeOrbit = .authored) throws(MeshError) -> FacetedForgeColouredMesh {
         var parts: Parts = Parts(lit: false)
         let shells: Int = max(tier.glowShells, 0)
         guard shells > 0 else { return parts.built() }
@@ -339,12 +406,13 @@ public enum FacetedForgeSceneGeometry {
         return parts.built()
     }
 
-    /// The glow mesh (see ``glowPart(_:tier:reduceMotion:)``).
+    /// The glow mesh (see ``glowPart(_:tier:reduceMotion:orbit:)``).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func glowMesh(_ snapshot: FacetedForgeSceneSnapshot, tier: FacetedForgeTier,
-                                reduceMotion: Bool = false) throws(MeshError) -> Mesh {
-        try glowPart(snapshot, tier: tier, reduceMotion: reduceMotion).mesh
+                                reduceMotion: Bool = false,
+                                orbit: FacetedForgeOrbit = .authored) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit).mesh
     }
 
     // MARK: Camera
@@ -364,16 +432,28 @@ public enum FacetedForgeSceneGeometry {
         return max(radius, 1e-3) / sin(atan(limit))
     }
 
-    /// The fixed authored camera for `snapshot` and `aspect` (width / height): the eye on ``eyeDirection`` (in front,
-    /// +z, pitched 30° down) at the distance that fits the sphere of radius 1.45 about the origin, looking at the
-    /// origin with +y up and a 45° vertical field of view. For aspects 0.4 … 2.5 the sphere projects inside the view
-    /// with at least 5 % margin on every side. A zero, negative or non-finite aspect is treated as 1; others are
-    /// clamped to 0.1 … 10. Independent of the tier, the time and the play.
+    /// The fixed authored camera for `snapshot` and `aspect` (width / height): ``camera(_:aspect:orbit:)`` at
+    /// ``FacetedForgeOrbit/authored``, bit for bit, so the eye lies on ``eyeDirection`` (in front, +z, pitched 30°
+    /// down) at the distance that fits the framing sphere of radius 1.65 about the origin, looking at the origin with
+    /// +y up and a 45° vertical field of view. For aspects 0.4 … 2.5 the sphere projects inside the view with at least
+    /// 5 % margin on every side. A zero, negative or non-finite aspect is treated as 1; others are clamped to 0.1 … 10.
+    /// Independent of the tier, the time and the play.
     public static func camera(_ snapshot: FacetedForgeSceneSnapshot, aspect: Double) -> FacetedForgeCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `snapshot`, `aspect` (width / height) and `orbit` (clamped, see ``FacetedForgeOrbit/clamped()``):
+    /// the eye on ``FacetedForgeOrbit/eyeDirection`` from the origin at the distance that fits the framing sphere of
+    /// radius 1.65 (the fit does not depend on the direction, so the 5 % margin holds at every orbit and aspect
+    /// 0.4 … 2.5), looking at the origin with +y up (never parallel to the view direction: the pitch is at most 60°)
+    /// and a 45° vertical field of view. Aspects are made usable as in ``camera(_:aspect:)``. Presentation only;
+    /// independent of the tier, the time and the play.
+    public static func camera(_ snapshot: FacetedForgeSceneSnapshot, aspect: Double,
+                              orbit: FacetedForgeOrbit) -> FacetedForgeCamera {
         let a: Double = usableAspect(aspect)
         let radius: Double = boundingRadius
         let d: Double = distance(radius: radius, aspect: a)
-        let eye: SIMD3<Double> = eyeDirection * d
+        let eye: SIMD3<Double> = orbit.eyeDirection * d
         let near: Double = max((d - radius) * 0.5, 1e-3)
         let far: Double = d + 2 * radius - groundY + 1
         let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: Vec3(0, 0, 0), up: Vec3(0, 1, 0))
@@ -403,24 +483,31 @@ public enum FacetedForgeSceneGeometry {
 
     // MARK: Building
 
-    /// Adds one piece moved by `shift`: its faces back to front (ascending centre · eye direction), each the inset
+    /// The faces of `piece` back to front for the unit eye direction `eye`: ascending face centre · eye, ties by
+    /// index.
+    static func faceOrder(_ piece: FacetedForgeSceneSnapshot.Piece, eye: SIMD3<Double>) -> [Int] {
+        var keyed: [(face: Int, depth: Double)] = []
+        for (f, face) in piece.faces.enumerated() {
+            let c: SIMD3<Double> = faceCentre(face, piece.corners) ?? .zero
+            keyed.append((f, dot(c, eye)))
+        }
+        keyed.sort { a, b in abs(a.depth - b.depth) > 1e-12 ? a.depth < b.depth : a.face < b.face }
+        return keyed.map(\.face)
+    }
+
+    /// Adds one piece moved by `shift`: its faces back to front for `eye` (``faceOrder(_:eye:)``), each the inset
     /// polygon and the bevel strips of its edges.
     static func addPiece(_ piece: FacetedForgeSceneSnapshot.Piece, shift: SIMD3<Double>, segments: Int,
-                         to parts: inout Parts) throws(MeshError) {
+                         eye: SIMD3<Double>, to parts: inout Parts) throws(MeshError) {
         var normals: [SIMD3<Double>] = []
         var edges: [EdgeKey: [Int]] = [:]
-        var keyed: [(face: Int, depth: Double)] = []
         for (f, face) in piece.faces.enumerated() {
             normals.append(newell(points(face, piece.corners)))
             for i in face.indices {
                 edges[EdgeKey(face[i], face[(i + 1) % face.count]), default: []].append(f)
             }
-            let c: SIMD3<Double> = faceCentre(face, piece.corners) ?? .zero
-            keyed.append((f, dot(c, eyeDirection)))
         }
-        keyed.sort { a, b in abs(a.depth - b.depth) > 1e-12 ? a.depth < b.depth : a.face < b.face }
-        for entry in keyed {
-            let f: Int = entry.face
+        for f in faceOrder(piece, eye: eye) {
             let face: [Int] = piece.faces[f]
             let p: [SIMD3<Double>] = points(face, piece.corners).map { $0 + shift }
             let n: SIMD3<Double> = normals[f]
@@ -452,13 +539,14 @@ public enum FacetedForgeSceneGeometry {
     }
 
     /// Adds the preview polygon (ruby fill, shade 0.7) and its dashed rim (ruby, rim coordinate 0), opened with the
-    /// chosen piece's offset and lifted 0.002 towards the eye, facing the eye side; nothing for an empty preview.
-    static func addPreview(_ snapshot: FacetedForgeSceneSnapshot, reduceMotion: Bool,
+    /// chosen piece's offset and lifted 0.002 towards the eye `eye`, facing the eye side; nothing for an empty
+    /// preview.
+    static func addPreview(_ snapshot: FacetedForgeSceneSnapshot, reduceMotion: Bool, eye: SIMD3<Double>,
                            to parts: inout Parts) throws(MeshError) {
         guard snapshot.preview.count >= 3 else { return }
         var n: SIMD3<Double> = newell(snapshot.preview)
         guard length(n) > 0 else { return }
-        if dot(n, eyeDirection) < 0 { n = -n }
+        if dot(n, eye) < 0 { n = -n }
         let shift: SIMD3<Double> = offset(piece: snapshot.choice.piece, snapshot, reduceMotion: reduceMotion)
             + n * previewLift
         let p: [SIMD3<Double>] = snapshot.preview.map { $0 + shift }

@@ -222,7 +222,7 @@ import Testing
     /// kernel sources, and the renderer-purity tests of feature 373 cover them.
     static let presentationSources: Set<String> = [
         "FacetedForgeSceneSnapshot.swift", "FacetedForgeSceneGeometry.swift", "FacetedForgeShaders.swift",
-        "FacetedForgeExperienceCore.swift", "FacetedForgeScenarios.swift",
+        "FacetedForgeExperienceCore.swift", "FacetedForgeScenarios.swift", "FacetedForgePicker.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, less the presentation

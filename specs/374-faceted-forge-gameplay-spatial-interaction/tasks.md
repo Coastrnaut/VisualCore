@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Foundational — orbit and picking
 
-- [ ] T-R02G0804-002 [P] Add `FacetedForgeOrbit` ("yaw ±40°, pitch 10° … 60°, authored (0, 30°)") and
+- [X] T-R02G0804-002 [P] Add `FacetedForgeOrbit` ("yaw ±40°, pitch 10° … 60°, authored (0, 30°)") and — Verified 2026-11-22: 2026-11-22: host-2 (FacetedForgePickerTests, FacetedForgeSceneGeometryTests, invariant tests, 37 tests) exit 0, rerun by the lead; framing sphere 1.65; meshes emitted back to front for the orbit's eye; tilt snaps n·c to 1e-6 before rounding
   `camera(_:aspect:orbit:)` (distance refit to the framing sphere of radius 1.65 with a 5 % margin, the cut-mark row
   included; `camera(_:aspect:)` equals the authored orbit, bit-identical) to
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneGeometry.swift`; create

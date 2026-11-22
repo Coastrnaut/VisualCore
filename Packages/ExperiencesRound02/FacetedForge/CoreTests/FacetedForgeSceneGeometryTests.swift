@@ -6,6 +6,13 @@
 // and level-2 has no glow; the cut flags of a known cut are exact; the uncut crystal does not move; the mark has 0,
 // half and all bars spent; the opening eases over 0.4 s and is full at once under Reduce Motion; pieces are emitted
 // back to front. Hand-made levels, plain loops; well under 10 s.
+// Feature 374 (R02-G08-04) T-R02G0804-002 (FR-R02G0804-006; SC-R02G0804-004): the cameras fit the framing sphere of
+// radius 1.65 (was 1.45); at the authored orbit, both yaw limits, both pitch limits and the four corners of the orbit
+// bounds every opened piece centre, cut-face centre, preview centre and both ends of every cut-mark bar project inside
+// the view with a 5 % margin at the seven aspects; the authored camera is the authored orbit's camera, bit for bit;
+// `FacetedForgeOrbit.clamped()` keeps the bounds and a non-finite angle becomes the authored one. At the four corners
+// of the orbit bounds the pieces and each piece's faces come out back to front for that orbit's eye, and the sliver
+// cross and cut-mark bars face that eye; the default (authored) meshes equal the explicit `.authored` ones.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -304,5 +311,233 @@ import VisualCoreScenes
             none += 1
         }
         #expect(none == 0)
+    }
+
+    // MARK: Orbit (feature 374)
+
+    typealias Orbit = FacetedForgeOrbit
+
+    /// The authored orbit, both yaw limits, both pitch limits and the four corners of the orbit bounds.
+    static let orbits: [Orbit] = [
+        .authored,
+        Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.authored.pitch),
+        Orbit(yaw: Orbit.yawLimit, pitch: Orbit.authored.pitch),
+        Orbit(yaw: 0, pitch: Orbit.pitchRange.lowerBound),
+        Orbit(yaw: 0, pitch: Orbit.pitchRange.upperBound),
+        Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.pitchRange.lowerBound),
+        Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.pitchRange.upperBound),
+        Orbit(yaw: Orbit.yawLimit, pitch: Orbit.pitchRange.lowerBound),
+        Orbit(yaw: Orbit.yawLimit, pitch: Orbit.pitchRange.upperBound),
+    ]
+
+    /// Every opened piece centre, cut-face centre, the preview centre and both ends of every cut-mark bar of `s`.
+    static func framedPoints(_ s: Snapshot) -> [SIMD3<Double>] {
+        var points: [SIMD3<Double>] = Geometry.cutFaceCentres(s)
+        for piece in s.pieces.indices { points.append(Geometry.pieceCentre(piece, s)) }
+        if let preview = Geometry.previewCentre(s) { points.append(preview) }
+        let budget: Int = max(s.budget, 0)
+        let slot: Double = (Geometry.markEnd - Geometry.markStart) / Double(max(budget, 1))
+        let halfWidth: Double = min(Geometry.markFill * slot, Geometry.markMaxWidth) / 2
+        for bar in 0..<budget {
+            let c: SIMD3<Double> = Geometry.markBarCentre(bar, budget: budget)
+            points.append(c + SIMD3(halfWidth, 0, 0))
+            points.append(c - SIMD3(halfWidth, 0, 0))
+        }
+        return points
+    }
+
+    @Test func theFramingSphereHoldsTheMarkRow() throws {
+        #expect(Geometry.boundingRadius == 1.65)
+        for s in try Self.snapshots() {
+            for p in Self.framedPoints(s) { #expect(Geometry.length(p) <= Geometry.boundingRadius, "\(p)") }
+            #expect(Geometry.camera(s, aspect: 1).radius == 1.65)
+        }
+    }
+
+    @Test func centresAndMarkInsideTheViewAtEveryOrbitBound() throws {
+        for s in try Self.snapshots() {
+            let points: [SIMD3<Double>] = Self.framedPoints(s)
+            for orbit in Self.orbits {
+                for aspect in Self.aspects {
+                    let cam: FacetedForgeCamera = Geometry.camera(s, aspect: aspect, orbit: orbit)
+                    #expect(Geometry.length(cam.eye) - cam.radius > cam.near)
+                    var outside: Int = 0
+                    for p in points {
+                        guard let v = Geometry.project(p, camera: cam) else {
+                            outside += 1
+                            continue
+                        }
+                        if !(v.x >= 0.05 && v.x <= 0.95 && v.y >= 0.05 && v.y <= 0.95) { outside += 1 }
+                    }
+                    #expect(outside == 0, "orbit \(orbit) aspect \(aspect)")
+                }
+            }
+        }
+    }
+
+    @Test func theOrbitCameraLooksFromTheOrbitDirection() throws {
+        let s: Snapshot = try Self.snapshots()[0]
+        for orbit in Self.orbits {
+            let cam: FacetedForgeCamera = Geometry.camera(s, aspect: 1, orbit: orbit)
+            let eye: SIMD3<Double> = cam.eye
+            let horizontal: Double = (eye.x * eye.x + eye.z * eye.z).squareRoot()
+            #expect(abs(atan2(eye.y, horizontal) - orbit.pitch) < 1e-12)
+            #expect(abs(atan2(eye.x, eye.z) - orbit.yaw) < 1e-12)
+            #expect(abs(Geometry.length(eye) - Geometry.length(Geometry.camera(s, aspect: 1).eye)) < 1e-12)
+            #expect(cam.radius == Geometry.boundingRadius)
+            let centre: SIMD2<Double>? = Geometry.project(.zero, camera: cam)
+            #expect(centre != nil)
+            if let centre { #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9) }
+        }
+    }
+
+    @Test func theAuthoredCameraIsTheAuthoredOrbitBitForBit() throws {
+        #expect(Orbit.authored.yaw == 0)
+        #expect(Orbit.authored.pitch == Geometry.pitch)
+        #expect(Orbit.authored.eyeDirection == Geometry.eyeDirection)
+        let aspects: [Double] = [0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 0, -1, .nan, .infinity, 20]
+        for s in try Self.snapshots() {
+            for aspect in aspects {
+                let cam: FacetedForgeCamera = Geometry.camera(s, aspect: aspect)
+                #expect(cam == Geometry.camera(s, aspect: aspect, orbit: .authored))
+                // The fixed camera of R02-G08-03, rebuilt from its formula with the framing radius 1.65.
+                let a: Double = Geometry.usableAspect(aspect)
+                let r: Double = Geometry.boundingRadius
+                let d: Double = Geometry.distance(radius: r, aspect: a)
+                let eye: SIMD3<Double> = Geometry.eyeDirection * d
+                let near: Double = max((d - r) * 0.5, 1e-3)
+                let far: Double = d + 2 * r - Geometry.groundY + 1
+                let view: Mat4 = Mat4.lookAt(eye: Vec3(eye.x, eye.y, eye.z), target: Vec3(0, 0, 0), up: Vec3(0, 1, 0))
+                let projection: Mat4 = Mat4.perspective(fovY: Geometry.fieldOfView, aspect: a, near: near, far: far)
+                #expect(cam.eye == eye && cam.near == near && cam.far == far && cam.aspect == a)
+                #expect(cam.view == view && cam.projection == projection && cam.radius == r)
+            }
+        }
+    }
+
+    @Test func clampedKeepsTheOrbitBounds() {
+        let limit: Double = Orbit.yawLimit
+        let low: Double = Orbit.pitchRange.lowerBound
+        let high: Double = Orbit.pitchRange.upperBound
+        #expect(abs(limit - 40 * Double.pi / 180) < 1e-15)
+        #expect(abs(low - 10 * Double.pi / 180) < 1e-15 && abs(high - 60 * Double.pi / 180) < 1e-15)
+        #expect(Orbit(yaw: 2, pitch: 2).clamped() == Orbit(yaw: limit, pitch: high))
+        #expect(Orbit(yaw: -2, pitch: -1).clamped() == Orbit(yaw: -limit, pitch: low))
+        #expect(Orbit(yaw: 0.1, pitch: 0.5).clamped() == Orbit(yaw: 0.1, pitch: 0.5))
+        #expect(Orbit(yaw: .nan, pitch: .infinity).clamped() == .authored)
+        #expect(Orbit(yaw: .nan, pitch: .infinity).eyeDirection == Orbit.authored.eyeDirection)
+        let far: Orbit = Orbit(yaw: 3, pitch: 1.5)
+        #expect(far.eyeDirection == far.clamped().eyeDirection)
+        for orbit in Self.orbits {
+            let e: SIMD3<Double> = orbit.eyeDirection
+            #expect(abs(Geometry.length(e) - 1) < 1e-12)
+            #expect(e.y > 0 && e.z > 0)
+        }
+    }
+
+    /// The four corners of the orbit bounds.
+    static let corners: [Orbit] = [
+        Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.pitchRange.lowerBound),
+        Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.pitchRange.upperBound),
+        Orbit(yaw: Orbit.yawLimit, pitch: Orbit.pitchRange.lowerBound),
+        Orbit(yaw: Orbit.yawLimit, pitch: Orbit.pitchRange.upperBound),
+    ]
+
+    @Test func piecesAndFacesAreBackToFrontForEveryOrbitCorner() throws {
+        var reordered: Int = 0
+        for s in try Self.snapshots() {
+            for orbit in Self.corners {
+                let eye: SIMD3<Double> = orbit.eyeDirection
+                let order: [Int] = Geometry.pieceOrder(s, orbit: orbit)
+                #expect(order.sorted() == Array(s.pieces.indices))
+                if order != Geometry.pieceOrder(s) { reordered += 1 }
+                for k in 1..<max(order.count, 1) {
+                    let a: Double = Geometry.dot(Geometry.pieceCentre(order[k - 1], s), eye)
+                    let b: Double = Geometry.dot(Geometry.pieceCentre(order[k], s), eye)
+                    #expect(a <= b + 1e-12, "orbit \(orbit)")
+                }
+                for piece in s.pieces {
+                    let faces: [Int] = Geometry.faceOrder(piece, eye: Geometry.frame(orbit).eye)
+                    #expect(faces.sorted() == Array(piece.faces.indices))
+                    for k in 1..<max(faces.count, 1) {
+                        let a: SIMD3<Double> = Geometry.faceCentre(piece.faces[faces[k - 1]], piece.corners) ?? .zero
+                        let b: SIMD3<Double> = Geometry.faceCentre(piece.faces[faces[k]], piece.corners) ?? .zero
+                        #expect(Geometry.dot(a, eye) <= Geometry.dot(b, eye) + 1e-12)
+                    }
+                }
+            }
+        }
+        // The 21-piece play is drawn in another order from at least one corner than from the authored view.
+        #expect(reordered > 0)
+    }
+
+    @Test func crossAndMarkFaceTheOrbitEye() throws {
+        let snapshots: [Snapshot] = [try Self.sliver(), Self.snapshot(try Self.manyPieces(), time: 1)]
+        for s in snapshots {
+            for orbit in Self.corners {
+                let frame: (eye: SIMD3<Double>, up: SIMD3<Double>, right: SIMD3<Double>) = Geometry.frame(orbit)
+                #expect(frame.eye == orbit.eyeDirection)
+                #expect(abs(Geometry.dot(frame.eye, frame.up)) < 1e-12)
+                #expect(abs(Geometry.dot(frame.eye, frame.right)) < 1e-12)
+                #expect(abs(Geometry.dot(frame.up, frame.right)) < 1e-12 && frame.up.y > 0)
+                #expect(abs(Geometry.length(frame.up) - 1) < 1e-12 && abs(Geometry.length(frame.right) - 1) < 1e-12)
+                // Right-handed: right × up is the direction towards the eye.
+                #expect(Geometry.length(Geometry.cross(frame.right, frame.up) - frame.eye) < 1e-12)
+                let m: Mesh = try Geometry.crystalMesh(s, tier: FacetedForgeTier.of(0), orbit: orbit)
+                var faced: Int = 0
+                for k in m.positions.indices {
+                    let code: Double = m.uvs[k].x
+                    guard code == FacetedForgeMaterial.sliverCross || code == FacetedForgeMaterial.spentBar
+                        || code == FacetedForgeMaterial.unspentBar else { continue }
+                    let n: SIMD3<Double> = SIMD3(m.normals[k].x, m.normals[k].y, m.normals[k].z)
+                    #expect(Geometry.length(n - frame.eye) < 1e-12)
+                    faced += 1
+                }
+                #expect(faced > 0)
+                // Each mark bar lies in the plane through its centre facing the eye.
+                let codes: [Double] = Geometry.markCodes(s)
+                for k in m.positions.indices where m.uvs[k].x == FacetedForgeMaterial.spentBar
+                    || m.uvs[k].x == FacetedForgeMaterial.unspentBar {
+                    let p: SIMD3<Double> = SIMD3(m.positions[k].x, m.positions[k].y, m.positions[k].z)
+                    var nearest: Double = .infinity
+                    var height: Double = .infinity
+                    for bar in 0..<codes.count {
+                        let c: SIMD3<Double> = Geometry.markBarCentre(bar, budget: codes.count)
+                        if Geometry.length(p - c) < nearest {
+                            nearest = Geometry.length(p - c)
+                            height = abs(Geometry.dot(p - c, frame.eye))
+                        }
+                    }
+                    #expect(nearest < 0.1 && height < 1e-9)
+                }
+            }
+        }
+    }
+
+    @Test func theAuthoredDefaultEqualsTheExplicitAuthoredOrbit() throws {
+        let frame: (eye: SIMD3<Double>, up: SIMD3<Double>, right: SIMD3<Double>) = Geometry.frame(.authored)
+        #expect(frame.eye == Geometry.eyeDirection && frame.up == Geometry.screenUp && frame.right == SIMD3(1, 0, 0))
+        #expect(Geometry.frame(Orbit(yaw: .nan, pitch: .nan)).up == Geometry.screenUp)
+        var snapshots: [Snapshot] = try Self.snapshots()
+        snapshots.append(try Self.won(time: 0.2))
+        for s in snapshots {
+            #expect(Geometry.pieceOrder(s) == Geometry.pieceOrder(s, orbit: .authored))
+            for tier in FacetedForgeTier.all {
+                for reduceMotion in [false, true] {
+                    let crystal: FacetedForgeColouredMesh = try Geometry.crystalPart(s, tier: tier,
+                                                                                     reduceMotion: reduceMotion)
+                    #expect(crystal == (try Geometry.crystalPart(s, tier: tier, reduceMotion: reduceMotion,
+                                                                 orbit: .authored)))
+                    #expect(crystal.mesh == (try Geometry.crystalMesh(s, tier: tier, reduceMotion: reduceMotion,
+                                                                      orbit: .authored)))
+                    let glow: FacetedForgeColouredMesh = try Geometry.glowPart(s, tier: tier,
+                                                                               reduceMotion: reduceMotion)
+                    #expect(glow == (try Geometry.glowPart(s, tier: tier, reduceMotion: reduceMotion,
+                                                           orbit: .authored)))
+                    #expect(glow.mesh == (try Geometry.glowMesh(s, tier: tier, reduceMotion: reduceMotion,
+                                                                orbit: Self.corners[0])))
+                }
+            }
+        }
     }
 }
