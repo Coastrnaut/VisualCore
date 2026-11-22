@@ -47,7 +47,7 @@ in this feature (the crystal state is the CPU reference the renderer of R02-G07-
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G0701-005 [P] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeRules.swift` (agent C:
+- [X] T-R02G0701-005 [P] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeRules.swift` (agent C: — Verified 2026-11-22: host-4 exit=0 (AmethystEscapeRulesTests 8/8: move order, terminal positions, fixtures, 200 walks agree)
   `PuzzleRules`: State = position (crystal, moves, outcome), Move = AmethystEscapeAction; legal moves while playing
   "rotate(r, +1), rotate(r, −1) for each shell r in order, then advance unless it is stuck") with
   `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeRulesTests.swift` (agreement with the play on 200
