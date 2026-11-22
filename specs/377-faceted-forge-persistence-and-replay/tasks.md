@@ -29,7 +29,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 - [ ] T-R02G0807-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeExperienceCore.swift` (schema 3, migration 2 → 3
   "results with an empty trace and verified false, sound off", digest v3; a campaign or daily win records the winning
-  net trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start [1…100]"
+  effective-cut trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start [1…100]"
   (`r02-g08.no-replay` without a verified traced result), "replay.step" (`r02-g08.replay-end` after the last or once
   ended), "replay.stop" (campaign at that level, the frontier when it is not open); every other play action in replay
   refused with `r02-g08.replay` except `tutorial.dismiss` and `settings.sound`; replay never records; the tutorial is
