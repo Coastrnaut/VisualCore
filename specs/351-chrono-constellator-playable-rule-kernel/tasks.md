@@ -66,7 +66,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
   `docs/automatedtesting.md`; `--name round02-host`
 - [X] T-R02G0601-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G06-01.*.json)
   `--name host-full`
-- [ ] T-R02G0601-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0601-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-21: 2026-11-21 reference-1 exit 0 (.autonomy/migration/checks/R02-G06-01.reference-1.json)
 - [ ] T-R02G0601-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0601-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G0601-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
