@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgePanelWin"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgePanelWin",
+  "elapsed_seconds": 13.675,
+  "exit_code": 0,
+  "finished": "2026-11-22T13:45:57+00:00",
+  "gate": "R02-G08-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-04.host-4.log",
+  "log_sha256": "e336d237745054b0d665ded48b89d5bb88a775f30fb67e7b7b6fb413f4427333",
+  "name": "host-4",
+  "started": "2026-11-22T13:45:43+00:00",
+  "timed_out": false
+}

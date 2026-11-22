@@ -46,7 +46,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G0804-004 [P] [US5] Create
+- [X] T-R02G0804-004 [P] [US5] Create — Verified 2026-11-22: 2026-11-22: host-4 (FacetedForgePanelWinTests: 100 levels won through panel actions in 10 cases, undo/redo digests) exit 0, rerun by the lead
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgePanelWinTests.swift`: all 100 certified levels won
   through panel actions only (the piece picker, direction picker and depth − and + move a `FacetedForgePreviewChoice` to
   each certified cut's piece, direction and depth, then Cut sends `piece.cut`), split so each test is under 10 s, plus
