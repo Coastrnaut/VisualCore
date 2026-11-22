@@ -37,7 +37,7 @@ logic); no GLSL in this feature.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G0902-004 [US2] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenGenerator.swift` (NocturneGardenBandProfile "band 1: 16 × 12, smallest 2 … 3,
+- [X] T-R02G0902-004 [US2] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenGenerator.swift` (NocturneGardenBandProfile "band 1: 16 × 12, smallest 2 … 3, — Verified 2026-11-22: host-3 exit=0 (NocturneGardenGeneratorTests 9: manifest shape, band profiles, candidate determinism and shape, 8 entries certified with skipped candidates re-checked, determinism, difficulty, reason codes, digest; agent C's tests retested by the lead)
   sizes {2}, elevations {2, 3}, 1 … 2 blooms, ring 1 kept 1/2, match 4/5, allowance 2, no decoy; band 2: 20 × 14, 3 … 4, {1, 2},
   {2, 3}, 2 … 3, ring 1 · 1/2, 17/20, 2, no; band 3: 24 × 16, 4 … 5, {1, 2, 3}, {1 … 4}, 3 … 4, ring 2 · 3/4, 9/10, 1, decoy;
   band 4: 28 × 20, 5 … 6, all, all, 4 … 5, ring 2 · 3/4, 19/20, 1, decoy; band 5: 32 × 24, 6 … 7, all, all, 5 … 6, ring 2 · 3/4, 1/1, 0,
