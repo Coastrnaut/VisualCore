@@ -85,8 +85,7 @@ analytic faceting".
   scenario manifest `Packages/ExperiencesRound02/AmethystEscape/scenario-manifest.json`, no permissions, a summary of
   at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's experience
   registry link `AmethystEscapeExperience` as a candidate (`available: false` until X-R02-G07), opening at seed 0
-  (level 1); `AppModelTests` switches its unregistered example to the next round-two game (`r02-g08`'s id from the
-  catalog). The adapter (`AmethystEscapeExperienceCore`) prepares certified level (seed mod 100) + 1 (generated once per
+  (level 1); `AppModelTests` switches its unregistered example to the next round-two game (`r02-g08.faceted-forge`). The adapter (`AmethystEscapeExperienceCore`) prepares certified level (seed mod 100) + 1 (generated once per
   process) and accepts `shell.rotate [shell, step]` (whole, 0 … shells − 1, −1 or +1), `pearl.advance`, `play.undo`,
   `play.redo` and `level.next`; the kernel refuses everything out of range or out of stage; its digest is the level
   number and the play's fingerprint (never the record history, so undo restores the earlier digest); snapshot schema 1
