@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForgeProgress|FacetedForgeInvariant"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForgeProgress|FacetedForgeInvariant'",
+  "elapsed_seconds": 10.762,
+  "exit_code": 0,
+  "finished": "2026-11-22T14:19:24+00:00",
+  "gate": "R02-G08-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G08-05.host-3.log",
+  "log_sha256": "e54b872d3b573791aea00c10e4eb8dcc446106865f23d346cc827705f262dd48",
+  "name": "host-3",
+  "started": "2026-11-22T14:19:13+00:00",
+  "timed_out": false
+}

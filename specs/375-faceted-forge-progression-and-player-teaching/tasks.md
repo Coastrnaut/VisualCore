@@ -28,7 +28,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G0805-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeProgress.swift`
+- [X] T-R02G0805-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeProgress.swift` — Verified 2026-11-22: 2026-11-22: host-3 (FacetedForgeProgressTests 10 + invariant tests 9) exit 0, rerun by the lead
   (`FacetedForgeTutorialStep` aim → match → finish → done with the texts of clarification Q2; `FacetedForgeProgress` "3
   when at most the certified smallest cut count, 2 when at most that + 2, else 1" by cuts made (cut records, undone ones
   included), frontier, best cuts made; `dailyLevel(year:month:day:)` "(days from 2026-01-01 × 67) mod 100 + 1, negative
