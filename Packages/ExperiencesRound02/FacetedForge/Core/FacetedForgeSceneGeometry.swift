@@ -325,12 +325,14 @@ public enum FacetedForgeSceneGeometry {
     /// preview polygon (code 4, shade 0.7) with its dashed rim (code 4); the sliver cross over the failure piece (code
     /// 5); the cut mark bars (codes 6 and 7). Colours: material colour × shade × (0.6 + 0.4 · max(n · light, 0)). The
     /// painter's order, the preview's facing side and the camera-facing sliver cross and mark bars follow the eye of
-    /// `orbit` (``frame(_:)``); the default, the authored orbit, gives the output of R02-G08-03 bit for bit.
+    /// `orbit` (``frame(_:)``); the default, the authored orbit, gives the output of R02-G08-03 bit for bit. With
+    /// `lights` (feature 376, R02-G08-06) the sliver cross's shade is the eased sliver level; without them the output
+    /// is unchanged.
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func crystalPart(_ snapshot: FacetedForgeSceneSnapshot, tier: FacetedForgeTier,
-                                   reduceMotion: Bool = false,
-                                   orbit: FacetedForgeOrbit = .authored) throws(MeshError) -> FacetedForgeColouredMesh {
+                                   reduceMotion: Bool = false, orbit: FacetedForgeOrbit = .authored,
+                                   lights: FacetedForgeLights? = nil) throws(MeshError) -> FacetedForgeColouredMesh {
         let view: (eye: SIMD3<Double>, up: SIMD3<Double>, right: SIMD3<Double>) = frame(orbit)
         var parts: Parts = Parts(lit: true)
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
@@ -348,7 +350,8 @@ public enum FacetedForgeSceneGeometry {
             let centre: SIMD3<Double> = pieceCentre(sliver, snapshot, reduceMotion: reduceMotion)
             let a: SIMD3<Double> = unit(view.right + view.up)
             let b: SIMD3<Double> = unit(view.right - view.up)
-            let uv: Vec2 = Vec2(FacetedForgeMaterial.sliverCross, 1)
+            // Feature 376 (R02-G08-06): the cross's shade is the eased sliver level when lights are given.
+            let uv: Vec2 = Vec2(FacetedForgeMaterial.sliverCross, lights.map { min(max($0.sliver, 0), 1) } ?? 1)
             try parts.bar(centre: centre, along: a, across: b, halfLength: crossArm, halfWidth: crossHalfWidth,
                           normal: view.eye, uv: uv)
             try parts.bar(centre: centre, along: b, across: a, halfLength: crossArm, halfWidth: crossHalfWidth,
@@ -368,9 +371,9 @@ public enum FacetedForgeSceneGeometry {
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func crystalMesh(_ snapshot: FacetedForgeSceneSnapshot, tier: FacetedForgeTier,
-                                   reduceMotion: Bool = false,
-                                   orbit: FacetedForgeOrbit = .authored) throws(MeshError) -> Mesh {
-        try crystalPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit).mesh
+                                   reduceMotion: Bool = false, orbit: FacetedForgeOrbit = .authored,
+                                   lights: FacetedForgeLights? = nil) throws(MeshError) -> Mesh {
+        try crystalPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit, lights: lights).mesh
     }
 
     /// The glow (glow program, colour in the normal slot, uv (weight, 0)): for k = `tier.glowShells` … 1, a copy of

@@ -22,6 +22,15 @@
 // levels with their stars and the goal (cuts spent, budget and certified smallest cut count); `retry` starts the level
 // again in its mode, `undoCut` takes back the last cut, and the daily level is chosen from the local calendar date read
 // here (`playDaily(port:date:)`, sent as `mode.daily [year, month, day]`), never in the core.
+// Feature 376 (R02-G08-06) T-R02G0806-005 (FR-R02G0806-001 … 006; clarifications Q1–Q5): after every described change
+// the presenter routes `FacetedForgeFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback
+// route (`feedback`, injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log; refusals are
+// announced with `refused(code:)` and shown in the panel in the same words (`refusalText(code:)`); preview choices are
+// not announced (the pickers speak their values). The scene's lights (`FacetedForgeLights`: the cut-face glow and the
+// sliver mark) settle on the first frame and afterwards fade every frame by the frame's elapsed time (0.45 s fades
+// under Reduce Flashing). The ambient loop (`FacetedForgeSound`) is offered the recipe of the piece count, the target's piece
+// count and the stage (`FacetedForgeSoundRecipe`) when a level or mode opens and when that recipe changes. The mirror
+// carries the summary element's text and the sound choice. Presentation only.
 #if os(iOS)
 import FacetedForgeCore
 import Foundation
@@ -31,6 +40,8 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
+import VisualCoreAudioDSP
 
 /// What the controls show and choose: the latest state the presenter described and the preview choice.
 @MainActor
@@ -69,6 +80,10 @@ final class FacetedForgeMirror {
     var smallest = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
     var pickedLevel = 1
+    /// The summary element's text (feature 376): cuts left, every piece, the target and the next cut.
+    var summary = ""
+    /// Whether the ambient sound is on (feature 376; off by default).
+    var soundOn = false
 
     /// The chosen piece in words.
     var pieceLabel: String {
@@ -81,15 +96,11 @@ final class FacetedForgeMirror {
     /// The chosen depth in words, or that the plane misses the chosen piece (feature 374, T-R02G0804-013).
     var depthLabel: String { misses ? "the plane misses this piece" : "depth \(choice.depth)" }
 
-    /// Whether no depth of the chosen direction crosses the chosen piece: the plane is not drawn and a commit sends
-    /// nothing.
+    /// Whether the chosen plane does not cross the chosen piece (no depth of the direction crosses it, or the chosen
+    /// depth lies outside it): the plane is not drawn and a commit sends nothing.
     var misses: Bool {
         guard let play, play.pieces.indices.contains(choice.piece) else { return false }
-        for depth in FacetedForgeHalfSpace.depths
-        where play.pieces[choice.piece].isCrossed(direction: choice.direction, depth: depth) {
-            return false
-        }
-        return true
+        return !play.pieces[choice.piece].isCrossed(direction: choice.direction, depth: choice.depth)
     }
 
     /// Moves the piece pick by `delta`, wrapping; the depth moves to the middle crossing depth of the new piece.
@@ -177,7 +188,20 @@ final class FacetedForgePresenter: ExperiencePresenter {
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 375).
     private(set) var dailyDate: DateComponents?
 
+    /// The feedback route of announcements and haptics (feature 376; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 376; tests and diagnostics).
+    private(set) var feedbackLog: [FacetedForgeFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 376).
+    private(set) var lights: FacetedForgeLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient sound (feature 376).
+    let sound: FacetedForgeSound
+
     init(reduceMotion: Bool, reduceFlashing: Bool) {
+        lights = FacetedForgeLights(reducedFlash: reduceFlashing)
+        sound = FacetedForgeSound(recipe: FacetedForgeSoundRecipe.recipe(pieces: 1, target: 1, stage: .loading))
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         scene.reducedFlash = reduceFlashing
@@ -216,6 +240,14 @@ final class FacetedForgePresenter: ExperiencePresenter {
         let snapshot = core.snapshot(choice: choice(for: core), time: time)
         lastSnapshot = snapshot
         lastPlay = core.play
+        // The lights settle on the very first frame only; every later change, a level change included, fades.
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         scene.orbit = gestures.orbit
         let shown: FacetedForgeSceneSnapshot
         if let candidate = gestures.candidate {
@@ -416,7 +448,9 @@ final class FacetedForgePresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(result.code)"
+            let plan = FacetedForgeFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(result.code)
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
@@ -458,6 +492,15 @@ final class FacetedForgePresenter: ExperiencePresenter {
         let choice = choice(for: core)
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
         mirror.levelNumber = core.levelNumber
+        if let previous = latestCore {
+            route(FacetedForgeFeedbackPlan.after(old: previous, new: core))
+            let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
+        mirror.summary = FacetedForgeFeedbackPlan.summaryText(core: core, choice: choice)
         latestCore = core
         if let key = hintKey, key != Self.hintKey(core) { clearHint() }
         mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
@@ -513,6 +556,38 @@ final class FacetedForgePresenter: ExperiencePresenter {
         if let hint = mirror.hintText { text += " Hint: " + hint }
         return text
     }
+
+    // MARK: Feedback and sound (feature 376)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: FacetedForgeFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its piece count, its target's piece count and its stage.
+    static func recipe(_ core: FacetedForgeExperienceCore) -> AmbientLoopRecipe {
+        FacetedForgeSoundRecipe.recipe(pieces: core.play.pieces.count, target: core.play.level.target.count,
+                                       stage: core.play.stage)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current crystal.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
         AnyView(FacetedForgeControls(port: port, mirror: mirror, presenter: self))

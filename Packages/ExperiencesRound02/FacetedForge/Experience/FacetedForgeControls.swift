@@ -6,7 +6,9 @@
 // through the presenter, which shows and logs a refusal like a gesture's. Feature 375 (R02-G08-05) T-R02G0805-005
 // (FR-R02G0805-001 … 005): the tutorial instruction with Dismiss, Hint (each press reveals the next level), the failure
 // explanation with Undo and Retry, the goal and stars, Campaign / Daily / Practice and a picker of the open levels; all
-// as wrapping text in the panel, never over the crystal.
+// as wrapping text in the panel, never over the crystal. Feature 376 (R02-G08-06) T-R02G0806-005 (FR-R02G0806-001,
+// 005, 006): the summary element ("Crystal"), adjustable piece, direction and depth pickers, the Sound toggle, rows
+// that become columns at accessibility text sizes and a 520-point readable width.
 #if os(iOS)
 import FacetedForgeCore
 import SwiftUI
@@ -19,6 +21,14 @@ struct FacetedForgeControls: View {
     /// The presenter, for "Reset view" (feature 374) and refusals shown and logged like the gestures' ones.
     let presenter: FacetedForgePresenter
 
+    /// The text size: rows become columns at accessibility sizes (feature 376).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the ambient loop plays only while it is.
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 376).
+    static let readableWidth: CGFloat = 520
+
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
@@ -27,19 +37,45 @@ struct FacetedForgeControls: View {
                 choiceRow
                 playRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 376).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 376; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Ambient sound")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
 
     /// The level, cuts and stage lines.
     @ViewBuilder private var header: some View {
         Text("Level \(mirror.levelNumber) · cuts \(mirror.cuts) of \(mirror.budget)")
             .font(.headline)
+            .fixedSize(horizontal: false, vertical: true)
         Text(mirror.status).font(.subheadline)
-        Text(mirror.targetLabel).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Crystal")
+            .accessibilityValue(mirror.summary)
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -56,11 +92,15 @@ struct FacetedForgeControls: View {
                     onDecrement: { mirror.pickDirection(-1) })
                 .accessibilityLabel("Direction of the cut")
                 .accessibilityValue(mirror.directionLabel)
-            HStack(spacing: 12) {
+            Stepper(mirror.depthLabel,
+                    onIncrement: { mirror.stepDepth(1) },
+                    onDecrement: { mirror.stepDepth(-1) })
+                .accessibilityLabel("Depth of the cut")
+                .accessibilityValue(mirror.depthLabel)
+            row {
                 Button("Depth −") { mirror.stepDepth(-1) }
                     .accessibilityLabel("Move the cut plane one step back")
                     .accessibilityValue(mirror.depthLabel)
-                Text(mirror.depthLabel).font(.footnote)
                 Button("Depth +") { mirror.stepDepth(1) }
                     .accessibilityLabel("Move the cut plane one step forward")
                     .accessibilityValue(mirror.depthLabel)
@@ -77,7 +117,7 @@ struct FacetedForgeControls: View {
                     .accessibilityLabel("Dismiss the tutorial")
             }
         }
-        HStack(spacing: 12) {
+        row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
@@ -90,7 +130,7 @@ struct FacetedForgeControls: View {
         if let failure = mirror.failureText {
             VStack(alignment: .leading, spacing: 4) {
                 Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 12) {
+                row {
                     Button("Undo") { presenter.undoCut(port: port) }
                         .accessibilityLabel("Undo the last cut")
                     Button("Retry") { presenter.retry(port: port) }
@@ -102,7 +142,7 @@ struct FacetedForgeControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 375).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
@@ -113,7 +153,7 @@ struct FacetedForgeControls: View {
                 .accessibilityLabel("Practise this level with a larger cut budget")
                 .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -142,7 +182,7 @@ struct FacetedForgeControls: View {
 
     /// Cut, undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Cut") {
                 let choice = mirror.choice
                 send("piece.cut", [Double(choice.piece), Double(choice.direction), Double(choice.depth)])

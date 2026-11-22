@@ -194,10 +194,11 @@ import VisualCoreExperienceHost
         let named: String = "Cut \(found.cut + 1) left piece \(found.piece + 1) thinner than the sliver limit."
         #expect(text.contains(named), "\(text)")
         #expect(shell.presenter.mirror.status == "Failed: " + named)
-        // Level-2 draws no glow shells, so nothing additive lies over the cross; the opening is full at time 1.
+        // Level-2 draws no glow shells, so nothing additive lies over the cross; the opening is full at time 1. Since
+        // feature 376 the cross fades in over 0.15 s (the lights), so the frames are taken once it has settled.
         FacetedForgeTest.pin(session, shell, tier: 2)
         let reduceMotion: Bool = shell.presenter.reduceMotion
-        let times: [Double] = [0, 1]
+        let times: [Double] = [1, 2]
         for time in times {
             let rgba: [UInt8] = try FacetedForgeTest.still(session, time: time)
             let snapshot: FacetedForgeSceneSnapshot = try #require(shell.presenter.lastSnapshot)

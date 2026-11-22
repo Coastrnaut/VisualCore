@@ -469,7 +469,7 @@ enum FacetedForgeTeaching {
         let locked: ActionResult = presenter.send("level.select", [4], port: shell.port)
         #expect(locked == .rejected(.rule(code: FacetedForgeExperienceRule.locked)), "\(locked.code)")
         #expect(locked.code.contains("r02-g08.locked"))
-        #expect(presenter.mirror.message == "That change was refused: \(locked.code)", "the refusal is shown")
+        #expect(presenter.mirror.message == FacetedForgeFeedbackPlan.refusalText(code: locked.code), "the refusal is shown in words")
         #expect(presenter.refusalLog.last == locked.code)
         #expect(presenter.refusalLog.count == 1)
         #expect(try FacetedForgeTest.digest(shell) == digest, "a refused pick changes nothing")

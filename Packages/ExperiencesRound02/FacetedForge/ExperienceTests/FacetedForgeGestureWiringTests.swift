@@ -579,7 +579,7 @@ enum FacetedForgeGestureScript {
         #expect(sentAfter.rejected == sentBefore.rejected + 1, "one piece.cut refused")
         #expect(played.presenter.refusalLog.count == logBefore + 1)
         #expect(played.presenter.refusalLog.last == expected.result.code)
-        #expect(played.presenter.mirror.message == "That change was refused: \(expected.result.code)")
+        #expect(played.presenter.mirror.message == FacetedForgeFeedbackPlan.refusalText(code: expected.result.code))
         #expect(try FacetedForgeTest.digest(played) == digest)
         #expect(try FacetedForgeTest.core(played).play.fingerprint == undone.play.fingerprint)
     }

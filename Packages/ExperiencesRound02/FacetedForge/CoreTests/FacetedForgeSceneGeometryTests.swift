@@ -540,4 +540,31 @@ import VisualCoreScenes
             }
         }
     }
+
+    /// Feature 376 (R02-G08-06): without lights the crystal is unchanged; with settled lights the sliver cross's shade
+    /// is the eased sliver level (1 once settled on a sliver failure), and nothing else changes.
+    @Test func lightsShadeOnlyTheSliverCross() throws {
+        let s: Snapshot = try Self.sliver()
+        let tier: FacetedForgeTier = FacetedForgeTier.of(0)
+        let plain: FacetedForgeColouredMesh = try Geometry.crystalPart(s, tier: tier)
+        var lights: FacetedForgeLights = FacetedForgeLights(reducedFlash: false)
+        lights.settle(to: s)
+        #expect(lights.sliver == 1)
+        let lit: FacetedForgeColouredMesh = try Geometry.crystalPart(s, tier: tier, lights: lights)
+        #expect(lit == plain, "a settled sliver level of 1 draws the cross as without lights")
+        var fading: FacetedForgeLights = FacetedForgeLights(reducedFlash: true)
+        let before: Snapshot = try Self.snapshot(try Self.play(try Self.openCube(budget: 3)), time: 1)
+        fading.settle(to: before)
+        fading.step(toward: s, elapsed: 0.1)
+        #expect(fading.sliver > 0 && fading.sliver < 1)
+        let half: FacetedForgeColouredMesh = try Geometry.crystalPart(s, tier: tier, lights: fading)
+        #expect(half.mesh.positions == plain.mesh.positions, "lights never move geometry")
+        var shades: [Double] = []
+        for (index, uv) in half.mesh.uvs.enumerated() where uv.x == FacetedForgeMaterial.sliverCross {
+            shades.append(Double(uv.y))
+            #expect(plain.mesh.uvs[index].y == 1)
+        }
+        #expect(!shades.isEmpty)
+        for shade in shades { #expect(abs(shade - fading.sliver) < 1e-6) }
+    }
 }

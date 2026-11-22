@@ -33,6 +33,9 @@ final class FacetedForgeCrystalScene {
     var reduceMotion = false
     /// The camera orbit (presentation only), set by the presenter before each frame (feature 374).
     var orbit: FacetedForgeOrbit = .authored
+    /// The eased light levels (presentation only), set by the presenter before each frame (feature 376): the glow gain
+    /// is multiplied by `lights.glow` and the sliver cross is shaded by `lights.sliver`; nil draws the full levels.
+    var lights: FacetedForgeLights?
     /// The light direction of the crystal (towards the light, from the upper left front).
     static let lightDirection = SIMD3<Float>(-0.35, 0.8, 0.5)
 
@@ -46,6 +49,7 @@ final class FacetedForgeCrystalScene {
         let failure: FacetedForgeFailure?
         let opening: Double
         let orbit: FacetedForgeOrbit
+        let sliver: Double
         let tier: Int
         let fallback: Bool
     }
@@ -103,7 +107,7 @@ final class FacetedForgeCrystalScene {
         }
         let time = Float(animate ? snapshot.time : 0)
         try drawCrystal(camera, time: time, layers: FacetedForgeShaders.dispersionLayers(for: tier))
-        let gain = FacetedForgeShaders.glowGain(for: tier)
+        let gain = FacetedForgeShaders.glowGain(for: tier) * min(max(lights?.glow ?? 1, 0), 1)
         guard tier.glowShells > 0, gain > 0 else { return }
         try drawGlow(camera, gain: gain)
     }
@@ -113,6 +117,7 @@ final class FacetedForgeCrystalScene {
         GeometryKey(levelNumber: s.levelNumber, cuts: s.cuts, corners: s.pieces.map(\.corners), choice: s.choice,
                     stage: s.stage, failure: s.failure,
                     opening: FacetedForgeSceneGeometry.opening(s, reduceMotion: reduceMotion), orbit: orbit,
+                    sliver: lights?.sliver ?? 1,
                     tier: tier.index,
                     fallback: fallbackReason != nil)
     }
@@ -125,7 +130,8 @@ final class FacetedForgeCrystalScene {
         if fallbackReason == nil {
             do {
                 let crystal = try FacetedForgeSceneGeometry.crystalMesh(snapshot, tier: tier,
-                                                                       reduceMotion: reduceMotion, orbit: orbit)
+                                                                       reduceMotion: reduceMotion, orbit: orbit,
+                                                                       lights: lights)
                 crystalRenderer = try Self.renderer(crystal, vertex: FacetedForgeShaders.crystalVertex,
                                                     fragment: crystalFragment, name: "faceted-forge-crystal",
                                                     registry: registry)

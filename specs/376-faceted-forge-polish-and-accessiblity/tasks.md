@@ -37,7 +37,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Wiring — geometry, presenter, scene, sound and panel
 
-- [ ] T-R02G0806-005 [US1] [US2] [US3] Edit
+- [X] T-R02G0806-005 [US1] [US2] [US3] Edit — Verified 2026-11-22: 2026-11-22: sim-27 (FacetedForgeExperienceTests, 55 tests incl. 8 accessibility tests, iOS 27.2) exit 0; unrecorded first run: the sliver frame check now waits for the cross's fade, and misses means the chosen plane does not cross the piece; two tests now expect the refusal words
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneGeometry.swift` (optional `lights:` on
   crystalPart/crystalMesh: the sliver cross's shade from the lights; without lights the output is unchanged, with tests
   in `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeSceneGeometryTests.swift`), create
