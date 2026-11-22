@@ -359,3 +359,14 @@ Feature 360 (R02-G06-10) prepares the device campaign without touching a device:
 `docs/apps/chrono-constellator/device-rows.json` (rows CR-D1 … CR-D8, pending) and
 `docs/apps/chrono-constellator/device-campaign.md`, checked by `scripts/check_device_rows.py --experience
 r02-g06.chrono-constellator`.
+
+## Amethyst Escape (R02-G07, `r02-g07.amethyst-escape`, free)
+
+`AmethystEscapeCore` (feature 361, R02-G07-01) is the playable rule kernel: `AmethystEscapeLevel` with
+`AmethystEscapeShell` (immutable, fingerprinted, JSON schema 1), the crystal state `AmethystEscapeCrystal` with
+`AmethystEscapePocket` and `AmethystEscapeTransition` (shell offsets, the pearl's pocket, exact rotation and the one
+transition of an advance), the play state `AmethystEscapePlay` with `AmethystEscapeAction`, `AmethystEscapeStage`,
+`AmethystEscapeEvent`, `AmethystEscapeFailure` and append-only `AmethystEscapeRecord`s, and `AmethystEscapeRules` for
+the R02-F23 puzzle contract. Refusals are `AmethystEscapeError` with `r02-g07.*` codes. Rules:
+[docs/architecture/amethyst-escape.md](../../docs/architecture/amethyst-escape.md).
+

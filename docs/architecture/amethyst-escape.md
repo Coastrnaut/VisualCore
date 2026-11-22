@@ -1,0 +1,52 @@
+# Amethyst Escape (R02-G07) — rules
+
+Experience `r02-g07.amethyst-escape` (free) of the one VisualCore app; package `Packages/ExperiencesRound02`, target
+`AmethystEscapeCore` (feature 361, R02-G07-01). A pearl rests in the innermost of a few nested crystal shells. The player
+turns shells one sector at a time and taps to advance the pearl, which rolls outward through an aperture lined up under
+it or else one pocket clockwise along its ring; the level is won when the pearl leaves the outermost shell through its
+exit gap within the move budget. Everything here is pure, exact integer logic; drawing, controls and sound come in
+later features of R02-G07.
+
+## Shells and pockets
+
+- **Sectors.** Every shell has the same N = 6 … 12 sectors; shells are numbered 0 (innermost) … K − 1 (outermost),
+  K = 2 … 5, and named "shell 1 (inner)" … "shell K (outer)", sectors "sector s of N", so everything is told apart
+  without colour (`AmethystEscapeLevel.description(ofShell:)`).
+- **A shell** lists, in its own sectors, its outer apertures (non-empty; the outermost shell has exactly one, the exit
+  gap), its radial walls (wall j stands between its sectors j and j + 1 mod N; at most N − 1) and its blocked wedges
+  (never every sector).
+- **Start and budget.** The pearl starts in shell 0 at a sector that is not blocked, with every shell at offset 0; the
+  move budget is 1 … 60.
+
+## The crystal
+
+`AmethystEscapeCrystal` holds every shell's offset o_r (0 … N − 1) and the pearl's pocket (shell r, absolute sector a);
+the pocket lies in shell r's own sector (a − o_r) mod N. `rotate(r, ±1)` changes o_r by ±1 mod N and turns the pearl
+with it when the pearl is in shell r; rotating another shell never moves the pearl, and N single steps are the
+identity. An advance makes exactly one transition from own sector j: through an outer aperture at j the pearl leaves
+the outermost shell (exit) or moves to the same absolute sector of the next shell; otherwise, without wall j, it moves
+one sector clockwise; otherwise it is stuck and nothing happens. A move that lands on a blocked wedge fails. Which
+pockets connect depends only on the current offsets, so nothing is cached across rotations.
+
+## Verdict
+
+After an advance, in this order: **exit** (won), **wedge** (failed, naming the shell and the sector of the pocket);
+then, after any accepted move that did not end the level, **budget** (moves spent equal to the budget: failed). An exit
+on the last move of the budget wins, and nothing is judged before the first move.
+
+## Play
+
+`AmethystEscapePlay` moves through loading, tutorial, playing, paused, won or failed and result. Every accepted rotation
+and advance spends one move; a stuck advance is refused (`r02-g07.stuck`) and spends nothing. An action is checked in
+this order — stage, previous fingerprint, range, stuck — and refused without change (`r02-g07.stage`, `.stale`,
+`.action("range")`, `.stuck`). Every accepted action, undo and redo appends a record with the previous and next play
+fingerprints (SHA-256 of the schema, level fingerprint, offsets, pearl, moves, stage and failure). Every action can be
+undone and redone; undo works in playing, paused and failed (a failed play returns to playing) and gives the move back,
+and a won play is final. A record trace replays to the same records and outcome (`AmethystEscapePlay.replay`).
+
+## Stored form and contract
+
+Levels are JSON schema 1 with sorted keys and their fingerprint; decoding re-checks every rule (including the sorted
+order of every shell's lists) and the fingerprint and refuses damaged, edited and newer forms (`r02-g07.malformed`,
+`.newer-schema`). `AmethystEscapeRules` expresses the game as an R02-F23 `PuzzleRules`: while playing, the moves are
+rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unless it is stuck.

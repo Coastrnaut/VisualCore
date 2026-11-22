@@ -59,7 +59,7 @@ in this feature (the crystal state is the CPU reference the renderer of R02-G07-
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0701-007 Docs: `docs/architecture/amethyst-escape.md` (new: rules), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0701-007 Docs: `docs/architecture/amethyst-escape.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-22: round02-host exit=0; docs/architecture/amethyst-escape.md (new), ExperiencesRound02 README section, automatedtesting.md entry
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0701-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`
