@@ -9,7 +9,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0601-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0601-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-21: 2026-11-21 baseline-host, baseline-timing, baseline-round02 exit 0, run with the new Chrono files set aside (.autonomy/migration/checks/R02-G06-01.baseline-*.json); rendering baseline: R02-G05-10 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G05-10's rendering runs (exit 0)
 
 ## Phase 2: Foundational
