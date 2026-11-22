@@ -14,7 +14,7 @@ R02-G06-03 are unchanged).
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanations (P1) 🎯
 
-- [ ] T-R02G0605-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorHints.swift` (ChronoConstellatorPlan "run(ticks),
+- [X] T-R02G0605-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorHints.swift` (ChronoConstellatorPlan "run(ticks), — Verified 2026-11-21: 2026-11-21: host (ChronoConstellatorHintsTests, 12 tests: exact hints win all 100 levels; opening plan = certified solution; 200 seeded states, hint stuck iff no plan, following hints wins; 500 seeded failures explained; slowest hint 66 ms) exit 0, lead retest; rewind/release gated on a plan (spec Q1 updated)
   rewind, release(star, start), phases"; `plan(_:)` "a winning current timeline: run (ticks to the win tick from the
   current tick); after tick 0 otherwise: rewind; at tick 0 with holds: release the first hold (star order, then start);
   else the solver on the level with the current phases as defaults, accepted only if the edits in use afterwards fit the

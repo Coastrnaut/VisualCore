@@ -42,8 +42,10 @@ core may not read a clock.
   no hint; a failed play's hint is "Undo the last change, rewind or retry the level." While playing or paused: if the
   current timeline wins (a replay from tick 0 reaches a win tick), the plan is to run — at tick 0 or later: level 1
   "Replay the timeline", level 2 "Run to the end", level 3 "Run: N ticks" (the ticks to the win tick from the current
-  tick). Otherwise, after tick 0 the plan is to rewind (every level: "Rewind to tick 0 to change the timeline"). At tick
-  0, if the timeline has holds, the plan removes the first hold (star order, then start): level 1 "Remove a hold", level
+  tick). Otherwise, after tick 0 the plan is to rewind (every level: "Rewind to tick 0 to change the timeline"), offered
+  only when the timeline at tick 0 has a plan of its own (implementation, 2026-11-21: 8 of 200 seeded states showed that an
+  ungated rewind or release can lead to a state with no win). At tick 0, if the timeline has holds, the plan removes the
+  first hold (star order, then start), likewise only when the state after the removal has a plan: level 1 "Remove a hold", level
   2 "Remove star k's hold", level 3 "Remove star k's hold from tick s"; without holds, the solver runs on the level with
   the current phases as its defaults and its phase changes are the plan, accepted only if the edits in use afterwards
   stay within the budget and the resulting timeline wins: level 1 "Change a star's start", level 2 "Change the start of
