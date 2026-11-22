@@ -10,7 +10,7 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-22; failu
 
 ## Player impact
 
-- [x] CHK001 Is the player promise stated (every one of the 80 levels can be escaped within its budget, and none by
+- [x] CHK001 Is the player promise stated (every one of the 100 levels can be escaped within its budget, and none by
   advances alone)? [Clarity, Spec §US1; FR-R02G0702-001]
 - [x] CHK002 Is difficulty defined as longer routes through more shells, never faster reactions, with measurable band
   ranges? [Clarity, Spec §US3; Clarifications Q1, Q3]
@@ -44,7 +44,7 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-22; failu
 
 ## Simulator proof
 
-- [x] CHK011 Are host-test sizes stated (all 80 levels, at least two brute-force samples per band, per-band tests under
+- [x] CHK011 Are host-test sizes stated (all 100 levels, at least two brute-force samples per band, per-band tests under
   10 s measured locally)? [Measurability, Spec §SC-R02G0702-001 … 006]
 
 ## Future D1/D2/D3 evidence

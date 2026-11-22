@@ -20,8 +20,11 @@ Canonical overrides:
   pure `AmethystEscapeCore` of feature 361.
 - **Superseded parts of the source prompt:** price and "no IAP"; the Round 2 lock and per-round device campaign.
   **Device-only items:** none (pure logic). **Owner-only items:** none.
-- **Content count:** 80 levels (the archived manifest's 80 planned stages: 16 per band, five bands, with planned seeds and
-  move budgets 6 … 21).
+- **Content count:** the canonical catalog is the 100-level manifest of the archived design (Auto-Creator.md, R02-G07
+  chapter: "100 solver-certified levels … the chapter header's earlier figure ("80 solver-certified stages") and its
+  shorter manifests are milestones only"; `python3 scripts/planning_index.py levels --experience R02-G07`: 20 levels in
+  each of bands 1 … 5, each with its planned seed and move budget 8 … 19). The prompt's "content count 80" is that
+  milestone figure.
 - **Model:** feature 352 (Chrono Constellator's content pipeline) for manifest, generator, witness files, digest and
   progression.
 
@@ -34,11 +37,11 @@ Answered autonomously under the owner's standing delegation, safest well-support
 (6 … 12 sectors, 2 … 5 shells, apertures, walls, blocked wedges, one exit gap, budget 1 … 60), `AmethystEscapeCrystal`,
 `AmethystEscapePlay` and `AmethystEscapeRules`; R02-F24's `PuzzleCatalog.digest(id:identities:)` and
 `ProgressionRule.standard` (drop at most 1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the
-archived manifest's 80 entries (bands 1 … 5 × 16, move budgets 6 … 9, 9 … 12, 12 … 15, 15 … 18, 18 … 21). Feature 352 is
-the pattern. A Python prototype (2026-11-22, the 80 manifest seeds, the rules below with Python's own generator)
-certified 80 of 80 levels in 5 s, at most 33 candidates for one level and at most 49,000 states explored for one proof.
+canonical manifest's 100 entries (`planning_index.py levels --experience R02-G07`: bands 1 … 5 × 20, move budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19). Feature 352 is
+the pattern. A Python prototype (2026-11-22, the 100 manifest seeds, the rules below with Python's own generator)
+certified 100 of 100 levels in 7 s, at most 51 candidates for one level and at most 38,000 states explored for one proof.
 
-- Q: How is a level built from its manifest entry? → A: the 80 entries (number, planned seed, band, move budget) are a
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, move budget) are a
   table in `AmethystEscapeManifest` with their provenance. Candidate k of entry n draws from
   `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`, in this order: the profile by band (6 sectors × 2
   shells; 6 × 3; 8 × 3; 8 × 4; 10 × 4); for each shell from the innermost: its apertures (the outermost shell one drawn
@@ -70,7 +73,7 @@ certified 80 of 80 levels in 5 s, at most 33 candidates for one level and at mos
   compares bytes; it writes the files only with `AMETHYST_ESCAPE_WRITE_WITNESSES=1`. Decoding refuses newer schemas,
   damaged files and witnesses that no longer replay. Impact: FR-R02G0702-004; SC-R02G0702-003, 005.
 - Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
-  `PuzzleCatalog<AmethystEscapeRules>.digest(id: "amethyst-escape", identities:)` over the 80 level fingerprints in
+  `PuzzleCatalog<AmethystEscapeRules>.digest(id: "amethyst-escape", identities:)` over the 100 level fingerprints in
   manifest order, pinned in a test. Certification tests are split by band so each runs under 10 seconds on a debug host
   build (measured locally, not asserted on CI). New refusals: `generation(Int)` (`r02-g07.generation`) and
   `witness(String)` (`r02-g07.witness`). Impact: FR-R02G0702-005, 006; SC-R02G0702-006.
@@ -79,7 +82,7 @@ certified 80 of 80 levels in 5 s, at most 33 candidates for one level and at mos
 
 ### User Story 1 - Every shipped level can be solved (Priority: P1) 🎯
 
-A player opening any of the 80 levels can always get the pearl out: some sequence of shell turns and advances within the
+A player opening any of the 100 levels can always get the pearl out: some sequence of shell turns and advances within the
 move budget carries it through the exit gap without falling into a blocked wedge. The game has proof of it for every
 level.
 
@@ -116,7 +119,7 @@ For each level a witness file records the level, the winning actions, a digest o
 counterexamples: advancing without turning any shell does not escape, and no shorter sequence escapes. Any edited or
 fake witness is caught.
 
-**Independent Test**: all 80 witness files match what the generator and solver produce now, byte for byte; an edited
+**Independent Test**: all 100 witness files match what the generator and solver produce now, byte for byte; an edited
 file is refused.
 
 ### Edge Cases
@@ -143,7 +146,7 @@ file is refused.
   shells, sectors, states explored) derived from the level and the solver.
 - **FR-R02G0702-004**: Each level MUST have a versioned witness record (level, actions, per-move state digests,
   counterexamples); damaged, newer and edited files MUST be refused.
-- **FR-R02G0702-005**: The catalog of 80 levels MUST have a digest pinned in tests and MUST satisfy the shared
+- **FR-R02G0702-005**: The catalog of 100 levels MUST have a digest pinned in tests and MUST satisfy the shared
   progression rule; band means of the smallest move count never fall.
 - **FR-R02G0702-006**: Invalid requests MUST be refused with stable reason codes; existing code MUST change only
   additively; every new public name is documented; the reference regression passes.
@@ -154,13 +157,13 @@ file is refused.
 - **Solver result**: smallest move count, a shortest action sequence, the states explored by depth (the proof).
 - **Difficulty**: smallest moves, turns, advances, shells, sectors, states explored.
 - **Witness**: schema, the level's stored form, actions, per-move digests, counterexamples, skipped candidates.
-- **Catalog**: the 80 levels in manifest order with a digest.
+- **Catalog**: the 100 levels in manifest order with a digest.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-R02G0702-001**: All 80 catalog levels are won by replaying their witness within the budget.
+- **SC-R02G0702-001**: All 100 catalog levels are won by replaying their witness within the budget.
 - **SC-R02G0702-002**: The solver's smallest move count equals an independent brute-force search on sampled catalog
   levels (at least two per band).
 - **SC-R02G0702-003**: Building the catalog twice gives identical levels and the pinned digest; each witness file matches
@@ -174,7 +177,7 @@ file is refused.
 
 ## Assumptions
 
-- The 80 witness files live in `docs/games/amethyst-escape/levels/NNN.witness.json` (the manifest's "Certification
+- The 100 witness files live in `docs/games/amethyst-escape/levels/NNN.witness.json` (the manifest's "Certification
   artifact"); they are regenerated only by a test run with an explicit opt-in and checked byte for byte on every other
   run.
 - The player sees every shell, aperture, wall and wedge; nothing is hidden.

@@ -9,7 +9,7 @@
   array. Rationale: up to 400,000 states per proof in a debug build stays fast without hashing; the encoding is exact.
 - **R3 Band profiles and tight ranges.** Decision: sectors × shells 6 × 2, 6 × 3, 8 × 3, 8 × 4, 10 × 4 and smallest
   move ranges 3 … 4, 5 … 6, 7 … 8, 9 … 10, 11 … 12, each within the manifest budget. Rationale: a Python prototype
-  certified all 80 manifest seeds with at most 33 candidates; ranges two wide keep the standard progression rule (drop
+  certified all 100 manifest seeds with at most 51 candidates; ranges two wide keep the standard progression rule (drop
   at most 1, jump at most 3) in manifest order. Alternatives: budget-relative ranges (prototype failed band 5).
 - **R4 Advances alone must not escape.** Decision: a candidate whose pearl escapes when only advanced is refused.
   Rationale: the puzzle needs the player to turn a shell (User Story 1, scenario 2).

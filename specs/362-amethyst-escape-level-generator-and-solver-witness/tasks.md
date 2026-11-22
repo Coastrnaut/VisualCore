@@ -16,9 +16,9 @@ logic); no GLSL in this feature.
 
 - [ ] T-R02G0702-002 Add `generation(Int)` ("r02-g07.generation") and `witness(String)` ("r02-g07.witness") to
   `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeError.swift`; create
-  `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeManifest.swift` (AmethystEscapeManifestEntry "number 1 … 80,
-  seed UInt64, band 1 … 5, budget 6 … 21", the 80 entries copied from the archived manifest (round2.md section 6.7.5) with
-  the source line) and `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeDifficulty.swift` ("smallest, turns,
+  `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeManifest.swift` (AmethystEscapeManifestEntry "number 1 … 100,
+  seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py levels
+  --experience R02-G07` with the source line) and `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeDifficulty.swift` ("smallest, turns,
   advances, shells, sectors, explored"); `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
   AmethystEscape` (existing tests unchanged)
 
@@ -57,10 +57,10 @@ logic); no GLSL in this feature.
   actions, digests, fingerprints, level, counterexamples and difficulty refused; newer schema and damaged JSON refused; the
   counterexamples behave as recorded) by agent B; `--name host-4`
 - [ ] T-R02G0702-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeCatalogTests.swift`
-  (80 entries, 16 per band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on
-  the smallest count; band means never fall; on levels 1, 9, 17, … 73 the solver equals the brute force (SC-R02G0702-002);
-  all 80 witnesses replay to a win; each witness equals `docs/games/amethyst-escape/levels/NNN.witness.json` byte for byte,
-  one test per band, written only with `AMETHYST_ESCAPE_WRITE_WITNESSES=1`) and generate the 80 files; `--name host-5`
+  (100 entries, 20 per band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on
+  the smallest count; band means never fall; on levels 1, 11, 21, … 91 the solver equals the brute force (SC-R02G0702-002);
+  all 100 witnesses replay to a win; each witness equals `docs/games/amethyst-escape/levels/NNN.witness.json` byte for byte,
+  one test per band, written only with `AMETHYST_ESCAPE_WRITE_WITNESSES=1`) and generate the 100 files; `--name host-5`
 
 ## Phase 6: Regression, documentation and close
 

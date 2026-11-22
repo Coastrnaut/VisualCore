@@ -4,7 +4,7 @@
 extension AmethystEscapeError { case generation(Int), witness(String) }   // r02-g07.generation, r02-g07.witness
 public struct AmethystEscapeManifestEntry: Sendable, Hashable, Codable { public let number: Int; public let seed: UInt64
     public let band: Int; public let budget: Int }
-public enum AmethystEscapeManifest { public static let entries: [AmethystEscapeManifestEntry]   // 80, manifest order
+public enum AmethystEscapeManifest { public static let entries: [AmethystEscapeManifestEntry]   // 100, manifest order
     public static let provenance: String }
 public struct AmethystEscapeBandProfile: Sendable, Equatable { public let sectors, shells: Int
     public let smallest: ClosedRange<Int>; public static func of(band: Int) -> Self }
