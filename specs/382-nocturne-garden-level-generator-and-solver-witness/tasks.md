@@ -9,7 +9,7 @@ logic); no GLSL in this feature.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0902-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0902-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit=0 (run on the committed tree with the feature's work held aside); rendering baseline is R02-G09-01's rendering runs (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G09-01's rendering runs (exit 0)
 
 ## Phase 2: Foundational
