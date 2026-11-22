@@ -46,7 +46,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   bed of 12 size-3 blooms at row H − 1; every cell centre, the lantern and the gauge inside the view with margin at 7
   aspects; same positions at every tier; shadow quads equal the mask; gauge bars at 0, half and the budget); agent B;
   `--name host-3`
-- [ ] T-R02G0903-005 [P] [US2] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenExperienceCore.swift` (controls "bloom.plant [0 … 5,
+- [X] T-R02G0903-005 [P] [US2] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenExperienceCore.swift` (controls "bloom.plant [0 … 5, — Verified 2026-11-22: host-4 exit=0 (NocturneGardenExperienceCoreTests 13 + NocturneGardenRendererPurityTests 2: conformance, controls and tiers, every action applied or refused with its code, undo restores the digest, snapshot round trip and refusals, the candidate table equals the 100 witnesses' skipped, 200 seeded snapshots never change digest or verdict; agent C's files retested by the lead)
   column, row, size], bloom.move [bloom, column, row], bloom.resize [bloom, size], bloom.remove [bloom], sun.set
   [elevation], play.undo, play.redo, level.next"; digest "level number and play fingerprint"; schema 1
   `{level, records}`; quality profile of three levels; each level certified directly from a table of its witness's
