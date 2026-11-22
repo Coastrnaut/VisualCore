@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G07-01: Amethyst Escape kernel, isolated build during an X gate).
+Last updated: 2026-11-22 (R02-G07-02: Amethyst Escape content pipeline, integer search).
 
 ## 1. What is tested, and where
 
@@ -265,6 +265,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
   timelines everywhere, one added hold on small levels). Witness files are generated in a separate write run: the
   byte-compare and decode tests run in parallel, so a first run with the write flag fails until the files exist.
+- **Search on packed integers** (R02-G07-02, 2026-11-22). Amethyst Escape's breadth-first solver first built a crystal
+  value for every state it visited; in a debug build the catalog's witness check took 18.5 s over its five bands. The
+  search now works on the packed integer state with the shell lists as bit masks (same rules, same digest and byte-equal
+  witnesses), and the check takes 6.9 s. Measure a content test in the debug build before adding catalog cases.
 - **Kernel files built in an isolated copy while an X gate runs** (R02-G07-01, 2026-11-22). Amethyst Escape's kernel
   and its four agent test files were written and tested in a scratchpad package that holds only the new Core, so the
   repository stayed unchanged under X-R02-G06's runs; the files were copied in after the record and retested by name.

@@ -7,5 +7,5 @@
 | `AmethystEscapeSolution` | smallest, actions, depths (states first reached at each depth 0 … smallest − 1), work (states expanded) | the actions escape on the last; no shorter escape exists |
 | `AmethystEscapeDifficulty` | smallest, turns, advances, shells, sectors, explored | turns + advances = smallest |
 | `AmethystEscapeGenerated` | entry, level, solution, difficulty, skipped | level id `amethyst-escape-NNN`; tutorial on 1 … 3; difficulty = band |
-| `AmethystEscapeCounterexample` | actions, outcome (`stuck`, `wedge(shell, sector)`, `budget`, `open`), move | the unedited run and the near miss |
+| `AmethystEscapeCounterexample` | actions, outcome (`stuck`, `wedge`, `budget` or `open`; the shell and sector of a wedge follow from replaying the actions), move | the unedited run and the near miss |
 | `AmethystEscapeWitness` | schema 1, number, level, actions, digests (one per move), fingerprints (after begin and each action), smallest, depths, unedited, near miss, difficulty, skipped | JSON with sorted keys; decode refuses newer, damaged and non-replaying files |

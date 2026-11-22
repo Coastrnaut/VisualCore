@@ -50,3 +50,25 @@ Levels are JSON schema 1 with sorted keys and their fingerprint; decoding re-che
 order of every shell's lists) and the fingerprint and refuses damaged, edited and newer forms (`r02-g07.malformed`,
 `.newer-schema`). `AmethystEscapeRules` expresses the game as an R02-F23 `PuzzleRules`: while playing, the moves are
 rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unless it is stuck.
+
+## Content pipeline (feature 362, R02-G07-02)
+
+- **Manifest.** `AmethystEscapeManifest` holds the 100 planned levels of the archived design (`python3
+  scripts/planning_index.py levels --experience R02-G07`): 20 per band, each with a planned seed and a move budget 8 … 19.
+  The chapter's "80 solver-certified stages" is a milestone figure only.
+- **Generator.** Candidate k of an entry draws from `SeededRandom(seed: SeedDerivation.derive(seed, index: k))`: the
+  band's profile (sectors × shells 6 × 2, 6 × 3, 8 × 3, 8 × 4, 10 × 4), each shell's apertures, walls (35 %) and blocked
+  wedges (25 %), then the start. A candidate is kept when advances alone do not escape and the solver proves a smallest
+  move count in the band's range (3 … 4, 5 … 6, 7 … 8, 9 … 10, 11 … 12) within the budget, and the witness wins through
+  the play; at most 512 candidates (`r02-g07.generation`).
+- **Solver.** `AmethystEscapeSolver` searches crystal states breadth-first (every shell offset and the pearl's pocket,
+  packed into one integer; shell lists as bit masks) in the rules' move order, never continuing from a blocked wedge. The
+  first escape is the shortest route; the states first reached at each smaller depth are the proof. Work counts the
+  states expanded (at most N^K × K × N).
+- **Witness files.** `docs/games/amethyst-escape/levels/NNN.witness.json` (schema 1): the level, the actions, a state
+  digest after every move, the play fingerprints, the smallest count with its depths, the unedited and near-miss
+  counterexamples, the difficulty and the skipped candidates. Decoding re-solves and replays them and refuses any edited
+  part by name (`r02-g07.witness`); the catalog test compares all 100 with the regenerated witnesses byte for byte and
+  rewrites them only with `AMETHYST_ESCAPE_WRITE_WITNESSES=1`. The catalog digest is pinned and the standard progression
+  rule holds.
+

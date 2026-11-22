@@ -370,3 +370,13 @@ transition of an advance), the play state `AmethystEscapePlay` with `AmethystEsc
 the R02-F23 puzzle contract. Refusals are `AmethystEscapeError` with `r02-g07.*` codes. Rules:
 [docs/architecture/amethyst-escape.md](../../docs/architecture/amethyst-escape.md).
 
+Feature 362 (R02-G07-02) adds the content pipeline: `AmethystEscapeManifest` (100 levels), the seeded
+`AmethystEscapeGenerator` with `AmethystEscapeBandProfile` and `AmethystEscapeGenerated`, the breadth-first
+`AmethystEscapeSolver` (`AmethystEscapeSolution`), `AmethystEscapeDifficulty` and versioned witness files
+(`AmethystEscapeWitness`, `AmethystEscapeCounterexample`) under `docs/games/amethyst-escape/levels/`; regenerate them on
+purpose with:
+
+```bash
+AMETHYST_ESCAPE_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter AmethystEscapeCatalogTests
+```
+
