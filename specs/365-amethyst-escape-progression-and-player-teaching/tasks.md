@@ -35,7 +35,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G0705-004 Edit `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeExperienceCore.swift` (controls `level.select [1 … 100]`, `mode.daily [year,
+- [X] T-R02G0705-004 Edit `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeExperienceCore.swift` (controls `level.select [1 … 100]`, `mode.daily [year, — Verified 2026-11-22: 2026-11-22: host-4 (swift test --filter AmethystEscape: adapter controls, refusals, schema 2 round trip, migration from schema 1, newer schema refused, wins and stars, regenerated manifest) exit 0, lead retest
   month, day]`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`; codes `r02-g07.locked`, `r02-g07.date`; practice
   budget 60, no stars, no unlocks; daily opens nothing; progress and mode in the digest, the tutorial step snapshotted
   but not digested; snapshot schema 2 `{level, records, progress, mode, tutorial}` with a migration from 1 "level 1

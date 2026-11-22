@@ -3,11 +3,18 @@
 // in stage `playing` (seeds 0, 1, 99 and 100 give levels 1, 2, 100 and 1); every control is accepted when legal and
 // refused with the state unchanged otherwise (the engine's range checks, `r02-g07.not-whole`, the kernel's
 // `r02-g07.action`, `r02-g07.stuck` and `r02-g07.stage`); undo restores the earlier digest exactly and redo the later
-// one; the certified solution wins and the budget fails, undo returns a failed play to playing; `level.next` wraps 100 to
-// 1 and reset returns; the snapshot round trip and refused payloads (damaged, level out of range, a trace of another
-// level, an edited record, a record of a newer schema, an envelope of a newer schema); the quality tier and the
-// presenter's snapshot time never touch the digest. Levels of bands 1 and 2 (1 … 40) keep the run short; only the
-// preparation and wrap checks generate level 100. Explicit types, plain loops.
+// one; the certified solution wins and the budget fails, undo returns a failed play to playing; `level.next` wrapped 100
+// to 1 (feature 365: no longer) and reset returns; the snapshot round trip and refused payloads (damaged, level out
+// of range, a trace of another level, an edited record, a record of a newer schema, an envelope of a newer schema);
+// the quality tier and the presenter's snapshot time never touch the digest. Levels of bands 1 and 2 (1 … 40) keep
+// the run short; only the preparation and no-wrap checks generate level 100. Explicit types, plain loops.
+//
+// Feature 365 (R02-G07-05) T-R02G0705-004: schema 2 and the progression controls — `level.select`, `mode.daily`,
+// `mode.practice`, `mode.campaign` and `tutorial.dismiss` with their refusals (`r02-g07.locked`, `r02-g07.date`);
+// `level.next` moves to the next open level only (100 no longer wraps); a campaign win records stars and opens the next
+// level, a daily win opens nothing and practice (budget 60) records nothing; a player following the tutorial and the
+// exact hints wins levels 1 … 3; the schema-2 round trip, the migration of a schema-1 payload, damaged progress or mode
+// refused and an envelope of a newer schema (3) refused.
 import Foundation
 import Testing
 @testable import AmethystEscapeCore
@@ -57,7 +64,10 @@ import VisualCoreSimulation
                                           ScriptedAction("shell.rotate", [0]),
                                           ScriptedAction("pearl.advance", [1]),
                                           ScriptedAction("play.undo"), ScriptedAction("play.redo"),
-                                          ScriptedAction("level.next", [1]), ScriptedAction("bogus")]
+                                          ScriptedAction("level.next", [1]), ScriptedAction("level.select", []),
+                                          ScriptedAction("mode.daily", [2026, 1]),
+                                          ScriptedAction("mode.practice", [1]), ScriptedAction("mode.campaign", [1]),
+                                          ScriptedAction("tutorial.dismiss", [1]), ScriptedAction("bogus")]
         let plan = ConformancePlan(seeds: [0, 1], stepsPerSegment: 2, actions: actions, rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
         #expect(report.entries.count == ConformanceCheck.allCases.count)
@@ -65,14 +75,18 @@ import VisualCoreSimulation
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g07.amethyst-escape" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g07.amethyst-escape.v1")
+        #expect(Core.experienceID == "r02-g07.amethyst-escape" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g07.amethyst-escape.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
-        #expect(Core.actionIDs == ["shell.rotate", "pearl.advance", "play.undo", "play.redo", "level.next"])
+        #expect(Core.actionIDs == ["shell.rotate", "pearl.advance", "play.undo", "play.redo", "level.next",
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
         #expect(Core.controls[0].ranges == [0...4, -1...1])
-        let plainIndices: [Int] = [1, 2, 3, 4]
+        #expect(Core.controls[5].ranges == [1...100])
+        #expect(Core.controls[6].ranges == [1...9_999, 1...12, 1...31])
+        let plainIndices: [Int] = [1, 2, 3, 4, 7, 8, 9]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 1)
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
+        #expect(Core.practiceBudget == 60)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == AmethystEscapeTier.all.map(\.name))
@@ -85,6 +99,8 @@ import VisualCoreSimulation
         #expect(elements == [1, 2.0 / 3.0, 1.0 / 3.0] && iterations == [1, 2.0 / 3.0, 1.0 / 3.0])
         #expect(passes == [2, 1, 0] && resolutions == [1, 1, 1])
         #expect(AmethystEscapeExperienceRule.notWhole == "r02-g07.not-whole")
+        #expect(AmethystEscapeExperienceRule.locked == "r02-g07.locked")
+        #expect(AmethystEscapeExperienceRule.date == "r02-g07.date")
     }
 
     @Test func theSeedPicksTheLevelDeterministically() async throws {
@@ -120,7 +136,13 @@ import VisualCoreSimulation
                                            Self.act("shell.rotate", [0, 0]), Self.act("shell.rotate", [0]),
                                            Self.act("pearl.advance", [1]), Self.act("play.undo"),
                                            Self.act("play.redo"), Self.act("play.undo", [1]),
-                                           Self.act("level.next", [1]), Self.act("nope")]
+                                           Self.act("level.next", [1]), Self.act("level.next"),
+                                           Self.act("level.select", [2]), Self.act("level.select", [0]),
+                                           Self.act("level.select", [1.5]), Self.act("level.select", []),
+                                           Self.act("mode.daily", [2027, 2, 29]), Self.act("mode.daily", [2026, 13, 1]),
+                                           Self.act("mode.daily", [2026, 11]), Self.act("mode.practice", [1]),
+                                           Self.act("mode.campaign", [1]), Self.act("tutorial.dismiss", [1]),
+                                           Self.act("nope")]
         if level.shells.count < 5 { illegal.append(Self.act("shell.rotate", [Double(level.shells.count), 1])) }
         for action in illegal {
             var copy: Core = core
@@ -130,12 +152,26 @@ import VisualCoreSimulation
             #expect(copy == core && after == opening && copy.play.records.isEmpty, "\(action.control)")
         }
         var probe: Core = core
+        let notWholeEarly: ActionResult = .rejected(.rule(code: AmethystEscapeExperienceRule.notWhole))
         // Outside the declared ranges or the value count: the engine's refusal; fractions: the adapter's.
         #expect(probe.apply(Self.act("shell.rotate", [5, 1])) == .rejected(.outOfRange(index: 0)))
         #expect(probe.apply(Self.act("shell.rotate", [0, 2])) == .rejected(.outOfRange(index: 1)))
         #expect(probe.apply(Self.act("shell.rotate", [0])) == .rejected(.wrongValueCount(expected: 2, found: 1)))
         #expect(probe.apply(Self.act("pearl.advance", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
         #expect(probe.apply(Self.act("level.next", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        #expect(probe.apply(Self.act("level.select", [])) == .rejected(.wrongValueCount(expected: 1, found: 0)))
+        #expect(probe.apply(Self.act("level.select", [101])) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.act("mode.daily", [2026, 11])) == .rejected(.wrongValueCount(expected: 3, found: 2)))
+        #expect(probe.apply(Self.act("mode.daily", [2026, 13, 1])) == .rejected(.outOfRange(index: 1)))
+        #expect(probe.apply(Self.act("mode.practice", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        #expect(probe.apply(Self.act("mode.campaign", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        #expect(probe.apply(Self.act("tutorial.dismiss", [1])) == .rejected(.wrongValueCount(expected: 0, found: 1)))
+        let locked: ActionResult = .rejected(.rule(code: AmethystEscapeExperienceRule.locked))
+        #expect(probe.apply(Self.act("level.next")) == locked)
+        #expect(probe.apply(Self.act("level.select", [2])) == locked)
+        #expect(probe.apply(Self.act("mode.daily", [2027, 2, 29])) == .rejected(.rule(code: "r02-g07.date")))
+        #expect(probe.apply(Self.act("mode.daily", [2026, 4, 31])) == .rejected(.rule(code: "r02-g07.date")))
+        #expect(probe.apply(Self.act("level.select", [1.5])) == notWholeEarly)
         let notWhole: ActionResult = .rejected(.rule(code: AmethystEscapeExperienceRule.notWhole))
         #expect(probe.apply(Self.act("shell.rotate", [0.5, 1])) == notWhole)
         #expect(probe.apply(Self.act("shell.rotate", [0, 0.5])) == notWhole)
@@ -248,24 +284,160 @@ import VisualCoreSimulation
         }
     }
 
-    @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+    /// Feature 365: `level.next` moves to the next open level only (a locked next level is refused, 100 does not wrap);
+    /// a selected open level opens fresh; reset returns to the seed's opening state, progress included.
+    @Test func nextLevelNeedsAnOpenLevelAndResetReturnsToTheSeedsLevel() async throws {
         var core: Core = try await Core.prepare(seed: 38)
-        #expect(core.levelNumber == 39)
+        #expect(core.levelNumber == 39 && core.progress.frontier == 39)
         #expect(core.apply(Self.act("shell.rotate", [1, 1])) == .accepted)
+        let before: StateDigest = try Self.digest(core)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: AmethystEscapeExperienceRule.locked)))
+        #expect(try Self.digest(core) == before)
+        #expect(core.apply(Self.act("level.select", [40])) == .rejected(.rule(code: "r02-g07.locked")))
+        #expect(core.apply(Self.act("level.select", [12])) == .accepted)
+        #expect(core.levelNumber == 12 && core.play.records.isEmpty && core.mode == .campaign)
         #expect(core.apply(Self.act("level.next")) == .accepted)
-        #expect(core.levelNumber == 40 && core.play.records.isEmpty && core.play.stage == .playing)
+        #expect(core.levelNumber == 13 && core.play.stage == .playing && core.play.records.isEmpty)
         core.reset()
         let fresh: Core = try await Core.prepare(seed: 38)
         let resetDigest: StateDigest = try Self.digest(core)
         let freshDigest: StateDigest = try Self.digest(fresh)
         #expect(core == fresh && resetDigest == freshDigest)
-        // The wrap: level 100 → 1.
+        // No wrap: level 100 has no next level.
         var last: Core = try Core.opening(number: 100)
-        #expect(last.apply(Self.act("level.next")) == .accepted)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(last.levelNumber == 1 && last == first)
-        last.reset()
+        #expect(last.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g07.locked")))
         #expect(last.levelNumber == 100)
+    }
+
+    /// Feature 365: daily and practice modes, the date refusal, the tutorial dismissal, stars and unlocks on a win.
+    @Test func modesProgressAndTheTutorial() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.tutorial == .turn && core.mode == .campaign && core.certifiedSmallest > 0)
+        #expect(core.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(core.tutorial == .done)
+        // The tutorial is not digested.
+        var undismissed: Core = try await Core.prepare(seed: 0)
+        #expect(try Self.digest(undismissed) == Self.digest(core))
+        #expect(undismissed.apply(Self.act("tutorial.dismiss")) == .accepted && undismissed == core)
+        #expect(core.apply(Self.act("mode.daily", [2027, 2, 29])) == .rejected(.rule(code: "r02-g07.date")))
+        let daily: Int = try #require(AmethystEscapeProgress.dailyLevel(year: 2026, month: 1, day: 2))
+        #expect(daily == 62)
+        #expect(core.apply(Self.act("mode.daily", [2026, 1, 2])) == .accepted)
+        #expect(core.mode == .daily(level: daily) && core.levelNumber == daily && core.progress.frontier == 1)
+        #expect(core.play.level == (try Core.level(number: daily)) && core.tutorial == .done)
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.mode == .practice && core.play.level.budget == Core.practiceBudget && core.levelNumber == daily)
+        // Campaign returns to the frontier when the current level is not open.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.tutorial == .turn)
+
+        // Practice on level 1: the certified solution wins with budget 60, records nothing and opens nothing.
+        let certified: AmethystEscapeGenerated = try Core.generated(number: 1)
+        var practice: Core = core
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        #expect(practice.play.level.budget == 60 && practice.play.level.sectors == certified.level.sectors)
+        for step in certified.solution.actions { #expect(practice.apply(Self.act(step)) == .accepted) }
+        #expect(practice.play.stage == .won && practice.progress.solved.isEmpty && practice.progress.frontier == 1)
+        #expect(practice.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g07.locked")))
+
+        // A campaign win records stars and opens level 2.
+        for step in certified.solution.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.frontier == 2 && core.tutorial == .done)
+        #expect(core.progress.solved[1]?.stars == 3)
+        #expect(core.progress.solved[1]?.bestMoves == certified.solution.smallest)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        #expect(core.levelNumber == 2 && core.tutorial == .turn && core.mode == .campaign)
+
+        // A daily win records stars but opens nothing.
+        let dailyNumber: Int = try #require(AmethystEscapeProgress.dailyLevel(year: 2026, month: 1, day: 1))
+        #expect(dailyNumber == 1)
+        var dailyCore: Core = try Core.opening(number: 1)
+        #expect(dailyCore.apply(Self.act("mode.daily", [2026, 1, 1])) == .accepted)
+        for step in certified.solution.actions { #expect(dailyCore.apply(Self.act(step)) == .accepted) }
+        #expect(dailyCore.play.stage == .won && dailyCore.progress.solved[1]?.stars == 3)
+        #expect(dailyCore.progress.frontier == 1)
+    }
+
+    /// Feature 365 (SC-R02G0705-001): on levels 1 … 3 a scripted player following each instruction and the exact hints
+    /// wins, and the tutorial goes turn → advance → escape → done.
+    @Test func aPlayerFollowingTheTutorialAndHintsWinsLevelsOneToThree() throws {
+        for number in 1...3 {
+            var core: Core = try Core.opening(number: number)
+            var seen: [AmethystEscapeTutorialStep] = [core.tutorial]
+            var guardCount: Int = 0
+            while core.play.stage != .won && guardCount < 60 {
+                guardCount += 1
+                let hint: AmethystEscapeHint = try #require(core.hint(level: 3), "level \(number)")
+                let action: AmethystEscapeAction = try #require(hint.action, "level \(number) \(hint.kind)")
+                #expect(core.apply(Self.act(action)) == .accepted, "level \(number) \(hint.kind)")
+                if seen.last != core.tutorial { seen.append(core.tutorial) }
+            }
+            #expect(core.play.stage == .won && core.tutorial == .done, "level \(number)")
+            #expect(core.hint(level: 1) == nil && core.failureExplanation == nil, "level \(number)")
+            #expect(seen.first == .turn && seen.last == .done, "level \(number): \(seen)")
+            #expect(core.progress.solved[number]?.stars == 3, "level \(number)")
+        }
+        // A failed play explains its failure.
+        let level: AmethystEscapeLevel = try Core.level(number: 1)
+        var failing: Core = try Core.opening(number: 1)
+        for index in 0..<level.budget {
+            #expect(failing.apply(Self.act("shell.rotate", [0, index % 2 == 0 ? 1 : -1])) == .accepted)
+        }
+        let explanation: AmethystEscapeFailureExplanation = try #require(failing.failureExplanation)
+        #expect(explanation.failure == .budget && explanation.move == level.budget)
+        #expect(failing.hint(level: 2)?.kind == .stuck && failing.tutorial == .done)
+    }
+
+    /// Feature 365: a schema-1 payload migrates to schema 2 (the levels up to the saved level open, campaign mode, the
+    /// tutorial at its initial step).
+    @Test func aSchemaOnePayloadMigrates() throws {
+        var core: Core = try Core.opening(number: 7)
+        #expect(core.apply(Self.act("shell.rotate", [0, 1])) == .accepted)
+        let records: Data = try JSONEncoder().encode(core.play.records)
+        let recordsText: String = String(decoding: records, as: UTF8.self)
+        let schemaOne: String = "{\"level\":7,\"records\":" + recordsText + "}"
+        let object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: Data(schemaOne.utf8)) as? [String: Any])
+        let migrated: [String: Any] = try Core.migratedToSchemaTwo(object)
+        let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 6)
+        #expect(restored.levelNumber == 7 && restored.play == core.play)
+        #expect(restored.progress.frontier == 7 && restored.progress.solved.isEmpty)
+        #expect(restored.mode == .campaign && restored.tutorial == .done)
+        // A tutorial level starts its tutorial at the initial step.
+        let tutorialLevel: Core = try Core.restore(
+            payload: try JSONSerialization.data(
+                withJSONObject: try Core.migratedToSchemaTwo(["level": 2, "records": [Any]()]), options: [.sortedKeys]),
+            seed: 0)
+        #expect(tutorialLevel.levelNumber == 2 && tutorialLevel.tutorial == .turn)
+        #expect(tutorialLevel.progress.frontier == 2)
+        #expect(throws: AmethystEscapeRestoreRefusal.damaged) {
+            try Core.migratedToSchemaTwo(["level": "7"])
+        }
+        #expect(throws: AmethystEscapeRestoreRefusal.damaged) {
+            try Core.migratedToSchemaTwo(["level": 7])
+        }
+        // The declared chain carries the step 1 → 2.
+        #expect(Core.migrations.currentVersion == 2)
+    }
+
+    /// Feature 365: an engine restores a schema-1 envelope through the migration chain.
+    @Test func theEngineMigratesASchemaOneEnvelope() async throws {
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        var engine = ExperienceEngine<Core>(id: id)
+        try await engine.prepare(seed: 4)
+        try engine.activate()
+        #expect(engine.handle(control: "shell.rotate", values: [1, 1]) == .accepted)
+        let saved: ExperienceSnapshot = try engine.snapshot()
+        var expected: Core = try Core.opening(number: 5)
+        #expect(expected.apply(Self.act("shell.rotate", [1, 1])) == .accepted)
+        let records: String = String(decoding: try JSONEncoder().encode(expected.play.records), as: UTF8.self)
+        let schemaOne: String = "{\"level\":5,\"records\":" + records + "}"
+        let old = try ExperienceSnapshot(experience: id, schemaVersion: 1, seed: saved.seed,
+                                         stepIndex: saved.stepIndex, digest: saved.digest,
+                                         payload: Data(schemaOne.utf8))
+        try engine.restore(old)
+        #expect(try engine.digest() == saved.digest)
     }
 
     @Test func snapshotRestoreRoundTripAndRefusals() async throws {
@@ -277,7 +449,8 @@ import VisualCoreSimulation
         let payload: Data = try core.snapshotPayload()
         #expect(try core.snapshotPayload() == payload)
         let text: String = try #require(String(data: payload, encoding: .utf8))
-        #expect(text.hasPrefix("{\"level\":32,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":32,\"mode\":{\"mode\":\"campaign\"},\"progress\":"))
+        #expect(text.contains("\"tutorial\":\"done\""))
         let restored: Core = try Core.restore(payload: payload, seed: 31)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -303,12 +476,43 @@ import VisualCoreSimulation
         #expect(throws: AmethystEscapeRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":\"32\",\"records\":[]}".utf8), seed: 31)
         }
+        #expect(throws: AmethystEscapeRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("{\"level\":32,\"records\":[]}".utf8), seed: 31)
+        }
         #expect(throws: AmethystEscapeRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":0").utf8),
+                             seed: 31)
         }
         #expect(throws: AmethystEscapeRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":101").utf8),
+                             seed: 31)
         }
+        // Damaged progress or mode: a frontier outside 1 … 100, an unknown mode, a daily mode of another level, an
+        // unknown tutorial step.
+        let damaged: [String] = [
+            text.replacingOccurrences(of: "\"frontier\":32", with: "\"frontier\":0"),
+            text.replacingOccurrences(of: "\"frontier\":32", with: "\"frontier\":101"),
+            text.replacingOccurrences(of: "{\"mode\":\"campaign\"}", with: "{\"mode\":\"arcade\"}"),
+            text.replacingOccurrences(of: "{\"mode\":\"campaign\"}", with: "{\"level\":5,\"mode\":\"daily\"}"),
+            text.replacingOccurrences(of: "\"tutorial\":\"done\"", with: "\"tutorial\":\"later\""),
+        ]
+        for variant in damaged {
+            #expect(variant != text)
+            #expect(throws: AmethystEscapeRestoreRefusal.damaged) {
+                try Core.restore(payload: Data(variant.utf8), seed: 31)
+            }
+        }
+        // A daily or practice state round-trips.
+        var practice: Core = core
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        #expect(practice.apply(Self.act("shell.rotate", [0, 1])) == .accepted)
+        let practiceRestored: Core = try Core.restore(payload: try practice.snapshotPayload(), seed: 31)
+        #expect(practiceRestored == practice && practiceRestored.play.level.budget == 60)
+        #expect(try Self.digest(practiceRestored) == Self.digest(practice))
+        var daily: Core = core
+        #expect(daily.apply(Self.act("mode.daily", [2026, 11, 22])) == .accepted)
+        let dailyRestored: Core = try Core.restore(payload: try daily.snapshotPayload(), seed: 31)
+        #expect(dailyRestored == daily && dailyRestored.certifiedSmallest == daily.certifiedSmallest)
         // The same records on another level: the first record's previous fingerprint is not that play's.
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":1").utf8)
         #expect(wrongLevel != payload)
@@ -337,14 +541,14 @@ import VisualCoreSimulation
         #expect(engine.handle(control: "shell.rotate", values: [1, 1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
