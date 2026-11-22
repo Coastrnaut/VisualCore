@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G07-04 (migration ledger, game feature of experience R02-G07) · ID namespace FR-R02G0704-###,
 SC-R02G0704-###, T-R02G0704-###
@@ -25,6 +25,54 @@ Canonical overrides:
 - **Shared features used:** R02-F14 (reversible history), R02-F22 (spatial controls and analytic picking), R02-F26
   (input and accessibility contract), the experience host's pointer events, and the kernel, content, adapter and
   renderer of R02-G07-01 … 03.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+354's answers. Facts checked in code (read-only, 2026-11-22): Chrono Constellator's feature 354 solved the same problem
+with a host-tested `ChronoConstellatorGestureController` taking `PointerEvent`s (id, phase began/moved/ended/cancelled,
+location in view points with the origin top-left, timestamp) with the view size and the drawn snapshot and orbit, an
+analytic picker and a clamped `ChronoConstellatorOrbit`; Amethyst Escape's camera
+(`AmethystEscapeSceneGeometry.camera(_:aspect:)`) looks from +z pitched 50° down; shell k is the annulus r_k … r_k + w
+with its top at h_k (inner shells taller), own sector s sits at world sector (s + offset) mod S with angles from +x
+towards +z (clockwise from above, the kernel's +1); the pearl is a sphere of radius 0.3·w; the adapter accepts
+`shell.rotate [shell, ±1]`, `pearl.advance`, `play.undo`, `play.redo` and `level.next`, actions only while playing.
+
+- Q: How does a drag become a turn? → A: a one-finger touch is picked at touch-down; if the pick is a shell (not the
+  pearl) and the play is in stage `playing`, the gesture is a shell drag. The angle of a touch is atan2(z, x) of the
+  point where the touch ray meets the plane y = h_k of the picked shell; the swept angle is the unwrapped sum of the angle
+  changes between moves; the candidate turn is n = round(swept / (2π/S)) reduced to the shortest equivalent in
+  −⌊S/2⌋ … ⌊S/2⌋ (a positive angle runs from +x towards +z, so n > 0 is the kernel's +1). When the finger lifts after
+  having moved at least 16 points, |n| `shell.rotate [k, sign(n)]` are sent in order if n ≠ 0; otherwise nothing. A touch
+  that moves less than 10 points is a tap. Impact: FR-R02G0704-001, 004; SC-R02G0704-001.
+- Q: What is the pearl's touch target and how are taps used? → A: a touch hits the pearl when its ray meets the pearl
+  sphere or its point lies within 22 points of the pearl centre's projection; the pearl wins over shells at touch-down.
+  A tap (less than 10 points of travel, lifted within 0.5 s) on the pearl while playing sends one `pearl.advance`; a tap on
+  a shell picks that shell in the panel (presentation only, no action); a tap on empty space sends nothing. Shells are
+  picked by intersecting the ray with each shell's top plane y = h_k from the innermost (tallest) outward and taking the
+  first hit inside r_k … r_k + w; if none, the shell whose projected top-ring midline lies within 22 points. Impact:
+  FR-R02G0704-002, 004; SC-R02G0704-001.
+- Q: What does isolating a layer do? → A: a double tap (two taps whose `.ended` timestamps are at most 0.35 s apart and
+  22 points apart) on a shell toggles its isolation: while isolated, every other shell's wedges, fins and marks are drawn
+  at shade 0.25 (darker, still opaque where they were) so the isolated shell and the pearl stand out; double-tapping the
+  isolated shell or any shell again re-isolates or clears; "Show all layers" clears; `level.next` clears. A double tap on
+  empty space resets the view. Isolation is presentation only: never in the digest, the snapshot or the kernel. Impact:
+  FR-R02G0704-003; SC-R02G0704-003.
+- Q: What can the camera do? → A: two-finger orbit of yaw (±40° about the y axis, 90° per view width) and pitch (30° …
+  75° down from the horizon, authored 50°, 60° per view height); a second finger cancels a drag or press (nothing sent);
+  a third re-bases the midpoint; a double tap on empty space or "Reset view" returns to the authored view; the distance
+  refits so the bounding sphere of radius 1.1 stays inside the view with a 5 % margin at every orbit and aspect 0.4 …
+  2.5. Presentation only: not saved, so the snapshot schema stays 1. Impact: FR-R02G0704-005; SC-R02G0704-004.
+- Q: How are drags previewed and everything tested? → A: during a shell drag the scene draws the snapshot with that
+  shell's offset (and the pearl, when it rests in that shell) turned by the candidate n sectors, and the description
+  reads "Shell k would turn n sectors clockwise" (or anticlockwise, or "would not turn"). The Core gesture controller
+  takes pointer events with the view size and the drawn snapshot and orbit and returns the actions plus the preview; host
+  tests feed 500 seeded drags and taps on certified levels at several sizes and orbits and compare with an independent
+  pick and angle computed in the test; simulator tests send the same touches through the experience's pointer entry; a
+  host test wins all 100 certified levels through panel actions (shell picker, turn − and +, advance). Refused actions
+  are logged with their reason code. Impact: FR-R02G0704-006 … 008; SC-R02G0704-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
