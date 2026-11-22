@@ -14,7 +14,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0801-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `FacetedForgeCore`, `FacetedForgeCoreTests`,
+- [X] T-R02G0801-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `FacetedForgeCore`, `FacetedForgeCoreTests`, — Verified 2026-11-22: host exit=0 (FacetedForgeFractionTests 4, FacetedForgeLevelTests 6: directions, cube geometry, range refusals, stored form, names, 500 fixtures closed and conserving volume)
   product); create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeError.swift` (codes "r02-g08.level,
   .action, .stage, .stale, .miss, .newer-schema, .malformed"),
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeFraction.swift` ("reduced, denominator > 0; checked +, −,
