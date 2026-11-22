@@ -30,6 +30,77 @@ Canonical overrides:
 - **Model:** feature 373 (Faceted Forge's hero renderer) for the adapter, snapshot, geometry, CPU reference, scenarios,
   presenter, scene, fallback and registration.
 
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+373's answers where the games agree. Facts checked in code (read-only, 2026-11-22): Faceted Forge's experience
+(R02-G08-03 … 10) is the pattern in this package — a Core adapter with a table of certified candidates (each level's
+`skipped`) so a level is certified directly from its candidate, an immutable scene snapshot, a CPU projection reference,
+GLSL sources in the Core, an iOS-only experience target (`…Experience.swift`, presenter, scene, controls), a scenario
+manifest with 80 acceptance scenarios, a registration with content facts in `Catalog/registrations.json` and the public
+`ShaderMeshRenderer`; the Nocturne Garden kernel provides the level (bed W × H, target and forbidden cells, supply,
+sizes, elevations, opening sun, budget, required match, leak allowance), blooms with exact cells, the mask with match,
+leak and deviation, the play (plant, move, resize, remove, sun, undo, redo, stages, failure leak(move) or budget) and
+the certified catalog with its pinned digest (ce13750a…52dd); `AppModelTests` uses `r02-g09.nocturne-garden` as its
+example of an unregistered candidate and the next round-two game is `r02-g10.backwards-aurora`; the catalog's design
+gives the palette "midnight blue, lantern coral and parchment gold", the hero "black botanical silhouettes climbing
+through luminous pearlescent mist" and the geometry "L-system stems, leaf polygons and projected shadow mesh".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the bed stands upright as the mist
+  plane z = 0 with y up: with u = 2 / W, cell (column c, row r) spans x from −1 + c·u to −1 + (c + 1)·u and y from r·u
+  to (r + 1)·u (row 0 at the bottom, where the blooms' feet are). Every cell of the kernel's mask is a shadow quad on
+  the plane; the target's boundary edges carry a gold rim; the forbidden cells a coral hatch; after a leak failure the
+  leaking cells (mask ∩ forbidden) a cross. Each bloom is a flower grown in front of the plane at z = 0.35: its head is
+  its kind's outline at size·u (unstretched), anchored at the anchor cell's lower-left corner, extruded 0.04 deep with
+  a glowing rim; its stem is an L-system of `stemDepth` levels from the foot with a leaf pair at each level. The lantern
+  (the sun) is a glowing sphere at x = 1.25 whose height falls with the elevation (y = (1.15 − 0.25·(e − 1))·H·u). The
+  move gauge is a row of `budget` small bars below the bed (y = −0.1, x from −0.9 to 0.9), spent ones lit coral. The
+  ground is a midnight plane at y = −0.2. The camera is a fixed authored perspective looking at the bed's centre from
+  +z, pitched 8° down, fitted to the bounding sphere of the bed, the lantern and the gauge with a 5 % margin for aspect
+  0.4 … 2.5. Mist drift and bloom sway move with presentation time only. Nothing drawn is consulted by the rules.
+  Impact: FR-R02G0903-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): 3 mist layers, stem depth 3, shadow edge
+  feather 0.3 cell, 2 glow shells around bloom heads; `level-1`: 2 mist layers, stem depth 2, feather 0.15, 1 glow
+  shell; `level-2` (the design's "Tier 0, D3-safe"): 1 mist layer, stem depth 1, hard shadow edges, no glow. Cells,
+  blooms' heads, target, forbidden cells, colours, gauge and positions are the same at every tier. Levels are ordered
+  richest first; the presenter logs each tier change with its reason. Impact: FR-R02G0903-004; SC-R02G0903-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects the centre of
+  every bed cell, the gauge's first bar and the screen box of every bloom (head and stem) through the same camera and
+  gives the palette. Simulator tests render offscreen at 1,152 × 768 and, at cell centres outside every bloom's box
+  (± 3 pixels), check that every shadow cell is darker than the mist by at least 0.15 in luminance, that every
+  forbidden cell outside the shadow is warmer than the mist (red minus blue at least 0.15), that every target cell
+  outside the shadow differs from a shadow cell by at least 0.15 in luminance, that the gauge's first bar differs from
+  the ground by at least 0.1, and that the background matches the ground within 0.05 away from geometry. Palette:
+  ground #0A1230, mist #B8C4E0, mist highlight #E6ECF7, shadow #05060A, target gold #E8C872, forbidden coral #FF7A5C,
+  leak cross #FF3B30, bloom body #10131C, bloom glow #FFB88A, lantern #FFD9A0, spent mark #FF7A5C, unspent mark
+  #3A4558. Impact: FR-R02G0903-006; SC-R02G0903-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `NocturneGardenSceneSnapshot` (bed size, the target, forbidden, shadow and leaking cells as sorted arrays, the blooms
+  with kind, anchor and size, the sun, stage, failure, moves spent, budget, level number and presentation time) made by
+  the adapter; it never holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry
+  unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its
+  `tierLog`. Reduce Motion holds mist drift and sway at time 0; Reduce Flashing caps the glow gain. A leak failure
+  marks the leaking cells with the cross colour and the failure text names the action, as the kernel's reason does.
+  Impact: FR-R02G0903-003, 007; SC-R02G0903-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g09.nocturne-garden` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/NocturneGarden/scenario-manifest.json`, no permissions, a summary of
+  at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's
+  experience registry link `NocturneGardenExperience` as a candidate (`available: false` until X-R02-G09), opening at
+  seed 0 (level 1); `AppModelTests` switches its unregistered example to the next round-two game
+  (`r02-g10.backwards-aurora`). The adapter (`NocturneGardenExperienceCore`) prepares certified level (seed mod 100) + 1
+  from its table of certified candidates (the whole generator only if that candidate no longer certifies) and accepts
+  `bloom.plant [kind, column, row, size]` (kind 0 … 5 in the kernel's kind order), `bloom.move [bloom, column, row]`,
+  `bloom.resize [bloom, size]`, `bloom.remove [bloom]`, `sun.set [elevation]`, `play.undo`, `play.redo` and
+  `level.next` (whole numbers only); the kernel refuses everything out of range or out of stage; its digest is the level
+  number and the play's fingerprint (never the record history, so undo restores the earlier digest); snapshot schema 1
+  `{level, records}`. The panel's choices (kind, column, row, size, bloom) are presentation state of the controls, not
+  kernel state: a level opens with its first supplied kind, column 0, row 0, its smallest size and bloom 0; after an
+  action, undo or redo the chosen bloom is clamped to the blooms planted. Impact: FR-R02G0903-005, 008, 009;
+  SC-R02G0903-004.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See black botanical shadows climb through pearlescent mist (Priority: P1) 🎯
