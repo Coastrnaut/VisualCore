@@ -294,3 +294,8 @@ Feature 349 (R02-G05-09) adds Colorfall Canyons's in-app integration: panel iden
 (`ColorfallCanyonsControls.identifierNames`), the stored schema-1 and schema-2 examples
 (`ColorfallCanyonsSchemaExamples`), app unit tests, and the interface tests `CCPlayUITests` and `CCReplayUITests` in
 serial chunk `n3`.
+
+Feature 350 (R02-G05-10) prepares the device campaign without touching a device:
+`docs/apps/colorfall-canyons/device-rows.json` (rows CC-D1 … CC-D8, pending) and
+`docs/apps/colorfall-canyons/device-campaign.md`, checked by `scripts/check_device_rows.py --experience
+r02-g05.colorfall-canyons`.

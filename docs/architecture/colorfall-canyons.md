@@ -232,3 +232,16 @@ long step as single ticks; the play accepts both.
   the app restores into schema 3; Colorfall Canyons stays a candidate (not available without `-vcCandidates`) until
   X-R02-G05.
 - **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
+
+## Device preparation (feature 350, R02-G05-10)
+
+- **Contract, no device touched.** `docs/apps/colorfall-canyons/device-rows.json` (schema 1 of feature 310) names the
+  device scenario set (the 11 standard and game scenarios and `fixture-level-1-solved`), the devices D1 iPhone 15, D2
+  iPad Pro 13-inch (M5) and D3 iPad (A16) on iPadOS 26.5 tied to DEV1/2/3-R02-G05, and rows CC-D1 … CC-D8: launch and
+  first frame, frame pacing per tier, memory and thermal state with the stress session, touch feel and touch-to-frame,
+  sound and haptics, VoiceOver at the largest text size (non-gating), progress across a real termination, and the panel
+  journeys. Every row is "pending device campaign"; the written plan is
+  [`docs/apps/colorfall-canyons/device-campaign.md`](../apps/colorfall-canyons/device-campaign.md).
+- **Check.** `python3 scripts/check_device_rows.py --experience r02-g05.colorfall-canyons` (release step
+  `device-rows-r02-g05`) proves every scenario exists, every row is complete and every {device} task of features
+  341–349 and every UA-F13 measurement is covered.

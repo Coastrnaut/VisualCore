@@ -236,6 +236,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
   opens the next one, so the tests do not cap the frontier.
+- **Colorfall Canyons device rows** (R02-G05-10, 2026-11-21). `ColorfallCanyonsDeviceRowsCheckTests` runs the same
+  generic check on `docs/apps/colorfall-canyons/device-rows.json` and on copies with a scenario removed, CC-D1's `pass`
+  removed and T-R02G0509-011 uncovered; the release step is `device-rows-r02-g05` (specs 341–349 found from the game
+  number). Two slips of this gate: a run-check command kept in a zsh variable ran nothing (zsh does not word-split), so
+  confirm the `CHECK … exit=0` line before ticking; and `tick_task.py` commits the whole tree, so drafts of the next gate
+  must be excluded or kept out of the repository while a gate records.
 - **Hue Compass device rows** (R02-G04-10, 2026-11-21). `HueCompassDeviceRowsCheckTests` runs the generic device-row
   check on the real definition and on copies with a scenario removed, a row field removed and T-R02G0409-011 uncovered;
   the release step is `device-rows-r02-g04`. The check finds the earlier features from the game number alone
