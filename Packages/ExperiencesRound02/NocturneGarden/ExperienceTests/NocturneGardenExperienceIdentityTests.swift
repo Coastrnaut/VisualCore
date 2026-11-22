@@ -65,12 +65,13 @@ import VisualCoreExperienceHost
     }
 
     /// The eight play actions and, since feature 385 (R02-G09-05), the five teaching and progression actions.
-    @Test func theControlsAreTheThirteenActions() {
+    /// The seventeen actions (feature 387 added replay and the sound setting to feature 385's thirteen).
+    @Test func theControlsAreTheSeventeenActions() {
         var ids: [String] = []
         for control in NocturneGardenExperienceCore.controls { ids.append(control.id) }
         #expect(ids == ["bloom.plant", "bloom.move", "bloom.resize", "bloom.remove", "sun.set", "play.undo",
                         "play.redo", "level.next", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                        "tutorial.dismiss"])
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"])
         #expect(ids == NocturneGardenExperienceCore.actionIDs)
     }
 

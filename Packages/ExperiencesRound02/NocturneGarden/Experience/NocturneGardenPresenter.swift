@@ -26,6 +26,12 @@
 // (`NocturneGardenSound`) is offered the recipe of the planted blooms, the sun and the stage (`NocturneGardenSoundRecipe`)
 // when a level or mode opens and when that recipe changes. The mirror carries the summary element's text and the sound
 // choice. Presentation only.
+// Feature 387 (R02-G09-07) T-R02G0907-005 (clarifications Q2, Q4, Q5): the mirror carries whether a verified replay
+// exists for the level and the replay position; `startReplay`, `stepReplay` and `stopReplay` send `replay.start
+// [level]`, `replay.step` and `replay.stop`; the Sound toggle saves the choice through `settings.sound [0/1]`
+// (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied when the experience opens or the value
+// changes; the results a restore dropped (`core.reconciliationDropped`) are announced once as `state` ("n saved
+// results could not be checked and were removed.", "1 saved result could not be checked and was removed.").
 #if os(iOS)
 import Foundation
 import NocturneGardenCore
@@ -94,6 +100,14 @@ final class NocturneGardenMirror {
     var summary = ""
     /// Whether the ambient sound is on (feature 386; off by default).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 387).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 387).
+    var replaying = false
+    /// The moves of the running replay played so far (0 when no replay runs; feature 387).
+    var replayPosition = 0
+    /// The moves of the running replay's trace (0 when no replay runs; feature 387).
+    var replayLength = 0
 
     /// The picked kind in words.
     var kindLabel: String { "kind " + NocturneGardenKind.allCases[min(max(kind, 0), 5)].name }
@@ -339,6 +353,31 @@ final class NocturneGardenPresenter: ExperiencePresenter {
             sound.offer(Self.recipe(core))
         }
         mirror.summary = NocturneGardenFeedbackPlan.summaryText(core: core)
+        // Feature 387: the saved sound choice is applied when it first appears or changes.
+        if previous == nil || previous?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(NocturneGardenFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                             haptic: nil))
+        }
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
         mirror.levelNumber = core.levelNumber
         mirror.moves = play.moves
         mirror.budget = level.budget
@@ -594,6 +633,48 @@ final class NocturneGardenPresenter: ExperiencePresenter {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
         mirror.soundOn = on
+    }
+
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 387); the described change turns the loop on or
+    /// off.
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    // MARK: Replay (feature 387)
+
+    /// Starts the replay of the current level's best stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next move of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 387).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 387).
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 387).
+    static func isReplay(_ mode: NocturneGardenMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
     }
 
     /// The controls view appeared (the loop may play).

@@ -47,7 +47,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G0907-005 [US3] Edit `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenPresenter.swift` and
+- [X] T-R02G0907-005 [US3] Edit `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenPresenter.swift` and — Verified 2026-11-22: sim-27 exit=65 (the identity test still listed feature 385's thirteen controls; updated to the seventeen), sim-27-2 exit=0 (NocturneGardenExperienceTests, 57 tests on iOS 27.2 incl. 3 replay tests: replay reproduces the win move by move with other actions refused and progress unchanged, the dropped-results announcement once, the saved sound choice applied on open and saved through settings.sound); agent C's tests retested by the lead
   `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the Sound toggle sends `settings.sound` and the presenter applies the restored
   `soundOn` when the experience opens; the dropped results announced once: "n saved results could not be checked and

@@ -8,7 +8,10 @@
 // full accessibility in R02-G09-06. Feature 386 (R02-G09-06) T-R02G0906-005 (FR-R02G0906-001, 005, 006; clarification
 // Q5): the summary element ("Garden"), adjustable kind, column, row, size, bloom and sun pickers (the sun picker is a
 // stepper over the allowed elevations), refusals in words, the Sound toggle (off by default), rows that become columns
-// at accessibility text sizes, wrapping text and a 520-point readable width.
+// at accessibility text sizes, wrapping text and a 520-point readable width. Feature 387 (R02-G09-07)
+// T-R02G0907-005 (clarifications Q2, Q4, Q5): "Replay best solution" for a level with a verified stored solution, and
+// during replay its position ("Replay: move k of n") with Step and Stop, each with a label and a value; the Sound toggle
+// saves the choice through `settings.sound`.
 #if os(iOS)
 import NocturneGardenCore
 import SwiftUI
@@ -42,6 +45,7 @@ struct NocturneGardenControls: View {
                 bloomRow
                 playRow
                 progressRows
+                replaySection
                 soundToggle
             }
             .padding()
@@ -61,9 +65,34 @@ struct NocturneGardenControls: View {
         }
     }
 
-    /// The Sound toggle (feature 386; off by default; presentation only).
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 387).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text(Self.replayPositionText(mirror)).font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next move of the replay")
+                    .accessibilityValue("Move \(mirror.replayPosition) of \(mirror.replayLength)")
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue("\(mirror.replayLength) moves")
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
+        }
+    }
+
+    /// The replay position line: "Replay: move k of n" (feature 387).
+    static func replayPositionText(_ mirror: NocturneGardenMirror) -> String {
+        "Replay: move \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// The Sound toggle (feature 386; off by default; saved through `settings.sound` since feature 387).
     @ViewBuilder private var soundToggle: some View {
-        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
@@ -285,7 +314,7 @@ struct NocturneGardenControls: View {
         return "Level \(level), band \(band)"
     }
 
-    /// The mode's name: campaign, daily or practice.
+    /// The mode's name: campaign, daily, practice or replay.
     static func modeName(_ mode: NocturneGardenMode) -> String {
         switch mode {
         case .campaign: "campaign"
