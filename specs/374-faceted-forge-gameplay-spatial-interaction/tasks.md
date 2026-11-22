@@ -84,3 +84,11 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → {002 (agent B), 004 (agent D)} → 003 (agent C, on B's picker) → 005 (lead; agent E writes the wiring tests) →
 006 … 010, 012. 011 stays open until device testing. Shared files (presenter, scene, controls, docs) stay with the
 lead. MVP: Stories 1, 2, 3 and 5.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0804-013 Say when the plane misses the chosen piece per the Spec's edge case "A direction whose plane crosses
+  the chosen piece at no integer depth" (partial): in `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgePresenter.swift`
+  the mirror's depth label reads "the plane misses this piece" and the description says "The cut plane misses piece N in
+  direction …" when no depth of the chosen direction crosses the chosen piece; cover it in
+  `Packages/ExperiencesRound02/FacetedForge/ExperienceTests/FacetedForgeGestureWiringTests.swift`; `--name sim-27-2`
