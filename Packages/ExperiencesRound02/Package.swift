@@ -29,6 +29,8 @@ let package = Package(
         .library(name: "ColorfallCanyonsCore", targets: ["ColorfallCanyonsCore"]),
         // Feature 351 (R02-G06-01): Chrono Constellator's rule kernel, a candidate until X-R02-G06.
         .library(name: "ChronoConstellatorCore", targets: ["ChronoConstellatorCore"]),
+        // Feature 361 (R02-G07-01): Amethyst Escape's rule kernel, a candidate until X-R02-G07.
+        .library(name: "AmethystEscapeCore", targets: ["AmethystEscapeCore"]),
         // Feature 353 (R02-G06-03): Chrono Constellator's experience (iOS only; a registered candidate until X-R02-G06).
         .library(name: "ChronoConstellatorExperience", targets: ["ChronoConstellatorExperience"]),
         // Feature 343 (R02-G05-03): Colorfall Canyons's experience (iOS only; a registered candidate until X-R02-G05).
@@ -244,6 +246,16 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "ChronoConstellator/CoreTests"),
+        // Feature 361 (R02-G07-01): Amethyst Escape's pure rule kernel.
+        .target(name: "AmethystEscapeCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "AmethystEscape/Core"),
+        .testTarget(name: "AmethystEscapeCoreTests",
+                    dependencies: ["AmethystEscapeCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "AmethystEscape/CoreTests"),
         .target(name: "ChronoConstellatorExperience",
                 dependencies: ["ChronoConstellatorCore",
                                .product(name: "VisualCoreMath", package: visualCore),

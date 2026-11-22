@@ -14,7 +14,7 @@ in this feature (the crystal state is the CPU reference the renderer of R02-G07-
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0701-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `AmethystEscapeCore`, `AmethystEscapeCoreTests`,
+- [X] T-R02G0701-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `AmethystEscapeCore`, `AmethystEscapeCoreTests`, — Verified 2026-11-22: host exit=0 (AmethystEscapeLevelTests 6/6: ranges and rules refused by name, names in words, stored form round trip and refusals, reason codes, 500 fixtures win on their last action)
   product); create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeError.swift` (codes "r02-g07.level,
   .action, .stage, .stale, .stuck, .newer-schema, .malformed"), `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeLevel.swift`
   (shells "apertures (own sectors, sorted, non-empty)", "walls … at most N − 1", "blocked … never all"; "sectors 6 … 12",
