@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G08-03: Faceted Forge hero renderer, certified candidates instead of regeneration).
+Last updated: 2026-11-22 (R02-G08-04: Faceted Forge gestures, rounding on rational points, an edge-on default).
 
 ## 1. What is tested, and where
 
@@ -292,6 +292,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Two games, one tilt direction** (R02-G07-04, 2026-11-22). Amethyst Escape's gesture agent followed its brief
   (`pitch += dy`), the opposite of Chrono Constellator's orbit; the lead chose Chrono's direction so a two-finger drag
   tilts every round-two crystal and sky the same way, and the orbit test's expected values moved with it.
+- **Round with a snap on rational points** (R02-G08-04, 2026-11-22). Faceted Forge's rim tilt rounds n·c for the
+  preview centre c, a rational point; in 112 of 500 seeded tilts the product was exactly x.5, so the Double rounding
+  flipped with the last bit. The picker snaps to 1e-6 before rounding half away from zero, and the test counts halves.
+- **An edge-on default hides a gesture** (R02-G08-04, 2026-11-22). The gesture agent found that the default preview
+  plane (direction x) is seen edge-on from the authored camera, so a tap could only ever hit its rim; the seeded test
+  produced 8 cuts in 500 scripts. The default became direction z, facing the camera.
 - **Certify the known candidate, not the whole search** (R02-G08-03, 2026-11-22). Faceted Forge's scenario manifest
   opens 83 levels; generating them reran every rejected candidate's solver search (up to 20,000 cut evaluations each)
   and took about 12 s per test. The adapter now keeps each level's certified candidate index (the witness files'

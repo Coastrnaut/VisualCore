@@ -86,7 +86,8 @@ directions 0 … 12, depths ascending.
   unit sphere), its faces in the kernel's corner order with a cut flag (a face whose plane is not one of the crystal's
   half-spaces), the preview choice and the chosen piece's cross-section, stage, failure, cuts, budget, level number and
   presentation time. The preview choice (piece, direction, depth) is presentation state of the controls: it starts at
-  piece 0, direction 0 and the middle crossing depth and is clamped to the play after every change.
+  piece 0, the plane facing the camera (direction z, since R02-G08-04) and the middle crossing depth and is clamped
+  to the play after every change.
 - **Scene.** Each piece is a bevelled convex solid built from its exact faces and moved away from the crystal's centre
   towards its own centroid by 0.12 (0.2 when won), eased over 0.4 s (at once under Reduce Motion), so the crystal opens
   like a blossom; cut faces glow amber to ruby under a lattice, original faces are ice glass; the preview is a ruby
@@ -107,3 +108,23 @@ directions 0 … 12, depths ascending.
   `hero`, three fixtures and the 80 acceptance rows R2-G08-QA-001 … 080 (row r opens level (7 × (r − 1)) mod 100 + 1);
   its scripted cuts other than certified ones are neutral cuts (the largest piece at its middle crossing depth, kept only
   when the play stays in play), derived by playing them.
+
+## Gestures and camera (feature 374, R02-G08-04)
+
+- **Picking.** A touch is picked once at touch-down with the ray through the drawn camera: the preview's rim (within 22
+  points of its projected outline), then the preview plane, then the nearest opened face of a piece, then a projected
+  piece centre within 22 points. Less than 10 points of travel is a tap, at least 16 a drag; 10 … 16 does nothing.
+- **Choose, tilt, slide.** A tap on a piece chooses it (at the middle crossing depth). A drag on the rim tilts the plane:
+  the normal follows the drag in the camera's right and up directions and snaps to the nearest of the 13 directions
+  (largest |dot|, ties to the lower index), the depth keeping the plane through the same preview centre (n·c snapped to
+  1e-6 and rounded half away from zero, then the nearest crossing depth). A drag on the plane's interior is the depth
+  slider: 24 points per crossing depth along the projected normal. All of this is presentation state; the scene draws
+  the candidate while the finger moves, and a second finger or a cancel drops it.
+- **Commit.** A tap on the plane while playing sends one `piece.cut` with the current choice, never twice within
+  0.35 s; on a finished play it sends nothing and the panel says the play is over.
+- **Camera.** Two fingers orbit: yaw ±40° (90° per view width), pitch 10° … 60° (60° per view height), authored (0,
+  30°); a double tap on empty space or "Reset view" returns to the authored view. Every camera fits a framing sphere of
+  radius 1.65 (the opened crystal and the cut-mark row) with a 5 % margin, and the pieces and faces are emitted back to
+  front for the orbit's eye, since depth testing is off.
+- **Panel.** Every gesture has a panel path (piece and direction pickers, depth − and +, Cut, Reset view); a host test
+  wins all 100 certified levels through panel presses alone.

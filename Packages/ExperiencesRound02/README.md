@@ -446,3 +446,8 @@ reference `FacetedForgeSceneGeometry` (pieces emitted back to front, `FacetedFor
 the GLSL sources `FacetedForgeShaders` and the scenario manifest `FacetedForgeScenarios` (`scenario-manifest.json`;
 `UPDATE_SCENARIO_MANIFEST=1` rewrites it); the iOS-only target `FacetedForgeExperience` (presenter, GL crystal scene
 with fallback, control panel) and its simulator tests. A registered candidate until X-R02-G08.
+
+Feature 374 (R02-G08-04) adds the gestures: `FacetedForgeOrbit` and `camera(_:aspect:orbit:)` (framing sphere 1.65,
+meshes emitted back to front for the orbit's eye), the analytic `FacetedForgePicker` (rim, plane, pieces, tilt, depth
+steps) and `FacetedForgeGestureController` (choose, tilt, slide, commit, orbit, reset) in the Core; the presenter's
+pointer entry, the candidate preview and "Reset view" in the experience; the plane faces the camera by default.
