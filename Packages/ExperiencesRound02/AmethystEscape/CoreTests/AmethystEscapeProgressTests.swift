@@ -292,8 +292,13 @@ import Testing
         #expect(decoded == progress)
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
-        #expect(text == "{\"frontier\":3,\"solved\":[{\"bestMoves\":6,\"level\":1,\"stars\":2},"
-            + "{\"bestMoves\":19,\"level\":2,\"stars\":1},{\"bestMoves\":9,\"level\":70,\"stars\":3}]}")
+        #expect(text == "{\"frontier\":3,\"solved\":[{\"bestMoves\":6,\"level\":1,\"stars\":2,\"trace\":[],"
+            + "\"verified\":false},{\"bestMoves\":19,\"level\":2,\"stars\":1,\"trace\":[],\"verified\":false},"
+            + "{\"bestMoves\":9,\"level\":70,\"stars\":3,\"trace\":[],\"verified\":false}]}")
+        // The schema 1 and 2 encoding (no trace, no verified flag) still decodes to the same progress (feature 367).
+        let old: String = "{\"frontier\":3,\"solved\":[{\"bestMoves\":6,\"level\":1,\"stars\":2},"
+            + "{\"bestMoves\":19,\"level\":2,\"stars\":1},{\"bestMoves\":9,\"level\":70,\"stars\":3}]}"
+        #expect(try JSONDecoder().decode(Progress.self, from: Data(old.utf8)) == progress)
         let bad: [String] = ["{\"frontier\":0,\"solved\":[]}", "{\"frontier\":101,\"solved\":[]}",
                              "{\"frontier\":1,\"solved\":[{\"bestMoves\":1,\"level\":1,\"stars\":4}]}",
                              "{\"frontier\":1,\"solved\":[{\"bestMoves\":1,\"level\":0,\"stars\":1}]}",
@@ -303,7 +308,8 @@ import Testing
         for json in bad {
             #expect(throws: DecodingError.self) { try JSONDecoder().decode(Progress.self, from: Data(json.utf8)) }
         }
-        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 100)]
+        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 100), .replay(level: 1),
+                             .replay(level: 100)]
         for mode in modes {
             let encoded: Data = try JSONEncoder().encode(mode)
             #expect(try JSONDecoder().decode(Mode.self, from: encoded) == mode)
@@ -314,7 +320,9 @@ import Testing
             == "{\"level\":7,\"mode\":\"daily\"}")
         #expect(String(decoding: try encoder.encode(Mode.practice), as: UTF8.self) == "{\"mode\":\"practice\"}")
         let badModes: [String] = ["{\"mode\":\"daily\",\"level\":0}", "{\"mode\":\"daily\",\"level\":101}",
-                                  "{\"mode\":\"daily\"}", "{\"mode\":\"replay\",\"level\":1}"]
+                                  "{\"mode\":\"daily\"}", "{\"mode\":\"replay\",\"level\":0}",
+                                  "{\"mode\":\"replay\",\"level\":101}", "{\"mode\":\"replay\"}",
+                                  "{\"mode\":\"rewind\",\"level\":1}"]
         for json in badModes {
             #expect(throws: DecodingError.self) { try JSONDecoder().decode(Mode.self, from: Data(json.utf8)) }
         }

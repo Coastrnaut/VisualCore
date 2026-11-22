@@ -12,7 +12,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G0707-002 [P] [US2] Edit `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeProgress.swift` (Result gains "trace:
+- [X] T-R02G0707-002 [P] [US2] Edit `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeProgress.swift` (Result gains "trace: — Verified 2026-11-22: 2026-11-22: host (swift test --filter AmethystEscape incl. ReconciliationTests 11: all 100 certified solutions verify as traces, edited results dropped and counted, untraced kept, frontier unchanged, netTrace over undo/redo; manifest regenerated for the trace fields) exit 0, lead retest
   [AmethystEscapeAction]" and "verified: Bool"; `record(level:moves:smallest:mode:trace:)` stores a verified result,
   replacing only when better (ties keep the earlier trace); `drop(level:)`; encoding keeps old payloads decodable
   (missing trace = empty, missing verified = false); mode "replay(level:)" that awards no stars and opens nothing) and

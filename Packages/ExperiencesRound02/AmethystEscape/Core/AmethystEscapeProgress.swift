@@ -7,6 +7,11 @@
 // opens the next level, up to 100). The daily level is a clock-free function of a calendar date: (days from 2026-01-01
 // × 61) mod 100 + 1, in integer arithmetic on the proleptic Gregorian calendar. Every type is Codable with a stable,
 // explicit form. Modelled on feature 355's ChronoConstellatorProgress.
+// Feature 367 (R02-G07-07) T-R02G0707-002 (clarifications Q1 … Q3): a result carries the net trace of its win and
+// whether it is verified (a win recorded with a trace); `drop(level:)` removes a result that failed reconciliation;
+// the replay mode (a saved trace played back) awards nothing and opens nothing. Encodings without trace or verified
+// (schema 1 and 2) decode as unverified results with an empty trace. Modelled on feature 357's
+// ChronoConstellatorProgress.
 import Foundation
 
 /// The step of the Amethyst Escape tutorial (levels 1 … 3, in every mode).
@@ -77,6 +82,9 @@ public enum AmethystEscapeMode: Sendable, Equatable, Hashable, Codable {
     /// The daily level `level` (1 … 100) of ``AmethystEscapeProgress/dailyLevel(year:month:day:)``: campaign rules, but
     /// a win never opens a level.
     case daily(level: Int)
+    /// The replay of the saved verified trace of level `level` (1 … 100): the campaign budget; never awards stars or
+    /// opens levels.
+    case replay(level: Int)
 
     /// The move budget of practice mode: the kernel's maximum, 60.
     public static let practiceBudget: Int = 60
@@ -86,8 +94,13 @@ public enum AmethystEscapeMode: Sendable, Equatable, Hashable, Codable {
         self == .practice ? Self.practiceBudget : base
     }
 
-    /// Whether a win in this mode records a result and stars: campaign and daily (never practice).
-    public var awardsStars: Bool { self != .practice }
+    /// Whether a win in this mode records a result and stars: campaign and daily (never practice or replay).
+    public var awardsStars: Bool {
+        switch self {
+        case .campaign, .daily: true
+        case .practice, .replay: false
+        }
+    }
 
     /// Whether a win in this mode opens the next level: campaign only.
     public var opensLevels: Bool { self == .campaign }
@@ -97,10 +110,11 @@ public enum AmethystEscapeMode: Sendable, Equatable, Hashable, Codable {
         case level
     }
 
-    /// Decodes `{"mode": "campaign"}`, `{"mode": "practice"}` or `{"mode": "daily", "level": n}`.
+    /// Decodes `{"mode": "campaign"}`, `{"mode": "practice"}`, `{"mode": "daily", "level": n}` or
+    /// `{"mode": "replay", "level": n}`.
     ///
-    /// - Throws: `DecodingError.dataCorrupted` for an unknown mode name or a daily level outside 1 … 100;
-    ///   `DecodingError.keyNotFound` for a daily mode without a level.
+    /// - Throws: `DecodingError.dataCorrupted` for an unknown mode name or a daily or replay level outside 1 … 100;
+    ///   `DecodingError.keyNotFound` for a daily or replay mode without a level.
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let name: String = try container.decode(String.self, forKey: .mode)
@@ -114,13 +128,20 @@ public enum AmethystEscapeMode: Sendable, Equatable, Hashable, Codable {
                                                        debugDescription: "daily level outside 1 … 100")
             }
             self = .daily(level: level)
+        case "replay":
+            let level: Int = try container.decode(Int.self, forKey: .level)
+            guard level >= 1 && level <= AmethystEscapeProgress.levelCount else {
+                throw DecodingError.dataCorruptedError(forKey: .level, in: container,
+                                                       debugDescription: "replay level outside 1 … 100")
+            }
+            self = .replay(level: level)
         default:
             throw DecodingError.dataCorruptedError(forKey: .mode, in: container,
                                                    debugDescription: "unknown mode \(name)")
         }
     }
 
-    /// Encodes the mode as `{"mode": <name>}`, with `"level"` for `daily`.
+    /// Encodes the mode as `{"mode": <name>}`, with `"level"` for `daily` and `replay`.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
@@ -129,14 +150,18 @@ public enum AmethystEscapeMode: Sendable, Equatable, Hashable, Codable {
         case .daily(let level):
             try container.encode("daily", forKey: .mode)
             try container.encode(level, forKey: .level)
+        case .replay(let level):
+            try container.encode("replay", forKey: .mode)
+            try container.encode(level, forKey: .level)
         }
     }
 }
 
 /// The campaign progress of Amethyst Escape: the won levels with their best results and the open frontier.
 ///
-/// Encoded as `{"frontier": n, "solved": [{"bestMoves": m, "level": l, "stars": s}, …]}` with the won levels as an
-/// array sorted by level, so equal progress gives equal JSON (``encoded()`` also sorts the keys).
+/// Encoded as `{"frontier": n, "solved": [{"bestMoves": m, "level": l, "stars": s, "trace": [...], "verified": v}, …]}`
+/// with the won levels as an array sorted by level, so equal progress gives equal JSON (``encoded()`` also sorts the
+/// keys). An entry without `trace` or `verified` (schema 1 and 2) decodes with an empty trace, unverified.
 public struct AmethystEscapeProgress: Sendable, Equatable, Hashable, Codable {
     /// The best result of one won level.
     public struct Result: Sendable, Equatable, Hashable, Codable {
@@ -144,11 +169,47 @@ public struct AmethystEscapeProgress: Sendable, Equatable, Hashable, Codable {
         public let bestMoves: Int
         /// The stars of that best result, 1 … 3.
         public let stars: Int
+        /// The net actions of the winning play (no undo or redo); empty for a result recorded without a trace.
+        public let trace: [AmethystEscapeAction]
+        /// Whether the result was recorded with a trace (reconciliation replays it on restore).
+        public let verified: Bool
+
+        /// A result of the given values without a trace, unverified (not checked).
+        public init(bestMoves: Int, stars: Int) {
+            self.init(bestMoves: bestMoves, stars: stars, trace: [], verified: false)
+        }
 
         /// A result of the given values (not checked).
-        public init(bestMoves: Int, stars: Int) {
+        public init(bestMoves: Int, stars: Int, trace: [AmethystEscapeAction], verified: Bool) {
             self.bestMoves = bestMoves
             self.stars = stars
+            self.trace = trace
+            self.verified = verified
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case bestMoves
+            case stars
+            case trace
+            case verified
+        }
+
+        /// Decodes a result; a missing `trace` is empty and a missing `verified` is false.
+        public init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            bestMoves = try container.decode(Int.self, forKey: .bestMoves)
+            stars = try container.decode(Int.self, forKey: .stars)
+            trace = try container.decodeIfPresent([AmethystEscapeAction].self, forKey: .trace) ?? []
+            verified = try container.decodeIfPresent(Bool.self, forKey: .verified) ?? false
+        }
+
+        /// Encodes every field, the trace and the verified flag included.
+        public func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(bestMoves, forKey: .bestMoves)
+            try container.encode(stars, forKey: .stars)
+            try container.encode(trace, forKey: .trace)
+            try container.encode(verified, forKey: .verified)
         }
     }
 
@@ -208,15 +269,43 @@ public struct AmethystEscapeProgress: Sendable, Equatable, Hashable, Codable {
 
     /// Records a win of `level` with `moves` moves spent (certified smallest move count `smallest`) in `mode`.
     ///
-    /// Practice records nothing. In campaign and daily mode the new result replaces a stored one only when it is better
-    /// (fewer moves or more stars); a worse or equal result keeps the stored one. A campaign win raises the frontier to
-    /// `level + 1` (at most 100); it never falls; a daily win opens nothing. A level outside 1 … 100 is ignored.
+    /// The result has no trace and is unverified. Practice and replay record nothing. In campaign and daily mode the
+    /// new result replaces a stored one only when it is better (fewer moves or more stars); a worse or equal result
+    /// keeps the stored one. A campaign win raises the frontier to `level + 1` (at most 100); it never falls; a daily
+    /// win opens nothing. A level outside 1 … 100 is ignored.
     ///
     /// - Returns: whether the stored result of `level` changed (a first or a better result).
     @discardableResult
     public mutating func record(level: Int, moves: Int, smallest: Int, mode: AmethystEscapeMode = .campaign) -> Bool {
-        guard level >= 1 && level <= Self.levelCount, mode.awardsStars else { return false }
         let result: Result = Result(bestMoves: moves, stars: Self.stars(moves: moves, smallest: smallest))
+        return store(result, level: level, mode: mode)
+    }
+
+    /// Records a verified win of `level` with `moves` moves spent (certified smallest move count `smallest`) in `mode`,
+    /// with `trace`, the net actions of the winning play.
+    ///
+    /// The rules of ``record(level:moves:smallest:mode:)`` apply: practice and replay record nothing; the result
+    /// replaces a stored one only when it is better (fewer moves or more stars), so a tie keeps the earlier trace; a
+    /// campaign win raises the frontier; a level outside 1 … 100 is ignored.
+    ///
+    /// - Returns: whether the stored result of `level` changed (a first or a better result).
+    @discardableResult
+    public mutating func record(level: Int, moves: Int, smallest: Int, mode: AmethystEscapeMode = .campaign,
+                                trace: [AmethystEscapeAction]) -> Bool {
+        let result: Result = Result(bestMoves: moves, stars: Self.stars(moves: moves, smallest: smallest),
+                                    trace: trace, verified: true)
+        return store(result, level: level, mode: mode)
+    }
+
+    /// Removes the result of `level` (reconciliation drops a result whose trace does not replay); the frontier is
+    /// unchanged. Nothing happens when `level` has no result.
+    public mutating func drop(level: Int) {
+        solved[level] = nil
+    }
+
+    /// Stores `result` for `level` in `mode` under the rules of ``record(level:moves:smallest:mode:)``.
+    private mutating func store(_ result: Result, level: Int, mode: AmethystEscapeMode) -> Bool {
+        guard level >= 1 && level <= Self.levelCount, mode.awardsStars else { return false }
         var improved: Bool = false
         if let old = solved[level] {
             if result.bestMoves < old.bestMoves || result.stars > old.stars {
@@ -272,11 +361,13 @@ public struct AmethystEscapeProgress: Sendable, Equatable, Hashable, Codable {
         return try encoder.encode(self)
     }
 
-    /// One won level as encoded.
+    /// One won level as encoded; `trace` and `verified` are absent in schema 1 and 2 encodings.
     private struct Entry: Codable {
         let level: Int
         let bestMoves: Int
         let stars: Int
+        let trace: [AmethystEscapeAction]?
+        let verified: Bool?
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -284,7 +375,8 @@ public struct AmethystEscapeProgress: Sendable, Equatable, Hashable, Codable {
         case frontier
     }
 
-    /// Decodes progress; the won levels are an array of `{level, bestMoves, stars}`.
+    /// Decodes progress; the won levels are an array of `{level, bestMoves, stars, trace, verified}`, where a missing
+    /// trace is empty and a missing verified flag is false.
     ///
     /// - Throws: `DecodingError.dataCorrupted` for a frontier outside 1 … 100, a level outside 1 … 100 or repeated,
     ///   stars outside 1 … 3 or best moves below 0.
@@ -303,7 +395,8 @@ public struct AmethystEscapeProgress: Sendable, Equatable, Hashable, Codable {
                 throw DecodingError.dataCorruptedError(forKey: .solved, in: container,
                                                        debugDescription: "invalid won level \(entry.level)")
             }
-            solved[entry.level] = Result(bestMoves: entry.bestMoves, stars: entry.stars)
+            solved[entry.level] = Result(bestMoves: entry.bestMoves, stars: entry.stars, trace: entry.trace ?? [],
+                                         verified: entry.verified ?? false)
         }
         self.solved = solved
         self.frontier = frontier
@@ -316,7 +409,8 @@ public struct AmethystEscapeProgress: Sendable, Equatable, Hashable, Codable {
         var entries: [Entry] = []
         for level in solved.keys.sorted() {
             guard let result = solved[level] else { continue }
-            entries.append(Entry(level: level, bestMoves: result.bestMoves, stars: result.stars))
+            entries.append(Entry(level: level, bestMoves: result.bestMoves, stars: result.stars, trace: result.trace,
+                                 verified: result.verified))
         }
         try container.encode(entries, forKey: .solved)
     }
