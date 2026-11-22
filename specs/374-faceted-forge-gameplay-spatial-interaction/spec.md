@@ -47,12 +47,12 @@ direction, depth]`, `play.undo`, `play.redo` and `level.next`, cuts only while p
   index). A touch that moves less than 10 points is a tap; one that moves at least 16 points is a drag; 10 … 16 is
   neither. Impact: FR-R02G0804-001, 005; SC-R02G0804-001.
 - Q: How does a rim drag become a direction? → A: with n0 the current direction's unit normal and R, U the camera's
-  right and up vectors in world space, the dragged orientation after a drag (dx, dy) points is
-  normalize(n0 + (dx·R − dy·U) · 2 / min(view width, height)); the new direction is the one of the 13 whose unit vector
-  has the largest |dot| with it (ties to the lower index). On release the depth becomes the crossing depth nearest to
-  round(n·c), c being the preview centre in kernel coordinates before the drag (the plane through the same point), or the
-  middle crossing depth when there was no preview. The drawn preview follows the candidate while dragging and the
-  description reads "The cut plane would tilt to direction x+y". Impact: FR-R02G0804-002; SC-R02G0804-001.
+  right and up vectors in world space, the dragged orientation after a drag (dx, dy) points is normalize(n0 + (dx·R −
+  dy·U) · 2 / min(view width, height)); the new direction is the one of the 13 whose unit vector has the largest |dot|
+  with it (ties to the lower index). On release the depth becomes the crossing depth nearest to round(n·c), c being the
+  preview centre in kernel coordinates before the drag (the plane through the same point), or the middle crossing depth
+  when there was no preview. The drawn preview follows the candidate while dragging and the description reads "The cut
+  plane would tilt to direction x+y". Impact: FR-R02G0804-002; SC-R02G0804-001.
 - Q: How does a depth drag move the plane? → A: a drag that starts on the preview interior moves the depth by
   round(s / 24) crossing depths (`steppingDepth`), s being the drag's component in points along the projected normal
   (the screen direction from the preview centre's projection to that of the centre plus 0.1 times the unit normal; s
@@ -142,8 +142,8 @@ A player who cannot drag precisely can do everything through the labelled panel 
 - **A cancelled touch:** changes nothing.
 - **A direction whose plane crosses the chosen piece at no integer depth:** the plane is not drawn and a commit sends
   nothing; the panel says the direction misses the piece.
-- **A cut that makes a sliver or spends the last cut:** the kernel fails the play as its rules say; the failure is shown;
-  undo returns to playing.
+- **A cut that makes a sliver or spends the last cut:** the kernel fails the play as its rules say; the failure is
+  shown; undo returns to playing.
 - **A piece hidden behind another piece:** picking takes the nearest piece hit along the touch ray; the panel picker
   reaches every piece.
 
@@ -164,14 +164,14 @@ A player who cannot drag precisely can do everything through the labelled panel 
 - **FR-R02G0804-005**: Picking MUST be analytic and deterministic: the touch ray through the drawn camera against the
   opened pieces' faces, the preview polygon and its rim, with a 22-point minimum touch target; the preview wins at
   touch-down, then the nearest piece hit.
-- **FR-R02G0804-006**: Two-finger orbit MUST stay within stated yaw and pitch bounds, keep the scene inside the view with
-  a 5 % margin at every aspect 0.4 … 2.5 and never enter the digest, the snapshot or the kernel; a double tap on empty
-  space or "Reset view" returns to the authored view.
+- **FR-R02G0804-006**: Two-finger orbit MUST stay within stated yaw and pitch bounds, keep the scene inside the view
+  with a 5 % margin at every aspect 0.4 … 2.5 and never enter the digest, the snapshot or the kernel; a double tap on
+  empty space or "Reset view" returns to the authored view.
 - **FR-R02G0804-007**: The panel MUST keep every action available without gestures and gain "Reset view"; every
   certified solution MUST be replayable through panel actions.
-- **FR-R02G0804-008**: Gestures MUST be tested on the host by scripted pointer sequences and on the simulator through the
-  experience's pointer entry; existing tests pass; every new public name is documented; refusals are logged with their
-  reason code (observability).
+- **FR-R02G0804-008**: Gestures MUST be tested on the host by scripted pointer sequences and on the simulator through
+  the experience's pointer entry; existing tests pass; every new public name is documented; refusals are logged with
+  their reason code (observability).
 
 ### Key Entities
 
