@@ -63,7 +63,7 @@ struct FacetedForgeLevelTests {
                                              + FacetedForgeFixtures.slab(2, -2, 2)).sorted()
         #expect(throws: FacetedForgeError.level("empty")) { try Self.level(planes: flat) }
         #expect(throws: FacetedForgeError.level("budget")) { try Self.level(budget: 0) }
-        #expect(throws: FacetedForgeError.level("budget")) { try Self.level(budget: 13) }
+        #expect(throws: FacetedForgeError.level("budget")) { try Self.level(budget: 21) }
         #expect(throws: FacetedForgeError.level("sliver")) { try Self.level(sliver: FacetedForgeFraction(1, 2)) }
         #expect(throws: FacetedForgeError.level("sliver")) { try Self.level(sliver: .zero) }
         #expect(throws: FacetedForgeError.level("target")) {
@@ -73,7 +73,7 @@ struct FacetedForgeLevelTests {
             FacetedForgeTargetPiece(share: third, faces: 6), FacetedForgeTargetPiece(share: third, faces: 6),
             FacetedForgeTargetPiece(share: third, faces: 6)]) }
         #expect(throws: FacetedForgeError.level("faces")) { try Self.level(target: [
-            FacetedForgeTargetPiece(share: two, faces: 27), FacetedForgeTargetPiece(share: third, faces: 6)]) }
+            FacetedForgeTargetPiece(share: two, faces: 35), FacetedForgeTargetPiece(share: third, faces: 6)]) }
         #expect(throws: FacetedForgeError.level("shares")) { try Self.level(target: [
             FacetedForgeTargetPiece(share: two, faces: 6), FacetedForgeTargetPiece(share: two, faces: 6)]) }
         #expect(throws: FacetedForgeError.level("order")) { try Self.level(target: [

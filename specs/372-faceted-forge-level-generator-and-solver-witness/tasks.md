@@ -14,7 +14,7 @@ logic); no GLSL in this feature.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0802-002 Add `generation(Int)` ("r02-g08.generation") and `witness(String)` ("r02-g08.witness") to
+- [X] T-R02G0802-002 Add `generation(Int)` ("r02-g08.generation") and `witness(String)` ("r02-g08.witness") to — Verified 2026-11-22: host exit=0 (FacetedForge suites with generation and witness errors, widened budget 1 … 20 and faces 4 … 34, manifest of 100 entries, difficulty)
   `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeError.swift`; widen `FacetedForgeLevel.budgets` to 1 … 20
   and `faceCounts` to 4 … 34 in `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeLevel.swift` (additive: every
   earlier level stays valid); create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeManifest.swift`

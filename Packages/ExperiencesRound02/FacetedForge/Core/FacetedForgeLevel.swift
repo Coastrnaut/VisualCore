@@ -36,9 +36,11 @@ public struct FacetedForgeLevel: Sendable, Equatable {
     /// The box every crystal corner lies in, on every axis.
     public static let box: ClosedRange<Int64> = -6...6
     /// The allowed cut budgets.
-    public static let budgets: ClosedRange<Int> = 1...12
+    /// Widened from 1 … 12 to 1 … 20 by feature 372 (R02-G08-02) for the manifest's budgets 8 … 19; additive.
+    public static let budgets: ClosedRange<Int> = 1...20
     /// The allowed face counts of a target entry.
-    public static let faceCounts: ClosedRange<Int> = 4...26
+    /// Widened from 4 … 26 to 4 … 34 by feature 372 (14 crystal planes + 20 cuts); additive.
+    public static let faceCounts: ClosedRange<Int> = 4...34
 
     /// The level id, a lowercase slug.
     public let id: String
