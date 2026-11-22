@@ -1442,7 +1442,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 353 (R02-G06-03): Chrono Constellator, integrated at X-R02-G06.
                                     "ChronoConstellatorCore", "ChronoConstellatorExperience",
                                     # Feature 363 (R02-G07-03): Amethyst Escape, integrated at X-R02-G07.
-                                    "AmethystEscapeCore", "AmethystEscapeExperience"])
+                                    "AmethystEscapeCore", "AmethystEscapeExperience",
+                                    # Feature 373 (R02-G08-03): Faceted Forge, a candidate until X-R02-G08.
+                                    "FacetedForgeCore", "FacetedForgeExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

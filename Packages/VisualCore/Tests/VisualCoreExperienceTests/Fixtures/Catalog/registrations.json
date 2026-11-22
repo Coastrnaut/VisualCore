@@ -802,6 +802,34 @@
       "manifest": "Packages/ExperiencesRound02/AmethystEscape/scenario-manifest.json",
       "permissions": [],
       "summary": "Turn the nested shells of an amethyst crystal one sector at a time to line up openings, then roll the pearl outward pocket by pocket past walls and blocked wedges until it leaves through the exit gap within the move budget. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g08.faceted-forge": {
+      "capabilities": [
+        "Cut a crystal with planes",
+        "Match target volumes and faces",
+        "100 solver-certified levels",
+        "Every cut can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#07090F",
+        "#BFE6F5",
+        "#C8163C",
+        "#FFB347",
+        "#FFE2A8"
+      ],
+      "content": {
+        "catalog_sha256": "ceb59042752490ceef76b62163e9f05414950788c74d2a95d80ef337a28a924c",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/FacetedForge/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Cut a glowing ice-glass crystal with planes from fixed directions until its pieces match the target shares and face counts exactly, within the cut budget and without leaving a sliver; cut faces glow amber. 100 certified levels. Drawn in code; offline."
     }
   }
 }

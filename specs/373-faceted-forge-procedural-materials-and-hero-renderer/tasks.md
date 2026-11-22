@@ -57,7 +57,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks pass.
 
-- [ ] T-R02G0803-006 [US3] [US4] Create
+- [X] T-R02G0803-006 [US3] [US4] Create — Verified 2026-11-22: 2026-11-22: sim-27 (FacetedForgeExperienceTests, 31 tests on iOS 27.2) exit 0 (an unrecorded first run failed the cut-face warmth at time 0, when the crystal is still closed; the check now runs on opened frames), packages exit 0, catalog-search exit 0, host-5 exit 0; levels certified from their witness candidates
   `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgeExperience.swift`, `…Presenter.swift`,
   `…CrystalScene.swift` (GL scene with `ShaderMeshRenderer`; translucent glass drawn after opaque geometry with depth
   writes off; fallback; tier log; Reduce Motion and Reduce Flashing; the presenter declares `probes(_:)` — two ground

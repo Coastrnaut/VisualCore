@@ -1,0 +1,3487 @@
+{
+  "controls" : [
+    "piece.cut",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g08.faceted-forge",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d949b620883a821cf36bff25caf22ee2070e3f9577b1c23861fdc43dd9064743",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              1,
+              5,
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              -1,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              25
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -25
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0.5,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g08.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g08.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              1,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g08.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              24
+            ]
+          },
+          "result" : "action.rule.r02-g08.miss",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g08.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g08.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d949b620883a821cf36bff25caf22ee2070e3f9577b1c23861fdc43dd9064743",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              1,
+              5,
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b426d74f73c91d862674b5461e2bad23c93073badd807426d144c10b83fa6b4f",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d949b620883a821cf36bff25caf22ee2070e3f9577b1c23861fdc43dd9064743",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ef643314fb587e3b714f84a83ec65f4e52254fd2a9646281e0968f7e7ab938f6",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465"
+      },
+      "name" : "acceptance-001",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1497d72bcfdd959fcadb39bfe57043cddfa98ea965f91a3237847b12a424cbfc",
+        "initialDigest" : "9aeda2b49ff6437cb9eff546657793f8fb07ac15a0ccce346d0a8c705e86707a"
+      },
+      "name" : "acceptance-002",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3d05cc578d910da100a7d66e583908d86b0dd573aacabed322577f7e3981da5c",
+        "initialDigest" : "e495dbca5d1f561cf053917d285276178a0a8ab9cbfbfff590124d984957b511"
+      },
+      "name" : "acceptance-003",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b12dcb9866356a439990b194db9ee2e8d021aff7d2901c19b593a1e3cdd26b30",
+        "initialDigest" : "bfeac85f812da194ee49bd56cd21d5f3ba23fb689b119d14f45d39908670cba9"
+      },
+      "name" : "acceptance-004",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e3bcd91c83debeaacad7f5547672adab8ed70a003ade91ee0f182f253003dc35",
+        "initialDigest" : "8714d68349361e807dbb2597043571b8978b63d6e3f85f7374d854ab7c3716f3"
+      },
+      "name" : "acceptance-005",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c7da8a0e80cdc220af150aa42b6c4305bf9fa73dcedbf1723c06670dac3b592f",
+        "initialDigest" : "aeb7b7f05556c0c2d7ebc148e812069119458ef338286259efe13fe9c0db03cc"
+      },
+      "name" : "acceptance-006",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3cec9887e1deaa22601223f385bbc2fbe3b4939b7c58fabf607dc49187d74289",
+        "initialDigest" : "846db67e6cda29b9b65b41d0edde593bd236057f6a80996520388fc947801884"
+      },
+      "name" : "acceptance-007",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "13b4d37019ee60b842737f154caf5cabaf8e691e66b4866053d11df04cb6f3ce",
+        "initialDigest" : "c7774fe524b154dbc2042753097ce1578ad839aa0499a75bb28232407223a201"
+      },
+      "name" : "acceptance-008",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "44252e282387e784195b5a7e2ea18a7199737452f7afd90fc4e8b5c7c7a0c542",
+        "initialDigest" : "f778f0ef6f53c38ec9bd4b8119d3783cd9472066108fb9b3d12d1ca35218f5fd"
+      },
+      "name" : "acceptance-009",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "54677c5edc3ad4733e51a189cedf8c9111c335c6355a3747b01768749b739cd7",
+        "initialDigest" : "6d8ce7f9e0945f38f07b857754d01f4085b92d0fa0c7850166f07c370ef46789"
+      },
+      "name" : "acceptance-010",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b65ba66926afb63a8a5bf672dab49fed291c9ab530c1ecefff565c313e00e3da",
+        "initialDigest" : "8d8130a777cdf9b6c58029ee1469df3d402bfd1ec84bcf1d50749dd604fa1370"
+      },
+      "name" : "acceptance-011",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2a6ab596bdfe24b0cadef525a6a79b18d6dbedaa9ed5052e7e054fdf42f88338",
+        "initialDigest" : "cd872acc1811ae4f77ec4e1bc7bd2c0ca5a7039e0b0ac3c0b1277bb436f6d991"
+      },
+      "name" : "acceptance-012",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bd6141b21049f138433c28f6258dbcecd61b6b44751e4f1a2819805f1b1a850d",
+        "initialDigest" : "529e9cd00be4e359664e453b41c8c7a79f83e3c01eee1fb39926cf701f35070c"
+      },
+      "name" : "acceptance-013",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              10,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e7537d3fa868e61c92580dffd9e267cd7d3443d43b1ca976e31d18068a09614e",
+        "initialDigest" : "31e48d09c5fdd1cd195f834951633293b91920347167159438f1309baf88e388"
+      },
+      "name" : "acceptance-014",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "40dad5fdf1eb80699b64cfccbfaf6b137f265276c25dd1c81ed8d8ed1bb12cd7",
+        "initialDigest" : "66f7adb77a0b60e5bce3b5f67e6ff848214be344ad22afdeee707140e46288d4"
+      },
+      "name" : "acceptance-015",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a64a0593eba2304837a653d03956fc4dcb4f606591103dd620e84cd80a922836",
+        "initialDigest" : "832033c01eb96b0fe877b7382fc7061c774edc7bbcd200b6e2a6793be8afb738"
+      },
+      "name" : "acceptance-016",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "318931f749a8a1986bcabd0646eb6e416b09920ef16b908e938a76642ac2080d",
+        "initialDigest" : "bf374d73b891b026a1958b54e180ad69e09f78a2a4cae67156c6855704fec343"
+      },
+      "name" : "acceptance-017",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "853b8dd24874165a9a664689b7630cbfb195fd0ad09f53007e417d428b26b1b1",
+        "initialDigest" : "540e651e110707920d87e1b00c61d39470bc125cad09bf4b18fe5b412fd0969e"
+      },
+      "name" : "acceptance-018",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              5,
+              -6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "858b72cbf3dd037acc2508e8f67bf5366b06fd6230636c25d45cf1e0bd8bca97",
+        "initialDigest" : "c502bb988a8ffa48ca61a1714e1c28ce3107eaef3d32bae8ef28fea04fcb46cd"
+      },
+      "name" : "acceptance-019",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "61084134a6326be9e43b3992dd89c80a3bfb702fd5937332467acd860a6d9f80",
+        "initialDigest" : "ade246e03ba6e96c470317826a0e10edb4c975f0030f2b48b0a32c3ccecf2670"
+      },
+      "name" : "acceptance-020",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "04d6bd9c9de62c879c04ca66ff802cd5280a29bb5007c2419444dca69d822ff6",
+        "initialDigest" : "a4eace183e41c427d6197b338e1e641d7e8cbe0857c6eacb7896ea954b6bacb3"
+      },
+      "name" : "acceptance-021",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "09efd05e7ed58b75d5f58ae753b853fc2012f9900365c9788e771ca88a012b43",
+        "initialDigest" : "16b33ff5e1065e4ec8c9874ec9807d6fc8101fc20c804df0b99deb5d79678deb"
+      },
+      "name" : "acceptance-022",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ed35e93b332e886c4b228885604a162aa3b84894411c66e17b12515b986e8f15",
+        "initialDigest" : "8a781a7fb74474b82c0b2b07b4ee62bb2656ccb3bb370c8747b4fd23826bf08c"
+      },
+      "name" : "acceptance-023",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "939fd9464bd7e652e933a80d250d15175b00615913a3eeef59dc8000d7655ba2",
+        "initialDigest" : "26ce85d4eafb4d57473ecca962e8a3ea13b9364e136a0acd8979d99e9749992e"
+      },
+      "name" : "acceptance-024",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1dc6caf7992b1c9485692cd2d7423ea76ca719da0ca51714290edadc953dbb1d",
+        "initialDigest" : "35c9cd66bce916246457d3f7bec4c9936bac7a2bbfbb5f0773e347860e61e53a"
+      },
+      "name" : "acceptance-025",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bdb2d4847aefa5e41fce3f4182d85fc24c24f0404559fe4993c9857f447dceb6",
+        "initialDigest" : "de6fa37b96428502f8659cd572ac7cd460b3c44f3c01d2b916f70593e08a5021"
+      },
+      "name" : "acceptance-026",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7f54d16aacc7bbf381c34366fc84b9a3c068c3d35298a7f6371b117c81ed3b0a",
+        "initialDigest" : "8b4be8e6a4b90822779059d758e56552250a7389fe3d2bbbf4c5b7e04757acee"
+      },
+      "name" : "acceptance-027",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d529c88d28466c7652035342029c72f49b375553b35b3407585821a1c55b6fea",
+        "initialDigest" : "7a324f9fdc8c48ed896a2c8b47125ebc8ba7a64933cc8a60438087b508d59b78"
+      },
+      "name" : "acceptance-028",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "532d3c897326c5a6dab466182bcf2eafcefa7cdd7b1c8b53d71f76a3e9c31f5e",
+        "initialDigest" : "7c4a638c06076a000325d703ae5a15c371c48f87d94e9213e6359e39a2dcb09c"
+      },
+      "name" : "acceptance-029",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "21ecda4bbee7d48ff24fcdb065d96ae413218ccd622a558098c374c7560616d8",
+        "initialDigest" : "acca37aa4fcd4d3b7df759ba567ee71b397ed2e815d228d3c1e9ac2ae43492fc"
+      },
+      "name" : "acceptance-030",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "11114d998eecb755d63d326584285891edcd85e98b64492df6c7734546a9d513",
+        "initialDigest" : "e6a32c47d59fc8e7af6123f5d66f891a99b570353ade46c92cf7dde1b9516787"
+      },
+      "name" : "acceptance-031",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "89e9afaf9242738e999a8717489538e59a5a3e50af21eb9a1cd2fda4202b0619",
+        "initialDigest" : "cf0606b58a9c0012fbad2ce2b574a8f5e0bc040e98797f654b910a993e73872f"
+      },
+      "name" : "acceptance-032",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              1,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6a73d50c3b106d4c4f238c20d9ab2036ca77396c6d77c2c8624620f7495ebf61",
+        "initialDigest" : "c6963538406cb4d729197e622a69f0701367db7fe4aa349625a74f6f26132e55"
+      },
+      "name" : "acceptance-033",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              5,
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b51ffcc9767f1c8ff12adaf8167fba545b24483bd9f46eeb6837f0d82afc178a",
+        "initialDigest" : "c5193c8c5940209845d6b53975fe7a444c3c1ed149d86fe3c02b3a4bc4ccf6dc"
+      },
+      "name" : "acceptance-034",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b9337ba324ef1d305a8ef5f3a1a6d53e7c2a08822c7993cc9b5e8e3a61070e5c",
+        "initialDigest" : "e231e6af03d19174d651cec731e7db6d5d9c36fbf3b7fe932dc37d885d98c0db"
+      },
+      "name" : "acceptance-035",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5c5bd3b270f9f0127aa4a7529a127ab6feaa4b30843241a4b5e2585a8c5c21d0",
+        "initialDigest" : "a030f00572de6702a84fadd91d4ffc82eccfeb20984e9fccf2b8e7ba11df702b"
+      },
+      "name" : "acceptance-036",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "08b4b195fc3589a15b59e9f26d255647839140320bac7b0e2395531a72f71030",
+        "initialDigest" : "f98af5490f8d8d750cbd82d72275d86d1c3acb586a852c9df8d754adb4cd2558"
+      },
+      "name" : "acceptance-037",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              10,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eabb692b4bfa201b8225a9349f95adec1e41cf9eda29b724db6c8d6390fcff7a",
+        "initialDigest" : "7e72ac4bd38c6707e68970428dbc4b009099316926df9d01b8e295c1f97513f7"
+      },
+      "name" : "acceptance-038",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4265e1a6ab58382138a3c9dcd71ca4fdfa8a2e4dbaf161767198ba04bcf25f3b",
+        "initialDigest" : "dbba86f6c951661e82da797696bafc9a32741415969ec502bae77876b8816b5e"
+      },
+      "name" : "acceptance-039",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b9883ddfc81a2e4224b62ff6cb5048ae78a3a6cc2df1fd88bb6cd5a52a4d4e4a",
+        "initialDigest" : "831ad1b5212348fac1c0562164ce9b162bd65ef01ae950fe40320010c2383a95"
+      },
+      "name" : "acceptance-040",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              10,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "82125cf71382e2b95a980ef0fda325dbc4b9482e45f18d88c9eb38bb3b161914",
+        "initialDigest" : "8b5310833f7b716bb1c3abe0d35e62dfd62f87d5ced07fcdc1179786e90e263f"
+      },
+      "name" : "acceptance-041",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9306881aea8f38e7d44f3630ac73d560859f7cef511f0e43eead73756cd69973",
+        "initialDigest" : "9371a45d3292d13bc5f976f7e3d4742c19c1f632de0ed560347d9aeeb0c4b2e5"
+      },
+      "name" : "acceptance-042",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "00822edf460db82bcff84e10683161237cbebb4bfb02172d2fb4adff8c1fa4f4",
+        "initialDigest" : "572157838a428e8605b3fdd08570592a2e865f50ff929d6dcf65697390f49e6d"
+      },
+      "name" : "acceptance-043",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e7bb5448df6196495e932d7f775c7578404d02ba38949d9d159ca189f23f5150",
+        "initialDigest" : "c2d5ce76b3523673cbc8256c6570581d1c94bc681788393aae8f2bcfbf3e00e5"
+      },
+      "name" : "acceptance-044",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4ddcb1bc5bf28abb30d7238e47d65e916843d27fd398c76eeb86cb23774e4470",
+        "initialDigest" : "8cc22b9de23b06b309b14add0ff50a3aafa27939cb80d01207bc768fa4e169a2"
+      },
+      "name" : "acceptance-045",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "843386778de0111e683e1dfd19041fd88971de016027582fdc24dbd2fe5b3adc",
+        "initialDigest" : "c00105a25eaa0a0a4d415f2d311f7f587bfa79478ae728c6ac91b950eb033ae0"
+      },
+      "name" : "acceptance-046",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "08caa8dea8168b6a46ae2d29530c14f0bc71fad140cc5092ea6a8d5ff733439a",
+        "initialDigest" : "ca4aa8868ffe40ba516361ac90d89717839772e0d876364bcfb574287adb6004"
+      },
+      "name" : "acceptance-047",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "19c9b0918d2e272f1f8becfb4bd3ac300e3b983f9a11716caaf4720bcf7313b7",
+        "initialDigest" : "6643fb403542e71e53c2c4da9dfd9fa53432a6a9cfc63f1524d74974e7e588ea"
+      },
+      "name" : "acceptance-048",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "05f411d72292ddc4d0eabd2bf0e86bdb4854e1f210f49f20a9c5ae6ee4907262",
+        "initialDigest" : "b13fd849269173bd4f433104bf1b880c61b178c00fc455910dd05655106307c5"
+      },
+      "name" : "acceptance-049",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "374ceb49243c53f249e7e9658968ded0ecc20313cc000e51e3addc53bf533c78",
+        "initialDigest" : "3f2f7fe2a58a55603a79c8f94a2bfc69159deb9c572886b0df9ec57a6479d5c9"
+      },
+      "name" : "acceptance-050",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bad8adec98f81ac6181f4b5816639d3316fe7586af5fcb7d3745633462e27b13",
+        "initialDigest" : "5f3952db8b8ba180b8714ed3a912ee4f6807462e7c0849da4ae48ba2ee1dfdba"
+      },
+      "name" : "acceptance-051",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ba75d6571408220a1a620274fb82e1b58fce97f8da94bcd63a89f90fd481012d",
+        "initialDigest" : "ce44b70a24293547c29932cc6182c22aa81277a75374b74b6105817043f9bdd3"
+      },
+      "name" : "acceptance-052",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "72ad1161e47c37430dc66ce00b983a930a9d61122695fe917871b2618b38842e",
+        "initialDigest" : "a4f19b8e71714bbec635d1d84f33abd33fb1ca977ea43a20558520be139f97f5"
+      },
+      "name" : "acceptance-053",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7644a7020102c3d53c9b0ab9d94b216bb950c8c39934f2a5fe22390323e5740a",
+        "initialDigest" : "2fd9d792435d56b968078ba0a1f9feef58a4da9611533e9156089ec32f19d1f2"
+      },
+      "name" : "acceptance-054",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "19e554ab9bca0aaf56096a3f42f2a002bf846093e3501afe1f557f77b563f4d6",
+        "initialDigest" : "aed667f95f09140234cb9719d0dabc27eac8194ca645a96cfb1f95bc56dae93d"
+      },
+      "name" : "acceptance-055",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "52bd4fabdb539a18d3f95df3937ecded120e35e26ac9e8cb5d732fb20cc5a1c9",
+        "initialDigest" : "64ffac3d98379518ae564be1b9921148dcaff9ad209d265bac5b36c0e1e1eb04"
+      },
+      "name" : "acceptance-056",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8ca87176b39a3496b021ee9a9fcdc6c4deb8fc8db441b56fe5681092af090484",
+        "initialDigest" : "d04d98fffd65ac99037daac92604f9b301f537ee1e2d4a90422895c3d63eec1c"
+      },
+      "name" : "acceptance-057",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "dcbfd079080822fa29761ab09c8db273151ee6ee026828e14439720cc207c1e7",
+        "initialDigest" : "8ac98e2f9e115fb9afa7774a6de1dfe4d51dfa637513f12a35dd74a033353298"
+      },
+      "name" : "acceptance-058",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "def2661eced88e89303f42441db3fc8dfdeb3ecd5a2b1802bebe013a9c093705",
+        "initialDigest" : "b7a4629f61152e2b742a41230cf482b977e96f5b7d196c347e564df037fd2c8f"
+      },
+      "name" : "acceptance-059",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c336b46d77c7bdc5016f93adb8b62034a1e593f2cb556adaf493731691231a6c",
+        "initialDigest" : "72255d7dae0c9ff0e004343832b69b56233d4235523bd18c94945cb474adb557"
+      },
+      "name" : "acceptance-060",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6b5d878b9f735ccdb769ea45efe49fb215e746a148058136ebd4f301c08339ed",
+        "initialDigest" : "1fefb75ff1bed8aa8bdce199d7f574d2cbf0d0f2090ef407d2a30d345040e9a1"
+      },
+      "name" : "acceptance-061",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2d04a7f9106a991041ee75f234b31489f268b93b795c9d7f74fa6b5ea71d11b7",
+        "initialDigest" : "25135b9cfd29299ef8ec10a359574c3d0af2018fc1b92610eb0dacfd85d5f4db"
+      },
+      "name" : "acceptance-062",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "36510ee1c05bafab9975f715cb394a3d926543f5897db814e36f7ef4cd3e268c",
+        "initialDigest" : "182fa7ebda3588c7eb7a69faea260e44de82181b9d4270196189451db423827a"
+      },
+      "name" : "acceptance-063",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "72f8aa795de51e33f1e202ca65d2e3d49e7f00ebdeee24ae3782df45cfdeb692",
+        "initialDigest" : "036f58c6e30ae8713245f4274caea47c954244fc8a39f7bffd50ea1ee2d8f50d"
+      },
+      "name" : "acceptance-064",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a02f49599165cd46d3f2ff13d40795892bee1f90681ecc818af0c0e6d39a0233",
+        "initialDigest" : "6f1d7d557798c61546a5b4c6ea709dcc2fa27a58d8c13dabaf5bf01a38335f6d"
+      },
+      "name" : "acceptance-065",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d24884515296c3ab6f4d6b73eb312255840bac4c90d0fc1c5b913206d9a2b9df",
+        "initialDigest" : "edab4d32a1c5a1815eed2734d75fac68c3d621638eacfb7ad74ca89b06a41f86"
+      },
+      "name" : "acceptance-066",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "16ea58313c9551112110dc460a8e06aff809e9bb13d40392e7cc09c247af5c6a",
+        "initialDigest" : "16ca421409413eb0a0ac7bb4fe049da0c00f02ba32b49a9f08b97e01d5f87e0c"
+      },
+      "name" : "acceptance-067",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              9,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bbd90884b15571c325fc6526c602d928c7779edba1ecd40c0c2b6253b81b8653",
+        "initialDigest" : "89c08820c6221f75c1878ec56f8ea2114101fffd8f7058cb4145206b942af816"
+      },
+      "name" : "acceptance-068",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e347290d0fdccdb39f7cfda32d42a5e3e37e922e7b0301d3087920b5af801564",
+        "initialDigest" : "cc3eb2e792adc77efa093bfe088708ba71e06c93416b2a9f49965027a327d32e"
+      },
+      "name" : "acceptance-069",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "be580bc723bbb3f045240ed530ada8ad5f476a915d95addf33c8f3ad00270038",
+        "initialDigest" : "a728bcad74ecac44f2b1e97d6ced64325d3768bb2236d007fc53c26211837c81"
+      },
+      "name" : "acceptance-070",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5b519a14fe3bee844db5988427c54ae531163470c7bd00366f5f1771d7c0aeb4",
+        "initialDigest" : "145746515b5611bf14a8075eadd2f5cda23ac9009f7b0257ef0f2978298d5217"
+      },
+      "name" : "acceptance-071",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a85491eb00106b20810a40cb4b593817463e1ecb356a95604a36751a9cb141dd",
+        "initialDigest" : "1af81986f9265fee176787491dc1d1c6fa6f65a30be23e3d46114b5d23e5c89e"
+      },
+      "name" : "acceptance-072",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e2b47faedbbfe1c325a9f6d84673bb0cb227464a13da63c11195b90f6112225e",
+        "initialDigest" : "5f865008182a9c73748f30c8bf1e069a94942bb4c0206b957537a33fe1d2102b"
+      },
+      "name" : "acceptance-073",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "971535c83b6885bf44bdc9dd5e33617139538e3f3052f2d67b43716f59d2c3c7",
+        "initialDigest" : "80520d4e3cdb12d9a0decc54378c07436edca9f1ddcf4ec652aea5ba987690df"
+      },
+      "name" : "acceptance-074",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "119ef56b93f48e2af01e27d101903500d90fac54ab7f5d88cbbcc526d2747c74",
+        "initialDigest" : "df6770a9a202a65e83466372533cec50996452654de05e121be68157023dd6c1"
+      },
+      "name" : "acceptance-075",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d5517bf7fb2fa990a6bb9aa04283a8f2bc789bc1c76c9d1ac17145a115e7b6bf",
+        "initialDigest" : "a8b44fbf485adb10dab04334db922a94dab92b6d1df8c4832a27f498bfe2460c"
+      },
+      "name" : "acceptance-076",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3b5184482745bc90a2897a62ac85e21c71eea71de9f8b8e6f8ba4812bc0b9f89",
+        "initialDigest" : "274f9849b02eda5b55fbe5804faf951762822dbc2d3c758851efd361a814a57d"
+      },
+      "name" : "acceptance-077",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "acb5b768acb3b6320bfe3f775cfee951a1b53a7049b1e607c4c8045f4f4cb014",
+        "initialDigest" : "c7ad86a6cf4199b42ae1fa863c9e4351d43cd0800f5e1b4ac684dcc0e3ef45f1"
+      },
+      "name" : "acceptance-078",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              10,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              21,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "044dffdb87e739543ca778043fc863d91ba898914796d7a360c5fdf29c759a5a",
+        "initialDigest" : "8e997585c056978338c89d2a361ff75cd23b36bef13d17857d754ac599c00577"
+      },
+      "name" : "acceptance-079",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              13,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e0364488127f1f0497bfcfcd0e583ec0642c1de7c6a85efce7985353956d31fd",
+        "initialDigest" : "958c669c05919fe20b86c42e29d979b79826e759f30f59d9788372ac93fbad1c"
+      },
+      "name" : "acceptance-080",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              1,
+              5,
+              -5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aa0ea7fb28a7d340892a1759c0658b193d4f5ee49e3674f489e1de250fa4f23e",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "00b7591ea553ecde2acf17964607014e12fa5fbd2519f4375365424175328187",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-budget-out",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "piece.cut",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d949b620883a821cf36bff25caf22ee2070e3f9577b1c23861fdc43dd9064743",
+        "initialDigest" : "c4f0fcd82632d1112860e9419891b66cb7abbb767d65bc0b9a0c593d9dae1465"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

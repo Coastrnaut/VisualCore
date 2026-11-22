@@ -178,6 +178,21 @@ private func played(_ level: FacetedForgeLevel, _ actions: [FacetedForgeAction])
         }
     }
 
+    /// Feature 373 (R02-G08-03): the adapter's table of certified candidates equals the witnesses' `skipped`, and the
+    /// level it certifies directly from that candidate is each stored witness's level, with the same solution (levels
+    /// 10·group + 1 … 10·group + 10, in 10 parallel groups).
+    @Test(arguments: Array(0..<10))
+    func theAdapterCertifiesTheStoredLevelsFromTheirCandidates(group: Int) throws {
+        #expect(FacetedForgeExperienceCore.certifiedCandidates.count == 100)
+        for number in (10 * group + 1)...(10 * group + 10) {
+            let witness: FacetedForgeWitness = try storedWitness(number)
+            #expect(FacetedForgeExperienceCore.certifiedCandidates[number - 1] == witness.skipped, "level \(number)")
+            let generated: FacetedForgeGenerated = try FacetedForgeExperienceCore.generated(number: number)
+            #expect(generated.level == witness.level && generated.skipped == witness.skipped, "level \(number)")
+            #expect(generated.solution.actions == witness.actions, "level \(number)")
+        }
+    }
+
     @Test func thereAreOneHundredWitnessFiles() throws {
         let names: [String] = try FileManager.default.contentsOfDirectory(atPath: witnessDirectory.path)
             .filter { $0.hasSuffix(".witness.json") }

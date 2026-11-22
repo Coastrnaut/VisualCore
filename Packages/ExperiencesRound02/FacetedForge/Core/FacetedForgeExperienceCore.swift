@@ -113,13 +113,45 @@ public struct FacetedForgeExperienceCore: ExperienceCore, Equatable {
     /// each level is generated once per process, and only when first asked for (feature 373).
     private static let generatedCache = Mutex<[Int: FacetedForgeGenerated]>([:])
 
-    /// The certified level and its solution of manifest number `number` (1 … 100), generated once per process.
+    /// The index of the certified candidate of each manifest level, 1 … 100 in order: the `skipped` field of its
+    /// witness file in docs/games/faceted-forge/levels/ (the candidates before it fail a filter or the solver). Pinned
+    /// against the witness files by the tests; it only spares the rejected candidates' solver runs.
+    static let certifiedCandidates: [Int] = [
+        1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 1, 3, 0, 4,
+        0, 0, 3, 0, 2, 3, 0, 0, 0, 2, 1, 0, 0, 2, 1, 2, 2, 2, 2, 3, 0, 1, 2, 3, 4,
+        0, 2, 0, 1, 2, 2, 0, 2, 1, 6, 0, 7, 8, 1, 9, 1, 1, 14, 6, 4, 1, 6, 0, 8, 2,
+        3, 6, 1, 2, 2, 0, 1, 12, 25, 18, 12, 6, 12, 14, 2, 3, 4, 1, 1, 7, 5, 41, 6, 5, 14,
+    ]
+
+    /// Candidate `index` of `entry` certified exactly as ``FacetedForgeGenerator/generate(_:)`` certifies a candidate
+    /// (the solver's smallest equals the lower bound, within the budget, and its actions win a fresh play); nil
+    /// otherwise.
+    static func certify(_ entry: FacetedForgeManifestEntry, index: Int) -> FacetedForgeGenerated? {
+        guard let level = FacetedForgeGenerator.candidate(entry, index: index),
+              let solution = FacetedForgeSolver.solve(level),
+              solution.smallest == FacetedForgeSolver.lowerBound(level), solution.smallest <= level.budget,
+              FacetedForgeGenerator.wins(level, actions: solution.actions) else { return nil }
+        return FacetedForgeGenerated(entry: entry, level: level, solution: solution,
+                                     difficulty: FacetedForgeDifficulty(level: level, actions: solution.actions,
+                                                                        work: solution.work),
+                                     skipped: index)
+    }
+
+    /// The certified level and its solution of manifest number `number` (1 … 100), generated once per process: its
+    /// certified candidate (``certifiedCandidates``) is certified directly; the whole generator runs only if that
+    /// candidate does not certify.
     ///
     /// - Throws: `.level("number")` for a number outside 1 … 100; the generator's `.generation(number)`.
     public static func generated(number: Int) throws(FacetedForgeError) -> FacetedForgeGenerated {
         guard levelNumbers.contains(number) else { throw .level("number") }
         if let cached = generatedCache.withLock({ $0[number] }) { return cached }
-        let fresh = try FacetedForgeGenerator.generate(FacetedForgeManifest.entries[number - 1])
+        let entry = FacetedForgeManifest.entries[number - 1]
+        let fresh: FacetedForgeGenerated
+        if let direct = certify(entry, index: certifiedCandidates[number - 1]) {
+            fresh = direct
+        } else {
+            fresh = try FacetedForgeGenerator.generate(entry)
+        }
         generatedCache.withLock { $0[number] = fresh }
         return fresh
     }

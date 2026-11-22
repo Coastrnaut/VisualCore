@@ -38,6 +38,8 @@ import ChronoConstellatorCore
 import ChronoConstellatorExperience
 import AmethystEscapeCore
 import AmethystEscapeExperience
+import FacetedForgeCore
+import FacetedForgeExperience
 import HueCompassCore
 import HueCompassExperience
 import VisualCoreExperience
@@ -116,7 +118,26 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [facetedForge].compactMap { $0 }
+
+    /// R02-G08 Faceted Forge (feature 373, R02-G08-03): a candidate until X-R02-G08. Snapshot schema 1, so no earlier
+    /// example is stored yet.
+    fileprivate static var facetedForge: ExperienceRegistration? {
+        guard let id = FacetedForgeExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: FacetedForgeExperienceCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return FacetedForgeExperience.make(
+                id: id, storage: launch.storage,
+                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        // Seed 0 opens certified level 1, as for the other round-two puzzles.
+        registration.openingSeed = 0
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = FacetedForgeExperienceCore.manifest(for: id)
+        #endif
+        return registration
+    }
 
     /// R02-G07 Amethyst Escape (features 361–370, R02-G07-01…10): integrated at X-R02-G07 (2026-11-22). Snapshot schema 3 (feature 367),
     /// so the schema-1 and schema-2 examples are stored (feature 369, R02-G07-09).
