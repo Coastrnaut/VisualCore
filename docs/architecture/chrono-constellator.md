@@ -57,3 +57,23 @@ Levels are JSON schema 1 with sorted keys and their fingerprint; decoding re-che
 refuses damaged, edited and newer forms (`r02-g06.malformed`, `.newer-schema`). `ChronoConstellatorRules` expresses the
 game as an R02-F23 `PuzzleRules`: at tick 0 the moves are each phase change, each hold on the grid of starts 1 … 32 and
 lengths 1 … 32 that the play accepts, each release, then a single step of the tick limit; after tick 0 only a rewind.
+
+## Content pipeline (feature 352, R02-G06-02)
+
+- **Manifest.** `ChronoConstellatorManifest` holds the archived design's 100 levels (number, planned seed, band, move
+  budget 8 … 19); the chapter header's "78 stages" is a milestone figure only.
+- **Generator.** Candidate k of a level draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`: per
+  band a grid of 6 × 5, 6 × 5, 7 × 6, 7 × 6 or 8 × 7 with 2, 3, 3, 4 or 5 stars; each star a rectangle loop of 2 … 5 by
+  2 … 4 cells, clockwise or reversed; distinct targets; random default phases; a tick limit of 120 … 360. A candidate is
+  kept when the solver certifies a smallest edit count in the band's range (1; 2; 2; 3; 3 … 4) with at least the band's
+  number of collision-blocked windows (0; 1; 2; 2; 3) and the witness wins while the default timeline does not; at most
+  512 candidates (the worst level needs 88).
+- **Solver (integer-tick phase search).** m(T) counts the stars off target at tick T under the default timeline; each
+  edit acts on one star, so m* = min m(T) is a lower bound on every winning timeline. The windows are the ticks with
+  m(T) = m*; a window's phase-only timeline re-phases exactly the stars off target, and it is blocked when two stars meet
+  on the way. The first unblocked window proves the count exactly. An independent brute force (every phase-only timeline
+  of fewer edits, plus one hold on the small levels) agrees on levels 1, 11, … 91.
+- **Witnesses.** `docs/games/chrono-constellator/levels/NNN.witness.json` (schema 1): the level, the actions, the win
+  tick, a 16-hex position digest per tick, the play fingerprints, the lower bound and windows, the unedited and near-miss
+  counterexamples, the difficulty and the skipped candidates; decoding re-solves and refuses any difference. The catalog
+  digest over the 100 fingerprints is pinned (`6483b20e…`).

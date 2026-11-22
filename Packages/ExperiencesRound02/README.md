@@ -310,3 +310,8 @@ fingerprint as the signed snapshot), `ChronoConstellatorEvaluation` with `Chrono
 `ChronoConstellatorStage`, `ChronoConstellatorEvent` and append-only `ChronoConstellatorRecord`s, and
 `ChronoConstellatorRules` for the R02-F23 puzzle contract. Refusals are `ChronoConstellatorError` with `r02-g06.*`
 codes. Rules: [docs/architecture/chrono-constellator.md](../../docs/architecture/chrono-constellator.md).
+
+Feature 352 (R02-G06-02) adds Chrono Constellator's content pipeline: `ChronoConstellatorManifest` (100 levels),
+`ChronoConstellatorGenerator` with `ChronoConstellatorBandProfile`, the integer-tick phase search
+`ChronoConstellatorSolver` with its lower-bound proof, `ChronoConstellatorDifficulty`, and `ChronoConstellatorWitness`
+files in `docs/games/chrono-constellator/levels/` (rewritten only with `CHRONO_CONSTELLATOR_WRITE_WITNESSES=1`).

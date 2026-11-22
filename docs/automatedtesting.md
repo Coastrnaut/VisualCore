@@ -236,6 +236,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
   opens the next one, so the tests do not cap the frontier.
+- **Certify by a lower bound, not by enumeration** (R02-G06-02, 2026-11-21). Chrono Constellator's timelines (phases
+  and holds) are too many to enumerate, so the solver proves its count with an argument (each edit moves one star) and a
+  collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
+  timelines everywhere, one added hold on small levels). Witness files are generated in a separate write run: the
+  byte-compare and decode tests run in parallel, so a first run with the write flag fails until the files exist.
 - **Closed form checked against a step-by-step reference** (R02-G06-01, 2026-11-21). Chrono Constellator computes a
   star's cell at any tick from one formula (start phase plus tick minus held ticks, modulo the loop length), so its
   timeline tests compare every tick of 500 seeded levels with a reference written in the test that moves each star one
