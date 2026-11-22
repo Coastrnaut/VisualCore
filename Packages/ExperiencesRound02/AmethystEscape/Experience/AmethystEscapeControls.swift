@@ -13,6 +13,9 @@
 // the exit gap and every shell; refusals appear in words; a Sound toggle (off by default) starts the ambient loop; rows
 // become columns at accessibility text sizes and every text wraps; the panel keeps a readable width of 520 points on
 // iPad; the scene phase reaches the presenter so the loop stops in the background.
+// Feature 367 (R02-G07-07) T-R02G0707-005 (clarifications Q2, Q4, Q5): "Replay best solution" for a level with a
+// verified stored solution, and during replay its position ("Replay: action k of n") with Step and Stop, each with a
+// label and a value; the Sound toggle saves the choice through `settings.sound`.
 #if os(iOS)
 import AmethystEscapeCore
 import SwiftUI
@@ -41,6 +44,7 @@ struct AmethystEscapeControls: View {
                 playRow
                 teaching
                 progressRows
+                replaySection
                 soundToggle
             }
             .padding()
@@ -79,9 +83,34 @@ struct AmethystEscapeControls: View {
         "Level \(mirror.levelNumber), " + AmethystEscapeFeedbackPlan.movesLeft(max(0, mirror.budget - mirror.moves))
     }
 
-    /// The Sound toggle (feature 366; off by default).
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 367).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text(Self.replayPositionText(mirror)).font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next action of the replay")
+                    .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue("\(mirror.replayLength) actions")
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
+        }
+    }
+
+    /// The replay position line: "Replay: action k of n" (feature 367).
+    static func replayPositionText(_ mirror: AmethystEscapeMirror) -> String {
+        "Replay: action \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// The Sound toggle (feature 366; off by default; saved through `settings.sound` since feature 367).
     @ViewBuilder private var soundToggle: some View {
-        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
@@ -210,12 +239,13 @@ struct AmethystEscapeControls: View {
         return "Level \(level), band \(band)"
     }
 
-    /// The mode's name: campaign, daily or practice.
+    /// The mode's name: campaign, daily, practice or replay.
     static func modeName(_ mode: AmethystEscapeMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 

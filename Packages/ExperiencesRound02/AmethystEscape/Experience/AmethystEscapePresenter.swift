@@ -32,6 +32,12 @@
 // ambient loop (`AmethystEscapeSound`) is offered the recipe of the pearl's shell, the shell count and the stage
 // (`AmethystEscapeSoundRecipe`) when a level or mode opens and when that recipe changes. The mirror carries the summary
 // element's text and the sound choice. Presentation only.
+// Feature 367 (R02-G07-07) T-R02G0707-005 (clarifications Q2, Q4, Q5): the mirror carries whether a verified replay
+// exists for the level and the replay position; `startReplay`, `stepReplay` and `stopReplay` send `replay.start
+// [level]`, `replay.step` and `replay.stop`; the Sound toggle saves the choice through `settings.sound [0/1]`
+// (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied when the experience opens or the value
+// changes; the results a restore dropped (`core.reconciliationDropped`) are announced once as `state` ("n saved
+// results could not be checked and were removed.", "1 saved result could not be checked and was removed.").
 #if os(iOS)
 import AmethystEscapeCore
 import Foundation
@@ -86,6 +92,14 @@ final class AmethystEscapeMirror {
     var summary = ""
     /// Whether the ambient sound is on (feature 366; off by default).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 367).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 367).
+    var replaying = false
+    /// The actions of the running replay played so far (0 when no replay runs; feature 367).
+    var replayPosition = 0
+    /// The actions of the running replay's trace (0 when no replay runs; feature 367).
+    var replayLength = 0
 
     /// The picked shell's name ("Shell 1 (inner)"), or "none".
     var pickedShellLabel: String {
@@ -275,6 +289,7 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])
         }
     }
 
@@ -448,6 +463,48 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         mirror.soundOn = on
     }
 
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 367); the described change turns the loop on or
+    /// off.
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    // MARK: Replay (feature 367)
+
+    /// Starts the replay of the current level's best stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next action of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 367).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 367).
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 367).
+    static func isReplay(_ mode: AmethystEscapeMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
     /// The controls view appeared (the loop may play).
     func controlsAppeared() { sound.setOnScreen(true) }
 
@@ -481,6 +538,31 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         let snapshot = core.snapshot(time: 0)
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
         mirror.levelNumber = core.levelNumber
+        // Feature 367: the saved sound choice is applied when it first appears or changes.
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(AmethystEscapeFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                             haptic: nil))
+        }
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
         if let previous = latestCore {
             if dragTurns == nil { route(AmethystEscapeFeedbackPlan.after(old: previous, new: core)) }
             let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
