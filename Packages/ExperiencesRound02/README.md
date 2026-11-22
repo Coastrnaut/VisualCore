@@ -329,3 +329,9 @@ Feature 354 (R02-G06-04) adds touch controls: in the Core the constrained `Chron
 timeline scrubs, hold presses, star taps, orbit, double-tap reset); in the experience the presenter's pointer entry, the
 candidate ring and "Reset view"; host tests with an independent pick, all 100 levels won through the panel, and
 simulator wiring tests.
+
+Feature 355 (R02-G06-05) adds teaching and progression: `ChronoConstellatorHints` (`ChronoConstellatorPlan`,
+`ChronoConstellatorHint`, `ChronoConstellatorFailureExplanation`), `ChronoConstellatorProgress` with
+`ChronoConstellatorMode` and `ChronoConstellatorTutorialStep`; the adapter's level, mode and tutorial controls and
+snapshot schema 2 with a migration from 1; the panel's instruction, hints, failure text with Undo, Rewind and Retry,
+modes and level picker.

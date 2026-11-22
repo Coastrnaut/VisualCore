@@ -127,3 +127,23 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
   it; a star gesture after tick 0 says that edits are made at tick 0. Refused actions are shown and their codes kept.
 - **Panel.** Every gesture has a panel equivalent (star picker, phase − and +, holds, steps, run, rewind, undo, redo,
   next level, Reset view); a host test wins all 100 certified levels through panel actions alone.
+
+## Teaching and progression (feature 355, R02-G06-05)
+
+- **Hints.** `ChronoConstellatorHints.plan` reads the current play: run when the timeline already wins (the ticks to the
+  win), rewind after tick 0, remove the first hold at tick 0, or the certified solver's phase changes from the current
+  phases (accepted only within the edit budget and when the timeline then wins); a rewind or hold removal is offered only
+  when the state it leads to has a plan, so a plan exists exactly when following the hints wins. Three levels reveal what,
+  which star and exactly where; a won play has no hint, a failed play's hint offers undo, rewind or retry. Exact hints
+  from the start win all 100 certified levels.
+- **Failures.** `ChronoConstellatorFailureExplanation` names the colliding stars, cell and tick, or every star off its
+  target at the tick limit with its cell and target.
+- **Tutorial.** Levels 1 … 3: shift a star's start until the timeline wins, replay, align every star on the same tick;
+  each step advances when done (a level won on its first replayed tick goes from replay to done), dismissible, never
+  moved back by undo.
+- **Progress.** `ChronoConstellatorProgress`: level 1 open, a campaign win opens the next, stars 3/2/1 by the edits in use
+  against the certified smallest count (+2), five bands of 20. Daily level (days since 2026-01-01 × 59) mod 100 + 1
+  from `mode.daily [y, m, d]` (the presenter reads the local date; the core reads no clock); practice raises the budget to
+  20 and never records. The adapter adds `level.select`, `mode.daily`, `mode.practice`, `mode.campaign` and
+  `tutorial.dismiss` (`r02-g06.locked`, `r02-g06.date`); `level.next` moves to the next open level. Snapshot schema 2
+  `{level, mode, progress, records, tutorial}` with a migration from schema 1; digest v2 adds progress and mode.
