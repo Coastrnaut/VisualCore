@@ -38,7 +38,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
 
 ## Phase 4: Stories 2 and 3 — collide, edit, rewind, undo, redo, replay (P1)
 
-- [ ] T-R02G0601-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorPlay.swift`
+- [X] T-R02G0601-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorPlay.swift` — Verified 2026-11-21: 2026-11-21 host-3 exit 0: ChronoConstellatorPlayTests 8 tests in 3.6 s (stage table; 200 fixtures win at their win tick; collision and time at the exact tick with one tick either side; validation order and every refusal; rewind and won final; exact undo/redo; 500 seeded traces with pauses replay identically, tampered records refused) (.autonomy/migration/checks/R02-G06-01.host-3.json); replay aligns pause/resume; lead retest
   (agent B: stages "loading, tutorial, playing, paused, won, failed, result"; actions validated for stage, previous
   fingerprint, range, "edits only at tick 0", unchanged phase, overlapping hold, missing hold, budget; step(1 … 1,200)
   stops at the deciding tick; rewind to tick 0; failures collision and time; records with previous and next fingerprints;

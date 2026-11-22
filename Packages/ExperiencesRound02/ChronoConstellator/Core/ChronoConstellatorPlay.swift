@@ -305,7 +305,9 @@ public struct ChronoConstellatorPlay: Sendable, Equatable {
     /// Replays a record trace on a new play of `level`: `begin` (and `dismissTutorial` when the level has a tutorial),
     /// then each record by kind (an action with the record's previous fingerprint, an undo or a redo). Every produced
     /// record must equal the given one, so the trace reproduces every fingerprint and the outcome. Pauses are not
-    /// recorded, so a replay runs in `playing`.
+    /// records, but the stage is part of every fingerprint: when a record's previous fingerprint is the current one with
+    /// the play paused (an undo or redo made while paused) or resumed (an action after a paused undo), the replay pauses
+    /// or resumes first.
     ///
     /// - Throws: any refusal of the replayed action; `.malformed("record <i>")` when record `i` is not reproduced.
     public static func replay(level: ChronoConstellatorLevel,
@@ -315,6 +317,13 @@ public struct ChronoConstellatorPlay: Sendable, Equatable {
         if level.tutorial { try play.handle(.dismissTutorial) }
         for index in records.indices {
             let record: ChronoConstellatorRecord = records[index]
+            if play.fingerprint != record.previous {
+                var other: ChronoConstellatorPlay = play
+                if other.stage == .playing { try? other.handle(.pause) } else if other.stage == .paused {
+                    try? other.handle(.resume)
+                }
+                if other.fingerprint == record.previous { play = other }
+            }
             switch record.kind {
             case .phase, .hold, .release, .step, .rewind:
                 guard let action = record.action else { throw .malformed("record \(index)") }
