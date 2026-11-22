@@ -57,7 +57,7 @@ tests stay short (< 10 s each). {device} items are D1–D3 observations after Im
 
 - [X] T-R02G0507-006 Docs: `docs/architecture/colorfall-canyons.md` (persistence and replay), — Verified 2026-11-21: 2026-11-21 docs updated (architecture persistence and replay, package README, testing lesson); round02-host exit 0 (.autonomy/migration/checks/R02-G05-07.round02-host.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0507-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0507-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G05-07.*.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G0507-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0507-009 Reference regression chunk 2 (`--name reference-2`)
