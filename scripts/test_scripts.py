@@ -1129,6 +1129,16 @@ class ReleaseCheckTests(unittest.TestCase):
         start = argv.index("--only-testing") + 1
         self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/HCPlayUITests", "VisualCoreUITests/HCReplayUITests"])
 
+    def test_colorfall_canyons_ui_chunk(self):
+        """Feature 349 R02-G05-09 (T-R02G0509-004): the serial chunk `n3` runs the Colorfall Canyons interface journeys."""
+        self.assertEqual(relcheck.UI_CHUNKS["n3"], ["CCPlayUITests", "CCReplayUITests"])
+        self.assertIn("n3", relcheck.SERIAL_CHUNKS)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-n3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2], ["VisualCoreUITests/CCPlayUITests", "VisualCoreUITests/CCReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""

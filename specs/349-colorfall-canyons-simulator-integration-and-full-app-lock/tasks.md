@@ -34,7 +34,7 @@ change (the shaders and reference of R02-G05-03 are unchanged and re-proven by t
   name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test --only-testing ColorfallCanyonsExperienceTests`
-- [ ] T-R02G0509-004 [US1] Create `Apps/VisualCore/Tests/UI/ColorfallCanyons/CCSupport.swift`, `CCPlayUITests.swift`,
+- [X] T-R02G0509-004 [US1] Create `Apps/VisualCore/Tests/UI/ColorfallCanyons/CCSupport.swift`, `CCPlayUITests.swift`, — Verified 2026-11-21: 2026-11-21 app-ui-3 exit 0 on the iOS 27.2 phone: CCPlayUITests (win 61.6 s; relaunch 76.3 s) and CCReplayUITests (46.6 s), serial chunk n3 (.autonomy/migration/checks/R02-G05-09.app-ui-3.json); app-ui and app-ui-2 failed on scrolling a stepper whose centre is not hittable, fixed by tapping its hittable buttons and stopping drags that no longer move; n3 key unique; lead runs
   `CCReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 certified actions and carvable-cell order pinned in
   `CC`; each carve cell reached by stepping the cell picker by its index in the carvable order, recomputed after each
   carve; read "Every basin is filled" and "Stars: 3 of 3"; background before terminate on relaunch); edit

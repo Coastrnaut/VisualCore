@@ -282,11 +282,12 @@ UI_CHUNKS = {
     "k3": ["LLPlayUITests", "LLReplayUITests"],   # feature 319 R02-G02-09 (T-R02G0209-004); "j3" is Particle Universe
     "l3": ["WKPlayUITests", "WKReplayUITests"],   # feature 329 R02-G03-09 (T-R02G0309-004)
     "m3": ["HCPlayUITests", "HCReplayUITests"],   # feature 339 R02-G04-09 (T-R02G0409-004)
+    "n3": ["CCPlayUITests", "CCReplayUITests"],   # feature 349 R02-G05-09 (T-R02G0509-004)
 }
 # Chunks that run on one simulator (feature 066 A08-P06): the oscilloscope draws every frame on the main thread, and
 # two parallel clones competing for the host's CPU kept XCTest's idle wait from settling (single tests took 60–89 s in
 # parallel, 23–41 s serially, with the same total time).
-SERIAL_CHUNKS = {"p2", "q2", "r2", "s2", "t2", "u2", "v2", "w2", "x2", "y2", "z2", "a3", "b3", "c3", "d3", "e3", "f3", "h3", "i3", "k3", "l3", "m3"}
+SERIAL_CHUNKS = {"p2", "q2", "r2", "s2", "t2", "u2", "v2", "w2", "x2", "y2", "z2", "a3", "b3", "c3", "d3", "e3", "f3", "h3", "i3", "k3", "l3", "m3", "n3"}
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",
                      "vcDamageStat", "vcCandidates", "vc_ci_angle_standin",
