@@ -236,6 +236,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   edit a trace step by replacing it with a move the kernel itself refuses at that point (asserted in the test), so the
   expected drop is known without asking the reconciliation code under test; a random walk that happens to win a level
   opens the next one, so the tests do not cap the frontier.
+- **Closed form checked against a step-by-step reference** (R02-G06-01, 2026-11-21). Chrono Constellator computes a
+  star's cell at any tick from one formula (start phase plus tick minus held ticks, modulo the loop length), so its
+  timeline tests compare every tick of 500 seeded levels with a reference written in the test that moves each star one
+  step per tick unless a hold covers it. The baselines of a new game's first feature run with the new files set aside
+  (moved to the scratchpad and the committed `Package.swift` restored), so they measure the tree before the feature.
 - **Colorfall Canyons device rows** (R02-G05-10, 2026-11-21). `ColorfallCanyonsDeviceRowsCheckTests` runs the same
   generic check on `docs/apps/colorfall-canyons/device-rows.json` and on copies with a scenario removed, CC-D1's `pass`
   removed and T-R02G0509-011 uncovered; the release step is `device-rows-r02-g05` (specs 341–349 found from the game

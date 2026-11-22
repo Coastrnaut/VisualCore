@@ -299,3 +299,14 @@ Feature 350 (R02-G05-10) prepares the device campaign without touching a device:
 `docs/apps/colorfall-canyons/device-rows.json` (rows CC-D1 … CC-D8, pending) and
 `docs/apps/colorfall-canyons/device-campaign.md`, checked by `scripts/check_device_rows.py --experience
 r02-g05.colorfall-canyons`.
+
+## Chrono Constellator (R02-G06, `r02-g06.chrono-constellator`, free)
+
+`ChronoConstellatorCore` (feature 351, R02-G06-01) is the playable rule kernel: `ChronoConstellatorLevel` with
+`ChronoConstellatorStar` and `ChronoConstellatorShape` (immutable, fingerprinted, JSON schema 1), the timeline
+`ChronoConstellatorTimeline` with `ChronoConstellatorHold` (closed-form star positions at any tick, edits in use, a
+fingerprint as the signed snapshot), `ChronoConstellatorEvaluation` with `ChronoConstellatorVerdict` and
+`ChronoConstellatorFailure`, the play state `ChronoConstellatorPlay` with `ChronoConstellatorAction`,
+`ChronoConstellatorStage`, `ChronoConstellatorEvent` and append-only `ChronoConstellatorRecord`s, and
+`ChronoConstellatorRules` for the R02-F23 puzzle contract. Refusals are `ChronoConstellatorError` with `r02-g06.*`
+codes. Rules: [docs/architecture/chrono-constellator.md](../../docs/architecture/chrono-constellator.md).

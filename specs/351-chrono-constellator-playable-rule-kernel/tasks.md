@@ -62,7 +62,7 @@ in this feature (the closed-form positions are the CPU reference the renderer of
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0601-007 Docs: `docs/architecture/chrono-constellator.md` (new: rules), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G0601-007 Docs: `docs/architecture/chrono-constellator.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-21: 2026-11-21 round02-host exit 0 (.autonomy/migration/checks/R02-G06-01.round02-host.json); new docs/architecture/chrono-constellator.md (rules), package README section, testing doc (closed form against a step-by-step reference; baselines with new files set aside)
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0601-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`
