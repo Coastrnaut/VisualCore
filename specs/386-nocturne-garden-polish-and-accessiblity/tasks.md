@@ -10,7 +10,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G0906-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit 0; rendering baseline = R02-G09-05 rendering-27/26 exit 0
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G09-05's rendering runs (exit 0)
-- [ ] T-R02G0906-002 Edit `Packages/ExperiencesRound02/Package.swift` (`NocturneGardenCore` and its tests gain
+- [X] T-R02G0906-002 Edit `Packages/ExperiencesRound02/Package.swift` (`NocturneGardenCore` and its tests gain — Verified 2026-11-22: host (swift test --filter NocturneGarden) exit 0; Core and tests gain VisualCoreAudioDSP, Experience gains VisualCoreAudioDSP and VisualCoreAudio (iOS), experience tests VisualCoreAudioDSP
   VisualCoreAudioDSP; `NocturneGardenExperience` gains VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as
   Faceted Forge's targets have); `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
   NocturneGarden`
