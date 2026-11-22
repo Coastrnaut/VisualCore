@@ -224,3 +224,14 @@ rotate(r, +1) and rotate(r, −1) for every shell in order, then an advance unle
   the app restores into schema 3 (a schema-2 result without a trace is kept, unverified); Amethyst Escape stays a
   candidate (not available without `-vcCandidates`) until X-R02-G07.
 - **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
+
+## Device preparation (feature 370, R02-G07-10)
+
+Nothing here touches a device. `docs/apps/amethyst-escape/device-rows.json` defines the device scenario set (the 11
+standard and game scenarios and `fixture-level-1-solved`) and rows AE-D1 … AE-D8 for D1, D2 and D3 (the ledger's
+DEV1/2/3-R02-G07 rows): launch and first frame, frame pacing and frame time per tier, memory and thermal state with the
+round-two stress session, touch feel and latency, sound and haptics, a non-gating VoiceOver walk-through, progress
+across a real termination and the panel journeys. Every row is "pending device campaign" and covers the open {device}
+tasks of features 363, 364 and 366 … 369 and UA-F13's measurements; `scripts/check_device_rows.py --experience
+r02-g07.amethyst-escape` (release step `device-rows-r02-g07`) keeps it true. The written plan is
+`docs/apps/amethyst-escape/device-campaign.md`; D3 stays on iPadOS 26.5.

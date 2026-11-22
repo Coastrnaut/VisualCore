@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G07-09: Amethyst Escape interface chunk p3, stored examples, xcodegen first).
+Last updated: 2026-11-22 (R02-G07-10: Amethyst Escape device rows and release step device-rows-r02-g07).
 
 ## 1. What is tested, and where
 
@@ -338,6 +338,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
 - **Chrono Constellator in the app** (R02-G06-09, 2026-11-22). Serial chunk `o3` holds `CRPlayUITests` and
   `CRReplayUITests` (54.7, 73.4 and 44.1 s on the iOS 27.2 phone); the key was checked unique before use. The level-1
   journey needs one Phase + press and Run, and its pinned values are checked against the Core by an app unit test.
+- **Amethyst Escape device rows** (R02-G07-10, 2026-11-22). `python3 scripts/check_device_rows.py --experience
+  r02-g07.amethyst-escape` (release step `device-rows-r02-g07`) checks the definition against the scenario manifest,
+  the ledger's DEV rows and the open {device} tasks of features 361 … 369; `AmethystEscapeDeviceRowsCheckTests` in
+  `test_scripts.py` proves it fails by name on a removed scenario, a missing field and an uncovered task.
 - **Amethyst Escape in the app** (R02-G07-09, 2026-11-22). Serial chunk `p3` holds `AEPlayUITests` and
   `AEReplayUITests` (54.9, 75.2 and 58.3 s on the iOS 27.2 phone); the key was checked unique before use. New UI test
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the

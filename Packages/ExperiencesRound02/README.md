@@ -420,3 +420,7 @@ Feature 369 (R02-G07-09) adds Amethyst Escape's in-app integration: panel identi
 (`AmethystEscapeControls.identifierNames`), the stored schema-1 and schema-2 examples (`AmethystEscapeSchemaExamples`),
 app unit tests, and the interface tests `AEPlayUITests` and `AEReplayUITests` in serial chunk `p3`.
 
+Feature 370 (R02-G07-10) prepares Amethyst Escape's device campaign without touching a device:
+`docs/apps/amethyst-escape/device-rows.json` (rows AE-D1 … AE-D8, all pending), the written plan
+`docs/apps/amethyst-escape/device-campaign.md`, and the release step `device-rows-r02-g07`.
+
