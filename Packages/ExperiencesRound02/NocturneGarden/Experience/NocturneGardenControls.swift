@@ -137,10 +137,13 @@ struct NocturneGardenControls: View {
                     send("bloom.move", [Double(mirror.bloom), Double(mirror.column), Double(mirror.row)])
                 }
                 .accessibilityLabel("Move the chosen bloom to the chosen cell")
+                .accessibilityValue(Self.values(mirror).move)
                 Button("Resize") { send("bloom.resize", [Double(mirror.bloom), Double(mirror.size)]) }
                     .accessibilityLabel("Give the chosen bloom the chosen size")
+                    .accessibilityValue(Self.values(mirror).resize)
                 Button("Remove") { send("bloom.remove", [Double(mirror.bloom)]) }
                     .accessibilityLabel("Remove the chosen bloom")
+                    .accessibilityValue(Self.values(mirror).remove)
             }
         }
     }
@@ -162,12 +165,16 @@ struct NocturneGardenControls: View {
             row {
                 Button("Undo") { send("play.undo") }
                     .accessibilityLabel("Undo the last move")
+                    .accessibilityValue(Self.values(mirror).moves)
                 Button("Redo") { send("play.redo") }
                     .accessibilityLabel("Redo the move")
+                    .accessibilityValue(Self.values(mirror).moves)
                 Button("Next level") { send("level.next") }
                     .accessibilityLabel("Go to the next level")
+                    .accessibilityValue(Self.values(mirror).nextLevel)
                 Button("Reset view") { resetView() }
                     .accessibilityLabel("Return the camera to the authored view")
+                    .accessibilityValue(Self.viewValue(presenter.gestures.orbit == .authored))
             }
         }
     }
@@ -179,6 +186,7 @@ struct NocturneGardenControls: View {
                 Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityValue(instruction)
             }
         }
         row {
@@ -197,8 +205,10 @@ struct NocturneGardenControls: View {
                 row {
                     Button("Undo") { presenter.undoMove(port: port) }
                         .accessibilityLabel("Undo the last move")
+                        .accessibilityValue(Self.values(mirror).moves)
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
+                        .accessibilityValue(Self.values(mirror).retry)
                 }
             }
         }
@@ -209,13 +219,13 @@ struct NocturneGardenControls: View {
         row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
-                .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
-                .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with a larger move budget")
-                .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "practice"))
         }
         row {
             Stepper(levelLabel(mirror.pickedLevel),
@@ -225,8 +235,48 @@ struct NocturneGardenControls: View {
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
+                .accessibilityValue(Self.values(mirror).playLevel)
         }
     }
+
+    /// The accessibility values in words of the buttons that act on the picks or the play (feature 386 convergence,
+    /// T-R02G0906-013): every native control carries a value.
+    struct Values: Equatable {
+        /// Move: the chosen bloom and the target cell.
+        let move: String
+        /// Resize: the chosen bloom and the chosen size.
+        let resize: String
+        /// Remove: the chosen bloom.
+        let remove: String
+        /// Undo and redo: the moves made of the budget.
+        let moves: String
+        /// Next level: the next open level, or that none is open.
+        let nextLevel: String
+        /// Retry: the level and the mode.
+        let retry: String
+        /// Play level: the picked level.
+        let playLevel: String
+    }
+
+    /// The button values of `mirror` (see ``Values``).
+    static func values(_ mirror: NocturneGardenMirror) -> Values {
+        let bloom: String = mirror.bloomLabel
+        let next: String = mirror.levelNumber < mirror.frontier ? "level \(mirror.levelNumber + 1)"
+            : "no further level open"
+        return Values(move: bloom + " to " + mirror.columnLabel + ", " + mirror.rowLabel,
+                      resize: bloom + " to " + mirror.sizeLabel,
+                      remove: bloom,
+                      moves: "\(mirror.moves) of \(mirror.budget) moves made",
+                      nextLevel: next,
+                      retry: "level \(mirror.levelNumber), " + modeName(mirror.mode),
+                      playLevel: "level \(mirror.pickedLevel)")
+    }
+
+    /// The Reset view value: "authored view" or "orbited view".
+    static func viewValue(_ authored: Bool) -> String { authored ? "authored view" : "orbited view" }
+
+    /// A mode button's value: "selected" or "not selected".
+    static func selectedValue(_ selected: Bool) -> String { selected ? "selected" : "not selected" }
 
     /// "Level n, band b" with its stars when won.
     private func levelLabel(_ level: Int) -> String {

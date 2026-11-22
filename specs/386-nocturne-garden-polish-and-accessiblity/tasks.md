@@ -78,7 +78,7 @@ FR-006 → 004, 005; FR-007 → 006 … 010.
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G0906-013 Give every native control an accessibility value in words per FR-R02G0906-001 and SC-R02G0906-001
+- [X] T-R02G0906-013 Give every native control an accessibility value in words per FR-R02G0906-001 and SC-R02G0906-001 — Verified 2026-11-22: sim-27-3 (NocturneGardenExperienceTests, 54 tests on iOS 27.2 incl. everyButtonHasAValueInWords) exit 0; Move, Resize, Remove, Undo, Redo, Next level, Reset view, Dismiss, Retry and Play level carry values in words, mode buttons selected or not selected
   (partial): in `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenControls.swift` Move, Resize and
   Remove carry the chosen bloom (and the target cell or size), Undo and Redo the moves made, Next level the next open
   level, Reset view the view ("authored" or "orbited"), Dismiss the tutorial instruction, Retry the level and mode,

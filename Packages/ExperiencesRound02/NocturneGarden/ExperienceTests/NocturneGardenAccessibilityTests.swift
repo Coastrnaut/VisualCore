@@ -860,5 +860,27 @@ enum NocturneGardenA11y {
         let core: Core = try Access.core(shell)
         #expect(secondDrawn == core.snapshot(time: 0))
     }
+
+    /// Feature 386 convergence (T-R02G0906-013): every button that acts on the picks or the play carries a value in
+    /// words; the mode buttons say "selected" or "not selected" and Reset view names the view.
+    @Test func everyButtonHasAValueInWords() throws {
+        let presenter = NocturneGardenPresenter(reduceMotion: false, reduceFlashing: false)
+        let core: Core = try Core.opening(number: 1)
+        _ = presenter.describe(core)
+        let mirror: NocturneGardenMirror = presenter.mirror
+        let values: NocturneGardenControls.Values = NocturneGardenControls.values(mirror)
+        let all: [String] = [values.move, values.resize, values.remove, values.moves, values.nextLevel, values.retry,
+                             values.playLevel]
+        for value in all { #expect(!value.isEmpty) }
+        #expect(values.moves == "0 of \(mirror.budget) moves made", "\(values.moves)")
+        #expect(values.retry == "level 1, campaign", "\(values.retry)")
+        #expect(values.playLevel == "level 1", "\(values.playLevel)")
+        #expect(values.nextLevel == "no further level open", "\(values.nextLevel)")
+        #expect(values.remove == "no bloom planted")
+        #expect(NocturneGardenControls.selectedValue(true) == "selected")
+        #expect(NocturneGardenControls.selectedValue(false) == "not selected")
+        #expect(NocturneGardenControls.viewValue(true) == "authored view")
+        #expect(NocturneGardenControls.viewValue(false) == "orbited view")
+    }
 }
 #endif
