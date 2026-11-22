@@ -53,7 +53,7 @@ in this feature (the blooms and the mask are the CPU reference the renderer of R
   (blooms, sun, moves, outcome), Move = NocturneGardenAction; legal moves while playing "plant by kind, row, column,
   size; then move, resize, remove by bloom; then sun") with `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenRulesTests.swift` (agreement
   with the play on 200 walks); `--name host-4`
-- [ ] T-R02G0901-006 [P] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenInvariantTests.swift` (agent D:
+- [X] T-R02G0901-006 [P] Create `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenInvariantTests.swift` (agent D: — Verified 2026-11-22: host-6 (46 tests incl. NocturneGardenInvariantTests 9: time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity, each with seeded neighbouring inputs, seed 2_386) exit 0 after host-5 exit 1 (a lead copy of an unfinished test file: too strict an import list and a paused-replay comparison; both test errors, Core unchanged), lead retest
   `testNocturneGardenTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
   with a seeded neighbouring-input check, seed 2_386); `--name host-5`
