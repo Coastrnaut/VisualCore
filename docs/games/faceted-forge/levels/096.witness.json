@@ -1,0 +1,219 @@
+{
+  "actions" : [
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 10,
+        "_2" : -7
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 11,
+        "_2" : 4
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 10,
+        "_2" : 3
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 5,
+        "_2" : 1
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 2,
+        "_1" : 10,
+        "_2" : -2
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 2,
+        "_1" : 10,
+        "_2" : 2
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 2,
+        "_1" : 1,
+        "_2" : 2
+      }
+    }
+  ],
+  "difficulty" : {
+    "crystalFaces" : 8,
+    "diagonals" : 6,
+    "directions" : 4,
+    "pieces" : 8,
+    "smallest" : 7,
+    "work" : 1960
+  },
+  "digests" : [
+    "7fd9a2a5ef09b98b",
+    "24b27ab00188ce90",
+    "5b0548c731333006",
+    "fc3959aa167696dc",
+    "07064d1dc5ad48fb",
+    "1397142ff7cbe9f6",
+    "777eea54fb6d5690"
+  ],
+  "fingerprints" : [
+    "a4af6239ef5d0c93ed52e3231640d96db986a72fc92750118aac30bc000ba91a",
+    "628b3b185172573db16c091b7f695a48918628ed6456aae519aa9355bd936693",
+    "5b56d759ed8714527acb60a82624976e3f59646be4bcbfe57ce015193adec22a",
+    "c01aedd7062a9cee29d959d11e91211da06211781ea7dc6a6c591e6a2815bc64",
+    "a7f941fea83479fe9119eed97e04160443144c5ab4d47c4a5a41511799e19199",
+    "f7ac31e6fb735c8f39ced50b1e986bced900333d8bc3f34b2b37ccb57b0d3356",
+    "ff6fb89609795056473b00284aac908856b7f26c9f302ffb47d8677f5d9ed1ca",
+    "5e04d6de46986fc15433c782d2838fec63fcd947646780812d64838edb976084"
+  ],
+  "level" : {
+    "budget" : 16,
+    "difficulty" : 5,
+    "fingerprint" : "986f9f6f523841dfa156d2b43181f2465a9d34d452f8b40557f11fb672846b17",
+    "id" : "faceted-forge-096",
+    "planes" : [
+      {
+        "depth" : -5,
+        "direction" : 0,
+        "sign" : -1
+      },
+      {
+        "depth" : 5,
+        "direction" : 0,
+        "sign" : 1
+      },
+      {
+        "depth" : -5,
+        "direction" : 1,
+        "sign" : -1
+      },
+      {
+        "depth" : 5,
+        "direction" : 1,
+        "sign" : 1
+      },
+      {
+        "depth" : -5,
+        "direction" : 2,
+        "sign" : -1
+      },
+      {
+        "depth" : 5,
+        "direction" : 2,
+        "sign" : 1
+      },
+      {
+        "depth" : -12,
+        "direction" : 9,
+        "sign" : -1
+      },
+      {
+        "depth" : 12,
+        "direction" : 9,
+        "sign" : 1
+      }
+    ],
+    "schema" : 1,
+    "seed" : 12140387464553811322,
+    "sliver" : "1/64",
+    "target" : [
+      {
+        "faces" : 10,
+        "share" : "8383/23784"
+      },
+      {
+        "faces" : 8,
+        "share" : "1567/5946"
+      },
+      {
+        "faces" : 5,
+        "share" : "2047/23784"
+      },
+      {
+        "faces" : 6,
+        "share" : "1907/23784"
+      },
+      {
+        "faces" : 6,
+        "share" : "76/991"
+      },
+      {
+        "faces" : 6,
+        "share" : "1375/23784"
+      },
+      {
+        "faces" : 7,
+        "share" : "148/2973"
+      },
+      {
+        "faces" : 6,
+        "share" : "199/5946"
+      }
+    ],
+    "tutorial" : false
+  },
+  "lowerBound" : 7,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 10,
+          "_2" : -7
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 11,
+          "_2" : 4
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 10,
+          "_2" : 3
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 5,
+          "_2" : 1
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 2,
+          "_1" : 10,
+          "_2" : -2
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 2,
+          "_1" : 10,
+          "_2" : 2
+        }
+      }
+    ],
+    "cut" : 6,
+    "outcome" : "open"
+  },
+  "number" : 96,
+  "schema" : 1,
+  "skipped" : 5,
+  "smallest" : 7
+}

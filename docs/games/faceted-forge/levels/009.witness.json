@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 3,
+        "_2" : -2
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 0,
+        "_2" : 1
+      }
+    }
+  ],
+  "difficulty" : {
+    "crystalFaces" : 6,
+    "diagonals" : 1,
+    "directions" : 2,
+    "pieces" : 3,
+    "smallest" : 2,
+    "work" : 32
+  },
+  "digests" : [
+    "b8dc84ff0f3d4e0a",
+    "73773fef66c7317b"
+  ],
+  "fingerprints" : [
+    "7ac8c9aa6618e7c8b6cf3f025eb5cb440c1d858cb5f203085584489940760f85",
+    "0e4499b955eaa1003abf329ad9a8e600c7c746e572ce55c4649eb4fb075a3d61",
+    "7825f378734514fb77af1a5d4a9a68871dcf2506f844f381af4eb56f583ad1ef"
+  ],
+  "level" : {
+    "budget" : 9,
+    "difficulty" : 1,
+    "fingerprint" : "249267cff96422a601e6579d2b66d74b8c166e4a0231048e871e23fd66590399",
+    "id" : "faceted-forge-009",
+    "planes" : [
+      {
+        "depth" : -4,
+        "direction" : 0,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 0,
+        "sign" : 1
+      },
+      {
+        "depth" : -4,
+        "direction" : 1,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 1,
+        "sign" : 1
+      },
+      {
+        "depth" : -4,
+        "direction" : 2,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 2,
+        "sign" : 1
+      }
+    ],
+    "schema" : 1,
+    "seed" : 12345761602475917819,
+    "sliver" : "1/64",
+    "target" : [
+      {
+        "faces" : 7,
+        "share" : "47/128"
+      },
+      {
+        "faces" : 6,
+        "share" : "45/128"
+      },
+      {
+        "faces" : 5,
+        "share" : "9/32"
+      }
+    ],
+    "tutorial" : false
+  },
+  "lowerBound" : 2,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 3,
+          "_2" : -2
+        }
+      }
+    ],
+    "cut" : 1,
+    "outcome" : "open"
+  },
+  "number" : 9,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 2
+}

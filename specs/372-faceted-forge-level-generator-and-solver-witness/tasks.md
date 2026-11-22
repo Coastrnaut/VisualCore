@@ -58,7 +58,7 @@ logic); no GLSL in this feature.
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeWitnessTests.swift` (round trip byte for byte; edited
   cuts, digests, fingerprints, level, counterexample and difficulty refused; newer schema and damaged JSON refused; the
   counterexample behaves as recorded) by agent B; `--name host-4`
-- [ ] T-R02G0802-006 [US2] [US3] [US4] Create
+- [X] T-R02G0802-006 [US2] [US3] [US4] Create — Verified 2026-11-22: host-5 exit=0 (FacetedForgeCatalogTests 8: manifest, pinned digest ceb59042…, progression and band means, 100 witnesses win at the lower bound and are open one cut short, independent recount on two levels per band, full decode per band, 100 files byte for byte in 20 groups of 5)
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeCatalogTests.swift` (100 entries, 20 per band; the
   catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest count; band
   means never fall; the independent check on two levels per band (SC-R02G0802-002); all 100 witnesses replay to a win;

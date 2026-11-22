@@ -1,0 +1,129 @@
+{
+  "actions" : [
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 3,
+        "_2" : -7
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 1,
+        "_2" : -4
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 2,
+        "_1" : 5,
+        "_2" : -4
+      }
+    }
+  ],
+  "difficulty" : {
+    "crystalFaces" : 6,
+    "diagonals" : 2,
+    "directions" : 3,
+    "pieces" : 4,
+    "smallest" : 3,
+    "work" : 1232
+  },
+  "digests" : [
+    "d1edb7af22768896",
+    "b7ce602bafc38409",
+    "2ba2ac0869e15163"
+  ],
+  "fingerprints" : [
+    "8bdb3a77a329119964634328bad23ac6f2102f4992c872ccbbe48dd05ff2de64",
+    "76e6d89881437688583bc14646898bd323fccc9b1fbefa71bbf1081dcf9fc5f7",
+    "61f68c8144e297cf26d015d4fbeed4612855faa6f5ad402addccbef45110993f",
+    "97834301cd3b6a9513e010c841152617b7797139167fca6ff73ccc31a3b970c2"
+  ],
+  "level" : {
+    "budget" : 10,
+    "difficulty" : 2,
+    "fingerprint" : "3db41207b4484215ecfe392c7c439dac7495147074e373eb5f3a8c777e962faa",
+    "id" : "faceted-forge-028",
+    "planes" : [
+      {
+        "depth" : -5,
+        "direction" : 0,
+        "sign" : -1
+      },
+      {
+        "depth" : 3,
+        "direction" : 0,
+        "sign" : 1
+      },
+      {
+        "depth" : -6,
+        "direction" : 1,
+        "sign" : -1
+      },
+      {
+        "depth" : 5,
+        "direction" : 1,
+        "sign" : 1
+      },
+      {
+        "depth" : -6,
+        "direction" : 2,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 2,
+        "sign" : 1
+      }
+    ],
+    "schema" : 1,
+    "seed" : 14953802608702340724,
+    "sliver" : "1/64",
+    "target" : [
+      {
+        "faces" : 7,
+        "share" : "35/44"
+      },
+      {
+        "faces" : 6,
+        "share" : "5/44"
+      },
+      {
+        "faces" : 5,
+        "share" : "17/330"
+      },
+      {
+        "faces" : 5,
+        "share" : "13/330"
+      }
+    ],
+    "tutorial" : false
+  },
+  "lowerBound" : 3,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 3,
+          "_2" : -7
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 1,
+          "_2" : -4
+        }
+      }
+    ],
+    "cut" : 2,
+    "outcome" : "open"
+  },
+  "number" : 28,
+  "schema" : 1,
+  "skipped" : 3,
+  "smallest" : 3
+}

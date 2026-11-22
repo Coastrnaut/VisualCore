@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 3,
+        "_2" : -2
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 5,
+        "_2" : -3
+      }
+    }
+  ],
+  "difficulty" : {
+    "crystalFaces" : 6,
+    "diagonals" : 2,
+    "directions" : 2,
+    "pieces" : 3,
+    "smallest" : 2,
+    "work" : 77
+  },
+  "digests" : [
+    "b8dc84ff0f3d4e0a",
+    "1e0ff5f63f050010"
+  ],
+  "fingerprints" : [
+    "0c5565244fcf3bf33fe7c6c2c85ee7a3ca05530e96d223acb47daa22eb842f43",
+    "54331c81663302ad88248df9bcd69468867e357951dab6ef7940f9bc8c2e1e1c",
+    "97629a0cdb4b8c6a0a98d0dff03776939d2f0ddc994d3eb4800bd21f262e1126"
+  ],
+  "level" : {
+    "budget" : 9,
+    "difficulty" : 1,
+    "fingerprint" : "ce1829d3cf69bf48e2aaf926eccb145f54529be79d886d686c410b62afee3fc7",
+    "id" : "faceted-forge-005",
+    "planes" : [
+      {
+        "depth" : -4,
+        "direction" : 0,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 0,
+        "sign" : 1
+      },
+      {
+        "depth" : -4,
+        "direction" : 1,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 1,
+        "sign" : 1
+      },
+      {
+        "depth" : -4,
+        "direction" : 2,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 2,
+        "sign" : 1
+      }
+    ],
+    "schema" : 1,
+    "seed" : 12804157791054984692,
+    "sliver" : "1/64",
+    "target" : [
+      {
+        "faces" : 8,
+        "share" : "1933/3072"
+      },
+      {
+        "faces" : 5,
+        "share" : "9/32"
+      },
+      {
+        "faces" : 5,
+        "share" : "275/3072"
+      }
+    ],
+    "tutorial" : false
+  },
+  "lowerBound" : 2,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 3,
+          "_2" : -2
+        }
+      }
+    ],
+    "cut" : 1,
+    "outcome" : "open"
+  },
+  "number" : 5,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 2
+}

@@ -1,0 +1,109 @@
+{
+  "actions" : [
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 3,
+        "_2" : -1
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 1,
+        "_1" : 2,
+        "_2" : -1
+      }
+    }
+  ],
+  "difficulty" : {
+    "crystalFaces" : 6,
+    "diagonals" : 1,
+    "directions" : 2,
+    "pieces" : 3,
+    "smallest" : 2,
+    "work" : 225
+  },
+  "digests" : [
+    "6741571c3757fd7f",
+    "473c7592ab43f171"
+  ],
+  "fingerprints" : [
+    "24d3404acc4800e7485fca6a05c4bf39c6f7f2e8b43e07ad072648454f12f301",
+    "865eb0cfafb10c8bb053bbbdeb09d896c369d1c3db2ba199985f0c226376d0b4",
+    "7aa5223d52a099f212964d22e4a97d7956edaef59a877b554a9fc66356724a1a"
+  ],
+  "level" : {
+    "budget" : 9,
+    "difficulty" : 1,
+    "fingerprint" : "e64ad95c7921aa4c97e671a0e910e636ddf0b5c70e021cbe3cfb68e12e932fe5",
+    "id" : "faceted-forge-013",
+    "planes" : [
+      {
+        "depth" : -4,
+        "direction" : 0,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 0,
+        "sign" : 1
+      },
+      {
+        "depth" : -4,
+        "direction" : 1,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 1,
+        "sign" : 1
+      },
+      {
+        "depth" : -4,
+        "direction" : 2,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 2,
+        "sign" : 1
+      }
+    ],
+    "schema" : 1,
+    "seed" : 15105628393689877086,
+    "sliver" : "1/64",
+    "target" : [
+      {
+        "faces" : 7,
+        "share" : "79/128"
+      },
+      {
+        "faces" : 5,
+        "share" : "245/1024"
+      },
+      {
+        "faces" : 5,
+        "share" : "147/1024"
+      }
+    ],
+    "tutorial" : false
+  },
+  "lowerBound" : 2,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 3,
+          "_2" : -1
+        }
+      }
+    ],
+    "cut" : 1,
+    "outcome" : "open"
+  },
+  "number" : 13,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 2
+}

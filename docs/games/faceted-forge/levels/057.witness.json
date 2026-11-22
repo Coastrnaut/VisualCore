@@ -1,0 +1,154 @@
+{
+  "actions" : [
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 3,
+        "_2" : -2
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 9,
+        "_2" : 4
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 1,
+        "_1" : 5,
+        "_2" : 0
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 1,
+        "_1" : 7,
+        "_2" : -1
+      }
+    }
+  ],
+  "difficulty" : {
+    "crystalFaces" : 7,
+    "diagonals" : 4,
+    "directions" : 4,
+    "pieces" : 5,
+    "smallest" : 4,
+    "work" : 597
+  },
+  "digests" : [
+    "c3590161d04e692c",
+    "d2f43cf383ef2e63",
+    "659e643e347d2a08",
+    "30b8fb1d460794c7"
+  ],
+  "fingerprints" : [
+    "eeb45ac52c12de32638306d9bac02f385e0d9b478ba41a7b9460dc78307804df",
+    "ada616fc58d2d61378eaeb39d8619fa154736adcb3994666c891f64025a65f35",
+    "6f58c12c1e75776e67080d4fd0ede673f362258a85364e30bd3f98c320b63e0b",
+    "7887fe28b4aa664bedd0be2fb67db61cb0f8efc23b1fabbd99502b9d813da538",
+    "8ffa4ea5da3d127a5d9dd38598129fc2e58434120ac74123326d7b6003f0ef34"
+  ],
+  "level" : {
+    "budget" : 13,
+    "difficulty" : 3,
+    "fingerprint" : "f59d27f34330f13a4636bdca3056d00454930bf83fab6b767944d727e0177fd3",
+    "id" : "faceted-forge-057",
+    "planes" : [
+      {
+        "depth" : -4,
+        "direction" : 0,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 0,
+        "sign" : 1
+      },
+      {
+        "depth" : -4,
+        "direction" : 1,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 1,
+        "sign" : 1
+      },
+      {
+        "depth" : -4,
+        "direction" : 2,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 2,
+        "sign" : 1
+      },
+      {
+        "depth" : 9,
+        "direction" : 9,
+        "sign" : 1
+      }
+    ],
+    "schema" : 1,
+    "seed" : 2275316059859108323,
+    "sliver" : "1/64",
+    "target" : [
+      {
+        "faces" : 8,
+        "share" : "1696/3045"
+      },
+      {
+        "faces" : 5,
+        "share" : "97/609"
+      },
+      {
+        "faces" : 6,
+        "share" : "191/1218"
+      },
+      {
+        "faces" : 4,
+        "share" : "72/1015"
+      },
+      {
+        "faces" : 5,
+        "share" : "341/6090"
+      }
+    ],
+    "tutorial" : false
+  },
+  "lowerBound" : 4,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 3,
+          "_2" : -2
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 9,
+          "_2" : 4
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 1,
+          "_1" : 5,
+          "_2" : 0
+        }
+      }
+    ],
+    "cut" : 3,
+    "outcome" : "open"
+  },
+  "number" : 57,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 4
+}

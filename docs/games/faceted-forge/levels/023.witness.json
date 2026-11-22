@@ -1,0 +1,149 @@
+{
+  "actions" : [
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 3,
+        "_2" : -3
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 0,
+        "_1" : 3,
+        "_2" : 1
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 1,
+        "_1" : 5,
+        "_2" : -1
+      }
+    },
+    {
+      "cut" : {
+        "_0" : 2,
+        "_1" : 5,
+        "_2" : -2
+      }
+    }
+  ],
+  "difficulty" : {
+    "crystalFaces" : 6,
+    "diagonals" : 4,
+    "directions" : 2,
+    "pieces" : 5,
+    "smallest" : 4,
+    "work" : 752
+  },
+  "digests" : [
+    "43b5437adc4a6d70",
+    "ceedd1cf6abcd477",
+    "052ebf6c31ee9ac6",
+    "bdafe3abc14d1632"
+  ],
+  "fingerprints" : [
+    "6c8b2230f0783712e9ae9e548f9bbed06f4250040d75c0936db9172ed04689b6",
+    "81b01cf26c78781194b77189257eacb0a8040efdb1d3eeeae3b3151f874a6089",
+    "e04d2d482a97ca4615e6deb251aa7bcb713fae229ca8a6e76b5c618106885232",
+    "6effe25fe6eaba5a99df75a871352a932f66c2a76af9260c0143f1eb5ab82eb1",
+    "c9f22d65ed6abbb02b68ddc8df1b84b4b7bd486157eda5b0dc2cba65a52f4967"
+  ],
+  "level" : {
+    "budget" : 13,
+    "difficulty" : 2,
+    "fingerprint" : "16c15990763d0880cbd330d35d557b40436d0fd3b6c17bf495a1cbace4be95b9",
+    "id" : "faceted-forge-023",
+    "planes" : [
+      {
+        "depth" : -5,
+        "direction" : 0,
+        "sign" : -1
+      },
+      {
+        "depth" : 5,
+        "direction" : 0,
+        "sign" : 1
+      },
+      {
+        "depth" : -5,
+        "direction" : 1,
+        "sign" : -1
+      },
+      {
+        "depth" : 4,
+        "direction" : 1,
+        "sign" : 1
+      },
+      {
+        "depth" : -5,
+        "direction" : 2,
+        "sign" : -1
+      },
+      {
+        "depth" : 5,
+        "direction" : 2,
+        "sign" : 1
+      }
+    ],
+    "schema" : 1,
+    "seed" : 9067093528341024663,
+    "sliver" : "1/64",
+    "target" : [
+      {
+        "faces" : 8,
+        "share" : "67/180"
+      },
+      {
+        "faces" : 6,
+        "share" : "1577/5400"
+      },
+      {
+        "faces" : 5,
+        "share" : "833/5400"
+      },
+      {
+        "faces" : 5,
+        "share" : "637/5400"
+      },
+      {
+        "faces" : 4,
+        "share" : "343/5400"
+      }
+    ],
+    "tutorial" : false
+  },
+  "lowerBound" : 4,
+  "nearMiss" : {
+    "actions" : [
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 3,
+          "_2" : -3
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 0,
+          "_1" : 3,
+          "_2" : 1
+        }
+      },
+      {
+        "cut" : {
+          "_0" : 1,
+          "_1" : 5,
+          "_2" : -1
+        }
+      }
+    ],
+    "cut" : 3,
+    "outcome" : "open"
+  },
+  "number" : 23,
+  "schema" : 1,
+  "skipped" : 3,
+  "smallest" : 4
+}
