@@ -20,8 +20,8 @@ Canonical overrides:
   VisualCore app. The source's `Apps/NocturneGarden` and `Packages/GameModules/NocturneGardenCore` become the experience
   module `Packages/ExperiencesRound02/NocturneGarden`; this feature adds its pure Core with tests. Catalog registration,
   adapter and renderer come in later features of R02-G09 and its gate X-R02-G09.
-- **Superseded parts of the source prompt:** the price and "no IAP" (free under the shared purchase controller); the Round
-  2 lock and per-round device campaign (ImplementationLock-100). The content count 76 (the catalog's "76
+- **Superseded parts of the source prompt:** the price and "no IAP" (free under the shared purchase controller); the
+  Round 2 lock and per-round device campaign (ImplementationLock-100). The content count 76 (the catalog's "76
   solver-certified stages") is produced in R02-G09-02. **Device-only items:** none (pure logic). **Owner-only items:**
   none.
 - **Exactness:** every kernel rule is decided in exact integer arithmetic on a grid (no floating point decides a shadow
@@ -37,8 +37,8 @@ Canonical overrides:
 
 A player sees a garden bed, a target silhouette (the dark flower shape to make) and a few forbidden outline regions
 around it. The player plants glowing blooms from the level's supply at grid positions and sizes and sets the sun's
-elevation, which lengthens or shortens every shadow. The blooms' shadows together form a dark mask; when that mask covers
-the target closely enough and keeps out of the forbidden regions, the level is won.
+elevation, which lengthens or shortens every shadow. The blooms' shadows together form a dark mask; when that mask
+covers the target closely enough and keeps out of the forbidden regions, the level is won.
 
 **Why this priority**: this is the whole game.
 
@@ -94,8 +94,8 @@ refused.
 - **FR-R02G0901-003**: Each bloom's shadow MUST be its exact outline stretched by the sun elevation and turned into grid
   cells by a fixed, exact rule; the garden's shadow mask MUST be the union of all blooms' shadows within the bed.
 - **FR-R02G0901-004**: Every accepted action MUST spend one move; undo and redo MUST spend nothing.
-- **FR-R02G0901-005**: The level MUST be won exactly on the action after which the match (shared cells of mask and target
-  divided by cells in either) reaches the required fraction and the leak (mask cells in the forbidden regions) is
+- **FR-R02G0901-005**: The level MUST be won exactly on the action after which the match (shared cells of mask and
+  target divided by cells in either) reaches the required fraction and the leak (mask cells in the forbidden regions) is
   within the allowance; it MUST fail with a named reason when the leak exceeds the allowance (leak) or when the last
   move is spent without a win (budget).
 - **FR-R02G0901-006**: Every action MUST be validated (range, supply, stage, previous fingerprint, budget) and refused
@@ -107,7 +107,8 @@ refused.
 - **FR-R02G0901-009**: Levels MUST have a versioned stored form with a fingerprint; damaged, edited and newer forms MUST
   be refused.
 - **FR-R02G0901-010**: The rules MUST be expressible as a puzzle contract (R02-F23).
-- **FR-R02G0901-011**: Invalid requests MUST be refused with stable reason codes `r02-g09.*`; existing modules unchanged.
+- **FR-R02G0901-011**: Invalid requests MUST be refused with stable reason codes `r02-g09.*`; existing modules
+  unchanged.
 - **FR-R02G0901-012**: The source's invariants this kernel owns (time, input budget, goal, repeatability, undo, failure
   honesty, stability, save, renderer purity) MUST each have a named direct test and a seeded neighbouring-input check.
 - **FR-R02G0901-013**: Every bloom, region and measure MUST be identifiable without colour vision: the kernel names them
@@ -134,8 +135,8 @@ refused.
   with its named reason.
 - **SC-R02G0901-002**: For 500 seeded action traces, replay reproduces every fingerprint and the outcome; undo of every
   action restores the exact earlier state.
-- **SC-R02G0901-003**: Over 500 seeded levels and action sequences, every shadow mask, match, leak and boundary deviation
-  equals an independent computation.
+- **SC-R02G0901-003**: Over 500 seeded levels and action sequences, every shadow mask, match, leak and boundary
+  deviation equals an independent computation.
 - **SC-R02G0901-004**: Leak and budget each fail on the exact action with the reason named, including the boundary cases
   at the leak allowance and one move either side of the budget.
 - **SC-R02G0901-005**: Levels round-trip exactly; damaged, edited and newer forms are refused.
@@ -168,3 +169,4 @@ refused.
 
 - No rendering, gestures, generator, solver certification, adapter, catalog registration or persistence in this
   feature; no soft shadows in the rules; no device run before ImplementationLock-100.
+
