@@ -74,7 +74,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
   `--name host-full`, `--name app-unit`
 - [X] T-R02G0606-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-22: 2026-11-22: reference-1 exit 0
 - [X] T-R02G0606-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: 2026-11-22: reference-2 exit 0
-- [ ] T-R02G0606-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G0606-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-22: 2026-11-22: script-tests (run alone) exit 0
 - [ ] T-R02G0606-012 {device} After ImplementationLock-100, on D1, D2 and D3: hear the ambient sound, feel the haptics,
   play level 1 with VoiceOver and the largest text size (SC-R02G0606-001 … 004 on hardware). Not run before the lock.
 - [ ] T-R02G0606-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
