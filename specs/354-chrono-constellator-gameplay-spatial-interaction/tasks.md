@@ -48,7 +48,7 @@ program).
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G0604-005 [US4] Wire `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorPresenter.swift` (`pointer(_:viewSize:port:)` routing
+- [X] T-R02G0604-005 [US4] Wire `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorPresenter.swift` (`pointer(_:viewSize:port:)` routing — Verified 2026-11-21: 2026-11-21: sim-27 (ChronoConstellatorExperienceTests, 33 tests on iOS 27.2 incl. 7 gesture wiring tests: star drag, scrub forward/back vs plain replay, long-press hold toggle, tap/orbit/double tap, tick-0 message, refusal shown and logged, cancel) exit 0; lead fixed one compile error
   through the gesture controller, `select` setting the mirror's picked star, `resetView()`, the descriptions "Star n
   (shape) would start at row r, column c", "Scrub to tick t of T" and, for a star drag or press after tick 0, "Edits
   are made at tick 0: rewind first"; a gesture's refused action shown in the mirror message like the panel's and logged

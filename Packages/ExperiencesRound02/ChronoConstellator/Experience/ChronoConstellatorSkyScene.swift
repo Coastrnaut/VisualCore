@@ -10,6 +10,10 @@
 // the shimmer moves by a uniform. Reduce Flashing passes `ChronoConstellatorShaders.glowLimit(reduceFlashing:)` as
 // `u_glowLimit`. If a program fails, the scene falls back to the level-2 geometry drawn unlit with the shared
 // `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason; nothing here can reach the kernel.
+// Feature 354 (R02-G06-04) T-R02G0604-005 (FR-R02G0604-005, 006; research R6): the camera follows the gesture
+// controller's orbit (`ChronoConstellatorSceneGeometry.camera(_:aspect:orbit:)`), and the cell a star drag would start
+// the star on gets a ring (`ChronoConstellatorSceneGeometry.candidatePart(_:_:)`) drawn after the field with the field
+// program (or unlit in the fallback).
 #if os(iOS)
 import ChronoConstellatorCore
 import Foundation
@@ -26,6 +30,10 @@ final class ChronoConstellatorSkyScene {
     var fieldFragment = ChronoConstellatorShaders.fieldFragment
     /// Whether the glow gain is capped (Reduce Flashing).
     var reducedFlash = false
+    /// The camera orbit (presentation only), set by the presenter before each frame.
+    var orbit: ChronoConstellatorOrbit = .authored
+    /// The cell a star drag would start the star on, set by the presenter before each frame.
+    var candidateCell: Int?
     /// The light direction of the field (towards the light, from the upper left front).
     static let lightDirection = SIMD3<Float>(-0.4, 0.8, 0.45)
 
@@ -47,6 +55,10 @@ final class ChronoConstellatorSkyScene {
     private var starRenderer: ShaderMeshRenderer?
     private var ribbonRenderer: ShaderMeshRenderer?
     private var fallbackRenderers: [MeshRenderer] = []
+    private var candidateRenderer: ShaderMeshRenderer?
+    private var candidateFallback: MeshRenderer?
+    /// What the candidate ring was built for: the cell, the level and the mode.
+    private var candidateKey: [Int]?
     private var geometryKey: GeometryKey?
     private var aspect = 1.0
 
@@ -73,6 +85,15 @@ final class ChronoConstellatorSkyScene {
         ribbonRenderer = nil
         fallbackRenderers = []
         geometryKey = nil
+        releaseCandidate()
+    }
+
+    private func releaseCandidate() {
+        candidateRenderer?.release()
+        candidateFallback?.release()
+        candidateRenderer = nil
+        candidateFallback = nil
+        candidateKey = nil
     }
 
     /// The glow limit passed as `u_glowLimit`.
@@ -88,17 +109,19 @@ final class ChronoConstellatorSkyScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = ChronoConstellatorSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = ChronoConstellatorSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let key = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
         if fallbackReason != nil {
             try drawFallback(camera)
+            try drawCandidate(snapshot, camera: camera)
             return
         }
         let time = Float(animate ? snapshot.time : 0)
         let cell = Float(ChronoConstellatorSceneGeometry.cellSize(snapshot))
         try drawField(camera, cell: cell)
+        try drawCandidate(snapshot, camera: camera)
         let gain = ChronoConstellatorShaders.glowGain(for: tier)
         try drawGlow(starRenderer, camera: camera, time: time, ticks: tier.ribbonTicks, animate: animate,
                      gain: gain, shell: false)
@@ -179,6 +202,41 @@ final class ChronoConstellatorSkyScene {
             p.set(ChronoConstellatorShaders.mvpUniform, matrix4: mvp.floats)
             p.set(ChronoConstellatorShaders.cellUniform, cell)
             p.set(ChronoConstellatorShaders.lightDirectionUniform, Self.lightDirection)
+        }
+    }
+
+    /// Draws the ring of ``candidateCell`` after the field, rebuilding it when the cell, level or mode change.
+    private func drawCandidate(_ snapshot: ChronoConstellatorSceneSnapshot, camera: ChronoConstellatorCamera) throws {
+        guard let cell = candidateCell, cell >= 0, cell < snapshot.columns * snapshot.rows, let registry else {
+            if candidateKey != nil { releaseCandidate() }
+            return
+        }
+        let key = [cell, snapshot.levelNumber, fallbackReason == nil ? 0 : 1]
+        if key != candidateKey {
+            releaseCandidate()
+            let part = try ChronoConstellatorSceneGeometry.candidatePart(cell, snapshot)
+            if fallbackReason == nil {
+                candidateRenderer = try Self.renderer(part.mesh, vertex: ChronoConstellatorShaders.fieldVertex,
+                                                      fragment: fieldFragment, name: "chrono-constellator-field",
+                                                      registry: registry)
+            } else {
+                let renderer = try MeshRenderer(mesh: part.mesh, colors: part.colours, registry: registry)
+                renderer.ambient = 1
+                candidateFallback = renderer
+            }
+            candidateKey = key
+        }
+        if let candidateRenderer {
+            let mvp = camera.viewProjection
+            let unit = Float(ChronoConstellatorSceneGeometry.cellSize(snapshot))
+            try candidateRenderer.draw(blend: .opaque, cullBackFaces: true) { p in
+                p.set(ChronoConstellatorShaders.mvpUniform, matrix4: mvp.floats)
+                p.set(ChronoConstellatorShaders.cellUniform, unit)
+                p.set(ChronoConstellatorShaders.lightDirectionUniform, Self.lightDirection)
+            }
+        } else if let candidateFallback {
+            try candidateFallback.draw(model: .identity, view: .identity, projection: camera.viewProjection,
+                                       color: Vec4(1, 1, 1, 1), fog: nil)
         }
     }
 

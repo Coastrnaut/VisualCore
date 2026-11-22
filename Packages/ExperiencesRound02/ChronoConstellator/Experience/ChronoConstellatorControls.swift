@@ -3,7 +3,8 @@
 // phase − and +, add and remove a hold (start 1, length 10 at the picked star), time steps of 1 and 10 ticks, run to the
 // end (a step of the ticks left), rewind, undo, redo and next level, each with an accessibility label and value; every
 // change is a kernel action sent through the action port. Timeline dragging and scrubbing come in R02-G06-04; full
-// accessibility in R02-G06-06.
+// accessibility in R02-G06-06. Feature 354 (R02-G06-04) T-R02G0604-005 (FR-R02G0604-007): the panel gains "Reset
+// view", which returns the camera to the authored view; refusals are shown and logged by the presenter.
 #if os(iOS)
 import ChronoConstellatorCore
 import SwiftUI
@@ -13,6 +14,8 @@ import VisualCoreExperienceHost
 struct ChronoConstellatorControls: View {
     let port: ExperienceActionPort
     let mirror: ChronoConstellatorMirror
+    /// The presenter, for "Reset view" (feature 354) and refusals shown like the gestures' ones.
+    let presenter: ChronoConstellatorPresenter
 
     /// The start and length of the hold the panel adds and removes.
     static let holdStart = 1
@@ -96,6 +99,9 @@ struct ChronoConstellatorControls: View {
                 .accessibilityLabel("Redo the action")
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+            Button("Reset view") { presenter.resetView() }
+                .accessibilityLabel("Return the camera to the starting view")
+                .accessibilityValue("camera")
         }
     }
 
@@ -105,10 +111,9 @@ struct ChronoConstellatorControls: View {
         send("star.phase", [Double(mirror.pickedStar), Double(next)])
     }
 
-    /// Sends `control` and shows a refusal.
+    /// Sends `control` through the presenter, which shows and logs a refusal.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        presenter.send(control, values, port: port)
     }
 }
 #endif

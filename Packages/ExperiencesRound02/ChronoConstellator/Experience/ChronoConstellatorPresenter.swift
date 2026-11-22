@@ -4,6 +4,15 @@
 // still under Reduce Motion (the snapshot time stays at 0) and caps the glow under Reduce Flashing. A memory warning
 // releases the GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing result
 // reaches the kernel (renderer purity). Its probes (two field corners) let the verification runner check a frame.
+// Feature 354 (R02-G06-04) T-R02G0604-005 (FR-R02G0604-001 … 008; clarifications Q1–Q5): canvas touches go through
+// `ChronoConstellatorGestureController`: a star dragged at tick 0 to another cell of its loop sends one `star.phase`, a
+// scrub along the timeline band sends `time.step` or `time.rewind` then `time.step`, a long press on a star toggles its
+// standard hold (`star.hold` / `star.release`), a tap on a star picks it in the panel, two fingers orbit the camera and
+// a double tap on empty space or `resetView()` ("Reset view") returns to the authored view (presentation only: never in
+// the digest, the snapshot or the kernel). While a star is dragged its candidate cell is outlined and the description
+// begins "Star n (shape) would start at row r, column c"; while scrubbing it begins "Scrub to tick t of T"; a star
+// gesture after tick 0 says "Edits are made at tick 0: rewind first". A refused action is shown in the panel and its
+// code kept in ``ChronoConstellatorPresenter/refusalLog``.
 #if os(iOS)
 import ChronoConstellatorCore
 import Foundation
@@ -12,6 +21,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show: the latest state the presenter described.
 @MainActor
@@ -87,6 +97,12 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
     private(set) var tierLog: [ChronoConstellatorTierChange] = []
     /// The last snapshot drawn (tests and the description).
     private(set) var lastSnapshot: ChronoConstellatorSceneSnapshot?
+    /// The gesture controller (feature 354): star drags, scrubs, hold presses, taps, orbit and the candidate cell.
+    private(set) var gestures = ChronoConstellatorGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -119,6 +135,8 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        scene.orbit = gestures.orbit
+        scene.candidateCell = gestures.candidateCell
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
@@ -128,6 +146,71 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
 
     func shedCaches() {
         scene.release()
+    }
+
+    // MARK: Touch controls (feature 354)
+
+    /// The canvas gestures send start phases, holds, releases, steps and rewinds.
+    var gestureActions: Set<String> { ["star.phase", "star.hold", "star.release", "time.step", "time.rewind"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(ChronoConstellatorExperienceCore.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller and sends the actions it returns, in order; a star
+    /// gesture released after tick 0 explains that edits are made at tick 0.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot else { return }
+        let wasStarGesture: Bool = gestures.state == .starDrag
+        let actions: [ChronoConstellatorGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
+        if wasStarGesture, event.phase == .ended, actions.isEmpty, snapshot.tick > 0, snapshot.stage == .playing {
+            mirror.message = Self.tickZeroMessage
+        }
+        for action in actions {
+            switch action {
+            case .phase(let star, let index):
+                send("star.phase", [Double(star), Double(index)], port: port)
+            case .step(let ticks):
+                send("time.step", [Double(ticks)], port: port)
+            case .rewind:
+                send("time.rewind", [], port: port)
+            case .hold(let star, let start, let length):
+                send("star.hold", [Double(star), Double(start), Double(length)], port: port)
+            case .release(let star, let start):
+                send("star.release", [Double(star), Double(start)], port: port)
+            case .select(let star):
+                mirror.pickedStar = star
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+    }
+
+    /// What a star gesture after tick 0 shows.
+    static let tickZeroMessage = "Edits are made at tick 0: rewind first"
+
+    /// Drops a touch in progress (the shell suspends the experience): a gesture under way is abandoned without an
+    /// action; the orbit is presentation only and returns to the authored view.
+    func cancelPointers() {
+        gestures.cancel()
+    }
+
+    /// Returns the camera to the authored view ("Reset view").
+    func resetView() {
+        gestures.resetView()
+    }
+
+    /// Sends `control` with `values`, shows a refusal in the panel and keeps its code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(result.code)"
+            refusalLog.append(result.code)
+            if refusalLog.count > Self.refusalLogLimit { refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit) }
+        }
+        return result
     }
 
     /// The frame probes of the frame last drawn: the top-left and bottom-right corners, outside the grid (the camera fits
@@ -155,7 +238,16 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
             snapshot.holds.filter { $0.star == star }.map { "hold from tick \($0.start) for \($0.length) ticks" }
         }
         if mirror.pickedStar >= level.stars.count { mirror.pickedStar = 0 }
-        var text = "Chrono Constellator level \(core.levelNumber). "
+        var text = ""
+        if let cell = gestures.candidateCell, gestures.state == .starDrag, cell >= 0, cell < level.columns * level.rows,
+           let star = gestures.draggedStar, level.stars.indices.contains(star) {
+            text += "Star \(star + 1) (\(ChronoConstellatorLevel.shape(of: star).name)) would start at row "
+                + "\(cell / max(level.columns, 1) + 1), column \(cell % max(level.columns, 1) + 1). "
+        }
+        if let tick = gestures.scrubTick, gestures.state == .scrub {
+            text += "Scrub to tick \(tick) of \(snapshot.tickLimit). "
+        }
+        text += "Chrono Constellator level \(core.levelNumber). "
         text += "Tick \(snapshot.tick) of \(snapshot.tickLimit); \(snapshot.remaining) edits left. "
         for index in level.stars.indices {
             let star = snapshot.stars[index]
@@ -184,7 +276,7 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(ChronoConstellatorControls(port: port, mirror: mirror))
+        AnyView(ChronoConstellatorControls(port: port, mirror: mirror, presenter: self))
     }
 }
 #endif
