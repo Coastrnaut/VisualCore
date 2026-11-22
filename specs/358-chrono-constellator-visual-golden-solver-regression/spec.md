@@ -56,8 +56,8 @@ teardown); the CI host job runs all round-two host tests and has a named regress
   frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after its witness's phase changes and the witness's actions up
   to tick min(win tick, 6) so trails show, at presentation time 0 and the authored camera, plus the hero frame of the
   scenario manifest's hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the projected pixel
-  positions of every star node centre, every target centre, every loop cell centre and the current-tick mark's two ends,
-  rounded to 1/8 pixel, and the expected colours as 8-bit sRGB (field, grid, silver, star, rose, amber); serialized as
+  positions of every star node centre, every target centre and every loop cell centre, rounded to 1/8 pixel, the
+  current-tick mark's length in cells rounded to 1/1,024, the tick, and the expected colours as 8-bit sRGB (field, grid, silver, star, rose, amber); serialized as
   JSON with sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
   `Packages/ExperiencesRound02/ChronoConstellator/golden-frames.json`; the host test recomputes each: an equal digest
   passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every colour must be
@@ -156,7 +156,7 @@ simulator parts and reports one summary.
 - **FR-R02G0608-002**: An altered level, solution or witness MUST make the regression fail, naming the level and the
   differing part.
 - **FR-R02G0608-003**: A golden set of frames (levels, tiers, frame times, including the hero frame) MUST have a
-  code-computed description (projected positions of star nodes, target centres, loop cells and the current-tick mark, palette colours) pinned in the
+  code-computed description (projected positions of star nodes, target centres and loop cells, the current-tick mark's length, palette colours) pinned in the
   repository with its digest; a recomputed description matches when its digest is equal or every position lies within
   one 1/8-pixel quantum and every colour is equal.
 - **FR-R02G0608-004**: Rendered frames of the golden set on the simulator MUST match their descriptions within the
