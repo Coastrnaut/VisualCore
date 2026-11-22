@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G07-02 (migration ledger, game feature of experience R02-G07) · ID namespace FR-R02G0702-###,
 SC-R02G0702-###, T-R02G0702-###
@@ -24,6 +24,56 @@ Canonical overrides:
   move budgets 6 … 21).
 - **Model:** feature 352 (Chrono Constellator's content pipeline) for manifest, generator, witness files, digest and
   progression.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+352's answers where the games agree. Facts checked in code (read-only, 2026-11-22): R02-G07-01's `AmethystEscapeLevel`
+(6 … 12 sectors, 2 … 5 shells, apertures, walls, blocked wedges, one exit gap, budget 1 … 60), `AmethystEscapeCrystal`,
+`AmethystEscapePlay` and `AmethystEscapeRules`; R02-F24's `PuzzleCatalog.digest(id:identities:)` and
+`ProgressionRule.standard` (drop at most 1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the
+archived manifest's 80 entries (bands 1 … 5 × 16, move budgets 6 … 9, 9 … 12, 12 … 15, 15 … 18, 18 … 21). Feature 352 is
+the pattern. A Python prototype (2026-11-22, the 80 manifest seeds, the rules below with Python's own generator)
+certified 80 of 80 levels in 5 s, at most 33 candidates for one level and at most 49,000 states explored for one proof.
+
+- Q: How is a level built from its manifest entry? → A: the 80 entries (number, planned seed, band, move budget) are a
+  table in `AmethystEscapeManifest` with their provenance. Candidate k of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`, in this order: the profile by band (6 sectors × 2
+  shells; 6 × 3; 8 × 3; 8 × 4; 10 × 4); for each shell from the innermost: its apertures (the outermost shell one drawn
+  sector, the exit gap; every other shell draw(1 … 2) distinct drawn sectors), its walls (each sector in order with draw(0 …
+  99) < 35; when every sector is walled, the lowest wall is removed) and its blocked wedges (each sector that is not an
+  aperture with draw(0 … 99) < 25); then the start, drawn among shell 0's sectors that are not blocked. A candidate is kept
+  when the pearl does not escape by advances alone and the solver proves a smallest move count in the band's range (3 … 4;
+  5 … 6; 7 … 8; 9 … 10; 11 … 12) that fits the manifest budget; otherwise k grows, at most 512 candidates, then
+  `generation(n)`. Ids `amethyst-escape-NNN`; tutorial flag on levels 1 … 3; difficulty = band; budget = manifest budget.
+  Impact: FR-R02G0702-001; SC-R02G0702-001, 003, 004.
+- Q: How does the solver decide the smallest move count, and what proves it? → A: a breadth-first search over crystal
+  states (every shell offset and the pearl's pocket) from the opening state, expanding moves in the rules' fixed order
+  (rotate(r, +1), rotate(r, −1) for each shell r in order, then advance unless it is stuck); a move into a blocked wedge
+  is a dead end (never expanded); the first escape found is at the smallest depth m and its path is the witness. The proof
+  is the search itself: every state reachable in fewer than m moves was expanded and none escapes; the counts of states
+  first reached at each depth 0 … m − 1 are recorded. Work = states expanded, bounded by N^K × K × N (at most 400,000 for
+  the band-5 profile). The witness is replayed through the kernel's play. Impact: FR-R02G0702-002; SC-R02G0702-001, 002,
+  005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `AmethystEscapeDifficulty` holds the
+  smallest move count, the turns and advances of the witness, the shell and sector counts and the states explored. The
+  catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on the smallest
+  move count; the band ranges make band means non-decreasing. Impact: FR-R02G0702-003, 005; SC-R02G0702-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/amethyst-escape/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the actions, the state digest after every move (16 hex
+  characters of the SHA-256 of the offsets and the pearl's pocket), the play fingerprints after `begin` and after each
+  action, the smallest move count with the states first reached at each depth below it, the unedited counterexample (the
+  pearl advanced with no shell turned: its outcome — stuck, wedge or budget — and move), the near miss (the witness minus
+  its last action, which has not escaped), the difficulty and the candidates skipped. A test rebuilds every witness and
+  compares bytes; it writes the files only with `AMETHYST_ESCAPE_WRITE_WITNESSES=1`. Decoding refuses newer schemas,
+  damaged files and witnesses that no longer replay. Impact: FR-R02G0702-004; SC-R02G0702-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<AmethystEscapeRules>.digest(id: "amethyst-escape", identities:)` over the 80 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split by band so each runs under 10 seconds on a debug host
+  build (measured locally, not asserted on CI). New refusals: `generation(Int)` (`r02-g07.generation`) and
+  `witness(String)` (`r02-g07.witness`). Impact: FR-R02G0702-005, 006; SC-R02G0702-006.
 
 ## User Scenarios & Testing *(mandatory)*
 
