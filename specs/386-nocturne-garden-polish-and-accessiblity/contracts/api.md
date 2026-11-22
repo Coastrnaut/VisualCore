@@ -7,6 +7,7 @@ public struct NocturneGardenFeedbackPlan: Sendable, Equatable {
     public static func after(old: NocturneGardenExperienceCore, new: NocturneGardenExperienceCore) -> Self
     public static func refused(code: String) -> Self         // rejection + error; texts of clarification Q1
     public static func refusalText(code: String) -> String   // the same words for the panel
+    public static func hint(text: String) -> Self             // a revealed hint: state, no haptic
     public static func summaryText(core: NocturneGardenExperienceCore) -> String
 }
 public struct NocturneGardenLights: Sendable, Equatable {

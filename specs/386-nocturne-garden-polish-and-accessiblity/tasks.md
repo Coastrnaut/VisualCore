@@ -19,7 +19,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [ ] T-R02G0906-003 [P] [US1] [US3] Create
   `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenFeedbackPlan.swift` (texts and kinds of clarification
-  Q1 word for word, including the revealed hint as `state`; haptics of Q2; `after(old:new:)`, `refused(code:)`,
+  Q1 word for word, including the revealed hint as `state` (`hint(text:)`); haptics of Q2; `after(old:new:)`, `refused(code:)`,
   `refusalText(code:)`, `summaryText(core:)` of Q5) with
   `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenFeedbackPlanTests.swift` (scripted sequences of
   plants, moves, resizes, removes, sun changes, undos, redos, refusals of every code, wins in campaign and practice,
