@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G09-06 (migration ledger, game feature of experience R02-G09) · ID namespace FR-R02G0906-###,
 SC-R02G0906-###, T-R02G0906-###
@@ -24,6 +24,65 @@ Canonical overrides:
 - **Shared features used:** R02-F26 (input and accessibility contract), the shared feedback route
   (announcements and haptics) and the ambient loop player, the kernel, content, adapter, renderer, gestures and teaching
   of R02-G09-01 … 05.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+376's answers where the games agree. Facts checked in code (read-only, 2026-11-22): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` (1 … 6 partials, a bounded loop length) are those feature 376 used; Nocturne Garden's mist layers drift at 0.35 rad/s times the layer number (at most
+1.05 rad/s, about 0.17 cycles per second) and the blooms sway at 1.1 rad/s, both still under Reduce Motion (time 0); its
+glow limit is 0.5 under Reduce Flashing (1.5 otherwise); the leak crosses appear at once on a leak failure; the
+adapter's refusal codes are `r02-g09.action`, `supply`, `noop`, `stage`, `stale`, `malformed`, `locked`, `date` and
+`not-whole`; the presenter shows refusals as "That change was refused: <code>" and logs their codes; blooms are named
+"bloom n: rose at column c, row r, size s".
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted move (`state`): plant "Planted bloom n: rose
+  at column c, row r, size s.", move "Moved bloom n to column c, row r.", resize "Bloom n is now size s.", remove
+  "Removed bloom n.", sun "Sun e of 4." — each followed by " Match x/y, needs p/q; leak k cells, a allowed. m moves
+  left." ("1 move left"); undo and redo: "Undone." / "Redone." followed by the same measure; a win (`outcome`): "The
+  shadow matches the target. Level won with m moves made, k of 3 stars." (without the stars in practice); a failure
+  (`outcome`): the failure explanation of feature 385; a level or mode change (`level`): "Level n, band b, <mode>." with
+  the tutorial instruction when shown; a refusal (`rejection`) in words: `r02-g09.locked` "That level is not open yet.",
+  `r02-g09.date` "That date cannot be used.", `r02-g09.action` "That move is not possible here.", `r02-g09.supply` "No
+  bloom of that kind is left.", `r02-g09.noop` "That changes nothing.", `r02-g09.stage` "The level has ended.",
+  `r02-g09.not-whole` "That value must be a whole number.", any other code "That move was refused." Picker changes and
+  drag previews are not announced (the adjustable pickers speak their own values). Texts are a pure function of the old
+  and new core (and the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact:
+  FR-R02G0906-002; SC-R02G0906-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted move, undo or redo; `success` for
+  a win; `warning` for a failure; `error` for a refusal; picker changes, level changes and drag previews play none. The
+  shared planners' intervals apply; when one move both changes the garden and ends the play (the winning move, a leak or
+  the last move of the budget), only the outcome is planned, so an outcome is never dropped behind a selection haptic.
+  Impact: FR-R02G0906-003; SC-R02G0906-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: the presenter keeps a light level for the blooms' glow
+  (0.7 while playing, 1 once won, 0.35 once failed) and the leak crosses (1 while the failure is a leak, else 0), each
+  easing toward its target in presentation time (0.15 s normally, 0.45 s under Reduce Flashing, linear; under Reduce
+  Flashing a fade that has started finishes before it may turn back). The scene draws the eased levels (the glow gain
+  times the glow level, the cross colour times its level); the state and digest never see them. Shadow cells change
+  with the player's moves, as Faceted Forge's pieces do, and are not faded. The mist drift stays at about 0.17 cycles
+  per second (below 3) and is still under Reduce Motion, with the sway. The measure: sampling the drawn levels every
+  1/60 s through a scripted win and adversarial flicker (a leak failure undone and repeated every frame, retry, level
+  changes), no element crosses half its range more than 3 times per second, and every complete one-way fade of more
+  than half the range takes at least 0.4 s under Reduce Flashing. Impact: FR-R02G0906-004; SC-R02G0906-003.
+- Q: Where does the sound choice live, and what is the recipe? → A: a Sound toggle in the panel, off by default, held by
+  the presenter (presentation only; saving it is R02-G09-07). The recipe is a pure function of the planted blooms, the
+  sun and the stage: a root at 110 Hz times (1, 9/8, 5/4, 4/3) for sun 1 … 4 and one partial per planted bloom, up to
+  four, at the root times (5/4, 3/2, 2, 5/2)[k − 1], each with the base gain, the root alone on an empty bed; an added
+  octave when won and halved gains when failed; the loop's length is the longest the shared player accepts at which
+  every partial has a whole number of cycles (tested). The presenter rebuilds the loop only when the level opens, a move,
+  undo or redo changes the bloom count, the sun or the stage, or the toggle turns on, never per frame. The loop plays
+  exactly while the choice is on, the controls are on screen and the scene is active. Impact: FR-R02G0906-006;
+  SC-R02G0906-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the kind, column,
+  row, size, bloom and sun pickers are accessibility-adjustable elements with their labels and values in words; a
+  summary element reads "m moves left. Match x/y, needs p/q; leak k cells, a allowed; sun e of 4. Blooms: <each bloom in
+  words>. Target: <the level in words>."; on iPad the panel keeps a readable width (at most 520 points). Impact:
+  FR-R02G0906-001, 005; SC-R02G0906-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -116,7 +175,7 @@ a pure function of the blooms, the sun and the stage; the loop plays only while 
 
 - **Announcement plan**: kind and text for each state change.
 - **Haptic plan**: kind for each outcome of an action.
-- **Light levels**: the blooms' glow, the leak crosses and the shadow change, eased in presentation time.
+- **Light levels**: the blooms' glow and the leak crosses, eased in presentation time.
 - **Ambient recipe**: partials (frequencies, gains) derived from the blooms, the sun and the stage.
 
 ## Success Criteria *(mandatory)*
