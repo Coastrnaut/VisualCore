@@ -34,7 +34,7 @@ change (the shaders and reference of R02-G08-03 are unchanged and re-proven by t
   every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test --only-testing FacetedForgeExperienceTests`
-- [ ] T-R02G0809-004 [US1] Create `Apps/VisualCore/Tests/UI/FacetedForge/FFSupport.swift`, `FFPlayUITests.swift`,
+- [X] T-R02G0809-004 [US1] Create `Apps/VisualCore/Tests/UI/FacetedForge/FFSupport.swift`, `FFPlayUITests.swift`, — Verified 2026-11-22: app-ui-2 (release_check app-build-for-testing-ios27 + app-ui-ios27-q3: FFPlayUITests win level 1 through the panel with 3 stars and level 2 open, progress kept over a relaunch; FFReplayUITests replay to a win and Stop back to the campaign) exit 0 after app-ui exit 1 (the relaunch test could not tap the restored level picker; the helpers now wait up to 5 s and tap a visible control by coordinate; a corrupt PosterBoard store on the UI-test simulator was crashing on every Home press and was moved aside); chunk q3 serial and unique
   `FFReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 certified cuts and the pickers' starting choice
   pinned in `FF`; each cut played by stepping the piece, direction and depth pickers from the current choice to the
   cut's values (reading each value), then Cut; read "The pieces match the target" and "Stars: 3 of 3"; background before terminate on
