@@ -50,7 +50,7 @@ logic); no GLSL in this feature.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0802-005 [P] [US4] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeWitness.swift` (schema
+- [X] T-R02G0802-005 [P] [US4] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeWitness.swift` (schema — Verified 2026-11-22: host-4 exit=0 (FacetedForgeWitnessTests 14: byte-for-byte round trip, solver values, digests and fingerprints, near miss, every edited part refused by name, newer and damaged refused)
   1; built by replaying the solution's cuts on a `FacetedForgePlay`: the 16-hex state digest after every cut,
   fingerprints after begin and each cut; smallest and the lower bound; the near-miss counterexample (the witness minus
   its last cut: not won); difficulty; skipped; sorted-key pretty JSON with a trailing newline; `decode` refuses newer,
