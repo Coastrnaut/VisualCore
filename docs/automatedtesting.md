@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-06: Nocturne Garden fades and render tests that wait for them).
+Last updated: 2026-11-22 (R02-G09-07: Nocturne Garden reconcilable saves and replay).
 
 ## 1. What is tested, and where
 
@@ -394,6 +394,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   cell of the whole bed (not only the bounding box) against a separate even-odd ray cast on exact rationals with its own
   on-segment test, and the boundary deviation against an all-pairs brute force. A timing baseline taken right after the
   round-two suite failed under a load average of 13 and passed when rerun: run timing baselines on a quiet machine.
+- **A schema change re-pins every winning scenario** (R02-G09-07, 2026-11-22). Nocturne Garden's results gained traces,
+  so the digest of every scenario that wins changed and `scenario-manifest.json` was regenerated with
+  `UPDATE_SCENARIO_MANIFEST=1`; equality checks on stored results became field checks (moves made, stars, verified,
+  a non-empty trace), and the newer-schema refusal test moved to schema 4.
 - **A frame test waits for a fade** (R02-G09-06, 2026-11-22). Once Nocturne Garden's leak crosses fade in over 0.15 s,
   a still drawn at the same presentation time as the failure showed no crosses, and the render test failed. Draw the
   still at a later time (1 s) and assert the eased level reached its target before checking pixels. A test with a

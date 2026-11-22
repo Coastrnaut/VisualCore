@@ -517,3 +517,7 @@ Feature 386 (R02-G09-06) adds polish and accessibility: `NocturneGardenFeedbackP
 `NocturneGardenLights` (eased glow and leak crosses, Reduce Flashing) and `NocturneGardenSoundRecipe` in the Core (the
 Core gains VisualCoreAudioDSP), `NocturneGardenSound` (the ambient loop over VisualCoreAudio) in the experience, the
 presenter's feedback route and log, and the accessible panel (adjustable pickers, summary element, Sound toggle).
+
+Feature 387 (R02-G09-07) adds persistence and replay: results carry their winning trace and `verified`
+(`NocturneGardenReconciliation` replays every trace on restore and drops edited results), snapshot schema 3 with a
+2 → 3 migration, the replay mode (`replay.start/step/stop`) and `settings.sound`, and the panel's Replay, Step and Stop.

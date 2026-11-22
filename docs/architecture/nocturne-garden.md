@@ -159,3 +159,25 @@ Presentation only: no state, digest or snapshot field changes (schema 2 stays).
 - **Panel.** Every control has a label and a value; the kind, column, row, size, bloom, sun and level pickers are
   adjustable steppers; the "Garden" summary element reads the moves left, the measures, the blooms and the target in
   words; text wraps, rows become columns at accessibility text sizes and the panel keeps a 520-point readable width.
+
+## Persistence and replay (feature 387, R02-G09-07)
+
+- **Saves.** The one app's shared saved-state store writes the experience snapshot atomically; this feature defines it:
+  schema 3 `{level, mode, progress, records, sound, tutorial}`, migrated from schema 1 (`{level, records}`) through 2.
+  The 2 → 3 step gives every result an empty trace, marks it unverified and turns the sound off. The digest
+  ("r02-g09.nocturne-garden.v3") covers the level, the play, the progress and the mode, never the sound choice or the
+  count of dropped results.
+- **Reconcilable scores.** Each campaign or daily win stores its fewest moves made (undone moves included), its stars and
+  the winning trace: the effective moves of the play (a move that was undone and not redone is left out). On restore,
+  `NocturneGardenReconciliation` replays every traced result on a fresh play of its certified level and keeps it only if
+  the play wins, the trace is no longer than the stored moves made and the stars equal the stars rule for them; a trace
+  of more than 40 moves or with an illegal move never verifies. A lowered moves made can never claim fewer moves than the
+  trace proves, and a raised one only worsens the score. Edited results are dropped and counted, and the presenter
+  announces the count once; untraced results from older saves are kept as unverified; the frontier is restored as saved.
+- **Replay.** `replay.start [level]` plays a verified result's trace from a fresh level, `replay.step` applies its next
+  move and `replay.stop` returns to the campaign. During replay every other play action is refused ("Stop the replay
+  first."), progress never changes and a replayed win claims no stars; the panel shows "Replay: move k of n" with Step
+  and Stop.
+- **Settings and determinism.** `settings.sound [0 … 1]` saves the sound choice, applied when the experience opens. The
+  state reads no clock or random source: the seed, the certified catalog, the date given to `mode.daily` and the
+  recorded actions decide everything, so a save restores and replays identically on every device.
