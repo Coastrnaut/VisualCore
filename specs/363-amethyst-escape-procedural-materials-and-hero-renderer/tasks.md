@@ -96,7 +96,7 @@ registration, docs) stay with the lead. MVP: Stories 1 and 2.
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G0703-014 Test the wedge-failure description per Spec Edge Cases and FR-R02G0703-007 (partial): in
+- [X] T-R02G0703-014 Test the wedge-failure description per Spec Edge Cases and FR-R02G0703-007 (partial): in — Verified 2026-11-22: 2026-11-22: sim-27-3 (30 tests incl. aWedgeFailureNamesItsWedgeAndTintsItAmber) exit 0; sim-27-2 failed first (12 px amber search inside the pearl), widened to 60 px
   `Packages/ExperiencesRound02/AmethystEscape/ExperienceTests/AmethystEscapeExperienceIdentityTests.swift` find, by a
   seeded search over the certified levels, a play whose advance drops the pearl into a blocked wedge, and check that the
   description names that wedge's shell and sector and that the frame tints that wedge amber; part of `--name sim-27-2`

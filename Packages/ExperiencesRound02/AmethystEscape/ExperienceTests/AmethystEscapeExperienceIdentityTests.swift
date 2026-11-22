@@ -148,5 +148,64 @@ import VisualCoreExperienceHost
         #expect(shell.presenter.mirror.status.hasPrefix("Failed: "), "\(shell.presenter.mirror.status)")
         print("amethyst-escape failure description: \(text)")
     }
+
+    /// A seeded search over the certified levels (seed 2_363) for a play whose advance drops the pearl into a blocked
+    /// wedge; nil when none is found within the bounds.
+    static func wedgeFailure() throws -> (level: Int, actions: [(String, [Double])], shell: Int, sector: Int)? {
+        var state: UInt64 = 2_363
+        func next(_ bound: Int) -> Int {
+            state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
+            return Int((state >> 33) % UInt64(bound))
+        }
+        for level in 1...100 {
+            for _ in 0..<20 {
+                var core: AmethystEscapeExperienceCore = try AmethystEscapeExperienceCore.opening(number: level)
+                var actions: [(String, [Double])] = []
+                let shells: Int = core.play.level.shells.count
+                for _ in 0..<core.play.level.budget {
+                    let action: (String, [Double]) = next(3) == 0
+                        ? ("pearl.advance", [])
+                        : ("shell.rotate", [Double(next(shells)), next(2) == 0 ? -1 : 1])
+                    guard core.apply(ExperienceAction(control: action.0, values: action.1, step: 0)) == .accepted
+                    else { continue }
+                    actions.append(action)
+                    if case .wedge(let shell, let sector) = core.play.failure {
+                        return (level, actions, shell, sector)
+                    }
+                    if core.play.stage != .playing { break }
+                }
+            }
+        }
+        return nil
+    }
+
+    /// T-R02G0703-014: a pearl that falls into a blocked wedge fails the play; the description names that wedge's
+    /// shell and sector, and the frame tints that wedge amber.
+    @Test func aWedgeFailureNamesItsWedgeAndTintsItAmber() async throws {
+        let found = try #require(try Self.wedgeFailure(), "a seeded play drops the pearl into a blocked wedge")
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await AmethystEscapeTest.open(session, seed: UInt64(found.level - 1))
+        for action in found.actions {
+            #expect(shell.handle(control: action.0, values: action.1) == .accepted, "\(action.0) \(action.1)")
+        }
+        let core: AmethystEscapeExperienceCore = try AmethystEscapeTest.core(shell)
+        #expect(core.play.stage == .failed && core.play.failure == .wedge(found.shell, found.sector))
+        let level: AmethystEscapeLevel = core.play.level
+        let text: String = shell.presenter.describe(core)
+        let named: String = "The pearl fell into the blocked wedge of \(level.shellName(found.shell)), "
+            + "\(level.sectorName(found.sector))."
+        #expect(text.contains(named), "\(text)")
+        #expect(shell.presenter.mirror.status.hasPrefix("Failed: "))
+        let rgba: [UInt8] = try AmethystEscapeTest.still(session)
+        let snapshot: AmethystEscapeSceneSnapshot = try #require(shell.presenter.lastSnapshot)
+        #expect(snapshot.failure == .wedge(found.shell, found.sector))
+        // The failure's sector is absolute; the wedge's own sector is (sector − offset) mod sectors.
+        let offset: Int = snapshot.shells[found.shell].offset
+        let own: Int = ((found.sector - offset) % snapshot.sectors + snapshot.sectors) % snapshot.sectors
+        #expect(AmethystEscapeTest.amberNear(rgba, snapshot: snapshot, shell: found.shell, sector: own),
+                "level \(found.level): the failed wedge is amber")
+        print("amethyst-escape wedge failure: level \(found.level), \(found.actions.count) actions, \(named)")
+    }
 }
 #endif

@@ -319,6 +319,41 @@ enum AmethystEscapeTest {
         return (checked, misses)
     }
 
+    /// The move bar check (T-R02G0703-015): after at least one move, within 3 px of the bar's midpoint some pixel
+    /// differs from the backdrop by at least `margin` in luminance. Returns the misses (empty when it passes, and when
+    /// no move was spent, since the bar then has no length).
+    static func moveBarMisses(_ rgba: [UInt8], snapshot: Snapshot, width: Int = width, height: Int = height,
+                              margin: Double = exitMargin) -> [String] {
+        let length: Double = Geometry.moveBarLength(snapshot)
+        guard snapshot.moves > 0, length > 0 else { return [] }
+        let cam: AmethystEscapeCamera = camera(snapshot, width: width, height: height)
+        let middle = SIMD3<Double>(Geometry.moveBarStart + length / 2, Geometry.moveBarLift, Geometry.moveBarZ)
+        guard let p = Geometry.pixel(middle, camera: cam, width: width, height: height) else {
+            return ["move bar: no projection"]
+        }
+        let found: Bool = anyPixel(rgba, near: p.x, p.y, radius: pointRadius, width: width, height: height,
+                                   minimum: margin, above: false, reference: backdropLuminance)
+        return found ? [] : [String(format: "move bar at (%.1f, %.1f) is backdrop", p.x, p.y)]
+    }
+
+    /// Whether some pixel within `radius` px of the top centre of `shell`/`sector` is amber-like (red above blue by at
+    /// least 0.2; the amethyst facets have more blue than red and the pearl is near white). The default reach is 60 px
+    /// because the failed pocket's pearl (radius 0.3·w, about 38 px on a two-shell level) covers the top centre itself.
+    static func amberNear(_ rgba: [UInt8], snapshot: Snapshot, shell: Int, sector: Int, radius: Double = 60,
+                          width: Int = width, height: Int = height) -> Bool {
+        let cam: AmethystEscapeCamera = camera(snapshot, width: width, height: height)
+        let top: SIMD3<Double> = Geometry.wedgeTopCentre(shell: shell, sector: sector, snapshot)
+        guard let p = Geometry.pixel(top, camera: cam, width: width, height: height) else { return false }
+        let reach: Int = Int(radius.rounded(.up))
+        for y in (Int(p.y) - reach)...(Int(p.y) + reach) where y >= 0 && y < height {
+            for x in (Int(p.x) - reach)...(Int(p.x) + reach) where x >= 0 && x < width {
+                let c: SIMD3<Double> = colour(rgba, x: x, y: y, width: width)
+                if c.x - c.z >= 0.2 { return true }
+            }
+        }
+        return false
+    }
+
     /// The background check: the pixels of the two probe corners are within 0.05 per channel of the backdrop. Returns
     /// the number checked and the misses.
     static func backgroundMisses(_ rgba: [UInt8], width: Int = width,
@@ -336,7 +371,8 @@ enum AmethystEscapeTest {
         return (checked, misses)
     }
 
-    /// Runs the checks of clarification Q3 on `rgba` against `snapshot`, recording an issue per failure. `wedges`
+    /// Runs the checks of clarification Q3 (and the move bar's, T-R02G0703-015) on `rgba` against `snapshot`, recording an
+    /// issue per failure. `wedges`
     /// false skips the open-wedge check (the fallback frame checks only the pearl and the corners).
     static func checkFrame(_ rgba: [UInt8], snapshot: Snapshot, width: Int = width, height: Int = height,
                            wedges: Bool = true, exit: Bool = true, _ what: String,
@@ -356,6 +392,8 @@ enum AmethystEscapeTest {
             #expect(open.checked > 0, "\(what): some wedge is open", sourceLocation: sourceLocation)
             #expect(open.misses.isEmpty, "\(what): \(open.misses.prefix(8))", sourceLocation: sourceLocation)
         }
+        let bar: [String] = moveBarMisses(rgba, snapshot: snapshot, width: width, height: height)
+        #expect(bar.isEmpty, "\(what): \(bar)", sourceLocation: sourceLocation)
         let background = backgroundMisses(rgba, width: width, height: height)
         #expect(background.checked == backgroundPoints.count, "\(what): background", sourceLocation: sourceLocation)
         #expect(background.misses.isEmpty, "\(what): \(background.misses)", sourceLocation: sourceLocation)
