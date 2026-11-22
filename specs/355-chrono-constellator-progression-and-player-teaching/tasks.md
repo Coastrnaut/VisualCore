@@ -66,7 +66,7 @@ R02-G06-03 are unchanged).
 
 - [X] T-R02G0605-006 Docs: `docs/architecture/chrono-constellator.md` (teaching and progression), — Verified 2026-11-21: 2026-11-21: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; architecture teaching and progression, package README, testing lesson
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G0605-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G0605-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-21: 2026-11-21: rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (registrations.json unchanged, no catalog-search needed)
   `--name host-full`, `--name app-unit`, plus `--name catalog-search` if `Catalog/registrations.json` changes
 - [ ] T-R02G0605-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G0605-009 Reference regression chunk 2 (`--name reference-2`)
