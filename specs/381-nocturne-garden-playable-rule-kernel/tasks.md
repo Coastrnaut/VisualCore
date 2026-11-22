@@ -38,7 +38,7 @@ in this feature (the blooms and the mask are the CPU reference the renderer of R
 
 ## Phase 4: Stories 2 and 3 — leak, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G0901-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenPlay.swift` (agent B: stages "loading,
+- [X] T-R02G0901-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenPlay.swift` (agent B: stages "loading, — Verified 2026-11-22: host-3 (swift test --filter NocturneGarden, 30 tests incl. NocturneGardenPlayTests: fixtures win on the exact last action, leak at and above the allowance, budget either side, win on the last move, 500 seeded traces replay, undo exact, every refusal and stage rule) exit 0, lead retest
   tutorial, playing, paused, won, failed, result"; actions plant, move, resize, remove, sun validated for stage,
   previous fingerprint, range, supply, no-op; each accepted action spends one move; after an action leak, then win, then
   budget; failures leak (move) and budget; blooms in canonical order "row, column, kind, size"; records with previous
