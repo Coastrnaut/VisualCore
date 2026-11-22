@@ -83,3 +83,7 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 001 → 002 (lead) → 003 solver (lead) → {003 tests (agent A), 004 generator (lead) → 004 tests (agent C), 005 (agent B)} →
 006 (lead) → 007 … 012. Agent B codes against the solution contract with hand-made solutions; shared files (error,
 manifest, difficulty, solver, generator, catalog tests, witness files, docs) stay with the lead. MVP: Story 1.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G0602-013 Bring `specs/352-chrono-constellator-level-generator-and-solver-witness/contracts/api.md` and `specs/352-chrono-constellator-level-generator-and-solver-witness/data-model.md` in line with the code: `ChronoConstellatorCounterexample` (actions, the full `ChronoConstellatorFailure` reason, tick), `ChronoConstellatorDifficulty.puzzleDifficulty` (explored = windows), `ChronoConstellatorGenerator.levelID`, `rectangle`, `winTick`, `timeline`, `catalogID`, and the witness helpers `phaseChanges(for:level:)`, `actions(for:level:)`, `digest(_:)` with its byte layout per plan: contracts (partial)
