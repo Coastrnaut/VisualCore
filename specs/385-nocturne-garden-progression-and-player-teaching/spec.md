@@ -65,7 +65,7 @@ multipliers are 37, 41, 43, 47, 53, 59, 61 and 67.
 - Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
   date × 71) mod 100 + 1, negative day counts wrapped into 0 … 99 (71 is coprime with 100 and differs from the other
   round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
-  refused with `r02-g09.date`). Daily play follows campaign rules but does not open levels. `mode.practice` replays the
+  refused with `r02-g09.date`). Daily play follows campaign rules (a daily win records that level's best result and stars) but does not open levels. `mode.practice` replays the
   current level with the budget raised to the kernel's maximum (40); practice results never award stars or open levels;
   `mode.campaign` returns. Impact: FR-R02G0905-005; SC-R02G0905-004.
 - Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 375: progress and
