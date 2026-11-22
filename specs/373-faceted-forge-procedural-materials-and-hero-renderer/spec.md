@@ -69,7 +69,8 @@ unregistered candidate and the next round-two game is `r02-g09.nocturne-garden`;
   palette. Simulator tests render offscreen at 1,152 × 768 and check that every piece centroid (± 3 pixels) differs
   from the ground by at least 0.1 in luminance, that every cut face's centre (± 3 pixels) is warmer than the ground
   (red minus blue at least 0.15), that the preview plane's centre (± 3 pixels) differs from the ground by at least
-  0.05, and that the background matches the ground within 0.05 away from geometry. Palette: ground #07090F, ice glass
+  0.05, that the cut mark's first bar (± 3 pixels) differs from the ground by at least 0.1, and that the background
+  matches the ground within 0.05 away from geometry. Palette: ground #07090F, ice glass
   #BFE6F5, ice highlight #F2FBFF, ruby #C8163C, inner amber #FFB347, lattice #FFE2A8, sliver cross #FF4D6D, spent mark
   #C8163C, unspent mark #3A4558. Impact: FR-R02G0803-006; SC-R02G0803-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
@@ -77,7 +78,8 @@ unregistered candidate and the next round-two game is `r02-g09.nocturne-garden`;
   are cuts, the chosen piece, direction and depth, stage, failure with its piece, cuts spent, budget, level number and
   presentation time) made by the adapter; it never holds the kernel. If a program fails to compile or link, the scene
   draws the level-2 geometry unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier
-  changes go to its `tierLog`. Reduce Motion holds the shimmer and the opening at their rest values; Reduce Flashing
+  changes go to its `tierLog`. Reduce Motion holds the shimmer at time 0 and shows the full opening (0.12, 0.2 when
+  won) without easing; Reduce Flashing
   caps the glow gain. A sliver failure marks the thin piece with a sliver-cross colour and the failure text names the
   piece and the cut. Impact: FR-R02G0803-003, 007; SC-R02G0803-002.
 - Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
@@ -91,7 +93,9 @@ unregistered candidate and the next round-two game is `r02-g09.nocturne-garden`;
   `play.undo`, `play.redo` and `level.next`; the kernel refuses everything out of range or out of stage; its digest is
   the level number and the play's fingerprint (never the record history, so undo restores the earlier digest); snapshot
   schema 1 `{level, records}`. The preview choice (piece, direction, depth) is presentation state of the controls, not
-  kernel state. Impact: FR-R02G0803-005, 008, 009; SC-R02G0803-004.
+  kernel state: a level opens with piece 0, direction 0 and the middle depth among those whose plane crosses piece 0;
+  after a cut, undo or redo the chosen piece is clamped to the new piece count and the depth moved to the nearest
+  crossing one. Impact: FR-R02G0803-005, 008, 009; SC-R02G0803-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -155,8 +159,8 @@ it as available, and the experience package, registry, catalog and content check
 - **A piece centred on the crystal's centre:** a piece whose centroid lies within 1e-9 of the crystal's centroid (the
   uncut crystal, or a central piece) is not moved by the opening; the uncut crystal is drawn whole and unopened.
 - **Memory warning:** caches are released and rebuilt on the next frame.
-- **Reduce Motion:** the interior shimmer and the opening stand still; Reduce Flashing caps the glow to the shared
-  limit.
+- **Reduce Motion:** the interior shimmer stands still and the opening is shown at full distance without easing; Reduce
+  Flashing caps the glow to the shared limit.
 
 ## Requirements *(mandatory)*
 

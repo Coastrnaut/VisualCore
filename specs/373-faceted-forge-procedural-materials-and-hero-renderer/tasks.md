@@ -36,10 +36,10 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [ ] T-R02G0803-004 [P] [US1] Create `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSceneGeometry.swift`
   (each piece from its exact faces, fan-triangulated in the kernel's corner order, edges bevelled with an inset of 0.02
   and the tier's segments; opening along the crystal-centroid-to-piece-centroid direction by 0.12, 0.2 when won, eased
-  over 0.4 s of presentation time, at rest under Reduce Motion, no move for a piece centred within 1e-9; cut faces
-  amber with a lattice, original faces ice glass, a sliver failure's piece with a cross; the preview polygon ruby with
-  a dashed rim; the cut mark a row of `budget` bars along z = 1.3 from x = −0.9 to 0.9, spent ones ruby; ground plane
-  y = −1.3; camera from +z pitched 30° fitted to the bounding sphere of radius 1.45 with a 5 % margin for aspect
+  over 0.4 s of presentation time, full without easing under Reduce Motion, no move for a piece centred within 1e-9; cut
+  faces amber with a lattice, original faces ice glass, a sliver failure's piece with a cross; the preview polygon ruby
+  with a dashed rim; the cut mark a row of `budget` bars along z = 1.3 from x = −0.9 to 0.9, spent ones ruby; ground
+  plane y = −1.3; camera from +z pitched 30° fitted to the bounding sphere of radius 1.45 with a 5 % margin for aspect
   0.4 … 2.5; `project`) with `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeSceneGeometryTests.swift`
   (finite and bounded for extreme settings — the uncut crystal and a 20-piece play; every piece centre, cut-face centre
   and the preview centre inside the view with margin at 7 aspects; same positions at every tier; cut flags exact on a
@@ -57,13 +57,15 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks pass.
 
-- [ ] T-R02G0803-006 [US3] [US4] Create `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgeExperience.swift`,
-  `…Presenter.swift`, `…CrystalScene.swift` (GL scene with `ShaderMeshRenderer`; translucent glass drawn after opaque
-  geometry with depth writes off; fallback; tier log; Reduce Motion and Reduce Flashing; the presenter declares
-  `probes(_:)` — two ground corners, as the round-two X gates require — and its quality levels equal the Core's
-  `qualityTiers`), `…Controls.swift` (labelled piece picker, direction picker, depth − and +, cut, undo, redo, next
-  level), `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeScenarios.swift` (standard scenarios,
-  full-playthrough, hero, fixtures, 80 acceptance scenarios R2-G08-QA-001 … 080) with
+- [ ] T-R02G0803-006 [US3] [US4] Create
+  `Packages/ExperiencesRound02/FacetedForge/Experience/FacetedForgeExperience.swift`, `…Presenter.swift`,
+  `…CrystalScene.swift` (GL scene with `ShaderMeshRenderer`; translucent glass drawn after opaque geometry with depth
+  writes off; fallback; tier log; Reduce Motion and Reduce Flashing; the presenter declares `probes(_:)` — two ground
+  corners, as the round-two X gates require — and its quality levels equal the Core's `qualityTiers`), `…Controls.swift`
+  (labelled piece picker, direction picker, depth − and +, cut, undo, redo, next level; default choice piece 0,
+  direction 0, middle crossing depth, clamped after each cut, undo or redo),
+  `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeScenarios.swift` (standard scenarios, full-playthrough,
+  hero, fixtures, 80 acceptance scenarios R2-G08-QA-001 … 080) with
   `Packages/ExperiencesRound02/FacetedForge/CoreTests/FacetedForgeScenariosTests.swift` and
   `Packages/ExperiencesRound02/FacetedForge/scenario-manifest.json`; register the candidate
   (`Catalog/registrations.json` with content facts, `build_catalog.py`, `Apps/VisualCore/App/ExperienceRegistry.swift`,
@@ -73,13 +75,12 @@ tests stay short (< 10 s each). No {owner} tasks.
   5 levels after the witness's first cut: every piece centre (± 3 px) differs from the ground by 0.1 in luminance, every
   cut face centre (± 3 px) has red minus blue ≥ 0.15, the preview centre differs from the ground by 0.05, the mark's
   first bar differs by 0.1, ground background within 0.05; tier coordinates; fallback; resize and zero size; memory
-  warning releases and the next frame rebuilds; Reduce Motion; a sliver failure found by a seeded search names its
-  piece and cut; identity); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package
-  Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing
-  FacetedForgeExperienceTests`; `--name packages -- python3 scripts/check_experience_packages.py`; `--name
-  catalog-search -- swift test --package-path Packages/VisualCore --filter
-  'CatalogSearchTests|RealCatalogTests|RegistryReportTests'` (the summary feeds catalog search and stays ≤ 300
-  characters)
+  warning releases and the next frame rebuilds; Reduce Motion; a sliver failure found by a seeded search names its piece
+  and cut; identity); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02
+  --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing FacetedForgeExperienceTests`;
+  `--name packages -- python3 scripts/check_experience_packages.py`; `--name catalog-search -- swift test --package-path
+  Packages/VisualCore --filter 'CatalogSearchTests|RealCatalogTests|RegistryReportTests'` (the summary feeds catalog
+  search and stays ≤ 300 characters)
 
 ## Phase 4: Regression, documentation and close
 
