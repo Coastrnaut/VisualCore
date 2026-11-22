@@ -34,7 +34,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Wiring — geometry, presenter, scene, sound and panel
 
-- [ ] T-R02G0706-005 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSceneGeometry.swift` (optional `lights:` on
+- [X] T-R02G0706-005 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSceneGeometry.swift` (optional `lights:` on — Verified 2026-11-22: 2026-11-22: host-4 (SceneGeometryTests 17: nil lights byte-identical, settled lights, mid-fade scaling) exit 0; sim-27 (AmethystEscapeExperienceTests, 52 tests on iOS 27.2 incl. 8 accessibility tests: recorded announcements and haptics equal the plan, level 1 won through accessibility operations, adjustable picker, labels and values, one announcement per drag, sound state table, Reduce Motion stills identical) exit 0
   crystalPart/crystalMesh/glowPart/glowMesh: the failed wedge's amber, the pearl's and the exit's glow from the lights;
   without lights the output is unchanged, with tests in `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeSceneGeometryTests.swift`), create
   `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapeSound.swift` (the ambient loop over `AmbientLoopPlayer`, playing exactly while wanted, on

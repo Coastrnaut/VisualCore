@@ -21,6 +21,17 @@
 // smallest move count); `retry` starts the level again in its mode, `undoMove` takes back the last move, and the daily
 // level is chosen from the local calendar date read here (`playDaily(port:date:)`, sent as `mode.daily [year, month,
 // day]`), never in the core.
+// Feature 366 (R02-G07-06) T-R02G0706-005 (FR-R02G0706-001 … 006; clarifications Q1–Q5): after every described change
+// the presenter routes `AmethystEscapeFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback
+// route (`feedback`, injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log; a shell drag that
+// sends several turns is announced once, after its last turn, with `AmethystEscapeFeedbackPlan.drag(old:new:shell:
+// sectors:)`; shell picks (panel or tap) are announced with `picked(shell:core:)`; refusals are announced with
+// `refused(code:)` and shown in the panel in the same words (`refusalText(code:)`). The scene's lights
+// (`AmethystEscapeLights`: pearl glow, exit glow and the failed wedge's amber) settle on the first frame and afterwards
+// fade every frame by the frame's elapsed time (0.45 s fades under Reduce Flashing), a level change included. The
+// ambient loop (`AmethystEscapeSound`) is offered the recipe of the pearl's shell, the shell count and the stage
+// (`AmethystEscapeSoundRecipe`) when a level or mode opens and when that recipe changes. The mirror carries the summary
+// element's text and the sound choice. Presentation only.
 #if os(iOS)
 import AmethystEscapeCore
 import Foundation
@@ -30,6 +41,8 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
+import VisualCoreAudioDSP
 
 /// What the controls show: the latest state the presenter described.
 @MainActor
@@ -69,10 +82,23 @@ final class AmethystEscapeMirror {
     var smallest = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
     var pickedLevel = 1
+    /// The summary element's text (feature 366): the moves left, the pearl, the exit gap and every shell.
+    var summary = ""
+    /// Whether the ambient sound is on (feature 366; off by default).
+    var soundOn = false
 
-    /// The picked shell's name, or "none".
+    /// The picked shell's name ("Shell 1 (inner)"), or "none".
     var pickedShellLabel: String {
-        shellNames.indices.contains(pickedShell) ? shellNames[pickedShell].capitalized : "none"
+        // Only the first letter is raised, as the announcements say it (feature 366).
+        guard shellNames.indices.contains(pickedShell) else { return "none" }
+        let name: String = shellNames[pickedShell]
+        return name.prefix(1).uppercased() + name.dropFirst()
+    }
+
+    /// The shell picker's value (feature 366): "<Shell>, turned t of N".
+    var pickedShellValue: String {
+        guard shellNames.indices.contains(pickedShell) else { return "none" }
+        return pickedShellLabel + ", " + pickedOffsetLabel
     }
 
     /// The picked shell's turn as "turned t of N".
@@ -113,10 +139,27 @@ final class AmethystEscapePresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The feedback route of announcements and haptics (feature 366; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 366; tests and diagnostics).
+    private(set) var feedbackLog: [AmethystEscapeFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 366).
+    private(set) var lights: AmethystEscapeLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient sound (feature 366).
+    let sound: AmethystEscapeSound
+    /// The gesture drag whose turns are being sent: the core before its first turn (nil before any was described),
+    /// the turns accepted so far and the first refusal's code; while it is set, per-turn plans and refusals are not
+    /// routed (feature 366).
+    private var dragTurns: (before: AmethystEscapeExperienceCore?, accepted: Int, refusal: String?)?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = AmethystEscapeLights(reducedFlash: reduceFlashing)
+        sound = AmethystEscapeSound(recipe: AmethystEscapeSoundRecipe.recipe(pearlShell: 0, shells: 1,
+                                                                             stage: .loading))
         scene.reducedFlash = reduceFlashing
     }
 
@@ -145,6 +188,14 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // The lights settle on the very first frame only; every later change, a level change included, fades.
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         scene.orbit = gestures.orbit
         scene.isolated = gestures.isolated
         try scene.render(previewed(snapshot), tier: drawn, context: context, frame: frame, animate: !reduceMotion)
@@ -294,18 +345,40 @@ final class AmethystEscapePresenter: ExperiencePresenter {
             fingersDown.remove(event.id)
             if fingersDown.isEmpty { multiTouch = false }
         }
+        // The turns of one drag are announced once, after the last (feature 366).
+        var dragged: Int?
+        for action in actions {
+            if case .turn(let shell, _) = action { dragged = shell }
+        }
+        if dragged != nil { dragTurns = (before: latestCore, accepted: 0, refusal: nil) }
         for action in actions {
             switch action {
             case .turn(let shell, let step):
-                send("shell.rotate", [Double(shell), Double(step)], port: port)
+                let result = send("shell.rotate", [Double(shell), Double(step)], port: port)
+                if result.isAccepted {
+                    dragTurns?.accepted += 1
+                } else if dragTurns?.refusal == nil {
+                    dragTurns?.refusal = result.code
+                }
             case .advance:
                 send("pearl.advance", [], port: port)
             case .select(let shell):
+                if mirror.pickedShell != shell, let core = latestCore {
+                    route(AmethystEscapeFeedbackPlan.picked(shell: shell, core: core))
+                }
                 mirror.pickedShell = shell
             case .isolate:
                 break   // the controller keeps the isolated shell; the next frame draws it
             case .resetView:
                 break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+        if let shell = dragged, let drag = dragTurns {
+            dragTurns = nil
+            if drag.accepted > 0, let before = drag.before, let after = latestCore {
+                route(AmethystEscapeFeedbackPlan.drag(old: before, new: after, shell: shell, sectors: drag.accepted))
+            } else if let code = drag.refusal {
+                route(AmethystEscapeFeedbackPlan.refused(code: code))
             }
         }
     }
@@ -335,12 +408,54 @@ final class AmethystEscapePresenter: ExperiencePresenter {
             mirror.message = nil
             if control == "level.next" { gestures.clearIsolation() }
         } else {
-            mirror.message = "That change was refused: \(result.code)"
+            let plan = AmethystEscapeFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            // A drag's refusals are announced once, after its last turn, and only when no turn was accepted.
+            if dragTurns == nil { route(plan) }
             refusalLog.append(result.code)
             if refusalLog.count > Self.refusalLogLimit { refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit) }
         }
         return result
     }
+
+    // MARK: Feedback and sound (feature 366)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: AmethystEscapeFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// Moves the panel's shell pick by `delta` shells (wrapping) and announces the shell ("Shell 2 picked.").
+    func pickShell(_ delta: Int) {
+        let before = mirror.pickedShell
+        mirror.pickNext(delta)
+        guard mirror.pickedShell != before, let core = latestCore else { return }
+        route(AmethystEscapeFeedbackPlan.picked(shell: mirror.pickedShell, core: core))
+    }
+
+    /// The ambient recipe of `core`: its pearl's shell, its shell count and its stage.
+    static func recipe(_ core: AmethystEscapeExperienceCore) -> AmbientLoopRecipe {
+        AmethystEscapeSoundRecipe.recipe(core.snapshot(time: 0))
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current crystal.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 
     func teardown(_ context: RenderContext) {
         scene.release()
@@ -366,7 +481,16 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         let snapshot = core.snapshot(time: 0)
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
         mirror.levelNumber = core.levelNumber
+        if let previous = latestCore {
+            if dragTurns == nil { route(AmethystEscapeFeedbackPlan.after(old: previous, new: core)) }
+            let opened = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         latestCore = core
+        mirror.summary = AmethystEscapeFeedbackPlan.summaryText(core: core)
         if let key = hintKey, key != Self.hintKey(core) { clearHint() }
         mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
         mirror.failureText = core.failureExplanation?.text

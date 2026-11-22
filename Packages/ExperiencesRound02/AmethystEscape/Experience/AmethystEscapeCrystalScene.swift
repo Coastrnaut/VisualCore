@@ -14,6 +14,10 @@
 // orbit (`AmethystEscapeSceneGeometry.camera(_:aspect:orbit:)`), the snapshot drawn may be a drag preview (the presenter
 // passes it), and an isolated shell leaves every other shell at shade 0.25 (`crystalMesh(_:tier:isolated:)`, also in
 // the fallback).
+// Feature 366 (R02-G07-06) T-R02G0706-005 (FR-R02G0706-004; clarification Q3): the crystal and glow meshes draw the
+// presenter's eased lights (`AmethystEscapeLights`: the failed wedge's amber, the pearl glow and the exit glow; also in
+// the fallback). The geometry key includes the light levels quantised to 1/1024, so the meshes are rebuilt only while a
+// fade runs; settled lights leave the key, and the meshes, unchanged.
 #if os(iOS)
 import AmethystEscapeCore
 import Foundation
@@ -36,6 +40,10 @@ final class AmethystEscapeCrystalScene {
     var orbit: AmethystEscapeOrbit = .authored
     /// The isolated shell (presentation only), set by the presenter before each frame.
     var isolated: Int?
+    /// The eased light levels (feature 366), set by the presenter before each frame; nil draws the snapshot's own.
+    var lights: AmethystEscapeLights?
+    /// The steps per unit of a light level in the geometry key (levels closer than 1/1024 share a mesh).
+    static let lightSteps = 1024.0
 
     /// What the geometry depends on: everything of the snapshot that the meshes read, the tier and the mode.
     private struct GeometryKey: Equatable {
@@ -48,6 +56,8 @@ final class AmethystEscapeCrystalScene {
         let isolated: Int?
         let tier: Int
         let fallback: Bool
+        /// The pearl, exit and wedge levels quantised to 1/``lightSteps``; empty without lights (feature 366).
+        let lights: [Int]
     }
 
     private var registry: ResourceRegistry?
@@ -94,9 +104,10 @@ final class AmethystEscapeCrystalScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let camera = AmethystEscapeSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
-        let key = Self.key(snapshot, tier: tier, isolated: isolated, fallback: fallbackReason != nil)
+        let key = Self.key(snapshot, tier: tier, isolated: isolated, fallback: fallbackReason != nil, lights: lights)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
-        geometryKey = Self.key(snapshot, tier: tier, isolated: isolated, fallback: fallbackReason != nil)
+        geometryKey = Self.key(snapshot, tier: tier, isolated: isolated, fallback: fallbackReason != nil,
+                               lights: lights)
         if fallbackReason != nil {
             try drawFallback(camera)
             return
@@ -111,9 +122,14 @@ final class AmethystEscapeCrystalScene {
 
     /// The geometry key of `snapshot` at `tier` in the given mode.
     private static func key(_ s: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier, isolated: Int?,
-                            fallback: Bool) -> GeometryKey {
-        GeometryKey(levelNumber: s.levelNumber, offsets: s.shells.map(\.offset), pearl: s.pearl, stage: s.stage,
-                    failure: s.failure, moves: s.moves, isolated: isolated, tier: tier.index, fallback: fallback)
+                            fallback: Bool, lights: AmethystEscapeLights?) -> GeometryKey {
+        var levels: [Int] = []
+        if let lights {
+            levels = [lights.pearl, lights.exit, lights.wedge].map { Int(($0 * Self.lightSteps).rounded()) }
+        }
+        return GeometryKey(levelNumber: s.levelNumber, offsets: s.shells.map(\.offset), pearl: s.pearl,
+                           stage: s.stage, failure: s.failure, moves: s.moves, isolated: isolated, tier: tier.index,
+                           fallback: fallback, lights: levels)
     }
 
     private func rebuild(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier) throws {
@@ -123,11 +139,12 @@ final class AmethystEscapeCrystalScene {
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let crystal = try AmethystEscapeSceneGeometry.crystalMesh(snapshot, tier: tier, isolated: isolated)
+                let crystal = try AmethystEscapeSceneGeometry.crystalMesh(snapshot, tier: tier, isolated: isolated,
+                                                                          lights: lights)
                 crystalRenderer = try Self.renderer(crystal, vertex: AmethystEscapeShaders.crystalVertex,
                                                     fragment: crystalFragment, name: "amethyst-escape-crystal",
                                                     registry: registry)
-                let glow = try AmethystEscapeSceneGeometry.glowMesh(snapshot, tier: tier)
+                let glow = try AmethystEscapeSceneGeometry.glowMesh(snapshot, tier: tier, lights: lights)
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: AmethystEscapeShaders.glowVertex,
                                                      fragment: AmethystEscapeShaders.glowFragment,
@@ -143,9 +160,10 @@ final class AmethystEscapeCrystalScene {
         let minimal = AmethystEscapeTier.of(AmethystEscapeTier.all.count - 1)
         let up = Vec3(0, 1, 0)
         let parts: [(part: AmethystEscapeColouredMesh, colourInNormals: Bool)] = [
-            (part: try AmethystEscapeSceneGeometry.crystalPart(snapshot, tier: minimal, isolated: isolated),
-             colourInNormals: false),
-            (part: try AmethystEscapeSceneGeometry.glowPart(snapshot, tier: minimal), colourInNormals: true),
+            (part: try AmethystEscapeSceneGeometry.crystalPart(snapshot, tier: minimal, isolated: isolated,
+                                                               lights: lights), colourInNormals: false),
+            (part: try AmethystEscapeSceneGeometry.glowPart(snapshot, tier: minimal, lights: lights),
+             colourInNormals: true),
         ]
         for entry in parts where !entry.part.mesh.indices.isEmpty {
             var mesh = entry.part.mesh

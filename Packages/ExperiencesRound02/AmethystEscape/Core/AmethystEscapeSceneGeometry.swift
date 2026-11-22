@@ -22,6 +22,15 @@
 // camera, bit for bit. The isolation parameter of `crystalPart(_:tier:isolated:)`: with a shell index, every other
 // shell's wedges, rim bands, wall fins and blocked crosses are drawn at shade 0.25 (positions unchanged); nil (the
 // default) leaves the mesh exactly as before.
+//
+// Feature 366 (R02-G07-06) T-R02G0706-005 (FR-R02G0706-004; clarification Q3): the meshes draw the presenter's eased
+// light levels (`AmethystEscapeLights`) when given them. `crystalPart(_:tier:isolated:lights:)`: the failed wedge is
+// amber at shade = the wedge level (times the isolation shade) while that level is above 0, so it rises from dark to
+// full amber as the fade runs; at level 0 it keeps its own material (blocked or facet). `glowPart(_:tier:lights:)`:
+// every pearl glow weight (core and shells) is multiplied by the pearl level and every exit glow weight by the exit
+// level / 0.5 (``AmethystEscapeLights/exitResting``), clamped to 0 … 1, so resting lights draw exactly today's exit.
+// Lights settled on a playing snapshot give the plain mesh bit for bit; nil lights (the default) leave every mesh
+// exactly as before.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -121,12 +130,12 @@ public struct AmethystEscapeWedge: Sendable, Equatable, Hashable {
 ///
 /// **Vertex streams** (the contract with the shaders; attributes a_position, a_normal, a_uv as bound by
 /// `ShaderMeshRenderer`; positions are world units, identity model).
-/// - ``crystalMesh(_:tier:)`` — crystal program: `a_normal` the real unit face normal; `a_uv` (material code, shade)
-///   with codes ``backdropCode`` 0, ``amethystCode`` 1 (open wedge facets), ``platinumCode`` 2 (rim bands, wall fins,
-///   blocked crosses, exit arrow, move bar), ``blockedCode`` 3 (blocked wedges) and ``amberCode`` 4 (the failed
-///   pocket's wedge); shade 1 everywhere except ``crossShade`` on the blocked crosses.
-/// - ``glowMesh(_:tier:)`` — glow program: `a_normal` the colour (sRGB 0 … 1); `a_uv` (glow weight 0 … 1, 0). The pearl
-///   core has weight 1; glow shell k = 1 … `tier.glowShells` around the pearl and the exit has weight 0.5^k.
+/// - ``crystalMesh(_:tier:isolated:lights:)`` — crystal program: `a_normal` the real unit face normal; `a_uv`
+///   (material code, shade) with codes ``backdropCode`` 0, ``amethystCode`` 1 (open wedge facets), ``platinumCode`` 2
+///   (rim bands, wall fins, blocked crosses, exit arrow, move bar), ``blockedCode`` 3 (blocked wedges) and
+///   ``amberCode`` 4 (the failed pocket's wedge); shade 1 everywhere except ``crossShade`` on the blocked crosses.
+/// - ``glowMesh(_:tier:lights:)`` — glow program: `a_normal` the colour (sRGB 0 … 1); `a_uv` (glow weight 0 … 1, 0).
+///   The pearl core has weight 1; glow shell k = 1 … `tier.glowShells` around the pearl and the exit has weight 0.5^k.
 /// ``AmethystEscapeColouredMesh/colours`` gives each vertex's unlit colour for the fallback: on the crystal the material
 /// colour times the shade times 0.6 + 0.4 · max(normal.y, 0) (tops at full colour), on the glow the stream colour times
 /// the weight.
@@ -352,9 +361,13 @@ public enum AmethystEscapeSceneGeometry {
     /// the isolated shell, the backdrop, the exit arrow and the move bar are unchanged. Nil (the default), or an index
     /// that names no shell, gives exactly the mesh without isolation.
     ///
+    /// - Parameter lights: the eased light levels (feature 366): the failed wedge is amber with its shade multiplied by
+    ///   ``AmethystEscapeLights/wedge`` while that level is above 0, and keeps its own material (blocked or facet) at
+    ///   level 0; nil (the default) draws the snapshot's failure at full amber, exactly as before.
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func crystalPart(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier,
-                                   isolated: Int? = nil) throws(MeshError) -> AmethystEscapeColouredMesh {
+                                   isolated: Int? = nil, lights: AmethystEscapeLights? = nil)
+        throws(MeshError) -> AmethystEscapeColouredMesh {
         var parts: Parts = Parts(lit: true)
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
         let e: Double = backdropHalf
@@ -370,14 +383,24 @@ public enum AmethystEscapeSceneGeometry {
             let dim: Double = isolationFactor(shell: wedge.shell, isolated: isolated, snapshot)
             let blocked: Bool = shell.blocked.contains(wedge.sector)
             var code: Double = blocked ? blockedCode : amethystCode
-            if let failed, failed.shell == wedge.shell, failed.sector == wedge.world { code = amberCode }
+            var amber: Double = 1
+            if let failed, failed.shell == wedge.shell, failed.sector == wedge.world {
+                if let lights {
+                    if lights.wedge > 0 {
+                        code = amberCode
+                        amber = lights.wedge
+                    }
+                } else {
+                    code = amberCode
+                }
+            }
             let r0: Double = shellRadius(wedge.shell, snapshot)
             let h: Double = shellHeight(wedge.shell, snapshot)
             let frame = WedgeFrame(rIn: r0 + wedgeInset * w, rOut: r0 + w - wedgeInset * w,
                                    a0: Double(wedge.world) * span, a1: Double(wedge.world + 1) * span,
                                    gap: wedgeInset * w, height: h)
             let bevel: Double = min(bevelWidth * w, 0.3 * h)
-            try addPrism(frame, bevel: bevel, segments: max(tier.bevelSegments, 1), code: code, shade: dim,
+            try addPrism(frame, bevel: bevel, segments: max(tier.bevelSegments, 1), code: code, shade: dim * amber,
                          to: &parts)
             let topY: Double = h
             if !shell.apertures.contains(wedge.sector) {
@@ -442,12 +465,13 @@ public enum AmethystEscapeSceneGeometry {
         return parts.built()
     }
 
-    /// The crystal mesh (see ``crystalPart(_:tier:isolated:)``), with `isolated` as there (nil by default).
+    /// The crystal mesh (see ``crystalPart(_:tier:isolated:lights:)``), with `isolated` and `lights` as there (nil by
+    /// default).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
     public static func crystalMesh(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier,
-                                   isolated: Int? = nil) throws(MeshError) -> Mesh {
-        try crystalPart(snapshot, tier: tier, isolated: isolated).mesh
+                                   isolated: Int? = nil, lights: AmethystEscapeLights? = nil) throws(MeshError) -> Mesh {
+        try crystalPart(snapshot, tier: tier, isolated: isolated, lights: lights).mesh
     }
 
     /// The shade factor of shell `shell` when `isolated` is drawn alone: 1 when `isolated` is nil, names no shell of
@@ -462,10 +486,16 @@ public enum AmethystEscapeSceneGeometry {
     /// 0.3·w · (1 + 0.35·k) (pearl colour), weight 0.5^k; then the pearl sphere of radius 0.3·w (8 bands × 16 slices,
     /// pearl colour, weight 1) at ``pearlCentre(_:)``. Colours: the stream colour times the weight.
     ///
+    /// - Parameter lights: the eased light levels (feature 366): every pearl weight is multiplied by
+    ///   ``AmethystEscapeLights/pearl`` and every exit weight by ``AmethystEscapeLights/exit`` /
+    ///   ``AmethystEscapeLights/exitResting`` (clamped to 0 … 1), so resting levels draw the plain weights; nil (the
+    ///   default) draws the plain weights, exactly as before.
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func glowPart(_ snapshot: AmethystEscapeSceneSnapshot,
-                                tier: AmethystEscapeTier) throws(MeshError) -> AmethystEscapeColouredMesh {
+    public static func glowPart(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier,
+                                lights: AmethystEscapeLights? = nil) throws(MeshError) -> AmethystEscapeColouredMesh {
         var parts: Parts = Parts(lit: false)
+        let pearlLevel: Double = lights?.pearl ?? 1
+        let exitLevel: Double = lights.map { $0.exit / AmethystEscapeLights.exitResting } ?? 1
         let w: Double = shellWidth(snapshot)
         let pearl: SIMD3<Double> = pearlCentre(snapshot)
         let exit: SIMD3<Double> = exitCentre(snapshot)
@@ -475,21 +505,28 @@ public enum AmethystEscapeSceneGeometry {
                 let weight: Double = pow(shellWeight, Double(k))
                 try parts.disc(centre: exit + SIMD3(0, -0.001 * Double(k), 0),
                                radius: exitGlowRadius * Double(1 + k), slot: AmethystEscapePalette.exit,
-                               uv: Vec2(weight, 0))
+                               uv: Vec2(lit(weight, exitLevel), 0))
                 try parts.sphere(centre: pearl, radius: pearlRadius * w * (1 + pearlShellGrowth * Double(k)),
-                                 slot: AmethystEscapePalette.pearl, uv: Vec2(weight, 0))
+                                 slot: AmethystEscapePalette.pearl, uv: Vec2(lit(weight, pearlLevel), 0))
             }
         }
-        try parts.sphere(centre: pearl, radius: pearlRadius * w, slot: AmethystEscapePalette.pearl, uv: Vec2(1, 0))
+        try parts.sphere(centre: pearl, radius: pearlRadius * w, slot: AmethystEscapePalette.pearl,
+                         uv: Vec2(lit(1, pearlLevel), 0))
         return parts.built()
     }
 
-    /// The glow mesh (see ``glowPart(_:tier:)``).
+    /// The glow mesh (see ``glowPart(_:tier:lights:)``), with `lights` as there (nil by default).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func glowMesh(_ snapshot: AmethystEscapeSceneSnapshot,
-                                tier: AmethystEscapeTier) throws(MeshError) -> Mesh {
-        try glowPart(snapshot, tier: tier).mesh
+    public static func glowMesh(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier,
+                                lights: AmethystEscapeLights? = nil) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, lights: lights).mesh
+    }
+
+    /// The glow weight `weight` scaled by the light factor `level`, clamped to 0 … 1; `weight` itself when `level` is 1
+    /// (bit for bit, so resting and absent lights draw the plain mesh).
+    static func lit(_ weight: Double, _ level: Double) -> Double {
+        level == 1 ? weight : min(max(weight * level, 0), 1)
     }
 
     // MARK: Camera

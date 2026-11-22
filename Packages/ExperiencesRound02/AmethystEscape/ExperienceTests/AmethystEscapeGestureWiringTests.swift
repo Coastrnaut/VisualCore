@@ -493,7 +493,9 @@ enum AmethystEscapeGestureScript {
         #expect(sentAfter.rejected == sentBefore.rejected + 1, "one shell.rotate refused")
         #expect(shell.presenter.refusalLog.count == logBefore + 1)
         #expect(shell.presenter.refusalLog.last == result.code)
-        #expect(shell.presenter.mirror.message == "That change was refused: \(result.code)")
+        // Feature 366: refusals are shown in words.
+        let words: String? = AmethystEscapeFeedbackPlan.refused(code: result.code).text
+        #expect(shell.presenter.mirror.message == words)
         #expect(try AmethystEscapeTest.digest(shell) == digest)
         #expect(try AmethystEscapeTest.core(shell).play.fingerprint == before.play.fingerprint)
     }

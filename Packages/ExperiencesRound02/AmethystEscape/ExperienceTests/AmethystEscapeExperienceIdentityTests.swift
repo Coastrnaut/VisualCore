@@ -199,7 +199,10 @@ import VisualCoreExperienceHost
             + "\(level.sectorName(found.sector))."
         #expect(text.contains(named), "\(text)")
         #expect(shell.presenter.mirror.status.hasPrefix("Failed: "))
-        let rgba: [UInt8] = try AmethystEscapeTest.still(session)
+        // The failed wedge's amber fades in (feature 366: 0.15 s, eased lights); a still at 0 s, then one at 1 s, once
+        // the fade has finished.
+        _ = try AmethystEscapeTest.still(session, time: 0)
+        let rgba: [UInt8] = try AmethystEscapeTest.still(session, time: 1)
         let snapshot: AmethystEscapeSceneSnapshot = try #require(shell.presenter.lastSnapshot)
         #expect(snapshot.failure == .wedge(found.shell, found.sector))
         // The failure's sector is absolute; the wedge's own sector is (sector − offset) mod sectors.

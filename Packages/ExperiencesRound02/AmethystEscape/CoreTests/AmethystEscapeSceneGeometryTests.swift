@@ -11,6 +11,12 @@
 // the seven aspects; the authored camera is the authored orbit's camera and the camera of R02-G07-03, bit for bit;
 // `AmethystEscapeOrbit.clamped()` keeps the bounds; isolating a shell keeps every position and scales exactly the other
 // shells' wedge, rim, fin and cross shades (and fallback colours) by 0.25; nil isolation is the plain mesh.
+//
+// Feature 366 (R02-G07-06) T-R02G0706-005: the eased lights. Nil lights give the plain meshes byte for byte; lights
+// settled on a snapshot give the plain crystal, and the plain glow scaled by the snapshot's targets (exactly the plain
+// glow while playing); mid-fade, the failed wedge's amber shade is the wedge level (no amber at level 0, where the wedge
+// keeps its blocked material), the pearl weights are the plain ones times the pearl level and the exit weights the plain
+// ones times the exit level / 0.5.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -518,5 +524,130 @@ import VisualCoreScenes
             }
             // The glow (pearl and exit) never changes with isolation: it has no isolation parameter.
         }
+    }
+
+    // MARK: Eased lights (feature 366)
+
+    /// The glow vertices of `part` whose colour slot is `colour` (pearl or exit), as (position, weight) pairs.
+    static func glowWeights(_ part: AmethystEscapeColouredMesh,
+                            colour: SIMD3<Double>) -> [(position: Vec3, weight: Double)] {
+        var result: [(position: Vec3, weight: Double)] = []
+        for k in part.mesh.positions.indices {
+            let n: Vec3 = part.mesh.normals[k]
+            if abs(n.x - colour.x) < 1e-12 && abs(n.y - colour.y) < 1e-12 && abs(n.z - colour.z) < 1e-12 {
+                result.append((part.mesh.positions[k], part.mesh.uvs[k].x))
+            }
+        }
+        return result
+    }
+
+    /// Checks that `lit`'s `colour` glow weights are `plain`'s times `factor` (clamped to 0 … 1), at the same places.
+    static func expectScaled(_ lit: AmethystEscapeColouredMesh, _ plain: AmethystEscapeColouredMesh,
+                             colour: SIMD3<Double>, factor: Double) {
+        let a: [(position: Vec3, weight: Double)] = glowWeights(plain, colour: colour)
+        let b: [(position: Vec3, weight: Double)] = glowWeights(lit, colour: colour)
+        #expect(a.count == b.count && !a.isEmpty)
+        for i in 0..<min(a.count, b.count) {
+            #expect(a[i].position == b[i].position)
+            #expect(abs(b[i].weight - min(max(a[i].weight * factor, 0), 1)) < 1e-12)
+        }
+    }
+
+    @Test func nilLightsAreThePlainMeshes() throws {
+        for s in try Self.snapshots() {
+            for tier in AmethystEscapeTier.all {
+                let crystal: AmethystEscapeColouredMesh = try Geometry.crystalPart(s, tier: tier)
+                #expect(try Geometry.crystalPart(s, tier: tier, lights: nil) == crystal)
+                #expect(try Geometry.crystalPart(s, tier: tier, isolated: 0, lights: nil)
+                    == Geometry.crystalPart(s, tier: tier, isolated: 0))
+                #expect(try Geometry.crystalMesh(s, tier: tier, lights: nil) == crystal.mesh)
+                let glow: AmethystEscapeColouredMesh = try Geometry.glowPart(s, tier: tier)
+                #expect(try Geometry.glowPart(s, tier: tier, lights: nil) == glow)
+                #expect(try Geometry.glowMesh(s, tier: tier, lights: nil) == glow.mesh)
+            }
+        }
+    }
+
+    @Test func settledLightsDrawTheSnapshotsTargets() throws {
+        for s in try Self.snapshots() {
+            var lights = AmethystEscapeLights(reducedFlash: false)
+            lights.settle(to: s)
+            #expect(lights.isSettled)
+            for tier in AmethystEscapeTier.all {
+                // The crystal: the failed wedge rests at full amber, exactly the plain mesh.
+                #expect(try Geometry.crystalPart(s, tier: tier, lights: lights) == Geometry.crystalPart(s, tier: tier))
+                let plain: AmethystEscapeColouredMesh = try Geometry.glowPart(s, tier: tier)
+                let lit: AmethystEscapeColouredMesh = try Geometry.glowPart(s, tier: tier, lights: lights)
+                if s.failure == nil && !s.escaped {
+                    #expect(lit == plain)
+                } else {
+                    #expect(lit.mesh.positions == plain.mesh.positions && lit.mesh.indices == plain.mesh.indices)
+                    Self.expectScaled(lit, plain, colour: AmethystEscapePalette.pearl,
+                                      factor: s.failure == nil ? 1 : AmethystEscapeLights.pearlFailed)
+                    if tier.glowShells > 0 {
+                        Self.expectScaled(lit, plain, colour: AmethystEscapePalette.exit,
+                                          factor: s.escaped ? AmethystEscapeLights.exitEscaped / 0.5 : 1)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test func midFadeLevelsScaleTheWedgeThePearlAndTheExit() throws {
+        // The wedge failure, a third of the way through its 0.15 s fade.
+        let failed: Snapshot = try Self.failed()
+        let level = try AmethystEscapeLevel(id: "wedge", seed: 4, difficulty: 1, sectors: 6,
+                                            shells: [AmethystEscapeShell(apertures: [0]),
+                                                     AmethystEscapeShell(apertures: [3], blocked: [0])],
+                                            start: 0, budget: 5)
+        let before: Snapshot = Snapshot(play: try Self.play(level), levelNumber: 4, time: 0)
+        var lights = AmethystEscapeLights(reducedFlash: false)
+        lights.settle(to: before)
+        lights.step(toward: failed, elapsed: 0.05)
+        #expect(lights.wedge > 0 && lights.wedge < 1 && lights.pearl < 1 && lights.pearl > 0.6)
+        let tier: AmethystEscapeTier = .of(0)
+        let plain: [(position: Vec3, uv: Vec2, colour: Vec4)] = Self.soup(try Geometry.crystalPart(failed, tier: tier))
+        let lit: [(position: Vec3, uv: Vec2, colour: Vec4)] =
+            Self.soup(try Geometry.crystalPart(failed, tier: tier, lights: lights))
+        #expect(plain.count == lit.count)
+        var amber: Int = 0
+        for i in 0..<min(plain.count, lit.count) {
+            #expect(plain[i].position == lit[i].position && plain[i].uv.x == lit[i].uv.x)
+            if plain[i].uv.x == Geometry.amberCode {
+                amber += 1
+                #expect(abs(lit[i].uv.y - plain[i].uv.y * lights.wedge) < 1e-12)
+            } else {
+                #expect(lit[i].uv.y == plain[i].uv.y && lit[i].colour == plain[i].colour)
+            }
+        }
+        #expect(amber > 0)
+        let glowPlain: AmethystEscapeColouredMesh = try Geometry.glowPart(failed, tier: tier)
+        let glowLit: AmethystEscapeColouredMesh = try Geometry.glowPart(failed, tier: tier, lights: lights)
+        Self.expectScaled(glowLit, glowPlain, colour: AmethystEscapePalette.pearl, factor: lights.pearl)
+        Self.expectScaled(glowLit, glowPlain, colour: AmethystEscapePalette.exit, factor: 1)
+        // At wedge level 0 (the fade not yet begun) the failed wedge keeps its blocked material.
+        var dark = AmethystEscapeLights(reducedFlash: true)
+        dark.settle(to: before)
+        dark.step(toward: failed, elapsed: 0)
+        #expect(dark.wedge == 0)
+        let unlit: [(position: Vec3, uv: Vec2, colour: Vec4)] =
+            Self.soup(try Geometry.crystalPart(failed, tier: tier, lights: dark))
+        #expect(!unlit.contains { $0.uv.x == Geometry.amberCode })
+        let blockedPlain: Int = plain.filter { $0.uv.x == Geometry.blockedCode }.count
+        #expect(unlit.filter { $0.uv.x == Geometry.blockedCode }.count == blockedPlain + amber)
+        // The escape, a third of the way through the exit's fade from 0.5 to 1.
+        let escaped: Snapshot = try Self.escaped()
+        let open = try AmethystEscapeLevel(id: "escape", seed: 3, difficulty: 1, sectors: 6,
+                                           shells: [AmethystEscapeShell(apertures: [0]),
+                                                    AmethystEscapeShell(apertures: [0])],
+                                           start: 0, budget: 5)
+        var exitLights = AmethystEscapeLights(reducedFlash: false)
+        exitLights.settle(to: Snapshot(play: try Self.play(open, [.advance]), levelNumber: 3, time: 0))
+        exitLights.step(toward: escaped, elapsed: 0.05)
+        #expect(exitLights.exit > 0.5 && exitLights.exit < 1)
+        let exitPlain: AmethystEscapeColouredMesh = try Geometry.glowPart(escaped, tier: tier)
+        let exitLit: AmethystEscapeColouredMesh = try Geometry.glowPart(escaped, tier: tier, lights: exitLights)
+        Self.expectScaled(exitLit, exitPlain, colour: AmethystEscapePalette.exit, factor: exitLights.exit / 0.5)
+        Self.expectScaled(exitLit, exitPlain, colour: AmethystEscapePalette.pearl, factor: 1)
     }
 }
