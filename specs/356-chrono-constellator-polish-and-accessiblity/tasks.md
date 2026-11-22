@@ -77,7 +77,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 - [X] T-R02G0606-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-22: 2026-11-22: script-tests (run alone) exit 0
 - [ ] T-R02G0606-012 {device} After ImplementationLock-100, on D1, D2 and D3: hear the ambient sound, feel the haptics,
   play level 1 with VoiceOver and the largest text size (SC-R02G0606-001 … 004 on hardware). Not run before the lock.
-- [ ] T-R02G0606-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0606-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-22: 2026-11-22: converge round 1 clean; sealed (18 passing) and recorded pass
 
 ## Dependencies and parallel work
 
