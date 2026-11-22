@@ -15,14 +15,22 @@
 // emitted in painter's order: backdrop, wedges back to front (each with its rim band, fins and marks, sides before the
 // top), the exit arrow, the move bar. Positions, colours and marks are the same at every tier; tiers change only the
 // bevel segments and the glow shells. Doubles are used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 364 (R02-G07-04) T-R02G0704-003 (clarifications Q1–Q4): the orbit (`AmethystEscapeOrbit`: yaw ±40° about +y,
+// pitch 30° … 75° down from the horizon, authored yaw 0 and pitch 50°) and `camera(_:aspect:orbit:)`, which refits the
+// same bounding sphere of radius 1.1 so the 5 % margin holds at every orbit; the authored camera is the authored orbit's
+// camera, bit for bit. The isolation parameter of `crystalPart(_:tier:isolated:)`: with a shell index, every other
+// shell's wedges, rim bands, wall fins and blocked crosses are drawn at shade 0.25 (positions unchanged); nil (the
+// default) leaves the mesh exactly as before.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
 /// The camera of the Amethyst Escape scene for one snapshot and aspect.
 ///
-/// Built only by ``AmethystEscapeSceneGeometry/camera(_:aspect:)``. World positions are in crystal units (the outer
-/// shell's outer radius is 1); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
+/// Built only by ``AmethystEscapeSceneGeometry/camera(_:aspect:orbit:)`` (and
+/// ``AmethystEscapeSceneGeometry/camera(_:aspect:)``, its authored orbit). World positions are in crystal units (the
+/// outer shell's outer radius is 1); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
 public struct AmethystEscapeCamera: Sendable, Equatable {
     /// The eye position in world units.
     public let eye: SIMD3<Double>
@@ -44,6 +52,47 @@ public struct AmethystEscapeCamera: Sendable, Equatable {
     public let projection: Mat4
     /// ``projection`` times ``view``.
     public let viewProjection: Mat4
+}
+
+/// The orbit of the Amethyst Escape camera: a yaw about the vertical axis and a pitch down from the horizon, both in
+/// radians (feature 364). Presentation only: never in the digest, the snapshot or the kernel, and not saved.
+///
+/// ``AmethystEscapeSceneGeometry/camera(_:aspect:orbit:)`` uses the ``clamped()`` orbit, so the eye always stays in
+/// front of the crystal and above it (no vertical singularity) and the whole crystal stays in view.
+public struct AmethystEscapeOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians: the angle of the eye direction above the horizon (the view looks down by it); allowed
+    /// ``pitchRange`` (30° … 75°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 50° (``AmethystEscapeSceneGeometry/pitch``), the fixed camera of R02-G07-03.
+    public static let authored = AmethystEscapeOrbit(yaw: 0, pitch: AmethystEscapeSceneGeometry.pitch)
+    /// The largest yaw either way, 40° in radians.
+    public static let yawLimit: Double = 40.0 * Double.pi / 180
+    /// The allowed pitches, 30° … 75° in radians.
+    public static let pitchRange: ClosedRange<Double> = (30.0 * Double.pi / 180)...(75.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −40° … 40° and pitch to 30° … 75°; a non-finite angle becomes the authored one.
+    public func clamped() -> AmethystEscapeOrbit {
+        let y: Double = yaw.isFinite ? yaw : Self.authored.yaw
+        let p: Double = pitch.isFinite ? pitch : Self.authored.pitch
+        return AmethystEscapeOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                   pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+
+    /// The unit direction from the crystal centre to the eye at the clamped orbit: (sin y · cos p, sin p, cos y · cos p)
+    /// with y the yaw and p the pitch; exactly ``AmethystEscapeSceneGeometry/eyeDirection`` at ``authored``.
+    public var eyeDirection: SIMD3<Double> {
+        let o: AmethystEscapeOrbit = clamped()
+        return SIMD3(sin(o.yaw) * cos(o.pitch), sin(o.pitch), cos(o.yaw) * cos(o.pitch))
+    }
 }
 
 /// A mesh with one colour per vertex (sRGB RGBA 0 … 1, alpha 1), aligned with `mesh.positions`.
@@ -141,6 +190,9 @@ public enum AmethystEscapeSceneGeometry {
     public static let crossRise = 0.012
     /// The shade of a blocked cross (platinum dimmed), 0.6.
     public static let crossShade = 0.6
+    /// The shade factor of every shell other than the isolated one (feature 364), 0.25: their wedges, rim bands, wall
+    /// fins and blocked crosses have their shade (and fallback colour) multiplied by it.
+    public static let isolationShade = 0.25
     /// The pearl's radius, 0.3 · w.
     public static let pearlRadius = 0.3
     /// The latitude bands of the pearl sphere, 8.
@@ -295,9 +347,14 @@ public enum AmethystEscapeSceneGeometry {
     /// every wall standing at its clockwise edge (code 2); then the exit arrow (code 2) and the move bar (code 2).
     /// Colours: ``materialColour(_:)`` × shade × (0.6 + 0.4 · max(n.y, 0)).
     ///
+    /// With `isolated` naming a shell (feature 364), every other shell's wedges, rim bands, wall fins and blocked
+    /// crosses have their shade multiplied by ``isolationShade`` (0.25; so their fallback colours too); the positions,
+    /// the isolated shell, the backdrop, the exit arrow and the move bar are unchanged. Nil (the default), or an index
+    /// that names no shell, gives exactly the mesh without isolation.
+    ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func crystalPart(_ snapshot: AmethystEscapeSceneSnapshot,
-                                   tier: AmethystEscapeTier) throws(MeshError) -> AmethystEscapeColouredMesh {
+    public static func crystalPart(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier,
+                                   isolated: Int? = nil) throws(MeshError) -> AmethystEscapeColouredMesh {
         var parts: Parts = Parts(lit: true)
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
         let e: Double = backdropHalf
@@ -310,6 +367,7 @@ public enum AmethystEscapeSceneGeometry {
         if case .wedge(let shell, let sector) = snapshot.failure { failed = (shell, modulo(sector, snapshot.sectors)) }
         for wedge in wedgeOrder(snapshot) {
             let shell: AmethystEscapeSceneSnapshot.Shell = snapshot.shells[wedge.shell]
+            let dim: Double = isolationFactor(shell: wedge.shell, isolated: isolated, snapshot)
             let blocked: Bool = shell.blocked.contains(wedge.sector)
             var code: Double = blocked ? blockedCode : amethystCode
             if let failed, failed.shell == wedge.shell, failed.sector == wedge.world { code = amberCode }
@@ -319,7 +377,8 @@ public enum AmethystEscapeSceneGeometry {
                                    a0: Double(wedge.world) * span, a1: Double(wedge.world + 1) * span,
                                    gap: wedgeInset * w, height: h)
             let bevel: Double = min(bevelWidth * w, 0.3 * h)
-            try addPrism(frame, bevel: bevel, segments: max(tier.bevelSegments, 1), code: code, to: &parts)
+            try addPrism(frame, bevel: bevel, segments: max(tier.bevelSegments, 1), code: code, shade: dim,
+                         to: &parts)
             let topY: Double = h
             if !shell.apertures.contains(wedge.sector) {
                 // The rim band along the outer arc of the top cap.
@@ -334,7 +393,7 @@ public enum AmethystEscapeSceneGeometry {
                 }
                 for t in 0..<arcSegments {
                     try parts.quad([outerArc[t], outerArc[t + 1], innerArc[t + 1], innerArc[t]], front: up,
-                                   uv: Vec2(platinumCode, 1))
+                                   uv: Vec2(platinumCode, dim))
                 }
             }
             if blocked {
@@ -343,7 +402,7 @@ public enum AmethystEscapeSceneGeometry {
                 let radial: SIMD3<Double> = direction(angle)
                 let tangent: SIMD3<Double> = SIMD3(-sin(angle), 0, cos(angle))
                 let arcHalf: Double = 0.35 * (r0 + w / 2) * span
-                let uv: Vec2 = Vec2(platinumCode, crossShade)
+                let uv: Vec2 = Vec2(platinumCode, crossShade * dim)
                 try parts.box(centre: centre, u: radial, v: tangent, halfU: crossArm * w, halfV: crossWidth * w / 2,
                               y0: topY, y1: topY + crossRise, uv: uv)
                 try parts.box(centre: centre, u: tangent, v: radial, halfU: min(crossArm * w, arcHalf),
@@ -355,7 +414,7 @@ public enum AmethystEscapeSceneGeometry {
                 let centre: SIMD3<Double> = direction(angle) * (r0 + w / 2)
                 try parts.box(centre: centre, u: direction(angle), v: SIMD3(-sin(angle), 0, cos(angle)),
                               halfU: w / 2, halfV: finThickness * w / 2, y0: 0, y1: h + finRise,
-                              uv: Vec2(platinumCode, 1))
+                              uv: Vec2(platinumCode, dim))
             }
         }
         // The exit arrow, flat, pointing outward.
@@ -383,12 +442,19 @@ public enum AmethystEscapeSceneGeometry {
         return parts.built()
     }
 
-    /// The crystal mesh (see ``crystalPart(_:tier:)``).
+    /// The crystal mesh (see ``crystalPart(_:tier:isolated:)``), with `isolated` as there (nil by default).
     ///
     /// - Throws: `MeshError` from `MeshBuilder` (not expected).
-    public static func crystalMesh(_ snapshot: AmethystEscapeSceneSnapshot,
-                                   tier: AmethystEscapeTier) throws(MeshError) -> Mesh {
-        try crystalPart(snapshot, tier: tier).mesh
+    public static func crystalMesh(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier,
+                                   isolated: Int? = nil) throws(MeshError) -> Mesh {
+        try crystalPart(snapshot, tier: tier, isolated: isolated).mesh
+    }
+
+    /// The shade factor of shell `shell` when `isolated` is drawn alone: 1 when `isolated` is nil, names no shell of
+    /// `snapshot` or is `shell` itself; ``isolationShade`` otherwise.
+    static func isolationFactor(shell: Int, isolated: Int?, _ snapshot: AmethystEscapeSceneSnapshot) -> Double {
+        guard let isolated, snapshot.shells.indices.contains(isolated), isolated != shell else { return 1 }
+        return isolationShade
     }
 
     /// The glow (glow program, colour in the normal slot, uv (weight, 0)): for k = `tier.glowShells` … 1 the exit glow
@@ -443,16 +509,28 @@ public enum AmethystEscapeSceneGeometry {
         return max(radius, 1e-3) / sin(atan(limit))
     }
 
-    /// The fixed authored camera for `snapshot` and `aspect` (width / height): the eye on ``eyeDirection`` (in front,
-    /// +z, pitched 50° down) at the distance that fits the sphere of radius 1.1 about the origin, looking at the origin
-    /// with +y up and a 45° vertical field of view. For aspects 0.4 … 2.5 the sphere projects inside the view with at
-    /// least 5 % margin on every side. A zero, negative or non-finite aspect is treated as 1; others are clamped to
-    /// 0.1 … 10. Independent of the tier, the time and the play.
+    /// The fixed authored camera for `snapshot` and `aspect` (width / height): ``camera(_:aspect:orbit:)`` at
+    /// ``AmethystEscapeOrbit/authored``, bit for bit, so the eye lies on ``eyeDirection`` (in front, +z, pitched 50°
+    /// down) at the distance that fits the sphere of radius 1.1 about the origin, looking at the origin with +y up and
+    /// a 45° vertical field of view. For aspects 0.4 … 2.5 the sphere projects inside the view with at least 5 % margin
+    /// on every side. A zero, negative or non-finite aspect is treated as 1; others are clamped to 0.1 … 10.
+    /// Independent of the tier, the time and the play.
     public static func camera(_ snapshot: AmethystEscapeSceneSnapshot, aspect: Double) -> AmethystEscapeCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `snapshot`, `aspect` (width / height) and `orbit` (clamped, see
+    /// ``AmethystEscapeOrbit/clamped()``): the eye on ``AmethystEscapeOrbit/eyeDirection`` from the origin at the
+    /// distance that fits the sphere of radius 1.1 (the fit does not depend on the direction, so the 5 % margin holds at
+    /// every orbit and aspect 0.4 … 2.5), looking at the origin with +y up (never parallel to the view direction: the
+    /// pitch is at most 75°) and a 45° vertical field of view. Aspects are made usable as in ``camera(_:aspect:)``.
+    /// Presentation only; independent of the tier, the time and the play.
+    public static func camera(_ snapshot: AmethystEscapeSceneSnapshot, aspect: Double,
+                              orbit: AmethystEscapeOrbit) -> AmethystEscapeCamera {
         let a: Double = usableAspect(aspect)
         let radius: Double = boundingRadius
         let d: Double = distance(radius: radius, aspect: a)
-        let eye: SIMD3<Double> = eyeDirection * d
+        let eye: SIMD3<Double> = orbit.eyeDirection * d
         let near: Double = max((d - radius) * 0.5, 1e-3)
         let far: Double = d + 2 * radius + 1
         let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: Vec3(0, 0, 0), up: Vec3(0, 1, 0))
@@ -521,10 +599,10 @@ public enum AmethystEscapeSceneGeometry {
     }
 
     /// Adds one bevelled prism: vertical sides from y = 0 to h − bevel, `segments` quarter-round bevel bands up to the
-    /// top (inset bevel · (1 − cos θ), y = h − bevel + bevel · sin θ), then the flat top cap.
-    static func addPrism(_ frame: WedgeFrame, bevel: Double, segments: Int, code: Double,
+    /// top (inset bevel · (1 − cos θ), y = h − bevel + bevel · sin θ), then the flat top cap; uv (code, `shade`).
+    static func addPrism(_ frame: WedgeFrame, bevel: Double, segments: Int, code: Double, shade: Double = 1,
                          to parts: inout Parts) throws(MeshError) {
-        let uv: Vec2 = Vec2(code, 1)
+        let uv: Vec2 = Vec2(code, shade)
         let a: Int = arcSegments
         var rings: [[SIMD3<Double>]] = [frame.ring(inset: 0, y: 0, segments: a)]
         for j in 0...segments {

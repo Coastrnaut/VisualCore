@@ -17,7 +17,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   offset turned by n sectors mod S, and the pearl's absolute sector with it when it rests in that shell; nothing else
   changes) with tests in `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapePreviewTests.swift` (a preview equals the snapshot after n
   kernel turns of that shell for n in −⌊S/2⌋ … ⌊S/2⌋ on certified levels); lead; `--name host-2`
-- [ ] T-R02G0704-003 [P] Add `AmethystEscapeOrbit` ("yaw ±40°, pitch 30° … 75°, authored (0, 50°)"),
+- [X] T-R02G0704-003 [P] Add `AmethystEscapeOrbit` ("yaw ±40°, pitch 30° … 75°, authored (0, 50°)"), — Verified 2026-11-22: 2026-11-22: host-3 (PickerTests 6 + SceneGeometryTests 14: 2,500 seeded points vs independent pick, orbit framing 9 orbits x 7 aspects, authored camera bit-identical, isolation) exit 0, lead retest
   `camera(_:aspect:orbit:)` (distance refit to the bounding sphere of radius 1.1 with a 5 % margin;
   `camera(_:aspect:)` equals the authored orbit, bit-identical) and the isolation parameter (`crystalPart`/`crystalMesh`
   with `isolated: Int?`: every other shell's wedges, fins and marks at shade 0.25; nil leaves the mesh unchanged) to
