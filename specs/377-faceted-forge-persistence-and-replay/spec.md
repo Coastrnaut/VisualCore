@@ -29,6 +29,51 @@ Canonical overrides:
   and 327: the saved frontier is restored as saved (raising it from the kept results would open levels for an honest
   daily win).
 
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+367's answers where the games agree. Facts checked in code (read-only, 2026-11-22): the shared `SavedStateStore` keeps
+one `state.json` per experience, writes it atomically, moves an unreadable file aside and refuses a newer schema; the
+engine applies the experience's `MigrationChain`; Faceted Forge's adapter writes snapshot schema 2 `{level, mode,
+progress, records, tutorial}` with a 1 → 2 step; `FacetedForgeProgress.Result` keeps `cutsMade` (the play's cut
+records, undone ones included) and `stars`; the play's records have kinds cut, undo and redo; the controls are
+`piece.cut`, `play.undo`, `play.redo`, `level.next`, `level.select`, `mode.daily`, `mode.practice`, `mode.campaign` and
+`tutorial.dismiss`; the presenter holds the sound choice (off by default) since R02-G08-06.
+
+- Q: What is stored for each result, and when is it written? → A: each result keeps its fewest cuts made, its stars and
+  the winning trace — the ordered effective cuts `(piece, direction, depth)` of the play that earned it (a cut that was
+  undone and not redone is left out, so the trace never contains an undo or a redo) — plus `verified`. Cuts made still
+  counts every cut record, undone ones included, as since R02-G08-05, so it is at least the trace's length. A campaign
+  or daily win replaces the stored result only when it is better (ties keep the earlier trace); practice records
+  nothing. The shared store writes at the app's save points; this feature does not change when. Impact:
+  FR-R02G0807-001, 003; SC-R02G0807-001.
+- Q: How are scores reconciled on restore? → A: for every result with a trace: the certified level is generated, a
+  fresh play (campaign budget) replays the trace (each cut legal), and the result is kept only if the play ends won,
+  the trace's length is at most `cutsMade`, and `stars` equals the stars rule for `cutsMade` and the level's certified
+  smallest cut count; otherwise it is dropped. (A lowered `cutsMade` can never claim fewer cuts than the trace proves;
+  a raised one only worsens the score.) The adapter exposes the number dropped and the presenter announces it once
+  ("n saved results could not be checked and were removed.", singular for 1). Results without a trace (schema 1 or 2)
+  are kept, marked unverified. The frontier is restored as saved. Impact: FR-R02G0807-003; SC-R02G0807-003.
+- Q: How do migrations work? → A: schema 3 adds the trace and `verified` to each result, the mode `replay(level)` and
+  the sound choice. 1 → 2 is the existing step; 2 → 3 copies results with an empty trace and `verified: false` and sets
+  the sound choice off. Schema 4 or newer is refused by the shared store; a damaged payload is refused with `damaged`
+  and the opening state is used. Impact: FR-R02G0807-002, 007; SC-R02G0807-002.
+- Q: How does replay work? → A: `replay.start [level]` opens mode `replay(level)` with a fresh play of that level when
+  a verified result with a trace exists (`r02-g08.no-replay` otherwise); `replay.step` applies the next cut of the
+  trace (`r02-g08.replay-end` after the last or once the play ended); `replay.stop` returns to campaign at that level
+  (the frontier when it is not open). During replay every other play control except `tutorial.dismiss` and
+  `settings.sound` is refused with `r02-g08.replay` (piece choice, plane aim, isolation and the camera are
+  presentation only and stay allowed); replay never changes progress; the tutorial is done during replay. The refusals
+  are shown and announced in words: "There is no saved solution to replay for this level.", "The replay is over." and
+  "Stop the replay first."; a replayed win claims no stars. Impact: FR-R02G0807-004; SC-R02G0807-004.
+- Q: Which inputs make the state deterministic, and how is the sound choice changed? → A: the seed (opening level),
+  the certified catalog (fixed planned seeds), the calendar date given to `mode.daily` and the recorded actions; the
+  state reads no clock and no random source. The sound choice is changed by `settings.sound [0 … 1]` (whole numbers; 1
+  on), stored in the snapshot, never in the digest, and applied by the presenter when the experience opens or the
+  value changes. Impact: FR-R02G0807-005, 007.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Progress is never lost or corrupted (Priority: P1) 🎯
@@ -55,7 +100,8 @@ edited save cannot claim scores it did not earn.
 
 **Why this priority**: the source requires reconcilable scores.
 
-**Independent Test**: honest saves restore every result; edited results (stars, cuts made, trace) are dropped and counted.
+**Independent Test**: honest saves restore every result; edited results (stars, cuts made, trace) are dropped and
+counted.
 
 ### User Story 3 - Watch a winning replay (Priority: P2)
 
@@ -75,7 +121,8 @@ actions other than stepping and stopping are refused during replay.
 - **Old saves without traces (schema 1 or 2):** results are kept but marked unverified; they still open levels but
   cannot be replayed.
 - **Undone actions:** a stored trace holds only the effective actions of the winning play in order (an undone action and
-  its undo are left out), so replay never needs an undo.
+  its undo are left out), so replay never needs an undo; cuts made still counts undone cuts, so it is at least the
+  trace's length.
 - **Deterministic seeds:** the opening level, the daily level and every certified level come from fixed seeds and dates,
   so the same save replays identically on every device.
 
@@ -88,8 +135,8 @@ actions other than stepping and stopping are refused during replay.
 - **FR-R02G0807-002**: Migration MUST bring schema 1 and schema 2 saves to schema 3 without losing progress; results
   without a trace are kept as unverified.
 - **FR-R02G0807-003**: Each campaign or daily win MUST store the winning actions of the best result; on restore every
-  verified result MUST be replayed on its certified level and dropped when it does not win with its recorded cuts made
-  and stars; the number of dropped results MUST be reported.
+  verified result MUST be replayed on its certified level and dropped unless it wins with at most its recorded cuts made
+  and its stars match the stars rule for them; the number of dropped results MUST be reported.
 - **FR-R02G0807-004**: A replay mode MUST play a stored trace action by action from a fresh level without changing
   progress, refusing other play actions with a named reason.
 - **FR-R02G0807-005**: All randomness MUST derive from fixed seeds or the given calendar date; no clock or random source
@@ -102,7 +149,8 @@ actions other than stepping and stopping are refused during replay.
 
 ### Key Entities
 
-- **Result**: level, fewest cuts made, stars, the winning actions (trace), verified or not.
+- **Result**: level, fewest cuts made (undone cuts included), stars, the winning effective cuts (trace), verified or
+  not.
 - **Snapshot schema 3**: level, records, progress (results with traces), mode, tutorial step, sound choice.
 - **Replay**: the level, the trace and the position in it.
 
@@ -113,8 +161,8 @@ actions other than stepping and stopping are refused during replay.
 - **SC-R02G0807-001**: 500 seeded reachable states round-trip through the snapshot with equal digests; the sound choice
   (on and off) survives the round trip and changes no digest.
 - **SC-R02G0807-002**: Schema 1 and 2 payloads for 100 seeded states migrate and restore with progress kept.
-- **SC-R02G0807-003**: For 200 seeded saves, every honest result survives restore and every edited result (stars, cuts made,
-  trace step) is dropped and counted.
+- **SC-R02G0807-003**: For 200 seeded saves, every honest result survives restore and every edited result (stars,
+  cuts made below the trace's length, trace step) is dropped and counted.
 - **SC-R02G0807-004**: Every stored trace of the 100 certified levels replays to a win with the recorded fingerprints;
   replay never changes progress.
 - **SC-R02G0807-005**: Existing tests pass; each test under 10 s; the reference regression passes 7 of 7.
