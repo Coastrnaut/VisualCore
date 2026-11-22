@@ -251,6 +251,10 @@ targets:
         product: FacetedForgeCore
       - package: ExperiencesRound02
         product: FacetedForgeExperience
+      - package: ExperiencesRound02
+        product: NocturneGardenCore
+      - package: ExperiencesRound02
+        product: NocturneGardenExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false

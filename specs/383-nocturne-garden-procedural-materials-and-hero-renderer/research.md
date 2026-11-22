@@ -8,7 +8,8 @@
   feathered band along boundary edges only (soft shadow approximation); no shadow is computed on the GPU. Rationale:
   renderer purity (US2) and the frame checks name exact cells. Alternatives: projected shadow volumes (rejected: the
   picture could disagree with the verdict).
-- **R3 Blooms in front of the mist.** Decision: each bloom's head is its kind's outline at size·u, unstretched,
+- **R3 Blooms in front of the mist.** Decision: each bloom's head is its kind's outline at 0.35·size·u (corrected in implementation: at size·u it hid its
+  own shadow),
   extruded 0.04 at z = 0.35, with an L-system stem of leaf pairs below it; the shadow on the mist is the stretched cast.
   Rationale: the player sees the flower and, behind it, its longer or shorter shadow as the lantern moves; frame checks
   skip cells behind a bloom's screen box. Alternatives: drawing the flower on the plane (rejected: no depth).

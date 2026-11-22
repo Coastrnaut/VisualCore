@@ -53,8 +53,9 @@ through luminous pearlescent mist" and the geometry "L-system stems, leaf polygo
   to (r + 1)·u (row 0 at the bottom, where the blooms' feet are). Every cell of the kernel's mask is a shadow quad on
   the plane; the target's boundary edges carry a gold rim; the forbidden cells a coral hatch; after a leak failure the
   leaking cells (mask ∩ forbidden) a cross. Each bloom is a flower grown in front of the plane at z = 0.35: its head is
-  its kind's outline at size·u (unstretched), anchored at the anchor cell's lower-left corner, extruded 0.04 deep with
-  a glowing rim; its stem is an L-system of `stemDepth` levels from the foot with a leaf pair at each level. The lantern
+  its kind's outline at 0.35·size·u (corrected during implementation, 2026-11-22: drawn at size·u, a head hid its own
+  shadow — the lantern magnifies, so the small flower casts the large shadow), anchored at the anchor cell's
+  lower-left corner, extruded 0.04 deep with a glowing rim; its stem is an L-system of `stemDepth` levels from the foot with a leaf pair at each level. The lantern
   (the sun) is a glowing sphere at x = 1.25 whose height falls with the elevation (y = (1.15 − 0.25·(e − 1))·H·u). The
   move gauge is a row of `budget` small bars below the bed (y = −0.1, x from −0.9 to 0.9), spent ones lit coral. The
   ground is a midnight plane at y = −0.2. The camera is a fixed authored perspective looking at the bed's centre from

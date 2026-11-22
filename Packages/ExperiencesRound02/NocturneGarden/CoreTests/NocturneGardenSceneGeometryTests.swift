@@ -174,8 +174,12 @@ import VisualCoreScenes
         #expect(first.x > -0.9 && last.x < 0.9)
         let box = Geometry.bloomBox(0, s, tier: NocturneGardenTier.all[0])
         let foot: Double = -1 + Double(s.blooms[0].column) * u
-        #expect(abs(box.min.x - (foot - 3 * u)) < 1e-12 && abs(box.max.x - (foot + 6 * u)) < 1e-12)
-        #expect(box.min.y == -0.2 && abs(box.max.y - (23 * u + 18 * u)) < 1e-12)
+        // The head is drawn at headScale·size·u (0.35 · 3 · u for these size-3 blooms; spec clarification Q1 as
+        // corrected on 2026-11-22).
+        let k: Double = Geometry.headScale
+        #expect(k == 0.35)
+        #expect(abs(box.min.x - (foot - 3 * k * u)) < 1e-12 && abs(box.max.x - (foot + 6 * k * u)) < 1e-12)
+        #expect(box.min.y == -0.2 && abs(box.max.y - (23 * u + 18 * k * u)) < 1e-12)
         #expect(box.min.z == 0.35 && abs(box.max.z - 0.39) < 1e-12)
     }
 

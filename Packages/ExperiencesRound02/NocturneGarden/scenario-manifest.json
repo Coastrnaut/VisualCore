@@ -1,0 +1,3375 @@
+{
+  "controls" : [
+    "bloom.plant",
+    "bloom.move",
+    "bloom.resize",
+    "bloom.remove",
+    "sun.set",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g09.nocturne-garden",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "991d2200262e5de39e5e9c311e80a3409238ab94ea4b3fdec37bdbbf840379ca",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              4,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              2,
+              11,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              32,
+              0,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              24,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.move",
+            "values" : [
+              12,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0.5,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g09.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              0.5,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g09.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              16,
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g09.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g09.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              1,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g09.supply",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g09.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g09.noop",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.move",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g09.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.resize",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g09.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g09.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g09.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g09.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "991d2200262e5de39e5e9c311e80a3409238ab94ea4b3fdec37bdbbf840379ca",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              4,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              2,
+              11,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              7,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              5,
+              11,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              4,
+              5,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bfecdde0ef81a37be464e35aee685fcd7a1b6fd0bf3e5fdbf57fae0e819140b1",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "991d2200262e5de39e5e9c311e80a3409238ab94ea4b3fdec37bdbbf840379ca",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              4,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "719fef0708aa148b8ba9b720515cd3c8164de96a72e8152562cdf0b57ef76222",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc"
+      },
+      "name" : "acceptance-001",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a36d30a573ca9b5a4a91bf742a45f7261cda284cc3c2aeaabb149a11c616ef36",
+        "initialDigest" : "13e30823b0af67a0ce49528566209de54616aa4d060db3611acfbc8274e423a9"
+      },
+      "name" : "acceptance-002",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              8,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "85ad03b657beda23f89c549ee7a902af4d0b98082a59989b86b77dc9e5f4ef34",
+        "initialDigest" : "32e8e4bd1a62b25c9b282318266e3f5be634285a223efc42c308974a7efc311e"
+      },
+      "name" : "acceptance-003",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              5,
+              3,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fad463056b2339310de75772001c7f29a6fe7622cc2aa78eca682350da6230af",
+        "initialDigest" : "b62d5483c9e3efca37c26dc77433930a0bc8b9d352fd7dd9086de360e6ba80cd"
+      },
+      "name" : "acceptance-004",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              2,
+              3,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5f54b7b4550a7c9a696e8b573d1d49ee3ad7793f188a3d85f52a0bfa6b4240ad",
+        "initialDigest" : "678f94034c998bccb1d8a7ab14a60fc0794018b106fd8b88aa9a1b7435caef7b"
+      },
+      "name" : "acceptance-005",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "014dec24b9310d843ffbe6e7ccd50e3e52a4f3fc1be542f1310794b92f9230bf",
+        "initialDigest" : "680356f61ff72cdbb8d47529025ad1ed522dc83ed76c3a418f0c3ee0d2263bd5"
+      },
+      "name" : "acceptance-006",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              1,
+              1,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "25e97b8eb5ced7520417b8233084ff69c66a8d1092af9f4782d9eef3ef4d295d",
+        "initialDigest" : "3435471c7b5a434b56a6b23a15f39991c313c63b6cea7aded3240a6ef1feb107"
+      },
+      "name" : "acceptance-007",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "395ee5c03617784e32d38388492b8b45fa675a1c82be533490ef6cf8dc2c9288",
+        "initialDigest" : "96dde07696061f4aabef02a1d17f1fb11cfebd3547e8caf8ea009c75dd4d3425"
+      },
+      "name" : "acceptance-008",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7ffd2937717fdf340fb34af28f43ca9f7e57536b1141202ae5b7862e015a6633",
+        "initialDigest" : "237de8e9648e3b0f924b3393637d65700c06c1e4a7afb53bc3e8069489a24158"
+      },
+      "name" : "acceptance-009",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ce4d8b6f56b15fc82ff4d2f6218aafdb9a171247b2268d68f202539467da8fe2",
+        "initialDigest" : "200a31828f0b1c62d8415472fdf1bbc799f14392320f6fd5744fedb5279d5afb"
+      },
+      "name" : "acceptance-010",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c1926b4f3e5418b064fb3941ebdcdaa22e2e2330798a9c8e1d2028bfda2b6772",
+        "initialDigest" : "36c55253bea2dbbc83a5ea15fbb92b81b7b3b34934e5afc038ab42deb4cc2e56"
+      },
+      "name" : "acceptance-011",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "11ad2aa5f7da3ddc3cf9d69f4c374ca75aef2b69dffaac1f1e3a47b4fdcfa784",
+        "initialDigest" : "7f7c17163b66b423402e9b46ed122157b990250ef9c210edb63b0d8c3c05e65b"
+      },
+      "name" : "acceptance-012",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e95c0a0536fe8c625f8419ba8be6ac8596471148cb990e29678413423784b872",
+        "initialDigest" : "c8abc2bdca42d51884ff1b625bb6d90eac248e517c0e407c8c112f21d0797ade"
+      },
+      "name" : "acceptance-013",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "258a2c02163fe554953c375f29b09cc2f616efbfeb8127d180ba90a22b197b41",
+        "initialDigest" : "d99a10f93cae549eb90e4c4ded69252c5745e07760fe2095914ec7f2b762addd"
+      },
+      "name" : "acceptance-014",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e94d9c90a0454bc50c3912b43f5647d008ecfd69d211388f9ade2e072c211822",
+        "initialDigest" : "12faeaf784a51694b3c2f3ab7de4987f42caf063b1380877560e9ab6808fbd4d"
+      },
+      "name" : "acceptance-015",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7a8a0afc3c368a2d0574f3db44ceb0319b2e3c332f3f2a0e39d72644701861e1",
+        "initialDigest" : "43f7c762a6e93cd35e367b9041ddf7e029a18808382523e3adf73af2906b9fa6"
+      },
+      "name" : "acceptance-016",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b3f2844418e43fbf38d52bb8c684fac061adb47f4c92323acfcc5d0acbc8ac7a",
+        "initialDigest" : "935899c99b591605186dc263df860f673319940e4105d65f87c3b2ba7fccab1b"
+      },
+      "name" : "acceptance-017",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              4,
+              3,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3d23d74e5c38af46e5f4f803fc7cd781379c15aed600d869c12513a9f1321a50",
+        "initialDigest" : "f05c1df997948aa8be4ff5071d5892fa03671e019c127c37f9c63c9a43cd2a03"
+      },
+      "name" : "acceptance-018",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "59018f5a325dfb8d8e7f2444de65c12dc3113a269da8be440a78df46ff3fdcd8",
+        "initialDigest" : "b5192733de280284065e5a0eeda9e1a82c32e2c728600ce12b45c912a32cf4e9"
+      },
+      "name" : "acceptance-019",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              10,
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "062a8901418203d98452e6053bfe05dcf1646c93290ad653b6dfddf260df7de6",
+        "initialDigest" : "630f8c62377b6874cfb2eaaa0e48841f84f1553821db2e91badf97307bc845ce"
+      },
+      "name" : "acceptance-020",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "81e7341b8d6fa285c1e2b0969e27d3748377854edc15b7494a2113de38e0dfbc",
+        "initialDigest" : "695b227c1f7fda5d6dd77b9ca44d1e3c2cdd915e811a655ee98b26fab9674da2"
+      },
+      "name" : "acceptance-021",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cd00fe40d41224821cfe19e566f102810c36728869fb57663e6c9876d5b8038f",
+        "initialDigest" : "ea48433e52779c63e971719e18d5894ee0499d8f52bb757484c3041369bd95cd"
+      },
+      "name" : "acceptance-022",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f594f45dbc401cec52018db52c4a6c23e20018745f63d18795df615578b04871",
+        "initialDigest" : "50e65fe74508f495fbe6f2dfa8a0010062363adcdfcec0b30336220094546d7f"
+      },
+      "name" : "acceptance-023",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "20149509046faa8cc6f970d20b3bcbe2cdd55e04329a95381e7507bcc8b0f897",
+        "initialDigest" : "6797b9b7a2294640f86793a8bdc752d124bbbeac6416475c7ce32ea4cf4435d3"
+      },
+      "name" : "acceptance-024",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3b7b4b32ad37912e926c5e5ec8626f01083860dc0e55fc18b2dd9400bdda638b",
+        "initialDigest" : "8c7fae4dd4e658b60a584327462a76bdd069125c2b1fd589992942d8bc4637c5"
+      },
+      "name" : "acceptance-025",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              5,
+              10,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "310a6249aa0a908e06ce024e81c7021bd2540c19cdd0d7330e7a2a56ff17dbb7",
+        "initialDigest" : "b3ced936b5f70d11fdfedba8b827d16599c1e519700a6861d55eb31aa8798578"
+      },
+      "name" : "acceptance-026",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bd7df22490c68b9ddac29ebd9525d3d5235cef4bf9079cbc12ab504ded6a9c3c",
+        "initialDigest" : "d9b33ddee91b677899d61fc6c92c23ebe92ccabd64838e463833eb810ba5f801"
+      },
+      "name" : "acceptance-027",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6a5f739170270ecf6999b1da1620e34e34335a57eea06c875b3e6880d6ac4ca5",
+        "initialDigest" : "68cf11a3225243891af5d26de16188e246279927cfaeb5c065b3a05afd60d4bd"
+      },
+      "name" : "acceptance-028",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ac819b28e7811d16fe15d8e56447fad04b2084f7b7fb964382544f6ab42f36b3",
+        "initialDigest" : "c862c83c166948af3b61b2ad49cef972d02831cbd5f5a60ae12e5140dc2e14a8"
+      },
+      "name" : "acceptance-029",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "524164a9c8814f61f0149dde22b2139bb521749acfd563ce357df67c260c864f",
+        "initialDigest" : "c0fe5ce43818e652ec24cba10807276ffaa3cbf32317e794cc148426c5aa21dc"
+      },
+      "name" : "acceptance-030",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1c9faffe2843160658be66292ad672933df51788567de2bb08d972c8269dc7a8",
+        "initialDigest" : "94ca51f2e5ead1edcdee04f522bf7b283377f4ef91e00365b8d754f698d44274"
+      },
+      "name" : "acceptance-031",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              5,
+              8,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8c2b3634261eba483673d17a6190a77b3f972b69db0281b4d62175559bf93084",
+        "initialDigest" : "7fc6953913ea8609af525d6353decfce5f4819cca03656967222469a4038c12c"
+      },
+      "name" : "acceptance-032",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "de4965942d745611969431813169c6d4d653830884cdced968ec639d03efe67d",
+        "initialDigest" : "8aae3005103f8889ef0e11d4d34dd3c6335cfc25a2d3d5146230b58fd0d4f124"
+      },
+      "name" : "acceptance-033",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf5f2ca8a49e2ee3d76a827c025bb9a80491b3542db4d72a6749f03f2c02e8e6",
+        "initialDigest" : "ace390cc2b69ea0e1bca2247b8e59cb754dc771fa3c8de87c10323717ff8165b"
+      },
+      "name" : "acceptance-034",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2b0d88f73a02f2df701c8c5c8677e2d9a300dacead0d1d01f121d615649a2ddc",
+        "initialDigest" : "1209401abe5acbe7344e63910697e4fe0573d9c91460ea0acd633e55221f17af"
+      },
+      "name" : "acceptance-035",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a27853dddad15b755d4052ed9e1ad361644bdd553b678f18723fa0e0325a14e0",
+        "initialDigest" : "9f85d20ffe2df10c4d02cdad40d2e879eca28a4ea903dc98404e8e0dd13c354c"
+      },
+      "name" : "acceptance-036",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b984a26d210d5b51e42f025a40f6505047e0107eac45b432c1ab0304c46b3f3a",
+        "initialDigest" : "667d9f90d81406343a2e9b4049f8d6284b5a77b9585c373fb6f94c5a325138f6"
+      },
+      "name" : "acceptance-037",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e9e4a987d8698db64ecf7f33055febe929916b38920bac5ca00e7d7c863b5dc5",
+        "initialDigest" : "af870b871b4d53383ee3a24feab27ec5656d285ee78e402ec4d2a9ec13e7ce8e"
+      },
+      "name" : "acceptance-038",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0f5e96bd6f5ac55ca3824164d0c0393df891427a7bcfd1a73ee63fedad54b591",
+        "initialDigest" : "e42588b1b55aadf9e2fc06c09374173327f7608aad4a3d515c293d5e2518a5e8"
+      },
+      "name" : "acceptance-039",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6233c66e837e8f8ead69a46eb3a4c40c30f904b723734b80d3e753ce6fb868de",
+        "initialDigest" : "4066ce36f7e262467d6f576bc9efa4d4de61bd6e462800a698d681d596cf3635"
+      },
+      "name" : "acceptance-040",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              5,
+              7,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4301aeef53eea965dde58d8bee57630c33f8bf26e348a6203a2f8c29bda34261",
+        "initialDigest" : "346400a67aced01280a543dff40281435a6700a4909e59402ff99a886e7787c6"
+      },
+      "name" : "acceptance-041",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b90c58b895b03b72cb55a9a4c60afe28f25f38f3048c28e6610c1ba696de193e",
+        "initialDigest" : "c1c1d82d653c8307992cfb2b21750c9617c2228920669204562769255b5b8ae3"
+      },
+      "name" : "acceptance-042",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "15d6aa18aa0bcb9ab332738c4e58af099e5b69e86ca6d842d5290abe3f79e741",
+        "initialDigest" : "fe20aa60d4537ef03fbaaa8a9c918449e8a57fd11f1ecb809d3722ccaa53d89d"
+      },
+      "name" : "acceptance-043",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              7,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "68d980ff357041ce81eb9c8025c99deeae8e32e98c70d4cc8a2f2542cec7335f",
+        "initialDigest" : "3fad4a281872e85b15859b212d363c065db08fb0586518c8ab467dc40de6174b"
+      },
+      "name" : "acceptance-044",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              5,
+              10,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ab4ec7af3c8d6adf5db8d71089a16809e7d85262001d0cd843465da4ebe3df5f",
+        "initialDigest" : "8e36b9f72ac7e8f77ba94bf163d66575b45817940521baf3ff75b11a62c25117"
+      },
+      "name" : "acceptance-045",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9da78cc7ae2d9de6a7278c8f31b1f6224d74a3f6bc5fae41336a0551e0ef1fb2",
+        "initialDigest" : "07a23ece2d95506eeec1e38770bee81c5c3429d932a4e9a07073798ea4fc2746"
+      },
+      "name" : "acceptance-046",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9e60e8ebcfafa716f417b6d47b25bebcfdef36400133a910ccfd273ff32f4a69",
+        "initialDigest" : "c81587f36d268778b203d56e5ed1cbfcafc1063ba554f6651c80bc9e67532e1a"
+      },
+      "name" : "acceptance-047",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              5,
+              4,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a76aec113a28d4754de8aad21082804f4def3c99795012a21b2263c0953a1706",
+        "initialDigest" : "2696f5c4dcef2f0756f06712c4f4a2dc7a1dbf565605e652be867d46f1fc32ce"
+      },
+      "name" : "acceptance-048",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              5,
+              5,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c4694bfa32f609ceb448bb192059f23ac6aa44ee029598bf2c04c9dcf38e339f",
+        "initialDigest" : "07182cb3c4ae285e860134fc69b1680965a23ed25e23165363f47bfc85af5995"
+      },
+      "name" : "acceptance-049",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0fe0966e1ce3fa53cfc1b6de1222516de11d475ab06d3927575d3eeb547584fe",
+        "initialDigest" : "5c578b561a98eaa8d55e8384a6c647f41fabd7e0b143949d0766ff1bb59a2728"
+      },
+      "name" : "acceptance-050",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bc5366c0cd473430d3db8fab996be3f72893f49fd19ce157211687cfbbaf31fa",
+        "initialDigest" : "5135da976958697766a40d96f3cd2fc820033b60c8d6e0b13c79544f62f55aa5"
+      },
+      "name" : "acceptance-051",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "292aa51a6f50872b25755a68da5fc155769f73881d44c38e4797df8fe818f28a",
+        "initialDigest" : "ad4201b242a909da273174b65b11c884ec7a443a96786497f18bd9f5a07ce965"
+      },
+      "name" : "acceptance-052",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7391ca8b2581d77c6c65696762e93514204337e4bb4707c07ba823aac2e6272a",
+        "initialDigest" : "6cab663cca523554c5fd0791c23e1e8f94d5cde3f72ff4a4c96caf80727c79b2"
+      },
+      "name" : "acceptance-053",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b67c4547dc85f7236f98d9b0f5a88bd0cf0b940fe41924e69911b713be9e7f5f",
+        "initialDigest" : "fbb27594efd4f32e803c18cf6052f65b85226cc2091bb8eb0c6ae131b7228e72"
+      },
+      "name" : "acceptance-054",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8337e93aa5a5abc1a7b9899f19e9798fb82b4c5c184d00290d73f49e19436113",
+        "initialDigest" : "ec9134b27af189e9286169cbcd8ca9dc2893546012a5f33f6764615bb266fb89"
+      },
+      "name" : "acceptance-055",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d2419a427313e927ac3117333cd5f6f00266f4fb8d76316b0587f83c40103346",
+        "initialDigest" : "02ecd71b8436f266eddb3a22b4067142ba111160100db5dc82241a4a5d81cfd4"
+      },
+      "name" : "acceptance-056",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b9f5fa6e960a9b70839b5eae3923462d55a10ed5a582e81d1614b5a61d1ffb2f",
+        "initialDigest" : "4b5fd1dbcd7c862195423afcf0873870541f7fb40ccdf11215744d3ea20fe3b2"
+      },
+      "name" : "acceptance-057",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "80afe00e4ee09f54d6bdb526a5a75ed0d009b4ee18cd1c972e9e957c2f4e6dd4",
+        "initialDigest" : "7a861ef19dab382dbb42f958c418791924b75b52f54a87a0e33c8eba5c804226"
+      },
+      "name" : "acceptance-058",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "323bc615c7cf7914a4bce717382ba48cc6a99528c27953b877c935cae6ecaad0",
+        "initialDigest" : "ce76fbf77d3c67e01972bf5dacdb6faea18b9f17c4f2e1b464028106b4be13fb"
+      },
+      "name" : "acceptance-059",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b8f9e5be13445f492f22d4db82e3bf172c0ea44120db14e67ed5e14cc21f0b24",
+        "initialDigest" : "824ee469fc145633f3e5cf9be5ad7f84c7fc8a315e0fc377681a8c04ffc2ca6a"
+      },
+      "name" : "acceptance-060",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              1,
+              2,
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ed9658a8934732e9ab93885363b2aebf5e19cca202f8c7c693f0aa7dbc54faa2",
+        "initialDigest" : "11c4f8ec160fcbe3f51458d5033e8d917001cfcbdcaa6ae64bd10498121e793c"
+      },
+      "name" : "acceptance-061",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              2,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e7c4418aaa6239fc86ee74cab37b15a46e8974cde8bce5a923365bf9c1b72655",
+        "initialDigest" : "87c6c29249c671f080e9af4763c2ef54838288cf0fbcaabb6bd77582482c1f0b"
+      },
+      "name" : "acceptance-062",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4616cbde8948254b2867e3ed46f6e0a59ed01346b192473e6633fe75d56e01db",
+        "initialDigest" : "2c3508ecaaa1e4f771d8cb3caf15301b68f9fe5c07110de56342514d30326b63"
+      },
+      "name" : "acceptance-063",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              8,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "28ab8d9ed0d33b5212bf73401ca17e299fb213cb587b48f91a8fa91c9df22ea1",
+        "initialDigest" : "d960514a05bbc8ce35e4bf4873a4a32c9e39ebc02b99f7248efe4ffb5f38fe80"
+      },
+      "name" : "acceptance-064",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1c9354034f0068123ae3dad648991e54dbe792c30d9446a4db99744b8ac47e87",
+        "initialDigest" : "953304d77aae24f9c1c4a077543c271b62d864efb2cd21c38f1ee5b69b0e555a"
+      },
+      "name" : "acceptance-065",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1e510f63eb944913604a9c102d47ec9b95c796a5bc41222f6bcc76c24423bb74",
+        "initialDigest" : "b4333949fbbf2c479dceb9bfb1c8d3e3db1dd5dac2cf22aa2f19073bd67bc09c"
+      },
+      "name" : "acceptance-066",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "941e106e2e87abfbce9fd19002e3907deae9c269c86bb7dbb0a2072f7c4fc532",
+        "initialDigest" : "078ae23e1df4bbe0e669e21defb02ca21a2d74ee3fdab1fc2bef97d52e4325d1"
+      },
+      "name" : "acceptance-067",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0b22386366b0211135d2e5d59e0ea5e59c5c1cae66b30f9221e0eabe35a2d1f1",
+        "initialDigest" : "c605b0b8978fbdf1110563ea0760b513da5466d749876e7ea12d0025c94163e0"
+      },
+      "name" : "acceptance-068",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8a85df66be44dbab84f08c2199e1668b89e4155d09de58f304de32dd2468d8c1",
+        "initialDigest" : "3ff0a1773f4bb7981005d3ea6dc01275835b8340ccaba1d14d2501e7617e69e9"
+      },
+      "name" : "acceptance-069",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "13ead2ea50b4fd3ab80867976f2f71de263a1f0d8c10df4578cc01b31d273845",
+        "initialDigest" : "60786ec3e9e345a043d36ce49538975d20f9fe3773a1ba6975996998afe203a2"
+      },
+      "name" : "acceptance-070",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b57add67ec948572c60ab506024bfec58499fc93b8134017dc5bb86decdf2832",
+        "initialDigest" : "f252dd88a0ff830dccb74db6ec54a553197c498f4125ff5e1eaaf363ba2e30ba"
+      },
+      "name" : "acceptance-071",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              2,
+              28,
+              12,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "890e4600b7892d002a87379fa1a21365c9e558fafe81ed41ecfb40d3f6a60289",
+        "initialDigest" : "d88302fad068de7dfc196a778c98c041873e4d429cf19525cd9facda45bb8cad"
+      },
+      "name" : "acceptance-072",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aa1b95b5bdecb11af62cf5e9d839ec5dfc5a813c3b2b9d9afc45bd962de99596",
+        "initialDigest" : "001106b18bc6997cf558d8b0fc2829dcb1ef9c9014c01495c306f0e31b341769"
+      },
+      "name" : "acceptance-073",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6cb38b7d7240889d767387a93bdc2799a80ac453ae15b703be45a5cd6938db37",
+        "initialDigest" : "17f51946b6afc1a5bce76f53dad897cb9cabb4c5d8cacc26c593fb29174a0b65"
+      },
+      "name" : "acceptance-074",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              4,
+              4,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d5782619d8f58560514bf0a6f31632f4241e4975ab6ebc8cb02d7acdba5087f3",
+        "initialDigest" : "ca07bdc02c30048d7007811aee8540d7b7e67366bdfea7459c22842f1cc58a15"
+      },
+      "name" : "acceptance-075",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "df7614d92c7ed173885b6d99c41e691dba12071eb9f402042d8d712acdf7a306",
+        "initialDigest" : "bdbdeed4370d1f662f840718152b44909162eb256550fcab12a21adcbe991c13"
+      },
+      "name" : "acceptance-076",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              3,
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f4163e182a7d144d663eeaabfa2feac0aee5c5061979dbf054d5bd930acac0b9",
+        "initialDigest" : "9f284b942e821aa2ff254010b7f2da1d3d8d064fb34dcc29a637306144236da2"
+      },
+      "name" : "acceptance-077",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ce5ae33813b57113204f2890127cf04ddaff52a9262950dc82be4c810fc0d5cb",
+        "initialDigest" : "d95f6db1f574b00459c087901342da48d757c0cfb289a22ea4dbc80ae915422d"
+      },
+      "name" : "acceptance-078",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              6,
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0a05684ac0780f400feba29ae923de507e6d1e09220792d3035a3c92e367d9f2",
+        "initialDigest" : "fc943197245ddc5e25a01dee350c830198e00b46ea65e26161f019fa727443df"
+      },
+      "name" : "acceptance-079",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8438d78e48382d18c9d92b04e9f42d091de46eb1fee805bf21a037b5e1a9d7ec",
+        "initialDigest" : "cd924717ac06dfe79bcfd89232c754c9db2a73ffaff787565ca2bd7433474805"
+      },
+      "name" : "acceptance-080",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              4,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              2,
+              11,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "df4e17f09befdcc2f327efec25a53ac329303ac9fa523d2a231d25df91d84880",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "sun.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1238a3b570a72c35fb525bfe1769baee7830639f7123711491e6408de2f53203",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-budget-out",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "bloom.plant",
+            "values" : [
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "991d2200262e5de39e5e9c311e80a3409238ab94ea4b3fdec37bdbbf840379ca",
+        "initialDigest" : "b866b3c0ec63007e748e2ce5549f9c234105a691ec4d337a12e956b07b30bbdc"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

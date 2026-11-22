@@ -41,6 +41,8 @@ let package = Package(
         .library(name: "AmethystEscapeExperience", targets: ["AmethystEscapeExperience"]),
         // Feature 373 (R02-G08-03): Faceted Forge's experience (iOS only; a registered candidate until X-R02-G08).
         .library(name: "FacetedForgeExperience", targets: ["FacetedForgeExperience"]),
+        // Feature 383 (R02-G09-03): Nocturne Garden's experience (iOS only; a registered candidate until X-R02-G09).
+        .library(name: "NocturneGardenExperience", targets: ["NocturneGardenExperience"]),
         // Feature 343 (R02-G05-03): Colorfall Canyons's experience (iOS only; a registered candidate until X-R02-G05).
         .library(name: "ColorfallCanyonsExperience", targets: ["ColorfallCanyonsExperience"]),
         // Feature 323 (R02-G03-03): Wave Knot Keeper's experience (iOS only; a registered candidate until X-R02-G03).
@@ -340,6 +342,26 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "ChronoConstellator/ExperienceTests"),
+        // Feature 383 (R02-G09-03): Nocturne Garden's experience (presenter, scene, controls) and its simulator tests.
+        .target(name: "NocturneGardenExperience",
+                dependencies: ["NocturneGardenCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "NocturneGarden/Experience"),
+        .testTarget(name: "NocturneGardenExperienceTests",
+                    dependencies: ["NocturneGardenExperience", "NocturneGardenCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreSimulation", package: visualCore)],
+                    path: "NocturneGarden/ExperienceTests"),
         // Feature 373 (R02-G08-03): Faceted Forge's experience (presenter, scene, controls) and its simulator tests.
         .target(name: "FacetedForgeExperience",
                 dependencies: ["FacetedForgeCore",

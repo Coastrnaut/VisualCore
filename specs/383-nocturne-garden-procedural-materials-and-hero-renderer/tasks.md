@@ -60,7 +60,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks pass.
 
-- [ ] T-R02G0903-006 [US3] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenExperience.swift`, `…Presenter.swift`,
+- [X] T-R02G0903-006 [US3] [US4] Create `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenExperience.swift`, `…Presenter.swift`, — Verified 2026-11-22: sim-27 exit=0 (NocturneGardenExperienceTests, 32 tests in 4 suites on iOS 27.2: frames vs the CPU reference at three tiers on levels 1, 21, 41, 61, 81, tier positions and log, fallback, resize and zero size, memory warning, Reduce Motion and Flashing, leak crosses, identity); a first run showed the full-size heads hid their own shadows (level 1: 96 of 192 cells behind blooms, 180 when won), so the head is drawn at 0.35·size·u (spec Q1 corrected; geometry and test boxes follow); packages, catalog-search and host-5 (136 Nocturne Garden host tests incl. 6 scenario tests) exit 0; agent D's tests retested by the lead
   `…GardenScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing;
   the presenter declares `probes(_:)` — two ground corners, as the round-two X gates require — and its quality levels
   equal the Core's `qualityTiers`), `…Controls.swift` (labelled kind picker, column and row − and +, size, plant,

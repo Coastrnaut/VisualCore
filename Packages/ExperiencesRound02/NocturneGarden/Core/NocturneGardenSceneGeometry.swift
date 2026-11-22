@@ -5,7 +5,8 @@
 // mask is a shadow quad on the plane (z = 0.002) with a feathered band of `tier.feather`·u along its boundary edges
 // towards non-shadow bed cells (shadow material, the shade the cover 1 … 0); the target's boundary edges carry a gold
 // rim (z = 0.003); the forbidden cells a coral hatch (z = 0.001); after a leak failure the leaking cells a cross (z =
-// 0.004). Each bloom grows in front of the plane: its head is its kind's outline at size·u, the foot at the anchor
+// 0.004). Each bloom grows in front of the plane: its head is its kind's outline at headScale·size·u (0.35: the
+// lantern magnifies, so the small flower hides little of its own shadow), the foot at the anchor
 // cell's lower-left corner, extruded from z = 0.35 to 0.39 (ear-clipped faces and side walls), and its stem an L-system
 // of `tier.stemDepth` segments from the foot down to the ground y = −0.2 with a leaf pair per segment. The lantern (the
 // sun) is a sphere at x = 1.25, y = (1.15 − 0.25·(e − 1))·H·u, z = 0.3; the move gauge a row of `budget` bars at y =
@@ -282,13 +283,19 @@ public enum NocturneGardenSceneGeometry {
         return SIMD2(-bedHalfWidth + Double(bloom.column) * u, Double(bloom.row) * u)
     }
 
-    /// The scale size·u of `bloom` (size clamped to 1 … 3).
+    /// How large a bloom is drawn against its unstretched shadow outline (0.35): the lantern magnifies, so the small
+    /// flower in front of the mist casts the large shadow the kernel's mask holds, and the flower hides little of it
+    /// (spec clarification Q1, corrected during implementation on 2026-11-22: drawn at size·u, a head covered its own
+    /// shadow and, with two blooms, nearly all of level 1's bed).
+    public static let headScale: Double = 0.35
+
+    /// The scale headScale·size·u of `bloom` (size clamped to 1 … 3): heads, stems, leaves and boxes use it.
     static func bloomScale(_ bloom: NocturneGardenBloom, _ snapshot: NocturneGardenSceneSnapshot) -> Double {
         Double(min(max(bloom.size, NocturneGardenBloom.sizes.lowerBound), NocturneGardenBloom.sizes.upperBound))
-            * cellSize(snapshot)
+            * cellSize(snapshot) * headScale
     }
 
-    /// The head outline of `bloom` in the plane: every outline vertex (x, y) at foot + size·u·(x, y).
+    /// The head outline of `bloom` in the plane: every outline vertex (x, y) at foot + headScale·size·u·(x, y).
     static func headOutline(_ bloom: NocturneGardenBloom, _ snapshot: NocturneGardenSceneSnapshot) -> [SIMD2<Double>] {
         let origin: SIMD2<Double> = foot(bloom, snapshot)
         let scale: Double = bloomScale(bloom, snapshot)
