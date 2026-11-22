@@ -3409,7 +3409,9 @@ class PromptCoverageTests(unittest.TestCase):
                              f"Canonical override: feature directory {g['spec_dir']}; requirement ids FR-{ns}-###, "
                              f"success criteria SC-{ns}-###, task ids T-{ns}-###.", g["id"])
             checked += 1
-        self.assertGreater(checked, 700)
+        # Every open gate is checked; the number falls as gates pass (it reached 700 at R02-G07-04 on 2026-11-22, when
+        # a fixed "> 700" bound failed), so the bound only guards against an empty loop.
+        self.assertGreater(checked, 0)
         backlog = next(f for f in index.values() if f["kind"] == "game-feature" and f["round"] == 5)
         self.assertIn(f"feature directory {backlog['spec_dir_proposed']};", planidx.override_ids(ROOT_DIR, backlog))
 

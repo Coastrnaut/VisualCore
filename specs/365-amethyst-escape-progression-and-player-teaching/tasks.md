@@ -62,7 +62,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
   `--name host-full`, `--name app-unit`
 - [X] T-R02G0705-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-22: 2026-11-22: reference-1 exit 0
 - [X] T-R02G0705-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: 2026-11-22: reference-2 exit 0
-- [X] T-R02G0705-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-22: 2026-11-22: script-tests (run alone) exit 0
+- [X] T-R02G0705-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-22: 2026-11-22: script-tests (run alone) exit 1 — ticked in error without reading the exit code (a fixed '> 700 open gates' bound in test_scripts.py failed once open gates fell to 700); bound fixed and script-tests-2 (--reverify) exit 0, correction 2026-11-22
 - [X] T-R02G0705-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-22: 2026-11-22: converge clean; sealed and recorded pass
 
 ## Dependencies and parallel work

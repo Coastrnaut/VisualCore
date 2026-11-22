@@ -265,6 +265,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
   timelines everywhere, one added hold on small levels). Witness files are generated in a separate write run: the
   byte-compare and decode tests run in parallel, so a first run with the write flag fails until the files exist.
+- **A count bound that shrinks with progress** (R02-G07-05, 2026-11-22). A script test required more than 700 open
+  gates to check; recording R02-G07-04 left exactly 700, so every later run failed. The script-tests check exited 1 and
+  was ticked and recorded without its exit code being read; the bound now only guards against an empty loop, the check
+  was re-run with `--reverify` (exit 0) and the task's evidence note says what happened. Read `exit=` on every `CHECK`
+  line before ticking, and never tie a test to a number that progress changes.
 - **Hints proved by a second search** (R02-G07-05, 2026-11-22). Amethyst Escape's hint is the first action of the
   solver's shortest escape from the current crystal. Its tests compare the shortest escape length on 200 seeded states
   with an independent breadth-first search written in the test on whole crystal values (no packed states), so a state
