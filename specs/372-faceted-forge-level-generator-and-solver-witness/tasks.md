@@ -26,7 +26,7 @@ logic); no GLSL in this feature.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G0802-003 [US1] Implement `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSolver.swift`
+- [X] T-R02G0802-003 [US1] Implement `Packages/ExperiencesRound02/FacetedForge/Core/FacetedForgeSolver.swift` — Verified 2026-11-22: host-2 exit=0 (FacetedForgeSolverTests 10: hand-built answers, unreachable targets nil, canPartition rules, determinism, work bound honoured, 40 fixtures solved at the lower bound, independent breadth-first check on small levels)
   (clarification Q2: `lowerBound` = target pieces − 1; `canPartition` of pieces into the remaining target by exact share
   subset sums with a one-entry piece matching its face count; depth-first search from the crystal alone in the rules'
   order (pieces in canonical order, directions 0 … 12, depths ascending), halves at least the sliver limit, pruned by
