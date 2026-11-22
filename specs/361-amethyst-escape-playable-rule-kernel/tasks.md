@@ -9,7 +9,7 @@ in this feature (the crystal state is the CPU reference the renderer of R02-G07-
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0701-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0701-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit=0; rendering baseline is X-R02-G06's runs (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is X-R02-G06's rendering runs (exit 0)
 
 ## Phase 2: Foundational
