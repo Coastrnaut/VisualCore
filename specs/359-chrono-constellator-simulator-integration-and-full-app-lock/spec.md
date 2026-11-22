@@ -162,6 +162,10 @@ solver regression proves all 100 levels solvable as certified.
 - Interface tests follow the app's existing patterns (one namespace of helpers per experience, launch arguments,
   identifiers, short waits), as Colorfall Canyons's `CC` tests.
 - The interface tests' 90-second bound sits inside the app's 180-second per-test allowance.
+- This feature adds no visuals: identifiers, tests and stored examples only, so the code-only graphics and their
+  licensing stay those of features 353 and 356.
+- Layout is unchanged: the panel of feature 356 (520 pt wide) on the iPhone and iPad simulators; the interface tests run
+  on the iOS 27 iPhone simulator, as the app's interface chunks do.
 
 ## Traceability
 
