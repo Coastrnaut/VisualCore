@@ -102,3 +102,19 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g09.malformed`, `.
   its scripted actions other than certified ones are a neutral plant (the first supplied kind at the smallest size at
   the first anchor that keeps the play in play) and sun moves, derived by playing them.
 
+## Gestures (feature 384, R02-G09-04)
+
+- **Picking.** `NocturneGardenPicker` casts the touch ray through the drawn camera: the lantern first (its projected
+  centre within 22 points), then the blooms (the ray meets a head box at z = 0.37, or the projected foot or head centre
+  lies within 22 points; nearest to the eye), then the bed cell under the ray on z = 0; off the bed is "outside".
+- **Gestures.** `NocturneGardenGestureController` (event timestamps only): a tap (under 10 points, 0.5 s) on a bed cell
+  plants the panel's kind and size there; a tap on a bloom chooses it; a bloom drag (from 16 points) keeps its grab
+  offset and shows the exact would-be shadow (`NocturneGardenDragPreview`, the kernel's own cells, with its match and
+  leak) as a pale dashed outline, then moves the bloom on release, or removes it when released off the bed; a vertical
+  lantern drag changes the sun by one allowed elevation per 48 points; two fingers pinch a bloom (the allowed size
+  nearest size·scale) or orbit (yaw ±35°, pitch 0° … 30°); a double tap on empty space or "Reset view" returns to the
+  authored view. A finished play takes no action from a gesture and says so. Refusals are shown and logged with their
+  reason codes.
+- **Panel.** Every action stays in the panel; the sun is a picker with "Set sun", so the panel wins all 100 certified
+  levels in their smallest move counts.
+

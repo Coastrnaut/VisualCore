@@ -502,3 +502,8 @@ kernel's exact shadow cells, the target rim, the forbidden hatch, the grown bloo
 camera and the CPU projection reference), `NocturneGardenShaders` and the scenario manifest in the Core, and the
 iOS-only `NocturneGardenExperience` target (presenter, garden scene, controls); the experience is a registered
 candidate until X-R02-G09.
+
+Feature 384 (R02-G09-04) adds the gestures: `NocturneGardenOrbit`, `NocturneGardenPicker` (lantern, blooms, bed cell),
+`NocturneGardenDragPreview` (the exact would-be shadow of a dragged bloom) and `NocturneGardenGestureController` (tap
+to plant, drag to move or remove, pinch to resize, lantern drag for the sun, two-finger orbit, double tap to reset) in
+the Core, the presenter's pointer entry, the preview outline (material 12) and "Reset view" and "Set sun" in the panel.
