@@ -28,7 +28,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/ColorfallCanyons/golden-frames.json` with `COLORFALL_CANYONS_WRITE_GOLDEN=1`, and add `ColorfallCanyonsGolden` to
   `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G0508-004 [P] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G0508-004 [P] [US2] Create `Packages/ExperiencesRound02/ColorfallCanyons/CoreTests/ColorfallCanyonsRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-21: 2026-11-21 host-2 exit 0: 8 golden tests (recomputed descriptions match pinned; digests self-check; moved positions beyond a quantum, changed colours, missing/unknown frame, schema 2, hand-edited description all fail naming the frame; rewrite only with the switch) (.autonomy/migration/checks/R02-G05-08.host-2.json); lead retest
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a
   moved position beyond a quantum, a changed colour, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
