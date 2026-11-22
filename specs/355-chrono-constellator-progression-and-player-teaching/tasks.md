@@ -53,7 +53,7 @@ R02-G06-03 are unchanged).
   actions; migration of a schema-1 payload; undo restores the digest with the tutorial advanced; on levels 1 … 3 a
   scripted player following each instruction and the exact hints wins (SC-R02G0605-001); scenarios that use level.next
   regenerated and replayed; the schema-1 example is registered at R02-G06-09); `--name host-3`
-- [ ] T-R02G0605-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorPresenter.swift` and
+- [X] T-R02G0605-005 [US1] [US2] [US3] [US4] Edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorPresenter.swift` and — Verified 2026-11-21: 2026-11-21: sim-27 (ChronoConstellatorExperienceTests, 37 tests in 6 suites on iOS 27.2 incl. 4 teaching tests: tutorial, hint levels, failure undo/rewind/retry, picker refusal, daily and practice) exit 0
   `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorControls.swift` (instruction with Dismiss; Hint revealing the next level, reset after
   any change of the play; failure explanation with Undo, Rewind and Retry; level picker of open levels with bands and
   stars; Campaign / Daily (local calendar date) / Practice; all as wrapping panel text) and create

@@ -13,6 +13,13 @@
 // begins "Star n (shape) would start at row r, column c"; while scrubbing it begins "Scrub to tick t of T"; a star
 // gesture after tick 0 says "Edits are made at tick 0: rewind first". A refused action is shown in the panel and its
 // code kept in ``ChronoConstellatorPresenter/refusalLog``.
+// Feature 355 (R02-G06-05) T-R02G0605-005 (FR-R02G0605-001 … 005; clarifications Q1–Q5): the mirror carries the
+// tutorial instruction, the hint revealed so far (`showHint()` reveals the next of three levels for the current play;
+// the hint level is presentation only and any change of the play — level, mode or play fingerprint — hides it), the
+// failure explanation, the mode, the open levels with their stars and the goal (edits in use, budget and certified
+// smallest edit count); `retry` starts the level again in its mode, `undo` takes back the last change, `rewind` returns
+// to tick 0, and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`, sent as
+// `mode.daily [year, month, day]`), never in the core.
 #if os(iOS)
 import ChronoConstellatorCore
 import Foundation
@@ -45,6 +52,24 @@ final class ChronoConstellatorMirror {
     var pickedStar = 0
     /// The text of the last refused change, if any.
     var message: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 355).
+    var instruction: String?
+    /// The hint level revealed (0 … 3) and its text (feature 355).
+    var hintLevel = 0
+    var hintText: String?
+    /// The failure explanation while the play has failed (feature 355).
+    var failureText: String?
+    /// The mode (feature 355).
+    var mode: ChronoConstellatorMode = .campaign
+    /// The highest open level and the stars of each won level (feature 355).
+    var frontier = 1
+    var stars: [Int: Int] = [:]
+    /// The goal: the edits in use, the budget and the certified smallest edit count (feature 355).
+    var spent = 0
+    var budget = 0
+    var smallest = 0
+    /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
+    var pickedLevel = 1
 
     /// The picked star's name, or "none".
     var pickedStarLabel: String {
@@ -103,6 +128,12 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The latest core described (feature 355): hints and retry read it.
+    private(set) var latestCore: ChronoConstellatorExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 355).
+    private var hintKey: String?
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 355).
+    private(set) var dailyDate: DateComponents?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -223,6 +254,90 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
             .compactMap { $0 }
     }
 
+    // MARK: Teaching and progression (feature 355)
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: ChronoConstellatorExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Hides the hint shown.
+    private func clearHint() {
+        hintKey = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; the hint is hidden when the play has none (won, or
+    /// not started). Hints never change the state: no action is sent.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let key: String = Self.hintKey(core)
+        let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        guard let hint = core.hint(level: next) else {
+            clearHint()
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = hint.text
+    }
+
+    /// Ends the tutorial of the current level.
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Takes back the last change (`play.undo`); after a failure this returns the play to playing.
+    @discardableResult
+    func undo(port: ExperienceActionPort) -> ActionResult {
+        send("play.undo", [], port: port)
+    }
+
+    /// Returns the replay to tick 0 keeping the timeline (`time.rewind`); also after a failure.
+    @discardableResult
+    func rewind(port: ExperienceActionPort) -> ActionResult {
+        send("time.rewind", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = ChronoConstellatorPresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = ChronoConstellatorPresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
+
     func describe(_ core: ChronoConstellatorExperienceCore) -> String {
         let play = core.play
         let level = play.level
@@ -238,6 +353,19 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
             snapshot.holds.filter { $0.star == star }.map { "hold from tick \($0.start) for \($0.length) ticks" }
         }
         if mirror.pickedStar >= level.stars.count { mirror.pickedStar = 0 }
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) { clearHint() }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.spent = core.play.spent
+        mirror.budget = core.play.level.budget
+        mirror.smallest = core.certifiedSmallest
         var text = ""
         if let cell = gestures.candidateCell, gestures.state == .starDrag, cell >= 0, cell < level.columns * level.rows,
            let star = gestures.draggedStar, level.stars.indices.contains(star) {
@@ -258,6 +386,7 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
         switch play.stage {
         case .won:
             text += "Every star stands on its target."
+            if let stars = mirror.stars[core.levelNumber] { text += " Stars: \(stars) of 3." }
             mirror.status = "Won"
         case .failed:
             let reason: String
@@ -268,6 +397,7 @@ final class ChronoConstellatorPresenter: ExperiencePresenter {
             case .time, .none: reason = "Time ran out before every star reached its target."
             }
             text += reason
+            if let explanation = mirror.failureText { text += " " + explanation }
             mirror.status = "Failed: " + reason
         default:
             mirror.status = snapshot.tick == 0 ? "Editing the timeline" : "Replaying"

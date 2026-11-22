@@ -4,7 +4,10 @@
 // end (a step of the ticks left), rewind, undo, redo and next level, each with an accessibility label and value; every
 // change is a kernel action sent through the action port. Timeline dragging and scrubbing come in R02-G06-04; full
 // accessibility in R02-G06-06. Feature 354 (R02-G06-04) T-R02G0604-005 (FR-R02G0604-007): the panel gains "Reset
-// view", which returns the camera to the authored view; refusals are shown and logged by the presenter.
+// view", which returns the camera to the authored view; refusals are shown and logged by the presenter. Feature 355
+// (R02-G06-05) T-R02G0605-005 (FR-R02G0605-001 … 005): the tutorial instruction with Dismiss, Hint (each press reveals
+// the next level), the failure explanation with Undo, Rewind and Retry, the goal and stars, Campaign / Daily / Practice
+// and a picker of the open levels; all as wrapping text in the panel, never over the sky.
 #if os(iOS)
 import ChronoConstellatorCore
 import SwiftUI
@@ -25,10 +28,12 @@ struct ChronoConstellatorControls: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
                 header
+                teaching
                 starRow
                 holdRow
                 timeRow
                 playRow
+                progressRows
             }
             .padding()
         }
@@ -41,6 +46,80 @@ struct ChronoConstellatorControls: View {
         Text(mirror.status).font(.subheadline)
         if let message = mirror.message {
             Text(message).font(.footnote)
+        }
+    }
+
+    /// The tutorial instruction, the hint and the failure explanation (feature 355).
+    @ViewBuilder private var teaching: some View {
+        if let instruction = mirror.instruction {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
+                Button("Dismiss") { presenter.dismissTutorial(port: port) }
+                    .accessibilityLabel("Dismiss the tutorial")
+            }
+        }
+        HStack(spacing: 12) {
+            Button("Hint") { presenter.showHint() }
+                .accessibilityLabel("Show a hint")
+                .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+            Text("Goal: \(mirror.spent) of \(mirror.budget) edits; best possible \(mirror.smallest)")
+                .font(.footnote)
+        }
+        if let hint = mirror.hintText {
+            Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true)
+        }
+        if let failure = mirror.failureText {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 12) {
+                    Button("Undo") { presenter.undo(port: port) }
+                        .accessibilityLabel("Undo the last change")
+                    Button("Rewind") { presenter.rewind(port: port) }
+                        .accessibilityLabel("Return to tick 0 keeping the timeline")
+                    Button("Retry") { presenter.retry(port: port) }
+                        .accessibilityLabel("Start the level again")
+                }
+            }
+        }
+    }
+
+    /// The mode buttons and the picker of open levels with their bands and stars (feature 355).
+    @ViewBuilder private var progressRows: some View {
+        HStack(spacing: 12) {
+            Button("Campaign") { send("mode.campaign") }
+                .accessibilityLabel("Play the campaign")
+                .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+            Button("Daily") { presenter.playDaily(port: port) }
+                .accessibilityLabel("Play today's daily level")
+                .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+            Button("Practice") { send("mode.practice") }
+                .accessibilityLabel("Practise this level with a larger budget")
+                .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+        }
+        HStack(spacing: 12) {
+            Stepper(levelLabel(mirror.pickedLevel),
+                    onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
+                    onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
+                .accessibilityLabel("Level to play")
+                .accessibilityValue(levelLabel(mirror.pickedLevel))
+            Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
+                .accessibilityLabel("Play the picked level")
+        }
+    }
+
+    /// "Level n, band b" with its stars when won.
+    private func levelLabel(_ level: Int) -> String {
+        let band = ChronoConstellatorProgress.band(of: level)
+        if let stars = mirror.stars[level] { return "Level \(level), band \(band), \(stars) stars" }
+        return "Level \(level), band \(band)"
+    }
+
+    /// The mode's name: campaign, daily or practice.
+    static func modeName(_ mode: ChronoConstellatorMode) -> String {
+        switch mode {
+        case .campaign: "campaign"
+        case .practice: "practice"
+        case .daily: "daily"
         }
     }
 

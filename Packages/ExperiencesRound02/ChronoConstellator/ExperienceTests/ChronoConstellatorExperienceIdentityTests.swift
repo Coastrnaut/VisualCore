@@ -1,8 +1,9 @@
 // ChronoConstellatorExperienceIdentityTests — feature 353 (R02-G06-03) T-R02G0603-006 (FR-R02G0603-004, 005, 008;
 // clarifications Q2, Q3, Q5). The experience's id is the catalog id, the factory builds a shell around the presenter
-// (with the accessibility settings passed through), the controls are the eight declared actions in order, the quality
-// profile's levels are the catalog tiers level-0 … level-2, the palette is the clarification's six colours and the
-// catalog's five hex strings, and the description names the level, the tick, every star with its shape and phase, and a
+// (with the accessibility settings passed through), the controls are the thirteen declared actions in order (eight
+// until feature 355), the quality profile's levels are the catalog tiers level-0 … level-2, the palette is the
+// clarification's six colours and the catalog's five hex strings, and the description names the level, the tick, every
+// star with its shape and phase, and a
 // failure with its reason. iOS only, as the target.
 #if os(iOS)
 import ChronoConstellatorCore
@@ -36,11 +37,12 @@ import VisualCoreExperienceHost
         #expect(plain.presenter.scene.glowLimit == ChronoConstellatorShaders.standardGlowLimit)
     }
 
-    @Test func theControlsAreTheEightActions() {
+    @Test func theControlsAreTheDeclaredActions() {
         var ids: [String] = []
         for control in ChronoConstellatorExperienceCore.controls { ids.append(control.id) }
         #expect(ids == ["star.phase", "star.hold", "star.release", "time.step", "time.rewind", "play.undo",
-                        "play.redo", "level.next"])
+                        "play.redo", "level.next", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss"])
         #expect(ids == ChronoConstellatorExperienceCore.actionIDs)
     }
 
