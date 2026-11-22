@@ -67,7 +67,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 - [X] T-R02G0907-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: reference-2 exit=0
 - [X] T-R02G0907-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-22: script-tests exit=0 (run alone)
 - [ ] T-R02G0907-011 {device} After ImplementationLock-100: a save survives a real app termination on D1/D2/D3.
-- [ ] T-R02G0907-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0907-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-22: converge clean (no tasks appended); sealed; recorded pass; failed attempt sim-27 kept
 
 ## Dependencies and parallel work
 
