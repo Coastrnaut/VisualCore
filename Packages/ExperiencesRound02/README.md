@@ -315,3 +315,10 @@ Feature 352 (R02-G06-02) adds Chrono Constellator's content pipeline: `ChronoCon
 `ChronoConstellatorGenerator` with `ChronoConstellatorBandProfile`, the integer-tick phase search
 `ChronoConstellatorSolver` with its lower-bound proof, `ChronoConstellatorDifficulty`, and `ChronoConstellatorWitness`
 files in `docs/games/chrono-constellator/levels/` (rewritten only with `CHRONO_CONSTELLATOR_WRITE_WITNESSES=1`).
+
+Feature 353 (R02-G06-03) adds the experience: in the Core the adapter `ChronoConstellatorExperienceCore`, the immutable
+`ChronoConstellatorSceneSnapshot` with `ChronoConstellatorPalette` and `ChronoConstellatorTier`, the geometry and CPU
+reference `ChronoConstellatorSceneGeometry`, the GLSL sources `ChronoConstellatorShaders` and the scenario manifest
+`ChronoConstellatorScenarios` (`scenario-manifest.json`; `UPDATE_SCENARIO_MANIFEST=1` rewrites it); the iOS-only target
+`ChronoConstellatorExperience` (presenter, GL sky scene with fallback, control panel) and its simulator tests. A
+registered candidate until X-R02-G06.

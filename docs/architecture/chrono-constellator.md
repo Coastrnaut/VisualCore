@@ -77,3 +77,31 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
   tick, a 16-hex position digest per tick, the play fingerprints, the lower bound and windows, the unedited and near-miss
   counterexamples, the difficulty and the skipped candidates; decoding re-solves and refuses any difference. The catalog
   digest over the 100 fingerprints is pinned (`6483b20e…`).
+
+## Experience and renderer (feature 353, R02-G06-03)
+
+- **Adapter.** `ChronoConstellatorExperienceCore` opens certified level (seed mod 100) + 1 (each level generated once
+  per process, on first use) and accepts `star.phase [star, phase]`, `star.hold [star, start, length]`,
+  `star.release [star, start]`, `time.step [ticks]`, `time.rewind`, `play.undo`, `play.redo` and `level.next`; values
+  out of range or fractional and kernel refusals change nothing. Its digest is the level number and the play
+  fingerprint; snapshot schema 1 `{level, records}` restores by replay.
+- **Snapshot.** The presenter draws an immutable `ChronoConstellatorSceneSnapshot` (grid, every star's loop, target,
+  cell and the cells of its last 24 ticks, the timeline's phases and holds, stage, failure, tick, tick limit, edits left,
+  level number and presentation time); it never holds the kernel, so no drawing result can change the game.
+- **Scene.** The grid lies in the xz-plane with cell size u = 2 / max(columns, rows): the indigo field (#0B0A24) with
+  faint grid lines, silver tracks (0.08·u wide) along each loop, star nodes (radius 0.3·u at height 0.25·u) drawn with
+  their shapes (ring, cross, diamond, triangle, square), rose target rings (outer radius 0.42·u) with the same shape,
+  lit while the star stands on them, hold bars, and an amber diagonal cross on a collision cell. Each star trails a
+  history ribbon over the tier's last R ticks, rising 0.04·u per tick of age, its alpha 1 − age/R, with a gentle shimmer
+  from presentation time only. The camera looks from +z, pitched 55° down, fitted to the bounding sphere of the grid and
+  the ribbons' full height with a 5 % margin for aspects 0.4 … 2.5.
+- **Shaders.** GLSL ES 3.00 on the shared `ShaderMeshRenderer`: the field program carries the material code and shade in
+  uv; the glow program carries the colour in the normal slot and the age in ticks and glow weight in uv, and computes
+  the ribbon fade itself. Reduce Motion holds the shimmer still; Reduce Flashing caps the glow at 0.5.
+- **Tiers.** level-0: ribbons of 24 ticks, 4 segments per tick, 2 glow shells; level-1: 12, 2, 1; level-2: 6, 1, 0.
+  Stars, targets, tracks and the camera never change between tiers; each tier change is logged with its reason. A
+  program that fails to compile draws the level-2 geometry unlit and keeps its reason. Depth testing is off on this
+  path, so the draw order is the layering and back faces are culled.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest 6483b20e…6ffc) and linked into the one
+  app; it stays unavailable until X-R02-G06. Its scenario manifest has the standard scenarios, `full-playthrough`,
+  `hero`, three fixtures and the 80 acceptance rows R2-G06-QA-001 … 080 (row r opens level (7 × (r − 1)) mod 100 + 1).
