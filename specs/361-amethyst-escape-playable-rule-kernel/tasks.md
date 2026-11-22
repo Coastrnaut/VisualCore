@@ -52,7 +52,7 @@ in this feature (the crystal state is the CPU reference the renderer of R02-G07-
   "rotate(r, +1), rotate(r, −1) for each shell r in order, then advance unless it is stuck") with
   `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeRulesTests.swift` (agreement with the play on 200
   walks); `--name host-4`
-- [ ] T-R02G0701-006 [P] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeInvariantTests.swift`
+- [X] T-R02G0701-006 [P] Create `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapeInvariantTests.swift` — Verified 2026-11-22: host-5 exit=0 (AmethystEscapeInvariantTests 9/9, each with a seeded neighbouring check, seed 2_366)
   (agent D: `testAmethystEscapeTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each with a
   seeded neighbouring-input check, seed 2_366); `--name host-5`
