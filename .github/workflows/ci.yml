@@ -127,6 +127,10 @@ jobs:
         # Feature 338 (R02-G04-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/hue_compass_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter HueCompassRegression
+      - name: Colorfall Canyons regression (host)
+        # Feature 348 (R02-G05-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/colorfall_canyons_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter ColorfallCanyonsRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase
