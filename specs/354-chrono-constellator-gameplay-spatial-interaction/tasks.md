@@ -41,7 +41,7 @@ program).
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G0604-004 [P] [US5] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorPanelWinTests.swift`: all 100 certified levels won
+- [X] T-R02G0604-004 [P] [US5] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorPanelWinTests.swift`: all 100 certified levels won — Verified 2026-11-21: 2026-11-21: host-4 (ChronoConstellatorPanelWinTests: all 100 levels won through panel actions in 4 groups; undo/redo digests) exit 0, lead retest
   through panel actions only (star picker order, phase − and + as `star.phase` of the neighbouring index, Run as
   `time.step` of the ticks left), split so each test is under 10 s, plus panel Undo then Redo after a phase change
   restoring the digests before and after it; agent D; `--name host-4`
