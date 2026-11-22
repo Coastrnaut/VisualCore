@@ -14,8 +14,8 @@
   skip cells behind a bloom's screen box. Alternatives: drawing the flower on the plane (rejected: no depth).
 - **R4 Shape is the non-colour twin.** Decision: the target is a rim, forbidden cells are hatched, leaks are crossed,
   shadows are the darkest element, the gauge is a row of bars. Rationale: R2-F10's rule.
-- **R5 Camera.** Decision: a fixed authored view from +z pitched 8° down, fitted to the sphere around the bed, lantern
-  and gauge for aspects 0.4 … 2.5 with a 5 % margin. Rationale: everything readable on a phone; gestures in R02-G09-04.
+- **R5 Camera.** Decision: a fixed authored view from +z pitched 8° down, fitted per level to the sphere around the bed
+  (widened by every possible bloom head), lantern and gauge for aspects 0.4 … 2.5 with a 5 % margin. Rationale: everything readable on a phone; gestures in R02-G09-04.
 - **R6 Reuse of R02-G08-03 patterns.** Decision: the adapter, snapshot, presenter, fallback, tier log, scenario manifest
   and registration follow Faceted Forge's shapes so the shared checks apply unchanged; the digest is the level number
   and the play fingerprint; the adapter certifies each level directly from its recorded candidate.

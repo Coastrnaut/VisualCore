@@ -58,8 +58,9 @@ through luminous pearlescent mist" and the geometry "L-system stems, leaf polygo
   (the sun) is a glowing sphere at x = 1.25 whose height falls with the elevation (y = (1.15 − 0.25·(e − 1))·H·u). The
   move gauge is a row of `budget` small bars below the bed (y = −0.1, x from −0.9 to 0.9), spent ones lit coral. The
   ground is a midnight plane at y = −0.2. The camera is a fixed authored perspective looking at the bed's centre from
-  +z, pitched 8° down, fitted to the bounding sphere of the bed, the lantern and the gauge with a 5 % margin for aspect
-  0.4 … 2.5. Mist drift and bloom sway move with presentation time only. Nothing drawn is consulted by the rules.
+  +z, pitched 8° down, fitted per level to the bounding sphere of the bed widened by every head a bloom of the level's
+  sizes can have at any anchor (s·u to the left, 2·s·u to the right and 6·s·u above for the largest size s), the lantern
+  and the gauge, with a 5 % margin for aspect 0.4 … 2.5, so it never moves while a level is played. Mist drift and bloom sway move with presentation time only. Nothing drawn is consulted by the rules.
   Impact: FR-R02G0903-001, 002, 006.
 - Q: What do the three quality tiers change? → A: `level-0` (richest): 3 mist layers, stem depth 3, shadow edge
   feather 0.3 cell, 2 glow shells around bloom heads; `level-1`: 2 mist layers, stem depth 2, feather 0.15, 1 glow
@@ -155,7 +156,7 @@ it as available, and the experience package, registry, catalog and content check
 - **A shader that fails to compile or link:** the scene shows the documented fallback (the minimal tier, unlit), keeps
   the program name and reason, and the logical state is unchanged.
 - **Zero-size or very small views, rotation and resize:** a zero-size view draws nothing and reports no error; for
-  every aspect ratio from 0.4 to 2.5 the camera fits the whole bed, the blooms and the gauge with a margin of at least
+  every aspect ratio from 0.4 to 2.5 the camera fits the whole bed, every possible bloom head, the lantern and the gauge with a margin of at least
   5 % on each side.
 - **Colour-blind players:** the target is an outline with a gold rim and the forbidden cells carry a hatch as well as
   their colour, the shadow is the darkest element, a leak marks the leaking cells with a cross, and each bloom, region
