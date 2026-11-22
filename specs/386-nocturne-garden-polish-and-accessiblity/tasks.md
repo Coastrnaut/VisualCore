@@ -75,3 +75,13 @@ tests stay short (< 10 s each). No {owner} tasks.
 012. 011 stays open until device testing. Shared files (Package.swift, geometry, presenter, scene, controls, docs) stay
 with the lead. MVP: Stories 1 and 2. Requirement coverage: FR-001/005 → 005; FR-002/003 → 003, 005; FR-004 → 004, 005;
 FR-006 → 004, 005; FR-007 → 006 … 010.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G0906-013 Give every native control an accessibility value in words per FR-R02G0906-001 and SC-R02G0906-001
+  (partial): in `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenControls.swift` Move, Resize and
+  Remove carry the chosen bloom (and the target cell or size), Undo and Redo the moves made, Next level the next open
+  level, Reset view the view ("authored" or "orbited"), Dismiss the tutorial instruction, Retry the level and mode,
+  Play level the picked level, and Campaign, Daily and Practice "selected" or "not selected"; extend
+  `Packages/ExperiencesRound02/NocturneGarden/ExperienceTests/NocturneGardenAccessibilityTests.swift` so every value
+  the panel reads is non-empty; `--name sim-27-3`
