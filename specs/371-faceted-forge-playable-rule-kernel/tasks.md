@@ -9,7 +9,7 @@ in this feature (the pieces are the CPU reference the renderer of R02-G08-03 wil
 
 ## Phase 1: Setup
 
-- [ ] T-R02G0801-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G0801-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit=0; rendering baseline is X-R02-G07's visualcore-rendering run (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is X-R02-G07's rendering runs (exit 0)
 
 ## Phase 2: Foundational
