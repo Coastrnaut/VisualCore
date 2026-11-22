@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/chrono_constellator_regression.py"
+  ],
+  "command": "python3 scripts/chrono_constellator_regression.py",
+  "elapsed_seconds": 11.761,
+  "exit_code": 0,
+  "finished": "2026-11-22T05:59:07+00:00",
+  "gate": "R02-G06-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G06-08.regression.log",
+  "log_sha256": "5bee3b398df37ec5ccbc68096ebeb8ac7210b76a3f8bfa58cd9b06634284fa4d",
+  "name": "regression",
+  "started": "2026-11-22T05:58:56+00:00",
+  "timed_out": false
+}

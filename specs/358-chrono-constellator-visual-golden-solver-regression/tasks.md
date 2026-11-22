@@ -52,7 +52,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G0608-006 [P] [US4] Create `scripts/chrono_constellator_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G0608-006 [P] [US4] Create `scripts/chrono_constellator_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-22: regression exit=0 (scripts/chrono_constellator_regression.py: host filter and isolated simulator classes pass); ChronoConstellatorRegressionTests 5/5 in test_scripts.py; CI step Chrono Constellator regression (host) added
   (agent D: host filter `ChronoConstellatorRegression`, then the simulator classes through
   `xcodebuild_package.py --only-testing` with the isolation variable, one summary line per part with pass or fail and
   the first failing name, a non-zero exit on any failure), and add the named step "Chrono Constellator regression
