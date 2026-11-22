@@ -39,7 +39,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G0608-005 [US2] [US3] Edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorSkyScene.swift` (`liveObjectCount`: GPU objects
+- [X] T-R02G0608-005 [US2] [US3] Edit `Packages/ExperiencesRound02/ChronoConstellator/Experience/ChronoConstellatorSkyScene.swift` (`liveObjectCount`: GPU objects — Verified 2026-11-22: sim-27 exit=0 (ChronoConstellatorExperienceTests on sim-27.2: 16 golden frames match their descriptions with the feature-353 checks; 12 memory cycles, liveObjectCount 0 after warning and close)
   held, 0 after release) and create `Packages/ExperiencesRound02/ChronoConstellator/ExperienceTests/ChronoConstellatorRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/ChronoConstellator/ExperienceTests/ChronoConstellatorRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked
   against their descriptions with the feature-353 tolerances (each star centre within 3 px of a pixel at least 0.15

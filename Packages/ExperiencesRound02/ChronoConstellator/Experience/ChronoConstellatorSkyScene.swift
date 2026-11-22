@@ -91,6 +91,18 @@ final class ChronoConstellatorSkyScene {
         releaseCandidate()
     }
 
+    /// The GPU objects the scene holds (feature 358, T-R02G0608-005): its shader and fallback renderers, the candidate
+    /// ring's included; 0 after ``release()`` until the next draw rebuilds them.
+    var liveObjectCount: Int {
+        var count: Int = fallbackRenderers.count
+        if fieldRenderer != nil { count += 1 }
+        if starRenderer != nil { count += 1 }
+        if ribbonRenderer != nil { count += 1 }
+        if candidateRenderer != nil { count += 1 }
+        if candidateFallback != nil { count += 1 }
+        return count
+    }
+
     private func releaseCandidate() {
         candidateRenderer?.release()
         candidateFallback?.release()
