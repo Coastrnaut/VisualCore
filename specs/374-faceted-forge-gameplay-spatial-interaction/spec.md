@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G08-04 (migration ledger, game feature of experience R02-G08) · ID namespace FR-R02G0804-###,
 SC-R02G0804-###, T-R02G0804-###
@@ -25,6 +25,52 @@ Canonical overrides:
 - **Shared features used:** R02-F14 (reversible history), R02-F22 (spatial controls and analytic picking), R02-F26
   (input and accessibility contract), the experience host's pointer events, and the kernel, content, adapter and
   renderer of R02-G08-01 … 03.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+364's answers. Facts checked in code (read-only, 2026-11-22): Amethyst Escape's feature 364 solved the same problem with
+a host-tested gesture controller in its Core taking `PointerEvent`s (id, phase began/moved/ended/cancelled, location in
+view points with the origin top-left, timestamp) with the view size and the drawn snapshot and orbit, an analytic picker
+and a clamped orbit; Faceted Forge's camera (`FacetedForgeSceneGeometry.camera(_:aspect:)`) looks from +z pitched 30°
+down at a bounding sphere of radius 1.45; the pieces are convex polygons in world space, moved apart by the opening
+(`offset(piece:_:reduceMotion:)`); the preview choice (`FacetedForgePreviewChoice`: piece, direction 0 … 12, depth)
+is presentation state with `clamped(to:)` and `steppingDepth(_:in:)`; the adapter accepts `piece.cut [piece,
+direction, depth]`, `play.undo`, `play.redo` and `level.next`, cuts only while playing.
+
+- Q: How is a touch picked? → A: at touch-down the touch ray through the drawn camera is tested, in this order: the
+  preview rim (the projected outline of the opened preview polygon within 22 points), the preview interior (the ray
+  meets the opened preview polygon, or the touch lies inside its projection), then the pieces (the nearest opened face
+  polygon hit by the ray; if none, the piece whose projected opened centre lies within 22 points; ties to the lower
+  index). A touch that moves less than 10 points is a tap; one that moves at least 16 points is a drag; 10 … 16 is
+  neither. Impact: FR-R02G0804-001, 005; SC-R02G0804-001.
+- Q: How does a rim drag become a direction? → A: with n0 the current direction's unit normal and R, U the camera's
+  right and up vectors in world space, the dragged orientation after a drag (dx, dy) points is
+  normalize(n0 + (dx·R − dy·U) · 2 / min(view width, height)); the new direction is the one of the 13 whose unit vector
+  has the largest |dot| with it (ties to the lower index). On release the depth becomes the crossing depth nearest to
+  round(n·c), c being the preview centre in kernel coordinates before the drag (the plane through the same point), or the
+  middle crossing depth when there was no preview. The drawn preview follows the candidate while dragging and the
+  description reads "The cut plane would tilt to direction x+y". Impact: FR-R02G0804-002; SC-R02G0804-001.
+- Q: How does a depth drag move the plane? → A: a drag that starts on the preview interior moves the depth by
+  round(s / 24) crossing depths (`steppingDepth`), s being the drag's component in points along the projected normal
+  (the screen direction from the preview centre's projection to that of the centre plus 0.1 times the unit normal; s
+  positive towards +n); the panel's depth − and + are the same steps. On release the depth stays; a tap on the
+  interior instead commits (FR-R02G0804-004). Impact: FR-R02G0804-003; SC-R02G0804-001.
+- Q: What can the camera do? → A: two-finger orbit of yaw (±40° about the y axis, 90° per view width) and pitch (10° …
+  60° down from the horizon, authored 30°, 60° per view height); a second finger cancels a drag or press (the choice
+  returns to what it was at touch-down; nothing sent); a third re-bases the midpoint; a double tap (two taps at most
+  0.35 s and 22 points apart) on empty space or "Reset view" returns to the authored view; the distance refits so the
+  bounding sphere of radius 1.45 stays inside the view with a 5 % margin at every orbit and aspect 0.4 … 2.5.
+  Presentation only: not saved, so the snapshot schema stays 1. Impact: FR-R02G0804-006; SC-R02G0804-004.
+- Q: How is everything tested? → A: the Core gesture controller (`FacetedForgeGestureController`) takes pointer events
+  with the view size and the drawn snapshot and orbit and returns the new preview choice, the actions to send (only
+  `piece.cut`) and the description of the preview; host tests feed 500 seeded taps and drags on certified levels at
+  several sizes and orbits and compare with an independent pick, tilt and step computed in the test; simulator tests
+  send the same touches through the experience's pointer entry; a host test wins all 100 certified levels through panel
+  actions (piece picker, direction picker, depth − and +, cut) by choosing each certified cut's piece, direction and
+  depth. Refused actions are logged with their reason code. Impact: FR-R02G0804-007, 008; SC-R02G0804-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
