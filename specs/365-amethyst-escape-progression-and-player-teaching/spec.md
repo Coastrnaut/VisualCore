@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G07-05 (migration ledger, game feature of experience R02-G07) · ID namespace FR-R02G0705-###,
 SC-R02G0705-###, T-R02G0705-###
@@ -24,6 +24,54 @@ Canonical overrides:
   items:** none.
 - **Shared features used:** R02-F23 (puzzle contract: hints, failure explanation), R02-F24 (progression), R02-F26
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G07-01 … 04.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+355's answers where the games agree. Facts checked in code (read-only, 2026-11-22): `AmethystEscapeSolver.solve(_:maxDepth:)`
+certifies the shortest escape of a level from its opening crystal by breadth-first search over packed states (shell
+offsets and pearl pocket), returning the actions; a move is a turn or an advance, each counted against the budget
+(manifest budgets 8 … 19, the level's range 1 … 60); a play fails on a blocked wedge (`wedge(shell, sector)`, sector
+absolute) or at the budget (`budget`); undo is allowed from `playing`, `paused` and `failed`, a won play is final;
+levels 1 … 3 carry the tutorial flag; the adapter prepares level (seed mod 100) + 1 and snapshots `{level, records}` as
+schema 1; the core may not read a clock.
+
+- Q: How is a hint computed and what does each level reveal? → A: the plan comes from the current state. A won play has
+  no hint; a failed play's hint is "Undo the last move or retry the level." While playing: a breadth-first search from
+  the current crystal (the same rules and packed states as the solver, a new entry point from a given crystal) limited to
+  the moves left finds the shortest escape; its first action is the plan: level 1 "Turn a shell" or "Roll the pearl",
+  level 2 "Turn shell k" (named in words) or "Roll the pearl", level 3 "Turn shell k one sector clockwise" /
+  "anticlockwise" or "Roll the pearl one pocket". When no escape fits in the moves left: "No escape is reachable in the
+  moves left: undo the last move or retry the level." Hints never change the state, are unlimited, do not affect stars
+  and reset to level 1 after any change of the play. "A state that can still win" means one whose plan exists. Impact:
+  FR-R02G0705-002; SC-R02G0705-002.
+- Q: What does the tutorial show, and when does it advance? → A: on levels 1 … 3, three instructions in order: (1)
+  "Drag a shell round the centre (or use Turn − and +) to line an opening up with the pearl; a hint shows which" — it
+  advances once a turn has been accepted; (2) "Tap the pearl (or Advance) to roll it one pocket: out through an opening,
+  else clockwise until a wall stops it" — until an advance is accepted; (3) "Lead the pearl out through the exit gap of
+  the outer shell before the moves run out; dark wedges with a cross end the play" — until the level ends.
+  `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G0705-001; SC-R02G0705-001.
+- Q: What are the progress and star rules? → A: as feature 355 with moves at the win: per level the best (fewest) moves
+  of a won campaign play and the stars (3 when at most the certified smallest move count, 2 when at most that + 2, else
+  1; a better result replaces a worse one); level 1 open; a campaign win opens the next; `level.select [n]` opens any
+  open level and refuses others (`r02-g07.locked`); `level.next` moves to the next open level (refused when none,
+  `r02-g07.locked`); the five bands of 20 are the certified difficulty bands. Impact: FR-R02G0705-004; SC-R02G0705-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 61) mod 100 + 1, negative day counts wrapped into 0 … 99 (61 is coprime with 100 and differs from the other
+  round-two games' 37, 41, 43, 47, 53 and 59); the date reaches the core as `mode.daily [year, month, day]` (an
+  impossible date is refused with `r02-g07.date`). Daily play follows campaign rules but does not open levels.
+  `mode.practice` replays the current level with the budget raised to the kernel's maximum (60); practice results never
+  award stars or open levels; `mode.campaign` returns. Impact: FR-R02G0705-005; SC-R02G0705-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 355: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint level
+  is presentation (held by the presenter); the snapshot payload becomes schema 2 (`{level, records, progress, mode,
+  tutorial}`) with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its first
+  step on tutorial levels). Failures are explained from the failing move: wedge "The pearl fell into the blocked wedge
+  of <shell in words>, sector s of N, on move m."; budget "The moves ran out: m of m spent and the pearl is in <shell in
+  words>, sector s of N.", each followed by "Undo the last move or retry the level." Impact: FR-R02G0705-003, 007;
+  SC-R02G0705-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
