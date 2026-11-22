@@ -36,7 +36,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G0508-005 [US2] [US3] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsCanyonScene.swift` (`liveObjectCount`: renderers
+- [X] T-R02G0508-005 [US2] [US3] Edit `Packages/ExperiencesRound02/ColorfallCanyons/Experience/ColorfallCanyonsCanyonScene.swift` (`liveObjectCount`: renderers — Verified 2026-11-21: 2026-11-21 sim-27 exit 0: ColorfallCanyonsExperienceTests 53 tests in 10 suites on sim-27.2 incl. golden-frame tests (16 frames rendered, snapshots equal the golden snapshots, positions within a quantum, feature-343 frame checks) and memory tests (12 cycles, live renderers 0 after close and warning) (.autonomy/migration/checks/R02-G05-08.sim-27.json); liveObjectCount added to the scene; lead run
   held, 0 after release) and create `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/ColorfallCanyons/ExperienceTests/ColorfallCanyonsRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked
   against their descriptions with the feature-343 tolerances (flowing emitter tops lit within 3 px by 0.15, dry front-row open cells and 80 % of open cells 0.1 from night, corners within 0.05); 12 open-draw-warn-close cycles with

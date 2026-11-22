@@ -99,6 +99,17 @@ final class ColorfallCanyonsCanyonScene {
         highlightKey = nil
     }
 
+    /// The GPU renderers the scene holds (feature 348, T-R02G0508-005): 0 after `release()`, rebuilt by the next draw.
+    var liveObjectCount: Int {
+        var count = fallbackRenderers.count
+        if terrainRenderer != nil { count += 1 }
+        if featureRenderer != nil { count += 1 }
+        if fluidRenderer != nil { count += 1 }
+        if highlightRenderer != nil { count += 1 }
+        if highlightFallback != nil { count += 1 }
+        return count
+    }
+
     /// The glow limit passed as `u_glowLimit`.
     var glowLimit: Double { ColorfallCanyonsShaders.glowLimit(reduceFlashing: reducedFlash) }
 
