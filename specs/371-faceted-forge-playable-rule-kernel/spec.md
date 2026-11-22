@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G08-01 (migration ledger, game feature of experience R02-G08) · ID namespace FR-R02G0801-###,
 SC-R02G0801-###, T-R02G0801-###
@@ -30,6 +30,52 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract, so
   R02-G08-02 can certify levels).
 - **Model:** feature 361 (Amethyst Escape's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+361's answers where the games agree. Facts checked in code (read-only, 2026-11-22): `Packages/ExperiencesRound02` holds
+Aurora Loom … Amethyst Escape as the pattern (Core with level, play, records with previous and next fingerprints, rules
+as R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.*` reason codes); no `FacetedForge*` name exists;
+VisualCore has no exact fraction type, so the kernel carries its own; the catalog sets the timestep at 0.008333 s and
+the content at 84 stages.
+
+- Q: What are the crystal, the plane directions and the depths, exactly? → A: 13 directions with components in
+  {−1, 0, 1}, each named in words: the three axes (x, y, z), the six face diagonals (x+y, x−y, x+z, x−z, y+z, y−z) and
+  the four body diagonals (x+y+z, x+y−z, x−y+z, −x+y+z). A plane is a direction n and an integer depth d (n·p = d),
+  d in −24 … 24. The crystal is the intersection of 4 … 14 half-spaces n·p ≤ d built from those directions (either
+  sign), bounded and inside the box −6 … 6 on every axis, with a non-empty interior; its corners are integer points.
+  Impact: FR-R02G0801-001, 002, 013; SC-R02G0801-001.
+- Q: What does a cut do, and when is it refused? → A: `cut(piece, direction, depth)` splits piece k (by its number in
+  the canonical order) by the plane: the two new pieces are the piece with n·p ≤ d added and with n·p ≥ d added (the
+  "below" and "above" halves). A cut is refused as degenerate (`r02-g08.miss`) unless at least one corner of the piece
+  lies strictly on each side of the plane, so both halves have an interior. Pieces are kept in canonical order: by
+  volume descending, then face count descending, then the sorted list of their exact corners; pieces are named "piece
+  1" … in that order with their share ("a quarter", "3/16") and face count. Impact: FR-R02G0801-002, 003, 013.
+- Q: How are corners, faces, volumes and the truth metric computed exactly? → A: every number is a reduced fraction of
+  64-bit integers with checked arithmetic (an overflow refuses the action as `r02-g08.action`; the bounds above keep
+  every denominator small). A piece's corners are the points where three of its bounding planes meet and every other
+  plane is satisfied; a face is a bounding plane with at least three corners on it, its corners ordered round the
+  face; the face count is the number of faces. The volume is the sum of signed tetrahedra from the piece's first corner
+  over a fan triangulation of each face. The truth metric holds after every cut: the volumes sum to the crystal's and
+  every edge lies on exactly two faces. Shares are volume / crystal volume. Impact: FR-R02G0801-002, 005, 014;
+  SC-R02G0801-003.
+- Q: In which order are sliver, win and budget decided, and from which stages can the player go back? → A: every
+  accepted cut spends one cut; refused actions, undo and redo spend nothing. After a cut: sliver first (a new piece
+  whose share is below the level's sliver limit fails the level, naming the piece and the cut), then win (the multiset
+  of (share, face count) equals the target: won), then budget (cuts spent equal to the budget: failed). Undo and redo
+  restore the exact earlier state; a new cut clears the redo stack. Undo works in playing and paused; from failed, undo
+  returns to playing (an honest retry, recorded); a won level is final and refuses undo. Impact: FR-R02G0801-004, 005,
+  007, 008; SC-R02G0801-002, 004.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G07-01: every accepted action appends a
+  record (schema, level seed, cut index, kind, operands, previous and next fingerprints); the play fingerprint is the
+  SHA-256 of the schema, the level fingerprint, the pieces in canonical order (each as its bounding planes and exact
+  corners), the cuts spent, the stage and the failure; levels are JSON schema 1 with sorted keys (crystal half-spaces,
+  budget, sliver limit as a fraction, target entries as share fractions and face counts, tutorial flag, seed, id) and a
+  fingerprint, re-checked on decode; reason codes `r02-g08.level`, `.action`, `.stage`, `.stale`, `.miss`,
+  `.newer-schema`, `.malformed`. Impact: FR-R02G0801-006 … 011; SC-R02G0801-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
