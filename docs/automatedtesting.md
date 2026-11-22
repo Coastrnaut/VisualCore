@@ -245,6 +245,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   24 s of app teardown after the last step, and every `waitFor` costs at least a second even for an element already on
   screen. Revealing the replay's Step button once and tapping the same element, and skipping the bounded wait when the
   element already exists, brought them to 64, 72 and 60 s. The chunk key `m3` was checked unique before use.
+- **Colorfall Canyons regression** (R02-G05-08, 2026-11-21). `python3 scripts/colorfall_canyons_regression.py` runs the
+  host filter `ColorfallCanyonsRegression` (solver regression over 100 witnesses in tests of 10, twelve named
+  alterations, golden descriptions) and then the simulator golden-frame and memory classes with
+  `TEST_RUNNER_COLORFALL_CANYONS_MEMORY_ISOLATED=1`; CI runs the host part as a named step. Golden frames show the
+  certified edits and 12 ticks so fluid sheets are part of every level baseline.
 - **Hue Compass regression** (R02-G04-08, 2026-11-21). `python3 scripts/hue_compass_regression.py` runs the host
   filter `HueCompassRegression` (solver regression over 100 witnesses, golden descriptions) and then the simulator
   golden-frame and memory classes with `TEST_RUNNER_HUE_COMPASS_MEMORY_ISOLATED=1`; CI runs the host part as a named

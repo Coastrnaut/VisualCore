@@ -196,3 +196,23 @@ long step as single ticks; the play accepts both.
 - **Determinism.** The state reads no clock or random source: the seed, the certified catalog, the date given to
   `mode.daily` and the recorded actions decide everything, so a save restores and replays identically on every device.
 
+## Regression net (feature 348, R02-G05-08)
+
+- **Solver.** For all 100 levels, in tests of 10: the generated level equals its witness's level, the witness's actions
+  replay to a win at its win tick with its per-tick digests and fingerprints, and the solver returns exactly the
+  witness's edit set with its `smaller` count. Twelve kinds of alteration (heights, grounds, spring colour, flow rate,
+  budget, tick limit, basin share and tolerance, a solution edit, a witness action or digest, the level fingerprint) each
+  fail naming the level and the part. Work is counted, never timed.
+- **Golden frames.** `ColorfallCanyonsGolden` (test builds only; forbidden in the Release binary) describes 16 frames —
+  levels 1, 21, 41, 61, 81 at three tiers after their certified edits and 12 ticks, plus the hero frame — at
+  1,152 × 768: projected cell tops, emitter tops, basin centres and wet sheet tops (to 1/8 px) and the palette and fluid
+  colours. The descriptions and SHA-256 digests are pinned in `golden-frames.json`; a recomputed description passes on
+  an equal digest or within one 1/8-px quantum with equal colours, and the file is rewritten only with
+  `COLORFALL_CANYONS_WRITE_GOLDEN=1`. The simulator renders the same frames and checks them with the feature-343 frame
+  tolerances.
+- **Memory.** Twelve open-draw-warn-close cycles on the simulator keep the footprint within 16 MB of the first cycle
+  (bound applied when the class runs alone) and leave the scene holding no renderers after each close and memory
+  warning.
+- **Where it runs.** CI's host job has a named "Colorfall Canyons regression (host)" step; locally,
+  `python3 scripts/colorfall_canyons_regression.py` runs the host and simulator parts with one summary line each.
+

@@ -55,7 +55,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0508-007 Docs: `docs/architecture/colorfall-canyons.md` (regression net),
+- [X] T-R02G0508-007 Docs: `docs/architecture/colorfall-canyons.md` (regression net), — Verified 2026-11-21: 2026-11-21 docs updated (architecture regression net, package README, testing doc); round02-host exit 0; audits exit 0 (verify_experiences --audits --only r02-g05.colorfall-canyons) (.autonomy/migration/checks/R02-G05-08.round02-host.json, .autonomy/migration/checks/R02-G05-08.audits.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name audits -- python3
   scripts/verify_experiences.py --audits --only r02-g05.colorfall-canyons`
 - [ ] T-R02G0508-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

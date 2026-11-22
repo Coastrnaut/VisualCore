@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--audits",
+    "--only",
+    "r02-g05.colorfall-canyons"
+  ],
+  "command": "python3 scripts/verify_experiences.py --audits --only r02-g05.colorfall-canyons",
+  "elapsed_seconds": 2.613,
+  "exit_code": 0,
+  "finished": "2026-11-22T00:17:43+00:00",
+  "gate": "R02-G05-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G05-08.audits.log",
+  "log_sha256": "cdd0abaeac1bc5bb27eb2f10e5955f2484cb586b49a159c50fe274b2dcf5c255",
+  "name": "audits",
+  "started": "2026-11-22T00:17:41+00:00",
+  "timed_out": false
+}

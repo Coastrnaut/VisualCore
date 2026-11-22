@@ -285,3 +285,8 @@ Feature 347 (R02-G05-07) adds persistence and replay: results keep their winning
 snapshot schema 3 (with the sound choice, not digested) with migrations from 1 and 2, and `replay.start`, `replay.step`
 and `replay.stop` replay a stored solution.
 
+Feature 348 (R02-G05-08) adds the regression net: solver and witness checks for all 100 levels with twelve named
+alterations, `ColorfallCanyonsGolden` (test builds only) with 16 pinned golden frame descriptions in
+`ColorfallCanyons/golden-frames.json` (`COLORFALL_CANYONS_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and
+memory tests, a CI step and `scripts/colorfall_canyons_regression.py`.
+
