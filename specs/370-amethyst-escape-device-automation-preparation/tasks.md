@@ -37,7 +37,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [X] T-R02G0710-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-22: rendering-27, rendering-26, experiences, host-full exit=0 (nothing in the app changes)
   `--name host-full` (nothing in the app changes)
-- [ ] T-R02G0710-007 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G0710-007 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-22: reference-1 exit=0
 - [ ] T-R02G0710-008 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G0710-009 {device} After ImplementationLock-100: the device campaign (UA-F13) runs rows AE-D1 … AE-D8 on D1,
   D2, D3 (SC-R02G0710-004)
