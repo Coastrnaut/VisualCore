@@ -24,6 +24,8 @@
 // Feature 355 (R02-G06-05) T-R02G0605-004: the digests are now schema 2's ("…v2": level, play, progress and mode), and
 // `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`; the
 // manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`).
+// Feature 357 (R02-G06-07) T-R02G0607-003: the digests are schema 3's ("…v3": the same parts with traced results), the
+// controls gain replay and the sound setting; the manifest was regenerated.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience

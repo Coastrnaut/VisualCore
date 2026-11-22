@@ -95,8 +95,15 @@ public struct ChronoConstellatorFeedbackPlan: Sendable, Equatable {
     /// (`r02-g06.date`), "That change is not allowed here." (`r02-g06.action`), "No edits are left."
     /// (`r02-g06.budget`), "The level has ended." (`r02-g06.stage`), "That value must be a whole number."
     /// (`r02-g06.not-whole`), otherwise (also the engine's own codes such as `action.out-of-range`) "That change was
-    /// refused.".
+    /// refused.". Feature 357: "There is no saved solution to replay for this level." (`r02-g06.no-replay`), "The
+    /// replay is over." (`r02-g06.replay-end`) and "Stop the replay first." (`r02-g06.replay`).
     public static func refusalText(code: String) -> String {
+        // Feature 357: the replay refusals ("…replay-end" before "…replay", which it contains).
+        if code.contains(ChronoConstellatorExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        if code.contains(ChronoConstellatorExperienceRule.replayEnd) { return "The replay is over." }
+        if code.contains(ChronoConstellatorExperienceRule.replay) { return "Stop the replay first." }
         if code.contains(ChronoConstellatorExperienceRule.locked) { return "That level is not open yet." }
         if code.contains(ChronoConstellatorExperienceRule.date) { return "That date cannot be used." }
         if code.contains(ChronoConstellatorExperienceRule.notWhole) { return "That value must be a whole number." }

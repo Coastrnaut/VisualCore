@@ -71,21 +71,24 @@ import VisualCoreExperience
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g06.chrono-constellator" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g06.chrono-constellator.v2")
+        #expect(Core.experienceID == "r02-g06.chrono-constellator" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g06.chrono-constellator.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         #expect(Core.actionIDs == ["star.phase", "star.hold", "star.release", "time.step", "time.rewind", "play.undo",
                                    "play.redo", "level.next", "level.select", "mode.daily", "mode.practice",
-                                   "mode.campaign", "tutorial.dismiss"])
+                                   "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step", "replay.stop",
+                                   "settings.sound"])
         #expect(Core.controls[0].ranges == [0...4, 0...31])
         #expect(Core.controls[1].ranges == [0...4, 1...1_200, 1...60])
         #expect(Core.controls[2].ranges == [0...4, 1...1_200])
         #expect(Core.controls[3].ranges == [1...1_200])
         #expect(Core.controls[8].ranges == [1...100])
         #expect(Core.controls[9].ranges == [1...9_999, 1...12, 1...31])
-        let plainIndices: [Int] = [4, 5, 6, 7, 10, 11, 12]
+        #expect(Core.controls[13].ranges == [1...100])
+        #expect(Core.controls[16].ranges == [0...1])
+        let plainIndices: [Int] = [4, 5, 6, 7, 10, 11, 12, 14, 15]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == ChronoConstellatorTier.all.map(\.name))
@@ -406,7 +409,7 @@ import VisualCoreExperience
             try Core.migratedToSchemaTwo(["level": "7"])
         }
         // The declared chain carries the step 1 → 2.
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
     }
 
     @Test func snapshotRestoreRoundTripAndRefusals() async throws {
@@ -481,14 +484,14 @@ import VisualCoreExperience
         #expect(engine.handle(control: "time.step", values: [4]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -521,5 +524,107 @@ import VisualCoreExperience
         }
         core.shedCaches()
         #expect(try Self.digest(core) == digest && core == before)
+    }
+
+    /// Feature 357: a won campaign play records its net trace as a verified result; replay plays it action by action,
+    /// refuses other play actions, ends with replay-end and never changes progress; stop returns to campaign.
+    @Test func replayPlaysTheStoredTraceAndChangesNothing() throws {
+        var core: Core = try Core.opening(number: 1)
+        let certified: ChronoConstellatorGenerated = try Core.generated(number: 1)
+        let actions: [ChronoConstellatorAction] = ChronoConstellatorWitness.actions(for: certified.solution,
+                                                                                    level: certified.level)
+        #expect(core.apply(Self.act("replay.start", [1])) == .rejected(.rule(code: "r02-g06.no-replay")))
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: "r02-g06.no-replay")))
+        // A detour that is undone stays out of the trace.
+        let detour: ExperienceAction = Self.act("star.hold", [0, 50, 2])
+        #expect(core.apply(detour) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for action in actions {
+            switch action {
+            case .phase(let star, let phase):
+                #expect(core.apply(Self.act("star.phase", [Double(star), Double(phase)])) == .accepted)
+            case .step(let ticks):
+                #expect(core.apply(Self.act("time.step", [Double(ticks)])) == .accepted)
+            default:
+                Issue.record("unexpected witness action \(action)")
+            }
+        }
+        let result: ChronoConstellatorProgress.Result = try #require(core.progress.solved[1])
+        #expect(result.verified && result.trace == actions)
+        let progress: ChronoConstellatorProgress = core.progress
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.tutorial == .done && core.play.records.isEmpty)
+        #expect(core.apply(Self.act("star.phase", [0, 1])) == .rejected(.rule(code: "r02-g06.replay")))
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g06.replay")))
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted)
+        var reference: ChronoConstellatorPlay = try Core.freshPlay(of: certified.level)
+        for action in actions {
+            #expect(core.apply(Self.act("replay.step")) == .accepted)
+            try reference.apply(action, expecting: reference.fingerprint)
+            #expect(core.play.fingerprint == reference.fingerprint)
+        }
+        #expect(core.play.stage == .won && core.progress == progress)
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: "r02-g06.replay-end")))
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.soundOn)
+        #expect(core.apply(Self.act("replay.stop")) == .rejected(.rule(code: "r02-g06.no-replay")))
+    }
+
+    /// Feature 357: the sound choice is snapshotted and in `==`, never in the digest; reset turns it off.
+    @Test func theSoundChoiceIsSavedButNotDigested() throws {
+        var core: Core = try Core.opening(number: 4)
+        let before: StateDigest = try Self.digest(core)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        #expect(try Self.digest(core) == before)
+        #expect(core.apply(Self.act("settings.sound", [0.5])) == .rejected(.rule(code: "r02-g06.not-whole")))
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 3)
+        #expect(restored.soundOn && restored == core)
+        core.reset()
+        #expect(!core.soundOn)
+    }
+
+    /// Feature 357: a schema-2 object migrates to schema 3 (empty traces, unverified, sound off) and restores with its
+    /// progress; an edited verified result is dropped on restore and counted, the frontier kept as saved.
+    @Test func schemaTwoMigratesAndEditedResultsAreDropped() throws {
+        var progress: ChronoConstellatorProgress = ChronoConstellatorProgress()
+        progress.record(level: 1, edits: 1, smallest: 1)
+        progress.open(through: 5)
+        let progressObject: Any = try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(progress))
+        var two: [String: Any] = ["level": 3, "records": [Any](), "progress": progressObject,
+                                  "mode": ["mode": "campaign"]]
+        two["tutorial"] = "done"
+        // Remove the schema-3 fields the encoder wrote, as a schema-2 save had none.
+        if var p = two["progress"] as? [String: Any], var solved = p["solved"] as? [[String: Any]] {
+            for index in solved.indices {
+                solved[index].removeValue(forKey: "trace")
+                solved[index].removeValue(forKey: "verified")
+            }
+            p["solved"] = solved
+            two["progress"] = p
+        }
+        let three: [String: Any] = try Core.migratedToSchemaThree(two)
+        #expect(three["sound"] as? Bool == false)
+        let data: Data = try JSONSerialization.data(withJSONObject: three, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 2)
+        #expect(restored.progress.frontier == 5 && restored.reconciliationDropped == 0)
+        #expect(restored.progress.solved[1]?.verified == false && !restored.soundOn)
+        #expect(throws: ChronoConstellatorRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+        // An edited verified result: a won trace claimed with one edit too many.
+        let certified: ChronoConstellatorGenerated = try Core.generated(number: 2)
+        let trace: [ChronoConstellatorAction] = ChronoConstellatorWitness.actions(for: certified.solution,
+                                                                                  level: certified.level)
+        var edited: ChronoConstellatorProgress = ChronoConstellatorProgress()
+        edited.open(through: 7)
+        edited.record(level: 2, edits: certified.difficulty.smallest + 1, smallest: certified.difficulty.smallest,
+                      trace: trace)
+        var core: Core = try Core.opening(number: 2)
+        #expect(core.apply(Self.act("time.step", [1])) == .accepted)
+        var object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: try core.snapshotPayload()) as? [String: Any])
+        object["progress"] = try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(edited))
+        let tampered: Data = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+        let checked: Core = try Core.restore(payload: tampered, seed: 1)
+        #expect(checked.reconciliationDropped == 1 && checked.progress.solved[2] == nil)
+        #expect(checked.progress.frontier == 7)
     }
 }
