@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-05: Nocturne Garden hints from the current state, schema 2).
+Last updated: 2026-11-22 (R02-G09-06: Nocturne Garden fades and render tests that wait for them).
 
 ## 1. What is tested, and where
 
@@ -394,6 +394,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   cell of the whole bed (not only the bounding box) against a separate even-odd ray cast on exact rationals with its own
   on-segment test, and the boundary deviation against an all-pairs brute force. A timing baseline taken right after the
   round-two suite failed under a load average of 13 and passed when rerun: run timing baselines on a quiet machine.
+- **A frame test waits for a fade** (R02-G09-06, 2026-11-22). Once Nocturne Garden's leak crosses fade in over 0.15 s,
+  a still drawn at the same presentation time as the failure showed no crosses, and the render test failed. Draw the
+  still at a later time (1 s) and assert the eased level reached its target before checking pixels. A test with a
+  literal array of fractions (`[1, 9.0 / 8, 5.0 / 4, 4.0 / 3]`) inside `#expect` did not type-check in reasonable time;
+  bind typed constants first.
 - **Hints are tested from the opening and from seeded states** (R02-G09-05, 2026-11-22). Nocturne Garden's hint search
   starts at the current blooms and sun; the host tests follow exact hints from the opening of all 100 levels (they must
   reproduce the certified move count) and from 200 seeded reachable states, and explain 500 seeded failures. The

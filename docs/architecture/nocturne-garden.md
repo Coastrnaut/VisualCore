@@ -136,3 +136,26 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g09.malformed`, `.
   2026-01-01 × 71) mod 100 + 1, from a date the presenter reads), `mode.practice` (budget 40, no stars or unlocks) and
   `mode.campaign`. Progress and mode are in the digest; the snapshot is schema 2 with a migration from schema 1.
 
+
+## Polish and accessibility (feature 386, R02-G09-06)
+
+Presentation only: no state, digest or snapshot field changes (schema 2 stays).
+
+- **Feedback.** `NocturneGardenFeedbackPlan` is a pure function of the core before and after an accepted action (or of
+  a refusal's code). An accepted plant, move, resize, removal, sun change, undo or redo is announced as `state` with what
+  changed, the match, the leak and the moves left, with a `selection` haptic; a win or a failure as `outcome` only
+  (`success` or `warning`, the failure explanation of feature 385); a level or mode change as `level` with no haptic; a
+  refusal as `rejection` in words ("That level is not open yet.") with an `error` haptic, the same words in the panel; a
+  revealed hint as `state`. The presenter routes plans through the shared `ExperienceFeedback` and keeps a feedback log.
+- **Lights.** `NocturneGardenLights` eases the blooms' glow (0.7 playing, 1 won, 0.35 failed) and the leak crosses
+  (1 while the failure is a leak) linearly over 0.15 s, 0.45 s under Reduce Flashing, where a started fade finishes
+  before it may turn back. The scene multiplies the glow gain by the glow level and shades the crosses by the leak level;
+  after an undo the crosses fade out over the last leaking cells. Under Reduce Flashing no element crosses half its
+  range more than 3 times per second and every half-range fade takes at least 0.4 s (host-tested).
+- **Sound.** `NocturneGardenSoundRecipe` builds an ambient loop from the planted blooms, the sun and the stage (root
+  110 Hz × the sun's ratio, one partial per bloom up to four, an octave when won, halved gains when failed, the longest
+  accepted loop with whole cycles: 16 s, or 15 s at sun 4). `NocturneGardenSound` plays it exactly while the panel's
+  Sound toggle is on (off by default), the panel is on screen and the scene is active.
+- **Panel.** Every control has a label and a value; the kind, column, row, size, bloom, sun and level pickers are
+  adjustable steppers; the "Garden" summary element reads the moves left, the measures, the blooms and the target in
+  words; text wraps, rows become columns at accessibility text sizes and the panel keeps a 520-point readable width.

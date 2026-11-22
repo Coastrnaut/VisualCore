@@ -59,7 +59,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G0906-006 Docs: `docs/architecture/nocturne-garden.md` (polish and accessibility),
+- [X] T-R02G0906-006 Docs: `docs/architecture/nocturne-garden.md` (polish and accessibility), — Verified 2026-11-22: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; architecture polish and accessibility section, package README feature 386, testing doc lesson (fades in frame tests); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0906-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

@@ -512,3 +512,8 @@ Feature 385 (R02-G09-05) adds teaching and progression: a solver entry point fro
 `NocturneGardenHints` (three hint levels and the failure explanation), `NocturneGardenProgress` (tutorial steps, stars,
 the frontier, the daily level and the modes), the adapter's level and mode controls with snapshot schema 2, and the
 panel's tutorial, Hint, Undo/Retry, mode buttons and level picker.
+
+Feature 386 (R02-G09-06) adds polish and accessibility: `NocturneGardenFeedbackPlan` (announcements and haptics),
+`NocturneGardenLights` (eased glow and leak crosses, Reduce Flashing) and `NocturneGardenSoundRecipe` in the Core (the
+Core gains VisualCoreAudioDSP), `NocturneGardenSound` (the ambient loop over VisualCoreAudio) in the experience, the
+presenter's feedback route and log, and the accessible panel (adjustable pickers, summary element, Sound toggle).
