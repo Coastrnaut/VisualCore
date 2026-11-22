@@ -521,3 +521,8 @@ presenter's feedback route and log, and the accessible panel (adjustable pickers
 Feature 387 (R02-G09-07) adds persistence and replay: results carry their winning trace and `verified`
 (`NocturneGardenReconciliation` replays every trace on restore and drops edited results), snapshot schema 3 with a
 2 → 3 migration, the replay mode (`replay.start/step/stop`) and `settings.sound`, and the panel's Replay, Step and Stop.
+
+Feature 388 (R02-G09-08) adds the regression net: solver and witness checks for all 100 levels with ten named
+alterations, `NocturneGardenGolden` (test builds only) with 16 pinned golden frame descriptions in
+`NocturneGarden/golden-frames.json` (`NOCTURNE_GARDEN_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and memory
+tests, a CI step and `scripts/nocturne_garden_regression.py`.

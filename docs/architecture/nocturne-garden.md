@@ -181,3 +181,24 @@ Presentation only: no state, digest or snapshot field changes (schema 2 stays).
 - **Settings and determinism.** `settings.sound [0 … 1]` saves the sound choice, applied when the experience opens. The
   state reads no clock or random source: the seed, the certified catalog, the date given to `mode.daily` and the
   recorded actions decide everything, so a save restores and replays identically on every device.
+
+## Regression net (feature 388, R02-G09-08)
+
+- **Solver.** For all 100 levels, in tests of 10: the generated level equals its witness's level, the witness's moves
+  replay to a win in its smallest move count within the budget with its per-move digests and fingerprints, and the
+  solver returns exactly the witness's moves with the smallest move count equal to the lower bound's; its work stays
+  within the solver's work bound. Ten kinds of alteration (a target cell, a forbidden cell, the budget, the leak
+  allowance, the required match, a solution move, a witness move, a per-move digest or fingerprint, the smallest move
+  count) each fail naming the level and the part. Work is counted, never timed.
+- **Golden frames.** `NocturneGardenGolden` (test builds only; forbidden in the Release binary) describes 16 frames —
+  levels 1, 21, 41, 61, 81 at three tiers after their certified solution's first min(smallest − 1, 2) moves, at time 0,
+  plus the hero frame — at 1,152 × 768: every projected bloom-head centre and the lantern's centre (to 1/8 px, null off
+  screen), the shadow cell count, the moves spent and the budget, the tier's detail and the palette. The descriptions
+  and SHA-256 digests are pinned in `golden-frames.json`; a recomputed description passes on an equal digest or within
+  one quantum with everything else equal, and the file is rewritten only with `NOCTURNE_GARDEN_WRITE_GOLDEN=1`. The
+  simulator renders the same frames and checks them with the feature-383 frame tolerances.
+- **Memory.** Twelve open-draw-warn-close cycles on the simulator keep the footprint within 16 MB of the first cycle
+  (bound applied when the class runs alone) and leave the garden scene holding no GPU objects (`liveObjectCount` 0)
+  after each close and memory warning.
+- **Where it runs.** CI's host job has a named "Nocturne Garden regression (host)" step; locally,
+  `python3 scripts/nocturne_garden_regression.py` runs the host and simulator parts with one summary line each.

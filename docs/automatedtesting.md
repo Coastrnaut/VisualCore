@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-07: Nocturne Garden reconcilable saves and replay).
+Last updated: 2026-11-22 (R02-G09-08: Nocturne Garden regression net).
 
 ## 1. What is tested, and where
 
@@ -451,6 +451,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (the key was checked unique before use). Each cut is set by stepping the piece, direction and depth pickers from
   their current values (read from the steppers), never from an assumed choice, because the panel keeps the player's
   choice across cuts; `xcodegen generate` ran first so the new UI test files reach the target.
+- **Nocturne Garden regression** (R02-G09-08, 2026-11-22). `python3 scripts/nocturne_garden_regression.py` runs the
+  host filter `NocturneGardenRegression` (solver regression over 100 witnesses in tests of 10, ten named alterations,
+  golden descriptions) and then the simulator golden-frame and memory classes with
+  `TEST_RUNNER_NOCTURNE_GARDEN_MEMORY_ISOLATED=1`; CI runs the host part as a named step. Golden frames are taken at
+  time 0 (the mist drift and the sway are shader uniforms, so no position depends on time), but the simulator still is
+  drawn 1 s later so the eased lights of feature 386 have settled. A golden source in the Core must be listed among the
+  invariant scan's presentation sources, or the kernel scan fails on its Doubles.
 - **Faceted Forge regression** (R02-G08-08, 2026-11-22). `python3 scripts/faceted_forge_regression.py` runs the host
   filter `FacetedForgeRegression` (solver regression over 100 witnesses in tests of 10, ten named alterations, golden
   descriptions) and then the simulator golden-frame and memory classes with
