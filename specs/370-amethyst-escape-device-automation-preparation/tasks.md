@@ -26,7 +26,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G0710-004 [P] [US2] Create `docs/apps/amethyst-escape/device-campaign.md` (agent B, modelled on
+- [X] T-R02G0710-004 [P] [US2] Create `docs/apps/amethyst-escape/device-campaign.md` (agent B, modelled on — Verified 2026-11-22: docs exit=0; docs/apps/amethyst-escape/device-campaign.md: D1 → D2 → D3 (D3 stays on iPadOS 26.5), owner actions as BLOCKED_OWNER_ACTION, rows AE-D1 … AE-D8 pending, no number claimed
   `docs/apps/chrono-constellator/device-campaign.md`: devices and order, D3 on iPadOS 26.5, owner actions as
   BLOCKED_OWNER_ACTION, every row AE-D1 … AE-D8 with devices, procedure, pass condition and "pending device campaign",
   no number claimed, the stress session only in the device campaign); `--name docs -- python3 scripts/validate_docs.py`
