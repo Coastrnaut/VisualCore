@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G07-01 (migration ledger, game feature of experience R02-G07) · ID namespace FR-R02G0701-###,
 SC-R02G0701-###, T-R02G0701-###
@@ -29,6 +29,49 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract, so
   R02-G07-02 can certify levels).
 - **Model:** feature 351 (Chrono Constellator's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+351's answers where the games agree. Facts checked in code (read-only, 2026-11-22): `Packages/ExperiencesRound02` holds
+Aurora Loom, Lissajous Labyrinth, Wave Knot Keeper, Hue Compass, Colorfall Canyons and Chrono Constellator as the pattern
+(Core with level, play, records with previous and next fingerprints, rules as R02-F23 `PuzzleRules`, `StableHash`
+fingerprints, `r02-gNN.*` reason codes); no `AmethystEscape*` name exists; the catalog sets the timestep at 0.008333 s
+and the content at 80 stages.
+
+- Q: What exactly are the shells, sectors, apertures, walls and wedges? → A: N = 6 … 12 sectors (the same for every
+  shell) and 2 … 5 shells numbered 0 (innermost) … K − 1 (outermost). Each shell lists, in its own sectors 0 … N − 1:
+  its outer apertures (a non-empty set; the outermost shell has exactly one, the exit gap), its radial walls (wall j
+  stands between its sectors j and j + 1 mod N; at most N − 1 walls) and its blocked wedges (a set; never every sector).
+  The pearl starts in shell 0 at a sector that is not blocked, with every shell at offset 0. The move budget is 1 … 60.
+  Shells are named "shell 1 (inner)" … "shell K (outer)" and sectors by their clock-face position ("sector 3 of 12"), so
+  everything is told apart without colour. Impact: FR-R02G0701-001, 013; SC-R02G0701-001.
+- Q: How do rotations and advances move things, exactly? → A: shell r has an offset o_r in 0 … N − 1; a pocket (r, a)
+  at absolute sector a lies in shell r's own sector (a − o_r) mod N. `rotate(r, +1)` (clockwise) sets o_r to
+  (o_r + 1) mod N and `rotate(r, −1)` to (o_r − 1) mod N; if the pearl is in shell r its absolute sector changes by the
+  same step. `advance` from (r, a) with own sector j: if j is an outer aperture of shell r — when r is the outermost
+  shell the pearl leaves through the exit gap (won); otherwise it moves to (r + 1, a). Else, if wall j is absent, it moves
+  to (r, a + 1 mod N). Else it is refused (`r02-g07.stuck`). A move that lands on a blocked wedge (the destination's own
+  sector in its shell's blocked set) puts the pearl there and fails the level. Impact: FR-R02G0701-002, 003, 005;
+  SC-R02G0701-003.
+- Q: What do the actions cost, and how is the budget spent? → A: every accepted rotate and advance spends one move; a
+  refused action spends nothing; undo and redo spend nothing (undo gives the move back, redo spends it again). There is
+  no budget refusal: the move that reaches the budget is still applied and then judged. Impact: FR-R02G0701-004;
+  SC-R02G0701-001, 004.
+- Q: In which order are exit, wedge and budget decided, and from which stages can the player go back? → A: after an
+  advance: exit first (won), then wedge (failed, naming the shell and the sector); then, after any accepted move that did
+  not end the level, budget (moves spent equal to the budget: failed). Undo and redo restore the exact earlier state for
+  every accepted rotate and advance; a new action clears the redo stack. Undo works in playing and paused; from failed,
+  undo returns to playing (an honest retry, recorded); a won level is final and refuses undo. Impact: FR-R02G0701-005, 007,
+  008; SC-R02G0701-002, 004.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G06-01: every accepted action appends a
+  record (schema, level seed, move index, kind, operands, previous and next fingerprints); the play fingerprint is the
+  SHA-256 of the schema, the level fingerprint, the offsets, the pearl's pocket, the moves spent, the stage and the
+  failure; levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decode; reason codes
+  `r02-g07.level`, `.action`, `.stage`, `.stale`, `.stuck`, `.newer-schema`, `.malformed`. Impact: FR-R02G0701-006 …
+  011; SC-R02G0701-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
