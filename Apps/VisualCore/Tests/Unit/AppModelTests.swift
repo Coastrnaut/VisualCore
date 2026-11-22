@@ -2,6 +2,7 @@
 // bundled catalog and the registry agree; the app model shows the empty launcher for the real catalog and six
 // tiles in three sections for the fixture; a premium tile gives the notice and no session; the quality override
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
+import AmethystEscapeCore
 import AuroraLoomCore
 import ChronoConstellatorCore
 import ColorfallCanyonsCore
@@ -1805,6 +1806,134 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(level.columns, pinnedColumns, "level 1 columns")
         XCTAssertEqual(level.tickLimit, pinnedTickLimit, "level 1 tick limit")
         XCTAssertEqual(ChronoConstellatorExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Amethyst Escape in the app (feature 369, R02-G07-09; T-R02G0709-005, FR-R02G0709-003,
+    // FR-R02G0709-006; SC-R02G0709-002)
+
+    /// Amethyst Escape's registration: a candidate until X-R02-G07.
+    private func amethystEscapeRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(AmethystEscapeExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Amethyst Escape is a candidate")
+    }
+
+    /// FR-R02G0709-003, clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples
+    /// restore to their digests through the migrations (the app's migration check).
+    func testTheAmethystEscapeRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try amethystEscapeRegistration()
+        XCTAssertEqual(AmethystEscapeExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(AmethystEscapeExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(AmethystEscapeExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G0709-006, clarification Q5: without `-vcCandidates` Amethyst Escape is a candidate only: in
+    /// `candidates`, outside `all`, listed in the bundled catalog as not available, without a tile and not opened.
+    func testAmethystEscapeIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(AmethystEscapeExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g07.amethyst-escape")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G0709-003, SC-R02G0709-002: with `-vcCandidates` Amethyst Escape is shown, opens through the registry and
+    /// engine with seed 0 (level 1), and level 1 is won by its certified witness actions
+    /// (`AmethystEscapeExperienceCore.certifiedActions(1)`) sent as `shell.rotate [shell, step]` and `pearl.advance`;
+    /// the win opens level 2 and `level.next` plays it.
+    func testAmethystEscapeOpensAsACandidateAndLevelOneIsWonByItsCertifiedWitness() async throws {
+        let registration = try amethystEscapeRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["shell.rotate", "pearl.advance", "level.next"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(AmethystEscapeExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<AmethystEscapeExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        let actions: [AmethystEscapeAction] = AmethystEscapeExperienceCore.certifiedActions(1)
+        XCTAssertFalse(actions.isEmpty)
+        for action in actions {
+            let control: String
+            let values: [Double]
+            switch action {
+            case .rotate(let shell, let step):
+                control = "shell.rotate"
+                values = [Double(shell), Double(step)]
+            case .advance:
+                control = "pearl.advance"
+                values = []
+            }
+            XCTAssertEqual(engine.handle(control: control, values: values), .accepted, "\(control) \(values)")
+        }
+        XCTAssertEqual(engine.outcome?.code, AmethystEscapeExperienceCore.wonCode)
+        XCTAssertEqual(AmethystEscapeExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, AmethystEscapeStage.won)
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `AE` (their own literals, which this
+    /// target cannot import); the same literals equal the Core's certified level 1: witness actions rotate(0, −1),
+    /// advance, advance; certified smallest 3; the shell picker starts on shell 0 (the innermost shell, a shell of
+    /// level 1, and the shell of the first certified turn, so the interface test needs no picker step for it). Seed 0
+    /// opens level 1.
+    func testAmethystEscapeLevelOneEqualsTheCore() throws {
+        let pinnedActions: [AmethystEscapeAction] = [.rotate(0, -1), .advance, .advance]
+        let pinnedSmallest: Int = 3
+        let pinnedStartingShell: Int = 0
+        let certified = try AmethystEscapeExperienceCore.generated(number: 1)
+        let level = certified.level
+        XCTAssertEqual(AmethystEscapeExperienceCore.certifiedActions(1), pinnedActions, "level 1 witness actions")
+        XCTAssertEqual(certified.solution.actions, pinnedActions, "level 1 solution actions")
+        XCTAssertEqual(certified.solution.smallest, pinnedSmallest, "level 1 smallest")
+        XCTAssertEqual(pinnedActions.count, pinnedSmallest, "the witness is a shortest solution")
+        XCTAssertEqual(level.shells.indices.lowerBound, pinnedStartingShell, "the picker starts on the innermost shell")
+        XCTAssertEqual(AmethystEscapeExperienceCore.shellRange.lowerBound, pinnedStartingShell, "a declared shell")
+        XCTAssertTrue(level.shells.indices.contains(pinnedStartingShell), "level 1 has the starting shell")
+        var firstTurnedShell: Int?
+        for action in pinnedActions {
+            if case .rotate(let shell, _) = action {
+                firstTurnedShell = shell
+                break
+            }
+        }
+        XCTAssertEqual(firstTurnedShell, pinnedStartingShell, "the first certified turn is of the starting shell")
+        XCTAssertEqual(AmethystEscapeExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }

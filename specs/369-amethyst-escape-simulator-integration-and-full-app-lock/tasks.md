@@ -44,7 +44,7 @@ change (the shaders and reference of R02-G07-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G0709-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G0709-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-22: app-unit exit=0 (AppModelTests: stored examples restore, candidate unavailable without -vcCandidates, level 1 won by its certified witness through the registry and engine, pinned level 1 values equal the Core)
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `AE`'s pinned level 1 certified actions and the
   shell picker's starting shell (the convergence lesson of feature 319) equal the Core's); `--name app-unit -- python3
