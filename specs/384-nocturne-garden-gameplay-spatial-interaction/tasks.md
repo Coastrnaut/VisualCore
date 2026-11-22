@@ -18,7 +18,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `withPreview(_:)` to `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSceneSnapshot.swift` and the preview material (code 12, a pale dashed
   outline drawn from world coordinates) to `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenShaders.swift` with its source test in
   `Packages/ExperiencesRound02/NocturneGarden/CoreTests/NocturneGardenShaderSourceTests.swift`; `--name host`
-- [ ] T-R02G0904-003 [P] Add `NocturneGardenOrbit` ("yaw ±35°, pitch 0° … 30° down, authored (0, 8°)"),
+- [X] T-R02G0904-003 [P] Add `NocturneGardenOrbit` ("yaw ±35°, pitch 0° … 30° down, authored (0, 8°)"), — Verified 2026-11-22: host-2 exit=0 (22 tests: NocturneGardenPickerTests 6 incl. 500 seeded picks and bed cells against an independent pick, 22-point targets, nearest bloom, 500 seeded sun steps and pinch sizes; geometry suite with orbit clamping, authored camera bit-identical, framing at the orbit corners and aspects, preview outline along the boundary edges; agent B's files retested by the lead)
   `camera(_:aspect:orbit:)` (distance refit so the level's framing sphere stays inside the view with a 5 % margin;
   `camera(_:aspect:)` equals the authored orbit, bit-identical) and the preview outline (the boundary edges of the
   preview cells, z = 0.0035, preview material) to `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSceneGeometry.swift`; create

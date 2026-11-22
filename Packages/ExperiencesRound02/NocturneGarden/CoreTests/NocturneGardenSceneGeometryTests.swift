@@ -6,6 +6,12 @@
 // 2.5; positions are the same at every tier, time and Reduce Motion; the shadow quads equal the kernel's mask; every
 // bloom vertex lies in its bloom box; the gauge has 0, half and all bars spent; level-2 has no glow; the head
 // triangulation covers each outline exactly. Hand-made levels and two catalog levels, plain loops; well under 2 s each.
+//
+// Feature 384 (R02-G09-04) T-R02G0904-003 (FR-R02G0904-003, 005; SC-R02G0904-002, 004; clarifications Q2, Q3): the
+// orbit clamps to yaw ±35° and pitch 0° … 30° (non-finite angles to the authored ones); `camera(_:aspect:)` is the
+// authored orbit's camera bit for bit; every place and the framing sphere stay inside the view with a 5 % margin at the
+// orbit bounds' corners and aspects 0.4, 1 and 2.5; the drag preview's outline is absent without a preview and lies
+// exactly along the preview's boundary edges otherwise.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -374,5 +380,209 @@ import VisualCoreScenes
         #expect(count == 4 * s.leaking.count && count > 0)
         let quiet: Mesh = try Geometry.gardenMesh(try Self.catalog(1), tier: NocturneGardenTier.all[1])
         #expect(quiet.uvs.allSatisfy { Int($0.x.rounded()) != cross })
+    }
+
+    // MARK: Orbit and preview outline (feature 384)
+
+    @Test func orbitClampsToItsBounds() {
+        let degree: Double = Double.pi / 180
+        #expect(abs(NocturneGardenOrbit.yawLimit - 35 * degree) < 1e-15)
+        #expect(NocturneGardenOrbit.pitchRange.lowerBound == 0)
+        #expect(abs(NocturneGardenOrbit.pitchRange.upperBound - 30 * degree) < 1e-15)
+        #expect(NocturneGardenOrbit.authored == NocturneGardenOrbit(yaw: 0, pitch: Geometry.pitch))
+        #expect(abs(Geometry.pitch - 8 * degree) < 1e-15)
+        let cases: [(NocturneGardenOrbit, NocturneGardenOrbit)] = [
+            (NocturneGardenOrbit(yaw: 1, pitch: 1), NocturneGardenOrbit(yaw: 35 * degree, pitch: 30 * degree)),
+            (NocturneGardenOrbit(yaw: -1, pitch: -0.2), NocturneGardenOrbit(yaw: -35 * degree, pitch: 0)),
+            (NocturneGardenOrbit(yaw: 0.2, pitch: 0.3), NocturneGardenOrbit(yaw: 0.2, pitch: 0.3)),
+            (NocturneGardenOrbit(yaw: .nan, pitch: .infinity), NocturneGardenOrbit.authored),
+            (NocturneGardenOrbit(yaw: -.infinity, pitch: .nan), NocturneGardenOrbit.authored),
+        ]
+        for (input, clamped) in cases {
+            let got: NocturneGardenOrbit = input.clamped()
+            #expect(abs(got.yaw - clamped.yaw) < 1e-15 && abs(got.pitch - clamped.pitch) < 1e-15, "\(input)")
+            let d: SIMD3<Double> = input.eyeDirection
+            #expect(abs(Geometry.length(d) - 1) < 1e-12)
+            #expect(d == got.eyeDirection)
+        }
+        #expect(NocturneGardenOrbit.authored.eyeDirection == Geometry.eyeDirection)
+    }
+
+    @Test func authoredCameraEqualsTheAuthoredOrbitBitForBit() throws {
+        for s in try Self.snapshots() {
+            for aspect in Self.aspects + [0.0, .nan, 20] {
+                let a: NocturneGardenCamera = Geometry.camera(s, aspect: aspect)
+                let b: NocturneGardenCamera = Geometry.camera(s, aspect: aspect, orbit: .authored)
+                #expect(a == b)
+                #expect(a.eye.x.bitPattern == b.eye.x.bitPattern && a.eye.y.bitPattern == b.eye.y.bitPattern
+                    && a.eye.z.bitPattern == b.eye.z.bitPattern)
+                let other: NocturneGardenCamera = Geometry.camera(s, aspect: aspect,
+                                                                  orbit: NocturneGardenOrbit(yaw: 0.3, pitch: 0.2))
+                #expect(other != a && abs(other.radius - a.radius) == 0)
+            }
+        }
+    }
+
+    @Test func framingStaysInsideTheViewAtTheOrbitBoundsCorners() throws {
+        let margin: Double = 0.05
+        let yaws: [Double] = [-NocturneGardenOrbit.yawLimit, 0, NocturneGardenOrbit.yawLimit]
+        let pitches: [Double] = [NocturneGardenOrbit.pitchRange.lowerBound, Geometry.pitch,
+                                 NocturneGardenOrbit.pitchRange.upperBound]
+        var directions: [SIMD3<Double>] = []
+        for i in -1...1 {
+            for j in -1...1 {
+                for k in -1...1 where i != 0 || j != 0 || k != 0 {
+                    let v: SIMD3<Double> = SIMD3(Double(i), Double(j), Double(k))
+                    directions.append(v / Geometry.length(v))
+                }
+            }
+        }
+        for s in try Self.snapshots() {
+            var points: [SIMD3<Double>] = []
+            for cell in 0..<(s.width * s.height) { points.append(Geometry.cellCentre(cell, s)) }
+            points.append(Geometry.lantern(s))
+            for bar in 0..<s.budget { points.append(Geometry.gaugeBar(bar, s)) }
+            for bloom in s.blooms.indices {
+                let box = Geometry.bloomBox(bloom, s, tier: NocturneGardenTier.all[0])
+                for corner in 0..<8 {
+                    points.append(SIMD3(corner & 1 == 0 ? box.min.x : box.max.x,
+                                        corner & 2 == 0 ? box.min.y : box.max.y,
+                                        corner & 4 == 0 ? box.min.z : box.max.z))
+                }
+            }
+            // The framing sphere itself, sampled in 26 directions.
+            let radius: Double = Geometry.boundingRadius(s)
+            for d in directions { points.append(Geometry.bedCentre(s) + d * radius) }
+            for aspect in [0.4, 1, 2.5] {
+                for yaw in yaws {
+                    for pitch in pitches {
+                        let orbit: NocturneGardenOrbit = NocturneGardenOrbit(yaw: yaw, pitch: pitch)
+                        let cam: NocturneGardenCamera = Geometry.camera(s, aspect: aspect, orbit: orbit)
+                        #expect(cam.near > 0 && cam.far > cam.near)
+                        var inside: Bool = true
+                        for p in points {
+                            guard let v = Geometry.project(p, camera: cam) else {
+                                inside = false
+                                continue
+                            }
+                            if v.x < margin || v.x > 1 - margin || v.y < margin || v.y > 1 - margin { inside = false }
+                        }
+                        #expect(inside, "level \(s.levelNumber) aspect \(aspect) orbit \(orbit)")
+                    }
+                }
+            }
+        }
+    }
+
+    /// The preview bars of `m` as sets of their four corners (each quad is two triangles sharing a diagonal), from the
+    /// triangles of the preview material.
+    static func previewVertices(_ m: Mesh) -> (triangles: Int, corners: Set<[Double]>, flat: Bool) {
+        let preview: Int = Int(NocturneGardenShaders.previewMaterial)
+        var triangles: Int = 0
+        var corners: Set<[Double]> = []
+        var flat: Bool = true
+        var t: Int = 0
+        while t + 2 < m.indices.count {
+            let ids: [UInt32] = [m.indices[t], m.indices[t + 1], m.indices[t + 2]]
+            t += 3
+            guard Self.code(m, ids[0]) == preview else { continue }
+            triangles += 1
+            for id in ids {
+                let p: Vec3 = m.positions[Int(id)]
+                if Self.code(m, id) != preview || m.uvs[Int(id)].y != 1 || p.z != Geometry.previewZ { flat = false }
+                corners.insert([p.x, p.y])
+            }
+        }
+        return (triangles, corners, flat)
+    }
+
+    @Test func previewOutlineFollowsThePreviewBoundaryEdges() throws {
+        #expect(Geometry.previewZ == 0.0035 && Int(NocturneGardenShaders.previewMaterial) == 12)
+        let base: Snapshot = try Self.catalog(1)
+        let tier: NocturneGardenTier = NocturneGardenTier.all[0]
+        // No preview: no preview triangles at all.
+        for s in try Self.snapshots() {
+            #expect(Self.previewVertices(try Geometry.gardenMesh(s, tier: tier)).triangles == 0)
+        }
+        let w: Int = base.width
+        let h: Int = base.height
+        // An L of three cells, a block on the bed's corner, a single cell, and the base's own shadow.
+        let shapes: [[Int]] = [[w + 1, w + 2, 2 * w + 1], [0, 1, w, w + 1], [5 * w + 7], base.shadow]
+        for cells in shapes {
+            let s: Snapshot = base.withPreview(cells)
+            let set: Set<Int> = Set(s.preview)
+            let u: Double = Geometry.cellSize(s)
+            let half: Double = Geometry.rimHalfWidth * u
+            var expectedCorners: Set<[Double]> = []
+            var edges: Int = 0
+            for cell in s.preview {
+                let c: Int = cell % w
+                let r: Int = cell / w
+                let x0: Double = -1 + Double(c) * u
+                let y0: Double = Double(r) * u
+                // Bottom, right, top, left: (inner neighbour present?, the edge's ends a → b, outward).
+                let sides: [(Bool, SIMD2<Double>, SIMD2<Double>, SIMD2<Double>)] = [
+                    (r > 0 && set.contains(cell - w), SIMD2(x0, y0), SIMD2(x0 + u, y0), SIMD2(0, -1)),
+                    (c + 1 < w && set.contains(cell + 1), SIMD2(x0 + u, y0), SIMD2(x0 + u, y0 + u), SIMD2(1, 0)),
+                    (r + 1 < h && set.contains(cell + w), SIMD2(x0 + u, y0 + u), SIMD2(x0, y0 + u), SIMD2(0, 1)),
+                    (c > 0 && set.contains(cell - 1), SIMD2(x0, y0 + u), SIMD2(x0, y0), SIMD2(-1, 0)),
+                ]
+                for (shared, a, b, out) in sides where !shared {
+                    edges += 1
+                    let along: SIMD2<Double> = (b - a) / u * half
+                    let quad: [SIMD2<Double>] = [a - along - out * half, b + along - out * half,
+                                                 b + along + out * half, a - along + out * half]
+                    for q in quad { expectedCorners.insert([q.x, q.y]) }
+                }
+            }
+            let found: (triangles: Int, corners: Set<[Double]>, flat: Bool) =
+                Self.previewVertices(try Geometry.gardenMesh(s, tier: tier))
+            #expect(edges > 0)
+            #expect(found.triangles == 2 * edges, "preview \(cells)")
+            #expect(found.flat)
+            // Every drawn corner is an expected bar corner (up to rounding), and every expected corner is drawn.
+            var unmatched: Int = 0
+            for corner in found.corners {
+                var hit: Bool = false
+                for e in expectedCorners where abs(e[0] - corner[0]) < 1e-12 && abs(e[1] - corner[1]) < 1e-12 {
+                    hit = true
+                }
+                if !hit { unmatched += 1 }
+            }
+            var missing: Int = 0
+            for e in expectedCorners {
+                var hit: Bool = false
+                for corner in found.corners where abs(e[0] - corner[0]) < 1e-12 && abs(e[1] - corner[1]) < 1e-12 {
+                    hit = true
+                }
+                if !hit { missing += 1 }
+            }
+            #expect(unmatched == 0 && missing == 0, "preview \(cells)")
+            // Painter's order: every preview triangle comes after the last target-rim triangle and before the blooms.
+            let m: Mesh = try Geometry.gardenMesh(s, tier: tier)
+            var lastRim: Int = -1
+            var firstPreview: Int = Int.max
+            var lastPreview: Int = -1
+            var firstBloom: Int = Int.max
+            var t: Int = 0
+            while t + 2 < m.indices.count {
+                let code: Int = Self.code(m, m.indices[t])
+                if code == Int(NocturneGardenShaders.targetRimMaterial) { lastRim = t }
+                if code == 12 {
+                    firstPreview = min(firstPreview, t)
+                    lastPreview = t
+                }
+                if code == 6 || code == 7 || code == 11 { firstBloom = min(firstBloom, t) }
+                t += 3
+            }
+            #expect(lastRim < firstPreview && lastPreview < firstBloom)
+            // The fallback colour of a preview vertex is the preview material's colour.
+            let part: NocturneGardenColouredMesh = try Geometry.gardenPart(s, tier: tier)
+            let colour: SIMD3<Double> = NocturneGardenShaders.GardenMaterial.preview.colour
+            for k in part.mesh.positions.indices where Self.code(part.mesh, UInt32(k)) == 12 {
+                let c: Vec4 = part.colours[k]
+                #expect(abs(c.x - colour.x) < 1e-12 && abs(c.y - colour.y) < 1e-12 && abs(c.z - colour.z) < 1e-12)
+            }
+        }
     }
 }

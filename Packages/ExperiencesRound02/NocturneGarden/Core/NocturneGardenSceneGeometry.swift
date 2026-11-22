@@ -17,13 +17,21 @@
 // painter's order. Mist drift and bloom sway move by uniforms only: no position depends on the time or Reduce Motion,
 // and positions, colours and marks are the same at every tier (tiers change only the feather band, the stem's segments
 // and leaves, and the glow shells). Doubles are used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 384 (R02-G09-04) T-R02G0904-003 (FR-R02G0904-002, 003, 005; SC-R02G0904-002, 004; clarifications Q2, Q3):
+// the player's orbit (`NocturneGardenOrbit`: yaw ±35° about +y, pitch 0° … 30° down from the horizon, authored yaw 0
+// and pitch 8°) and `camera(_:aspect:orbit:)`, which fits the same per-level framing sphere at every orbit (the fit
+// does not depend on the direction, so the 5 % margin holds everywhere; the authored camera is the authored orbit's
+// camera, bit for bit); and the drag preview's outline: thin quads of the preview material along the boundary edges
+// of the snapshot's `preview` cells (z = 0.0035, drawn right after the target rim).
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
-/// The camera of the Nocturne Garden scene for one snapshot and aspect.
+/// The camera of the Nocturne Garden scene for one snapshot, aspect and orbit.
 ///
-/// Built only by ``NocturneGardenSceneGeometry/camera(_:aspect:)``. World positions are in bed units (the bed spans x
+/// Built only by ``NocturneGardenSceneGeometry/camera(_:aspect:orbit:)`` (and
+/// ``NocturneGardenSceneGeometry/camera(_:aspect:)``, its authored orbit). World positions are in bed units (the bed spans x
 /// −1 … 1); ``viewProjection`` maps them to GL clip space (right-handed, depth −1 … 1).
 public struct NocturneGardenCamera: Sendable, Equatable {
     /// The eye position in world units.
@@ -48,6 +56,44 @@ public struct NocturneGardenCamera: Sendable, Equatable {
     public let viewProjection: Mat4
 }
 
+/// The player's view of the garden: a yaw about +y and a pitch above the horizon, both in radians (feature 384,
+/// R02-G09-04, clarification Q3). Presentation only: never saved, never read by the rules.
+public struct NocturneGardenOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians: the angle of the eye direction above the horizon (the view looks down by it); allowed
+    /// ``pitchRange`` (0° … 30°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 8° (``NocturneGardenSceneGeometry/pitch``), the fixed camera of R02-G09-03.
+    public static let authored = NocturneGardenOrbit(yaw: 0, pitch: NocturneGardenSceneGeometry.pitch)
+    /// The largest yaw either way, 35° in radians.
+    public static let yawLimit: Double = 35.0 * Double.pi / 180
+    /// The allowed pitches, 0° … 30° in radians.
+    public static let pitchRange: ClosedRange<Double> = 0...(30.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −35° … 35° and pitch to 0° … 30°; a non-finite angle becomes the authored one.
+    public func clamped() -> NocturneGardenOrbit {
+        let y: Double = yaw.isFinite ? yaw : Self.authored.yaw
+        let p: Double = pitch.isFinite ? pitch : Self.authored.pitch
+        return NocturneGardenOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                   pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+
+    /// The unit direction from the bed's centre to the eye at the clamped orbit: (sin y · cos p, sin p, cos y · cos p)
+    /// with y the yaw and p the pitch; exactly ``NocturneGardenSceneGeometry/eyeDirection`` at ``authored``.
+    public var eyeDirection: SIMD3<Double> {
+        let o: NocturneGardenOrbit = clamped()
+        return SIMD3(sin(o.yaw) * cos(o.pitch), sin(o.pitch), cos(o.yaw) * cos(o.pitch))
+    }
+}
+
 /// A mesh with one colour per vertex (sRGB RGBA 0 … 1, alpha 1), aligned with `mesh.positions`.
 ///
 /// The colours feed the shared unlit mesh renderer of the fallback path (the shader programs have no colour stream;
@@ -67,7 +113,8 @@ public struct NocturneGardenColouredMesh: Sendable, Equatable {
 /// `ShaderMeshRenderer`; positions are world units, identity model).
 /// - ``gardenMesh(_:tier:reduceMotion:)`` — garden program: `a_normal` the unit shading normal; `a_uv` (material code,
 ///   shade) with the codes of `NocturneGardenShaders.GardenMaterial` (0 ground, 1 mist, 2 shadow, 3 target rim, 4
-///   forbidden hatch, 5 leak cross, 6 bloom body, 7 leaf or stem, 8 lantern, 9 spent bar, 10 unspent bar, 11 head rim);
+///   forbidden hatch, 5 leak cross, 6 bloom body, 7 leaf or stem, 8 lantern, 9 spent bar, 10 unspent bar, 11 head rim,
+///   12 drag-preview outline);
 ///   shade 1 everywhere except on a shadow feather band, whose shade is the shadow cover (1 at the shadow's edge … 0 at
 ///   the band's outer edge; every shadow quad has cover 1).
 /// - ``glowMesh(_:tier:)`` — glow program: `a_normal` the colour (sRGB 0 … 1: bloom glow, or lantern); `a_uv` (glow
@@ -78,7 +125,7 @@ public struct NocturneGardenColouredMesh: Sendable, Equatable {
 /// ``lightDirection``; on the glow the stream colour times the weight.
 ///
 /// Every triangle is wound counter-clockwise seen from its front. Depth testing is off, so the garden mesh is in
-/// painter's order: ground, mist, hatch, shadow, feather, rim, crosses, the blooms (each stem, leaves, back face, side
+/// painter's order: ground, mist, hatch, shadow, feather, rim, preview outline, crosses, the blooms (each stem, leaves, back face, side
 /// walls, front face, in canonical order), the lantern, the gauge.
 public enum NocturneGardenSceneGeometry {
     /// The material codes of the garden program (`a_uv.x`), shared with ``NocturneGardenShaders``.
@@ -107,6 +154,8 @@ public enum NocturneGardenSceneGeometry {
         static let unspentBar: Double = NocturneGardenShaders.unspentBarMaterial
         /// A head's side wall (the glowing rim).
         static let headRim: Double = NocturneGardenShaders.headRimMaterial
+        /// A bar of the drag preview's outline.
+        static let preview: Double = NocturneGardenShaders.previewMaterial
     }
 
     // MARK: Constants (world units unless stated)
@@ -127,6 +176,8 @@ public enum NocturneGardenSceneGeometry {
     public static let shadowZ = 0.002
     /// The z of the target rim, 0.003.
     public static let rimZ = 0.003
+    /// The z of the drag preview's outline, 0.0035 (above the target rim, below the leak crosses).
+    public static let previewZ = 0.0035
     /// The z of the leak crosses, 0.004.
     public static let crossZ = 0.004
     /// The z of a head's back face, 0.35.
@@ -310,7 +361,9 @@ public enum NocturneGardenSceneGeometry {
     /// x ±6, z −0.2 … 1); the mist quad over the bed (z = 0); the forbidden hatch (z = 0.001: one quad per cell, the
     /// program draws the stripes); one shadow quad per mask cell (z = 0.002) and, when `tier.feather` is positive, a
     /// feather band of that many cells outward along each shadow edge that borders a non-shadow bed cell (shade 1 … 0);
-    /// the gold rim along every target edge that borders a non-target cell or the bed's border (z = 0.003); after a
+    /// the gold rim along every target edge that borders a non-target cell or the bed's border (z = 0.003); the drag
+    /// preview's outline along every edge of a `snapshot.preview` cell that borders a non-preview cell or the bed's
+    /// border (z = 0.0035, preview material, shade 1, as wide as the rim; nothing when `preview` is empty); after a
     /// leak failure a cross on every leaking cell (z = 0.004); every bloom in canonical order (stem segments and leaf
     /// pairs at z = 0.37, the head's back face at z = 0.35, side walls, front face at z = 0.39); the lantern sphere;
     /// the gauge bars. `reduceMotion` changes nothing here: drift and sway are uniforms of the shaders.
@@ -366,6 +419,17 @@ public enum NocturneGardenSceneGeometry {
                 let along: SIMD3<Double> = unit(b - a) * half
                 try parts.polygon([a - along - out * half, b + along - out * half, b + along + out * half,
                                    a - along + out * half], normal: front, uv: Vec2(M.targetRim, 1))
+            }
+        }
+        // Preview outline.
+        let preview: Set<Int> = Set(snapshot.preview.filter { $0 >= 0 && $0 < count })
+        for cell in preview.sorted() {
+            for side in 0..<4 {
+                if let other = neighbour(cell, side: side, width: w, height: h), preview.contains(other) { continue }
+                let (a, b, out) = edge(cell, side: side, snapshot, z: previewZ)
+                let along: SIMD3<Double> = unit(b - a) * half
+                try parts.polygon([a - along - out * half, b + along - out * half, b + along + out * half,
+                                   a - along + out * half], normal: front, uv: Vec2(M.preview, 1))
             }
         }
         // Leak crosses.
@@ -500,13 +564,26 @@ public enum NocturneGardenSceneGeometry {
     /// bed's centre with +y up and a 45° vertical field of view. For aspects 0.4 … 2.5 the sphere projects inside the
     /// view with at least 5 % margin on every side. A zero, negative or non-finite aspect is treated as 1; others are
     /// clamped to 0.1 … 10. Depends only on the level (bed, sizes, sun's lantern height is inside the fit at every
-    /// elevation it is drawn), never on the tier or the time.
+    /// elevation it is drawn), never on the tier or the time. The camera of ``NocturneGardenOrbit/authored`` (see
+    /// ``camera(_:aspect:orbit:)``).
     public static func camera(_ snapshot: NocturneGardenSceneSnapshot, aspect: Double) -> NocturneGardenCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `snapshot`, `aspect` (width / height) and `orbit` (clamped, see
+    /// ``NocturneGardenOrbit/clamped()``): the eye on ``NocturneGardenOrbit/eyeDirection`` from the bed's centre at the
+    /// distance that fits ``boundingRadius(_:)`` (the fit does not depend on the direction, so the 5 % margin holds at
+    /// every orbit and aspect 0.4 … 2.5), looking at the bed's centre with +y up (never parallel to the view
+    /// direction: the pitch is at most 30°) and a 45° vertical field of view. Aspects are made usable as in
+    /// ``camera(_:aspect:)``; at ``NocturneGardenOrbit/authored`` the result equals ``camera(_:aspect:)`` bit for bit.
+    /// Presentation only; independent of the tier, the time and the play's progress.
+    public static func camera(_ snapshot: NocturneGardenSceneSnapshot, aspect: Double,
+                              orbit: NocturneGardenOrbit) -> NocturneGardenCamera {
         let a: Double = usableAspect(aspect)
         let radius: Double = boundingRadius(snapshot)
         let d: Double = distance(radius: radius, aspect: a)
         let target: SIMD3<Double> = bedCentre(snapshot)
-        let eye: SIMD3<Double> = target + eyeDirection * d
+        let eye: SIMD3<Double> = target + orbit.eyeDirection * d
         let near: Double = max((d - radius) * 0.5, 1e-3)
         let far: Double = d + radius + 2 * groundHalfWidth + 2
         let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: vec(target), up: Vec3(0, 1, 0))
@@ -745,7 +822,7 @@ public enum NocturneGardenSceneGeometry {
             switch material {
             case .shadow:
                 return NocturneGardenPalette.mist * (1 - shade) + NocturneGardenPalette.shadow * shade
-            case .ground, .mist, .targetRim, .forbiddenHatch, .leakCross, .spentBar, .unspentBar:
+            case .ground, .mist, .targetRim, .forbiddenHatch, .leakCross, .spentBar, .unspentBar, .preview:
                 return material.colour * shade
             case .bloomBody, .leafStem:
                 return NocturneGardenShaders.gardenShade(base: material.colour * shade, normalDotLight: n)
