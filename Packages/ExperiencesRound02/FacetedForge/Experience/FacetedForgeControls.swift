@@ -8,7 +8,10 @@
 // explanation with Undo and Retry, the goal and stars, Campaign / Daily / Practice and a picker of the open levels; all
 // as wrapping text in the panel, never over the crystal. Feature 376 (R02-G08-06) T-R02G0806-005 (FR-R02G0806-001,
 // 005, 006): the summary element ("Crystal"), adjustable piece, direction and depth pickers, the Sound toggle, rows
-// that become columns at accessibility text sizes and a 520-point readable width.
+// that become columns at accessibility text sizes and a 520-point readable width. Feature 377 (R02-G08-07)
+// T-R02G0807-005 (clarifications Q2, Q4, Q5): "Replay best solution" for a level with a verified stored solution, and
+// during replay its position ("Replay: cut k of n") with Step and Stop, each with a label and a value; the Sound toggle
+// saves the choice through `settings.sound`.
 #if os(iOS)
 import FacetedForgeCore
 import SwiftUI
@@ -37,6 +40,7 @@ struct FacetedForgeControls: View {
                 choiceRow
                 playRow
                 progressRows
+                replaySection
                 soundToggle
             }
             .padding()
@@ -56,9 +60,34 @@ struct FacetedForgeControls: View {
         }
     }
 
-    /// The Sound toggle (feature 376; off by default; presentation only).
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 377).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text(Self.replayPositionText(mirror)).font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next cut of the replay")
+                    .accessibilityValue("Cut \(mirror.replayPosition) of \(mirror.replayLength)")
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue("\(mirror.replayLength) cuts")
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
+        }
+    }
+
+    /// The replay position line: "Replay: cut k of n" (feature 377).
+    static func replayPositionText(_ mirror: FacetedForgeMirror) -> String {
+        "Replay: cut \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// The Sound toggle (feature 376; off by default; saved through `settings.sound` since feature 377).
     @ViewBuilder private var soundToggle: some View {
-        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
@@ -171,12 +200,13 @@ struct FacetedForgeControls: View {
         return "Level \(level), band \(band)"
     }
 
-    /// The mode's name: campaign, daily or practice.
+    /// The mode's name: campaign, daily, practice or replay.
     static func modeName(_ mode: FacetedForgeMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 
