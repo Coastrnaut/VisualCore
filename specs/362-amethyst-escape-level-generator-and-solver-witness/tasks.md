@@ -48,7 +48,7 @@ logic); no GLSL in this feature.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G0702-005 [P] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeWitness.swift`
+- [X] T-R02G0702-005 [P] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeWitness.swift` — Verified 2026-11-22: host-4 exit=0 (AmethystEscapeWitnessTests 15/15: round trip, every edited part refused by name, counterexamples replay)
   (schema 1; built by replaying the solution's actions on an `AmethystEscapePlay`: the 16-hex state digest after every
   move, fingerprints after begin and each action; smallest and depths; unedited (advances alone: outcome and move) and
   near-miss (the witness minus its last action: not escaped) counterexamples; difficulty; skipped; sorted-key pretty JSON
