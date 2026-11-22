@@ -55,7 +55,8 @@ bloom) are presentation state.
   of the arrangement with the moved bloom (the kernel's own cell computation, `NocturneGardenMask.union`), its match
   and its leak are shown as the preview (a pale dashed outline of the would-be cells and a line "would match 12/16,
   leak 0 cells"); on release one `bloom.move` to the target (nothing when the target is the bloom's own anchor) or,
-  when the finger's ray meets z = 0 outside the bed, one `bloom.remove`. A vertical drag on the lantern changes the
+  when the finger's ray meets z = 0 outside the bed, one `bloom.remove` (while the finger is outside the bed the
+  preview is the arrangement without the bloom, "would remove: match 9/16, leak 0 cells"). A vertical drag on the lantern changes the
   elevation by one step per 48 points (down: lower sun, larger elevation), to the nearest of the level's allowed
   elevations, and on release sends one `sun.set` when it differs. Impact: FR-R02G0904-001 … 003; SC-R02G0904-001,
   003.
