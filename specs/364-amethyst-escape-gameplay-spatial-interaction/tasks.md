@@ -51,7 +51,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Stories 3 and 4 and wiring — isolation, orbit, reset, presenter
 
-- [ ] T-R02G0704-006 [US3] [US4] Wire `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapePresenter.swift` (`pointer(_:viewSize:port:)` routing
+- [X] T-R02G0704-006 [US3] [US4] Wire `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapePresenter.swift` (`pointer(_:viewSize:port:)` routing — Verified 2026-11-22: 2026-11-22: sim-27 (AmethystEscapeExperienceTests, 37 tests on iOS 27.2 incl. 7 gesture wiring tests: ring drag turns twice with preview, pearl tap advances, shell tap picks, double-tap isolation, orbit keeps the digest, finished-play message, refusal log) exit 0
   through the gesture controller, `select` setting the mirror's picked shell, `isolate`, `showAllLayers()` (also on
   `level.next`), `resetView()`, the descriptions "Shell k would turn n sectors clockwise" / "anticlockwise" / "would
   not turn" and, for a gesture on a finished play, "The play is over: undo or go to the next level"; a gesture's refused

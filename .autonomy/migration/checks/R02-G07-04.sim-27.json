@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "AmethystEscapeExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing AmethystEscapeExperienceTests",
+  "elapsed_seconds": 8.771,
+  "exit_code": 0,
+  "finished": "2026-11-22T08:58:41+00:00",
+  "gate": "R02-G07-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G07-04.sim-27.log",
+  "log_sha256": "9ed9705778675d2ac0e2da7c8b393df730acb2a82248b74e1276e23a30c6d72e",
+  "name": "sim-27",
+  "started": "2026-11-22T08:58:32+00:00",
+  "timed_out": false
+}

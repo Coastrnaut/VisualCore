@@ -5,6 +5,15 @@
 // warning releases the GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing
 // result reaches the kernel (renderer purity). Its probes (two backdrop corners) let the verification runner check a
 // frame.
+// Feature 364 (R02-G07-04) T-R02G0704-006 (FR-R02G0704-001 … 008; clarifications Q1–Q5): canvas touches go through
+// `AmethystEscapeGestureController`: a shell dragged round the centre sends one `shell.rotate [k, ±1]` per whole sector
+// swept (the shortest way round), a tap on the pearl sends `pearl.advance`, a tap on a shell picks it in the panel, a
+// double tap on a shell isolates it (the other shells darken; again to clear; "Show all layers" and `level.next` clear
+// it), two fingers orbit the camera and a double tap on empty space or `resetView()` ("Reset view") returns to the
+// authored view (presentation only: never in the digest, the snapshot or the kernel). While a shell is dragged the scene
+// draws the turn it would make and the description begins "Shell k would turn n sectors clockwise"; a gesture on a
+// finished play says "The play is over: undo or go to the next level". A refused action is shown in the panel and its
+// code kept in ``AmethystEscapePresenter/refusalLog``.
 #if os(iOS)
 import AmethystEscapeCore
 import Foundation
@@ -13,6 +22,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show: the latest state the presenter described.
 @MainActor
@@ -72,8 +82,14 @@ final class AmethystEscapePresenter: ExperiencePresenter {
     let scene = AmethystEscapeCrystalScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G0703-004).
     private(set) var tierLog: [AmethystEscapeTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot of the kernel drawn (tests, the description and the gestures; never a preview).
     private(set) var lastSnapshot: AmethystEscapeSceneSnapshot?
+    /// The gesture controller (feature 364): shell drags, pearl taps, selection, isolation, orbit.
+    private(set) var gestures = AmethystEscapeGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -106,7 +122,103 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
-        try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
+        scene.orbit = gestures.orbit
+        scene.isolated = gestures.isolated
+        try scene.render(previewed(snapshot), tier: drawn, context: context, frame: frame, animate: !reduceMotion)
+    }
+
+    /// `snapshot` with the turn of the shell being dragged, while a drag previews one; `snapshot` otherwise.
+    func previewed(_ snapshot: AmethystEscapeSceneSnapshot) -> AmethystEscapeSceneSnapshot {
+        guard gestures.state == .shellDrag, let shell = gestures.draggedShell, gestures.candidateSectors != 0 else {
+            return snapshot
+        }
+        return snapshot.previewing(shell: shell, sectors: gestures.candidateSectors)
+    }
+
+    // MARK: Touch controls (feature 364)
+
+    /// The canvas gestures send turns and advances.
+    var gestureActions: Set<String> { ["shell.rotate", "pearl.advance"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(AmethystEscapeExperienceCore.actionIDs) }
+
+    /// What a turn or advance gesture on a finished play shows.
+    static let finishedMessage = "The play is over: undo or go to the next level"
+
+    /// The touch-down of the current one-finger touch: its point and what it picked (for the finished-play message).
+    private var touchDown: (id: Int, point: Vec2, pick: AmethystEscapePick)?
+
+    /// Routes a canvas touch through the gesture controller and sends the actions it returns, in order; a drag on a
+    /// shell (at least ``AmethystEscapeGestureController/dragDistance`` points) or a touch on the pearl on a finished
+    /// play explains that the play is over (a shell tap still picks the shell).
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot else { return }
+        switch event.phase {
+        case .began:
+            let pick: AmethystEscapePick = AmethystEscapePicker.pick(
+                SIMD2(Double(event.location.x), Double(event.location.y)),
+                size: SIMD2(Double(viewSize.x), Double(viewSize.y)), snapshot: snapshot, orbit: gestures.orbit)
+            touchDown = touchDown == nil ? (event.id, event.location, pick) : nil   // a second finger: no message
+        case .cancelled:
+            touchDown = nil
+        default:
+            break
+        }
+        let actions: [AmethystEscapeGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
+        if event.phase == .ended, let down = touchDown, down.id == event.id {
+            touchDown = nil
+            let travel: Double = Double((event.location - down.point).length)
+            let moved: Bool = down.pick != .empty
+                && (down.pick == .pearl || travel >= AmethystEscapeGestureController.dragDistance)
+            if moved, actions.isEmpty, snapshot.stage != .playing { mirror.message = Self.finishedMessage }
+        }
+        for action in actions {
+            switch action {
+            case .turn(let shell, let step):
+                send("shell.rotate", [Double(shell), Double(step)], port: port)
+            case .advance:
+                send("pearl.advance", [], port: port)
+            case .select(let shell):
+                mirror.pickedShell = shell
+            case .isolate:
+                break   // the controller keeps the isolated shell; the next frame draws it
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+    }
+
+    /// Drops a touch in progress (the shell suspends the experience): a gesture under way is abandoned without an
+    /// action; the orbit is presentation only and returns to the authored view.
+    func cancelPointers() {
+        gestures.cancel()
+    }
+
+    /// Returns the camera to the authored view ("Reset view").
+    func resetView() {
+        gestures.resetView()
+    }
+
+    /// Brings every shell back ("Show all layers").
+    func showAllLayers() {
+        gestures.clearIsolation()
+    }
+
+    /// Sends `control` with `values`, shows a refusal in the panel and keeps its code in ``refusalLog``; an accepted
+    /// `level.next` clears the isolation.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+            if control == "level.next" { gestures.clearIsolation() }
+        } else {
+            mirror.message = "That change was refused: \(result.code)"
+            refusalLog.append(result.code)
+            if refusalLog.count > Self.refusalLogLimit { refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit) }
+        }
+        return result
     }
 
     func teardown(_ context: RenderContext) {
@@ -141,7 +253,19 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         let pearl = snapshot.escaped ? "outside the crystal"
             : "in \(level.shellName(snapshot.pearl.shell)), \(level.sectorName(snapshot.pearl.sector))"
         mirror.pearlLabel = "The pearl is " + pearl
-        var text = "Amethyst Escape level \(core.levelNumber). "
+        var text = ""
+        if gestures.state == .shellDrag, let shell = gestures.draggedShell, level.shells.indices.contains(shell) {
+            let n: Int = gestures.candidateSectors
+            let name: String = level.shellName(shell)
+            let sectors: String = abs(n) == 1 ? "1 sector" : "\(abs(n)) sectors"
+            text += n == 0 ? name.prefix(1).uppercased() + name.dropFirst() + " would not turn. "
+                : name.prefix(1).uppercased() + name.dropFirst()
+                    + " would turn \(sectors) \(n > 0 ? "clockwise" : "anticlockwise"). "
+        }
+        if let isolated = gestures.isolated, level.shells.indices.contains(isolated) {
+            text += "Showing \(level.shellName(isolated)) alone. "
+        }
+        text += "Amethyst Escape level \(core.levelNumber). "
         text += "\(snapshot.moves) of \(snapshot.budget) moves spent. The pearl is \(pearl). "
         text += "The exit gap is at \(level.sectorName(snapshot.exitGap)). "
         for index in level.shells.indices {
@@ -170,7 +294,7 @@ final class AmethystEscapePresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(AmethystEscapeControls(port: port, mirror: mirror))
+        AnyView(AmethystEscapeControls(port: port, mirror: mirror, presenter: self))
     }
 }
 #endif

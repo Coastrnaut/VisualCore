@@ -10,6 +10,10 @@
 // `AmethystEscapeShaders.glowLimit(reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls back to the
 // level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason;
 // nothing here can reach the kernel.
+// Feature 364 (R02-G07-04) T-R02G0704-006 (FR-R02G0704-003, 005, 006): the camera follows the gesture controller's
+// orbit (`AmethystEscapeSceneGeometry.camera(_:aspect:orbit:)`), the snapshot drawn may be a drag preview (the presenter
+// passes it), and an isolated shell leaves every other shell at shade 0.25 (`crystalMesh(_:tier:isolated:)`, also in
+// the fallback).
 #if os(iOS)
 import AmethystEscapeCore
 import Foundation
@@ -28,6 +32,10 @@ final class AmethystEscapeCrystalScene {
     var reducedFlash = false
     /// The light direction of the crystal (towards the light, from the upper left front).
     static let lightDirection = SIMD3<Float>(-0.4, 0.8, 0.45)
+    /// The camera orbit (presentation only), set by the presenter before each frame.
+    var orbit: AmethystEscapeOrbit = .authored
+    /// The isolated shell (presentation only), set by the presenter before each frame.
+    var isolated: Int?
 
     /// What the geometry depends on: everything of the snapshot that the meshes read, the tier and the mode.
     private struct GeometryKey: Equatable {
@@ -37,6 +45,7 @@ final class AmethystEscapeCrystalScene {
         let stage: AmethystEscapeStage
         let failure: AmethystEscapeFailure?
         let moves: Int
+        let isolated: Int?
         let tier: Int
         let fallback: Bool
     }
@@ -84,10 +93,10 @@ final class AmethystEscapeCrystalScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = AmethystEscapeSceneGeometry.camera(snapshot, aspect: aspect)
-        let key = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
+        let camera = AmethystEscapeSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
+        let key = Self.key(snapshot, tier: tier, isolated: isolated, fallback: fallbackReason != nil)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
-        geometryKey = Self.key(snapshot, tier: tier, fallback: fallbackReason != nil)
+        geometryKey = Self.key(snapshot, tier: tier, isolated: isolated, fallback: fallbackReason != nil)
         if fallbackReason != nil {
             try drawFallback(camera)
             return
@@ -101,9 +110,10 @@ final class AmethystEscapeCrystalScene {
     }
 
     /// The geometry key of `snapshot` at `tier` in the given mode.
-    private static func key(_ s: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier, fallback: Bool) -> GeometryKey {
+    private static func key(_ s: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier, isolated: Int?,
+                            fallback: Bool) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, offsets: s.shells.map(\.offset), pearl: s.pearl, stage: s.stage,
-                    failure: s.failure, moves: s.moves, tier: tier.index, fallback: fallback)
+                    failure: s.failure, moves: s.moves, isolated: isolated, tier: tier.index, fallback: fallback)
     }
 
     private func rebuild(_ snapshot: AmethystEscapeSceneSnapshot, tier: AmethystEscapeTier) throws {
@@ -113,7 +123,7 @@ final class AmethystEscapeCrystalScene {
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let crystal = try AmethystEscapeSceneGeometry.crystalMesh(snapshot, tier: tier)
+                let crystal = try AmethystEscapeSceneGeometry.crystalMesh(snapshot, tier: tier, isolated: isolated)
                 crystalRenderer = try Self.renderer(crystal, vertex: AmethystEscapeShaders.crystalVertex,
                                                     fragment: crystalFragment, name: "amethyst-escape-crystal",
                                                     registry: registry)
@@ -133,7 +143,8 @@ final class AmethystEscapeCrystalScene {
         let minimal = AmethystEscapeTier.of(AmethystEscapeTier.all.count - 1)
         let up = Vec3(0, 1, 0)
         let parts: [(part: AmethystEscapeColouredMesh, colourInNormals: Bool)] = [
-            (part: try AmethystEscapeSceneGeometry.crystalPart(snapshot, tier: minimal), colourInNormals: false),
+            (part: try AmethystEscapeSceneGeometry.crystalPart(snapshot, tier: minimal, isolated: isolated),
+             colourInNormals: false),
             (part: try AmethystEscapeSceneGeometry.glowPart(snapshot, tier: minimal), colourInNormals: true),
         ]
         for entry in parts where !entry.part.mesh.indices.isEmpty {
