@@ -148,6 +148,10 @@ final class AmethystEscapePresenter: ExperiencePresenter {
 
     /// The touch-down of the current one-finger touch: its point and what it picked (for the finished-play message).
     private var touchDown: (id: Int, point: Vec2, pick: AmethystEscapePick)?
+    /// The fingers down now (T-R02G0704-014).
+    private var fingersDown: Set<Int> = []
+    /// Whether more than one finger has been down since the last time none was: such a gesture shows no message.
+    private var multiTouch = false
 
     /// Routes a canvas touch through the gesture controller and sends the actions it returns, in order; a drag on a
     /// shell (at least ``AmethystEscapeGestureController/dragDistance`` points) or a touch on the pearl on a finished
@@ -156,22 +160,32 @@ final class AmethystEscapePresenter: ExperiencePresenter {
         guard let snapshot = lastSnapshot else { return }
         switch event.phase {
         case .began:
-            let pick: AmethystEscapePick = AmethystEscapePicker.pick(
-                SIMD2(Double(event.location.x), Double(event.location.y)),
-                size: SIMD2(Double(viewSize.x), Double(viewSize.y)), snapshot: snapshot, orbit: gestures.orbit)
-            touchDown = touchDown == nil ? (event.id, event.location, pick) : nil   // a second finger: no message
+            fingersDown.insert(event.id)
+            if fingersDown.count == 1, !multiTouch {
+                let pick: AmethystEscapePick = AmethystEscapePicker.pick(
+                    SIMD2(event.location.x, event.location.y), size: SIMD2(viewSize.x, viewSize.y),
+                    snapshot: snapshot, orbit: gestures.orbit)
+                touchDown = (event.id, event.location, pick)
+            } else {
+                multiTouch = true   // a second (or later) finger: this gesture shows no message
+                touchDown = nil
+            }
         case .cancelled:
             touchDown = nil
         default:
             break
         }
         let actions: [AmethystEscapeGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
-        if event.phase == .ended, let down = touchDown, down.id == event.id {
+        if event.phase == .ended, let down = touchDown, down.id == event.id, !multiTouch {
             touchDown = nil
-            let travel: Double = Double((event.location - down.point).length)
+            let travel: Double = (event.location - down.point).length
             let moved: Bool = down.pick != .empty
                 && (down.pick == .pearl || travel >= AmethystEscapeGestureController.dragDistance)
             if moved, actions.isEmpty, snapshot.stage != .playing { mirror.message = Self.finishedMessage }
+        }
+        if event.phase == .ended || event.phase == .cancelled {
+            fingersDown.remove(event.id)
+            if fingersDown.isEmpty { multiTouch = false }
         }
         for action in actions {
             switch action {

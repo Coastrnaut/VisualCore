@@ -497,5 +497,37 @@ enum AmethystEscapeGestureScript {
         #expect(try AmethystEscapeTest.digest(shell) == digest)
         #expect(try AmethystEscapeTest.core(shell).play.fingerprint == before.play.fingerprint)
     }
+
+    /// T-R02G0704-014: on a finished play, two fingers down, then a third that drags over a shell and lifts first,
+    /// show no message (a multi-finger gesture is never a shell drag).
+    @Test func aThirdFingerOnAFinishedPlayShowsNoMessage() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await Script.open(session)
+        let budget: Int = try AmethystEscapeTest.core(shell).play.level.budget
+        for turn in 0..<budget {
+            #expect(shell.handle(control: "shell.rotate", values: [0, turn % 2 == 0 ? 1 : -1]) == .accepted)
+        }
+        try #require(try AmethystEscapeTest.core(shell).play.stage != .playing, "the budget is spent")
+        try AmethystEscapeTest.draw(session)
+        let target: AmethystEscapeDragTarget =
+            try #require(try Script.dragTarget(shell), "a shell ring visible at the authored orbit")
+        let first: Vec2 = try #require(target.path.first)
+        let last: Vec2 = try #require(target.path.last)
+        let sentBefore: Script.Sent = Script.sent(shell)
+        var time: Double = 0
+        // Fingers 1 and 2 go down away from the drag; finger 3 then drags over the shell and lifts first.
+        let rest1 = Vec2(first.x + 40, first.y)
+        let rest2 = Vec2(first.x, first.y + 30)
+        Script.touch(shell, id: 1, .began, at: rest1, time: &time)
+        Script.touch(shell, id: 2, .began, at: rest2, time: &time)
+        Script.touch(shell, id: 3, .began, at: first, time: &time)
+        for point in target.path.dropFirst() { Script.touch(shell, id: 3, .moved, at: point, time: &time) }
+        Script.touch(shell, id: 3, .ended, at: last, time: &time)
+        Script.touch(shell, id: 1, .ended, at: rest1, time: &time)
+        Script.touch(shell, id: 2, .ended, at: rest2, time: &time)
+        #expect(Script.sent(shell) == sentBefore, "a multi-finger gesture on a finished play sends nothing")
+        #expect(shell.presenter.mirror.message == nil, "\(shell.presenter.mirror.message ?? "")")
+    }
 }
 #endif

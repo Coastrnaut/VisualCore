@@ -83,7 +83,7 @@ presenter, scene, controls, docs) stay with the lead. MVP: Stories 1, 2 and 5.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G0704-014 Keep multi-finger gestures silent per the second-finger edge case and FR-R02G0704-008 (partial): in
+- [X] T-R02G0704-014 Keep multi-finger gestures silent per the second-finger edge case and FR-R02G0704-008 (partial): in — Verified 2026-11-22: 2026-11-22: sim-27-2 (38 tests incl. aThirdFingerOnAFinishedPlayShowsNoMessage) exit 0
   `Packages/ExperiencesRound02/AmethystEscape/Experience/AmethystEscapePresenter.swift` count the fingers down and keep
   the touch-down record only while exactly one finger has been down since the last time none was, so a third finger
   never re-arms the finished-play message; cover it in
