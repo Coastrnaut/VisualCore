@@ -31,10 +31,10 @@ tests stay short (< 10 s each). No {owner} tasks.
   uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match); agent A; `--name host-2`
 - [ ] T-R02G0703-004 [P] [US1] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSceneGeometry.swift`
   (shell k annulus from 0.2 + k·w to 0.2 + (k + 1)·w, w = 0.8 / n; wedge of sector s at world sector (s + offset) mod S,
-  angles measured from +x towards −z; bevelled prisms of height h_k = 0.08 + 0.06·(n − 1 − k), inset 0.04·w, the tier's
+  angles measured from +x towards +z (clockwise from above, as the kernel's +1); bevelled prisms of height h_k = 0.08 + 0.06·(n − 1 − k), inset 0.04·w, the tier's
   bevel segments; apertures as gaps in the rim band; platinum wall fins thickness 0.03·w, height h_k + 0.02 on the
-  wedge's leading edge; blocked wedges dark with a raised cross; a failed pocket's wedge tinted amber; pearl sphere radius
-  0.3·w at the pocket centre, y = h_k + 0.3·w, or on the exit arrow's centre once won; exit arrow at radius
+  boundary between own sectors i and i + 1 for wall i; blocked wedges dark with a raised cross; a failed pocket's wedge tinted amber; pearl sphere radius
+  0.3·w at the pocket centre, y = h_k + 0.3·w, or on the exit arrow's centre once won; exit arrow over world sector (exit gap + outer offset) mod S at radius
   r_(n−1) + w + 0.06 pointing outward; a platinum move bar along the near edge (z = 1.02, from x = −0.8, length 1.6 ·
   moves / budget); backdrop plane y = 0; camera from +z pitched 50° fitted to the bounding sphere of radius 1.1 with a 5 %
   margin for aspect 0.4 … 2.5; `project`) with

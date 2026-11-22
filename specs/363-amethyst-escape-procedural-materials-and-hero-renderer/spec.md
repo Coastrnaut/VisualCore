@@ -50,13 +50,15 @@ analytic faceting".
 - Q: What exactly does the scene show, and how does it map the rules to space? → A: the crystal lies in the xz-plane,
   y up, centred at the origin. With n shells and S sectors, shell k (0 innermost) is the annulus from radius
   r_k = 0.2 + k·w to r_k + w, w = 0.8 / n; sector s of shell k covers the angles 2π·(s + o_k)/S … 2π·(s + o_k + 1)/S
-  measured from +x towards −z, o_k being the shell's offset, so the world sector of a wedge is (s + o_k) mod S. Each
+  measured from +x towards +z (clockwise seen from above, matching the kernel's "+1 clockwise"), o_k being the shell's offset, so the world sector of a wedge is (s + o_k) mod S. Each
   wedge is a bevelled prism (height h_k = 0.08 + 0.06·(n − 1 − k), so inner shells stand taller like a cathedral)
   inset by 0.04·w on each side; an aperture is an opening in the shell's outer wall drawn as a gap in its rim band;
-  a radial wall is a platinum fin (thickness 0.03·w, height h_k + 0.02) on the wedge's leading edge; a blocked wedge is
+  a radial wall of own index i is a platinum fin (thickness 0.03·w, height h_k + 0.02) on the boundary between own sectors
+  i and i + 1, where it stops the pearl; a blocked wedge is
   dark and opaque with a raised cross mark on its top. The pearl is a sphere of radius 0.3·w at its pocket's centre
-  (radius r_k + w/2, angle at the sector's middle), centre y = h_k + 0.3·w. The exit gap of the outer shell carries a
-  platinum arrow mark pointing outward at radius r_(n−1) + w + 0.06. The backdrop is a dark plane at y = 0. The camera is
+  (the kernel's pocket sector is already absolute: radius r_k + w/2, angle at the sector's middle), centre y = h_k + 0.3·w. The exit gap of the outer shell (world sector (exit gap + o_(n−1)) mod S) carries a
+  platinum arrow mark pointing outward at radius r_(n−1) + w + 0.06. The backdrop is a dark plane at y = 0. The move counter mark is a platinum bar along the near edge (z = 1.02,
+  from x = −0.8, length 1.6 · moves / budget). The camera is
   a fixed authored perspective looking at the origin from the front (+z), pitched 50° down, fitted to the bounding sphere
   of radius 1.1 (the crystal plus the arrow) with a 5 % margin for aspect 0.4 … 2.5. Facet highlights move with
   presentation time only. Nothing drawn is consulted by the rules. Impact: FR-R02G0703-001, 002, 006.
@@ -75,7 +77,7 @@ analytic faceting".
   Impact: FR-R02G0703-006; SC-R02G0703-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
   `AmethystEscapeSceneSnapshot` (sectors, every shell's apertures, walls, blocked wedges and offset, the pearl pocket,
-  the exit gap, stage, failure, moves spent, budget, level number and presentation time) made by the adapter; it never
+  the exit gap's world sector, stage, failure, moves spent, budget, level number and presentation time) made by the adapter; it never
   holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the shared
   unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion holds the
   facet highlights at time 0; Reduce Flashing caps the glow gain. A failure in a blocked wedge tints that wedge amber

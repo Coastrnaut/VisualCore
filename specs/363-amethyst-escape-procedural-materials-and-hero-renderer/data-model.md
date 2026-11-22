@@ -2,7 +2,7 @@
 
 | Entity | Fields | Rules |
 |---|---|---|
-| `AmethystEscapeSceneSnapshot` | sectors, shells (apertures, walls, blocked, offset), pearl pocket, exit gap, stage, failure, moves, budget, levelNumber, time | immutable; built from the adapter; finite values |
+| `AmethystEscapeSceneSnapshot` | sectors, shells (apertures, walls, blocked, offset), pearl pocket (absolute sector), exit gap (world sector), stage, failure, moves, budget, levelNumber, time | immutable; built from the adapter; finite values |
 | `AmethystEscapePalette` | backdrop #0A0614, amethyst #8E4FD8, highlight #E3CCFF, platinum #D6DCE6, blocked #1E1426, pearl #F6F2FF, exit #B8F0FF, amber #FFB020 | linear colours in 0 … 1 |
 | `AmethystEscapeTier` | level-0: 3 bevel segments, 3 highlight layers, 2 glow shells; level-1: 2, 2, 1; level-2: 1, 1, 0 | richest first; logged with reason on change |
 | `AmethystEscapeExperienceCore` | level number, play | digest = level number + play fingerprint; snapshot schema 1 `{level, records}` |
