@@ -322,3 +322,10 @@ reference `ChronoConstellatorSceneGeometry`, the GLSL sources `ChronoConstellato
 `ChronoConstellatorScenarios` (`scenario-manifest.json`; `UPDATE_SCENARIO_MANIFEST=1` rewrites it); the iOS-only target
 `ChronoConstellatorExperience` (presenter, GL sky scene with fallback, control panel) and its simulator tests. A
 registered candidate until X-R02-G06.
+
+Feature 354 (R02-G06-04) adds touch controls: in the Core the constrained `ChronoConstellatorOrbit` with
+`ChronoConstellatorSceneGeometry.camera(_:aspect:orbit:)` and `candidatePart(_:_:)`, the analytic `ChronoConstellatorPicker`
+(`ChronoConstellatorPick`) and `ChronoConstellatorGestureController` (`ChronoConstellatorGestureAction`: star drags,
+timeline scrubs, hold presses, star taps, orbit, double-tap reset); in the experience the presenter's pointer entry, the
+candidate ring and "Reset view"; host tests with an independent pick, all 100 levels won through the panel, and
+simulator wiring tests.

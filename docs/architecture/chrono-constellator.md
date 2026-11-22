@@ -106,3 +106,24 @@ lengths 1 … 32 that the play accepts, each release, then a single step of the 
 - **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest 6483b20e…6ffc) and linked into the one
   app; it stays unavailable until X-R02-G06. Its scenario manifest has the standard scenarios, `full-playthrough`,
   `hero`, three fixtures and the 80 acceptance rows R2-G06-QA-001 … 080 (row r opens level (7 × (r − 1)) mod 100 + 1).
+
+## Touch controls (feature 354, R02-G06-04)
+
+- **Orbit.** `ChronoConstellatorOrbit` (yaw ±40°, pitch 30° … 75°, authored 0° and 55°) and
+  `ChronoConstellatorSceneGeometry.camera(_:aspect:orbit:)`: the distance is refitted so the sky stays inside the view
+  with a 5 % margin at every orbit and aspect 0.4 … 2.5. Two fingers orbit (90° of yaw per view width, 60° of pitch per
+  view height); a double tap on empty space or "Reset view" returns to the authored view. The orbit is presentation
+  only: never in the digest, the snapshot or the kernel, and not saved.
+- **Picking.** `ChronoConstellatorPicker` casts the touch ray through the drawn camera against the star node spheres
+  (nearest hit), then the field plane: a hit within 0.25·u of the near edge is the timeline band (its x fraction), any
+  other hit a cell; otherwise the nearest projected star within 22 points. `loopIndex` finds a star's loop cell under
+  the finger or within 22 points; `tick` maps the plane hit's x fraction to round(tickLimit × fraction).
+- **Gestures.** `ChronoConstellatorGestureController` (host-tested, event timestamps only): a star dragged at least 16
+  points at tick 0 sends one `star.phase` to the loop index under the finger; a touch in the timeline band (or within
+  22 points of the tick bar) scrubs: `time.step` forward, or `time.rewind` then `time.step` back (a won play scrubs
+  nothing); a long press (0.5 s within 10 points) on a star at tick 0 toggles its standard hold (`star.hold [s, 1, 10]`
+  or `star.release [s, 1]`); a tap on a star picks it in the panel. A second finger or a cancelled touch sends nothing.
+  While a star is dragged its candidate cell gets a silver ring drawn with the field program and the description names
+  it; a star gesture after tick 0 says that edits are made at tick 0. Refused actions are shown and their codes kept.
+- **Panel.** Every gesture has a panel equivalent (star picker, phase − and +, holds, steps, run, rewind, undo, redo,
+  next level, Reset view); a host test wins all 100 certified levels through panel actions alone.

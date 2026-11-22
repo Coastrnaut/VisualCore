@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-21 (R02-G06-03: a stream contract between the shader and geometry agents relayed while both still ran).
+Last updated: 2026-11-21 (R02-G06-04: no `try` inside an `&&` operand in simulator tests).
 
 ## 1. What is tested, and where
 
@@ -203,6 +203,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   chose uv = (age in ticks, glow) so the glow program computes the ribbon fade itself, where the data model said
   (alpha, glow); the lead forwarded the contract to the geometry agent before it finished and corrected the data model,
   so the two halves met without a rework round.
+- **No `try` inside `&&`** (R02-G06-04, 2026-11-21). An agent's simulator test wrote
+  `while a && (try f()) > 0`; `&&` takes an autoclosure, so the iOS build failed with "operator can throw but expression
+  is not marked with 'try'" (the host build never compiles `#if os(iOS)` tests). Evaluate the throwing call into a local
+  first; compile agents' simulator files once before the test run.
 - **Compare picks with an independent ray test** (R02-G05-04, 2026-11-21). Colorfall Canyons's picker and gesture tests
   compute the expected cell or spring in the test with their own plane and box intersections (only the ray is shared)
   over seeded points, sizes and orbits, and each was shown to fail by changing one threshold; a panel test wins all 100
