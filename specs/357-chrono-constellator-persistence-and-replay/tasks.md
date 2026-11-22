@@ -12,7 +12,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G0607-002 [P] [US2] Edit `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorProgress.swift` (Result gains "trace:
+- [X] T-R02G0607-002 [P] [US2] Edit `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorProgress.swift` (Result gains "trace: — Verified 2026-11-22: 2026-11-22: host (ReconciliationTests + ProgressTests, 19 tests: all 100 certified witnesses verify as traces; 9 tampered saves dropped and counted; untraced kept; frontier as saved; netTrace over undo/redo) exit 0, lead retest; FeedbackPlan.modeName gained the replay case
   [ChronoConstellatorAction]" and "verified: Bool"; `record(level:edits:smallest:mode:trace:)` stores a verified result,
   replacing only when better (ties keep the earlier trace); `drop(level:)`; encoding keeps old payloads decodable
   (missing trace = empty, missing verified = false); mode "replay(level:)" that awards no stars and opens nothing) and
