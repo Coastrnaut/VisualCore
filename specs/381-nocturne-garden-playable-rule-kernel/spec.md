@@ -78,8 +78,8 @@ elevation".
   record (schema, level seed, move index, kind, operands, previous and next fingerprints); the play fingerprint is the
   SHA-256 of the schema, the level fingerprint, the blooms in canonical order, the sun elevation, the moves spent, the
   stage and the failure; levels are JSON schema 1 with sorted keys (bed size, target and forbidden cells as sorted
-  row-major indices, supply, size and elevation ranges, budget, required match as a fraction, leak allowance, opening sun
-  elevation, tutorial flag, seed, id) and a fingerprint, re-checked on decode; reason codes `r02-g09.level`, `.action`,
+  row-major indices, supply, size and elevation ranges, budget, required match as a fraction, leak allowance, opening
+  sun elevation, tutorial flag, seed, id) and a fingerprint, re-checked on decode; reason codes `r02-g09.level`, `.action`,
   `.supply`, `.noop`, `.stage`, `.stale`, `.newer-schema`, `.malformed`. Impact: FR-R02G0901-006 … 011;
   SC-R02G0901-002, 005.
 
