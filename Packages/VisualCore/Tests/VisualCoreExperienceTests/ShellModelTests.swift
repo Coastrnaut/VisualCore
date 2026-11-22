@@ -277,7 +277,8 @@ import Testing
                          "r02-g03.wave-knot-keeper",
                          "r02-g04.hue-compass",
                          "r02-g05.colorfall-canyons",
-                         "r02-g06.chrono-constellator"])
+                         "r02-g06.chrono-constellator",
+                         "r02-g07.amethyst-escape"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

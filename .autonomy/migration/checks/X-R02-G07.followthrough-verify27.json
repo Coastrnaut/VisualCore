@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g07.amethyst-escape",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g07.amethyst-escape --runtime 27",
+  "elapsed_seconds": 235.323,
+  "exit_code": 0,
+  "finished": "2026-11-22T12:13:12+00:00",
+  "gate": "X-R02-G07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G07.followthrough-verify27.log",
+  "log_sha256": "e5054b9a9158e02cddff2aeb5aac58e47d3bf159309c32aece649fb7799f3633",
+  "name": "followthrough-verify27",
+  "started": "2026-11-22T12:09:17+00:00",
+  "timed_out": false
+}

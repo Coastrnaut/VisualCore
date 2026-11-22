@@ -1153,7 +1153,7 @@
         "catalog_sha256": "e65c452967b32b37446b6bff95faa9e7c728931d9af0457b3ddd5bc0772394e6",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g08.faceted-forge",

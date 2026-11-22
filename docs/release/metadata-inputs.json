@@ -261,9 +261,17 @@
       "name": "Chrono Constellator",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G07",
+      "id": "r02-g07.amethyst-escape",
+      "name": "Amethyst Escape",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "1686e6605d9dae6eefca26b14636e3de6eb4ad779bc9078c679c62305ea8fcfd",
+  "ledger_sha256": "7db179d09b4b5a65b97f6942c1a857439311f152aad4358c4e1bd73b761c17e2",
   "privacy_answers": "unproven",
   "schema": 1
 }
