@@ -102,7 +102,8 @@ private func played(_ level: FacetedForgeLevel, _ actions: [FacetedForgeAction])
         }
         #expect(ProgressionRule.standard.breach(difficulties) == nil)
         for band in 1..<5 {
-            #expect(sumSmallest[band] >= sumSmallest[band - 1], "mean smallest falls at band \(band + 1): \(sumSmallest)")
+            #expect(sumSmallest[band] >= sumSmallest[band - 1],
+                    "mean smallest falls at band \(band + 1): \(sumSmallest)")
         }
     }
 
@@ -141,7 +142,8 @@ private func played(_ level: FacetedForgeLevel, _ actions: [FacetedForgeAction])
         #expect(total == .one)
         guard witness.actions.count == 2 else { return }
         for direction in FacetedForgeDirection.all.indices {
-            for depth in FacetedForgeHalfSpace.depths where level.crystal.isCrossed(direction: direction, depth: depth) {
+            for depth in FacetedForgeHalfSpace.depths
+            where level.crystal.isCrossed(direction: direction, depth: depth) {
                 let halves = try level.crystal.cut(direction: direction, depth: depth)
                 let pieces: [FacetedForgePiece] = [halves.below, halves.above]
                 #expect(!FacetedForgeSolver.matches(pieces, level.target, crystal: level.crystal.volume))

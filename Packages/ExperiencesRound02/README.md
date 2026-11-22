@@ -433,3 +433,8 @@ play state `FacetedForgePlay` with `FacetedForgeAction`, `FacetedForgeStage`, `F
 and append-only `FacetedForgeRecord`s, and `FacetedForgeRules` for the R02-F23 puzzle contract. Refusals are
 `FacetedForgeError` with `r02-g08.*` codes. Rules:
 [docs/architecture/faceted-forge.md](../../docs/architecture/faceted-forge.md).
+
+Feature 372 (R02-G08-02) adds the content pipeline: `FacetedForgeManifest` (100 planned levels), the band profiles and
+seeded `FacetedForgeGenerator`, `FacetedForgeSolver` (a winning sequence of exactly target pieces − 1 cuts, the lower
+bound, found with partition pruning and counted work), `FacetedForgeDifficulty`, `FacetedForgeWitness` with the 100
+witness files in `docs/games/faceted-forge/levels/` and the pinned catalog digest.

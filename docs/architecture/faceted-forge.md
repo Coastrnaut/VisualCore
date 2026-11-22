@@ -53,3 +53,22 @@ Levels are JSON schema 1 with sorted keys and their fingerprint; decoding re-che
 refuses damaged, edited and newer forms (`r02-g08.malformed`, `.newer-schema`). `FacetedForgeRules` expresses the game
 as an R02-F23 `PuzzleRules`: while playing, the moves are every non-degenerate cut — pieces in canonical order,
 directions 0 … 12, depths ascending.
+
+## Content pipeline (feature 372, R02-G08-02)
+
+- **Manifest.** `FacetedForgeManifest` holds the 100 planned levels of the archived design (number, planned seed, band
+  1 … 5, move budget 8 … 19). The kernel's ranges were widened additively for it: budget 1 … 20, target faces 4 … 34.
+- **Generator.** Candidate k of a level draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: k))`:
+  the band's crystal (a cube, a box, a cube with one corner cut, an octahedron, a cube with two opposite corners cut),
+  the number of cuts (band b: b + 1 … b + 2), then each cut's piece, direction (bands 1 … 2: axes and face diagonals;
+  bands 3 … 5: all 13) and a depth from the middle half of those that cross it. The target is the resulting multiset
+  of (share, face count); the sliver limit is 1/64. A candidate is kept when every share is at least 1/32, bands 3 … 5
+  drew a body diagonal and the solver certifies it; at most 256 candidates, then `r02-g08.generation`.
+- **Solver.** A target of P pieces needs at least P − 1 cuts (each cut adds one piece); `FacetedForgeSolver` finds a
+  sequence of exactly P − 1 cuts from the crystal alone, depth-first in the rules' order, keeping only cuts whose
+  pieces can still be partitioned into the target by exact shares (and face counts for single entries). Work is
+  counted in cut evaluations and bounded at 20,000. The whole catalog certifies in about 15 s on a debug host build.
+- **Witnesses.** `docs/games/faceted-forge/levels/NNN.witness.json` holds each level, its cuts, the state digest after
+  every cut, the play fingerprints, the smallest cut count with its lower bound, the near miss (one cut short, not won),
+  the difficulty and the candidates skipped; decoding re-verifies and refuses damaged, newer or edited files
+  (`r02-g08.witness`). The catalog digest is pinned in `FacetedForgeCatalogTests`.
