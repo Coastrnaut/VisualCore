@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Foundational — preview, orbit, picking and isolation
 
-- [ ] T-R02G0704-002 [P] Add `previewing(shell:sectors:)` to `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSceneSnapshot.swift` (the shell's
+- [X] T-R02G0704-002 [P] Add `previewing(shell:sectors:)` to `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeSceneSnapshot.swift` (the shell's — Verified 2026-11-22: 2026-11-22: host-2 (AmethystEscapePreviewTests, 2 tests: preview equals kernel turns on 6 levels, every shell, n in -S/2...S/2) exit 0
   offset turned by n sectors mod S, and the pearl's absolute sector with it when it rests in that shell; nothing else
   changes) with tests in `Packages/ExperiencesRound02/AmethystEscape/CoreTests/AmethystEscapePreviewTests.swift` (a preview equals the snapshot after n
   kernel turns of that shell for n in −⌊S/2⌋ … ⌊S/2⌋ on certified levels); lead; `--name host-2`

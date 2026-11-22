@@ -120,3 +120,41 @@ public struct AmethystEscapeSceneSnapshot: Sendable, Equatable {
         self.time = time.isFinite ? time : 0
     }
 }
+
+// Feature 364 (R02-G07-04) T-R02G0704-002 (FR-R02G0704-006; clarification Q5): the drag preview.
+extension AmethystEscapeSceneSnapshot {
+    /// A copy of this snapshot with shell `shell`'s offset turned by `sectors` (positive: clockwise from above, the
+    /// kernel's +1) modulo the sector count, the pearl's absolute sector turned with it when it rests in that shell,
+    /// and the exit gap's world sector following the outer shell; everything else unchanged. An unknown shell gives
+    /// the snapshot unchanged. Presentation only: the kernel never sees a preview.
+    public func previewing(shell: Int, sectors turn: Int) -> AmethystEscapeSceneSnapshot {
+        guard shells.indices.contains(shell), sectors > 0 else { return self }
+        let step: Int = ((turn % sectors) + sectors) % sectors
+        guard step != 0 else { return self }
+        var turned: [Shell] = shells
+        let old: Shell = shells[shell]
+        turned[shell] = Shell(apertures: old.apertures, walls: old.walls, blocked: old.blocked,
+                              offset: (old.offset + step) % sectors)
+        let pearl: AmethystEscapePocket = self.pearl.shell == shell
+            ? AmethystEscapePocket(shell: shell, sector: (self.pearl.sector + step) % sectors) : self.pearl
+        let exit: Int = shell == shells.count - 1 ? (exitGap + step) % sectors : exitGap
+        return AmethystEscapeSceneSnapshot(sectors: sectors, shells: turned, pearl: pearl, exitGap: exit, stage: stage,
+                                           failure: failure, moves: moves, budget: budget, levelNumber: levelNumber,
+                                           time: time)
+    }
+
+    /// Every field given (the preview's copy).
+    private init(sectors: Int, shells: [Shell], pearl: AmethystEscapePocket, exitGap: Int, stage: AmethystEscapeStage,
+                 failure: AmethystEscapeFailure?, moves: Int, budget: Int, levelNumber: Int, time: Double) {
+        self.sectors = sectors
+        self.shells = shells
+        self.pearl = pearl
+        self.exitGap = exitGap
+        self.stage = stage
+        self.failure = failure
+        self.moves = moves
+        self.budget = budget
+        self.levelNumber = levelNumber
+        self.time = time
+    }
+}
