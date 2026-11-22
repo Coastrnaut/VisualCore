@@ -154,7 +154,8 @@ simulator parts and reports one summary.
 ### Functional Requirements
 
 - **FR-R02G0708-001**: The regression MUST replay every certified level's witness to a win in exactly its recorded
-  actions and MUST re-solve every level, requiring the certified shortest escape length and the same work count.
+  actions and MUST re-solve every level, requiring the certified shortest escape, the same depths
+  and work within the state count.
 - **FR-R02G0708-002**: An altered level, solution or witness MUST make the regression fail, naming the level and the
   differing part.
 - **FR-R02G0708-003**: A golden set of frames (levels, tiers, frame times, including the hero frame) MUST have a
