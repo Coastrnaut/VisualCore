@@ -33,7 +33,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Stories 1 to 3 — plant, drag with preview, pinch, sun (P1) 🎯
 
-- [ ] T-R02G0904-004 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenDragPreview.swift` (the would-be mask with the
+- [X] T-R02G0904-004 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenDragPreview.swift` (the would-be mask with the — Verified 2026-11-22: host-3 exit=0 (NocturneGardenGestureControllerTests 7: 500 seeded scripts over 3 sizes and 3 orbits against an independent expectation with every preview equal to the kernel's mask, 10-16 points send nothing, second fingers, cancels and finished plays send nothing, double tap resets, orbit clamps and re-bases, previews and orbit never change the digest; agent C's files retested by the lead)
   bloom moved to (column, row) or removed, computed with `NocturneGardenMask.union` on a copy of the blooms; shared,
   either and leak; text "would match 12/16, leak 0 cells" or "would remove: match …") and
   `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenGestureController.swift` (states idle, bedPress, bloomPress, bloomDrag, lanternDrag, pinch,
