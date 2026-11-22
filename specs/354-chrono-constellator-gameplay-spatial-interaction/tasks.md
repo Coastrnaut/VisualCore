@@ -70,7 +70,7 @@ program).
 - [X] T-R02G0604-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-21: 2026-11-21: reference-2 exit 0
 - [X] T-R02G0604-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-21: 2026-11-21: script-tests (run alone) exit 0
 - [ ] T-R02G0604-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G0604-007)
-- [ ] T-R02G0604-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G0604-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-21: 2026-11-21: converge round 2 clean; sealed (18 passing) and recorded pass
 
 ## Dependencies and parallel work
 
