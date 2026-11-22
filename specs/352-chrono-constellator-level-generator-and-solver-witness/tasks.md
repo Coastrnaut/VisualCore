@@ -32,8 +32,9 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
   unblocked window is the solution, nil when every window is blocked; windows, blocked and work counted) and, after it,
   agent A's `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorSolverTests.swift` (seed 2_352:
   hand-built levels needing 1, 2 and 3 edits; a level won unedited gives nil; a level with every window blocked gives nil;
-  on seeded small levels an independent brute force over every timeline of fewer than m* edits (phase changes and holds
-  of starts 1 … T, lengths 1 … L) finds no win and one of m* edits wins; the solution replays to a win through the play;
+  on seeded small levels an independent brute force over every phase-only timeline of at most m* edits, replayed to the
+  tick limit, finds no win below m* and one at m*; on band 1–2 sized levels (m* ≤ 2) the brute force also adds every single
+  hold of starts 1 … 32 and lengths 1 … 32 (the lower-bound argument of clarification Q2 covers holds on every level); the solution replays to a win through the play;
   determinism); `--name host-2`
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
@@ -61,7 +62,8 @@ the reference every run uses). Fixture seed 2_352; tests stay short (< 10 s each
 - [ ] T-R02G0602-006 [US2] [US3] [US4] Create
   `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorCatalogTests.swift` (100 entries, 20 per
   band; the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest count;
-  band means never fall; on levels 1, 11, 21, … 91 the solver equals the brute force (SC-R02G0602-002); all 100 witnesses
+  band means never fall; on levels 1, 11, 21, … 91 the solver equals the phase-only brute force, with holds added on the band 1–2 samples
+  (SC-R02G0602-002); all 100 witnesses
   replay to a win; each witness equals `docs/games/chrono-constellator/levels/NNN.witness.json` byte for byte, one test per
   band, written only with `CHRONO_CONSTELLATOR_WRITE_WITNESSES=1`) and generate the 100 files; `--name host-5`
 
