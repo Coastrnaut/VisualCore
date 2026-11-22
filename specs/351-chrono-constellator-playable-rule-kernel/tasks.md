@@ -51,7 +51,8 @@ in this feature (the closed-form positions are the CPU reference the renderer of
 
 - [ ] T-R02G0601-005 [P] [US4] Create `Packages/ExperiencesRound02/ChronoConstellator/Core/ChronoConstellatorRules.swift`
   (agent C: `PuzzleRules`: State = position (timeline, tick, outcome), Move = ChronoConstellatorAction; legal moves at tick
-  0 phase(i, o) for each star and offset in order, holds on a bounded grid of starts and lengths, then step(tick limit))
+  0 phase(i, o) for each star and offset ≠ current in order, then hold(i, s, k) for each star, "start 1 … 32 and length 1 … 32"
+  in that order skipping refused ones, then release(i, s) for each hold, then step(tick limit); after tick 0 only rewind)
   with `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorRulesTests.swift` (agreement with the play
   on 200 walks); `--name host-4`
 - [ ] T-R02G0601-006 [P] Create `Packages/ExperiencesRound02/ChronoConstellator/CoreTests/ChronoConstellatorInvariantTests.swift`

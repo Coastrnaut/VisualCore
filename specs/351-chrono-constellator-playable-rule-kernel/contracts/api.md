@@ -41,6 +41,7 @@ public struct ChronoConstellatorPlay: Sendable, Equatable {
     public static func replay(level: ChronoConstellatorLevel, records: [ChronoConstellatorRecord]) throws(ChronoConstellatorError) -> ChronoConstellatorPlay
 }
 public struct ChronoConstellatorRules: PuzzleRules { /* State = Position (timeline, tick, outcome), Move = ChronoConstellatorAction;
-    moves at tick 0: phase(i, o) for each star and offset in order, hold(i, s, k) on a bounded grid of starts and lengths,
-    then step(tick limit) */ }
+    moves at tick 0: phase(i, o) for each star i and offset o ≠ current in order, then hold(i, s, k) for each star i, start
+    s 1 … 32 and length k 1 … 32 in that order (skipping those the play refuses), then release(i, s) for each hold, then
+    step(tick limit); after tick 0 only rewind */ }
 ```
