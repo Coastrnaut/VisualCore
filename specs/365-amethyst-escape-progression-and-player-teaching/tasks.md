@@ -25,7 +25,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks (no device-only beh
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G0705-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeProgress.swift` (`AmethystEscapeTutorialStep` turn →
+- [X] T-R02G0705-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/AmethystEscape/Core/AmethystEscapeProgress.swift` (`AmethystEscapeTutorialStep` turn → — Verified 2026-11-22: 2026-11-22: host-3 (ProgressTests, 9 tests: tutorial on levels 1-3, stars and frontier over 100 levels, daily for 4,018 dates, impossible dates, Codable) exit 0, lead retest
   advance → escape → done with the texts of clarification Q2; `AmethystEscapeProgress` "3 when at most the certified
   smallest move count, 2 when at most that + 2, else 1", frontier, best moves; `dailyLevel(year:month:day:)` "(days
   from 2026-01-01 × 61) mod 100 + 1, negative day counts wrapped", nil for an impossible date; `AmethystEscapeMode`
