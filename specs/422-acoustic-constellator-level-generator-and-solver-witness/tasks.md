@@ -15,7 +15,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1302-002 Add `generation(Int)` ("r02-g13.generation") and `witness(String)` ("r02-g13.witness") to
+- [X] T-R02G1302-002 Add `generation(Int)` ("r02-g13.generation") and `witness(String)` ("r02-g13.witness") to — Verified 2026-11-23: host (AcousticConstellatorContentSmokeTests + LevelTests 17 tests: manifest of 100 entries, 20 per band, budgets 8...19, reason codes r02-g13.generation and r02-g13.witness, the first two entries of each band generate in range and win) exit 0, lead retest
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorError.swift`; create
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorManifest.swift` (the 100 entries "number
   1 … 100, planned seed, band 1 … 5, budget 8 … 19" copied from `python3 scripts/planning_index.py levels --experience
