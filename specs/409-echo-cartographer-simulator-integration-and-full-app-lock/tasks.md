@@ -14,7 +14,7 @@ change (the shaders and reference of R02-G11-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1109-002 Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSchemaExamples.swift`
+- [X] T-R02G1109-002 Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSchemaExamples.swift` — Verified 2026-11-23: host exit 0 (round-two host suite incl. EchoCartographerSchemaExampleTests 7: both examples at seed 7 step 0 restore through the migrations to schema 3 with level 1 and its pulse or its unverified won result kept, digests match, the registry check reports no problems, other versions nil, deterministic; the examples join the invariant scan's presentation sources; the registration stores both examples and its comment is corrected; agent A's tests retested by the lead)
   (contracts/api.md; data-model: schema 1 "a seeded play of level 1 with one pulse that does not win, seed 7";
   schema 2 "campaign mode, progress {frontier 2, solved [level 1, energy spent, stars]}, tutorial", "the result is kept,
   unverified, without a trace"; the envelope of `BackwardsAuroraSchemaExamples`, feature 399) with

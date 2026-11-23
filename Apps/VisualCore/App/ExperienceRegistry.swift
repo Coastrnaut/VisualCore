@@ -127,11 +127,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [echoCartographer].compactMap { $0 }
 
-    /// R02-G11 Echo Cartographer (feature 403, R02-G11-03): a candidate until X-R02-G11. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G11 Echo Cartographer (feature 403, R02-G11-03): a candidate until X-R02-G11. Snapshot schema 3 (feature 407),
+    /// so the schema-1 and schema-2 examples are stored (feature 409, R02-G11-09).
     fileprivate static var echoCartographer: ExperienceRegistration? {
         guard let id = EchoCartographerExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: EchoCartographerExperienceCore.self) { launch in
+        let examples = [EchoCartographerExperienceCore.schemaOneExample(),
+                        EchoCartographerExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: EchoCartographerExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return EchoCartographerExperience.make(
                 id: id, storage: launch.storage,
