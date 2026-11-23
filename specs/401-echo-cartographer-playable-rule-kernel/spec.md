@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G11-01 (migration ledger, game feature of experience R02-G11) · ID namespace FR-R02G1101-###,
 SC-R02G1101-###, T-R02G1101-###
@@ -30,6 +30,59 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract, so
   R02-G11-02 can certify levels).
 - **Model:** feature 391 (Backwards Aurora's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+391's answers where the games agree. Facts checked in code (read-only, 2026-11-23): `Packages/ExperiencesRound02` holds
+Aurora Loom … Backwards Aurora as the pattern (Core with level, play, records with previous and next fingerprints, rules
+as R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.*` reason codes); no `EchoCartographer*` name exists; the
+catalog sets the timestep at 0.008333 s, the content at 90 stages and the controls "tap to emit pulse; triangulate via
+dragging markers; rotate 3D camera".
+
+- Q: What are the chamber, its cells and the beacons, exactly? → A: a chamber is a grid of W × H cells, W and H in
+  5 … 16, cell (x, y) with x in 0 … W − 1 and y in 0 … H − 1; every cell is open or a wall (a wall is a whole unit
+  square, the static convex segment the echoes strike); the chamber's border is a wall too. The entry is an open cell.
+  There are 1 … 4 beacons, each on a distinct open cell other than the entry, all reachable from the entry through
+  open cells by steps to the four side neighbours. The claim tolerance is 0 … 2 cells (the larger of the column and row
+  differences), the energy budget 1 … 60 and the miss cost 1 … 3. At the start the player knows only that the entry is
+  open; every other cell is unknown. Impact: FR-R02G1101-001, 013; SC-R02G1101-001.
+- Q: What does a pulse reveal and report, and how are distances and delays measured? → A: a pulse from a cell known to
+  be open costs 1 energy and sends four rays in the fixed order north (−y), east (+x), south (+y), west (−x). A ray
+  steps cell by cell; every open cell it enters becomes known open; the first wall cell it enters becomes known wall (at
+  the border nothing more is revealed). Its travel distance is the number of steps to the struck wall or border (1 when
+  the neighbour is a wall). Each beacon echoes with its path length: the fewest side steps through open cells from the
+  emitter to the beacon (0 when the emitter is on it), found by breadth-first search; the echoes are reported as a
+  sorted list without naming the beacon. Every delay is the round trip at 12 ticks per cell each way: 24 × distance
+  ticks of 0.008333 s; delays never decide a rule. Impact: FR-R02G1101-002, 003, 014; SC-R02G1101-003.
+- Q: Which actions exist, what does each cost, and when is one refused? → A: `pulse(x, y)` (1 energy), `claim(x, y)`
+  (free on a hit, the miss cost on a miss, never more than the energy left) and `mark(x, y)` (toggles a free marker the
+  player uses to triangulate; at most 8 markers; markers never decide anything). Refused without change: a cell outside
+  the chamber, a pulse from a cell not known open, a claim on a known wall, a ninth marker (`r02-g11.action`); a claim
+  whose cell is within the tolerance only of beacons already located (`r02-g11.noop`); a wrong stage (`r02-g11.stage`)
+  or a stale fingerprint (`r02-g11.stale`). A claim locates the not-yet-located beacon within the tolerance that is
+  nearest (then lowest row, then lowest column); otherwise it is a miss. Undo and redo spend nothing; a new action
+  clears the redo stack. The life of a level is loading → tutorial (when the level has one) → playing ⇄ paused → won or
+  failed → result, entered by `begin`, `dismissTutorial`, `pause`, `resume` and `showResult`. Impact: FR-R02G1101-002,
+  004, 006, 008, 011.
+- Q: In which order are win and energy decided, and from which stages can the player go back? → A: after an accepted
+  action: win first (every beacon located: won, even with no energy left), then energy (energy zero with a beacon still
+  hidden: failed, naming the action). Undo and redo restore the exact earlier state, including the energy and what was
+  revealed. Undo works in playing and paused; from failed, undo returns to playing (an honest retry, recorded); a won
+  level is final and refuses undo. The truth metric is reported after every action: each located beacon's localization
+  error (the column-or-row distance between the claim and the beacon, an exact integer) and their total, beside the
+  echo report of the last pulse; it never decides the outcome. Impact: FR-R02G1101-004, 005, 007, 008, 014;
+  SC-R02G1101-002, 004.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G10-01: every accepted action appends a
+  record (schema, level seed, action index, kind, cell, previous and next fingerprints); the play fingerprint is the
+  SHA-256 of the schema, the level fingerprint, the knowledge, the markers, the located beacons with their claims, the
+  energy, the stage and the failure; levels are JSON schema 1 with sorted keys (width, height, walls as sorted cell
+  indices y·W + x, entry, beacons as sorted cell indices, tolerance, energy, miss cost, tutorial flag, seed, id) and a
+  fingerprint, re-checked on decode; a level with a beacon on a wall, on the entry or unreachable, duplicate cells, or
+  values out of range is refused; reason codes `r02-g11.level`, `.action`, `.noop`, `.stage`, `.stale`,
+  `.newer-schema`, `.malformed`. Impact: FR-R02G1101-006 … 011; SC-R02G1101-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -77,6 +130,7 @@ refused.
 - **A pulse from a spot not known to be open:** refused without cost.
 - **A claim on a known wall, outside the chamber, or where a beacon was already claimed:** refused without cost.
 - **A claim exactly at the tolerance:** counts; one cell further is a miss.
+- **A pulse that spends the last energy:** fails the level unless every beacon is already located (it cannot be).
 - **Win on the last energy:** a claim that locates the last beacon wins even with no energy left.
 - **A level already solved at load:** never generated; every level hides at least one beacon.
 - **Actions after the end:** every action is refused once the level is won or failed, except undo.

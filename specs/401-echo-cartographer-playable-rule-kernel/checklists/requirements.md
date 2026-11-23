@@ -32,4 +32,4 @@
 ## Notes
 
 - Validated 2026-11-23 by the lead; every item passes. The chamber and beacons, the pulse and echo rules, the actions
-  and energy, the order of decisions and the stored form are left to `/speckit-clarify`.
+  and energy, the order of decisions and the stored form are settled by `/speckit-clarify`.
