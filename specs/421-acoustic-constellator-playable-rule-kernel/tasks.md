@@ -86,7 +86,7 @@ will consume).
   `--name host-full`
 - [ ] T-R02G1301-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1301-010 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02G1301-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1301-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: script-tests (alone) exit 0
 - [ ] T-R02G1301-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
 
