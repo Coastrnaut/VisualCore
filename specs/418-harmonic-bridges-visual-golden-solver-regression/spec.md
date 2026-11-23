@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G12-08 (migration ledger, game feature of experience R02-G12) · ID namespace FR-R02G1208-###,
 SC-R02G1208-###, T-R02G1208-###
@@ -22,6 +22,64 @@ Canonical overrides:
   "content count 82" milestone figure. **Device-only items:** frame time and memory on D1/D2/D3 after
   ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 408 (Harmonic Bridges's visual golden and solver regression).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+408's answers where the games agree. Facts checked in code (read-only audit, 2026-11-23): `HarmonicBridgesSolver.plan`
+certifies a level by the minimal set of retuned strings (k = 1 … 6, at most 400,000 choices, `workBound`), returning the
+tunings, `smallerChoices` (every choice of fewer tunings, none winning) and `work`; the 100 witness files in
+`docs/games/harmonic-bridges/levels/` hold the number, the level, the actions (the plan's tunings then the test), the
+per-action fingerprints, the per-step bridge digests, the counterexample (`choices` = `smallerChoices`, `size`), the
+difficulty and the skipped candidate count, and are byte-checked by `HarmonicBridgesCatalogTests` with the catalog
+digest pinned there; the simulator frame checks of feature 413 compare rendered frames with the CPU reference (island
+tops 0.1 from the ground in luminance with red above blue, membrane check points 0.08 from the ground with blue above
+red, the gauge's first bar 0.1 from the ground, the ground within 0.05, each point at least 6 px from other elements) at
+1,152 × 768; `HarmonicBridgesBridgeScene.release()` frees every renderer, the next draw rebuilds them and
+`liveObjectCount` counts them; the CI job `round02-host-tests` runs all round-two host tests and has a named regression
+step per earlier round-two game (Echo Cartographer's the latest); `scripts/xcodebuild_package.py` runs simulator tests
+with `--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win in exactly its action count, within the budget, with exactly its per-action fingerprints and per-step
+  bridge digests; and `plan` returns exactly the witness's tunings with exactly its `smallerChoices` (the
+  counterexample's `choices`) and size; `work` is at most `workBound` (counted, never timed). The run is split into
+  tests of 10 levels so each stays short. Impact: FR-R02G1208-001; SC-R02G1208-001.
+- Q: Which alterations must the regression detect and how is each named? → A: eleven kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: an island's position, a string's length, a string's
+  starting peg, a string's lock, a step's tone, the threshold, the budget; a plan tuning; a witness action, a
+  per-action fingerprint; the smaller-choices count. Impact: FR-R02G1208-002; SC-R02G1208-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after the witness's tunings and before its test, so bridges,
+  filled marks, pips and a partly spent gauge show, at presentation time 0 (the step shown is step 0) and the authored
+  camera, plus the hero frame of the scenario manifest's hero scenario at tier 0: 16 frames) the Core computes, at
+  1,152 × 768, the projected pixel positions of every island top, every string midpoint, every membrane check point of
+  the shown step's bridges, every step pip and the gauge's first bar, rounded to 1/8 pixel, the counts of islands,
+  strings, bridges in the shown step, filled and hollow marks, pips and lit and total gauge bars, and the expected
+  colours as 8-bit sRGB (ground, island face, island edge, string, membrane, filled mark, hollow mark, start, goal, pip,
+  unlit pip, lit gauge, unlit gauge); serialized as JSON with sorted keys and hashed with SHA-256. The 16 descriptions
+  and their digests live in `Packages/ExperiencesRound02/HarmonicBridges/golden-frames.json`; the host test recomputes
+  each: an equal digest passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and
+  every count and colour must be equal, or the test fails naming the frame and the first differing value; each pinned
+  digest must also equal the digest of its pinned description. The file is rewritten only when
+  `HARMONIC_BRIDGES_WRITE_GOLDEN=1` is set. The simulator test renders the 16 frames and checks them against the same
+  descriptions with the feature-413 tolerances. Impact: FR-R02G1208-003, 004; SC-R02G1208-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_HARMONIC_BRIDGES_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU
+  objects of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a
+  named reason. Impact: FR-R02G1208-005; SC-R02G1208-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's `round02-host-tests` job keeps running all
+  round-two host tests and adds a named step "Harmonic Bridges regression (host)" that runs the Harmonic Bridges
+  regression filter alone. The local command `python3 scripts/harmonic_bridges_regression.py` runs the host regression
+  filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`, and prints one
+  summary line per part with pass or fail and the first failing name; its exit code is non-zero on any failure. Nothing
+  is timed against the wall clock. Impact: FR-R02G1208-006, 007; SC-R02G1208-005.
 
 ## User Scenarios & Testing *(mandatory)*
 

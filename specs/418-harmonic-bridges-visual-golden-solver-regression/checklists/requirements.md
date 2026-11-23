@@ -31,4 +31,4 @@
 
 ## Notes
 
-- The kinds of alteration, the golden set, tolerances, the memory bound and the CI step are left to `/speckit-clarify` (modelled on feature 408).
+- The kinds of alteration, the golden set, tolerances, the memory bound and the CI step were settled by `/speckit-clarify` (session 2026-11-23).
