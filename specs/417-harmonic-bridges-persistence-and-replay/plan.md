@@ -18,7 +18,8 @@ API: [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstar
 **Audit (2026-11-23)**: the adapter writes schema 2 with a 1 → 2 step; `HarmonicBridgesProgress.Result` holds
 `actionsSpent` (tuning and test records, undone ones included) and `stars`; the play's records carry tune, test,
 undo and redo; the shared `SavedStateStore` (VisualCorePersistence) writes atomically and refuses newer schemas;
-no new target is needed.
+no new target is needed. Prerequisite: R02-G12-06 (the feedback plan `HarmonicBridgesFeedbackPlan` and the presenter's
+sound choice) is recorded first, as the ledger's gate order requires.
 **Language/Version**: Swift 6. **Primary dependencies**: the Harmonic Bridges Core (play, records, progress,
 generator), VisualCoreExperience (`MigrationChain`, snapshots), VisualCorePersistence (the shared store). No new
 package, target, GLSL or VisualCore API; no Objective-C++.
