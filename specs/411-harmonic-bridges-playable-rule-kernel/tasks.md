@@ -31,7 +31,7 @@ consume).
 
 ## Phase 3: Story 1 — tune strings until a path of bridges forms (P1) 🎯
 
-- [ ] T-R02G1201-003 [P] [US1] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesResonanceTests.swift`
+- [X] T-R02G1201-003 [P] [US1] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesResonanceTests.swift` — Verified 2026-11-23: host-2 exit 0 (HarmonicBridgesResonanceTests 8: swing table from exact quarters; every (length, peg, frequency) mode against enumeration; 1,502 seeded cases of resonance, swing, bridge, reachability by relaxation and broken step and string against an independent reference; hand cases incl. strength 2, mode above 5, threshold boundaries); agent A's tests retested by the lead
   (agent A: the swing table equals 4 sin²(nπk/6) computed from exact quarter values; on 500 seeded levels and peg
   assignments, every resonance equals enumerating n in 1 … 5 with n · peg == F · length, every swing equals an
   independent sum, every bridge equals the threshold rule, every reachable set equals repeated relaxation to a fixed
