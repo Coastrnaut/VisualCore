@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G11-04 (migration ledger, game feature of experience R02-G11) · ID namespace FR-R02G1104-###,
 SC-R02G1104-###, T-R02G1104-###
@@ -26,6 +26,54 @@ Canonical overrides:
   renderer of R02-G11-01 … 03.
 - **Model:** feature 394 (Backwards Aurora's gameplay spatial interaction) for the gesture controller, picker, orbit and
   panel.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+394's answers where the games agree. Facts checked in code (read-only, 2026-11-23): Backwards Aurora's feature 394
+solved the same problem with a host-tested gesture controller in its Core taking `PointerEvent`s (id, phase
+began/moved/ended/cancelled, location in view points with the origin top-left, timestamp) with the view size, the drawn
+snapshot and orbit, an analytic picker and a clamped orbit; tap below 10 points and 0.5 s, drag from 16 points, double
+tap within 0.35 s and 22 points, orbit 90° per view width and 60° per view height; Echo Cartographer's camera
+(`EchoCartographerSceneGeometry.camera(_:aspect:)`) looks from above and in front at the box x −1 … 1, z −1 … 1.1,
+y 0 … 0.8; cell (x, y) is centred at X = (x + 0.5 − W / 2)·s, Z = (y + 0.5 − H / 2)·s on y = 0; the adapter accepts
+`cell.pulse`, `cell.claim`, `cell.mark` [x, y], `play.undo`, `play.redo` and `level.next`; the panel's cursor is
+presentation state.
+
+- Q: How is a touch picked? → A: at touch-down the touch ray through the drawn camera meets the floor plane y = 0 at
+  (X, Z). In this order: a marker (its ring centre projected within 22 points of the touch; the nearest first, ties to
+  the lower cell index), then the cell whose square contains (X, Z) inside the chamber; anything else is empty space. A
+  tap is a touch that moves less than 10 points and lifts within 0.5 s; a drag moves at least 16 points; 10 … 16 points
+  is neither. Impact: FR-R02G1104-001, 004; SC-R02G1104-001.
+- Q: What do taps do? → A: a tap on a cell known open sends `cell.pulse [x, y]` while playing; a tap on any other cell
+  of the chamber (unknown or known wall) moves the cursor there and sends nothing; a tap on a marker's cell counts as a
+  tap on that cell; a tap on empty space changes nothing, and two such taps within 0.35 s and 22 points reset the view.
+  Impact: FR-R02G1104-001, 005; SC-R02G1104-001.
+- Q: What do drags and held presses do? → A: a drag that starts on a marker moves it: on release over a cell of the
+  chamber other than its own that has no marker, it sends `cell.mark` on the old cell (removing it) and then
+  `cell.mark` on the new cell (adding it); over its own cell, a marked cell or empty space it sends nothing. A drag that
+  starts on a cell without a marker places one: on release over a cell of the chamber without a marker it sends
+  `cell.mark` there (the kernel refuses a ninth marker); otherwise nothing. A press held 0.5 s without moving 10 points
+  arms a claim; lifting it sends `cell.claim [x, y]` for the held cell while playing; moving 10 points after it armed
+  cancels it and nothing is sent. The cursor follows every placed, moved or claimed cell. Impact: FR-R02G1104-002, 003;
+  SC-R02G1104-001.
+- Q: How do two fingers behave, and what happens on a finished play? → A: a second finger cancels any one-finger
+  gesture (nothing sent) and orbits: yaw ±35° about the y axis (90° per view width), pitch −15° … +20° (60° per view
+  height) about the authored view; a third finger re-bases the midpoint; a double tap on empty space or "Reset view"
+  returns to the authored view. The camera distance refits so the authored box stays inside the view with a 5 % margin
+  at every orbit and aspect 0.4 … 2.5. Orbit is presentation only: not saved, so the snapshot schema stays 1. On a won,
+  failed or result stage taps, drags and held presses send nothing and the description says the play is over (undo or
+  next level); the cursor and orbit still work. A pulse, claim or mark the kernel refuses is refused by the adapter with
+  its reason code, which the presenter logs and shows. Impact: FR-R02G1104-005, 007; SC-R02G1104-002, 004.
+- Q: How is everything tested? → A: the Core gesture controller (`EchoCartographerGestureController`) with a picker
+  (`EchoCartographerPicker`) takes pointer events with the view size, the drawn snapshot, the orbit and the cursor and
+  returns the gesture actions (pulse, claim, mark, moveCursor, resetView) and the orbit; host tests feed 500 seeded taps,
+  drags and held presses on certified levels at several sizes and orbits and compare with an independent pick computed
+  in the test; simulator tests send the same touches through the experience's pointer entry; a host test wins all 100
+  certified levels through panel actions alone (cursor steppers, pulse, claim). Impact: FR-R02G1104-006, 007;
+  SC-R02G1104-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 

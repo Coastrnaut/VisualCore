@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Picking, gesture thresholds, the marker drags, the held claim, orbit and testing are left to
+- Picking, gesture thresholds, the marker drags, the held claim, orbit and testing are settled by
   `/speckit-clarify`.
