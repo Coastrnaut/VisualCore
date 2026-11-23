@@ -175,8 +175,7 @@ a pure function of the state it is made from; the loop plays only while wanted, 
   error → refused action, through the shared route and the person's switch; they never change state.
 - **FR-R02G1006-004**: Reduce Flashing MUST cap the glow and turn every brightness change of the aurora's glow, the won
   lift, the tear cross and the freeze preview into fades of at least 0.4 s, with every periodic motion below 3 cycles
-  per second; Reduce
-  Motion MUST hold the shimmer and the pulses still; neither changes the state or its digest.
+  per second; Reduce Motion MUST hold the shimmer and the pulses still; neither changes the state or its digest.
 - **FR-R02G1006-005**: The panel MUST support Dynamic Type up to the largest accessibility size and Increase Contrast on
   iPhone and iPad, scrolling instead of clipping.
 - **FR-R02G1006-006**: An optional ambient sound MUST be synthesized in code from the worst bend, the checkpoints
