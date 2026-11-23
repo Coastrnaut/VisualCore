@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "HarmonicBridgesExperienceCoreTests|HarmonicBridgesRendererPurityTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'HarmonicBridgesExperienceCoreTests|HarmonicBridgesRendererPurityTests'",
+  "elapsed_seconds": 9.912,
+  "exit_code": 0,
+  "finished": "2026-11-23T17:35:07+00:00",
+  "gate": "R02-G12-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G12-03.host-4.log",
+  "log_sha256": "fa99a97d650ef352c900f9353febf997999ec4b2986ef83e4abc5572642e6b0e",
+  "name": "host-4",
+  "started": "2026-11-23T17:34:57+00:00",
+  "timed_out": false
+}

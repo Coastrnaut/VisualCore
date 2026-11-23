@@ -52,7 +52,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   4 steps; every island top, membrane midpoint, gauge bar and pip inside the view with margin at 7 aspects; same
   positions at every tier; marks filled exactly where the kernel's swing reaches the threshold; gauge bars at 0, half and
   the budget; a won level's bridges and reached islands brighter and in place); agent B; `--name host-3`
-- [ ] T-R02G1203-005 [P] [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesExperienceCore.swift`
+- [X] T-R02G1203-005 [P] [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesExperienceCore.swift` — Verified 2026-11-23: host-4 exit 0 (HarmonicBridgesExperienceCoreTests 12 and HarmonicBridgesRendererPurityTests 2: conformance, seeds to levels, the candidate table equal to the 100 witnesses' skipped, every control and refusal code incl. not-whole, undo restores the digest, wins and failures, level changes, payload round trip and refusals; 200 seeded snapshots never change digest, state or verdict at any time or tier and their report equals the kernel's exact report); agent C's adapter retested by the lead
   (controls "string.tune [s, p], crossing.test, play.undo, play.redo, level.next"; digest "level number and play
   fingerprint"; schema 1 `{level, records}`; quality profile of three levels (the Core's `qualityTiers` equals the
   presenter's levels); each level certified directly from a table of its witness's `skipped` candidate, the whole
