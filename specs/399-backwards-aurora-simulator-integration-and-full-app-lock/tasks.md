@@ -63,7 +63,7 @@ change (the shaders and reference of R02-G10-03 are unchanged and re-proven by t
 - [X] T-R02G1009-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: rendering-27, rendering-26, experiences, host-full exit 0, 2026-11-23 (.autonomy/migration/checks/R02-G10-09.*.json)
   `--name host-full` (app-unit and app-ui are this gate's own runs)
 - [X] T-R02G1009-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-23: reference-1 exit 0, 2026-11-23 (.autonomy/migration/checks/R02-G10-09.reference-1.json)
-- [ ] T-R02G1009-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G1009-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-23: reference-2 exit 0, 2026-11-23 (.autonomy/migration/checks/R02-G10-09.reference-2.json)
 - [ ] T-R02G1009-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G1009-006; feature 400
   prepares them)
 - [ ] T-R02G1009-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
