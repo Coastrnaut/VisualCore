@@ -49,7 +49,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G1302-005 [P] [US4] Create
+- [X] T-R02G1302-005 [P] [US4] Create — Verified 2026-11-23: host-4 (AcousticConstellatorWitnessTests 15 tests: entries 1, 21, 41 through generate and make; byte-identical re-encoding; parts equal the solver's plan; digests and fingerprints equal an independent replay; counterexample (size, sets, reason missing/tried) consistent; every refusal named: actions, replay, digests, fingerprints, counterexample, level, candidate, difficulty, number, skipped, solution, newer schema, schema, unreadable) exit 0, lead retest
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorWitness.swift` (agent B: schema 1 sorted-key
   JSON; state digests "first 16 hex of SHA-256 of the links and phases" after each action; play fingerprints after begin
   (and dismissTutorial) and each action; counterexample (the size one below and the count of its sets tried);
