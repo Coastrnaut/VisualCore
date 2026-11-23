@@ -1,0 +1,196 @@
+{
+  "actions" : [
+    {
+      "link" : {
+        "_0" : 0,
+        "_1" : 5
+      }
+    },
+    {
+      "link" : {
+        "_0" : 1,
+        "_1" : 3
+      }
+    },
+    {
+      "link" : {
+        "_0" : 1,
+        "_1" : 5
+      }
+    },
+    {
+      "link" : {
+        "_0" : 4,
+        "_1" : 6
+      }
+    },
+    {
+      "nudge" : {
+        "_0" : 1,
+        "_1" : -1
+      }
+    },
+    {
+      "nudge" : {
+        "_0" : 1,
+        "_1" : -1
+      }
+    },
+    {
+      "listen" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "reason" : "tried",
+    "sets" : 28,
+    "size" : 5
+  },
+  "difficulty" : {
+    "actions" : 6,
+    "cycles" : 1,
+    "fixedLinks" : 3,
+    "hold" : 6,
+    "rateSpread" : 0,
+    "smallerSets" : 29,
+    "stars" : 7,
+    "symbolPairs" : 7,
+    "threshold" : 29,
+    "window" : 48,
+    "work" : 337
+  },
+  "digests" : [
+    "ce34e1ff90c8c3c5",
+    "366560746dd54f70",
+    "e2f88b815793ec83",
+    "585fb98f710bb63c",
+    "7a5a1cb00a6edef1",
+    "9e0daffaa5eef7c5",
+    "9e0daffaa5eef7c5"
+  ],
+  "fingerprints" : [
+    "f2ff0b50868a22cad26d376fe9750fd5d20785e49518a748d1643c0ba3969d23",
+    "738a324a963ea87479cc9aca25689f8a76102320ae7bb5ddb4db7cfa0f126d4a",
+    "0b88db1f81aa94dcb25b1984a6f0ea68a912b77fce370756fb7ec3c197608453",
+    "f443d3aa9372acac3fd74b7d5816c26442599e2371b4f51a0902cbd0bec7487f",
+    "3c7e0adf8c49ef86ddb131ff266ae7558dbe1863b7a8149d5cb3ad1869b51467",
+    "096b4ac9a9cbf3ca2ea26788b7f56601ad87bd86c71643a2531d4eb517e3a09e",
+    "01c92fbaba5f71a5e801095cd0bddd2e99d04bcc5afefd84db33cc900f439473",
+    "212436e779133f25e0fadb56977787d7fc411b36b0aed704b20b9c55e28594b9"
+  ],
+  "level" : {
+    "budget" : 18,
+    "coupling" : 8,
+    "degreeLimit" : 4,
+    "difficulty" : 5,
+    "fingerprint" : "7ad2188aa7ac757ef5b6b191b0ef9369d371fdab0c18de5fd9b7367c30507258",
+    "fixedLinks" : [
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        3,
+        6
+      ]
+    ],
+    "hold" : 6,
+    "id" : "acoustic-constellator-094",
+    "linkLimit" : 9,
+    "schema" : 1,
+    "seed" : 11752394205093806912,
+    "snapLimit" : 3,
+    "stars" : [
+      [
+        2,
+        3,
+        5,
+        2,
+        5
+      ],
+      [
+        8,
+        11,
+        7,
+        2,
+        1
+      ],
+      [
+        1,
+        7,
+        7,
+        2,
+        6
+      ],
+      [
+        10,
+        3,
+        7,
+        2,
+        11
+      ],
+      [
+        11,
+        7,
+        5,
+        2,
+        4
+      ],
+      [
+        4,
+        11,
+        5,
+        2,
+        8
+      ],
+      [
+        6,
+        1,
+        5,
+        2,
+        8
+      ]
+    ],
+    "symbol" : [
+      [
+        0,
+        5
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        3,
+        6
+      ],
+      [
+        4,
+        6
+      ]
+    ],
+    "threshold" : 29,
+    "tutorial" : false,
+    "window" : 48
+  },
+  "number" : 94,
+  "schema" : 1,
+  "skipped" : 5
+}

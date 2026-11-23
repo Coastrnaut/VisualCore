@@ -55,7 +55,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   (and dismissTutorial) and each action; counterexample (the size one below and the count of its sets tried);
   difficulty; skipped; decode refuses newer, damaged and non-replaying files) with
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G1302-006 [US2] [US3] [US4] Create
+- [X] T-R02G1302-006 [US2] [US3] [US4] Create — Verified 2026-11-23: host-5 (AcousticConstellatorCatalogTests 9 tests: 100 entries 20 per band, pinned digest 4c50d04a...7a12, progression rule and band means, every stored witness wins within its budget, brute force over every play action on two fewest-star levels in bands 1-3 and over the pruned options in bands 4-5 finds no smaller win, one full decode per band, 100 witness files byte for byte in 20 groups) exit 0, lead retest; files unchanged by the run
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorCatalogTests.swift` (lead: 100 entries,
   20 per band; every level generated, won by its witness within the budget, and no set of one action fewer wins; the
   brute force on two levels per band (all play actions in bands 1 … 3, the pruned options in bands 4 and 5); pinned digest; progression rule and band means; witness files byte for byte,

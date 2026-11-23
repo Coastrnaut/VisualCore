@@ -1,0 +1,123 @@
+{
+  "actions" : [
+    {
+      "link" : {
+        "_0" : 1,
+        "_1" : 3
+      }
+    },
+    {
+      "nudge" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "listen" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "reason" : "tried",
+    "sets" : 1,
+    "size" : 1
+  },
+  "difficulty" : {
+    "actions" : 2,
+    "cycles" : 0,
+    "fixedLinks" : 2,
+    "hold" : 4,
+    "rateSpread" : 1,
+    "smallerSets" : 1,
+    "stars" : 4,
+    "symbolPairs" : 3,
+    "threshold" : 9,
+    "window" : 24,
+    "work" : 9
+  },
+  "digests" : [
+    "9de9a8d073b83ad3",
+    "083dc0f9d7fb47d9",
+    "083dc0f9d7fb47d9"
+  ],
+  "fingerprints" : [
+    "5d517a621114986f274aac439b1a76caa75bc5811faec1c810e0abdb50e698d3",
+    "5a82bba6e649c5e5b802c7c396f7886e84a51062420cb4d968cde026cc41f9bd",
+    "5df5a5508d5faf62828546d64325ba56f1bba746360522a4ad3a4cd011d72968",
+    "899b72307b077a9955f1a47e7e7be0823ffee1042928ccee00c36f65d881cd73"
+  ],
+  "level" : {
+    "budget" : 11,
+    "coupling" : 2,
+    "degreeLimit" : 3,
+    "difficulty" : 2,
+    "fingerprint" : "6cee46e9791d621d1b13969e88342c9f5bdc41b14c99cab41c1d6615d588b9ad",
+    "fixedLinks" : [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "hold" : 4,
+    "id" : "acoustic-constellator-021",
+    "linkLimit" : 5,
+    "schema" : 1,
+    "seed" : 9983212699669521387,
+    "snapLimit" : 3,
+    "stars" : [
+      [
+        1,
+        6,
+        7,
+        9,
+        0
+      ],
+      [
+        11,
+        6,
+        7,
+        10,
+        2
+      ],
+      [
+        6,
+        11,
+        5,
+        10,
+        9
+      ],
+      [
+        6,
+        1,
+        5,
+        9,
+        5
+      ]
+    ],
+    "symbol" : [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "threshold" : 9,
+    "tutorial" : false,
+    "window" : 24
+  },
+  "number" : 21,
+  "schema" : 1,
+  "skipped" : 0
+}

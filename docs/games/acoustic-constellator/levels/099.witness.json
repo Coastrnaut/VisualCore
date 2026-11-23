@@ -1,0 +1,207 @@
+{
+  "actions" : [
+    {
+      "link" : {
+        "_0" : 0,
+        "_1" : 3
+      }
+    },
+    {
+      "link" : {
+        "_0" : 1,
+        "_1" : 4
+      }
+    },
+    {
+      "link" : {
+        "_0" : 2,
+        "_1" : 6
+      }
+    },
+    {
+      "link" : {
+        "_0" : 3,
+        "_1" : 5
+      }
+    },
+    {
+      "nudge" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "listen" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "reason" : "tried",
+    "sets" : 36,
+    "size" : 4
+  },
+  "difficulty" : {
+    "actions" : 5,
+    "cycles" : 1,
+    "fixedLinks" : 5,
+    "hold" : 5,
+    "rateSpread" : 1,
+    "smallerSets" : 37,
+    "stars" : 8,
+    "symbolPairs" : 8,
+    "threshold" : 38,
+    "window" : 48,
+    "work" : 125
+  },
+  "digests" : [
+    "6ca0b25b3e0d2474",
+    "93d50e4e250f747b",
+    "8e2724911104eaf9",
+    "162f18bb31e5b5fa",
+    "4db33e21406046d4",
+    "4db33e21406046d4"
+  ],
+  "fingerprints" : [
+    "5eb112eefd01eaa97b94fabd6f2750ec2899deea36a7991ad35e565897e18ec3",
+    "e91c947ec289b3c2129011463d180b5706561d5bb0562b822ab2b2c5959c2cae",
+    "c6dc762a6a6223ce76e9b7f1f062ec66aab28badbd44c365dfa351207869c100",
+    "a98781d2124be42e74b0f90c7f65dc88a2953ec08784ac24223157edcedc1cb2",
+    "bb64c8f8514318d391ad41936efdd43029eabe74137477e4df246d384eb44cf6",
+    "8028a14b69f0e077958d0a52990869992eb0e162789916aa1c0d31106dba38dc",
+    "27c1f1f27d644203bf333a336290a8376e8a885dfe749517c9e545776881b643"
+  ],
+  "level" : {
+    "budget" : 19,
+    "coupling" : 2,
+    "degreeLimit" : 4,
+    "difficulty" : 5,
+    "fingerprint" : "8804f41f7fff2d796428592e1f9f252337c8f78e53cefc3342ce59eab1baaadb",
+    "fixedLinks" : [
+      [
+        0,
+        6
+      ],
+      [
+        0,
+        7
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        5,
+        7
+      ]
+    ],
+    "hold" : 5,
+    "id" : "acoustic-constellator-099",
+    "linkLimit" : 10,
+    "schema" : 1,
+    "seed" : 18316388321191575268,
+    "snapLimit" : 4,
+    "stars" : [
+      [
+        11,
+        6,
+        5,
+        10,
+        2
+      ],
+      [
+        2,
+        10,
+        7,
+        10,
+        2
+      ],
+      [
+        6,
+        1,
+        5,
+        10,
+        7
+      ],
+      [
+        1,
+        6,
+        5,
+        10,
+        0
+      ],
+      [
+        6,
+        11,
+        5,
+        10,
+        4
+      ],
+      [
+        2,
+        2,
+        7,
+        10,
+        0
+      ],
+      [
+        10,
+        2,
+        7,
+        10,
+        1
+      ],
+      [
+        10,
+        10,
+        7,
+        11,
+        3
+      ]
+    ],
+    "symbol" : [
+      [
+        0,
+        6
+      ],
+      [
+        0,
+        7
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        5,
+        7
+      ]
+    ],
+    "threshold" : 38,
+    "tutorial" : false,
+    "window" : 48
+  },
+  "number" : 99,
+  "schema" : 1,
+  "skipped" : 0
+}

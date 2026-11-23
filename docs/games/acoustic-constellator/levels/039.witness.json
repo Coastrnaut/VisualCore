@@ -1,0 +1,142 @@
+{
+  "actions" : [
+    {
+      "link" : {
+        "_0" : 0,
+        "_1" : 2
+      }
+    },
+    {
+      "link" : {
+        "_0" : 0,
+        "_1" : 4
+      }
+    },
+    {
+      "link" : {
+        "_0" : 1,
+        "_1" : 4
+      }
+    },
+    {
+      "listen" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "reason" : "tried",
+    "sets" : 1,
+    "size" : 2
+  },
+  "difficulty" : {
+    "actions" : 3,
+    "cycles" : 0,
+    "fixedLinks" : 2,
+    "hold" : 5,
+    "rateSpread" : 1,
+    "smallerSets" : 1,
+    "stars" : 5,
+    "symbolPairs" : 4,
+    "threshold" : 15,
+    "window" : 24,
+    "work" : 3
+  },
+  "digests" : [
+    "56249d9041e21f3b",
+    "60a6166c37f0deb3",
+    "6d5f93feea0b050a",
+    "6d5f93feea0b050a"
+  ],
+  "fingerprints" : [
+    "739dcfdbe9741535a5a874ee7c8fcd9fcae383173235d40d8e0506be99571e32",
+    "29af615933455666067147d7230d90fad9341cfca5874aaf9e8d24dc14d9ab2d",
+    "07f9af911979f6c95f838354c885c9a8084e72cbffda81efdca9a4eaf6d4ae48",
+    "a10a698717f81c7ffbec597299bc77aa1a26afc4e76fe6e50091507f49eabd26",
+    "9d2ff57ba79657caac60e8fc323a81bf09407345fa943ad883fbfa85a8dd1172"
+  ],
+  "level" : {
+    "budget" : 13,
+    "coupling" : 4,
+    "degreeLimit" : 3,
+    "difficulty" : 2,
+    "fingerprint" : "186f6f92908e950a881083fa472ed0e2327e4b2dcc3cef114e9c195424406919",
+    "fixedLinks" : [
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "hold" : 5,
+    "id" : "acoustic-constellator-039",
+    "linkLimit" : 6,
+    "schema" : 1,
+    "seed" : 12989672724823041942,
+    "snapLimit" : 5,
+    "stars" : [
+      [
+        9,
+        10,
+        5,
+        8,
+        5
+      ],
+      [
+        6,
+        1,
+        5,
+        8,
+        0
+      ],
+      [
+        3,
+        10,
+        7,
+        9,
+        2
+      ],
+      [
+        1,
+        4,
+        5,
+        8,
+        9
+      ],
+      [
+        11,
+        4,
+        7,
+        8,
+        11
+      ]
+    ],
+    "symbol" : [
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        4
+      ]
+    ],
+    "threshold" : 15,
+    "tutorial" : false,
+    "window" : 24
+  },
+  "number" : 39,
+  "schema" : 1,
+  "skipped" : 0
+}

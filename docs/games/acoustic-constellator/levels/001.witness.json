@@ -1,0 +1,101 @@
+{
+  "actions" : [
+    {
+      "link" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "listen" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "reason" : "missing",
+    "sets" : 0,
+    "size" : 0
+  },
+  "difficulty" : {
+    "actions" : 1,
+    "cycles" : 0,
+    "fixedLinks" : 1,
+    "hold" : 8,
+    "rateSpread" : 1,
+    "smallerSets" : 0,
+    "stars" : 3,
+    "symbolPairs" : 2,
+    "threshold" : 5,
+    "window" : 24,
+    "work" : 1
+  },
+  "digests" : [
+    "3fb42f447e5f702c",
+    "3fb42f447e5f702c"
+  ],
+  "fingerprints" : [
+    "5da15523f7e5eaf91b4ddcf46f1031575fe4b682d455b89b505867c8a4b210fb",
+    "9c4d5181cb3692ee2bceb43e26691cf69b6b527cac8b3cbc6c7b5d41e0ff23d4",
+    "308e42f48914776fb17ff1461504b02e40d5527ec1ceba93f9f8a01f44743ef6",
+    "7b134e9d921c1165858316e0538995adf3a5506660555c9f8d97e685d4105527"
+  ],
+  "level" : {
+    "budget" : 9,
+    "coupling" : 5,
+    "degreeLimit" : 3,
+    "difficulty" : 1,
+    "fingerprint" : "684c7afe1e16050cdd78f808c8a2039b8d54e9c524d3a662fd59ad6a0b2007ed",
+    "fixedLinks" : [
+      [
+        1,
+        2
+      ]
+    ],
+    "hold" : 8,
+    "id" : "acoustic-constellator-001",
+    "linkLimit" : 4,
+    "schema" : 1,
+    "seed" : 13369098944330968295,
+    "snapLimit" : 5,
+    "stars" : [
+      [
+        2,
+        9,
+        5,
+        9,
+        7
+      ],
+      [
+        6,
+        1,
+        5,
+        9,
+        5
+      ],
+      [
+        10,
+        8,
+        7,
+        10,
+        4
+      ]
+    ],
+    "symbol" : [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "threshold" : 5,
+    "tutorial" : true,
+    "window" : 24
+  },
+  "number" : 1,
+  "schema" : 1,
+  "skipped" : 2
+}

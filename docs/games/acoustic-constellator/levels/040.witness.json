@@ -1,0 +1,123 @@
+{
+  "actions" : [
+    {
+      "link" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "link" : {
+        "_0" : 0,
+        "_1" : 2
+      }
+    },
+    {
+      "listen" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "reason" : "tried",
+    "sets" : 1,
+    "size" : 1
+  },
+  "difficulty" : {
+    "actions" : 2,
+    "cycles" : 0,
+    "fixedLinks" : 2,
+    "hold" : 8,
+    "rateSpread" : 1,
+    "smallerSets" : 1,
+    "stars" : 4,
+    "symbolPairs" : 3,
+    "threshold" : 9,
+    "window" : 24,
+    "work" : 2
+  },
+  "digests" : [
+    "8f477cb6f47dcb3e",
+    "00de9fe0587b8eb5",
+    "00de9fe0587b8eb5"
+  ],
+  "fingerprints" : [
+    "671d5a40c30397f81b75843e029675133e4055aecf3b6066105e3528463d9b02",
+    "a07f9ff431531e6d8eba88e33e7f925b8b54999c122f6c6f0c636a321f452472",
+    "cdcc8a80939ba8c6b4d2e7c21d32ff84879aa6ec276965e715a64996d3bd217b",
+    "33ac322d1801dd41e0539663fe7897d9834c8c3a8d594814fe41ce50cecda81c"
+  ],
+  "level" : {
+    "budget" : 10,
+    "coupling" : 3,
+    "degreeLimit" : 4,
+    "difficulty" : 2,
+    "fingerprint" : "92fc03a10681268c521088ba30cfac37cabf2d18453cc6462276cbef6f2bea83",
+    "fixedLinks" : [
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "hold" : 8,
+    "id" : "acoustic-constellator-040",
+    "linkLimit" : 5,
+    "schema" : 1,
+    "seed" : 4831102754750763000,
+    "snapLimit" : 5,
+    "stars" : [
+      [
+        6,
+        1,
+        5,
+        5,
+        2
+      ],
+      [
+        1,
+        6,
+        7,
+        5,
+        1
+      ],
+      [
+        11,
+        6,
+        7,
+        6,
+        8
+      ],
+      [
+        6,
+        11,
+        5,
+        6,
+        6
+      ]
+    ],
+    "symbol" : [
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        3
+      ]
+    ],
+    "threshold" : 9,
+    "tutorial" : false,
+    "window" : 24
+  },
+  "number" : 40,
+  "schema" : 1,
+  "skipped" : 0
+}

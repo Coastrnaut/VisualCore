@@ -1,0 +1,169 @@
+{
+  "actions" : [
+    {
+      "link" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "link" : {
+        "_0" : 1,
+        "_1" : 4
+      }
+    },
+    {
+      "link" : {
+        "_0" : 3,
+        "_1" : 4
+      }
+    },
+    {
+      "link" : {
+        "_0" : 4,
+        "_1" : 5
+      }
+    },
+    {
+      "listen" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "reason" : "tried",
+    "sets" : 1,
+    "size" : 3
+  },
+  "difficulty" : {
+    "actions" : 4,
+    "cycles" : 1,
+    "fixedLinks" : 3,
+    "hold" : 7,
+    "rateSpread" : 1,
+    "smallerSets" : 1,
+    "stars" : 6,
+    "symbolPairs" : 6,
+    "threshold" : 21,
+    "window" : 40,
+    "work" : 2
+  },
+  "digests" : [
+    "74450cac06f6ed38",
+    "12747516aa8a5486",
+    "e08baae3b94a5ed3",
+    "c9d6ab61a03ab527",
+    "c9d6ab61a03ab527"
+  ],
+  "fingerprints" : [
+    "8b80f960cc8a00f6fceb269587a8755c7c6af81dc7ae2f81423a8375fbcb2c88",
+    "cb8601e5734189f7bf4f5b7bb36cdf6c50e4a84ec52f296d74a0d6198d46eb0e",
+    "0bb77b47c5bd27050a19ff39f8cdf2c6a7b4cb6cb5608501f3b37d1aedff9c1f",
+    "a0523c7db4ebfc2f57e5c6243fb92edf909d13f2becd88bb1b35cbf242a73bf8",
+    "c07f4aadc5c7a6ce36cb6d52e792cd08ad386f43c16f93bd308ffcbb4cae7517",
+    "4c2ce352bac25eb054c8ad51c0a24d39c097637109736284ca5239cdfefd5fa5"
+  ],
+  "level" : {
+    "budget" : 16,
+    "coupling" : 7,
+    "degreeLimit" : 4,
+    "difficulty" : 4,
+    "fingerprint" : "345fb97a226d852bff91a38abd1a722ca418298b2d5c72a799f47e62d983fbea",
+    "fixedLinks" : [
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        3,
+        5
+      ]
+    ],
+    "hold" : 7,
+    "id" : "acoustic-constellator-078",
+    "linkLimit" : 8,
+    "schema" : 1,
+    "seed" : 15691876684211811188,
+    "snapLimit" : 5,
+    "stars" : [
+      [
+        2,
+        9,
+        5,
+        7,
+        9
+      ],
+      [
+        10,
+        8,
+        5,
+        8,
+        1
+      ],
+      [
+        2,
+        3,
+        7,
+        8,
+        7
+      ],
+      [
+        6,
+        1,
+        5,
+        7,
+        3
+      ],
+      [
+        10,
+        3,
+        7,
+        7,
+        0
+      ],
+      [
+        6,
+        11,
+        7,
+        7,
+        9
+      ]
+    ],
+    "symbol" : [
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        5
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "threshold" : 21,
+    "tutorial" : false,
+    "window" : 40
+  },
+  "number" : 78,
+  "schema" : 1,
+  "skipped" : 0
+}
