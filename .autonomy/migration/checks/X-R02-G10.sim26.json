@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g10.backwards-aurora",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g10.backwards-aurora --runtime 26",
+  "elapsed_seconds": 293.413,
+  "exit_code": 0,
+  "finished": "2026-11-23T08:44:59+00:00",
+  "gate": "X-R02-G10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G10.sim26.log",
+  "log_sha256": "ba2ac8b4e3becb964d0df2fd7cc3b50e3ee8bf0bd8ba3521f17fbcb60c2b5a48",
+  "name": "sim26",
+  "started": "2026-11-23T08:40:06+00:00",
+  "timed_out": false
+}

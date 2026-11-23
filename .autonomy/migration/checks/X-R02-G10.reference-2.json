@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "reference-test-anglerendering-ios27",
+    "reference-test-anglerendering-ios26",
+    "projectm-reference-ios27",
+    "projectm-reference-ios26"
+  ],
+  "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+  "elapsed_seconds": 23.925,
+  "exit_code": 0,
+  "finished": "2026-11-23T09:01:20+00:00",
+  "gate": "X-R02-G10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G10.reference-2.log",
+  "log_sha256": "e01b3a40551b77de8cf4f292e524f9516b4a05f24acbc7d8bd798f51d8d166a0",
+  "name": "reference-2",
+  "started": "2026-11-23T09:00:56+00:00",
+  "timed_out": false
+}

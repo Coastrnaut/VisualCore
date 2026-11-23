@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-build-for-testing-ios27",
+    "app-ui-ios27-s3"
+  ],
+  "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-s3",
+  "elapsed_seconds": 253.99,
+  "exit_code": 0,
+  "finished": "2026-11-23T09:00:33+00:00",
+  "gate": "X-R02-G10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G10.ui-s3.log",
+  "log_sha256": "ac8d2b1899a2d58ada8d6fd18f76424e7bf8a962d988fc4731dde085bf8ac509",
+  "name": "ui-s3",
+  "started": "2026-11-23T08:56:19+00:00",
+  "timed_out": false
+}
