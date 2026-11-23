@@ -250,6 +250,9 @@ import VisualCoreSimulation
         // Feature 394 (R02-G10-04): the picker, the freeze preview and the gesture controller (touch geometry in
         // Doubles, pointer events); presentation only, covered by their own tests and the renderer-purity tests.
         "BackwardsAuroraPicker.swift", "BackwardsAuroraFreezePreview.swift", "BackwardsAuroraGestureController.swift",
+        // Feature 396 (R02-G10-06): the eased lights and the ambient sound recipe (Doubles, VisualCoreAudioDSP);
+        // presentation only, covered by their own tests.
+        "BackwardsAuroraLights.swift", "BackwardsAuroraSoundRecipe.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, without the presentation

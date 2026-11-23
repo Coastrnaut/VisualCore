@@ -25,7 +25,7 @@ native control carries a value in words from the start).
   code, wins in campaign and practice, tear and budget failures and level and mode changes compare texts, kinds and
   haptics exactly; a reversal that ends the play plans only the outcome; section-end changes and previews plan nothing);
   agent A; `--name host-2`
-- [ ] T-R02G1006-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraLights.swift` ("glow 0.7 playing / 1 won / 0.35
+- [X] T-R02G1006-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraLights.swift` ("glow 0.7 playing / 1 won / 0.35 — Verified 2026-11-23: host-3 exit=0 (BackwardsAuroraLightsTests 10: scripted win, 45 adversarial flicker runs of tears, undos, retries, level changes and previews sampled at 1/60 s within 3 half-range crossings per second and at least 0.4 s per half-range fade under Reduce Flashing, normal settling, targets per stage; BackwardsAuroraSoundRecipeTests 6: root steps at their boundaries, pure and distinct over 60 inputs, whole cycles, octave when won, halved when failed, real plays of level 97; the lead added the lights and recipe to the invariant scan's presentation sources; agent B's files retested by the lead)
   failed; won 1 once won, else 0; tear 1 while the failure is a tear, else 0; preview 1 while a preview shows, else 0",
   eased linearly over 0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade under Reduce Flashing;
   `maxHalfRangeCrossingsPerSecond`) and `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSoundRecipe.swift` ("root 110 Hz × (1, 9/8, 5/4, 4/3)
