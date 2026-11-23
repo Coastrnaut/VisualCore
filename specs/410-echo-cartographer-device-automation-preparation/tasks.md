@@ -26,7 +26,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G1110-004 [P] [US2] Create `docs/apps/echo-cartographer/device-campaign.md` (agent B, modelled on
+- [X] T-R02G1110-004 [P] [US2] Create `docs/apps/echo-cartographer/device-campaign.md` (agent B, modelled on — Verified 2026-11-23: docs exit 0 (validate_docs); docs/apps/echo-cartographer/device-campaign.md modelled on Backwards Aurora's: devices in order, D3 on iPadOS 26.5 and never updated, owner actions as BLOCKED_OWNER_ACTION, rows EC-D1 … EC-D8 matching the definition field for field, no number claimed, the stress session only in the device campaign; agent B's text re-read by the lead
   `docs/apps/backwards-aurora/device-campaign.md`: devices and order, D3 on iPadOS 26.5, owner actions as
   BLOCKED_OWNER_ACTION, every row EC-D1 … EC-D8 with devices, procedure, pass condition and "pending device campaign",
   no number claimed, the stress session only in the device campaign); `--name docs -- python3 scripts/validate_docs.py`
