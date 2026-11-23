@@ -1348,7 +1348,7 @@
         "catalog_sha256": "b832e7eef70880b12895f1e047d0baaf6a51fdd0a14ce9e655f02c022ab3c737",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g13.acoustic-constellator",

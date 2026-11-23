@@ -301,9 +301,17 @@
       "name": "Echo Cartographer",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G12",
+      "id": "r02-g12.harmonic-bridges",
+      "name": "Harmonic Bridges",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "f34fd3a5329de2109a67eae1020925c66cb2581d7f4dc680f9736b92bd6773e4",
+  "ledger_sha256": "a431a83f28709f00bbda4251dc46f60d307fe1c221c2c6af2da537d34f056ccd",
   "privacy_answers": "unproven",
   "schema": 1
 }

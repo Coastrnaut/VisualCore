@@ -49,7 +49,7 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // A01–A25 and R02-G01 … G11 are integrated (X-A01 to X-A25 and X-R02-G01 … G11 pass): registered and
+        // A01–A25 and R02-G01 … G12 are integrated (X-A01 to X-A25 and X-R02-G01 … G12 pass): registered and
         // available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
         XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
@@ -73,7 +73,8 @@ final class AppModelTests: XCTestCase {
                                                      "r02-g08.faceted-forge",
                                                      "r02-g09.nocturne-garden",
                                                      "r02-g10.backwards-aurora",
-                                                     "r02-g11.echo-cartographer"])
+                                                     "r02-g11.echo-cartographer",
+                                                     "r02-g12.harmonic-bridges"])
         XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
@@ -99,7 +100,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
         // Any catalog experience before its X gate works as a candidate; R02-G13 is one (unavailable, not in `all`, not yet
-        // registered; R02-G01 … R02-G11 were real candidates until their X gates).
+        // registered; R02-G01 … R02-G12 were real candidates until their X gates).
         // The synthetic debug registration stands in for one.
         let id = try XCTUnwrap(ExperienceID(rawValue: "r02-g13.acoustic-constellator"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
@@ -499,7 +500,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 36, "A01–A25 and R02-G01 … G11 are integrated")
+        XCTAssertEqual(ExperienceRegistry.all.count, 37, "A01–A25 and R02-G01 … G12 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.
@@ -1240,6 +1241,7 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(try nocturneGardenRegistration().openingSeed, 0)
         XCTAssertEqual(try backwardsAuroraRegistration().openingSeed, 0)
         XCTAssertEqual(try echoCartographerRegistration().openingSeed, 0)
+        XCTAssertEqual(try harmonicBridgesRegistration().openingSeed, 0)
         let puzzles: Set<String> = [AuroraLoomExperienceCore.experienceID,
                                     LissajousLabyrinthExperienceCore.experienceID,
                                     WaveKnotKeeperExperienceCore.experienceID,
@@ -1250,7 +1252,8 @@ final class AppModelTests: XCTestCase {
                                     FacetedForgeExperienceCore.experienceID,
                                     NocturneGardenExperienceCore.experienceID,
                                     BackwardsAuroraExperienceCore.experienceID,
-                                    EchoCartographerExperienceCore.experienceID]
+                                    EchoCartographerExperienceCore.experienceID,
+                                    HarmonicBridgesExperienceCore.experienceID]
         for other in ExperienceRegistry.all where !puzzles.contains(other.id.rawValue) {
             XCTAssertNil(other.openingSeed, "\(other.id.rawValue) keeps its stable seed")
         }
@@ -2562,10 +2565,10 @@ final class AppModelTests: XCTestCase {
     // MARK: Harmonic Bridges in the app (feature 419, R02-G12-09; T-R02G1209-005, FR-R02G1209-003,
     // FR-R02G1209-006; SC-R02G1209-002)
 
-    /// Harmonic Bridges' registration: a candidate until X-R02-G12.
+    /// Harmonic Bridges' registration (a candidate until X-R02-G12, integrated since 2026-11-23).
     private func harmonicBridgesRegistration() throws -> ExperienceRegistration {
         let id = try ExperienceID(HarmonicBridgesExperienceCore.experienceID)
-        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Harmonic Bridges is a candidate")
+        return try XCTUnwrap(ExperienceRegistry.all.first { $0.id == id }, "Harmonic Bridges is integrated")
     }
 
     /// FR-R02G1209-003, clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples
@@ -2582,25 +2585,24 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(problems, [], "\(registration.id)")
     }
 
-    /// FR-R02G1209-006, clarification Q5: without `-vcCandidates` Harmonic Bridges is a candidate only: in
-    /// `candidates`, outside `all`, listed in the bundled catalog as not available, without a tile and not opened.
-    func testHarmonicBridgesIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+    /// X-R02-G12 (2026-11-23): Harmonic Bridges is integrated: in `all`, not a candidate, available in the bundled
+    /// catalog, shown and opened without `-vcCandidates` (FR-R02G1209-006 held until then).
+    func testHarmonicBridgesIsIntegratedAndAvailableWithoutTheCandidatesArgument() async throws {
         let id = try ExperienceID(HarmonicBridgesExperienceCore.experienceID)
         XCTAssertEqual(id.rawValue, "r02-g12.harmonic-bridges")
-        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
-        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertTrue(ExperienceRegistry.all.map(\.id).contains(id))
         let categories = try CategoryList(data: bundled("categories"))
         let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
-        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
-        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available")
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
                                                               categories: try bundled("categories"),
                                                               registry: ExperienceRegistry.all))
-        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "a tile")
         let opened = await model.open(id)
-        XCTAssertFalse(opened)
-        XCTAssertNil(model.session.experience)
+        XCTAssertTrue(opened)
+        XCTAssertNotNil(model.session.experience)
     }
 
     /// FR-R02G1209-003, SC-R02G1209-002: with `-vcCandidates` Harmonic Bridges is shown, opens through the registry

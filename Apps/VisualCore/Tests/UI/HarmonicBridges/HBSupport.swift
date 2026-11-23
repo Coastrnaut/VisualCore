@@ -1,11 +1,11 @@
 // HBSupport — feature 419 (R02-G12-09) T-R02G1209-004 (FR-R02G1209-002; SC-R02G1209-001; clarifications Q1, Q2):
 // helpers of the interface tests of Harmonic Bridges (R02-G12) inside the one app, modelled on `ECGSupport` (feature
-// 409). The namespace is `HB` (no other UI test uses it). Harmonic Bridges is a candidate until X-R02-G12; every launch
-// carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh
-// start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens the experience directly
-// with `-openExperience r02-g12.harmonic-bridges`; a relaunch (`HB.reopen`) backgrounds the app first (its save point),
-// terminates it and starts again without the reset, so the stored progress (solved levels, stars, the frontier, the
-// verified winning trace) survives.
+// 409). The namespace is `HB` (no other UI test uses it). Harmonic Bridges was a candidate until X-R02-G12
+// (2026-11-23); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become
+// available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the
+// welcome and opens the experience directly with `-openExperience r02-g12.harmonic-bridges`; a relaunch (`HB.reopen`)
+// backgrounds the app first (its save point), terminates it and starts again without the reset, so the stored progress
+// (solved levels, stars, the frontier, the verified winning trace) survives.
 //
 // The canvas (`session.canvas`) is labelled with the presenter's description (`HarmonicBridgesPresenter.describe`):
 // "Harmonic Bridges level n. ", the progress "step s: k bridge(s), goal reached|goal not reached; a actions left"
