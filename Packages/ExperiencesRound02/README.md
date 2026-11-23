@@ -584,3 +584,7 @@ classes, `scripts/backwards_aurora_regression.py` and the CI step "Backwards Aur
 Feature 399 (R02-G10-09) adds the in-app integration: identifiers on every panel control, the schema-1 and schema-2
 examples (`BackwardsAuroraSchemaExamples`) stored by the app registration, app unit tests, and the interface tests
 `BAPlayUITests` and `BAReplayUITests` (serial chunk `s3`).
+
+Feature 400 (R02-G10-10) prepares Backwards Aurora's device campaign without touching a device:
+`docs/apps/backwards-aurora/device-rows.json` (rows BA-D1 … BA-D8, all pending), the written plan
+`docs/apps/backwards-aurora/device-campaign.md`, and the release step `device-rows-r02-g10`.

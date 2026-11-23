@@ -200,3 +200,15 @@ opening wave that already wins is refused) and the fingerprint and refuses damag
   7), which the app restores into schema 3; Backwards Aurora stays a candidate (not available without
   `-vcCandidates`) until X-R02-G10.
 - **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
+
+## Device preparation (feature 400, R02-G10-10)
+
+Nothing here touches a device. `docs/apps/backwards-aurora/device-rows.json` defines the device scenario set (the 11
+standard and game scenarios and `fixture-level-1-solved`) and rows BA-D1 … BA-D8 for D1, D2 and D3 (the ledger's
+DEV1/2/3-R02-G10 rows): launch and first frame, frame pacing and frame time per tier, memory and thermal state with the
+round-two stress session, touch feel and latency (segment-end taps and drags, swipes that reverse, the held freeze
+preview, orbit), sound and haptics, a non-gating VoiceOver walk-through, progress across a real termination and the
+panel journeys. Every row is "pending device campaign" and covers the open {device} tasks of features 393, 394 and
+396 … 399 and UA-F13's measurements; `scripts/check_device_rows.py --experience r02-g10.backwards-aurora` (release step
+`device-rows-r02-g10`) keeps it true. The written plan is `docs/apps/backwards-aurora/device-campaign.md`; D3 stays on
+iPadOS 26.5.
