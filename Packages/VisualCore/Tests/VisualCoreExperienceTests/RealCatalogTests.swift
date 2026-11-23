@@ -53,7 +53,8 @@ enum CatalogFixture {
                          "r02-g06.chrono-constellator",
                          "r02-g07.amethyst-escape",
                          "r02-g08.faceted-forge",
-                         "r02-g09.nocturne-garden"])
+                         "r02-g09.nocturne-garden",
+                         "r02-g10.backwards-aurora"])
     }
 
     @Test func everyIdIsInTheGoldenListAndWellFormed() throws {
@@ -158,7 +159,7 @@ enum CatalogFixture {
                                "r02-g08.faceted-forge",
                                // Feature 383 (R02-G09-03); integrated at X-R02-G09.
                                "r02-g09.nocturne-garden",
-                               // Feature 393 (R02-G10-03); a registered candidate until X-R02-G10.
+                               // Feature 393 (R02-G10-03); integrated at X-R02-G10.
                                "r02-g10.backwards-aurora"],
                 "the registrations of Catalog/registrations.json")
     }

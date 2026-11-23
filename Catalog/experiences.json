@@ -1270,7 +1270,7 @@
         "catalog_sha256": "6eb242e60a77f39d9ce23f4d28909b827608b19138329c4b18100eebe1e2d06e",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g11.echo-cartographer",

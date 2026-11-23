@@ -1489,7 +1489,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "FacetedForgeCore", "FacetedForgeExperience",
                                     # Feature 383 (R02-G09-03): Nocturne Garden, integrated at X-R02-G09.
                                     "NocturneGardenCore", "NocturneGardenExperience",
-                                    # Feature 393 (R02-G10-03): Backwards Aurora, a registered candidate until X-R02-G10.
+                                    # Feature 393 (R02-G10-03): Backwards Aurora, integrated at X-R02-G10.
                                     "BackwardsAuroraCore", "BackwardsAuroraExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

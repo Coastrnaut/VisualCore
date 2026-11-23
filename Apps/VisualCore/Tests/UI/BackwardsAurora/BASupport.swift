@@ -1,6 +1,6 @@
 // BASupport — feature 399 (R02-G10-09) T-R02G1009-004 (FR-R02G1009-002; SC-R02G1009-001; clarifications Q1, Q2;
 // research R2): helpers of the interface tests of Backwards Aurora (R02-G10) inside the one app, modelled on
-// `NGSupport` (feature 389). Backwards Aurora is a candidate until X-R02-G10; every launch carries `-vcCandidates`
+// `NGSupport` (feature 389). Backwards Aurora was a candidate until X-R02-G10 (2026-11-23); every launch still carries `-vcCandidates`
 // (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh start erases the data
 // (`-vcResetData`, so no level is solved), skips the welcome and opens the experience directly with
 // `-openExperience r02-g10.backwards-aurora`; a relaunch (`BA.reopen`) backgrounds the app first (its save point),

@@ -104,7 +104,7 @@ struct ExperienceRegistration: Sendable {
 /// The explicit list of registered experiences.
 enum ExperienceRegistry {
     /// Every registered experience, in catalog order: those whose X gate is pass (X-A01, X-A02 and X-A03, recorded
-    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06; X-A08 recorded 2026-11-14 after A08-P06; X-A09 recorded 2026-11-14 after A09-P06; X-A10 recorded 2026-11-15 after A10-P06; X-A11 recorded 2026-11-15 after A11-P06; X-A12 recorded 2026-11-15 after A12-P06; X-A13 recorded 2026-11-15 after A13-P06; X-A14 recorded 2026-11-15 after A14-P06; X-A15 recorded 2026-11-16 after A15-P06; X-A16 recorded 2026-11-16 after A16-P06; X-A17 recorded 2026-11-16 after A17-P06; X-A18 recorded 2026-11-16 after A18-P06; X-A19 recorded 2026-11-17 after A19-P06; X-A20 recorded 2026-11-17 after A20-P06; X-A21 recorded 2026-11-17 after A21-P06; X-A22 recorded 2026-11-18 after A22-P06; X-A23 recorded 2026-11-19 after A23-P06; X-A24 recorded 2026-11-19 after A24-P06; X-A25 recorded 2026-11-19 after A25-P06; X-R02-G01 recorded 2026-11-21 after R02-G01-10; X-R02-G02 recorded 2026-11-21 after R02-G02-10; X-R02-G03 recorded 2026-11-21 after R02-G03-10; X-R02-G04 recorded 2026-11-21 after R02-G04-10; X-R02-G05 recorded 2026-11-21 after R02-G05-10; X-R02-G06 recorded 2026-11-22 after R02-G06-10; X-R02-G07 recorded 2026-11-22 after R02-G07-10; X-R02-G08 recorded 2026-11-22 after R02-G08-10; X-R02-G09 recorded 2026-11-22 after R02-G09-10).
+    /// 2026-11-13 after UA-F07; X-A04 recorded 2026-11-13 after A04-P06; X-A05 recorded 2026-11-14 after A05-P06; X-A06 recorded 2026-11-14 after A06-P06; X-A07 recorded 2026-11-14 after A07-P06; X-A08 recorded 2026-11-14 after A08-P06; X-A09 recorded 2026-11-14 after A09-P06; X-A10 recorded 2026-11-15 after A10-P06; X-A11 recorded 2026-11-15 after A11-P06; X-A12 recorded 2026-11-15 after A12-P06; X-A13 recorded 2026-11-15 after A13-P06; X-A14 recorded 2026-11-15 after A14-P06; X-A15 recorded 2026-11-16 after A15-P06; X-A16 recorded 2026-11-16 after A16-P06; X-A17 recorded 2026-11-16 after A17-P06; X-A18 recorded 2026-11-16 after A18-P06; X-A19 recorded 2026-11-17 after A19-P06; X-A20 recorded 2026-11-17 after A20-P06; X-A21 recorded 2026-11-17 after A21-P06; X-A22 recorded 2026-11-18 after A22-P06; X-A23 recorded 2026-11-19 after A23-P06; X-A24 recorded 2026-11-19 after A24-P06; X-A25 recorded 2026-11-19 after A25-P06; X-R02-G01 recorded 2026-11-21 after R02-G01-10; X-R02-G02 recorded 2026-11-21 after R02-G02-10; X-R02-G03 recorded 2026-11-21 after R02-G03-10; X-R02-G04 recorded 2026-11-21 after R02-G04-10; X-R02-G05 recorded 2026-11-21 after R02-G05-10; X-R02-G06 recorded 2026-11-22 after R02-G06-10; X-R02-G07 recorded 2026-11-22 after R02-G07-10; X-R02-G08 recorded 2026-11-22 after R02-G08-10; X-R02-G09 recorded 2026-11-22 after R02-G09-10; X-R02-G10 recorded 2026-11-23 after R02-G10-10).
     static let all: [ExperienceRegistration] = [generativeArtStudio, fluidArtPlayground, fractalExplorer,
                                                 particleUniverse, infiniteGeometry,
                                                 visualCoreMusicLab, audioOdyssey,
@@ -116,15 +116,16 @@ enum ExperienceRegistry {
                                                 visualProgrammingLab, graphicsBenchmarkLab, effectsComposer,
                                                 auroraLoom, lissajousLabyrinth, waveKnotKeeper,
                                                 hueCompass, colorfallCanyons, chronoConstellator,
-                                                amethystEscape, facetedForge, nocturneGarden].compactMap { $0 }
+                                                amethystEscape, facetedForge, nocturneGarden,
+                                                backwardsAurora].compactMap { $0 }
 
     /// The adopted experiences before their X gate (feature 193, FR-U07-021; clarification 4), in catalog order:
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = [backwardsAurora].compactMap { $0 }
+    static let candidates: [ExperienceRegistration] = []
 
-    /// R02-G10 Backwards Aurora (feature 393, R02-G10-03): a candidate until X-R02-G10. Snapshot schema 3 (feature 397),
+    /// R02-G10 Backwards Aurora (features 391–400, R02-G10-01…10): integrated at X-R02-G10 (2026-11-23). Snapshot schema 3 (feature 397),
     /// so the schema-1 and schema-2 examples are stored (feature 399, R02-G10-09).
     fileprivate static var backwardsAurora: ExperienceRegistration? {
         guard let id = BackwardsAuroraExperience.id else { return nil }
