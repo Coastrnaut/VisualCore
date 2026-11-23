@@ -83,7 +83,7 @@ catalog tests, witness files, docs) stay with the lead. MVP: Story 1. Requiremen
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G1302-013 Align `specs/422-acoustic-constellator-level-generator-and-solver-witness/data-model.md` with the
+- [X] T-R02G1302-013 Align `specs/422-acoustic-constellator-level-generator-and-solver-witness/data-model.md` with the — Verified 2026-11-23: data-model.md now states the plan's links in one pair-ordered list with one nudge entry per step (as AcousticConstellatorSolver does) and that degree-5 symbol candidates are refused by the level rules and skipped (as AcousticConstellatorGenerator.candidate does)
   code: `AcousticConstellatorPlan` keeps all its links (missing and helper) in one list in pair order and one nudge entry
   per ±1 step, and a candidate whose symbol has a star of degree 5 or more (over the capped degree limit of 4) is refused
   by the level rules and skipped like any uncertified candidate, per plan: data-model (contradicts)
