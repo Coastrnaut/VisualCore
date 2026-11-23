@@ -33,7 +33,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 385
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1005-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraProgress.swift`
+- [X] T-R02G1005-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraProgress.swift` — Verified 2026-11-23: host-3 exit=0 (BackwardsAuroraProgressTests 12: tutorial steps on levels 1-3 incl. a detour reaching finish, undo and redo never move the step back, stars by reversals made, a 100-level progress script, every day of 2026-2036 maps into 1-100 and is stable, negative day counts wrap, impossible dates refused, Codable round trips; agent C's files retested by the lead)
   (`BackwardsAuroraTutorialStep` mark → reverse → finish → done with the texts of clarification Q2, advanced only by an
   accepted reversal or the level's end, never moved back by undo; `BackwardsAuroraProgress` "3 when at most the certified
   smallest reversal count, 2 when at most that + 2, else 1" by reversals made (reversal records, undone ones included),
