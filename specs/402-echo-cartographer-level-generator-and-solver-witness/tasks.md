@@ -47,7 +47,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   pulse; play fingerprints after begin (and dismissTutorial) and each action; counterexample; difficulty; skipped;
   decode refuses newer, damaged and non-replaying files) with
   `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G1102-006 [US2] [US3] [US4] Create
+- [X] T-R02G1102-006 [US2] [US3] [US4] Create — Verified 2026-11-23: host-5 (86 EchoCartographer tests incl. EchoCartographerCatalogTests: 100 entries, pinned digest a32a593b…, progression and band means, every witness wins within the energy, brute force on the two smallest regions per band, one full decode per band, 100 witness files byte for byte in 20 groups) exit 0, 2026-11-23
   `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the energy, singled out after its pulses and not before the
   last; the brute force on the two smallest regions of each band; pinned digest; progression rule and band means;

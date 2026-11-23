@@ -1,0 +1,90 @@
+{
+  "actions" : [
+    {
+      "pulse" : {
+        "_0" : 0,
+        "_1" : 6
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 0,
+        "_1" : 0
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 5,
+        "_1" : 6
+      }
+    }
+  ],
+  "counterexample" : [
+    [
+      {
+        "x" : 0,
+        "y" : 1
+      }
+    ],
+    [
+      {
+        "x" : 2,
+        "y" : 3
+      }
+    ]
+  ],
+  "difficulty" : {
+    "beacons" : 1,
+    "height" : 7,
+    "placementsBeforeLast" : 5,
+    "pulses" : 2,
+    "region" : 42,
+    "tolerance" : 1,
+    "width" : 7,
+    "work" : 42
+  },
+  "echoDigests" : [
+    "edf9931f814925d4",
+    "e0e0aaa60280c03c"
+  ],
+  "fingerprints" : [
+    "d54ec415437e541510cf26662515c239b6fee22ad715d86fcafdcec72f2589bd",
+    "ccb43cd3538943c6d87ff1fe0d0ba40060b180fa950a0f31f3b64222c7c37fde",
+    "0b87b2f1211dae0e17daac8a1f6666cb9ca75e8a29b6389ce4811415e814d5e6",
+    "ce5bac9a14433f796ed48a63eb45aacf31aef302b980049338a7ca5ebe858a8e"
+  ],
+  "level" : {
+    "beacons" : [
+      47
+    ],
+    "difficulty" : 2,
+    "energy" : 12,
+    "entry" : 42,
+    "fingerprint" : "4daec7eca13ebac0628fea53fe36b0348d463c2b2fe91462aae7edf645df24eb",
+    "height" : 7,
+    "id" : "echo-cartographer-026",
+    "missCost" : 1,
+    "schema" : 1,
+    "seed" : 8221391078547840162,
+    "tolerance" : 1,
+    "tutorial" : false,
+    "walls" : [
+      1,
+      6,
+      15,
+      17,
+      30,
+      34,
+      48
+    ],
+    "width" : 7
+  },
+  "number" : 26,
+  "placements" : [
+    5,
+    1
+  ],
+  "placementsBeforeLast" : 5,
+  "schema" : 1,
+  "skipped" : 1
+}

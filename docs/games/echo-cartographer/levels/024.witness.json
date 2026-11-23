@@ -1,0 +1,115 @@
+{
+  "actions" : [
+    {
+      "pulse" : {
+        "_0" : 2,
+        "_1" : 3
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 2,
+        "_1" : 5
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 2,
+        "_1" : 0
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 2,
+        "_1" : 1
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 6,
+        "_1" : 4
+      }
+    }
+  ],
+  "counterexample" : [
+    [
+      {
+        "x" : 2,
+        "y" : 1
+      },
+      {
+        "x" : 6,
+        "y" : 4
+      }
+    ],
+    [
+      {
+        "x" : 1,
+        "y" : 2
+      },
+      {
+        "x" : 6,
+        "y" : 4
+      }
+    ]
+  ],
+  "difficulty" : {
+    "beacons" : 2,
+    "height" : 9,
+    "placementsBeforeLast" : 4,
+    "pulses" : 3,
+    "region" : 56,
+    "tolerance" : 1,
+    "width" : 7,
+    "work" : 536
+  },
+  "echoDigests" : [
+    "9961a2797af107f8",
+    "dc35a311a988c11d",
+    "b811c861ebbc8f1d"
+  ],
+  "fingerprints" : [
+    "992881ff3606790a4e86e803c182d22745531897b2316aa00a02cfd9f5a6eccf",
+    "c3539a32981dfc370570fae5488e70142d090a5c1786911ecc6c077d81d3dd43",
+    "d8a1e104dfc235aeb0a13564bec4747ce6cdc0418df3e23ea7cf0b95472416f7",
+    "1fe95565572c01be9ce1b8133ed4ef6a0ae6197e6b3a0af8a6b47d0247cbdc67",
+    "641a023dbbf87a230c81ddc582cb65dabe98927046f85a1967c3b87d55614a56",
+    "a4b57661aa5269f10a136dde0bb1a1a3b73c62af84e384e6d1ac4c87d3a4d569"
+  ],
+  "level" : {
+    "beacons" : [
+      9,
+      34
+    ],
+    "difficulty" : 2,
+    "energy" : 10,
+    "entry" : 23,
+    "fingerprint" : "33caa90d97a79a3c20e9bf1d586fd5ae8e57475a2010ebcdaa06e7725f54c2c2",
+    "height" : 9,
+    "id" : "echo-cartographer-024",
+    "missCost" : 1,
+    "schema" : 1,
+    "seed" : 7384969900698661931,
+    "tolerance" : 1,
+    "tutorial" : false,
+    "walls" : [
+      3,
+      13,
+      17,
+      27,
+      28,
+      49,
+      50
+    ],
+    "width" : 7
+  },
+  "number" : 24,
+  "placements" : [
+    70,
+    4,
+    1
+  ],
+  "placementsBeforeLast" : 4,
+  "schema" : 1,
+  "skipped" : 0
+}

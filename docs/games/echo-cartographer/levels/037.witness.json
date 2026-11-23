@@ -1,0 +1,118 @@
+{
+  "actions" : [
+    {
+      "pulse" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 5,
+        "_1" : 1
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 5,
+        "_1" : 3
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 7,
+        "_1" : 2
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 2,
+        "_1" : 4
+      }
+    }
+  ],
+  "counterexample" : [
+    [
+      {
+        "x" : 7,
+        "y" : 2
+      },
+      {
+        "x" : 2,
+        "y" : 4
+      }
+    ],
+    [
+      {
+        "x" : 6,
+        "y" : 3
+      },
+      {
+        "x" : 2,
+        "y" : 4
+      }
+    ]
+  ],
+  "difficulty" : {
+    "beacons" : 2,
+    "height" : 7,
+    "placementsBeforeLast" : 2,
+    "pulses" : 3,
+    "region" : 46,
+    "tolerance" : 1,
+    "width" : 8,
+    "work" : 223
+  },
+  "echoDigests" : [
+    "80dc27c79dab3470",
+    "f1f64a737890ae67",
+    "3dc89474c418d813"
+  ],
+  "fingerprints" : [
+    "c07d4b005eb39a5226a84c805ad4a980c4cacfe4161eb3a612e80e7517a57ce7",
+    "7df5f4bde6f9b58c5f7a55d244df5145e5939bb3c2b4a6abd974e97a5192d959",
+    "5eae5fe3b5b7c248983173b1d0dc358817918dcdf9674bd5c46cf1d9d86ac905",
+    "4533c1dadd123d54ed7762ceda36b3b85c55bf0c44089ca20ce466345910ffa0",
+    "fc6c91d63744782a1742ecfae3e83a5ba62111737c3b002ec0e02bac7a610b1a",
+    "b20d506461344a52476d4f75b64a86773457dde8dd11f8a1b1bfc05ddc2c0917"
+  ],
+  "level" : {
+    "beacons" : [
+      23,
+      34
+    ],
+    "difficulty" : 2,
+    "energy" : 11,
+    "entry" : 8,
+    "fingerprint" : "eb4f0d223929ceb404cfb0a6936303d2fd993e3d4a970f50844ac4972b0aeb78",
+    "height" : 7,
+    "id" : "echo-cartographer-037",
+    "missCost" : 1,
+    "schema" : 1,
+    "seed" : 6256730275887538462,
+    "tolerance" : 1,
+    "tutorial" : false,
+    "walls" : [
+      6,
+      7,
+      15,
+      27,
+      31,
+      37,
+      39,
+      40,
+      50,
+      55
+    ],
+    "width" : 8
+  },
+  "number" : 37,
+  "placements" : [
+    20,
+    2,
+    1
+  ],
+  "placementsBeforeLast" : 2,
+  "schema" : 1,
+  "skipped" : 2
+}

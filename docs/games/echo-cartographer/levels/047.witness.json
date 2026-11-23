@@ -1,0 +1,127 @@
+{
+  "actions" : [
+    {
+      "pulse" : {
+        "_0" : 8,
+        "_1" : 0
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 5,
+        "_1" : 0
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 9,
+        "_1" : 0
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 5,
+        "_1" : 0
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 9,
+        "_1" : 0
+      }
+    }
+  ],
+  "counterexample" : [
+    [
+      {
+        "x" : 5,
+        "y" : 0
+      },
+      {
+        "x" : 9,
+        "y" : 0
+      }
+    ],
+    [
+      {
+        "x" : 5,
+        "y" : 0
+      },
+      {
+        "x" : 8,
+        "y" : 1
+      }
+    ]
+  ],
+  "difficulty" : {
+    "beacons" : 2,
+    "height" : 8,
+    "placementsBeforeLast" : 2,
+    "pulses" : 3,
+    "region" : 33,
+    "tolerance" : 1,
+    "width" : 10,
+    "work" : 70
+  },
+  "echoDigests" : [
+    "9f8ec1b1dfc16eca",
+    "bc614de35bfde8c8",
+    "cbaf16232159cc66"
+  ],
+  "fingerprints" : [
+    "79c0c6481b694f40e2e0c50d6fb275e534dd1c9996881ce50bc8c744cc85ec31",
+    "04c3dc77ea971cf38aa96cf8aa4054e432d7fc8fe4181c2dfcb81d2e39005ed0",
+    "4f0420a440eb3b6c02c0ebf6a4a01c2e79398a04c16892f3cf19f06bd1d6e339",
+    "8031be7eb170aaf6c977c2b1182fbbcf389efe702a3b02c39322765d76d6d43c",
+    "c06c3757dd464a1e311e9ef91a60603743ae6eb6316d8e3a8316abe3912085be",
+    "e3138819f9dd1360cfbe04576ab072d7f2f29d35405063004b5b0c02c03dfbee"
+  ],
+  "level" : {
+    "beacons" : [
+      5,
+      9
+    ],
+    "difficulty" : 3,
+    "energy" : 15,
+    "entry" : 8,
+    "fingerprint" : "b74332ff183546fb10859b64a02fb03a1a16593bb5162f6df947db80a9b1fc94",
+    "height" : 8,
+    "id" : "echo-cartographer-047",
+    "missCost" : 2,
+    "schema" : 1,
+    "seed" : 4846837192012177432,
+    "tolerance" : 1,
+    "tutorial" : false,
+    "walls" : [
+      2,
+      4,
+      15,
+      16,
+      19,
+      22,
+      24,
+      28,
+      30,
+      33,
+      43,
+      47,
+      49,
+      54,
+      56,
+      62,
+      65,
+      68,
+      74
+    ],
+    "width" : 10
+  },
+  "number" : 47,
+  "placements" : [
+    6,
+    2,
+    1
+  ],
+  "placementsBeforeLast" : 2,
+  "schema" : 1,
+  "skipped" : 0
+}

@@ -1,0 +1,196 @@
+{
+  "actions" : [
+    {
+      "pulse" : {
+        "_0" : 9,
+        "_1" : 8
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 5,
+        "_1" : 8
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 5,
+        "_1" : 5
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 4,
+        "_1" : 5
+      }
+    },
+    {
+      "pulse" : {
+        "_0" : 4,
+        "_1" : 0
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 4,
+        "_1" : 1
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 9,
+        "_1" : 1
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 3,
+        "_1" : 6
+      }
+    },
+    {
+      "claim" : {
+        "_0" : 6,
+        "_1" : 6
+      }
+    }
+  ],
+  "counterexample" : [
+    [
+      {
+        "x" : 4,
+        "y" : 1
+      },
+      {
+        "x" : 9,
+        "y" : 1
+      },
+      {
+        "x" : 3,
+        "y" : 6
+      },
+      {
+        "x" : 6,
+        "y" : 6
+      }
+    ],
+    [
+      {
+        "x" : 9,
+        "y" : 1
+      },
+      {
+        "x" : 3,
+        "y" : 2
+      },
+      {
+        "x" : 3,
+        "y" : 6
+      },
+      {
+        "x" : 6,
+        "y" : 6
+      }
+    ]
+  ],
+  "difficulty" : {
+    "beacons" : 4,
+    "height" : 11,
+    "placementsBeforeLast" : 4,
+    "pulses" : 5,
+    "region" : 65,
+    "tolerance" : 0,
+    "width" : 10,
+    "work" : 11621
+  },
+  "echoDigests" : [
+    "c045eb85763a984b",
+    "1afba9dbc7fb3481",
+    "658b29459717c247",
+    "ea4acdaadfc2284d",
+    "fea03d366975441e"
+  ],
+  "fingerprints" : [
+    "1992aa81962c105b2aff1d5cb0e8255616e40a71df289f56c6a873b6995b0a02",
+    "cce446c0d3da30ee0387b34a816949965fdbf91d24f361cbf9cd1af54c1c56ba",
+    "4deadf65fe08145bd41ab0d415f6ba7dd90682f45e0327265e854a22d5c49b8a",
+    "c6580870f023f76a5ba800bf5c1b2fe0963b707d5a344ddb4208d9f5777e3afd",
+    "a0c7e94670b53d57e6c08fe7956b3d79816fed4ba9d7ecd031c584e9a96fd588",
+    "852aaafc6052dc219ab7877b9e7c58bdb750c5a629a4067808ad81696d72fb55",
+    "83f4993254aadb40649a931330eca99ef1ca94e237b95459d611a00906d59199",
+    "934f212d7c1e9e17121e7b3a4873f9aa0b305547811ca8e2574d71c721c377e5",
+    "7865223e35f849e850c4d4c202baab492e53a44a1644810474f57a04e5865a4d",
+    "0a6d13a70eddafe26ef425eabae185c587eeaeb2ef68c75df99d88e377324f22"
+  ],
+  "level" : {
+    "beacons" : [
+      14,
+      19,
+      63,
+      66
+    ],
+    "difficulty" : 5,
+    "energy" : 16,
+    "entry" : 89,
+    "fingerprint" : "47ab86f979c3a1d5da3563071584a517cb73facac2b9306ce27cd4f1abb5ca15",
+    "height" : 11,
+    "id" : "echo-cartographer-096",
+    "missCost" : 3,
+    "schema" : 1,
+    "seed" : 16254712198994678288,
+    "tolerance" : 0,
+    "tutorial" : false,
+    "walls" : [
+      0,
+      3,
+      6,
+      7,
+      9,
+      11,
+      12,
+      13,
+      18,
+      21,
+      22,
+      26,
+      30,
+      36,
+      37,
+      40,
+      41,
+      45,
+      46,
+      48,
+      53,
+      56,
+      57,
+      69,
+      72,
+      76,
+      78,
+      79,
+      81,
+      84,
+      91,
+      95,
+      96,
+      98,
+      100,
+      102,
+      103,
+      107
+    ],
+    "width" : 10
+  },
+  "number" : 96,
+  "placements" : [
+    960,
+    42,
+    8,
+    4,
+    1
+  ],
+  "placementsBeforeLast" : 4,
+  "schema" : 1,
+  "skipped" : 31
+}
