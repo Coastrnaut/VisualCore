@@ -26,7 +26,7 @@ logic); no GLSL in this feature.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G1002-003 [US1] Implement `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSolver.swift`
+- [X] T-R02G1002-003 [US1] Implement `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSolver.swift` — Verified 2026-11-22: host-2 (BackwardsAuroraSolverTests 12: hand-built one- and two-section levels solved exactly at the bound; bound arithmetic; bound over budget gives nil; section lengths and tears respected; determinism and the work bound; 10 generated levels (two per band) solved at the bound and replayed to a win on a fresh play; independent checks: bad bends from second differences, no single reversal (any section, palindromes included) removing more than 4 from every witness state, exhaustive search of every shorter sequence on two band-1 levels; 24 seeded one-section openings) exit 0, lead retest
   (clarification Q2: `badBends` = interior positions with |b| > L; `lowerBound` = ⌈β / 4⌉; iterative-deepening
   depth-first search over sections in the rules' order (start, then end; lengths within the level's sections; no
   palindromes) with the bound starting at ⌈β / 4⌉, pruning when depth + ⌈β / 4⌉ > bound, torn or failed states as
