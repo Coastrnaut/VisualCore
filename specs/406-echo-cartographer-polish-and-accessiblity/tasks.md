@@ -27,7 +27,7 @@ native control carries a value in words from the start).
   markers placed and removed, undos, redos, refusals of every code, wins in campaign and practice, failures by a pulse
   and by a missed claim, and level and mode changes compare texts, kinds and haptics exactly; an action that ends the
   play plans only the outcome; cursor moves plan nothing); agent A; `--name host-2`
-- [ ] T-R02G1106-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerLights.swift` ("glow 0.7 playing / 1 won / 0.35
+- [X] T-R02G1106-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerLights.swift` ("glow 0.7 playing / 1 won / 0.35 — Verified 2026-11-23: host-3 (199 EchoCartographer core tests incl. EchoCartographerLightsTests 7: settle per stage, 9-frame normal and 27-frame Reduce Flashing fades without mid-fade reversal, a scripted win and seven 300-frame flicker patterns at 1/60 s within 3 half-range crossings per second and 0.4 s fades; EchoCartographerSoundRecipeTests 6: root-step boundaries for budgets 1-60, documented partials, purity and distinctness, whole cycles within the recipe limits) exit 0, lead retest; lights and sound recipe join the invariant scan's presentation sources
   failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade under
   Reduce Flashing; `maxHalfRangeCrossingsPerSecond`) and `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSoundRecipe.swift` ("root 110 Hz ×
   (1, 9/8, 5/4, 4/3) for more than 3/4, 1/2, 1/4 of the energy left, or less; one partial per located beacon, up to

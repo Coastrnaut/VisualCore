@@ -389,15 +389,17 @@ import VisualCoreSimulation
         EchoCartographerFixtures.fixture(seed &+ UInt64(index))
     }
 
-    /// The presentation sources of features 403 and 404 (R02-G11-03, 04), which use Doubles for drawing and picking
-    /// and import the experience packages; the purity scan covers the kernel files only.
+    /// The presentation sources of features 403, 404 and 406 (R02-G11-03, 04, 06), which use Doubles for drawing,
+    /// picking, lights and sound and import the experience packages; the purity scan covers the kernel files only.
     static let presentationSources: Set<String> = ["EchoCartographerSceneSnapshot.swift",
                                                    "EchoCartographerSceneGeometry.swift",
                                                    "EchoCartographerShaders.swift",
                                                    "EchoCartographerScenarios.swift",
                                                    "EchoCartographerExperienceCore.swift",
                                                    "EchoCartographerPicker.swift",
-                                                   "EchoCartographerGestureController.swift"]
+                                                   "EchoCartographerGestureController.swift",
+                                                   "EchoCartographerLights.swift",
+                                                   "EchoCartographerSoundRecipe.swift"]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, without the presentation
     /// sources).
