@@ -9,6 +9,8 @@
 // mi = 4 ni + wi), the wave (0.01 · w per mode), shell, membrane and won references, the glow gain per tier and the
 // Reduce Flashing limit, and, when `glslangValidator` is installed, a real front-end compile of each source (skipped
 // otherwise; the real compile happens on the simulator).
+// Feature 416 (R02-G12-06) T-R02G1206-005: both fragment stages declare `u_wonLight`, which scales the won lift (7 vec4
+// slots per program).
 // The version literal "#version 300 es" is VisualCoreShaderSource's `ShaderLibrary.versionLine`; the attributes
 // `a_position` at 0, `a_normal` at 1 and `a_uv` at 2 are VisualCoreRendering's `ShaderMeshRenderer` streams (none of
 // these is a dependency of this target). Test data uses explicit types and plain loops (CI type-check rule).
@@ -206,22 +208,26 @@ import Testing
         let constants: [String] = [
             HarmonicBridgesShaders.mvpUniform, HarmonicBridgesShaders.timeUniform, HarmonicBridgesShaders.motionUniform,
             HarmonicBridgesShaders.glowGainUniform, HarmonicBridgesShaders.glowLimitUniform,
+            HarmonicBridgesShaders.wonLightUniform,
         ]
-        let names: [String] = ["u_mvp", "u_time", "u_motion", "u_glowGain", "u_glowLimit"]
+        let names: [String] = ["u_mvp", "u_time", "u_motion", "u_glowGain", "u_glowLimit", "u_wonLight"]
         #expect(constants == names)
         let listed: Set<String> = Set(HarmonicBridgesShaders.bridgeUniforms + HarmonicBridgesShaders.glowUniforms)
         #expect(Set(constants) == listed)
-        #expect(HarmonicBridgesShaders.bridgeUniforms == ["u_mvp", "u_time", "u_motion"])
-        #expect(HarmonicBridgesShaders.glowUniforms == ["u_mvp", "u_glowGain", "u_glowLimit"])
-        #expect(Self.declared("uniform", in: HarmonicBridgesShaders.bridgeFragment).isEmpty)
+        #expect(HarmonicBridgesShaders.bridgeUniforms == ["u_mvp", "u_time", "u_motion", "u_wonLight"])
+        #expect(HarmonicBridgesShaders.glowUniforms == ["u_mvp", "u_glowGain", "u_glowLimit", "u_wonLight"])
+        // Feature 416: the bridge fragment declares only the won light.
+        #expect(Self.declared("uniform", in: HarmonicBridgesShaders.bridgeFragment) == ["u_wonLight"])
+        #expect(HarmonicBridgesShaders.bridgeFragment.contains("uniform float u_wonLight;"))
         let bridge: String = HarmonicBridgesShaders.bridgeVertex
         let bridgeDeclarations: [String] = ["uniform mat4 u_mvp;", "uniform float u_time;", "uniform float u_motion;"]
         for declaration in bridgeDeclarations { #expect(bridge.contains(declaration), "\(declaration)") }
         let glow: String = HarmonicBridgesShaders.glowVertex + HarmonicBridgesShaders.glowFragment
         let glowDeclarations: [String] = ["uniform mat4 u_mvp;", "uniform float u_glowGain;",
-                                          "uniform float u_glowLimit;"]
+                                          "uniform float u_glowLimit;", "uniform float u_wonLight;"]
         for declaration in glowDeclarations { #expect(glow.contains(declaration), "\(declaration)") }
-        // The glow never pulses: no time input. The won flag comes from the streams, not a uniform.
+        // The glow never pulses: no time input. The won flag comes from the streams, not a uniform; the uniform
+        // `u_wonLight` only scales its lift (feature 416).
         #expect(Self.wordCount("u_time", in: glow) == 0)
         #expect(Self.wordCount("u_motion", in: glow) == 0)
         for source in Self.sources() { #expect(Self.wordCount("u_won", in: source) == 0) }
@@ -242,7 +248,7 @@ import Testing
             #expect(slots <= HarmonicBridgesShaders.maxUniformVec4s, "\(program.name) uses \(slots) vec4 slots")
             slotsByProgram[program.name] = slots
         }
-        #expect(slotsByProgram == ["bridge": 6, "glow": 6])
+        #expect(slotsByProgram == ["bridge": 7, "glow": 7])
         #expect(HarmonicBridgesShaders.maxModes == HarmonicBridgesLevel.toneCounts.upperBound)
     }
 
@@ -715,15 +721,18 @@ import Testing
         for line in lines { #expect(source.contains(line), "\(line)") }
     }
 
+    /// Feature 416 (R02-G12-06): the won flag's lift is scaled by the eased won light `u_wonLight` in both programs.
     @Test func aWonLevelLiftsMembranesGlowRingsAndTheGlow() {
         let vertex: String = HarmonicBridgesShaders.bridgeVertex
         #expect(vertex.contains(
             "v_won = clamp(a_normal.z, 0.0, 1.0) * clamp(isCode(m, 6.0) + isCode(m, 9.0), 0.0, 1.0);"))
         let fragment: String = HarmonicBridgesShaders.bridgeFragment
+        #expect(fragment.contains("float won = clamp(v_won, 0.0, 1.0) * clamp(u_wonLight, 0.0, 1.0);"))
         #expect(fragment.contains("rgb = mix(rgb, HB_MARK_FILLED, HB_WON_LIFT * won);"))
         #expect(fragment.contains("float membrane = mix(mix(HB_MEMBRANE_ALPHA, 1.0, rim), 1.0, HB_WON_LIFT * won);"))
         #expect(HarmonicBridgesShaders.wonLift > 0 && HarmonicBridgesShaders.wonLift <= 1)
         let glow: String = HarmonicBridgesShaders.glowFragment
+        #expect(glow.contains("float won = clamp(v_won, 0.0, 1.0) * clamp(u_wonLight, 0.0, 1.0);"))
         #expect(glow.contains(
             "vec3 rgb = mix(colour, HB_MARK_FILLED, clamp((HB_CORE * gain + HB_WON_LIFT * won) * v_glow, 0.0, 1.0));"))
         let plain: SIMD4<Double> = HarmonicBridgesShaders.glowColour(colour: HarmonicBridgesPalette.glow, glow: 1,

@@ -42,7 +42,7 @@ tests stay short (< 10 s each). No {owner} tasks. Model: feature 406's tasks.
 
 ## Phase 3: Wiring — shader, presenter, scene, sound and panel
 
-- [ ] T-R02G1206-005 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesShaders.swift`
+- [X] T-R02G1206-005 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesShaders.swift` — Verified 2026-11-23: Verified 2026-11-23: sim-27 exit 0 (51 Harmonic Bridges simulator tests incl. HarmonicBridgesAccessibilityTests: labels and values on every control, the adjustable string and peg, level 1 won through the panel operations with every step's recorded announcement and haptic equal to the plan, refusals as rejection + error in words, Reduce Motion and Reduce Flashing stills identical with no wave shell under Reduce Flashing, the won light fading in over 0.45 s, the sound state table); shader source tests 16 on the host with u_wonLight in both programs; wiring drafted by one agent and the accessibility tests by agent C from feature 406's API, compiled (two test fixes: daily(level:) argument, the first level with two strings), reviewed and retested by the lead
   (`u_wonLight` scales the won lift; `wonLightUniform`) with its source test in
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesShaderSourceTests.swift`, create
   `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesSound.swift` (the ambient loop over

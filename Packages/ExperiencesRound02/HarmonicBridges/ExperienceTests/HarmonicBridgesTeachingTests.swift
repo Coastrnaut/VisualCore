@@ -392,8 +392,9 @@ enum HarmonicBridgesTeaching {
         #expect(words != HarmonicBridgesMirror.refusalText(code: "r02-g12.unknown"),
                 "the locked level has its own words: \(words)")
         #expect(!words.contains("r02-g12"), "\(words)")
-        #expect(presenter.mirror.message == "That change was refused: \(words).",
-                "\(presenter.mirror.message ?? "nil")")
+        // Since feature 416 the panel shows exactly the feedback plan's words.
+        #expect(presenter.mirror.message == words, "\(presenter.mirror.message ?? "nil")")
+        #expect(words == "That level is not open yet.", "\(words)")
         #expect(presenter.refusalLog.last == locked.code)
         #expect(try HarmonicBridgesTest.digest(shell) == digest, "a refused pick changes nothing")
         #expect(presenter.mirror.levelNumber == 2)
@@ -418,8 +419,9 @@ enum HarmonicBridgesTeaching {
         let dateWords: String = HarmonicBridgesMirror.refusalText(code: impossible.code)
         #expect(dateWords != HarmonicBridgesMirror.refusalText(code: "r02-g12.unknown"),
                 "an impossible date has its own words: \(dateWords)")
-        #expect(presenter.mirror.message == "That change was refused: \(dateWords).",
-                "\(presenter.mirror.message ?? "nil")")
+        // Since feature 416 the panel shows exactly the feedback plan's words.
+        #expect(presenter.mirror.message == dateWords, "\(presenter.mirror.message ?? "nil")")
+        #expect(dateWords == "That date cannot be used.", "\(dateWords)")
         #expect(try HarmonicBridgesTest.digest(shell) == digest)
         #expect(presenter.mirror.mode == .campaign)
 

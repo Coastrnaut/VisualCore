@@ -24,15 +24,31 @@
 // count); `retry` starts the level again in its mode, `undoAction` takes back the last action, and the daily level is
 // chosen from the local calendar date read here (`playDaily(port:date:)`), never by the core. A refused `level.next` before a win
 // (`r02-g12.locked`) and an impossible date (`r02-g12.date`) read in words.
+// Feature 416 (R02-G12-06) T-R02G1206-005 (FR-R02G1206-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `HarmonicBridgesFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log; refusals are shown and announced in
+// words (`refused(code:)`; the panel shows exactly the plan's text, `HarmonicBridgesFeedbackPlan.refusalText(code:)`),
+// and a revealed hint is announced as `state` (`hint(text:)`); choosing a string, previewing a peg and orbit are not
+// announced (the string and peg speak their values). The scene's lights (`HarmonicBridgesLights`: the glow and the won
+// brightening) step toward the drawn snapshot every frame (0.15 s fades, 0.45 s under Reduce Flashing; the first frame
+// settles them), and under Reduce Flashing the strings are at rest, the resting step is held and no wave shell is
+// drawn. The ambient loop (`HarmonicBridgesSound`) is offered the recipe of the actions left, the steps reached and
+// the stage (`HarmonicBridgesSoundRecipe.recipe(play:)`) when the first state is described, when a level or mode opens
+// and when that recipe changes; a pluck (the gesture's `choose`) plays the plucked string's audition
+// (`HarmonicBridgesAudition.of(_:string:step:)` in the drawn step) when the sound is on, on screen and active. The
+// mirror carries the summary element's text (`HarmonicBridgesFeedbackPlan.summaryText(core:string:peg:)`) and the sound
+// choice (off by default). Presentation only.
 #if os(iOS)
 import Foundation
 import HarmonicBridgesCore
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
 
 /// What the controls show and choose: the latest state the presenter described and the panel's chosen string and peg.
 @MainActor
@@ -77,6 +93,11 @@ final class HarmonicBridgesMirror {
     var certifiedActions = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen) (feature 415).
     var pickedLevel = 1
+    /// The summary element's text (feature 416): `HarmonicBridgesFeedbackPlan.summaryText(core:string:peg:)` of the
+    /// latest core and the chosen string and peg.
+    var summary = ""
+    /// Whether the sound is on (feature 416; off by default; presentation only).
+    var soundOn = false
 
     /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 415).
     var goalLabel: String {
@@ -100,6 +121,27 @@ final class HarmonicBridgesMirror {
         guard let play, string >= 0, string < play.pegs.count else { return nil }
         return play.pegs[string]
     }
+    /// The chosen string as the level words it, at its current peg with its lock (feature 416: the adjustable string's
+    /// value): "string i, island a to island b, peg p" (", locked"); "string i" while no play is followed.
+    var stringWords: String {
+        guard let play, string >= 0, string < play.level.strings.count else { return stringLabel }
+        return play.level.stringName(string, peg: currentPeg ?? play.level.strings[string].peg)
+    }
+
+    /// The adjustable peg's value (feature 416): "peg p", and ", the current peg" when the chosen string is already at
+    /// it.
+    var pegWords: String {
+        currentPeg == peg ? pegLabel + ", the current peg" : pegLabel
+    }
+
+    /// The steps reached in words (feature 416: Test's value): "the start reaches the goal in k of n steps".
+    var reachedLabel: String {
+        guard let play else { return "the start reaches the goal in 0 of 0 steps" }
+        var reached = 0
+        for step in play.report.reached where play.level.goal < step.count && step[play.level.goal] { reached += 1 }
+        return "the start reaches the goal in \(reached) of \(play.level.steps.count) steps"
+    }
+
     /// The chosen string in words with its ends, current peg and lock, and the peg it would be tuned to.
     var choiceLabel: String {
         guard let play, string >= 0, string < play.level.strings.count else { return stringLabel + ", " + pegLabel }
@@ -133,23 +175,13 @@ final class HarmonicBridgesMirror {
     }
 
     /// The engine's prefix of a refusal that the core itself returned (`action.rule.<kernel code>`).
-    static let rulePrefix = "action.rule."
+    static let rulePrefix = HarmonicBridgesFeedbackPlan.rulePrefix
 
     /// A refused action's reason code in words; accepts the kernel's code bare or as the engine reports it
-    /// (`action.rule.r02-g12.noop`).
+    /// (`action.rule.r02-g12.noop`). Since feature 416 it forwards to `HarmonicBridgesFeedbackPlan.refusalText(code:)`
+    /// (clarification Q1's sentences, e.g. "That string is already at that peg.").
     static func refusalText(code: String) -> String {
-        let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
-        return switch bare {
-        case "r02-g12.noop": "that string is already at that peg"
-        case "r02-g12.stage": "the play is over: undo or go to the next level"
-        case "r02-g12.action": "that string cannot be tuned to that peg"
-        case "r02-g12.stale": "the play changed before the action arrived"
-        case "r02-g12.level": "the next level could not be made"
-        case HarmonicBridgesExperienceRule.locked: "that level is not open yet: win the level before it first"
-        case HarmonicBridgesExperienceRule.date: "that date is not a calendar date"
-        case HarmonicBridgesExperienceRule.notWhole: "a string and a peg must be whole numbers"
-        default: "that action is not available now"
-        }
+        HarmonicBridgesFeedbackPlan.refusalText(code: code)
     }
 }
 
@@ -200,6 +232,16 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
     private(set) var hintSearch: Task<Void, Never>?
     /// What the hint line shows while the search runs.
     static let searchingText = "Finding a hint…"
+    /// The feedback route of announcements and haptics (feature 416; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 416; tests and diagnostics).
+    private(set) var feedbackLog: [HarmonicBridgesFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 416).
+    private(set) var lights: HarmonicBridgesLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the pluck's audition (feature 416).
+    let sound: HarmonicBridgesSound
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 415).
     private(set) var dailyDate: DateComponents?
 
@@ -220,6 +262,9 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = HarmonicBridgesLights(reducedFlash: reduceFlashing)
+        sound = HarmonicBridgesSound(recipe: HarmonicBridgesSoundRecipe.recipe(rootStep: 0, reached: 0,
+                                                                               stage: .loading))
         scene.reducedFlash = reduceFlashing
         scene.reduceMotion = reduceMotion
     }
@@ -272,6 +317,14 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         let time = stepTime(core, now: frame.time)
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // The lights settle on the very first frame only; every later change, a level change included, fades.
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         scene.orbit = gestures.orbit
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
@@ -301,7 +354,17 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        let previous: HarmonicBridgesExperienceCore? = latestCore
+        if let previous {
+            route(HarmonicBridgesFeedbackPlan.after(old: previous, new: core))
+            let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         absorbProgress(core)
+        mirror.summary = HarmonicBridgesFeedbackPlan.summaryText(core: core, string: mirror.string, peg: mirror.peg)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -376,6 +439,7 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
                 mirror.string = string
                 mirror.peg = HarmonicBridgesMirror.clampedPeg(peg)
                 previewing = string
+                refreshSummary()
             case let .tune(string, peg):
                 tuned = true
                 previewing = nil
@@ -475,9 +539,11 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
             clearHint()
             return
         }
+        let revealed: Bool = mirror.hintLevel != level || mirror.hintText != hint.text
         hintKey = key
         mirror.hintLevel = level
         mirror.hintText = hint.text
+        if revealed { route(HarmonicBridgesFeedbackPlan.hint(text: hint.text)) }   // feature 416: announced as state
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -535,14 +601,18 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         scene.orbit = gestures.orbit
     }
 
-    /// Chooses `string` at `peg` in the panel and describes its resonance in the drawn step.
+    /// Chooses `string` at `peg` in the panel and describes its resonance in the drawn step; since feature 416 the
+    /// pluck also plays the string's audition in that step when the sound is on (``HarmonicBridgesSound/audition(_:)``
+    /// plays only while the sound is on, the controls are on screen and the scene is active). The drawn step is the
+    /// resting step under Reduce Motion or Reduce Flashing.
     private func choose(_ string: Int, peg: Int, snapshot: HarmonicBridgesSceneSnapshot) {
         mirror.string = string
         mirror.peg = HarmonicBridgesMirror.clampedPeg(peg)
         previewing = nil
-        mirror.message = Self.resonanceText(string, snapshot: snapshot,
-                                            step: HarmonicBridgesSceneGeometry.drawnStep(snapshot,
-                                                                                        reduceMotion: reduceMotion))
+        let step: Int = scene.drawnStep(snapshot, animate: !reduceMotion)
+        mirror.message = Self.resonanceText(string, snapshot: snapshot, step: step)
+        refreshSummary()
+        if mirror.soundOn { sound.audition(HarmonicBridgesAudition.of(snapshot, string: string, step: step)) }
     }
 
     /// Puts the panel's peg back to the previewed string's current peg after a drag that ended without a tune.
@@ -551,6 +621,7 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         previewing = nil
         if string >= 0, string < snapshot.pegs.count, mirror.string == string {
             mirror.peg = HarmonicBridgesMirror.clampedPeg(snapshot.pegs[string])
+            refreshSummary()
         }
     }
 
@@ -577,20 +648,61 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         return text
     }
 
-    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its code in ``refusalLog``.
+    /// Sends `control` with `values`, shows a refusal in words in the panel (since feature 416 exactly the plan's
+    /// text, `HarmonicBridgesFeedbackPlan.refusalText(code:)`), routes the refusal's plan (an announcement and an error
+    /// haptic) and keeps its code in ``refusalLog``.
     @discardableResult
     func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
         let result = port.send(control, values)
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(HarmonicBridgesMirror.refusalText(code: result.code))."
+            let plan = HarmonicBridgesFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(result.code)
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
             }
         }
         return result
+    }
+
+    // MARK: Feedback and sound (feature 416, R02-G12-06)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: HarmonicBridgesFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its actions left, its steps reached and its stage.
+    static func recipe(_ core: HarmonicBridgesExperienceCore) -> AmbientLoopRecipe {
+        HarmonicBridgesSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Turns the sound on or off; turning it on plays the recipe of the current crossing.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
+
+    /// The summary element's text for the chosen string and peg (the choice is presentation state of the panel).
+    func refreshSummary() {
+        guard let core = latestCore else { return }
+        mirror.summary = HarmonicBridgesFeedbackPlan.summaryText(core: core, string: mirror.string, peg: mirror.peg)
     }
 }
 #endif

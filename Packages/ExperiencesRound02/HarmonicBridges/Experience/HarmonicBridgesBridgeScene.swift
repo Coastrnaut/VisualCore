@@ -13,6 +13,11 @@
 // reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls back to the level-2 geometry drawn unlit with
 // the shared `MeshRenderer` (ambient 1, the geometry's fallback colours) and keeps the reason; nothing here can reach
 // the kernel. A zero-sized drawable is cleared and nothing else is drawn.
+// Feature 416 (R02-G12-06) T-R02G1206-005 (FR-R02G1206-004; clarification Q3): the presenter's eased lights scale the
+// glow gain (`lights.glow`) and the won lift of both programs (`u_wonLight`, `lights.won`), so a win brightens as a fade
+// rather than at once; under Reduce Flashing the scene also draws the resting step with the strings at rest
+// (`u_motion` 0) and no wave shell, exactly as under Reduce Motion (`stringsAtRest`). The lights are uniforms, so a
+// fade rebuilds no geometry.
 #if os(iOS)
 import Foundation
 import HarmonicBridgesCore
@@ -33,6 +38,12 @@ final class HarmonicBridgesBridgeScene {
     var reduceMotion = false
     /// The orbit drawn (feature 414): presentation only, never part of the snapshot or the digest.
     var orbit: HarmonicBridgesOrbit = .authored
+    /// The eased light levels (presentation only), set by the presenter before each frame (feature 416); nil draws the
+    /// full levels (the full glow gain and won lift).
+    var lights: HarmonicBridgesLights?
+    /// Whether the strings are drawn at rest, the resting step is held and no wave shell is drawn: under Reduce Motion
+    /// or Reduce Flashing (feature 416).
+    var stringsAtRest: Bool { reduceMotion || reducedFlash }
 
     /// What the geometry depends on: everything of the snapshot that the meshes read, the tier and the mode.
     private struct GeometryKey: Equatable {
@@ -90,10 +101,19 @@ final class HarmonicBridgesBridgeScene {
     /// The glow limit passed as `u_glowLimit`.
     var glowLimit: Double { HarmonicBridgesShaders.glowLimit(reduceFlashing: reducedFlash) }
 
-    /// The step drawn for `snapshot`: the resting step under Reduce Motion (or when `animate` is false), else the
-    /// shown step.
+    /// The step drawn for `snapshot`: the resting step under Reduce Motion or Reduce Flashing (feature 416), or when
+    /// `animate` is false, else the shown step.
     func drawnStep(_ snapshot: HarmonicBridgesSceneSnapshot, animate: Bool) -> Int {
-        HarmonicBridgesSceneGeometry.drawnStep(snapshot, reduceMotion: reduceMotion || !animate)
+        HarmonicBridgesSceneGeometry.drawnStep(snapshot, reduceMotion: stringsAtRest || !animate)
+    }
+
+    /// The won light passed as `u_wonLight`: `lights.won` clamped to 0 … 1, or 1 without lights (feature 416).
+    var wonLight: Double { min(max(lights?.won ?? 1, 0), 1) }
+
+    /// The glow gain drawn at `tier`: the tier's gain times `lights.glow` clamped to 0 … 1 (1 without lights;
+    /// feature 416).
+    func glowGain(for tier: HarmonicBridgesTier) -> Double {
+        HarmonicBridgesShaders.glowGain(for: tier) * min(max(lights?.glow ?? 1, 0), 1)
     }
 
     /// Draws `snapshot` at `tier` into `context`'s framebuffer; `animate` false draws the strings at rest and holds the
@@ -107,7 +127,7 @@ final class HarmonicBridgesBridgeScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let still: Bool = reduceMotion || !animate
+        let still: Bool = stringsAtRest || !animate
         let camera = HarmonicBridgesSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let wanted = key(snapshot, tier: tier, still: still)
         if wanted != geometryKey { try rebuild(snapshot, tier: tier, still: still) }
@@ -116,10 +136,11 @@ final class HarmonicBridgesBridgeScene {
             try drawFallback(camera)
             return
         }
-        try drawBridges(snapshot, camera: camera, tier: tier, still: still)
-        let gain = HarmonicBridgesShaders.glowGain(for: tier)
+        let won = Float(wonLight)
+        try drawBridges(snapshot, camera: camera, tier: tier, still: still, wonLight: won)
+        let gain = glowGain(for: tier)
         guard tier.glowShells > 0, gain > 0 else { return }
-        try drawGlow(camera, gain: gain)
+        try drawGlow(camera, gain: gain, wonLight: won)
     }
 
     /// The geometry key of `snapshot` at `tier` in the current mode.
@@ -182,9 +203,9 @@ final class HarmonicBridgesBridgeScene {
                                vertexName: name + ".vert", fragmentName: name + ".frag")
     }
 
-    /// Draws the bridge mesh: `u_mvp`, `u_time` (wrapped presentation time) and `u_motion`.
+    /// Draws the bridge mesh: `u_mvp`, `u_time` (wrapped presentation time), `u_motion` and `u_wonLight`.
     private func drawBridges(_ snapshot: HarmonicBridgesSceneSnapshot, camera: HarmonicBridgesCamera,
-                             tier: HarmonicBridgesTier, still: Bool) throws {
+                             tier: HarmonicBridgesTier, still: Bool, wonLight: Float) throws {
         guard let bridgeRenderer else { return }
         let mvp = camera.viewProjection
         let time = Float(HarmonicBridgesShaders.wrappedTime(snapshot.time))
@@ -193,11 +214,12 @@ final class HarmonicBridgesBridgeScene {
             p.set(HarmonicBridgesShaders.mvpUniform, matrix4: mvp.floats)
             p.set(HarmonicBridgesShaders.timeUniform, time)
             p.set(HarmonicBridgesShaders.motionUniform, motion)
+            p.set(HarmonicBridgesShaders.wonLightUniform, wonLight)
         }
     }
 
-    /// Draws the glow shells additively: `u_mvp`, `u_glowGain` and `u_glowLimit`.
-    private func drawGlow(_ camera: HarmonicBridgesCamera, gain: Double) throws {
+    /// Draws the glow shells additively: `u_mvp`, `u_glowGain`, `u_glowLimit` and `u_wonLight`.
+    private func drawGlow(_ camera: HarmonicBridgesCamera, gain: Double, wonLight: Float) throws {
         guard let glowRenderer else { return }
         let mvp = camera.viewProjection
         let limit = Float(glowLimit)
@@ -205,6 +227,7 @@ final class HarmonicBridgesBridgeScene {
             p.set(HarmonicBridgesShaders.mvpUniform, matrix4: mvp.floats)
             p.set(HarmonicBridgesShaders.glowGainUniform, Float(gain))
             p.set(HarmonicBridgesShaders.glowLimitUniform, limit)
+            p.set(HarmonicBridgesShaders.wonLightUniform, wonLight)
         }
     }
 

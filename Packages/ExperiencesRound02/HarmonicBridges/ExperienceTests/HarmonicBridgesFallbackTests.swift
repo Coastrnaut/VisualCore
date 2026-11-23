@@ -243,7 +243,11 @@ import VisualCoreMath
             HarmonicBridgesTest.pin(session, shell, tier: 0)
             let rgba: [UInt8] = try HarmonicBridgesTest.still(session)
             let snapshot: HarmonicBridgesSceneSnapshot = try #require(shell.presenter.lastSnapshot)
-            HarmonicBridgesTest.checkFrame(rgba, snapshot: snapshot, mode: .tier(0), "Reduce Flashing \(reduceFlashing)")
+            // Since feature 416 Reduce Flashing also draws the strings at rest with the resting step and no wave shell,
+            // so the reference is the Reduce Motion one.
+            #expect(shell.presenter.scene.stringsAtRest == reduceFlashing)
+            HarmonicBridgesTest.checkFrame(rgba, snapshot: snapshot, mode: .tier(0, reduceMotion: reduceFlashing),
+                                           "Reduce Flashing \(reduceFlashing)")
             stills.append(rgba)
             session.qualityPin = 0
         }

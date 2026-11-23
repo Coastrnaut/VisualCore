@@ -52,6 +52,10 @@
 // u_glowLimit), no texture samplers, no image assets, no `discard` and one loop, bounded by a constant. Output is
 // premultiplied alpha. Palette constants are written with six fixed decimals from `HarmonicBridgesPalette`, so the
 // shader colours equal the CPU's within 1e-6.
+// Feature 416 (R02-G12-06) T-R02G1206-005 (FR-R02G1206-004; clarification Q3): the won lift of both programs is scaled
+// by the presenter's eased won light `u_wonLight` (``wonLightUniform``, 0 … 1, `HarmonicBridgesLights.won`), so the
+// per-vertex won flag no longer switches the brightness at once; 1 draws the lift at full strength. The bridge program
+// now uses 7 vec4 slots (u_wonLight 1, in its fragment stage) and the glow program 7.
 
 import Foundation
 
@@ -179,12 +183,15 @@ public enum HarmonicBridgesShaders {
     public static let glowGainUniform = "u_glowGain"
     /// `float`: the glow limit (glow): ``glowLimit(reduceFlashing:)``.
     public static let glowLimitUniform = "u_glowLimit"
+    /// `float`: the won brightening's eased light (bridge and glow, fragment stage; feature 416): scales ``wonLift`` on
+    /// won membranes, glow rings and glow shells; 1 draws the lift at full strength, 0 none.
+    public static let wonLightUniform = "u_wonLight"
 
     /// Every uniform the bridge program declares, each once, in order of declaration (vertex stage first).
-    public static let bridgeUniforms: [String] = [mvpUniform, timeUniform, motionUniform]
+    public static let bridgeUniforms: [String] = [mvpUniform, timeUniform, motionUniform, wonLightUniform]
 
     /// Every uniform the glow program declares, exactly as declared (vertex stage first).
-    public static let glowUniforms: [String] = [mvpUniform, glowGainUniform, glowLimitUniform]
+    public static let glowUniforms: [String] = [mvpUniform, glowGainUniform, glowLimitUniform, wonLightUniform]
 
     /// The uniform lists per program name (`bridge`, `glow`).
     public static let uniformNames: [String: [String]] = ["bridge": bridgeUniforms, "glow": glowUniforms]
@@ -380,10 +387,10 @@ public enum HarmonicBridgesShaders {
     }
     """
 
-    /// The bridge fragment shader (no uniforms). Ambient ``ambient`` plus Lambert ``diffuse`` from ``lightDirection``
+    /// The bridge fragment shader. Uniform: `u_wonLight` (feature 416). Ambient ``ambient`` plus Lambert ``diffuse`` from ``lightDirection``
     /// on island faces, the palette colour on the others; soft edges from the local coordinate
     /// (``edgeCoverage(local:)``); translucent membranes (``membraneAlpha(local:won:)``); the won lift on membranes and
-    /// glow rings; the shell fade. Premultiplied.
+    /// glow rings, scaled by `u_wonLight`; the shell fade. Premultiplied.
     public static let bridgeFragment = """
     #version 300 es
     precision highp float;
@@ -393,6 +400,7 @@ public enum HarmonicBridgesShaders {
     in float v_local;
     in float v_fade;
     in float v_won;
+    uniform float u_wonLight;
     out vec4 color;
     const vec3 HB_MARK_FILLED = \(vec3Literal(HarmonicBridgesPalette.markFilled));
     const vec3 HB_LIGHT = \(vec3Literal(lightDirection));
@@ -414,7 +422,7 @@ public enum HarmonicBridgesShaders {
         float light = mix(1.0, HB_AMBIENT + HB_DIFFUSE * lambert, isLit);
         float d = clamp(abs(v_local), 0.0, 1.0);
         float soft = 1.0 - smoothstep(1.0 - HB_EDGE_FEATHER, 1.0, d);
-        float won = clamp(v_won, 0.0, 1.0);
+        float won = clamp(v_won, 0.0, 1.0) * clamp(u_wonLight, 0.0, 1.0);
         float rim = smoothstep(HB_MEMBRANE_RIM, 1.0 - HB_EDGE_FEATHER, d);
         float membrane = mix(mix(HB_MEMBRANE_ALPHA, 1.0, rim), 1.0, HB_WON_LIFT * won);
         vec3 rgb = clamp(v_base, 0.0, 1.0) * light;
@@ -445,7 +453,8 @@ public enum HarmonicBridgesShaders {
     }
     """
 
-    /// The glow fragment shader. Uniforms: `u_glowGain`, `u_glowLimit`. Gain ``glowGain(gain:limit:)``, colour and
+    /// The glow fragment shader. Uniforms: `u_glowGain`, `u_glowLimit`, `u_wonLight` (the won lift's scale, feature
+    /// 416). Gain ``glowGain(gain:limit:)``, colour and
     /// alpha ``glowColour(colour:glow:gain:won:)`` (a zero colour counts as the glow colour); premultiplied RGBA in
     /// 0 ... 1, drawn with additive blending.
     public static let glowFragment = """
@@ -456,6 +465,7 @@ public enum HarmonicBridgesShaders {
     in float v_won;
     uniform float u_glowGain;
     uniform float u_glowLimit;
+    uniform float u_wonLight;
     out vec4 color;
     const vec3 HB_GLOW = \(vec3Literal(HarmonicBridgesPalette.glow));
     const vec3 HB_MARK_FILLED = \(vec3Literal(HarmonicBridgesPalette.markFilled));
@@ -465,7 +475,7 @@ public enum HarmonicBridgesShaders {
     const float HB_MAX_GAIN = \(fixed(maxGlowGain));
     void main() {
         float gain = min(clamp(u_glowGain, 0.0, HB_MAX_GAIN), clamp(u_glowLimit, 0.0, HB_MAX_GAIN));
-        float won = clamp(v_won, 0.0, 1.0);
+        float won = clamp(v_won, 0.0, 1.0) * clamp(u_wonLight, 0.0, 1.0);
         vec3 colour = mix(HB_GLOW, v_colour, step(0.0001, v_colour.r + v_colour.g + v_colour.b));
         vec3 rgb = mix(colour, HB_MARK_FILLED, clamp((HB_CORE * gain + HB_WON_LIFT * won) * v_glow, 0.0, 1.0));
         float alpha = clamp(HB_GLOW_WEIGHT * gain * v_glow, 0.0, 1.0);

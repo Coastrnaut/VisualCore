@@ -465,10 +465,10 @@ enum HarmonicBridgesGestureScript {
         #expect(shell.presenter.refusalLog.last == "action.rule.r02-g12.noop", "the refusal's code is logged")
         #expect(shell.presenter.refusalLog.count == 1)
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message.hasPrefix("That change was refused"), "\(message)")
-        #expect(message == "That change was refused: "
-                + HarmonicBridgesMirror.refusalText(code: "r02-g12.noop") + ".")
-        #expect(message == "That change was refused: that string is already at that peg.", "the kernel code in words")
+        // Since feature 416 the refusal is shown in the feedback plan's words.
+        #expect(message == HarmonicBridgesFeedbackPlan.refusalText(code: "r02-g12.noop"), "\(message)")
+        #expect(message == HarmonicBridgesMirror.refusalText(code: "r02-g12.noop"))
+        #expect(message == "That string is already at that peg.", "the kernel code in words")
         let sentAfter: Script.Sent = Script.sent(shell)
         #expect(sentAfter.accepted == sentBefore.accepted)
         #expect(sentAfter.rejected == sentBefore.rejected + 1, "one string.tune refused")

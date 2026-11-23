@@ -229,7 +229,9 @@ import VisualCoreMath
         let text: String = shell.presenter.describe(core)
         #expect(text.contains("The crossing holds in every step."), "\(text)")
         #expect(shell.presenter.mirror.status == "Won")
-        let won: [UInt8] = try HarmonicBridgesTest.still(session)
+        // Since feature 416 the won brightening eases in over presentation time: the frame 10 s later shows it settled.
+        // The play changed at that frame, so its step clock starts there and step 0 is still shown.
+        let won: [UInt8] = try HarmonicBridgesTest.still(session, time: 10)
         let snapshot: HarmonicBridgesSceneSnapshot = try #require(shell.presenter.lastSnapshot)
         #expect(snapshot.stage == .won)
         #expect(snapshot.shownStep == 0)
