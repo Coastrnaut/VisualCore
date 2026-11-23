@@ -45,6 +45,8 @@ let package = Package(
         .library(name: "FacetedForgeExperience", targets: ["FacetedForgeExperience"]),
         // Feature 383 (R02-G09-03): Nocturne Garden's experience (iOS only; a registered candidate until X-R02-G09).
         .library(name: "NocturneGardenExperience", targets: ["NocturneGardenExperience"]),
+        // Feature 393 (R02-G10-03): Backwards Aurora's experience (iOS only; a registered candidate until X-R02-G10).
+        .library(name: "BackwardsAuroraExperience", targets: ["BackwardsAuroraExperience"]),
         // Feature 343 (R02-G05-03): Colorfall Canyons's experience (iOS only; a registered candidate until X-R02-G05).
         .library(name: "ColorfallCanyonsExperience", targets: ["ColorfallCanyonsExperience"]),
         // Feature 323 (R02-G03-03): Wave Knot Keeper's experience (iOS only; a registered candidate until X-R02-G03).
@@ -366,6 +368,26 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "ChronoConstellator/ExperienceTests"),
+        // Feature 393 (R02-G10-03): Backwards Aurora's experience (presenter, scene, controls) and its simulator tests.
+        .target(name: "BackwardsAuroraExperience",
+                dependencies: ["BackwardsAuroraCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "BackwardsAurora/Experience"),
+        .testTarget(name: "BackwardsAuroraExperienceTests",
+                    dependencies: ["BackwardsAuroraExperience", "BackwardsAuroraCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreSimulation", package: visualCore)],
+                    path: "BackwardsAurora/ExperienceTests"),
         // Feature 383 (R02-G09-03): Nocturne Garden's experience (presenter, scene, controls) and its simulator tests.
         .target(name: "NocturneGardenExperience",
                 dependencies: ["NocturneGardenCore",

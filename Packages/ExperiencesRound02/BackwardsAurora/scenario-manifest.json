@@ -1,0 +1,3232 @@
+{
+  "controls" : [
+    "wave.reverse",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g10.backwards-aurora",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7f59ca8d93322fad1219a19794f1fe9d230f1227c14cc21115a3882007ee3e01",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              8,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0.5,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g10.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1.5
+            ]
+          },
+          "result" : "action.rule.r02-g10.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g10.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              4,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g10.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              14
+            ]
+          },
+          "result" : "action.rule.r02-g10.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g10.noop",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g10.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g10.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7f59ca8d93322fad1219a19794f1fe9d230f1227c14cc21115a3882007ee3e01",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              8,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              9,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              8,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "21c7e25d28cfe21470bc9e8650eb4579d1f21391e354a2ea72191b68dccbbfac",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7f59ca8d93322fad1219a19794f1fe9d230f1227c14cc21115a3882007ee3e01",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c3c268db0d315e44aea4d3854a0f849a53b1bb2f60d2d5a47f5080120fd0941b",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80"
+      },
+      "name" : "acceptance-001",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c98b365591f6b7f59f9356f109a81b1f931e9babbd8f8a8df271678708991fb0",
+        "initialDigest" : "4ee365819876056792afab714ebc35ee8d0496425ee8b40ec845cd36b202057c"
+      },
+      "name" : "acceptance-002",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c594e2a0f94d42e3487d98d9ce9086c781f9eef64e68f6e743cbdf4741e2aa9a",
+        "initialDigest" : "6474e7e9cde83857c653e7c90c46cd7b0362e8873f5deff45f5c3f63618ac4c4"
+      },
+      "name" : "acceptance-003",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bd4994b8498b662ca50fcff6698f152fffea9d282fed5862f678169304c00450",
+        "initialDigest" : "eeff060eb0e733fd03bf01991ee269bf0c481a581d73c294c43caa2a815c5d20"
+      },
+      "name" : "acceptance-004",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "40df9dde7bfd6c81a559a0fb01071bb396f122db0d4320d3b7bf43244ae23266",
+        "initialDigest" : "28a2ab616ed36c764d29eea7c2a29fca067c19403adb4ef1f18d83f9df215f58"
+      },
+      "name" : "acceptance-005",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9797f28be0d57e04ad3ca719213d2a1ed30d593bc6ee72c43d308e96b3298a67",
+        "initialDigest" : "9649b15e706f7931ed62fce7f0b139e69a7acd8eb8a948249fdeb8fb39f3a186"
+      },
+      "name" : "acceptance-006",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f67c479424f8474afbcfde454cb4443c7ffeb7a804c85117fbb30075ce7119a6",
+        "initialDigest" : "fc7bd778716fee31d9f5377d7cea0cb071c239fb828423f11a15798b63408e46"
+      },
+      "name" : "acceptance-007",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e962bd8769e5cafc7f87cd48f73da9cb4a5e035c5de6729fd6278b562d1c1d88",
+        "initialDigest" : "06f2e4e79f6267e5f66a709587cb31fe5b5921a23c1b2085869de047ceaf7bcb"
+      },
+      "name" : "acceptance-008",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5523a2ff5a28f46a2de477c6203a6ca87436fee0c9c885222f25bffad654d007",
+        "initialDigest" : "1ed6d245b989a41a92405d6dc2821ac321f159dc268cdad6e27759e0b7e8c7f0"
+      },
+      "name" : "acceptance-009",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8785e2572c8e72e7c695c7215804f709eba73be3dc56c23a76cad15a2e6e66ba",
+        "initialDigest" : "cf147a5fd7ba43fe31d11310563a9d134a7283578881588344da4110546b859c"
+      },
+      "name" : "acceptance-010",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e69155f1d7cc99e53876c4c403c36d87e3a141afaaaa67b03071546e6b01ee52",
+        "initialDigest" : "d199fa8c3f77003551688364fe2de23f6ba7f9108acc1800911146c0c475ff05"
+      },
+      "name" : "acceptance-011",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8f65142fb2c81b614afd15f2c4984cb3c9e3d013b19b05d876406d249359e8bf",
+        "initialDigest" : "cbc999ad20e13a2619a9b04295264f7288e54cd237b053105d52e534cc7166e4"
+      },
+      "name" : "acceptance-012",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f01c7e77ea0895f6ecac7a726315d0f7e667806a50e482feaa4b67929eaf6f4e",
+        "initialDigest" : "361f970f41e3c36e3cd9b7d91a26d082f78b5452fcba41e33e3ab46cfc504ca5"
+      },
+      "name" : "acceptance-013",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0e9adde943ee6e798e1791e5cb030ac2884064a28d8a2d71392be053f3e44407",
+        "initialDigest" : "4d764d47bbfc4d77301d05684b466b37cc54a165b429b541d28a3d7fedda01b4"
+      },
+      "name" : "acceptance-014",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1eaa2edf817f0b4965a6a1e28ac7d6bb3f6bd8500e1d5f6cc69e52ddfb49899b",
+        "initialDigest" : "0051c7a0be4338f5c0511520b367679b6b7b55a1bd0a3221e63cf3a840985cdd"
+      },
+      "name" : "acceptance-015",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              4,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e80d88019e40ab60b97e4105bc68497b8664340256d64c406a48c94f2ab8daa7",
+        "initialDigest" : "c574247ceadd4a9a6d1e846a7ad1839d17f497fcea2f49d513b4b413b5f46c47"
+      },
+      "name" : "acceptance-016",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "edc054baaf457ea2db4791664c9d628b361fb545a8ce8fe68de5ec7c0608502c",
+        "initialDigest" : "b9d6466c84ff16715427ad8e978bc6913f0b9cf3448a63dc7e0fec2717c0a0ac"
+      },
+      "name" : "acceptance-017",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              5,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "87c8623d545c632dbfe30c56c0d39320c452961be3c19add3207d0ee3ca50a59",
+        "initialDigest" : "c3d9c199c68e196c00a22f6d439d5d50e0381cf3cce2511bd5116071cd858e56"
+      },
+      "name" : "acceptance-018",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d44a4f7d199fb5da6453ebd8981fcc10e1271b6ddc9a10d174a7755f204a634a",
+        "initialDigest" : "1c210df9f62a983e5ab5b2df9cac7005897af6c76ea266a3c22196ba144e3c18"
+      },
+      "name" : "acceptance-019",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "64dd75fe6c4e415ee1bf2ef6e396f125532dfcd78b0d18be866b3fb6a2edf98f",
+        "initialDigest" : "3b50e2ee36f8c79b5eb05051ef2aacb66a597eb77a3b72071fdef8b2e998e10d"
+      },
+      "name" : "acceptance-020",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a71cefb5216d5bbb99c378008d058f07641653f037c7d0cd9a15a7ebfe48d799",
+        "initialDigest" : "83229523e34c6a5b0d16f74c800c28613032ba7f0eb872a31a4bc6f69c9d9415"
+      },
+      "name" : "acceptance-021",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "19845b7787ea8683efaca494165da5e5e7a82df63f18d027d7e8c68a279c4844",
+        "initialDigest" : "6dd61a417ba62451aa70080c3724918fbc26bcea2625be625668adce39038649"
+      },
+      "name" : "acceptance-022",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cc51a6c417ccd5fa090bb6631cccde86df9334aa193d1ca953c7ae00bcdab7e9",
+        "initialDigest" : "685e9c7196b47971926016d4ac4d48a2315be6f8e424e08fb4398c6910c10aab"
+      },
+      "name" : "acceptance-023",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c7cc7d7a9752ee31c9c371046c36a178209816c9355843e1a1158c31bf671509",
+        "initialDigest" : "85a3e059909620c1bbcd89d08b86e4bda71ef1e006b4f414926b2f2aa2585e8b"
+      },
+      "name" : "acceptance-024",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a8aa6053b7803d99076901077622a1d5bda8db0b102090e448b25ef884271445",
+        "initialDigest" : "7c07344aa7478246a9070f1c76917d24e5073c103f94ac686ad124129764d334"
+      },
+      "name" : "acceptance-025",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "339bcfb13aa6231758b9fe126a2784610a61edbfa51eae4f03cf7231a277ff93",
+        "initialDigest" : "6a328a3b49d226679c49e47d116d25602a5f438df219a0802935b5e1acd80a37"
+      },
+      "name" : "acceptance-026",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1a1d8c04465af51cdc9935171e536899fe7da96eef663f3285bceac341f36188",
+        "initialDigest" : "ee0353bdfc5394d09d66c9f54f0ec35f27eb55ce9ae69abab05554be524e7c73"
+      },
+      "name" : "acceptance-027",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "34843f20183572e94447653a8486e5a9185ba25883d7c0b36873c833e7391c03",
+        "initialDigest" : "2babe41621304ac81a217b37455d2f68f88b8e9b02b2ee3151420d503217ffc4"
+      },
+      "name" : "acceptance-028",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7bca5ec3362bcd6280d5658890ca918c30aff940473e5b46f06775b54052d578",
+        "initialDigest" : "fdc81dc8441f8492f4b6b94b9bbcac3c5e27f1575ee4652ae80d756ac9c457a6"
+      },
+      "name" : "acceptance-029",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4e4376ba03a1f4e519885f6b172cdff716857b19d8055d97d12badfa9f793543",
+        "initialDigest" : "c35f3a84a945d72d4f2008ec3ea9e0aa8cdb59fe74c7de0d676be81796c315eb"
+      },
+      "name" : "acceptance-030",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3c64085d35f6ab6344c6685a82fa70e73f81bd3e0b6e7bb2357a3846b32dda8e",
+        "initialDigest" : "a9fbc43a664d29b9fb82af2036f774441a173e9e828848d77f44443366393ed0"
+      },
+      "name" : "acceptance-031",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a6c1da93c04d08b12e30397b541197672dc99ceb469f293b859e1b09c97f59e4",
+        "initialDigest" : "55ec1188909465ff2e09db0f01d12637e7deb8c70aaf4bf59c4bf40327c37eb8"
+      },
+      "name" : "acceptance-032",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "96546bcd2e794cc6fb48b9a78287c12173fb1a6ec251c59500974956d2bcad8f",
+        "initialDigest" : "21e66fb8a1fbbd4793061b7f0a1476c577d9ec2421611902fa4b3753b7c8a96c"
+      },
+      "name" : "acceptance-033",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1db94d50ea2c5407dd0ab28d1a379c3545d6aa08cafde73c3d4ab1ddc5f84284",
+        "initialDigest" : "abd6af468f684491df6c9cbcdb31a24e4827521697bcfd1a851d16b06d2b8cd2"
+      },
+      "name" : "acceptance-034",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f48aa28b8f1999b81a1ccd1d082d8c7483f2e193c86d69c4ab42fdc83bf8a68d",
+        "initialDigest" : "863bbea055b62069bad5868084d05185d9f5dcfb6ea5470df3ea878bdb09d4c1"
+      },
+      "name" : "acceptance-035",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "99e03a55e9ce1b15a4ba0aadf5e7487361ccdb95a257da0fe2b9f1eefa17ad61",
+        "initialDigest" : "f855d2af5a80dd40a230de56024ca6f4a39965017fb37ea429a4c29444f5a5b9"
+      },
+      "name" : "acceptance-036",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4fee6498be38420803866dec666fbf928ab0a4505df3b99b2549f718f12c7743",
+        "initialDigest" : "57c40be1e21795415c812cc3191bee7ded8f173de1d4084dd92b4af833222e8e"
+      },
+      "name" : "acceptance-037",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1794e7a2969fa49d707d01c39caf47dd7d28a65fa2686d61fd2901ceb51f5c79",
+        "initialDigest" : "4a46ee4cf07629ea789f08abe01e4ca9babad3e197cf927cfec7aa62d868cef2"
+      },
+      "name" : "acceptance-038",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1f3491afe28a0caa6e270e0eb8121049c7793046478ead0f9c2305fa65a63ac1",
+        "initialDigest" : "35bdd2490ed377137cab94fe135f9ee6c39175549a8da671bc68b2d4b5597039"
+      },
+      "name" : "acceptance-039",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6f4f832b28b7f3beac11330b0f74f33688ee5ffb4e1e845f30cb88b2800084a6",
+        "initialDigest" : "9bfdee3e0e7adaa565187078a25d535d9b81187e8d0cbda38a3ffc27eb318b6b"
+      },
+      "name" : "acceptance-040",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ee2b8cbb573c7b62dfce6b82b5880d64ccdcb1ab64c813907976f69b5546c74d",
+        "initialDigest" : "fa2ce8ecfce9aaded758191c94eb01d27a7e2955a6ec9dcd777656708defdc50"
+      },
+      "name" : "acceptance-041",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0e50508a779c31795fcdd4b27efdd011b3e16e7ebedcb586625bed343247f038",
+        "initialDigest" : "11099cee54ed265c315c01a0dd7cfc7dc85d00dda75420babe8e9040712dccc6"
+      },
+      "name" : "acceptance-042",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "09a23c318dc77286da9c4bbd8fa7d8e0cc9b8ef234628e2a81d89bd53bcfa145",
+        "initialDigest" : "23833218270b0a6000951ad009c0e1bd8a43f5411448835929dd9c81cf07580d"
+      },
+      "name" : "acceptance-043",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aa025f9a4bc29c6be43d3d22cae81ea4431e2f1eb9babbe0ed62bff98f9ba142",
+        "initialDigest" : "3352d72d759b32857b3961176f691324d350a0f3d4715e8d56632c98d26dba7a"
+      },
+      "name" : "acceptance-044",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              4,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58080eeb0503d4b81e0f7f3a95fb7023e82bbcca83c8e4dd16c770401cc43b20",
+        "initialDigest" : "e23473d2fa97cde8846fb967d5f69fe7c84aa5bdba80063b54e1b2f202539ddd"
+      },
+      "name" : "acceptance-045",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "adacdbc11491db4fd2a81316a135c3c94bdd9dacd324490ec486107c5ff8cc42",
+        "initialDigest" : "bf48c23b188f4cc06275c8edf64a48e5f93f4c67a230196aab83fe7d413d20f2"
+      },
+      "name" : "acceptance-046",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "247459debfdcd9abebe47662ad25d8924c70fa8cef611b9a5b85aea70cccbf7a",
+        "initialDigest" : "e24963aa854344b4faed64af1694c563c7bb92dc8637a01b7073dfb62a6d385d"
+      },
+      "name" : "acceptance-047",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aa5c4a61dc262f1094416296846b1ee6c8544b12c6cae39283f3b7fc321d0ed2",
+        "initialDigest" : "eb45a5609689d3b3eacc76dee9cc90a21d777ce2190573e6d6c022403c95b9b8"
+      },
+      "name" : "acceptance-048",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              4,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c0ae99ad2ed87bb0fdf19fd7576f50799b14aecbe889e297645610c9bb57cff5",
+        "initialDigest" : "c09333949a2cc486f0c8d55ba37f30e4a12d4eec86ca88772a5a1a04d00e023b"
+      },
+      "name" : "acceptance-049",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "740c203a822f31f694f7fe36bbb65a827c44272fb9d35496495ae8a5f6359b1b",
+        "initialDigest" : "eb065789aaf7e4050184ca850cba0a1552692779722f964da4acb1ee97e6d377"
+      },
+      "name" : "acceptance-050",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c18667ac02dba14d54b1a4f173a3a6abdb779776a79167134bb16e31042e8c26",
+        "initialDigest" : "476abb51a39edfc7c2f819a5ff494a3e065859220160b53dc1b5f5e7de51e7e5"
+      },
+      "name" : "acceptance-051",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8ed971828400b88c5d35a3a4539dc898f92ef20d33dadeaa03470c9f0bfc9ab2",
+        "initialDigest" : "faae8b1182ee1067367a056578963b010e6ada245941b3c2623befba8514c27f"
+      },
+      "name" : "acceptance-052",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "792fbc45a6998e8833caedef53f5813365c25aaa92d5afd9daf3c9550e454135",
+        "initialDigest" : "a6d26b307c8405ad2d98dff3d7a517051f969400a454186c82c68b3e5641c2f0"
+      },
+      "name" : "acceptance-053",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8a381d40da08c8d5091c6529b6944e86c0f0682fe9c35bb6a50ca6c1e271c37a",
+        "initialDigest" : "90e881ece9fcb6be46820ac55319d4b35e6da490de7c9ac979d597199aaf6646"
+      },
+      "name" : "acceptance-054",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "db4302243dc36acd18d093622ed78b6d2f79a2f3f53d33df6692147ad4807038",
+        "initialDigest" : "f25619dc799dce4fab58e3d4672b652c5d8c0ffc5f1ffe643e2994885b019a0a"
+      },
+      "name" : "acceptance-055",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "285669143031eb9e3d2c9dac554571c86c7a6e0ecdbd0061639dbb6a9bde16d7",
+        "initialDigest" : "9cd62f43daf0e693e1206dd64d00bb43de980e33a1bcfbbf70b39140a2ff94ed"
+      },
+      "name" : "acceptance-056",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7e6ba06fcfb608df5e228c347c8116f77e1992636a9f52b6473ff0f88fcba533",
+        "initialDigest" : "ab9d63ab6935c45eb99f45a113eeb994a1af4fa008405bfeb98b1653682d9c99"
+      },
+      "name" : "acceptance-057",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f0d5653501fb27c511e3cbb5a918e12fb1aeae6fb1b42d4a1cfd0daaa099bcdd",
+        "initialDigest" : "db1603943d930a1571b162d7e7b5225a699cb25379a383eb7dcf129fb5f90d0e"
+      },
+      "name" : "acceptance-058",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c99f7984744a33417eabc7777aaf4d40ec15e24ec97fc12dd8fc52ee90b7a552",
+        "initialDigest" : "4ca400dad8aea468b0827620d2597ffed904c8f8af707c061a6f589d6a5d25f7"
+      },
+      "name" : "acceptance-059",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              4,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b373923cc16dec0584a4967a2c83fa65537433be33d14732cab2a7ae6cfe360a",
+        "initialDigest" : "f8a2190d13ab59250a2839840af7cb547e51fc1b9fe3537d9d56063988f90733"
+      },
+      "name" : "acceptance-060",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8d0d95d2648b5c7821365724c875ce9ef87c4d8317f08e45fe0fc1277fb6f95b",
+        "initialDigest" : "1916f3db2e8e49710c3073eee45100ed93c9553ea1499e614bf48239c0c444a8"
+      },
+      "name" : "acceptance-061",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5a7207a6b04bcf5b98ba699721d04a0998d38767503ea2642f6673fad9ff9512",
+        "initialDigest" : "0089479d3e5abcb69673159353992b5633a2e5f0c9a5a73a5297c016347061e5"
+      },
+      "name" : "acceptance-062",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1e7d04d435c2dcf50d2cad774b0a04e9c2af2fee0fa113bbbe152ba0b497e290",
+        "initialDigest" : "70fa9f903a7f4e94d99868431f64afd74354b58c5477eedcc5645cd73df1cc6a"
+      },
+      "name" : "acceptance-063",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eecddca2415e925a35b9cd334154ad2ff60a1b1cfc26ef47520ced6dfba9fac2",
+        "initialDigest" : "2bb02e22d60df6bdaf551c9d1a23be366b8ab3d4479a69e2b929463fcc0d5eb0"
+      },
+      "name" : "acceptance-064",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "03b893780820a28e87b490f27e012c4cead68d2f9b244f6ed1aa793a1fcb2daa",
+        "initialDigest" : "c68f98d22a8999f6b9f64ef2470dd000a4ea085577438706fc742ed81f20852d"
+      },
+      "name" : "acceptance-065",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e42fad98f2749c5b4a26d4dcd2e853e480f8eaba913db3eeb1cb1cd7ae22a932",
+        "initialDigest" : "c6bc9f906170e98a1c73c2e5ec6fe6c17cd90947975079d2283f988ddf3295ad"
+      },
+      "name" : "acceptance-066",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "68745c6b19553971dfa6d277dc04b991cbca67aeff997a6e11f418f518660770",
+        "initialDigest" : "4ee17021469df568a645ef6c0592c057b41b3a9be61854ae1f981254aaa11a8f"
+      },
+      "name" : "acceptance-067",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b2b0b7d4d6a8862d60c85f2204fe8d6e40cc84f9a35d984004430410bfdfe0ed",
+        "initialDigest" : "57b97df5c344fc7352bd3b3cec1388dacf06324e8f91907e1db5c5ebbe83730e"
+      },
+      "name" : "acceptance-068",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f5327689007457c57bab11226e14e159521a9786b938729ce30ec158cf3a509c",
+        "initialDigest" : "9a768ef2c50f840c2ec57abea9ca8f71ebebea448b3ec23e5f1d2a1cb06964dc"
+      },
+      "name" : "acceptance-069",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fb7fe9d3400c672a9432d7dc0bf2f2ba259e66ca553b5b4419e3fcb2bca0912d",
+        "initialDigest" : "a5789ac4e87d1044aa13c342c270cb1a25f081f298a39b169cc7604e21f26dd3"
+      },
+      "name" : "acceptance-070",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8970628da9367dbdeaf910a0a7cfba122fab4702a30817edf05164f5c3a9aebf",
+        "initialDigest" : "a3c31dc6d47cd5c7f76f38c9ca0725c822c61ee08381f5381fdc7d9c190d9655"
+      },
+      "name" : "acceptance-071",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "98b2eb5efc702140de0aa7c30edc3ee49b654d1856d0ded4ad2f176041a4cc25",
+        "initialDigest" : "0926ed3bcbd26c6e1f908a8b1fe765e6d0a3bcfad0184db1cee42dd81f5f1a49"
+      },
+      "name" : "acceptance-072",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a33d2e77c21193634b2badec9f667c9073061538097382a98fa872c7dc2c0d46",
+        "initialDigest" : "1e81b81f9b64b66c554275f848b5f191b6055f5e668c5dbd2b6c1f3331e4ae6b"
+      },
+      "name" : "acceptance-073",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              4,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "43d5592d430675bbd17dc5f0888a2e48c0f2aad0d4d6900e53e9622336624053",
+        "initialDigest" : "8491c586784b214aa4cfe9acec6a83844cc221b0dd820ab926f3e238e235bf4e"
+      },
+      "name" : "acceptance-074",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e9959654fed70e0ac7d1f1edcfc56647c89f1bcd049e2f21d00dfa996e065946",
+        "initialDigest" : "9ac7c53e901d87d5fc6342465318356aea8f80824b0a8f9df7f613b91361aa4f"
+      },
+      "name" : "acceptance-075",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "109aa9bed3feb4d277c10004800f2ea42f9c1c42254c40ca9b3f6b962485c403",
+        "initialDigest" : "cb660bd96290babc65cf678f04c66c33584a077f95340b049ceaca21d5cadb53"
+      },
+      "name" : "acceptance-076",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d9bda5d9ce26942a9f7505eab9a841e827f82670282b8d32e3c6ac16de12e4ac",
+        "initialDigest" : "4434bbd0cad19c64f291d0ce72f3640e1ee7c1916e4dbe7c41afda9f2e306d91"
+      },
+      "name" : "acceptance-077",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5cf944d56277dbbf5511e41835137e301553e0d464687c31e19c5ce32cde6d54",
+        "initialDigest" : "693890f3320e139f63293d1daf9ad27c4ddbaead2f19e64f38a4425034afc0de"
+      },
+      "name" : "acceptance-078",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              32
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "37c106f2464033aea6a04b739619241c4babbb5ade1f19cd34314b1227dc1942",
+        "initialDigest" : "f160597c1b8b87b32d83f8c10258f4bd5074517a1c2f61e63ae1ad5c89f47064"
+      },
+      "name" : "acceptance-079",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              32,
+              31
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fc5f1ba581cf72563c717c27aa201569c260fa0e19ef1249e56901b8e95f4667",
+        "initialDigest" : "6c38646d6c7b95b33b0c68f4f8fa394d04a11392a80554e608ae46693254bd04"
+      },
+      "name" : "acceptance-080",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              8,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "af6814ce7052b8d6a0ba3e63bfe8cde8ed03b9e519046bfe2a8cdc6628bce0e0",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9a66afad1fce45dca23f33da60aba1837172026ff4b55692b8f8b9d3db493741",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-budget-out",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "wave.reverse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7f59ca8d93322fad1219a19794f1fe9d230f1227c14cc21115a3882007ee3e01",
+        "initialDigest" : "ac0aef08f1052e740b890e24cae24efaae9f689ee3bafc173bbd60592ac94d80"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

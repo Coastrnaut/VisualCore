@@ -255,6 +255,10 @@ targets:
         product: NocturneGardenCore
       - package: ExperiencesRound02
         product: NocturneGardenExperience
+      - package: ExperiencesRound02
+        product: BackwardsAuroraCore
+      - package: ExperiencesRound02
+        product: BackwardsAuroraExperience
     postBuildScripts:
       - name: Bundle licenses (UA-F04)
         basedOnDependencyAnalysis: false

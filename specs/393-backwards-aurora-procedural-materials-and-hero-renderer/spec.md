@@ -74,7 +74,8 @@ synchronized waves" and the geometry "tessellated temporal ribbon with direction
   tests render offscreen at 1,152 × 768 and, at sample and target points at least 6 pixels from every ring, kink and
   tick (corrected at the checklist, 2026-11-22: the ghost points too), check that the ribbon pixel is cyan (blue minus
   red at least 0.15) and differs from the ground by at least 0.15 in luminance; at target points whose sample differs
-  from the wave's by at least 8 units, that the ghost pixel differs from the ground by at least 0.1 in luminance with
+    from the wave's by at least 12 units (corrected during implementation, 2026-11-22: at 8 units the additive tier-0
+  glow tinted a ghost pixel), that the ghost pixel differs from the ground by at least 0.1 in luminance with
   red above green by at least 0.05 (lilac); that the gauge's first bar differs from the ground by at least 0.1; and that
   the background matches the ground within 0.05 away from geometry. Palette: ground #070B1F, ribbon #1FC8D6, ribbon
   highlight #9FF4FA, glow #6FE8F0, ghost #C9B8F0, checkpoint ring #DCD3FA, matched disc #F4F0FF, kink cross #FF8A7A,

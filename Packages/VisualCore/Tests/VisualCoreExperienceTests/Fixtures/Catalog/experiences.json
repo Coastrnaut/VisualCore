@@ -1237,7 +1237,7 @@
       "id": "r02-g10.backwards-aurora",
       "code": "R02-G10",
       "title": "Backwards Aurora",
-      "summary": "Correct a hidden signal by reversing sections of an auroral wave",
+      "summary": "Reverse sections of a glowing cyan aurora in time until every checkpoint shows its true height and every bend stays within the limit, without tearing it, within the reversal budget. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1246,11 +1246,30 @@
         "temporal-puzzles"
       ],
       "order": 35,
-      "palette": [],
+      "palette": [
+        "#070B1F",
+        "#1FC8D6",
+        "#C9B8F0",
+        "#DCD3FA",
+        "#FF8A7A"
+      ],
       "tile_seed": 2668167125,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Fold an aurora back in time",
+        "Match checkpoints, keep bends smooth",
+        "100 solver-certified levels",
+        "Every reversal can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "6eb242e60a77f39d9ce23f4d28909b827608b19138329c4b18100eebe1e2d06e",
+        "levels": 100
+      },
       "available": false
     },
     {
