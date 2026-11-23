@@ -8,6 +8,11 @@
 // daily level is a function of a calendar day without any clock: (days from 2026-01-01 × 73) mod 100 + 1, in integer
 // arithmetic on the proleptic Gregorian calendar. Every type is Codable with a stable, explicit form. Modelled on
 // feature 385's NocturneGardenProgress.
+// Feature 397 (R02-G10-07) T-R02G1007-002 (FR-R02G1007-001, 002; clarifications Q1, Q3, Q4): a result carries the
+// trace of its win (the effective reversals as the kernel applied them; undone reversals left out unless redone) and
+// whether it is verified (a win recorded with a trace); `drop(level:)` removes a result that failed reconciliation; the
+// replay mode (a saved trace played back) awards nothing and opens nothing. Encodings without trace or verified
+// (schema 1 and 2) decode as unverified results with an empty trace. Modelled on feature 387's NocturneGardenProgress.
 import Foundation
 
 /// The step of the Backwards Aurora tutorial (levels 1 … 3).
@@ -84,21 +89,24 @@ public enum BackwardsAuroraMode: Sendable, Equatable, Hashable, Codable {
     /// The daily level `level` (1 … 100) of ``BackwardsAuroraProgress/dailyLevel(year:month:day:)``: campaign rules,
     /// but a win never opens a level.
     case daily(level: Int)
+    /// The replay of the saved verified trace of level `level` (1 … 100): the campaign budget; never awards stars or
+    /// opens levels.
+    case replay(level: Int)
 
     /// The reversal budget of practice mode: the kernel's maximum, 40 (``BackwardsAuroraLevel/budgets``).
     public static let practiceBudget: Int = BackwardsAuroraLevel.budgets.upperBound
 
     /// The budget a level with budget `base` is played with: ``practiceBudget`` in practice, `base` otherwise
-    /// (campaign and daily).
+    /// (campaign, daily and replay).
     public func budget(base: Int) -> Int {
         self == .practice ? Self.practiceBudget : base
     }
 
-    /// Whether a win in this mode records a result and stars: campaign and daily (never practice).
+    /// Whether a win in this mode records a result and stars: campaign and daily (never practice or replay).
     public var awardsStars: Bool {
         switch self {
         case .campaign, .daily: true
-        case .practice: false
+        case .practice, .replay: false
         }
     }
 
@@ -110,10 +118,11 @@ public enum BackwardsAuroraMode: Sendable, Equatable, Hashable, Codable {
         case level
     }
 
-    /// Decodes `{"mode": "campaign"}`, `{"mode": "practice"}` or `{"mode": "daily", "level": n}`.
+    /// Decodes `{"mode": "campaign"}`, `{"mode": "practice"}`, `{"mode": "daily", "level": n}` or
+    /// `{"mode": "replay", "level": n}`.
     ///
-    /// - Throws: `DecodingError.dataCorrupted` for an unknown mode name or a daily level outside 1 … 100;
-    ///   `DecodingError.keyNotFound` for a daily mode without a level.
+    /// - Throws: `DecodingError.dataCorrupted` for an unknown mode name or a daily or replay level outside 1 … 100;
+    ///   `DecodingError.keyNotFound` for a daily or replay mode without a level.
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let name: String = try container.decode(String.self, forKey: .mode)
@@ -127,13 +136,20 @@ public enum BackwardsAuroraMode: Sendable, Equatable, Hashable, Codable {
                                                        debugDescription: "daily level outside 1 … 100")
             }
             self = .daily(level: level)
+        case "replay":
+            let level: Int = try container.decode(Int.self, forKey: .level)
+            guard level >= 1 && level <= BackwardsAuroraProgress.levelCount else {
+                throw DecodingError.dataCorruptedError(forKey: .level, in: container,
+                                                       debugDescription: "replay level outside 1 … 100")
+            }
+            self = .replay(level: level)
         default:
             throw DecodingError.dataCorruptedError(forKey: .mode, in: container,
                                                    debugDescription: "unknown mode \(name)")
         }
     }
 
-    /// Encodes the mode as `{"mode": <name>}`, with `"level"` for `daily`.
+    /// Encodes the mode as `{"mode": <name>}`, with `"level"` for `daily` and `replay`.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
@@ -142,14 +158,18 @@ public enum BackwardsAuroraMode: Sendable, Equatable, Hashable, Codable {
         case .daily(let level):
             try container.encode("daily", forKey: .mode)
             try container.encode(level, forKey: .level)
+        case .replay(let level):
+            try container.encode("replay", forKey: .mode)
+            try container.encode(level, forKey: .level)
         }
     }
 }
 
 /// The campaign progress of Backwards Aurora: the won levels with their best results and the open frontier.
 ///
-/// Encoded as `{"frontier": n, "solved": [{"level": l, "reversalsMade": r, "stars": s}, …]}` with the won levels as an
-/// array sorted by level, so equal progress gives equal JSON (``encoded()`` also sorts the keys).
+/// Encoded as `{"frontier": n, "solved": [{"level": l, "reversalsMade": r, "stars": s, "trace": [...], "verified": v},
+/// …]}` with the won levels as an array sorted by level, so equal progress gives equal JSON (``encoded()`` also sorts
+/// the keys). An entry without `trace` or `verified` (schema 1 and 2) decodes with an empty trace, unverified.
 public struct BackwardsAuroraProgress: Sendable, Equatable, Hashable, Codable {
     /// The best result of one won level.
     public struct Result: Sendable, Equatable, Hashable, Codable {
@@ -157,11 +177,48 @@ public struct BackwardsAuroraProgress: Sendable, Equatable, Hashable, Codable {
         public let reversalsMade: Int
         /// The stars of that best result, 1 … 3.
         public let stars: Int
+        /// The effective reversals of the winning play (as the kernel applied them; undone reversals left out unless
+        /// redone); empty for a result recorded without a trace.
+        public let trace: [BackwardsAuroraAction]
+        /// Whether the result was recorded with a trace (reconciliation replays it on restore).
+        public let verified: Bool
+
+        /// A result of the given values without a trace, unverified (not checked).
+        public init(reversalsMade: Int, stars: Int) {
+            self.init(reversalsMade: reversalsMade, stars: stars, trace: [], verified: false)
+        }
 
         /// A result of the given values (not checked).
-        public init(reversalsMade: Int, stars: Int) {
+        public init(reversalsMade: Int, stars: Int, trace: [BackwardsAuroraAction], verified: Bool) {
             self.reversalsMade = reversalsMade
             self.stars = stars
+            self.trace = trace
+            self.verified = verified
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case reversalsMade
+            case stars
+            case trace
+            case verified
+        }
+
+        /// Decodes a result; a missing `trace` is empty and a missing `verified` is false.
+        public init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            reversalsMade = try container.decode(Int.self, forKey: .reversalsMade)
+            stars = try container.decode(Int.self, forKey: .stars)
+            trace = try container.decodeIfPresent([BackwardsAuroraAction].self, forKey: .trace) ?? []
+            verified = try container.decodeIfPresent(Bool.self, forKey: .verified) ?? false
+        }
+
+        /// Encodes every field, the trace and the verified flag included.
+        public func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(reversalsMade, forKey: .reversalsMade)
+            try container.encode(stars, forKey: .stars)
+            try container.encode(trace, forKey: .trace)
+            try container.encode(verified, forKey: .verified)
         }
     }
 
@@ -229,17 +286,60 @@ public struct BackwardsAuroraProgress: Sendable, Equatable, Hashable, Codable {
 
     /// Records a win of `level` with `reversalsMade` reversals made (certified smallest reversal count `smallest`).
     ///
-    /// The caller records only campaign and daily wins (never practice). The new result replaces a stored one only
-    /// when it is better (fewer reversals made, then more stars); a worse or equal result keeps the stored one. When
-    /// `opensNext` is true (a campaign win, the default) the frontier rises to `level + 1` (at most 100); it never
-    /// falls; a daily win passes false and opens nothing. A level outside 1 … 100 is ignored.
+    /// The result has no trace and is unverified. The caller records only campaign and daily wins (never practice or
+    /// replay). The new result replaces a stored one only when it is better (fewer reversals made, then more stars); a
+    /// worse or equal result keeps the stored one. When `opensNext` is true (a campaign win, the default) the frontier
+    /// rises to `level + 1` (at most 100); it never falls; a daily win passes false and opens nothing. A level outside
+    /// 1 … 100 is ignored.
     ///
     /// - Returns: whether the stored result of `level` changed (a first or a better result).
     @discardableResult
     public mutating func record(level: Int, reversalsMade: Int, smallest: Int, opensNext: Bool = true) -> Bool {
-        guard level >= 1 && level <= Self.levelCount else { return false }
         let result: Result = Result(reversalsMade: reversalsMade,
                                     stars: Self.stars(reversalsMade: reversalsMade, smallest: smallest))
+        return store(result, level: level, opensNext: opensNext)
+    }
+
+    /// Records a win of `level` in `mode` under the rules of ``record(level:reversalsMade:smallest:opensNext:)``:
+    /// practice and replay record nothing, campaign opens the next level, daily opens nothing. The result has no trace
+    /// and is unverified.
+    ///
+    /// - Returns: whether the stored result of `level` changed.
+    @discardableResult
+    public mutating func record(level: Int, reversalsMade: Int, smallest: Int, mode: BackwardsAuroraMode) -> Bool {
+        guard mode.awardsStars else { return false }
+        return record(level: level, reversalsMade: reversalsMade, smallest: smallest, opensNext: mode.opensLevels)
+    }
+
+    /// Records a verified win of `level` with `reversalsMade` reversals made (certified smallest reversal count
+    /// `smallest`) in `mode`, with `trace`, the effective reversals of the winning play
+    /// (``BackwardsAuroraReconciliation/netTrace(_:)``).
+    ///
+    /// The rules of ``record(level:reversalsMade:smallest:mode:)`` apply: practice and replay record nothing; the
+    /// result replaces a stored one only when it is better (fewer reversals made, then more stars), so a tie keeps the
+    /// earlier result and its trace; a campaign win raises the frontier; a daily win opens nothing; a level outside
+    /// 1 … 100 is ignored.
+    ///
+    /// - Returns: whether the stored result of `level` changed (a first or a better result).
+    @discardableResult
+    public mutating func record(level: Int, reversalsMade: Int, smallest: Int, mode: BackwardsAuroraMode = .campaign,
+                                trace: [BackwardsAuroraAction]) -> Bool {
+        guard mode.awardsStars else { return false }
+        let result: Result = Result(reversalsMade: reversalsMade,
+                                    stars: Self.stars(reversalsMade: reversalsMade, smallest: smallest),
+                                    trace: trace, verified: true)
+        return store(result, level: level, opensNext: mode.opensLevels)
+    }
+
+    /// Removes the result of `level` (reconciliation drops a result whose trace does not replay); the frontier is
+    /// unchanged. Nothing happens when `level` has no result.
+    public mutating func drop(level: Int) {
+        solved[level] = nil
+    }
+
+    /// Stores `result` for `level` under the rules of ``record(level:reversalsMade:smallest:opensNext:)``.
+    private mutating func store(_ result: Result, level: Int, opensNext: Bool) -> Bool {
+        guard level >= 1 && level <= Self.levelCount else { return false }
         var improved: Bool = false
         if let old = solved[level] {
             let fewer: Bool = result.reversalsMade < old.reversalsMade
@@ -254,16 +354,6 @@ public struct BackwardsAuroraProgress: Sendable, Equatable, Hashable, Codable {
         }
         if opensNext { frontier = max(frontier, min(level + 1, Self.levelCount)) }
         return improved
-    }
-
-    /// Records a win of `level` in `mode` under the rules of ``record(level:reversalsMade:smallest:opensNext:)``:
-    /// practice records nothing, campaign opens the next level, daily opens nothing.
-    ///
-    /// - Returns: whether the stored result of `level` changed.
-    @discardableResult
-    public mutating func record(level: Int, reversalsMade: Int, smallest: Int, mode: BackwardsAuroraMode) -> Bool {
-        guard mode.awardsStars else { return false }
-        return record(level: level, reversalsMade: reversalsMade, smallest: smallest, opensNext: mode.opensLevels)
     }
 
     /// The daily level (1 … 100) of a calendar day: (d × 73) mod 100 + 1, where d is the days from 2026-01-01 to the
@@ -307,11 +397,13 @@ public struct BackwardsAuroraProgress: Sendable, Equatable, Hashable, Codable {
         return try encoder.encode(self)
     }
 
-    /// One won level as encoded.
+    /// One won level as encoded; `trace` and `verified` are absent in schema 1 and 2 encodings.
     private struct Entry: Codable {
         let level: Int
         let reversalsMade: Int
         let stars: Int
+        let trace: [BackwardsAuroraAction]?
+        let verified: Bool?
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -319,7 +411,8 @@ public struct BackwardsAuroraProgress: Sendable, Equatable, Hashable, Codable {
         case frontier
     }
 
-    /// Decodes progress; the won levels are an array of `{level, reversalsMade, stars}`.
+    /// Decodes progress; the won levels are an array of `{level, reversalsMade, stars, trace, verified}`, where a
+    /// missing trace is empty and a missing verified flag is false.
     ///
     /// - Throws: `DecodingError.dataCorrupted` for a frontier outside 1 … 100, a level outside 1 … 100 or repeated,
     ///   stars outside 1 … 3 or reversals made below 0.
@@ -338,7 +431,8 @@ public struct BackwardsAuroraProgress: Sendable, Equatable, Hashable, Codable {
                 throw DecodingError.dataCorruptedError(forKey: .solved, in: container,
                                                        debugDescription: "invalid won level \(entry.level)")
             }
-            solved[entry.level] = Result(reversalsMade: entry.reversalsMade, stars: entry.stars)
+            solved[entry.level] = Result(reversalsMade: entry.reversalsMade, stars: entry.stars,
+                                         trace: entry.trace ?? [], verified: entry.verified ?? false)
         }
         self.solved = solved
         self.frontier = frontier
@@ -351,7 +445,8 @@ public struct BackwardsAuroraProgress: Sendable, Equatable, Hashable, Codable {
         var entries: [Entry] = []
         for level in solved.keys.sorted() {
             guard let result = solved[level] else { continue }
-            entries.append(Entry(level: level, reversalsMade: result.reversalsMade, stars: result.stars))
+            entries.append(Entry(level: level, reversalsMade: result.reversalsMade, stars: result.stars,
+                                 trace: result.trace, verified: result.verified))
         }
         try container.encode(entries, forKey: .solved)
     }

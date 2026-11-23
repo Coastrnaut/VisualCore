@@ -12,7 +12,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1007-002 [P] [US2] Edit `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraProgress.swift` (Result gains "trace:
+- [X] T-R02G1007-002 [P] [US2] Edit `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraProgress.swift` (Result gains "trace: — Verified 2026-11-23: host exit=0 (207 Backwards Aurora host tests incl. BackwardsAuroraReconciliationTests 7: every certified solution verifies as a trace, traced wins replace only when better, edited stars, reversals made below the trace length, altered, illegal and overlong traces dropped and counted, untraced kept unverified, frontier kept, netTrace over undo and redo, old payloads decode, replay mode Codable; progress tests updated for trace and verified; modeName gains replay; scenario manifest regenerated; agent A's files retested by the lead)
   [BackwardsAuroraAction]" (effective reversals) and "verified: Bool"; `record(level:reversalsMade:smallest:mode:trace:)` stores
   a verified result, replacing only when better (ties keep the earlier trace); `drop(level:)`; encoding keeps old
   payloads decodable (missing trace = empty, missing verified = false); mode "replay(level:)" that awards no stars and

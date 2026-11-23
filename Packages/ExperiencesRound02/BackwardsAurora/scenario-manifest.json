@@ -511,7 +511,7 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "07367cd5f78ba8ed57d0c3cebb1c281cca3a9b1da87ccba5f3343e0ec007bfc3",
+        "finalDigest" : "ece66191b4b10cd5d3980841bb9588ca83fe8d0117c42da3b592c7d27e3eb4c4",
         "initialDigest" : "90e6d50305000972de2128f017826daba560f0968121d45afd957fa8f3a1acde",
         "outcome" : "won"
       },
@@ -3125,7 +3125,7 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "fe86fade897705665dda14c332819f1c8f20eb298bd24e3acefa971bca0176f2",
+        "finalDigest" : "815e74572f907f186c7bbe74455a60041f4cb20d6cd8406dccab3c315cc13863",
         "initialDigest" : "90e6d50305000972de2128f017826daba560f0968121d45afd957fa8f3a1acde",
         "outcome" : "won"
       },
