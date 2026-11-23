@@ -58,7 +58,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G1204-005 [US4] Wire `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesPresenter.swift`
+- [X] T-R02G1204-005 [US4] Wire `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesPresenter.swift` — Verified 2026-11-23: Verified 2026-11-23: sim-27 exit 0 (37 Harmonic Bridges simulator tests incl. HarmonicBridgesGestureWiringTests 8: a tap on a string chooses it and describes its resonance, a drag up by 48 points tunes it by two pegs, a drag back sends nothing and restores the panel peg, a tap on the goal tests, orbit and reset change no digest, a refused tune is shown in words and logged with its code, a drag on a won play sends nothing and says the play is over, gesture actions are native actions); the first run found refusals shown as 'not available' because the engine prefixes kernel codes with action.rule. — refusalText now reads both forms; agent E's tests retested by the lead
   (FR-R02G1204-001 … 003, 005 … 007; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot; tune and test sent
   through the port; choose and preview changing the mirror's string and peg; the chosen string's resonance described
   (its modes in the shown step and how many of its five samples reach the threshold); a locked string's drag described

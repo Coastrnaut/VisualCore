@@ -31,6 +31,8 @@ final class HarmonicBridgesBridgeScene {
     var reducedFlash = false
     /// Whether the strings are drawn at rest and the shown step is held (Reduce Motion).
     var reduceMotion = false
+    /// The orbit drawn (feature 414): presentation only, never part of the snapshot or the digest.
+    var orbit: HarmonicBridgesOrbit = .authored
 
     /// What the geometry depends on: everything of the snapshot that the meshes read, the tier and the mode.
     private struct GeometryKey: Equatable {
@@ -104,7 +106,7 @@ final class HarmonicBridgesBridgeScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let still: Bool = reduceMotion || !animate
-        let camera = HarmonicBridgesSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = HarmonicBridgesSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let wanted = key(snapshot, tier: tier, still: still)
         if wanted != geometryKey { try rebuild(snapshot, tier: tier, still: still) }
         geometryKey = key(snapshot, tier: tier, still: still)

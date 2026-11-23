@@ -10,6 +10,13 @@
 // A memory warning releases the GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`:
 // no drawing result reaches the kernel (renderer purity). Its probes (two ground corners) let the verification runner
 // check a frame.
+// Feature 414 (R02-G12-04): `pointer(_:viewSize:port:)` routes canvas touches through
+// `HarmonicBridgesGestureController` with the drawn snapshot: a pluck chooses a string and describes its resonance in the
+// drawn step, a peg drag previews the peg in the panel and tunes on release, a tap on the goal or a step pip tests the
+// crossing; tunes and tests go through the port (refusals are shown and kept with their code in `refusalLog`); a drag
+// that ends without a tune puts the panel's peg back to the string's current peg; a one-finger gesture on a won or
+// failed play says that the play is over; the scene draws the controller's orbit, and "Reset view" or a double tap on
+// empty space returns to the authored view.
 #if os(iOS)
 import Foundation
 import HarmonicBridgesCore
@@ -18,6 +25,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show and choose: the latest state the presenter described and the panel's chosen string and peg.
 @MainActor
@@ -92,9 +100,14 @@ final class HarmonicBridgesMirror {
         }
     }
 
-    /// A refused action's reason code in words.
+    /// The engine's prefix of a refusal that the core itself returned (`action.rule.<kernel code>`).
+    static let rulePrefix = "action.rule."
+
+    /// A refused action's reason code in words; accepts the kernel's code bare or as the engine reports it
+    /// (`action.rule.r02-g12.noop`).
     static func refusalText(code: String) -> String {
-        switch code {
+        let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+        return switch bare {
         case "r02-g12.noop": "that string is already at that peg"
         case "r02-g12.stage": "the play is over: undo or go to the next level"
         case "r02-g12.action": "that string cannot be tuned to that peg"
@@ -132,6 +145,17 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
     private(set) var tierLog: [HarmonicBridgesTierChange] = []
     /// The last snapshot drawn (tests and the description).
     private(set) var lastSnapshot: HarmonicBridgesSceneSnapshot?
+
+    /// The gesture controller (feature 414): plucks, peg drags, test taps, double taps, orbit.
+    private(set) var gestures = HarmonicBridgesGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
+    /// What a gesture on a finished play shows, and what the description adds on a won or failed play.
+    static let finishedMessage = "The play is over: undo or go to the next level"
+    /// The string whose drag previewed a peg and has not ended in a tune, if any.
+    private var previewing: Int?
 
     /// What restarts the step clock: the play's level, pegs, actions spent, stage and failure.
     private struct PlayKey: Equatable {
@@ -202,6 +226,7 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         let time = stepTime(core, now: frame.time)
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        scene.orbit = gestures.orbit
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
@@ -242,12 +267,12 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         text += measure + ". "
         switch play.stage {
         case .won, .result where play.failure == nil:
-            text += "The crossing holds in every step."
+            text += "The crossing holds in every step. " + Self.finishedMessage + "."
             mirror.status = "Won"
             mirror.failureText = nil
         case .failed, .result:
             let reason: String = HarmonicBridgesSceneSnapshot.failureText(play.failure) ?? "The play failed."
-            text += reason
+            text += reason + " " + Self.finishedMessage + "."
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         default:
@@ -259,7 +284,128 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
 
     /// The control panel.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(HarmonicBridgesControls(port: port, mirror: mirror))
+        AnyView(HarmonicBridgesControls(port: port, mirror: mirror,
+                                        resetView: { [weak self] in self?.resetView() },
+                                        sender: { [weak self] control, values in
+                                            self?.send(control, values, port: port)
+                                        }))
+    }
+
+    // MARK: Touch controls (feature 414, R02-G12-04)
+
+    /// The canvas gestures send tunes and tests; the choice, the preview and the orbit are presentation state.
+    var gestureActions: Set<String> { ["string.tune", "crossing.test"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(HarmonicBridgesExperienceCore.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
+    /// order: choices and previews go to the mirror (a choice also describes the string's resonance), tunes and tests
+    /// are sent through the port; a drag that ends without a tune restores the panel's peg; a one-finger gesture that
+    /// ends on a won or failed play explains that the play is over.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot else { return }
+        let before: HarmonicBridgesGestureController.State = gestures.state
+        let actions: [HarmonicBridgesGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
+        let finished: Bool = snapshot.stage == .won || snapshot.stage == .failed || snapshot.stage == .result
+        let oneFinger: Bool = before == .stringPress || before == .pegDrag || before == .targetPress
+        var tuned = false
+        var chose = false
+        for action in actions {
+            switch action {
+            case let .choose(string, peg):
+                chose = true
+                choose(string, peg: peg, snapshot: snapshot)
+            case let .preview(string, peg):
+                mirror.string = string
+                mirror.peg = HarmonicBridgesMirror.clampedPeg(peg)
+                previewing = string
+            case let .tune(string, peg):
+                tuned = true
+                previewing = nil
+                send("string.tune", [Double(string), Double(peg)], port: port)
+            case .test:
+                send("crossing.test", [], port: port)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+        let ended: Bool = event.phase == .ended || event.phase == .cancelled || gestures.state == .orbiting
+        if ended, !tuned { restorePreview(snapshot) }
+        if event.phase == .ended, finished, oneFinger, !chose {
+            mirror.message = Self.finishedMessage
+        }
+        scene.orbit = gestures.orbit
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the panel's peg is restored.
+    func cancelPointers() {
+        gestures.cancel()
+        if let snapshot = lastSnapshot { restorePreview(snapshot) }
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Chooses `string` at `peg` in the panel and describes its resonance in the drawn step.
+    private func choose(_ string: Int, peg: Int, snapshot: HarmonicBridgesSceneSnapshot) {
+        mirror.string = string
+        mirror.peg = HarmonicBridgesMirror.clampedPeg(peg)
+        previewing = nil
+        mirror.message = Self.resonanceText(string, snapshot: snapshot,
+                                            step: HarmonicBridgesSceneGeometry.drawnStep(snapshot,
+                                                                                        reduceMotion: reduceMotion))
+    }
+
+    /// Puts the panel's peg back to the previewed string's current peg after a drag that ended without a tune.
+    private func restorePreview(_ snapshot: HarmonicBridgesSceneSnapshot) {
+        guard let string = previewing else { return }
+        previewing = nil
+        if string >= 0, string < snapshot.pegs.count, mirror.string == string {
+            mirror.peg = HarmonicBridgesMirror.clampedPeg(snapshot.pegs[string])
+        }
+    }
+
+    /// String `index` in step `step` in words: the modes it sings and how many of its five samples reach the threshold
+    /// (the kernel's exact swings).
+    static func resonanceText(_ index: Int, snapshot: HarmonicBridgesSceneSnapshot, step: Int) -> String {
+        guard index >= 0, index < snapshot.strings.count else { return "That string is not in this level." }
+        var modes: [Int] = []
+        if step >= 0, step < snapshot.modes.count, index < snapshot.modes[step].count { modes = snapshot.modes[step][index] }
+        var reaching = 0
+        if step >= 0, step < snapshot.report.swings.count, index < snapshot.report.swings[step].count {
+            for swing in snapshot.report.swings[step][index] where swing >= snapshot.threshold { reaching += 1 }
+        }
+        let peg: Int = index < snapshot.pegs.count ? snapshot.pegs[index] : snapshot.strings[index].peg
+        var text = "String \(index) at peg \(peg)"
+        if snapshot.strings[index].locked { text += " (locked)" }
+        if modes.isEmpty {
+            text += " sings no mode in step \(step)"
+        } else {
+            let names: [String] = modes.map { String($0) }
+            text += " sings mode " + names.joined(separator: " and ") + " in step \(step)"
+        }
+        text += "; \(reaching) of 5 samples reach the threshold."
+        return text
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(HarmonicBridgesMirror.refusalText(code: result.code))."
+            refusalLog.append(result.code)
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        return result
     }
 }
 #endif

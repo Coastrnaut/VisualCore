@@ -2,8 +2,9 @@
 // control panel: labelled steppers for the chosen string and peg (presentation state only; a level opens with string 0
 // chosen at its current peg, both clamped), tune (the chosen string to the chosen peg) and test (kernel actions
 // through the action port), undo, redo and next level, each with an accessibility label, value and identifier; the
-// header shows the actions left of the budget, the stage, the failure in words and a refused action in words. Plucking
-// and dragging pegs on the canvas come in R02-G12-04; full accessibility in R02-G12-06.
+// header shows the actions left of the budget, the stage, the failure in words and a refused action in words. Feature
+// 414 (R02-G12-04) adds "Reset view" (the authored camera) and sends through the presenter, which shows and logs
+// refusals; full accessibility comes in R02-G12-06.
 #if os(iOS)
 import HarmonicBridgesCore
 import SwiftUI
@@ -11,10 +12,14 @@ import VisualCoreExperienceHost
 
 /// The control panel of Harmonic Bridges.
 struct HarmonicBridgesControls: View {
-    /// Where actions are sent.
+    /// The action port (its identifiers name the controls).
     let port: ExperienceActionPort
     /// What the panel shows and chooses.
     let mirror: HarmonicBridgesMirror
+    /// Returns the camera to the authored view.
+    let resetView: () -> Void
+    /// Sends a control with its values through the presenter (which shows and logs a refusal).
+    let sender: (String, [Double]) -> Void
 
     /// The panel.
     var body: some View {
@@ -92,17 +97,18 @@ struct HarmonicBridgesControls: View {
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
                 .accessibilityIdentifier(port.identifier("next-level"))
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 
     /// The choice as the values of `string.tune`.
     private var choiceValues: [Double] { [Double(mirror.string), Double(mirror.peg)] }
 
-    /// Sends `control` and shows a refusal in words.
+    /// Sends `control` through the presenter.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(HarmonicBridgesMirror.refusalText(code: result.code))."
+        sender(control, values)
     }
 }
 #endif
