@@ -53,7 +53,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1008-006 [P] [US4] Create `scripts/backwards_aurora_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G1008-006 [P] [US4] Create `scripts/backwards_aurora_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-23: regression exit=0 (python3 scripts/backwards_aurora_regression.py: host BackwardsAuroraRegression PASS, simulator golden-frame and memory classes with TEST_RUNNER_BACKWARDS_AURORA_MEMORY_ISOLATED=1 PASS, one summary line per part); BackwardsAuroraRegressionTests (5) pass in scripts/test_scripts.py; CI step 'Backwards Aurora regression (host)' added; agent D's files retested by the lead
   (agent D: host filter `BackwardsAuroraRegression`, then the simulator classes through `xcodebuild_package.py
   --only-testing` with the isolation variable, one summary line per part with pass or fail and the first failing name,
   a non-zero exit on any failure), and add the named step "Backwards Aurora regression (host)" to

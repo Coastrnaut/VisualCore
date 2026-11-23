@@ -147,6 +147,10 @@ jobs:
         # Feature 388 (R02-G09-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/nocturne_garden_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter NocturneGardenRegression
+      - name: Backwards Aurora regression (host)
+        # Feature 398 (R02-G10-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/backwards_aurora_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter BackwardsAuroraRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase

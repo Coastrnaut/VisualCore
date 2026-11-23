@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/backwards_aurora_regression.py"
+  ],
+  "command": "python3 scripts/backwards_aurora_regression.py",
+  "elapsed_seconds": 11.879,
+  "exit_code": 0,
+  "finished": "2026-11-23T07:15:04+00:00",
+  "gate": "R02-G10-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G10-08.regression.log",
+  "log_sha256": "8e32924afbcd09ef29843b3bd22edfaf45cdac3f05d110c7790f9d52448c293a",
+  "name": "regression",
+  "started": "2026-11-23T07:14:52+00:00",
+  "timed_out": false
+}
