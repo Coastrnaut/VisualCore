@@ -72,7 +72,7 @@ will consume).
   valid link (pair order), every valid unlink (pair order), every nudge (star, then −1, +1), then the listen") with
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorRulesTests.swift` (agreement with the
   play on 200 walks); `--name host-4`
-- [ ] T-R02G1301-006 [P] Create
+- [X] T-R02G1301-006 [P] Create — Verified 2026-11-23: host-5 (AcousticConstellatorInvariantTests 9 boundaries — time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity — each with a seeded neighbouring-input check, seed 2_426) exit 0, run with the real rules file, lead retest
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorInvariantTests.swift` (agent D:
   `testAcousticConstellatorTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each with
