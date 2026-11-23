@@ -33,7 +33,7 @@ change (the shaders and reference of R02-G10-03 are unchanged and re-proven by t
   every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test --only-testing BackwardsAuroraExperienceTests`
-- [ ] T-R02G1009-004 [US1] Create `Apps/VisualCore/Tests/UI/BackwardsAurora/BASupport.swift`, `BAPlayUITests.swift`,
+- [X] T-R02G1009-004 [US1] Create `Apps/VisualCore/Tests/UI/BackwardsAurora/BASupport.swift`, `BAPlayUITests.swift`, — Verified 2026-11-23: app-ui check exit 0, 2026-11-23 (.autonomy/migration/checks/R02-G10-09.app-ui.json)
   `BAReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 certified reversals and the steppers' starting section
   pinned in `BA`; each reversal played by stepping the end stepper up first, then the start stepper, then lowering the
   end if needed (reading each value), then Reverse; read "Every checkpoint matches and every bend is within the limit"
