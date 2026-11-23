@@ -620,3 +620,8 @@ greedy continuation, `EchoCartographerSolver.continuation`), `EchoCartographerFa
 `EchoCartographerProgress` (tutorial steps, stars by energy spent, unlocks, the daily level × 79, campaign, practice
 and daily modes), the adapter's progression controls with snapshot schema 2, and the panel's tutorial, hints, failure
 text, goal, stars and level picker.
+
+Feature 406 (R02-G11-06) adds polish and accessibility: `EchoCartographerFeedbackPlan` (announcements and haptics),
+`EchoCartographerLights` (eased glow and won brightening; rings and flares at rest under Reduce Flashing),
+`EchoCartographerSoundRecipe` with the experience's `EchoCartographerSound` loop, and the panel's labels, values,
+adjustable column and row, summary element, Sound toggle and Dynamic Type layout.

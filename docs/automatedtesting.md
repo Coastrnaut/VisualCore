@@ -395,6 +395,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   and INV-10 failing in their copies; the shared test file is the lead's, so the lead added the picker, the freeze
   preview and the controller to the set in one edit before retesting. Name every new presentation file in the task that
   creates it.
+- **Eased lights need moving frame times in stills** (R02-G11-06, 2026-11-23). Once Echo Cartographer's won brightening
+  eased in over presentation time, an earlier render test that took two stills at the default time 0 saw no change:
+  the lights step by the frame time, so the fade never advanced. Take the "after" still at a later time (10 s, past every
+  ring, flare and fade), and compare refusal messages with the feedback plan's words (`refusalText(code:)`) rather than
+  the raw code once the panel speaks refusals in words.
 - **Agents can start before the gate's baselines** (R02-G11-05, 2026-11-23). Echo Cartographer's hint and progress
   agents worked in isolated package copies while the previous gate's evidence chain ran, and the lead built the adapter
   in a third copy that combined their files; the baselines were then taken on the untouched tree, and each result was

@@ -135,3 +135,21 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g11.malformed`, `.
 - **Adapter.** Controls `level.select`, `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss` (refusals
   `r02-g11.locked`, `r02-g11.date`); digest v2 adds progress and mode; snapshot schema 2 `{level, mode, progress,
   records, tutorial}` with a migration from schema 1.
+
+## Polish and accessibility (feature 406, R02-G11-06)
+
+- **Announcements and haptics.** `EchoCartographerFeedbackPlan` is a pure function of the old and new core: a pulse
+  names its rays and echoes, a claim the located beacon or the energy a miss took, a marker its cell, undo and redo
+  themselves, each followed by the progress words (`state`, selection haptic); a win names the energy spent and the
+  stars and a failure its explanation (`outcome`, success or warning); level and mode changes (`level`); refusals in
+  words (`rejection`, error haptic). An action that ends the play plans only its outcome.
+- **Comfort.** `EchoCartographerLights` eases the chamber's glow (0.7 playing, 1 won, 0.35 failed) and the won
+  brightening over 0.15 s, or 0.45 s under Reduce Flashing, where a started fade finishes before it turns back; the
+  scene scales the glow gain and `u_wonLight` by them. The pulse and echo rings and the wall flares restart with every
+  pulse, undo or redo, so Reduce Flashing draws them at rest, as Reduce Motion does.
+- **Sound.** `EchoCartographerSoundRecipe`: a 110 Hz root stepped by the share of energy left, one partial per located
+  beacon, an octave when won and halved gains when failed, looping whole; the presenter's Sound toggle (off by default)
+  plays it only while the controls are on screen and the scene is active.
+- **Panel.** Every control has a label and a value in words; the column and row steppers are adjustable and name the
+  cell and what is known of it; a summary element reads the energy, the beacons located, the last echo, the chosen cell
+  and the level; rows become columns at accessibility text sizes and the panel is at most 520 points wide.
