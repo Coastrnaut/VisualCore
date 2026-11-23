@@ -48,7 +48,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   for extreme settings — 5 × 5 and 16 × 16 chambers, all known, none known, every wall known, 4 pillars, 8 markers,
   budgets 1 and 60; every cell centre, wall top and gauge bar inside the view with margin at 7 aspects; same positions at
   every tier; no vertex on an unknown cell; gauge bars at 0, half and the budget); agent B; `--name host-3`
-- [ ] T-R02G1103-005 [P] [US2] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerExperienceCore.swift`
+- [X] T-R02G1103-005 [P] [US2] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerExperienceCore.swift` — Verified 2026-11-23: host-4 (incl. EchoCartographerExperienceCoreTests and EchoCartographerRendererPurityTests 14: conformance, seeds to levels, candidate table equal to the 100 witnesses' skipped, every control and refusal code, undo digest, payload round trip and refusals, 200 seeded snapshots never change digest or verdict and hold no unknown wall or unlocated beacon) exit 0, 2026-11-23; agent C's adapter retested by the lead
   (controls "cell.pulse [x, y], cell.claim [x, y], cell.mark [x, y], play.undo, play.redo, level.next"; digest "level
   number and play fingerprint"; schema 1 `{level, records}`; quality profile of three levels; each level certified
   directly from a table of its witness's `skipped` candidate, the whole generator only if that fails;
