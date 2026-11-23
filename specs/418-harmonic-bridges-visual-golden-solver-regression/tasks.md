@@ -71,7 +71,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1208-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1208-010 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02G1208-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1208-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: script-tests exit 0 (run alone, before the chain's other steps)
 - [ ] T-R02G1208-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden levels.
   Not run before the lock.
 - [ ] T-R02G1208-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
