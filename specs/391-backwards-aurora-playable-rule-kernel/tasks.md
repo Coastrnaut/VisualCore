@@ -55,7 +55,7 @@ in this feature (the wave and its bends are the CPU reference the renderer of R0
   playing "every valid, non-noop reversal in order of start, then end") with
   `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraRulesTests.swift` (agreement with the play on 200
   walks); `--name host-4`
-- [ ] T-R02G1001-006 [P] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraInvariantTests.swift`
+- [X] T-R02G1001-006 [P] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraInvariantTests.swift` — Verified 2026-11-22: host-5 (41 tests incl. BackwardsAuroraInvariantTests 9: time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity, each with a seeded neighbouring-input check, seed 2_396) exit 0, lead retest against the real play and rules
   (agent D: `testBackwardsAuroraTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
   with a seeded neighbouring-input check, seed 2_396); `--name host-5`
