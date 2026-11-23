@@ -56,8 +56,9 @@ primitives plus instanced wireframe edge strips".
   presentation time from the emitter, up to the longest ray, and echo rings that shrink back to the emitter, one per
   beacon echo, reaching it at that echo's delay (24 ticks of 0.008333 s per cell); on every cell known wall a block
   0.92·s wide and 0.5·s high with dark faces and its 12 edges as strips 0.05·s thick; located beacons as pillars 0.3·s
-  wide and 0.8·s high; and the energy gauge, a row of `energy` bars in front of the chamber at z = 1.0, y = 0, lit for the
-  energy left. Walls struck by the last pulse flare (brighter edges) when the pulse ring reaches their distance, fading
+  wide and 0.8·s high; and the energy gauge, a row of `energy` bars in front of the chamber at z = 1.0, y = 0, spread evenly from x = −0.9
+  to 0.9 (each 1.8 / budget wide with a gap of a fifth of that, 0.06 deep), lit for the energy left (corrected at the
+  checklist, 2026-11-23: the gauge's extent was added). Walls struck by the last pulse flare (brighter edges) when the pulse ring reaches their distance, fading
   over 0.5 s. Depth testing is on for floor, blocks and pillars; rings, rays and glow are additive and drawn last.
   Unknown cells draw nothing but the ground; unlocated beacons are never drawn. The camera is a fixed authored
   perspective from above and in front (eye (0, 2.4, 1.9) looking at (0, 0, 0.05)) fitted to the box x −1 … 1, z −1 … 1.1,
