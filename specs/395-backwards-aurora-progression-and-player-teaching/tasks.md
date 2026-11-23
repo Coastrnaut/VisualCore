@@ -73,7 +73,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 385
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G1005-006 Docs: `docs/architecture/backwards-aurora.md` (teaching and progression),
+- [X] T-R02G1005-006 Docs: `docs/architecture/backwards-aurora.md` (teaching and progression), — Verified 2026-11-23: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; docs/architecture/backwards-aurora.md teaching and progression, ExperiencesRound02 README feature 395, docs/automatedtesting.md entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1005-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

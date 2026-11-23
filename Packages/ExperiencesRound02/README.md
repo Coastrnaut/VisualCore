@@ -562,3 +562,8 @@ Feature 394 (R02-G10-04) adds the gestures: `BackwardsAuroraOrbit` and `camera(_
 (the kernel's reversal of the chosen section with its bends and tear, drawn as a dashed ribbon) and
 `BackwardsAuroraGestureController` (tap ends, drag ends, swipe to reverse, hold to freeze, two-finger orbit, double-tap
 reset), wired through the presenter's pointer entry, with "Reset view" in the panel.
+
+Feature 395 (R02-G10-05) adds teaching and progression: a solver entry point from the current wave,
+`BackwardsAuroraHints` (three hint levels and the failure explanation), `BackwardsAuroraProgress` (tutorial steps,
+stars, the frontier, the daily level and the modes), the adapter's level and mode controls with snapshot schema 2, and
+the panel's tutorial, Hint, goal with band and stars, Undo/Retry, mode buttons and level picker.

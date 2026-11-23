@@ -94,3 +94,30 @@ opening wave that already wins is refused) and the fingerprint and refuses damag
   double tap or "Reset view" returns to the authored view. Orbit, section and preview are never saved and never reach
   the kernel (`BackwardsAuroraGestureController`).
 - **Panel.** Every level can be won with the start and end steppers and Reverse alone.
+
+## Teaching and progression (feature 395, R02-G10-05)
+
+- **Hints.** `BackwardsAuroraHints` plans from the current wave with a solver entry point
+  (`solve(_:from:reversalsLeft:workBound:)`): the certification's iterative deepening and seam-count pruning, started
+  at the play's wave and bounded by the reversals left and 20,000 reversals evaluated. The first reversal of the plan is
+  the hint, in three levels: its length ("Reverse a section of 4 samples"), then where it starts, then both ends. From
+  the opening it is exactly the certification, so following exact hints wins every level. When no plan is found within
+  the bound the hint says so ("No way to fold the aurora back was found in the reversals left …"); a state that can
+  still win but needs a deeper search than the bound is reported the same way (24 of the 200 seeded test states). The
+  presenter runs the search off the main actor; a stale search owns nothing; any change of the play hides the hint.
+- **Failures.** `BackwardsAuroraFailureExplanation` names the tearing reversal, its section and the seam with its bend
+  against the breaking limit, or the reversals spent with the checkpoints matched and the worst bend against the limit,
+  each followed by "Undo the last reversal or retry the level."
+- **Tutorial.** Levels 1 … 3 show three instructions (mark a section's ends; swipe to reverse, hold to preview, never
+  tear; match every checkpoint before the reversals run out), each advancing on an accepted reversal and ending with the
+  level; undo and redo never move it back; it can be dismissed. The tutorial levels' certified solutions take two
+  reversals, so a perfect play goes from the second instruction straight to the end.
+- **Progress.** Stars count the reversals made, undone ones included (3 at the certified smallest count, 2 within two
+  more); a campaign win opens the next level; `level.select`, `level.next` (no wrap), `mode.daily [y, m, d]` (the level
+  (days from 2026-01-01 × 73) mod 100 + 1, from a date the presenter reads; a daily win records stars and opens
+  nothing), `mode.practice` (budget 40, no stars or unlocks) and `mode.campaign`. No level is gated by payment. Progress
+  and mode are in the digest, the tutorial step only in the snapshot; the snapshot is schema 2
+  (`{level, mode, progress, records, tutorial}`) with a migration from schema 1.
+- **Panel.** The tutorial with Dismiss, Hint (each press reveals the next level), the goal with the level's band and best
+  stars, the failure explanation with Undo and Retry, Campaign / Daily / Practice and a stepper over the open levels, all
+  as wrapping text in the panel, never over the aurora.
