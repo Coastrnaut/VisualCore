@@ -68,7 +68,7 @@ consume).
 
 - [X] T-R02G1201-007 Docs: `docs/architecture/harmonic-bridges.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-23: round02-host exit 0; docs/architecture/harmonic-bridges.md (new: rules), ExperiencesRound02 README Harmonic Bridges section, testing doc entry; validate_docs passes
   `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: rendering-27, rendering-26, experiences, host-full exit 0
   `--name host-full`
 - [ ] T-R02G1201-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1201-010 Reference regression chunk 2 (`--name reference-2`)
