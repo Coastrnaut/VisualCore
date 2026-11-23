@@ -59,7 +59,7 @@ consume).
   playing "every valid tuning (string, then peg order), then the test") with
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesRulesTests.swift` (agreement with the play on 200
   walks); `--name host-4`
-- [ ] T-R02G1201-006 [P] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesInvariantTests.swift`
+- [X] T-R02G1201-006 [P] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesInvariantTests.swift` — Verified 2026-11-23: host-5 exit 0 (HarmonicBridgesInvariantTests 9: time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity, each with a seeded neighbouring check, seed 2_416; the kernel source scan covers Error, Resonance, Level, Play and Rules); agent D's tests retested by the lead against the real play and rules
   (agent D: `testHarmonicBridgesTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
   with a seeded neighbouring-input check, seed 2_416); `--name host-5`
