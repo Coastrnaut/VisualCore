@@ -34,7 +34,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   compare with the one-quantum fallback and the pinned-digest self-check), generate `Packages/ExperiencesRound02/EchoCartographer/golden-frames.json` with
   `ECHO_CARTOGRAPHER_WRITE_GOLDEN=1`, and add `EchoCartographerGolden` to `RELEASE_FORBIDDEN` in
   `scripts/release_check.py`
-- [ ] T-R02G1108-004 [P] [US2] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G1108-004 [P] [US2] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-23: host-2 (EchoCartographerRegressionGoldenTests 9 tests: the fixed set, every frame shows floors, walls and a marker and is not won, deterministic descriptions with distinct tier digests, every frame matches the pinned file, pinned digests self-consistent, missing, unreadable, renamed, extra, unknown frames and schema 2 named, a position beyond one quantum, a colour, count or tier change caught, a hand-edited description with its old digest refused; the file rewritten only with the switch) exit 0, lead retest; pinned file unchanged by the run
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a moved
   position beyond a quantum, a changed colour or count, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
