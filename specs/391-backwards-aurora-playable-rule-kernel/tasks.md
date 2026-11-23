@@ -14,7 +14,7 @@ in this feature (the wave and its bends are the CPU reference the renderer of R0
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1001-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `BackwardsAuroraCore`, `BackwardsAuroraCoreTests`,
+- [X] T-R02G1001-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `BackwardsAuroraCore`, `BackwardsAuroraCoreTests`, — Verified 2026-11-22: host (swift test --filter BackwardsAurora: BackwardsAuroraLevelTests 6 — reason codes, every range refusal incl. solved openings, stored form round trip and damaged/edited/newer refusals, hand-computed bends, seams, palindromes and distances, names in words, 500 fixtures whose known reversals restore the target without tearing and win only on the last) exit 0, lead
   product); create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraError.swift` (codes "r02-g10.level,
   .action, .noop, .stage, .stale, .newer-schema, .malformed"),
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraWave.swift` ("N 12 … 32, each −64 … 64"; bends

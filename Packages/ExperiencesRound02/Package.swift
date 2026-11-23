@@ -35,6 +35,8 @@ let package = Package(
         .library(name: "FacetedForgeCore", targets: ["FacetedForgeCore"]),
         // Feature 381 (R02-G09-01): Nocturne Garden's rule kernel, a candidate until X-R02-G09.
         .library(name: "NocturneGardenCore", targets: ["NocturneGardenCore"]),
+        // Feature 391 (R02-G10-01): Backwards Aurora's rule kernel, a candidate until X-R02-G10.
+        .library(name: "BackwardsAuroraCore", targets: ["BackwardsAuroraCore"]),
         // Feature 353 (R02-G06-03): Chrono Constellator's experience (iOS only; a registered candidate until X-R02-G06).
         .library(name: "ChronoConstellatorExperience", targets: ["ChronoConstellatorExperience"]),
         // Feature 363 (R02-G07-03): Amethyst Escape's experience (iOS only; a registered candidate until X-R02-G07).
@@ -322,6 +324,16 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "NocturneGarden/CoreTests"),
+        // Feature 391 (R02-G10-01): Backwards Aurora's pure rule kernel.
+        .target(name: "BackwardsAuroraCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "BackwardsAurora/Core"),
+        .testTarget(name: "BackwardsAuroraCoreTests",
+                    dependencies: ["BackwardsAuroraCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "BackwardsAurora/CoreTests"),
         .target(name: "ChronoConstellatorExperience",
                 dependencies: ["ChronoConstellatorCore",
                                .product(name: "VisualCoreMath", package: visualCore),
