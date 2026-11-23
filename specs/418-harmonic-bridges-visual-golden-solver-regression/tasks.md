@@ -34,7 +34,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   sorted keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/HarmonicBridges/golden-frames.json` (schema 1) with `HARMONIC_BRIDGES_WRITE_GOLDEN=1`, and
   add `HarmonicBridgesGolden` to `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G1208-004 [P] [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G1208-004 [P] [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-23: host-2 (HarmonicBridgesRegressionGoldenTests 9 tests: the fixed set, every frame shows islands, strings, bridges and filled marks and is not won, deterministic descriptions with distinct tier digests, every frame matches the pinned file, pinned digests self-consistent, missing, unreadable, renamed, extra, unknown frames and schema 2 named, positions beyond one quantum, colours, counts and tier detail caught, a hand-edited description refused) exit 0, lead retest; pinned file unchanged by the run
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a moved
   position beyond a quantum, a changed colour or count, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
