@@ -25,7 +25,7 @@ change (the shaders and reference of R02-G09-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G0909-003 [US1] Edit `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenControls.swift`:
+- [X] T-R02G0909-003 [US1] Edit `Packages/ExperiencesRound02/NocturneGarden/Experience/NocturneGardenControls.swift`: — Verified 2026-11-22: sim-27 (NocturneGardenExperienceTests on iOS 27.2 incl. NocturneGardenIdentifierTests: the 29 clarified names each once, lower-case tokens, every identifier experience.r02-g09.nocturne-garden.<name> and unique) exit 0; agent E's tests retested by the lead
   identifiers `experience.r02-g09.nocturne-garden.<name>` through `port.identifier` (spec Clarifications Q1 names:
   plant, move, resize, remove, set-sun, undo, redo, next-level, reset-view, hint, dismiss-tutorial, failure-undo,
   retry, campaign, daily, practice, play-level, replay, replay-step, replay-stop, kind-picker, column-picker,

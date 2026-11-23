@@ -11,7 +11,9 @@
 // at accessibility text sizes, wrapping text and a 520-point readable width. Feature 387 (R02-G09-07)
 // T-R02G0907-005 (clarifications Q2, Q4, Q5): "Replay best solution" for a level with a verified stored solution, and
 // during replay its position ("Replay: move k of n") with Step and Stop, each with a label and a value; the Sound toggle
-// saves the choice through `settings.sound`.
+// saves the choice through `settings.sound`. Feature 389 (R02-G09-09) T-R02G0909-003 (FR-R02G0909-001; clarification
+// Q1): every control also carries the stable identifier `experience.r02-g09.nocturne-garden.<name>`
+// (`port.identifier`), the names listed in ``identifierNames``.
 #if os(iOS)
 import NocturneGardenCore
 import SwiftUI
@@ -32,6 +34,15 @@ struct NocturneGardenControls: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the ambient loop plays only while it is.
     @Environment(\.scenePhase) private var scenePhase
+
+    /// Every control's identifier name (clarification Q1 of feature 389), each once; the identifier is
+    /// `experience.r02-g09.nocturne-garden.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "plant", "move", "resize", "remove", "set-sun", "undo", "redo", "next-level", "reset-view", "hint",
+        "dismiss-tutorial", "failure-undo", "retry", "campaign", "daily", "practice", "play-level", "replay",
+        "replay-step", "replay-stop", "kind-picker", "column-picker", "row-picker", "size-picker", "bloom-picker",
+        "sun-picker", "level-picker", "sound", "summary",
+    ]
 
     /// The widest the panel's content grows, padding included (clarification Q5 of feature 386).
     static let readableWidth: CGFloat = 520
@@ -73,14 +84,17 @@ struct NocturneGardenControls: View {
             row {
                 Button("Step") { presenter.stepReplay(port: port) }
                     .accessibilityLabel("Play the next move of the replay")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                     .accessibilityValue("Move \(mirror.replayPosition) of \(mirror.replayLength)")
                 Button("Stop") { presenter.stopReplay(port: port) }
                     .accessibilityLabel("Stop the replay")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
                     .accessibilityValue("\(mirror.replayLength) moves")
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
                 .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityIdentifier(port.identifier("replay"))
                 .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }
@@ -94,6 +108,7 @@ struct NocturneGardenControls: View {
     @ViewBuilder private var soundToggle: some View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
+            .accessibilityIdentifier(port.identifier("sound"))
             .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
 
@@ -106,6 +121,7 @@ struct NocturneGardenControls: View {
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Garden")
+            .accessibilityIdentifier(port.identifier("summary"))
             .accessibilityValue(mirror.summary)
         Text(mirror.measureLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
@@ -127,27 +143,32 @@ struct NocturneGardenControls: View {
                     onIncrement: { mirror.pickKind(1) },
                     onDecrement: { mirror.pickKind(-1) })
                 .accessibilityLabel("Bloom kind to plant")
+                .accessibilityIdentifier(port.identifier("kind-picker"))
                 .accessibilityValue(mirror.kindLabel)
             Stepper(mirror.columnLabel,
                     onIncrement: { mirror.stepColumn(1) },
                     onDecrement: { mirror.stepColumn(-1) })
                 .accessibilityLabel("Column of the anchor cell")
+                .accessibilityIdentifier(port.identifier("column-picker"))
                 .accessibilityValue(mirror.columnLabel)
             Stepper(mirror.rowLabel,
                     onIncrement: { mirror.stepRow(1) },
                     onDecrement: { mirror.stepRow(-1) })
                 .accessibilityLabel("Row of the anchor cell")
+                .accessibilityIdentifier(port.identifier("row-picker"))
                 .accessibilityValue(mirror.rowLabel)
             Stepper(mirror.sizeLabel,
                     onIncrement: { mirror.stepSize(1) },
                     onDecrement: { mirror.stepSize(-1) })
                 .accessibilityLabel("Bloom size")
+                .accessibilityIdentifier(port.identifier("size-picker"))
                 .accessibilityValue(mirror.sizeLabel)
             Button("Plant") {
                 send("bloom.plant", [Double(mirror.kind), Double(mirror.column), Double(mirror.row),
                                      Double(mirror.size)])
             }
             .accessibilityLabel("Plant the chosen bloom at the chosen cell")
+            .accessibilityIdentifier(port.identifier("plant"))
             .accessibilityValue(mirror.kindLabel + ", " + mirror.columnLabel + ", " + mirror.rowLabel + ", "
                                 + mirror.sizeLabel)
         }
@@ -160,18 +181,22 @@ struct NocturneGardenControls: View {
                     onIncrement: { mirror.pickBloom(1) },
                     onDecrement: { mirror.pickBloom(-1) })
                 .accessibilityLabel("Planted bloom to change")
+                .accessibilityIdentifier(port.identifier("bloom-picker"))
                 .accessibilityValue(mirror.bloomLabel)
             row {
                 Button("Move") {
                     send("bloom.move", [Double(mirror.bloom), Double(mirror.column), Double(mirror.row)])
                 }
                 .accessibilityLabel("Move the chosen bloom to the chosen cell")
+                .accessibilityIdentifier(port.identifier("move"))
                 .accessibilityValue(Self.values(mirror).move)
                 Button("Resize") { send("bloom.resize", [Double(mirror.bloom), Double(mirror.size)]) }
                     .accessibilityLabel("Give the chosen bloom the chosen size")
+                    .accessibilityIdentifier(port.identifier("resize"))
                     .accessibilityValue(Self.values(mirror).resize)
                 Button("Remove") { send("bloom.remove", [Double(mirror.bloom)]) }
                     .accessibilityLabel("Remove the chosen bloom")
+                    .accessibilityIdentifier(port.identifier("remove"))
                     .accessibilityValue(Self.values(mirror).remove)
             }
         }
@@ -186,23 +211,29 @@ struct NocturneGardenControls: View {
                         onIncrement: { mirror.stepSun(1) },
                         onDecrement: { mirror.stepSun(-1) })
                     .accessibilityLabel("Sun elevation to set")
+                    .accessibilityIdentifier(port.identifier("sun-picker"))
                     .accessibilityValue(mirror.sunPickLabel)
                 Button("Set sun") { send("sun.set", [Double(mirror.sunPick)]) }
                     .accessibilityLabel("Move the sun to the picked elevation")
+                    .accessibilityIdentifier(port.identifier("set-sun"))
                     .accessibilityValue(mirror.sunLabel + "; picked " + mirror.sunPickLabel)
             }
             row {
                 Button("Undo") { send("play.undo") }
                     .accessibilityLabel("Undo the last move")
+                    .accessibilityIdentifier(port.identifier("undo"))
                     .accessibilityValue(Self.values(mirror).moves)
                 Button("Redo") { send("play.redo") }
                     .accessibilityLabel("Redo the move")
+                    .accessibilityIdentifier(port.identifier("redo"))
                     .accessibilityValue(Self.values(mirror).moves)
                 Button("Next level") { send("level.next") }
                     .accessibilityLabel("Go to the next level")
+                    .accessibilityIdentifier(port.identifier("next-level"))
                     .accessibilityValue(Self.values(mirror).nextLevel)
                 Button("Reset view") { resetView() }
                     .accessibilityLabel("Return the camera to the authored view")
+                    .accessibilityIdentifier(port.identifier("reset-view"))
                     .accessibilityValue(Self.viewValue(presenter.gestures.orbit == .authored))
             }
         }
@@ -215,12 +246,14 @@ struct NocturneGardenControls: View {
                 Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
                     .accessibilityValue(instruction)
             }
         }
         row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
+                .accessibilityIdentifier(port.identifier("hint"))
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
             Text("Goal: match in \(mirror.smallest) moves; budget \(mirror.budget)")
                 .font(.footnote).fixedSize(horizontal: false, vertical: true)
@@ -234,9 +267,11 @@ struct NocturneGardenControls: View {
                 row {
                     Button("Undo") { presenter.undoMove(port: port) }
                         .accessibilityLabel("Undo the last move")
+                        .accessibilityIdentifier(port.identifier("failure-undo"))
                         .accessibilityValue(Self.values(mirror).moves)
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
+                        .accessibilityIdentifier(port.identifier("retry"))
                         .accessibilityValue(Self.values(mirror).retry)
                 }
             }
@@ -248,12 +283,15 @@ struct NocturneGardenControls: View {
         row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
+                .accessibilityIdentifier(port.identifier("campaign"))
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
+                .accessibilityIdentifier(port.identifier("daily"))
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with a larger move budget")
+                .accessibilityIdentifier(port.identifier("practice"))
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "practice"))
         }
         row {
@@ -261,9 +299,11 @@ struct NocturneGardenControls: View {
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
                 .accessibilityLabel("Level to play")
+                .accessibilityIdentifier(port.identifier("level-picker"))
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
+                .accessibilityIdentifier(port.identifier("play-level"))
                 .accessibilityValue(Self.values(mirror).playLevel)
         }
     }
