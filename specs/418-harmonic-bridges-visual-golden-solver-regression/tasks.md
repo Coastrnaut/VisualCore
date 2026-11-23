@@ -24,7 +24,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1208-003 [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G1208-003 [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-23: HarmonicBridgesGolden (DEBUG or VISUALCORE_AUTOMATION): 16 frames (levels 1, 21, 41, 61, 81 x tiers 0-2 after the witness's tunings plus the hero), descriptions with positions to 1/8 px, counts, 13 colours, sorted-key JSON and SHA-256, manifest and compare; golden-frames.json schema 1 with 16 frames generated with HARMONIC_BRIDGES_WRITE_GOLDEN=1; invariant, purity, shader and scenario tests pass (33); HarmonicBridgesGolden in RELEASE_FORBIDDEN (release-symbols, 34 release script tests) exit 0
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after the witness's tunings and before its test, plus
   the hero frame of `scenario-manifest.json` at tier 0; at 1,152 × 768 with the authored camera: every island top, every
   string midpoint, every membrane check point of the shown step's bridges, every step pip (index order) and the first
