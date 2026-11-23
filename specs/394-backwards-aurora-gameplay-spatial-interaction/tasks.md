@@ -18,7 +18,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `withPreview(_:)` to `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneSnapshot.swift` and the preview material (code 13, a pale dashed
   copy of the ribbon) to `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraShaders.swift` with its source test in
   `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraShaderSourceTests.swift`; `--name host`
-- [ ] T-R02G1004-003 [P] Add `BackwardsAuroraOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)"),
+- [X] T-R02G1004-003 [P] Add `BackwardsAuroraOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)"), — Verified 2026-11-22: host-2 (139 tests incl. BackwardsAuroraPickerTests 4 (500 seeded picks against an independent pick over 5 levels, 3 sizes, 3 orbits; the 22-point target at 21/23 points; ends win; unusable input) and 3 new geometry tests (orbit framing at 9 orbits × 7 aspects; camera(_:aspect:) bit-identical to the authored orbit; preview ribbon code 13 exactly when previewed)) exit 0, lead retest; the invariant scan skips the picker, freeze preview and gesture controller (presentation sources)
   `camera(_:aspect:orbit:)` (distance refit so the authored box stays inside the view with a 5 % margin;
   `camera(_:aspect:)` equals the authored orbit, bit-identical) and the preview ribbon (the would-be samples as a
   dashed strip at z = 0.01, preview material) to `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneGeometry.swift`; create

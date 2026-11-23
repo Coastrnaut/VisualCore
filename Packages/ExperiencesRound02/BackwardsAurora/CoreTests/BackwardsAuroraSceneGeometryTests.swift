@@ -5,6 +5,13 @@
 // point, ring centre and gauge bar projects inside the view with a 5 % margin at seven aspects 0.4 … 2.5; the ribbon,
 // ghost and marker positions are the same at every tier; the ribbon passes through the exact sample points; the gauge
 // has 0, half and all bars spent; the fallback parts are non-empty. Plain loops; well under 10 s each.
+//
+// Feature 394 (R02-G10-04) T-R02G1004-003 (FR-R02G1004-002, 005; SC-R02G1004-004; clarifications Q3, Q4): at the orbit
+// extremes (yaw ±35°, pitch −15° and +20°, and the edges between) and seven aspects every sample point, target point,
+// ring centre and gauge bar, and every corner of the authored box, projects inside the view with a 5 % margin; the
+// orbit clamps; `camera(_:aspect:)` equals `camera(_:aspect:orbit: .authored)` bit for bit; the freeze preview ribbon
+// (material code 13 at z = 0.01) is present exactly when the snapshot carries preview samples, passes through the exact
+// would-be sample points and is emitted after the ribbon and before the rings.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -315,6 +322,205 @@ import VisualCoreScenes
             #expect(codes.contains(9) == (s.tear != nil))
             #expect(codes.contains(7) == s.matched.contains(true))
             #expect(codes.contains(6) == s.matched.contains(false))
+        }
+    }
+    // MARK: Feature 394 (R02-G10-04) T-R02G1004-003: orbit framing and the preview ribbon
+
+    /// The orbits at the bounds' extremes and edges, plus the authored one.
+    static func extremeOrbits() -> [BackwardsAuroraOrbit] {
+        let yaw: Double = BackwardsAuroraOrbit.yawLimit
+        let low: Double = BackwardsAuroraOrbit.pitchRange.lowerBound
+        let high: Double = BackwardsAuroraOrbit.pitchRange.upperBound
+        var result: [BackwardsAuroraOrbit] = [.authored]
+        for y in [-yaw, 0, yaw] {
+            for p in [low, 0, high] where !(y == 0 && p == 0) {
+                result.append(BackwardsAuroraOrbit(yaw: y, pitch: p))
+            }
+        }
+        return result
+    }
+
+    @Test func orbitFramingKeepsEveryPlaceInsideTheView() throws {
+        let margin: Double = 0.05
+        let orbits: [BackwardsAuroraOrbit] = Self.extremeOrbits()
+        #expect(orbits.count == 9)
+        var checked: Int = 0
+        for s in try Self.snapshots() {
+            var points: [SIMD3<Double>] = []
+            for k in 0..<s.count {
+                points.append(Geometry.samplePoint(k, s))
+                points.append(Geometry.targetPoint(k, s))
+            }
+            for index in s.checkpoints.indices { points.append(Geometry.ringCentre(index, s)) }
+            for bar in 0..<s.budget { points.append(Geometry.gaugeBar(bar, s)) }
+            for corner in 0..<8 {
+                points.append(SIMD3(corner & 1 == 0 ? -1 : 1, corner & 2 == 0 ? -0.95 : 0.75,
+                                    corner & 4 == 0 ? -0.2 : 0.05))
+            }
+            for orbit in orbits {
+                for aspect in Self.aspects {
+                    let cam: BackwardsAuroraCamera = Geometry.camera(s, aspect: aspect, orbit: orbit)
+                    #expect(cam.near > 0 && cam.far > cam.near && cam.aspect == aspect)
+                    for p in points {
+                        guard let v = Geometry.project(p, camera: cam) else {
+                            Issue.record("point \(p) not projected at orbit \(orbit) aspect \(aspect)")
+                            continue
+                        }
+                        #expect(v.x >= margin && v.x <= 1 - margin && v.y >= margin && v.y <= 1 - margin,
+                                "point \(p) at \(v), orbit \(orbit), aspect \(aspect)")
+                        checked += 1
+                    }
+                    // The eye stays at the fitted distance from the look-at point, on the orbit's direction.
+                    let offset: SIMD3<Double> = cam.eye - Geometry.lookAt
+                    let length: Double = (offset * offset).sum().squareRoot()
+                    let direction: SIMD3<Double> = orbit.eyeDirection
+                    #expect(abs((offset * direction).sum() - length) < 1e-9)
+                    // Up is up: a higher point projects higher (smaller y).
+                    if let low = Geometry.project(SIMD3(0, -0.5, 0), camera: cam),
+                       let high = Geometry.project(SIMD3(0, 0.5, 0), camera: cam) {
+                        #expect(high.y < low.y)
+                    }
+                }
+            }
+        }
+        #expect(checked > 10_000)
+        // The orbit clamps; non-finite angles become the authored ones.
+        let wild: BackwardsAuroraOrbit = BackwardsAuroraOrbit(yaw: 4, pitch: -4).clamped()
+        #expect(wild.yaw == BackwardsAuroraOrbit.yawLimit && wild.pitch == BackwardsAuroraOrbit.pitchRange.lowerBound)
+        let wild2: BackwardsAuroraOrbit = BackwardsAuroraOrbit(yaw: -4, pitch: 4).clamped()
+        #expect(wild2.yaw == -BackwardsAuroraOrbit.yawLimit
+            && wild2.pitch == BackwardsAuroraOrbit.pitchRange.upperBound)
+        #expect(BackwardsAuroraOrbit(yaw: .nan, pitch: .infinity).clamped() == .authored)
+        #expect(abs(BackwardsAuroraOrbit.yawLimit - 35 * Double.pi / 180) < 1e-15)
+        #expect(abs(BackwardsAuroraOrbit.pitchRange.lowerBound + 15 * Double.pi / 180) < 1e-15)
+        #expect(abs(BackwardsAuroraOrbit.pitchRange.upperBound - 20 * Double.pi / 180) < 1e-15)
+    }
+
+    @Test func authoredCameraIsBitIdenticalToTheAuthoredOrbit() throws {
+        #expect(BackwardsAuroraOrbit.authored == BackwardsAuroraOrbit(yaw: 0, pitch: 0))
+        #expect(BackwardsAuroraOrbit.authored.eyeDirection == SIMD3<Double>(0, 0, 1))
+        for s in try Self.snapshots() {
+            for aspect in Self.aspects + [0.0, -1, .nan, .infinity, 1e-9, 1e9, 0.1, 10] {
+                let fixed: BackwardsAuroraCamera = Geometry.camera(s, aspect: aspect)
+                let orbit: BackwardsAuroraCamera = Geometry.camera(s, aspect: aspect, orbit: .authored)
+                #expect(fixed == orbit, "aspect \(aspect)")
+                #expect(fixed.viewProjection.floats == orbit.viewProjection.floats)
+                #expect(fixed.eye.x == 0 && fixed.eye.y == Geometry.lookAt.y && fixed.target == Geometry.lookAt)
+            }
+            // Another orbit moves the eye off the axis.
+            let turned: BackwardsAuroraCamera = Geometry.camera(s, aspect: 1, orbit: BackwardsAuroraOrbit(yaw: 0.3,
+                                                                                                        pitch: 0.2))
+            #expect(turned.eye.x > 0 && turned.eye.y > Geometry.lookAt.y && turned.target == Geometry.lookAt)
+        }
+    }
+
+    /// `samples` with the section [start, end] reversed (written here, not the kernel's reversal).
+    static func reversing(_ samples: [Int], _ start: Int, _ end: Int) -> [Int] {
+        var result: [Int] = samples
+        var i: Int = start
+        var j: Int = end
+        while i < j {
+            let t: Int = result[i]
+            result[i] = result[j]
+            result[j] = t
+            i += 1
+            j -= 1
+        }
+        return result
+    }
+
+    @Test func previewRibbonIsDrawnExactlyWhenThereIsAPreview() throws {
+        #expect(Geometry.previewZ == 0.01 && BackwardsAuroraShaders.previewMaterial == 13)
+        for s in try Self.snapshots() {
+            let preview: [Int] = Self.reversing(s.samples, s.sectionStart, s.sectionEnd)
+            let shown: Snapshot = s.withPreview(preview)
+            #expect(shown.preview == preview)
+            for tier in BackwardsAuroraTier.all {
+                // Without a preview (or with one of the wrong length) there is no code 13.
+                for plain in [s, s.withPreview([1, 2, 3])] {
+                    let m: Mesh = try Geometry.auroraMesh(plain, tier: tier)
+                    var any: Bool = false
+                    for k in m.positions.indices where Self.code(m, k) == 13 { any = true }
+                    #expect(!any)
+                }
+                let part: BackwardsAuroraColouredMesh = try Geometry.auroraPart(shown, tier: tier)
+                let m: Mesh = part.mesh
+                #expect(m == (try Geometry.auroraMesh(shown, tier: tier)))
+                var previewVertices: [Int] = []
+                var lastRibbon: Int = -1
+                var firstRing: Int = Int.max
+                for k in m.positions.indices {
+                    let c: Int = Self.code(m, k)
+                    if c == 13 { previewVertices.append(k) }
+                    if c == 5 { lastRibbon = max(lastRibbon, k) }
+                    if c == 6 || c == 7 || c == 8 || c == 9 || c == 10 || c == 11 { firstRing = min(firstRing, k) }
+                }
+                #expect(!previewVertices.isEmpty)
+                guard let first = previewVertices.first, let last = previewVertices.last else { continue }
+                // Painter's order: after the ribbon, before the rings, crosses and gauge.
+                #expect(first > lastRibbon && last < firstRing)
+                // Its triangles face +z like the rest.
+                var t: Int = 0
+                var triangles: Int = 0
+                while t + 2 < m.indices.count {
+                    let a: Int = Int(m.indices[t])
+                    if Self.code(m, a) == 13 {
+                        let pa: Vec3 = m.positions[a]
+                        let pb: Vec3 = m.positions[Int(m.indices[t + 1])]
+                        let pc: Vec3 = m.positions[Int(m.indices[t + 2])]
+                        #expect((pb.x - pa.x) * (pc.y - pa.y) - (pb.y - pa.y) * (pc.x - pa.x) > 0)
+                        triangles += 1
+                    }
+                    t += 3
+                }
+                #expect(triangles == 4 * Geometry.stepsPerSegment * (s.count - 1))
+                // Every preview vertex: z = 0.01, the fallback highlight colour, unsigned timeline coordinate,
+                // within ±0.03 of the would-be polyline.
+                let u: Double = 2 / Double(s.count)
+                let highlight: SIMD3<Double> = BackwardsAuroraPalette.ribbonHighlight
+                for k in previewVertices {
+                    let q: Vec3 = m.positions[k]
+                    #expect(q.z == 0.01)
+                    #expect(m.uvs[k].y >= 0 && abs(m.uvs[k].y - (q.x + 1) / 2) < 1e-12)
+                    let colour: Vec4 = part.colours[k]
+                    #expect(abs(colour.x - highlight.x) < 1e-12 && abs(colour.y - highlight.y) < 1e-12
+                        && abs(colour.z - highlight.z) < 1e-12)
+                    let f: Double = (q.x + 1) / u - 0.5
+                    let i: Int = min(max(Int(f.rounded(.down)), 0), s.count - 2)
+                    let ax: Double = -1 + (Double(i) + 0.5) * u
+                    let bx: Double = -1 + (Double(i) + 1.5) * u
+                    let ay: Double = 0.6 * Double(preview[i]) / 64
+                    let by: Double = 0.6 * Double(preview[i + 1]) / 64
+                    let y: Double = ay + (by - ay) * (q.x - ax) / (bx - ax)
+                    #expect(abs(q.y - y) <= Geometry.ribbonHalfHeight + 1e-12)
+                }
+                // A vertex at every exact would-be sample point.
+                for k in 0..<s.count {
+                    let x: Double = -1 + (Double(k) + 0.5) * u
+                    let y: Double = 0.6 * Double(preview[k]) / 64
+                    var found: Bool = false
+                    for i in previewVertices {
+                        let q: Vec3 = m.positions[i]
+                        if abs(q.x - x) < 1e-12 && q.y == y && q.z == 0.01 { found = true }
+                    }
+                    #expect(found, "would-be sample \(k)")
+                    let p: SIMD3<Double> = Geometry.previewPoint(k, shown)
+                    #expect(abs(p.x - x) < 1e-12 && p.y == y && p.z == 0.01)
+                }
+                // Everything else is unchanged: without the code-13 vertices the meshes agree.
+                let base: Mesh = try Geometry.auroraMesh(s, tier: tier)
+                var others: [String] = []
+                for k in m.positions.indices where Self.code(m, k) != 13 {
+                    let p: Vec3 = m.positions[k]
+                    others.append("\(Self.code(m, k)) \(p.x) \(p.y) \(p.z) \(m.uvs[k].y)")
+                }
+                var reference: [String] = []
+                for k in base.positions.indices {
+                    let p: Vec3 = base.positions[k]
+                    reference.append("\(Self.code(base, k)) \(p.x) \(p.y) \(p.z) \(base.uvs[k].y)")
+                }
+                #expect(others == reference)
+            }
         }
     }
 }

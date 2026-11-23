@@ -247,6 +247,9 @@ import VisualCoreSimulation
     static let presentationSources: Set<String> = [
         "BackwardsAuroraSceneSnapshot.swift", "BackwardsAuroraSceneGeometry.swift", "BackwardsAuroraShaders.swift",
         "BackwardsAuroraExperienceCore.swift", "BackwardsAuroraScenarios.swift",
+        // Feature 394 (R02-G10-04): the picker, the freeze preview and the gesture controller (touch geometry in
+        // Doubles, pointer events); presentation only, covered by their own tests and the renderer-purity tests.
+        "BackwardsAuroraPicker.swift", "BackwardsAuroraFreezePreview.swift", "BackwardsAuroraGestureController.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, without the presentation

@@ -11,7 +11,7 @@
 // y −0.7 … 0.7, at z = −0.08, with dashed edges. The reversal gauge is a row of `budget` bars at y = −0.85 from
 // x = −0.9 to 0.9, the spent ones first. The ground is a midnight plane at z = −0.2 reaching well beyond the view.
 // Depth testing is off on this render path, so the mesh is emitted in painter's order: ground, band, trailing layers
-// (back to front), ghost, ticks, ribbon, rings and discs, crosses, gauge. The fixed authored camera looks from +z at
+// (back to front), ghost, ticks, ribbon, preview ribbon (feature 394), rings and discs, crosses, gauge. The fixed authored camera looks from +z at
 // (0, −0.1, 0), fitted so the box x −1 … 1, y −0.95 … 0.75, z −0.2 … 0.05 fits with a margin of at least 5 % for
 // aspect 0.4 … 2.5.
 //
@@ -22,6 +22,15 @@
 // only: no position depends on the time or Reduce Motion, and positions of the ribbon, ghost and markers are the same
 // at every tier (tiers change only the trailing layers and the glow shells here). Doubles are used for drawing only;
 // nothing here is consulted by the rules.
+//
+// Feature 394 (R02-G10-04) T-R02G1004-003 (FR-R02G1004-002, 004, 005; SC-R02G1004-004; clarifications Q1, Q3, Q4) adds
+// the player's orbit (`BackwardsAuroraOrbit`: yaw ±35° about +y, pitch −15° … +20°, authored (0, 0)) and
+// `camera(_:aspect:orbit:)`: the eye orbits about the look-at point (0, −0.1, 0) and its distance refits to the same
+// authored box with the same margin at every orbit and aspect 0.4 … 2.5; at the authored orbit the camera equals
+// `camera(_:aspect:)` bit for bit. It also adds the freeze preview's ribbon: when the snapshot carries `preview`
+// samples, a strip like the ribbon (0.06 high, 4 straight steps per segment, unsigned timeline coordinate) through the
+// would-be sample points at z = 0.01 with material code 13 (the shader dashes it along the timeline), emitted right
+// after the ribbon and before the rings and crosses.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -46,6 +55,57 @@ public struct BackwardsAuroraCamera: Sendable, Equatable {
     public let projection: Mat4
     /// projection · view (upload with `.floats`).
     public let viewProjection: Mat4
+}
+
+/// The player's view of the aurora: a yaw about +y and a pitch above the horizontal, both in radians (feature 394,
+/// R02-G10-04, clarification Q4). Presentation only: never saved, never read by the rules.
+public struct BackwardsAuroraOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians: the angle of the eye direction above the horizontal through the look-at point (positive:
+    /// the eye above, looking down); allowed ``pitchRange`` (−15° … +20°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 0, the fixed camera of R02-G10-03 (from +z).
+    public static let authored = BackwardsAuroraOrbit(yaw: 0, pitch: 0)
+    /// The largest yaw either way, 35° in radians.
+    public static let yawLimit: Double = 35.0 * Double.pi / 180
+    /// The allowed pitches, −15° … +20° in radians.
+    public static let pitchRange: ClosedRange<Double> = (-15.0 * Double.pi / 180)...(20.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −35° … 35° and pitch to −15° … 20°; a non-finite angle becomes the authored one.
+    public func clamped() -> BackwardsAuroraOrbit {
+        let y: Double = yaw.isFinite ? yaw : Self.authored.yaw
+        let p: Double = pitch.isFinite ? pitch : Self.authored.pitch
+        return BackwardsAuroraOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                    pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+
+    /// The unit direction from the look-at point to the eye at the clamped orbit: (sin y · cos p, sin p, cos y · cos p)
+    /// with y the yaw and p the pitch; exactly (0, 0, 1) at ``authored``.
+    public var eyeDirection: SIMD3<Double> {
+        let o: BackwardsAuroraOrbit = clamped()
+        return SIMD3(sin(o.yaw) * cos(o.pitch), sin(o.pitch), cos(o.yaw) * cos(o.pitch))
+    }
+
+    /// The camera's unit right axis at the clamped orbit, (cos y, 0, −sin y): exactly (1, 0, 0) at ``authored``.
+    var rightAxis: SIMD3<Double> {
+        let o: BackwardsAuroraOrbit = clamped()
+        return SIMD3(cos(o.yaw), 0, -sin(o.yaw))
+    }
+
+    /// The camera's unit up axis at the clamped orbit, (−sin y · sin p, cos p, −cos y · sin p): exactly (0, 1, 0) at
+    /// ``authored``.
+    var upAxis: SIMD3<Double> {
+        let o: BackwardsAuroraOrbit = clamped()
+        return SIMD3(-sin(o.yaw) * sin(o.pitch), cos(o.pitch), -cos(o.yaw) * sin(o.pitch))
+    }
 }
 
 /// A mesh with one RGBA colour per vertex, for the shared unlit `MeshRenderer` (the fallback path).
@@ -86,6 +146,8 @@ public enum BackwardsAuroraSceneGeometry {
         static let unspent: Double = 11
         /// The second trailing copy of the ribbon (layer 2).
         static let trailingSecond: Double = 12
+        /// The freeze preview's dashed ribbon (feature 394, R02-G10-04).
+        static let preview: Double = 13
 
         /// The code of trailing layer `layer` (1 or 2; deeper layers reuse the second code).
         static func trailing(_ layer: Int) -> Double { layer <= 1 ? trailingFirst : trailingSecond }
@@ -105,6 +167,8 @@ public enum BackwardsAuroraSceneGeometry {
     public static let layerDepth: Double = 0.06
     /// Height lift of each trailing layer (layer i at y + layerLift·i).
     public static let layerLift: Double = 0.04
+    /// The freeze preview ribbon's plane, just in front of the ribbon (feature 394, R02-G10-04).
+    public static let previewZ: Double = 0.01
     /// The ghost trail's plane.
     public static let ghostZ: Double = -0.05
     /// Half the ghost trail's height.
@@ -298,6 +362,10 @@ public enum BackwardsAuroraSceneGeometry {
         // Ribbon.
         try addStrip(snapshot, lift: 0, z: 0, halfHeight: ribbonHalfHeight, code: M.ribbon, signed: true, slot: nil,
                      to: &parts)
+        // Freeze preview ribbon (feature 394): only while the snapshot carries would-be samples.
+        if snapshot.preview.count == n && n >= 2 {
+            try addPreview(snapshot, to: &parts)
+        }
         // Rings and discs.
         for index in snapshot.checkpoints.indices {
             let position: Int = snapshot.checkpoints[index]
@@ -403,6 +471,70 @@ public enum BackwardsAuroraSceneGeometry {
                                      view: view, projection: projection, viewProjection: projection * view)
     }
 
+    /// The camera for `snapshot`, `aspect` (width / height) and `orbit` (clamped, see
+    /// ``BackwardsAuroraOrbit/clamped()``): the eye on ``BackwardsAuroraOrbit/eyeDirection`` from the look-at point
+    /// (0, −0.1, 0), looking at it with +y up (never parallel: the pitch is at most 20°) and a 45° vertical field of
+    /// view, at the smallest distance that holds every corner of the authored box (x −1 … 1, y −0.95 … 0.75, z −0.2 …
+    /// 0.05) inside the view with ``fitMargin`` per side; the box is convex, so everything inside it (every sample
+    /// point, ring and gauge bar) keeps a margin of at least 5 % at every orbit and aspect 0.4 … 2.5. Aspects are made
+    /// usable as in ``camera(_:aspect:)``; at ``BackwardsAuroraOrbit/authored`` the result equals
+    /// ``camera(_:aspect:)`` bit for bit. Presentation only; independent of the tier, the time and the play.
+    public static func camera(_ snapshot: BackwardsAuroraSceneSnapshot, aspect: Double,
+                              orbit: BackwardsAuroraOrbit) -> BackwardsAuroraCamera {
+        _ = snapshot
+        let a: Double = usableAspect(aspect)
+        let direction: SIMD3<Double> = orbit.eyeDirection
+        let right: SIMD3<Double> = orbit.rightAxis
+        let up: SIMD3<Double> = orbit.upAxis
+        let d: Double = distance(aspect: a, direction: direction, right: right, up: up)
+        let eye: SIMD3<Double> = lookAt + direction * d
+        var nearest: Double = Double.infinity
+        for index in 0..<8 {
+            let r: SIMD3<Double> = corner(index) - lookAt
+            nearest = min(nearest, d - dot(r, direction))
+        }
+        var farthest: Double = -Double.infinity
+        let g: Double = groundHalfSize
+        for index in 0..<4 {
+            let p: SIMD3<Double> = SIMD3(index & 1 == 0 ? -g : g, index & 2 == 0 ? -g : g, groundZ)
+            farthest = max(farthest, d - dot(p - lookAt, direction))
+        }
+        let near: Double = max(nearest * 0.5, 1e-3)
+        let far: Double = farthest + 2
+        let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: vec(lookAt), up: Vec3(0, 1, 0))
+        let projection: Mat4 = Mat4.perspective(fovY: fieldOfView, aspect: a, near: near, far: far)
+        return BackwardsAuroraCamera(eye: eye, target: lookAt, fovY: fieldOfView, aspect: a, near: near, far: far,
+                                     view: view, projection: projection, viewProjection: projection * view)
+    }
+
+    /// Corner `index` (0 … 7; bit 0 x, bit 1 y, bit 2 z, clear: low) of the authored box.
+    static func corner(_ index: Int) -> SIMD3<Double> {
+        SIMD3(index & 1 == 0 ? boxLow.x : boxHigh.x, index & 2 == 0 ? boxLow.y : boxHigh.y,
+              index & 4 == 0 ? boxLow.z : boxHigh.z)
+    }
+
+    /// The dot product of `a` and `b`, summed x, y, z in that order.
+    static func dot(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> Double { a.x * b.x + a.y * b.y + a.z * b.z }
+
+    /// The eye distance along `direction` from the look-at point that holds the box with `fitMargin` per side at
+    /// `aspect`, for the view axes `right` and `up`: for every corner with r its offset from the look-at point, the
+    /// depth d − r·direction must reach |r·right| / lx and |r·up| / ly. Equals ``distance(aspect:)`` at the authored
+    /// axes.
+    static func distance(aspect: Double, direction: SIMD3<Double>, right: SIMD3<Double>,
+                         up: SIMD3<Double>) -> Double {
+        let half: Double = tan(fieldOfView / 2)
+        let limit: Double = 1 - 2 * fitMargin
+        let lx: Double = limit * usableAspect(aspect) * half
+        let ly: Double = limit * half
+        var d: Double = 0
+        for index in 0..<8 {
+            let r: SIMD3<Double> = corner(index) - lookAt
+            let along: Double = dot(r, direction)
+            d = max(d, along + abs(dot(r, right)) / lx, along + abs(dot(r, up)) / ly)
+        }
+        return d
+    }
+
     /// `point` in view coordinates 0 … 1 (x right, y down), or nil when it is not finite or behind the eye.
     public static func project(_ point: SIMD3<Double>, camera: BackwardsAuroraCamera) -> SIMD2<Double>? {
         guard point.x.isFinite, point.y.isFinite, point.z.isFinite,
@@ -442,6 +574,35 @@ public enum BackwardsAuroraSceneGeometry {
         }
     }
 
+    /// The freeze preview point of position `k` (clamped): x(k), the preview sample's height, z = ``previewZ``; the
+    /// look-at point when there is no preview.
+    public static func previewPoint(_ k: Int, _ snapshot: BackwardsAuroraSceneSnapshot) -> SIMD3<Double> {
+        guard !snapshot.preview.isEmpty else { return SIMD3(lookAt.x, lookAt.y, previewZ) }
+        let i: Int = min(max(k, 0), snapshot.preview.count - 1)
+        return SIMD3(x(Double(i), snapshot), y(snapshot.preview[i]), previewZ)
+    }
+
+    /// Adds the freeze preview ribbon: a strip ±``ribbonHalfHeight`` through the preview points, each segment in
+    /// ``stepsPerSegment`` steps (the vertices at the preview points exact), material code 13, uv.y the unsigned
+    /// timeline coordinate (the shader dashes along it).
+    static func addPreview(_ snapshot: BackwardsAuroraSceneSnapshot, to parts: inout Parts) throws(MeshError) {
+        let n: Int = snapshot.preview.count
+        guard n >= 2 else { return }
+        let steps: Int = stepsPerSegment
+        for k in 0..<(n - 1) {
+            let a: SIMD3<Double> = previewPoint(k, snapshot)
+            let b: SIMD3<Double> = previewPoint(k + 1, snapshot)
+            for j in 0..<steps {
+                let f0: Double = Double(j) / Double(steps)
+                let f1: Double = Double(j + 1) / Double(steps)
+                let p0: SIMD3<Double> = j == 0 ? a : a + (b - a) * f0
+                let p1: SIMD3<Double> = j + 1 == steps ? b : a + (b - a) * f1
+                try parts.step(SIMD3(p0.x, p0.y, previewZ), SIMD3(p1.x, p1.y, previewZ), halfHeight: ribbonHalfHeight,
+                               code: Material.preview, signA: 1, signB: 1, slot: nil)
+            }
+        }
+    }
+
     /// Collects vertices with fallback colours and triangles facing their front.
     struct Parts {
         /// The mesh being built.
@@ -470,6 +631,7 @@ public enum BackwardsAuroraSceneGeometry {
             case 9: return BackwardsAuroraPalette.tear
             case 10: return BackwardsAuroraPalette.spent
             case 11: return BackwardsAuroraPalette.unspent
+            case 13: return BackwardsAuroraPalette.ribbonHighlight
             default: return ground
             }
         }
