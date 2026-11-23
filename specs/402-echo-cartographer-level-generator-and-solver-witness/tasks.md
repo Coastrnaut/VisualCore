@@ -14,7 +14,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1102-002 Add `generation(Int)` ("r02-g11.generation") and `witness(String)` ("r02-g11.witness") to
+- [X] T-R02G1102-002 Add `generation(Int)` ("r02-g11.generation") and `witness(String)` ("r02-g11.witness") to — Verified 2026-11-23: host (swift test --filter EchoCartographer, 45 tests) exit 0, 2026-11-23; error cases generation and witness, 100-entry manifest from planning_index.py levels --experience R02-G11, difficulty metrics
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerError.swift`; create
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerManifest.swift` (the 100 entries "number 1 … 100,
   planned seed, band 1 … 5, energy 8 … 19" copied from `python3 scripts/planning_index.py levels --experience R02-G11`,

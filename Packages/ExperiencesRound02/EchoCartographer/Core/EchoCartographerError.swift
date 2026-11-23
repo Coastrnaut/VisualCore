@@ -1,6 +1,7 @@
 // EchoCartographerError — feature 401 (R02-G11-01) T-R02G1101-002 (FR-R02G1101-006, 011; clarifications Q3, Q5). The
 // refusals of Echo Cartographer's rule kernel, each with a stable reason code `r02-g11.*` that the experience logs with
-// the level id and the action.
+// the level id and the action. Feature 402 (R02-G11-02) T-R02G1102-002 adds the content pipeline's refusals:
+// `generation` and `witness`.
 
 /// A refusal of an Echo Cartographer level, action or event.
 public enum EchoCartographerError: Error, Equatable, Sendable {
@@ -19,6 +20,10 @@ public enum EchoCartographerError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of the manifest entry with this number qualified within the generator's bound (feature 402).
+    case generation(Int)
+    /// A witness file is damaged, newer, edited or no longer replays; the payload names the part (feature 402).
+    case witness(String)
 
     /// The stable reason code, `r02-g11.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +35,8 @@ public enum EchoCartographerError: Error, Equatable, Sendable {
         case .stale: "r02-g11.stale"
         case .newerSchema: "r02-g11.newer-schema"
         case .malformed: "r02-g11.malformed"
+        case .generation: "r02-g11.generation"
+        case .witness: "r02-g11.witness"
         }
     }
 }
