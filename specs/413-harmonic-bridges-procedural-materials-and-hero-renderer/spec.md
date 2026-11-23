@@ -55,7 +55,8 @@ and the geometry "swept strings and radial wave-shell strip meshes".
   top edges as strips 0.008 thick; a ring (radius 0.1, line 0.012) at y = 0.005 around the start island and a
   four-pointed star (radius 0.1) around the goal; every string as a swept strip 0.012 wide between its islands' top
   centres at y = 0.1, deflected sideways by its drawn wave (presentation only: Σ over its resonant modes in the shown
-  step of 0.03 · w · sin(nπu) · cos(2π · n · t / 1.6), u along the string, 24 segments); a string that is a bridge in the
+  step of 0.01 · w · sin(nπu) · cos(2π · n · t / 1.6) (corrected during implementation, 2026-11-23: 0.03 · w could swing a
+  string 0.27, more than the island spacing), u along the string, 24 segments); a string that is a bridge in the
   shown step as a membrane strip 0.05 wide beneath it; on each string the five samples k = 1 … 5 at u = k / 6 as marks
   0.02 wide at y = 0.11, a filled square when the kernel's swing E(k) reaches the threshold and a hollow ring when it
   does not; every island the start reaches in the shown step lit with a glow ring; the window's steps as a row of pips
@@ -78,15 +79,18 @@ and the geometry "swept strings and radial wave-shell strip meshes".
   every tier. Levels are ordered richest first; the presenter logs each tier change with its reason. Impact:
   FR-R02G1203-004; SC-R02G1203-001.
 - Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every island's
-  top centre, every bridge membrane's midpoint (in the shown step, strings at rest), every string's midpoint, the first
+  top centre, every bridge membrane's check point (in the shown step, strings at rest, at u = 0.25 and 0.018 to the side, clear of
+  the string and its marks; corrected during implementation, 2026-11-23: the midpoint lies under the string and the
+  middle mark), every string's midpoint, the first
   gauge bar and the first step pip through the same camera and gives the palette. Simulator tests render offscreen at
   1,152 × 768 at time 0 and check, at points at least 6 pixels from any other element, that an island's top centre
   differs from the ground by at least 0.1 in luminance with red above blue by at least 0.05 (copper); that a membrane's
-  midpoint differs from the ground by at least 0.08 with blue above red by at least 0.05 (cyan); that the gauge's first
+  check point differs from the ground by at least 0.08 with blue above red by at least 0.05 (cyan); that the gauge's first
   bar differs from the ground by at least 0.1; and that the background matches the ground within 0.05 away from geometry.
   Palette: ground #07060C, island face #7A4A2E, island edge #E0A070, string #C88A5A, membrane #4FD8E8, filled mark
   #B8F4FF, hollow mark #7A6A9C, start ring #F2D2A8, goal star #A894FF, reached glow #8FF4FF, wave shell #6FE0F0, pip
-  #4FD8E8, unlit pip #3A3348, lit gauge bar #E0A070, unlit gauge bar #2A2433. Impact: FR-R02G1203-006; SC-R02G1203-001.
+  #4FD8E8, unlit pip #3A3348, lit gauge bar #E0A070, unlit gauge bar #2A2433, broken outline #FF6B4A (added during implementation, 2026-11-23: the
+  broken string and step needed a colour beside their shapes). Impact: FR-R02G1203-006; SC-R02G1203-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
   `HarmonicBridgesSceneSnapshot` (islands with positions, strings with ends, lengths, current pegs and locks, the
   kernel's report, the steps' resonant modes per string, threshold, start, goal, stage, failure, actions left, budget,
