@@ -44,7 +44,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G1202-005 [P] [US4] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesWitness.swift`
+- [X] T-R02G1202-005 [P] [US4] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesWitness.swift` — Verified 2026-11-23: host-4 exit 0 (HarmonicBridgesWitnessTests 16: byte-stable round trip with key order, digests and fingerprints recomputed by an independent replay, digest format pinned by a hand-computed hash, counterexample re-checked by a recount (one size up wins, dropping any tuning loses, a one-tuning plan's starting break), every edited part refused by name, newer, older and damaged forms refused); agent B's witness retested by the lead
   (agent B: schema 1 sorted-key JSON; bridge digests "first 16 hex of SHA-256 of the bridges per step" after each tuning;
   play fingerprints after begin (and dismissTutorial) and each action; counterexample (the size one below and the count
   of its choices tried; for a one-tuning plan the starting pegs' break); difficulty; skipped; decode refuses newer,
