@@ -1175,6 +1175,20 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(argv[start:start + 2],
                          ["VisualCoreUITests/FFPlayUITests", "VisualCoreUITests/FFReplayUITests"])
 
+    def test_nocturne_garden_ui_chunk(self):
+        """Feature 389 R02-G09-09 (T-R02G0909-004): the serial chunk `r3` runs the Nocturne Garden interface
+        journeys; its key appears once in the `UI_CHUNKS` literal."""
+        self.assertEqual(relcheck.UI_CHUNKS["r3"], ["NGPlayUITests", "NGReplayUITests"])
+        self.assertIn("r3", relcheck.SERIAL_CHUNKS)
+        source = Path(relcheck.__file__).read_text(encoding="utf-8")
+        self.assertEqual(source.count('"r3": ['), 1)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-r3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2],
+                         ["VisualCoreUITests/NGPlayUITests", "VisualCoreUITests/NGReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""

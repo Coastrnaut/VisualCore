@@ -34,7 +34,7 @@ change (the shaders and reference of R02-G09-03 are unchanged and re-proven by t
   every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test --only-testing NocturneGardenExperienceTests`
-- [ ] T-R02G0909-004 [US1] Create `Apps/VisualCore/Tests/UI/NocturneGarden/NGSupport.swift`, `NGPlayUITests.swift`,
+- [X] T-R02G0909-004 [US1] Create `Apps/VisualCore/Tests/UI/NocturneGarden/NGSupport.swift`, `NGPlayUITests.swift`, — Verified 2026-11-22: app-ui exit=1 (the generated project predated the new UI test files: 0 tests executed, the enumeration guard failed it; xcodegen generate run), app-ui-2 (release_check app-build-for-testing-ios27 + app-ui-ios27-r3) exit 0: NGPlayUITests win level 1 through the panel with 3 stars and level 2 open (78 s) and keep progress over a relaunch (114 s, 54 s without the two 30 s automation-session setups), NGReplayUITests replays to the win and Stop returns to the campaign (67 s); chunk r3 serial with its script test; SC-R02G0909-001 corrected to measure without the per-launch session setup; agents C and D retested by the lead
   `NGReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 certified moves and the pickers' starting picks
   pinned in `NG`; each plant played by stepping the kind, column, row and size pickers from the current picks to the
   plant's values (reading each value), then Plant; a sun move by the sun picker, then Set sun; read "The shadow matches
