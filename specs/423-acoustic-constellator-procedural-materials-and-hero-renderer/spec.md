@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G13-03 (migration ledger, game feature of experience R02-G13) · ID namespace FR-R02G1303-###,
 SC-R02G1303-###, T-R02G1303-###
@@ -30,6 +30,84 @@ Canonical overrides:
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G13-01 and -02.
 - **Model:** feature 413 (Harmonic Bridges's hero renderer and experience).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+413's answers where the games agree. Facts checked in code (read-only, 2026-11-23): Harmonic Bridges's experience
+(R02-G12-03 … 10) is the pattern in this package — a Core adapter with a table of certified candidates, an immutable
+scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+(`…Experience.swift`, presenter, scene, controls), a scenario manifest with 80 acceptance scenarios, a registration with
+content facts in `Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Acoustic Constellator kernel
+provides the level (stars with drawing positions on a 12 × 12 × 12 grid, rates and starting phases, fixed links, the
+symbol, K, limits, σ, θ, hold, window, budget), the listen report (phases per tick, snapped links per tick, A and B per
+tick, coherent ticks, longest run, outcome), the play (link, unlink, nudge, listen, undo, redo, stages, failures
+missing, disconnected, incoherent and budget) and the certified catalog of R02-G13-02; generated star positions lie on
+a circle of radius 5 around (6, 6) at depth 5 or 7; `AppModelTests` uses `r02-g13.acoustic-constellator` as its synthetic
+unregistered candidate and the next round-two game is `r02-g14.moonlit-mechanism`; the catalog's design gives the
+palette "star white, teal resonance and plum", the hero "celestial musical diagrams pulsing along silver filaments" and
+the geometry "instanced ellipsoids and shader-tinted spline links".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: star (gx, gy, gz) of the drawing grid
+  is at X = (gx − 5.5) · 0.14, Z = (gy − 5.5) · 0.11, Y = 0.15 + (gz − 5.5) · 0.02. Drawn in this order: the sky (a plane
+  at y = −0.01 covering x −1.1 … 1.1, z −0.9 … 1.3); the unlinked symbol pairs as dashed guides (8 dashes, 0.006 wide)
+  between the star centres; every current link as a spline strip 0.01 wide (a quadratic curve rising 0.03 above the
+  chord at its middle, 16 segments), silver when its gap at the shown tick is more than 1 step and teal when it is at
+  most 1; a link snapped at or before the shown tick of the preview as two halves with the middle 30 % missing; each star
+  as an ellipsoid (radii 0.045 × 0.035 × 0.045, 12 × 8 segments) and its phase hand, a strip 0.006 wide from the centre
+  0.07 long at angle phase · 30° in the star's horizontal plane, 0.04 above it; the coherence gauge, a row of 12 bars at
+  z = 0.85 spread from x = −0.6 to 0.6 with ⌊12 · (A + B√3) / n²⌋ lit (presentation arithmetic) and a mark over bar
+  ⌈12θ / n²⌉; the hold gauge, `hold` pips at z = 1.0 spread from x = −0.4 to 0.4, lit for the current coherent run;
+  the moves gauge, `budget` bars at z = 1.15 spread from x = −0.9 to 0.9 (each 1.8 / budget wide with a gap of a fifth,
+  0.05 deep), lit for the actions left. The shown tick plays the kernel's listen report of the current state, one tick
+  per 0.25 s of presentation time, then holds the last tick 1 s and starts again; at time 0 it is tick 0. Depth testing
+  is off (the shared mesh renderer's path): the sky and the flat gauges first, then the guides, the links and the
+  hands, then the stars back to front (by z from the far side, then by x) with back faces culled; the glow is additive
+  and drawn last. The camera is a fixed authored perspective (eye (0, 2.0, 1.7) looking at (0, 0, 0.2)) fitted to the
+  box x −0.9 … 0.9, z −0.7 … 1.25, y 0 … 0.3 with a 5 % margin for aspect 0.4 … 2.5. Nothing drawn is consulted by the
+  rules; the drawn pulse never replaces the kernel's phases. Impact: FR-R02G1303-001, 002, 003, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): stars pulse (scale 1 + 0.15 · cos(2π · phase /
+  12) at the shown tick), 2 radial wave shells (strip rings 0.01 wide expanding from each star on a coherent tick from
+  radius 0 to 0.12 over 1 s, at the star's height) and 2 glow shells around teal links and stars; `level-1`: stars
+  pulse, no wave shells, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): no pulse, no shells, no glow. Stars,
+  hands, links, guides, gauges, colours and positions are the same at every tier. Levels are ordered richest first; the
+  presenter logs each tier change with its reason. Impact: FR-R02G1303-004; SC-R02G1303-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every star's
+  centre, every link's check point (u = 0.25 along its spline at tick 0, 0.015 to the side, clear of the strip), the
+  first coherence bar, the first hold pip and the first moves bar through the same camera and gives the palette.
+  Simulator tests render offscreen at 1,152 × 768 at time 0 and check, at points at least 6 pixels from any other
+  element, that a star's centre differs from the sky by at least 0.15 in luminance with red, green and blue within 0.1 of
+  each other (white); that a teal link's strip point differs from the sky by at least 0.08 with green above red by at
+  least 0.05; that the first moves bar differs from the sky by at least 0.1; and that the background matches the sky
+  within 0.05 away from geometry. Palette: sky #05060F, star #F4F1E8, phase hand #F4F1E8, silver link #B8C0D0, teal link
+  #3FD6C6, guide #8A5A9C, broken outline #FF6B4A, coherence lit #3FD6C6, coherence unlit #2A2433, threshold mark
+  #F4F1E8, hold lit #3FD6C6, hold unlit #3A3348, moves lit #B8C0D0, moves unlit #2A2433, wave shell #6FE0D8, glow
+  #8FF4EA. Impact: FR-R02G1303-006; SC-R02G1303-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `AcousticConstellatorSceneSnapshot` (stars with positions, rates and starting phases, the links, the symbol, the
+  kernel's listen report of the current state, threshold, hold, window, stage, failure, actions left, budget, level
+  number and presentation time) made by the adapter; it never holds the kernel. If a program fails to compile or link,
+  the scene draws the level-2 geometry unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps
+  running; tier changes go to its `tierLog`. Reduce Motion draws the stars at tick 0 without pulsing and does not play
+  the preview; Reduce Flashing caps the glow gain. A failure outlines the missing pair's guide or the snapped link in the
+  broken colour, and the failure text names them, as the kernel's reason does. Impact: FR-R02G1303-003, 007;
+  SC-R02G1303-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g13.acoustic-constellator` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/AcousticConstellator/scenario-manifest.json`, no permissions, a summary
+  of at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's
+  experience registry link `AcousticConstellatorExperience` as a candidate (`available: false` until X-R02-G13), opening
+  at seed 0 (level 1); `AppModelTests` switches its synthetic unregistered candidate to the next round-two game
+  (`r02-g14.moonlit-mechanism`). The adapter (`AcousticConstellatorExperienceCore`) prepares certified level (seed mod
+  100) + 1 from its table of certified candidates (the whole generator only if that candidate no longer certifies) and
+  accepts `link.add [a, b]`, `link.remove [a, b]`, `star.nudge [s, ±1]`, `constellation.listen`, `play.undo`,
+  `play.redo` and `level.next` (whole numbers only); the kernel refuses everything out of range or out of stage; its
+  digest is the level number and the play's fingerprint (never the record history, so undo restores the earlier
+  digest); snapshot schema 1 `{level, records}`. The panel's chosen star and partner are presentation state of the
+  controls, not kernel state: a level opens with star 0 and partner 1 chosen. Impact: FR-R02G1303-005, 008, 009;
+  SC-R02G1303-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
