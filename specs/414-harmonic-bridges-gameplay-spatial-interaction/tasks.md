@@ -82,7 +82,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G1204-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-23: Verified 2026-11-23: reference-2-2 exit=0 (reference-2 failed once: the ProjectM square preset's within8 0.9685 against a floor of 0.979 while an outside device test run used xcodebuild; kept in the evidence; the rerun passed 4/4)
 - [X] T-R02G1204-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: Verified 2026-11-23: script-tests exit=0 (run alone)
 - [ ] T-R02G1204-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G1204-007)
-- [ ] T-R02G1204-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G1204-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-23: Verified 2026-11-23: converge round 1 appended T-013 (island depth order under orbit; implemented, host-5 and sim-27-2 exit 0, 37 simulator tests); converge round 2 appended nothing; README row, gate list and feature count updated
 
 ## Dependencies and parallel work
 
