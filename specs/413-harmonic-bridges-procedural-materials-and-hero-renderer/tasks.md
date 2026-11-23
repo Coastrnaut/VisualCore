@@ -95,7 +95,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [X] T-R02G1203-007 Docs: `docs/architecture/harmonic-bridges.md` (renderer and experience), — Verified 2026-11-23: Verified 2026-11-23: round02-host exit 0 (swift test --package-path Packages/ExperiencesRound02, 345.5 s; all round-two host suites incl. the Harmonic Bridges shader, geometry, adapter, purity and scenario tests); docs/architecture/harmonic-bridges.md (hero renderer and experience), Packages/ExperiencesRound02/README.md and docs/automatedtesting.md (stream contract lesson) updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1203-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1203-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: Verified 2026-11-23: rendering-27, rendering-26, experiences, host-full, app-unit exit=0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1203-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1203-010 Reference regression chunk 2 (`--name reference-2`)
