@@ -16,9 +16,10 @@ logic); no GLSL in this feature.
 
 - [ ] T-R02G1002-002 Add `generation(Int)` ("r02-g10.generation") and `witness(String)` ("r02-g10.witness") to
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraError.swift` (no other kernel change: generated
-  levels stay inside R02-G10-01's ranges); create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraManifest.swift`
-  (BackwardsAuroraManifestEntry "number 1 … 100, seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from
-  `python3 scripts/planning_index.py levels --experience R02-G10` with the source line) and
+  levels stay inside R02-G10-01's ranges); create
+  `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraManifest.swift` (BackwardsAuroraManifestEntry "number
+  1 … 100, seed UInt64, band 1 … 5, budget 8 … 19", the 100 entries copied from `python3 scripts/planning_index.py
+  levels --experience R02-G10` with the source line) and
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraDifficulty.swift` ("smallest, length, checkpoints,
   reversedSamples, longestSection, badBends, bendLimit, breakingMargin, work"); `--name host -- swift test
   --package-path Packages/ExperiencesRound02 --filter BackwardsAurora` (existing tests unchanged)
@@ -43,15 +44,15 @@ logic); no GLSL in this feature.
   band 3: 22 … 26, 4 … 5, 2 … 6, 4, 48; band 4: 26 … 30, 5 … 6, 2 … 6, 5, 32; band 5: 30 … 32, 6 … 7, 2 … 6, 6, 16 (B =
   min(128, L + margin))", `candidate(_:index:)` drawing in the order of clarification Q1 from `SeededRandom(seed:
   SeedDerivation.derive(seed, index: c))`: length, target (start −24 … 24, slope −3 … 3, change −2 … 2 kept within −6 …
-  6, heights within −64 … 64), L = max(1, worst bend), k, section lengths and their separated placement (first start ≥ 2,
-  each start ≥ previous end + 3, last end ≤ N − 3), no palindrome and all 4 seam bends above L, opening = all sections
-  reversed, checkpoints (band + 1 sections, one differing position each), B; BackwardsAuroraGenerated; `generate` with c
-  = 0 … 255 keeping a candidate only when the solver certifies exactly k within the budget; id `backwards-aurora-NNN`,
-  budget = manifest budget, tutorial for 1 … 3, difficulty = band, `.generation(number)` beyond 256; `catalogDigest` via
-  `PuzzleCatalog.digest(id: "backwards-aurora", identities:)`) and, after it, agent C's
-  `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraGeneratorTests.swift` (determinism; band
-  profiles; separation and seam filters; β = 4k; budget; the solution wins; skipped recorded and re-checked); `--name
-  host-3`
+  6, heights within −64 … 64), L = max(1, worst bend), k, section lengths and their separated placement (first start ≥
+  2, each start ≥ previous end + 3, last end ≤ N − 3; nil when they do not fit), no palindrome and all 4 seam bends
+  above L, opening = all sections reversed, checkpoints (band + 1 sections, one differing position each), B;
+  BackwardsAuroraGenerated; `generate` with c = 0 … 255 keeping a candidate only when the solver certifies exactly k
+  within the budget; id `backwards-aurora-NNN`, budget = manifest budget, tutorial for 1 … 3, difficulty = band,
+  `.generation(number)` beyond 256; `catalogDigest` via `PuzzleCatalog.digest(id: "backwards-aurora", identities:)`)
+  and, after it, agent C's `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraGeneratorTests.swift`
+  (determinism; band profiles; separation and seam filters; β = 4k; budget; the solution wins; skipped recorded and
+  re-checked); `--name host-3`
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
@@ -59,8 +60,8 @@ logic); no GLSL in this feature.
   (schema 1; built by replaying the solution's reversals on a `BackwardsAuroraPlay`: the 16-hex sample digest after
   every reversal, fingerprints after begin (and dismissTutorial) and each reversal; smallest and the bound (bad bends);
   the near miss (the witness minus its last reversal: not won, bad bends above 0); difficulty; skipped; sorted-key
-  pretty JSON with a trailing newline; `decode` refuses newer, damaged and non-replaying witnesses and re-runs the solver
-  on the decoded level, refusing a witness whose actions or work differ (`.witness("solution")`, feature 382's
+  pretty JSON with a trailing newline; `decode` refuses newer, damaged and non-replaying witnesses and re-runs the
+  solver on the decoded level, refusing a witness whose actions or work differ (`.witness("solution")`, feature 382's
   convergence lesson)) with `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraWitnessTests.swift`
   (round trip byte for byte; edited actions, digests, fingerprints, level, near miss and difficulty refused; newer
   schema and damaged JSON refused; the near miss behaves as recorded) by agent B; `--name host-4`
