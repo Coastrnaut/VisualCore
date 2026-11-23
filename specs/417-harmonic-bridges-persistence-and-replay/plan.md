@@ -5,7 +5,7 @@
 
 ## Summary
 
-Make Harmonic Bridges's saves reconcilable on Harmonic Bridges's feature-407 pattern: results gain the winning trace (the
+Make Harmonic Bridges' saves reconcilable on Echo Cartographer's feature-407 pattern: results gain the winning trace (the
 effective actions of the play) and `verified`; `HarmonicBridgesReconciliation` replays each trace on its certified level
 on restore and drops results that do not verify; the adapter writes snapshot schema 3 (`{level, mode, progress,
 records, sound, tutorial}`) with a 2 → 3 migration, adds replay (`replay.start/step/stop`, mode `replay(level)`) and
