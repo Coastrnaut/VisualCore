@@ -18,7 +18,7 @@ native control carries a value in words from the start).
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipe (P1, P2) 🎯
 
-- [ ] T-R02G1006-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraFeedbackPlan.swift` (texts and kinds of
+- [X] T-R02G1006-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraFeedbackPlan.swift` (texts and kinds of — Verified 2026-11-23: host-2 exit=0 (BackwardsAuroraFeedbackPlanTests 8: reversal, undo and redo with measures, 3-star and 2-star campaign wins, a practice win without stars, every refusal code in words, a tear and a budget failure plan only the outcome, level and mode changes with the tutorial, section ends and previews plan nothing, summary and hint texts; invariant scan passes; agent A's files retested by the lead in a combined copy, 198 Core tests)
   clarification Q1 word for word, including the revealed hint as `state` (`hint(text:)`); haptics of Q2;
   `after(old:new:)`, `refused(code:)`, `refusalText(code:)`, `summaryText(core:sectionStart:sectionEnd:)` of Q5) with
   `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraFeedbackPlanTests.swift` (scripted sequences of reversals, undos, redos, refusals of every
