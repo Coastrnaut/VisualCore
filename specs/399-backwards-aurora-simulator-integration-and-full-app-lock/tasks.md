@@ -43,7 +43,7 @@ change (the shaders and reference of R02-G10-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G1009-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G1009-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-23: app-unit check exit 0, 119 of 119 tests incl. the four Backwards Aurora AppModelTests, 2026-11-23 (.autonomy/migration/checks/R02-G10-09.app-unit.json)
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `BA`'s pinned level 1 certified reversals and the
   steppers' starting section (the convergence lesson of feature 319) equal the Core's); `--name app-unit -- python3
