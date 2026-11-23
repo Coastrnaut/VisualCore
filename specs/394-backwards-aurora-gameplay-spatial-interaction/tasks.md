@@ -77,7 +77,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G1004-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-23: reference-2 exit=1 (projectm-reference-ios27 square preset within8 0.9723 vs floor 0.9824, run-to-run variance per docs/automatedtesting.md; game-logic-only gate); rerun reference-2-2 exit=0; failed attempt kept
 - [X] T-R02G1004-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: script-tests exit=0 (run alone)
 - [ ] T-R02G1004-012 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G1004-007)
-- [ ] T-R02G1004-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G1004-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-23: converge clean (no tasks appended); sealed (18 passing, 1 failed attempt kept); recorded pass; README updated
 
 ## Dependencies and parallel work
 
