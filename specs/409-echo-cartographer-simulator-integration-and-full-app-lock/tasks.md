@@ -33,7 +33,7 @@ change (the shaders and reference of R02-G11-03 are unchanged and re-proven by t
   every name of Q1 is listed once by the controls' identifier list and has the prefix); `--name sim-27 -- python3
   scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test --only-testing EchoCartographerExperienceTests`
-- [ ] T-R02G1109-004 [US1] Create `Apps/VisualCore/Tests/UI/EchoCartographer/ECGSupport.swift`, `ECGPlayUITests.swift`,
+- [X] T-R02G1109-004 [US1] Create `Apps/VisualCore/Tests/UI/EchoCartographer/ECGSupport.swift`, `ECGPlayUITests.swift`, — Verified 2026-11-23: app-ui-4 exit 0 (ECGPlayUITests: level 1 won through the panel with three stars and level 2 open, 51 s; progress kept over a relaunch, 98 s with two launches; ECGReplayUITests: the stored solution replayed by exactly its 3 actions to a win, Stop back to the campaign, 59 s; chunk t3 serial, its key unique, 5 script tests); earlier attempts: app-ui 0 tests (project not regenerated), app-ui-2 and app-ui-3 a replay press counted without its value moving (the loop now counts confirmed presses)
   `ECGReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 certified actions and the cursor's starting cell (the
   entry, column 0, row 3) and the chamber size (6 × 6) pinned in `ECG`; each action played by stepping the column and row steppers from the cursor's
   cell to the action's cell (reading each value), then Pulse or Claim; read "Every beacon is located" and "Stars: 3 of
