@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G12-02 (migration ledger, game feature of experience R02-G12) · ID namespace FR-R02G1202-###,
 SC-R02G1202-###, T-R02G1202-###
@@ -26,6 +26,69 @@ Canonical overrides:
   figure, as for the earlier round-two games.
 - **Model:** feature 402 (Echo Cartographer's content pipeline) for manifest, generator, witness files, digest and
   progression.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+402's answers where the games agree. Facts checked (read-only, 2026-11-23): R02-G12-01's `HarmonicBridgesLevel`
+(islands 2 … 8, strings 1 … 12, length 1 … 6, peg 1 … 12, steps 1 … 4 of 1 … 3 tones, frequency 1 … 72, strength
+1 … 3, threshold 1 … 12, budget 1 … 60), `HarmonicBridgesReport`, `HarmonicBridgesPlay` and `HarmonicBridgesRules`;
+R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most 1, jump at most 3);
+`SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (`planning_index.py levels
+--experience R02-G12`: bands 1 … 5 × 20, moves budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19). The acceptance
+ranges below were measured before they were written down: a prototype of this generator and solver over 60 generated
+candidates per band gave minimal tuning counts in the band's range for 60, 49, 43, 39 and 37 of 60 (bands 1 … 5), with
+at most 237 nodes of work; skipped draws (no string length and peg that is a bridge in every step) were bounded.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, budget) are a table
+  in `HarmonicBridgesManifest` with their provenance. Candidate c of entry n draws from `SeededRandom(seed:
+  SeedDerivation.derive(plannedSeed, index: c))`, in this order: the scrambled count k in the band's range (1 … 2,
+  2 … 3, 3 … 4, 4 … 5, 5 … 6); the path length P = k + (0 or 1), at most 7; the island count min(8, P + 1 + (0 or 1));
+  the steps by band (1, 1 … 2, 2, 2 … 3, 3 … 4), each with its tones (2, 2 … 3, 2 … 3, 2 … 3, 3) drawn without repeat
+  from the frequencies {6, 12, 18, 24, 30, 36, 48, 60, 72}, each with a strength 1 … 3; the threshold by band (1 … 3,
+  2 … 4, 2 … 5, 3 … 6, 3 … 6); the path from island 0 through P − 1 distinct interior islands (a shuffled draw) to the last
+  island; for each path string a (length, peg) drawn from the pairs that are a bridge in every step (none: the candidate
+  is skipped); the k scrambled path strings (a drawn subset) get instead a peg that is not a bridge in every step (none:
+  skipped); then decoy strings by band (1 … 2, 2 … 3, 2 … 4, 3 … 4, 3 … 5) on unused island pairs (shuffled), each with a
+  length 1 … 6, a peg 1 … 12 and locked with chance 3 in 10; the strings are shuffled. Start is island 0, goal the last;
+  budget = the manifest's; ids `harmonic-bridges-NNN`; tutorial on levels 1 … 3; difficulty = band; island drawing
+  positions are laid out from the path order and never decide a rule. A candidate the solver does not certify with a
+  minimal tuning count in its band's range and at most budget − 1 tunings within its work bound is skipped; at most 256
+  candidates, then `generation(n)`. Impact: FR-R02G1202-001; SC-R02G1202-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing smaller wins? → A: for every string and peg, the
+  bridge pattern is the set of window steps in which the string is a bridge. A string kept at its peg keeps its current
+  pattern; a retuned unlocked string's useful options are the maximal patterns, among its other pegs, that are not
+  contained in its current pattern, each realised by its lowest peg (more bridges never hurt reachability, so a minimal
+  plan never needs a non-maximal or a contained pattern). The solver tries k = 1, 2, … 6 retuned strings: subsets of the
+  useful strings in lexicographic index order and, for each, the product of their options in order; the first choice
+  after which the start reaches the goal in every step is the plan. Work = choices tried, counted and bounded at
+  400 000; over the bound the candidate is skipped. The minimality proof is that every choice of every smaller size was
+  tried and failed (their count is stored). The witness is the plan's tunings in string order followed by one test,
+  replayed through the kernel's play. Impact: FR-R02G1202-002; SC-R02G1202-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `HarmonicBridgesDifficulty` holds the
+  witness tuning count, the islands, strings, locked strings, steps, tones, the threshold, the choices tried at smaller
+  sizes and the solver work. The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1,
+  jump at most 3) on the witness tuning count; the band ranges, each two values wide and meeting the next band's at
+  one value, make band means non-decreasing. Impact: FR-R02G1202-003, 005; SC-R02G1202-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/harmonic-bridges/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the actions, the bridge digest after every tuning (16 hex
+  characters of the SHA-256 of the bridges per step), the play fingerprints after `begin` (and `dismissTutorial` when the
+  level has one) and after each action, the counterexample (the size one below the plan and the number of choices of
+  that size tried, none winning; for a one-tuning plan, the starting pegs' break), the difficulty and the candidates
+  skipped. A test rebuilds every witness and compares bytes; it writes the files only with
+  `HARMONIC_BRIDGES_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. Impact: FR-R02G1202-004; SC-R02G1202-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<HarmonicBridgesRules>.digest(id: "harmonic-bridges", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split into groups of 5 levels so each runs under 10 seconds
+  on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New refusals:
+  `generation(Int)` (`r02-g12.generation`) and `witness(String)` (`r02-g12.witness`). The independent check of
+  SC-R02G1202-002 brute-forces every set of one tuning fewer than the plan over every peg (12 per string, no pattern
+  pruning) on the two levels with the fewest strings in each of bands 1 … 3, and over every bridge pattern (every
+  pattern a peg gives, not only maximal ones) on two levels in each of bands 4 and 5, and confirms none wins and that
+  the plan wins. Impact: FR-R02G1202-004, 006; SC-R02G1202-002, 003, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
