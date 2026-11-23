@@ -26,7 +26,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G0910-004 [P] [US2] Create `docs/apps/nocturne-garden/device-campaign.md` (agent B, modelled on
+- [X] T-R02G0910-004 [P] [US2] Create `docs/apps/nocturne-garden/device-campaign.md` (agent B, modelled on — Verified 2026-11-22: docs (validate_docs.py: 310 dossiers, 0 problems) exit 0; docs/apps/nocturne-garden/device-campaign.md: devices in order, D3 on iPadOS 26.5, owner actions as BLOCKED_OWNER_ACTION, rows NG-D1 to NG-D8 pending, no number claimed; NG-D4 pass wording aligned with the definition by the lead; agent B's file reviewed by the lead
   `docs/apps/faceted-forge/device-campaign.md`: devices and order, D3 on iPadOS 26.5, owner actions as
   BLOCKED_OWNER_ACTION, every row NG-D1 … NG-D8 with devices, procedure, pass condition and "pending device campaign",
   no number claimed, the stress session only in the device campaign); `--name docs -- python3 scripts/validate_docs.py`
