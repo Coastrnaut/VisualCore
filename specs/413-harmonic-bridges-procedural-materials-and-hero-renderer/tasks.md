@@ -28,7 +28,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1203-003 [P] [US1] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesShaders.swift`
+- [X] T-R02G1203-003 [P] [US1] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesShaders.swift` — Verified 2026-11-23: Verified 2026-11-23: host-2 exit 0 (HarmonicBridgesShaderSourceTests 16: material codes 0…15, attributes and uniforms of both programs within 16 vec4, no samplers, loops bounded, the wave 0.01·w per mode decoded from the packed modes, shell positions, 16 palette constants equal to the CPU palette incl. broken outline #FF6B4A); agent A's sources, rewritten to agent B's stream contract, retested by the lead
   (bridge and glow sources, GLSL ES 3.00; signed-distance shading of membranes, marks, rings and edge strips from
   per-vertex local coordinates; the presentation wave Σ 0.03 · w · sin(nπu) · cos(2π n t / 1.6) of up to 3 modes driven
   by `u_time`, zero at level-2 and under Reduce Motion; wave shells expanding from radius 0 to 0.15 over 1.6 s; a won

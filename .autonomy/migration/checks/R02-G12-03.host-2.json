@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "HarmonicBridgesShaderSourceTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridgesShaderSourceTests",
+  "elapsed_seconds": 7.139,
+  "exit_code": 0,
+  "finished": "2026-11-23T17:41:05+00:00",
+  "gate": "R02-G12-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G12-03.host-2.log",
+  "log_sha256": "e81401d1e8496263040fd2c2979db758cbecc565cd149a5b1a86580068cc813a",
+  "name": "host-2",
+  "started": "2026-11-23T17:40:58+00:00",
+  "timed_out": false
+}
