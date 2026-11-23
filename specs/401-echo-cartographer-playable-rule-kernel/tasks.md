@@ -60,7 +60,7 @@ in this feature (the chamber, its rays and echoes are the CPU reference the rend
   moves while playing "every valid pulse, then every valid claim, each in cell-index order (markers are not moves)") with
   `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerRulesTests.swift` (agreement with the play on 200
   walks); `--name host-4`
-- [ ] T-R02G1101-006 [P] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerInvariantTests.swift`
+- [X] T-R02G1101-006 [P] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerInvariantTests.swift` — Verified 2026-11-23: host-5 (incl. EchoCartographerInvariantTests 9: time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity, each with a seeded neighbouring check, seed 2_406) exit 0, 2026-11-23; agent D's tests retested by the lead against the real play
   (agent D: `testEchoCartographerTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
   with a seeded neighbouring-input check, seed 2_406); `--name host-5`
