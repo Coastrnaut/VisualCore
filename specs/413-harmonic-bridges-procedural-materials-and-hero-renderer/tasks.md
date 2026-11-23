@@ -67,7 +67,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks pass.
 
-- [ ] T-R02G1203-006 [US3] [US4] Create `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesExperience.swift`,
+- [X] T-R02G1203-006 [US3] [US4] Create `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesExperience.swift`, — Verified 2026-11-23: Verified 2026-11-23: sim-27 exit 0 (HarmonicBridgesExperienceTests 29 tests in 4 suites on iOS 27.2: five levels × three tiers at 1,152 × 768 against the CPU reference — island tops, membrane check points, first gauge bar, ground; tier positions and log; fallback; zero size and resize; memory warning and rebuild; Reduce Motion and Reduce Flashing; a broken crossing outlined in #FF6B4A; a won level brighter; identity and probes); HarmonicBridgesScenariosTests 6 (94 scenarios incl. acceptance-001…080 = R2-G12-QA-001…080, replayed through the engine; committed manifest equal); packages-2 exit 0 (packages failed first, before the test target existed: kept); catalog-search exit 0; xcodegen regenerated; agents S, E and D retested by the lead
   `…Presenter.swift`, `…BridgeScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and
   Reduce Flashing; the presenter declares `probes(_:)` — two ground corners, as the round-two X gates require — and its
   quality levels equal the Core's `qualityTiers`), `…Controls.swift` (labelled string − and +, peg − and +, tune, test,

@@ -1315,7 +1315,7 @@
       "id": "r02-g12.harmonic-bridges",
       "code": "R02-G12",
       "title": "Harmonic Bridges",
-      "summary": "Tune suspended strings so their resonances solidify walkable bridges",
+      "summary": "Tune copper strings between floating islands until the tones of every step make them swing into cyan bridges, then cross from the start to the goal in every step before the moves run out. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1324,11 +1324,30 @@
         "acoustic-geometry"
       ],
       "order": 37,
-      "palette": [],
+      "palette": [
+        "#07060C",
+        "#E0A070",
+        "#4FD8E8",
+        "#7A6A9C",
+        "#A894FF"
+      ],
       "tile_seed": 435727826,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Tune strings into resonant bridges",
+        "Cross every step of the window",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "b832e7eef70880b12895f1e047d0baaf6a51fdd0a14ce9e655f02c022ab3c737",
+        "levels": 100
+      },
       "available": false
     },
     {

@@ -163,7 +163,9 @@ enum CatalogFixture {
                                // Feature 393 (R02-G10-03); integrated at X-R02-G10.
                                "r02-g10.backwards-aurora",
                                // Feature 403 (R02-G11-03); integrated at X-R02-G11.
-                               "r02-g11.echo-cartographer"],
+                               "r02-g11.echo-cartographer",
+                               // Feature 413 (R02-G12-03); a registered candidate until X-R02-G12.
+                               "r02-g12.harmonic-bridges"],
                 "the registrations of Catalog/registrations.json")
     }
 

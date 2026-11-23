@@ -1,0 +1,6052 @@
+{
+  "controls" : [
+    "string.tune",
+    "crossing.test",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g12.harmonic-bridges",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1ba3103cecc9e096190400f8c2067421bc5c34ab49fdc7aedba16f01019eb6ac",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              13
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0.5,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g12.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              1.5
+            ]
+          },
+          "result" : "action.rule.r02-g12.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "action.rule.r02-g12.noop",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1ba3103cecc9e096190400f8c2067421bc5c34ab49fdc7aedba16f01019eb6ac",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "af5c738d6f06ed8184f4cf10d7606d7365d498584240c5b4f15e1f6eb4c17c81",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1ba3103cecc9e096190400f8c2067421bc5c34ab49fdc7aedba16f01019eb6ac",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "51637db98705ec82531c5ded0276ceb0035ca6287b65fd554b20f45daf85bc94",
+        "initialDigest" : "ebbe80319acba60313dd03e5927c5b0bbca7aadd02a2fb18f10b053e181bd27c"
+      },
+      "name" : "acceptance-001",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              13
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b10cc7be74f86ca1a89bed5c2523f482aed29060cd48b462139276f042b75494",
+        "initialDigest" : "0d3f3ba3379563a5a5078bc36f20510e96668bc6ba673105def0de3a39b802aa"
+      },
+      "name" : "acceptance-002",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "action.rule.r02-g12.noop",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2555ea6340fa8e63bfecbb2e16822b09f3278eca3e8ed7a06fef6c24cc735d27",
+        "initialDigest" : "f767183a73190ff5271eecbd346f6e39cee52eda851318295d06b461ed2deb39"
+      },
+      "name" : "acceptance-003",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              2.5
+            ]
+          },
+          "result" : "action.rule.r02-g12.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "22ab58a05004a3993a2e38373009b777bf7dd282ae615679e3fc3957b2cd0e4f",
+        "initialDigest" : "5d6bec69d462f2b1fb5be746bc227337921e9e6418314e2367159fcf780c56e6"
+      },
+      "name" : "acceptance-004",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e9c1b938928b389fabb5b3fd98c874becb50a4ba06f27e6b57224a8395a38fec",
+        "initialDigest" : "eaff0622e8662581383c0af04aead78bb3ba151c60b9e9aa0d9cd906d8da6ca2",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-005",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              9,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d14812257f688ad70a68bf6027315f3f75320e419ecb99775b7b66269d9b7494",
+        "initialDigest" : "83eb630f66858f5e86a72d1f07fbbdb422455450683b8a2e3d3197cde8817463"
+      },
+      "name" : "acceptance-006",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              13
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9f1ea83e5a99030a868ad1cd015865ec10e464fc5e738990ac2ee2ea634117f1",
+        "initialDigest" : "b7d8ea00333a142c84fae1bca8e9d08036591d32e9360d799e1fe6df88824711"
+      },
+      "name" : "acceptance-007",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "action.rule.r02-g12.noop",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "11ac984fef4399b84572649f3bb6bb4f91fcaf401fa90734e2a0e292e95ed27e",
+        "initialDigest" : "585eca3599e196661f16d6d2250c910b97feb0bbfa2e18acadde027e35b6b576"
+      },
+      "name" : "acceptance-008",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              2.5
+            ]
+          },
+          "result" : "action.rule.r02-g12.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a225fde071d6c91b83054207e0acd0daeec108c02609c2f22e3cdc2bd39907dd",
+        "initialDigest" : "fea80eaf4cd4b0fcb955c412d13548b62ed93b19d53cd218f1dbcda10d64ef1d"
+      },
+      "name" : "acceptance-009",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e6242f99280494534cdaaad070f57512af54c4b0fad5260469778511b50c4e8d",
+        "initialDigest" : "890bcce547d2373f104c8de8a703a9cce59c3bd8d84dd7e5c8b95467781f827a",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-010",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5f8e135f7ca027e325282c31323cb4abac9169dd19022cc659abb8063708b0f0",
+        "initialDigest" : "2e77347a93cc42a830454d82c7a4762a53a3ffdfbca3305ce367fe6242f91796",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-011",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eabd0701555eead532249b8077cea2101c67952c2765f0a8deadebeae1a244d6",
+        "initialDigest" : "bb4ddc2d5771e9c38b54357ac478de6f036c5af1d7af15ddf09ad7fc32c2aacd",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-012",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "03714b146fea197a31bd1479048b1f516be0303eafe1f83c9730f6aff9b7c1cf",
+        "initialDigest" : "8ac48146b67e66dbe49cac021534f58cc2a2f05208c5b6caa86867a9421c02fa",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-013",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "99864113a751a89acb4dd3c544ba93280dc4cd47d037eeae59c23cfe1e6046fd",
+        "initialDigest" : "9ff7518669b11327bdb56308fee40954dfabfb127cf1a5eff7bfb5fc60fe3f5d",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-014",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "99fd5ff43ee980f37646f134ab7c2d4c3ebcf395a01749e22b22eb335142a75a",
+        "initialDigest" : "4c25fd27b7dd3bb5f16ec825f9ce1cecfdc680f3d8eb6997239774139a8e2104",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-015",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2d4fa4913204451c32f48c83e59569b22188a0b61a727fe3bece92e5ef1157b1",
+        "initialDigest" : "0e51e510b5dc181152ae79471cbd6d5d9700333878ecdc27ee2dcd6f2eb8b580",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-016",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a7b0f941df2fdfdfbdea78be2e837a319ead0469afde58caa8e4af66424d5a0d",
+        "initialDigest" : "4c3a028e53aa36ac3e76570b296f44d74e9382a7fc4734752e25dac6b5f01537",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-017",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1439e0ec789d575af60e327f675f414dca94165609c1fb7f0b4326bb2dd7e8bb",
+        "initialDigest" : "e6d00a4ac7b424b26d94a03146d9250055ad2044c169856d7d7e460de2144c58",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-018",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "194e90a69d3f00b12a853f3b2a66f52d0ea83c40ccb37ae0610564af85f2e1fd",
+        "initialDigest" : "35fdd0ae40e16dd15c41625694465809f289fafe3dcb7f842d3e0b8a4d6ceb6a",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-019",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              6,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "33428349637a44f92253dd988d3187dc22b1e59626466412b6e8d6ded2095178",
+        "initialDigest" : "0e37360aad69312633402e87f0de457d3770c5a68ae330a5c86b1d9b90e09941",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-020",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              10,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ee3a7a109cf263cd7674b15fd9e4d532c323f282cefcb549c29826807c6c8e57",
+        "initialDigest" : "ee3a7a109cf263cd7674b15fd9e4d532c323f282cefcb549c29826807c6c8e57"
+      },
+      "name" : "acceptance-021",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              13
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              9,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0a108c23b2818db7f0e03315dbb9471c38fa0986d2b5a568f7fbc97f9b291463",
+        "initialDigest" : "0a108c23b2818db7f0e03315dbb9471c38fa0986d2b5a568f7fbc97f9b291463"
+      },
+      "name" : "acceptance-022",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              10,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e73bf1d1cd77a24c7f91952e10b438f5c74e867eefb86937b54fd44ec975eb06",
+        "initialDigest" : "e73bf1d1cd77a24c7f91952e10b438f5c74e867eefb86937b54fd44ec975eb06"
+      },
+      "name" : "acceptance-023",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              13
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5d6f5ce90a57091237be5a70673af4b3b241e1c3b7bd44eaa752aad541afb100",
+        "initialDigest" : "5d6f5ce90a57091237be5a70673af4b3b241e1c3b7bd44eaa752aad541afb100"
+      },
+      "name" : "acceptance-024",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "739e2820a967df47ef5b6fb2256064517e5d98872795ceb52dc6204196b0bcdc",
+        "initialDigest" : "739e2820a967df47ef5b6fb2256064517e5d98872795ceb52dc6204196b0bcdc"
+      },
+      "name" : "acceptance-025",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              13
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bf3064602d4a886aeec370d6f8706ab65fe265a76ee6e7874b3280aa3e07a56c",
+        "initialDigest" : "bf3064602d4a886aeec370d6f8706ab65fe265a76ee6e7874b3280aa3e07a56c"
+      },
+      "name" : "acceptance-026",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fe0a73b4811565a8b04519446f3b8caec3b0970249ae6d7fa5dd5c46aa223d66",
+        "initialDigest" : "fe0a73b4811565a8b04519446f3b8caec3b0970249ae6d7fa5dd5c46aa223d66"
+      },
+      "name" : "acceptance-027",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              13
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "018c3beb13d3cd70e33bd4057f5902855f3634ad2097e96abcf434ed234692ea",
+        "initialDigest" : "018c3beb13d3cd70e33bd4057f5902855f3634ad2097e96abcf434ed234692ea"
+      },
+      "name" : "acceptance-028",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9d4ada2b9dac6fe34af4c8d9f379fb0a611f8a81742a68274fc4cc4b7d28ab49",
+        "initialDigest" : "9d4ada2b9dac6fe34af4c8d9f379fb0a611f8a81742a68274fc4cc4b7d28ab49"
+      },
+      "name" : "acceptance-029",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              13
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d22fb335b4091cb8ee8d242ae1436a7b46d351aa1e3bce461c41760a7644d6f7",
+        "initialDigest" : "d22fb335b4091cb8ee8d242ae1436a7b46d351aa1e3bce461c41760a7644d6f7"
+      },
+      "name" : "acceptance-030",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f5f357357d053c9a0fcc1544ab5749cb5c2992da23d6e662bf7d9e8eee4862e4",
+        "initialDigest" : "eb1332be57b168a6b11b82253228a5fd10991828efbf9115d5aa89f0cea506dd"
+      },
+      "name" : "acceptance-031",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5145d1a4d3730d9ada568661b8d6132989a100e6cddb6006d8a74ad298b3d5f8",
+        "initialDigest" : "871280d21b32201e1682e32b6b42094ec00560d00f5df0146e308b5b5ff0d6a0"
+      },
+      "name" : "acceptance-032",
+      "seed" : "60"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "83779dc501c57f80380e7dd73ef0d3814c7e07c2a57a75b6ee0bd2c1beb770c6",
+        "initialDigest" : "524fb2b0246b396c2d94509478103e2d9e5f8ca8ca928711dab0171b56ab74a1"
+      },
+      "name" : "acceptance-033",
+      "seed" : "67"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6b0c55b7a977dccdc03d11ae0d9cc068c9b98d3c568f7c84e2b2e4706a8e9f71",
+        "initialDigest" : "972e4db031b12edf75a7ded1331b9b23d625638b4f95a84f8235feaa864926b8"
+      },
+      "name" : "acceptance-034",
+      "seed" : "74"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a8c149be2be76a28272369d96c3e8f6649a3bb9eccef4e249c2021ec905f3f88",
+        "initialDigest" : "7aaa5949839dcc43665f8381876e9c58f9beb2d5ea742b6eaa183edfe43155da"
+      },
+      "name" : "acceptance-035",
+      "seed" : "81"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6c33e71bad7cd9da159c7fa73da48203a09d73ee052e09f656ac14b62fc8ecf6",
+        "initialDigest" : "d0e2776bdd57404dd0e80d7685126905128e6bb56018f186e6940e48de22d0b5"
+      },
+      "name" : "acceptance-036",
+      "seed" : "88"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ffe669218ba2c732219c512626bb08da3e63dd948dfa46f24d3191076e3ee56a",
+        "initialDigest" : "4fb7bdd821d2256d466ab005f1368eb7a272c93c35ac8b61c6d24f2e952669e2"
+      },
+      "name" : "acceptance-037",
+      "seed" : "95"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b2fb849b2bcd55c3059fb6b0b928a6cc87804110a6080b06fc05c2e948d43d2b",
+        "initialDigest" : "c04119c2db0e5345d0cf9a112cea25aa439cfed479b3202dcc738dffc5f1ae40"
+      },
+      "name" : "acceptance-038",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "212064358b45ed6034b183c824b8fb3be04872cb742f3c0781a97b22d00a7350",
+        "initialDigest" : "b1a57d5974e6199496d996d32dd7b8e76213c2f8a4524893e4c5c160860591e0"
+      },
+      "name" : "acceptance-039",
+      "seed" : "9"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6dd562e1b65e7c3ffd91781aa059cc7c57ea046bf7423be886fae8d07802f726",
+        "initialDigest" : "831c7e8ab8322c0dd660bb85212a691775acafaf630dc5a77b499381324c9d40"
+      },
+      "name" : "acceptance-040",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "99fb0a6f8c1658f0b848292daf044ece105e1392af73fc7bf773c17f52b803d6",
+        "initialDigest" : "62c1bd79efd609b69d7fece5dbaaf49638a77c38da73ac3d2e1fa10744bf1b55",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-041",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f37e83a4e933b0ec392434897c5ec98f55baca36bf9db7ebc1a01aecdd4939a1",
+        "initialDigest" : "1dbfe277341fdacb1eddf608c7480393ae5e4337ab905b31e4cb179c730834db",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-042",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9042df302ea16b043db5d7b783f4764896e181b49d2e0c7ed0817b24612f944a",
+        "initialDigest" : "8b176d61cdbe45d9daf9feedbc4cf2f4f1c66ad8ad175e8948ccdb5704e5e224",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-043",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "db2503477495faa3a92a3ecd9fa2bb86377225a497523a7702ffc9838924864a",
+        "initialDigest" : "67a8b78722de59eadf77220ef0c0a534e7b125536618d6b90d75410618340095",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-044",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "34c396d90ea117585b576f563bf95eeb33d00f8e0c988d25fd07327da04b4664",
+        "initialDigest" : "381e1cbcd3b70b5768451d78561ab9b665a71b973a3ec7f45722651de717e506",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-045",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ee39a2803e2f5a3ee7dc1eb2c9da5dcbb1a82f6cd2ba4c00ef04b5cae62401ed",
+        "initialDigest" : "c2255a96ad60f4413cb3424abe997ab4f05a298662a00a6798e9e68cbbb2de92",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-046",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5f826adf613ca89a9c2c6e120d8cdf68a6336c9f18415bc330574684eb85f9da",
+        "initialDigest" : "264bb25080cc174ee8a4afd3a02a35ac5c318e4253443635ca09bb0a1b332bb0",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-047",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "73afb530fbf210752d785b1880cb3a2de54f0ba886400a2e99d8ce95d54ec98b",
+        "initialDigest" : "ef257d6c07a15dfa35d15f2f7deee2c85241e85661c4421c8b7884bbf30be3f4",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-048",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5a2c1aeb136cbf582db135f9763eedc3a217026ef37a699ff75ae289d6077d68",
+        "initialDigest" : "9fcd635d56a6646167e0b22b29fc373c432a59e02b9326a6fb530a741f016964",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-049",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              8,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              9,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2e68bd779a4c7e8f3ceec8a7e2ff7b5a33aa23368c0d74972edcddbdbcfb39de",
+        "initialDigest" : "3f51c5e2c41f4c8629cf79fb00979c20a7acf5f13cce06d9a3e96f966fb2f174",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-050",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b91fde279870bb51039276d42170dd37fe4b9c449cffe6e24d5182cbd61af0e6",
+        "initialDigest" : "b91fde279870bb51039276d42170dd37fe4b9c449cffe6e24d5182cbd61af0e6"
+      },
+      "name" : "acceptance-051",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3"
+      },
+      "name" : "acceptance-052",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "550f58f598d23fcc00029a882aacfcad9a0ce0cc687473575127a905f02e7cee",
+        "initialDigest" : "550f58f598d23fcc00029a882aacfcad9a0ce0cc687473575127a905f02e7cee"
+      },
+      "name" : "acceptance-053",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8156e4ff3a9a09287b60ae1edc1d64d91937bb1afc8f0e541336184facfe1b87",
+        "initialDigest" : "8156e4ff3a9a09287b60ae1edc1d64d91937bb1afc8f0e541336184facfe1b87"
+      },
+      "name" : "acceptance-054",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aae5698b33de7a8e046a1acee84b57a9328d0de9d9093dcbfb393dd866ce100e",
+        "initialDigest" : "aae5698b33de7a8e046a1acee84b57a9328d0de9d9093dcbfb393dd866ce100e"
+      },
+      "name" : "acceptance-055",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "213c5a3780fe089d1b99e62d0fe44520e6a90308cb35818902f8843122ad646d",
+        "initialDigest" : "213c5a3780fe089d1b99e62d0fe44520e6a90308cb35818902f8843122ad646d"
+      },
+      "name" : "acceptance-056",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7e59f389ac826fd32a70e9bf03c489a3f9850dfdc13cc0094a5fabeb700e8cf8",
+        "initialDigest" : "7e59f389ac826fd32a70e9bf03c489a3f9850dfdc13cc0094a5fabeb700e8cf8"
+      },
+      "name" : "acceptance-057",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "780dbcbe02b297e606c3112387243e5def726de66027e365af3922b0229b993a",
+        "initialDigest" : "780dbcbe02b297e606c3112387243e5def726de66027e365af3922b0229b993a"
+      },
+      "name" : "acceptance-058",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "339af3c8267102ebf8341192d26e20538cf8937a7bbd23dacc37663380288331",
+        "initialDigest" : "339af3c8267102ebf8341192d26e20538cf8937a7bbd23dacc37663380288331"
+      },
+      "name" : "acceptance-059",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bee03738bcff06f30614dcde17e93859299c73ffe377a4036d1b87ae0ad09469",
+        "initialDigest" : "bee03738bcff06f30614dcde17e93859299c73ffe377a4036d1b87ae0ad09469"
+      },
+      "name" : "acceptance-060",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ef8e7e8b63722c5aa0dad12a9428a264040b1f6a4fd41536e3de49023998e504",
+        "initialDigest" : "1b11aa77f83a95de2724058ed7be19ad8bcb900ef3fa22c371898098d2b4a305",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-061",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              6,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              8,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ba88ca26a9138c7cf615c3c8492ca7f7855349fdeb30670a67cf9e32d7bce1d9",
+        "initialDigest" : "81e129d85b267a08b4526759f65088c388246ca6ef8694e623702912b3583e98",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-062",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              9,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0342ee3b86ccfe2cbc2c2acf7ad79b3e4718072935871a2e60bf4183bb432b17",
+        "initialDigest" : "20eae74f55e364eb7fc193f15d092e12ffe7e07fa7faf06dea3cf82ada8ce5f2",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-063",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              6,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              8,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "02de1fe046e006b22959dc19e6a9ba8cfb5c477d6d5b7b390915788d93d0ca69",
+        "initialDigest" : "004530588938a5c9cb79b29b9201cd84c5d599fd9a78c7c97c8b4216086adad8",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-064",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2fbc5b718fa8a005bf58567ceecfb0b28712d40600e7e0bea21a89627fd7924b",
+        "initialDigest" : "4d9d9f86ab9404e08be94e9eede3beb44df5a1fe1ddc9ece6a12c0d73e26ff74",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-065",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              5,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              6,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              7,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              8,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8ee63f8ad75a3165ec406e1bcc1f2a18676ec72f56cbbd81a3f15dd927fe8874",
+        "initialDigest" : "5749276700b2ccdb683889c869a4b3b4bc1621830af6213eb5604728a2cd1c76",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-066",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              4,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "05c07a669da89f10ada11ee68dc5cb21f3b3e74de8cb1b9a4c887310dce70a83",
+        "initialDigest" : "9337f38fdec651b3dfd2e54cad07db458d512cbb1240ef85b16cd124cb0b6834",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-067",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0063dea8ba8d9b430ca3cac43bff2cdf6837f98e53e335b7653a42f5feae9fa1",
+        "initialDigest" : "4f5710e838147ed3288f4bfc095f91873557fe7171107f145b1a6fc2e386f5f9",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-068",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "05fa1ef948c7628b169d3d5b81ac5d27a7c85b1ca8c180f9ae0c61bfe3b360f8",
+        "initialDigest" : "08baec3438332fe2b5415ca818af96fce249f44cb82aa4c3ee2ca77a8742e777",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-069",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              3,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cb552cbeb786fb5a094e3b4a8e2367c65f492c6d3ff1a9dc327e387d692a06a9",
+        "initialDigest" : "fdd7988f576834795703256b05c40bc914d2ca7645ac1dd2343bea4359f78325",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-070",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9ff7518669b11327bdb56308fee40954dfabfb127cf1a5eff7bfb5fc60fe3f5d",
+        "initialDigest" : "ea1f794d973e265a9a9cb52879174cfb68472042157332655248df4c7058312f"
+      },
+      "name" : "acceptance-071",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4c25fd27b7dd3bb5f16ec825f9ce1cecfdc680f3d8eb6997239774139a8e2104",
+        "initialDigest" : "ec2c6a1330b976c7a51e8fd105ada382a76a4e7b2f5af1eb9043a727b68e1735"
+      },
+      "name" : "acceptance-072",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0e51e510b5dc181152ae79471cbd6d5d9700333878ecdc27ee2dcd6f2eb8b580",
+        "initialDigest" : "8742e121398a86f79d5aa409373b316d73916e14e749424f2d87c0a52362319c"
+      },
+      "name" : "acceptance-073",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4c3a028e53aa36ac3e76570b296f44d74e9382a7fc4734752e25dac6b5f01537",
+        "initialDigest" : "7159fcb144dbdbb36a756cde7cc60c2e3e219ae584a6d3afcb587a3abb8198bb"
+      },
+      "name" : "acceptance-074",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e6d00a4ac7b424b26d94a03146d9250055ad2044c169856d7d7e460de2144c58",
+        "initialDigest" : "3ea01198e3d3b841f35013f90927a4732544a652123076dcbb8554bc2a381980"
+      },
+      "name" : "acceptance-075",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "35fdd0ae40e16dd15c41625694465809f289fafe3dcb7f842d3e0b8a4d6ceb6a",
+        "initialDigest" : "5d9e1de8e3e2b20ebe0cd306de0215009c360172ff92d3f09399b1407bf3dc3b"
+      },
+      "name" : "acceptance-076",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0e37360aad69312633402e87f0de457d3770c5a68ae330a5c86b1d9b90e09941",
+        "initialDigest" : "ccfc0e1f6a0a1998f0848d1e36c63a455edb0961ab1193b392416c0af573c31b"
+      },
+      "name" : "acceptance-077",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              2,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ee3a7a109cf263cd7674b15fd9e4d532c323f282cefcb549c29826807c6c8e57",
+        "initialDigest" : "6064c50d90d9cd006ecde8538932414199fcbef0b2559851f326c5cde240a0e7"
+      },
+      "name" : "acceptance-078",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0a108c23b2818db7f0e03315dbb9471c38fa0986d2b5a568f7fbc97f9b291463",
+        "initialDigest" : "02771ef125739e9b4c6ee8f3c30a43506993dce0a1d8824c8f5a74871fd445fa"
+      },
+      "name" : "acceptance-079",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g12.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e73bf1d1cd77a24c7f91952e10b438f5c74e867eefb86937b54fd44ec975eb06",
+        "initialDigest" : "a5b2b94e8c0d484e9cda15c5a56af79fadca7aa6fca54c1aec64a3b7b71f5bb1"
+      },
+      "name" : "acceptance-080",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "crossing.test",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e4b6b0261ea2cafb0282743bfa049812f707081ac205c2088ca724128140f5ea",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7446fc129bdc7d8a797b3f7eb11d860364b422f0daa83df18013e4062ac4959f",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-budget-out",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "string.tune",
+            "values" : [
+              0,
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1ba3103cecc9e096190400f8c2067421bc5c34ab49fdc7aedba16f01019eb6ac",
+        "initialDigest" : "c27785ca2c145432d3ae697eef0ac8b66a5a3f3f103f95f159e97b73b89249d3"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

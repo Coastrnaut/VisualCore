@@ -914,6 +914,34 @@
       "manifest": "Packages/ExperiencesRound02/EchoCartographer/scenario-manifest.json",
       "permissions": [],
       "summary": "Send sonar pulses through a dark chamber: walls flare into mint wireframe and hidden beacons answer with echoes. Work out where every beacon must be and claim it before the energy runs out. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g12.harmonic-bridges": {
+      "capabilities": [
+        "Tune strings into resonant bridges",
+        "Cross every step of the window",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#07060C",
+        "#E0A070",
+        "#4FD8E8",
+        "#7A6A9C",
+        "#A894FF"
+      ],
+      "content": {
+        "catalog_sha256": "b832e7eef70880b12895f1e047d0baaf6a51fdd0a14ce9e655f02c022ab3c737",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/HarmonicBridges/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Tune copper strings between floating islands until the tones of every step make them swing into cyan bridges, then cross from the start to the goal in every step before the moves run out. 100 certified levels. Drawn in code; offline."
     }
   }
 }

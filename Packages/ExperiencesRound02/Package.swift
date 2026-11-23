@@ -41,6 +41,8 @@ let package = Package(
         .library(name: "EchoCartographerCore", targets: ["EchoCartographerCore"]),
         // Feature 411 (R02-G12-01): Harmonic Bridges' rule kernel, a candidate until X-R02-G12.
         .library(name: "HarmonicBridgesCore", targets: ["HarmonicBridgesCore"]),
+        // Feature 413 (R02-G12-03): Harmonic Bridges' experience (iOS only; a registered candidate until X-R02-G12).
+        .library(name: "HarmonicBridgesExperience", targets: ["HarmonicBridgesExperience"]),
         // Feature 403 (R02-G11-03): Echo Cartographer's experience (iOS only; a registered candidate until X-R02-G11).
         .library(name: "EchoCartographerExperience", targets: ["EchoCartographerExperience"]),
         // Feature 353 (R02-G06-03): Chrono Constellator's experience (iOS only; a registered candidate until X-R02-G06).
@@ -396,6 +398,27 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "HarmonicBridges/CoreTests"),
+        // Feature 413 (R02-G12-03): Harmonic Bridges' experience (presenter, scene, controls).
+        .target(name: "HarmonicBridgesExperience",
+                dependencies: ["HarmonicBridgesCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "HarmonicBridges/Experience"),
+        // Feature 413 (R02-G12-03): the simulator tests of Harmonic Bridges' experience.
+        .testTarget(name: "HarmonicBridgesExperienceTests",
+                    dependencies: ["HarmonicBridgesExperience", "HarmonicBridgesCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "HarmonicBridges/ExperienceTests"),
         // Feature 403 (R02-G11-03): Echo Cartographer's experience (presenter, scene, controls) and its simulator tests.
         .target(name: "EchoCartographerExperience",
                 dependencies: ["EchoCartographerCore",

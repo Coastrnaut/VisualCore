@@ -1,0 +1,268 @@
+// HarmonicBridgesScenariosTests — feature 413 (R02-G12-03) T-R02G1203-006 (FR-R02G1203-005). The scenario manifest of
+// Harmonic Bridges: a valid round-two game manifest with the nine standard scenarios, `full-playthrough`, `hero`, the 80
+// acceptance scenarios (rows R2-G12-QA-001 … 080, in order, on 80 distinct levels, the first twenty the levels the
+// archived rows name) and three fixtures; its derived digests, results and outcomes equal to what `ExperienceEngine`
+// gives when played as the runner plays them; the save-restore state survives a restore; every standard scenario and
+// fixture ends in the kernel state its actions describe; every acceptance row ends in the state of its family (a
+// refusal with the kernel's code, a broken test, a spent budget, a won witness, undo and redo restoring digests, the
+// next level's opening digest); and the committed `scenario-manifest.json` equal to the Swift manifest
+// (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run (`swift test`); explicit types, plain loops.
+#if DEBUG || VISUALCORE_AUTOMATION
+@testable import HarmonicBridgesCore
+import Foundation
+import Testing
+import VisualCoreExperience
+
+/// The id of the manifest's experience.
+private let scenarioID: ExperienceID = ExperienceID(rawValue: HarmonicBridgesExperienceCore.experienceID)!
+
+/// The manifest, built once per test process (it certifies 80 levels and more).
+private let builtManifest: ScenarioManifest = HarmonicBridgesExperienceCore.manifest(for: scenarioID)
+
+/// What playing `spec` on a fresh engine gives, as the runner plays it.
+private func playScenario(_ spec: ScenarioSpec) async throws
+    -> (initial: String, results: [String], final: String, core: HarmonicBridgesExperienceCore?) {
+    var engine: ExperienceEngine<HarmonicBridgesExperienceCore> =
+        ExperienceEngine<HarmonicBridgesExperienceCore>(id: scenarioID)
+    try await engine.prepare(seed: spec.seed)
+    try engine.activate()
+    let initial: String = try engine.digest().hex
+    var results: [String] = []
+    for entry in spec.entries {
+        try engine.run(steps: entry.steps)
+        if let action = entry.action {
+            results.append(engine.handle(control: action.control, values: action.values).code)
+        }
+    }
+    return (initial, results, try engine.digest().hex, engine.core)
+}
+
+/// The digest of `core` as the engine writes it.
+private func digest(of core: HarmonicBridgesExperienceCore) throws -> String {
+    var builder: DigestBuilder = DigestBuilder(domain: scenarioID.rawValue)
+    try core.writeDigest(into: &builder)
+    return builder.finish().hex
+}
+
+@Suite struct HarmonicBridgesScenariosTests {
+    typealias Core = HarmonicBridgesExperienceCore
+
+    /// The names of the three fixtures.
+    static let fixtureNames: [String] = ["fixture-level-1-solved", "fixture-budget-out", "fixture-undo-redo"]
+
+    /// The record kinds of `core`'s play.
+    static func kinds(_ core: Core) -> [HarmonicBridgesRecordKind] { core.play.records.map(\.kind) }
+
+    @Test func theManifestIsAValidRoundTwoGame() {
+        let manifest: ScenarioManifest = builtManifest
+        let problems: [String] = ScenarioManifestValidator.problems(
+            manifest, controls: Core.controls, content: ContentRequirement(fixtures: 3, acceptance: 80, levels: 100))
+        #expect(problems.isEmpty, "\(problems)")
+        var acceptanceNames: [String] = []
+        var rowIDs: [String] = []
+        for row in 1...80 {
+            acceptanceNames.append(Core.acceptanceName(row))
+            rowIDs.append(Core.acceptanceRowID(row))
+        }
+        #expect(acceptanceNames[0] == "acceptance-001" && acceptanceNames[79] == "acceptance-080")
+        #expect(rowIDs[0] == "R2-G12-QA-001" && rowIDs[9] == "R2-G12-QA-010" && rowIDs[79] == "R2-G12-QA-080")
+        #expect(Set(rowIDs).count == 80)
+        let names: [String] = manifest.scenarios.map(\.name)
+        #expect(names == ScenarioManifest.standardNames + ["full-playthrough", "hero"] + acceptanceNames
+            + Self.fixtureNames)
+        #expect(Set(names).count == names.count)
+        #expect(manifest.kind == .game && manifest.round == 2 && manifest.experience == scenarioID)
+        let declared: Set<String> = Set(Core.controls.map(\.id))
+        for spec in manifest.scenarios {
+            if spec.name.hasPrefix("acceptance-") {
+                #expect(spec.entries.count >= 2, "\(spec.name)")
+            } else {
+                #expect(spec.seed == Core.manifestSeed, "\(spec.name)")
+            }
+            #expect(spec.entries.count <= 64, "\(spec.name) is short")
+            for entry in spec.entries {
+                if let action = entry.action { #expect(declared.contains(action.control), "\(spec.name)") }
+            }
+        }
+        // The archived rows 1 … 20 name these levels (round2.md: 044, 051, … 100, 007, … 077).
+        let named: [Int] = [44, 51, 58, 65, 72, 79, 86, 93, 100, 7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77]
+        #expect(Array(Core.acceptanceLevels.prefix(20)) == named)
+        #expect(Core.acceptanceLevels.count == 80 && Set(Core.acceptanceLevels).count == 80)
+        #expect(Core.acceptanceFamily(1) == .truth && Core.acceptanceFamily(10) == .truth)
+        #expect(Core.acceptanceFamily(11) == .witness && Core.acceptanceFamily(80) == .integration)
+        #expect(Core.inputActions.count == 2)
+        #expect(!Core.completionEntries.isEmpty && !Core.playthroughEntries.isEmpty && !Core.budgetOutEntries.isEmpty)
+        #expect(!Core.heroEntries.isEmpty && Core.rejectionEntries.count >= 12)
+    }
+
+    @Test func derivedDigestsResultsAndOutcomesAreWhatTheEngineGives() async throws {
+        for spec in builtManifest.scenarios {
+            let played = try await playScenario(spec)
+            if let initial = spec.expect.initialDigest {
+                #expect(played.initial == initial, "\(spec.name) initial: \(played.initial)")
+            }
+            if let final = spec.expect.finalDigest {
+                #expect(played.final == final, "\(spec.name) final: \(played.final)")
+            }
+            var expected: [String] = []
+            for entry in spec.entries where entry.action != nil { expected.append(entry.result ?? "accepted") }
+            #expect(played.results == expected, "\(spec.name): \(played.results)")
+            if let outcome = spec.expect.outcome {
+                #expect(played.core?.outcome?.code == outcome, "\(spec.name)")
+            }
+        }
+    }
+
+    @Test func theSaveRestoreStateSurvivesARestore() async throws {
+        let spec: ScenarioSpec = try #require(builtManifest.scenarios.first { $0.name == "save-restore" })
+        let played = try await playScenario(spec)
+        let core: Core = try #require(played.core)
+        let restored: Core = try Core.restore(payload: core.snapshotPayload(), seed: spec.seed)
+        let restoredDigest: String = try digest(of: restored)
+        #expect(restoredDigest == played.final)
+        #expect(restored == core && restored.play.canRedo)
+    }
+
+    @Test func everyGameScenarioAndFixtureEndsInTheStateItsActionsDescribe() async throws {
+        let level1: HarmonicBridgesGenerated = try Core.generated(number: 1)
+        let certified1: [HarmonicBridgesAction] = Core.certifiedActions(1)
+        let tunings1: Int = certified1.count - 1
+        for spec in builtManifest.scenarios where !spec.name.hasPrefix("acceptance-") {
+            let played = try await playScenario(spec)
+            let core: Core = try #require(played.core, "\(spec.name)")
+            switch spec.name {
+            case "launch-first-frame", "suspend-resume", "teardown-reentry", "cancel-prepare", "rejection":
+                #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.play.stage == .playing,
+                        "\(spec.name)")
+                #expect(core.play.actionsSpent == 0 && core.play.pegs == level1.level.startingPegs, "\(spec.name)")
+            case "input-response", "save-restore", "reset":
+                #expect(core.levelNumber == 1 && core.play.actionsSpent == 1, "\(spec.name)")
+                #expect(Self.kinds(core) == [.tune, .tune, .undo], "\(spec.name)")
+                #expect(core.play.stage == .playing && core.outcome == nil && core.play.canRedo, "\(spec.name)")
+                #expect(core.play.records[0].action == certified1[0], "\(spec.name)")
+            case "completion", "fixture-level-1-solved":
+                #expect(core.levelNumber == 1 && core.play.stage == .won, "\(spec.name)")
+                #expect(core.play.records.map(\.action) == certified1.map { Optional($0) }, "\(spec.name)")
+            case "full-playthrough":
+                #expect(core.levelNumber == Core.playthroughLevels[Core.playthroughLevels.count - 1])
+                #expect(core.play.stage == .won && core.outcome?.code == Core.wonCode)
+                #expect(core.play.records.map(\.action) == Core.certifiedActions(3).map { Optional($0) })
+            case "hero":
+                #expect(core.play.records.count == tunings1 && core.play.stage == .playing && core.outcome == nil)
+                #expect(core.play.level.firstBreak(core.play.report) == nil, "the certified tunings bridge the goal")
+            case "fixture-budget-out":
+                #expect(core.play.stage == .failed && core.outcome?.code == Core.failedCode, "\(spec.name)")
+                #expect(core.play.failure == .budget(level1.level.budget - 1), "\(spec.name)")
+                #expect(core.play.records.count == level1.level.budget, "\(spec.name)")
+            case "fixture-undo-redo":
+                #expect(Self.kinds(core) == [.tune, .undo, .redo] && !core.play.canRedo)
+                #expect(core.play.actionsSpent == 1 && core.play.stage == .playing)
+            default:
+                Issue.record("unexpected scenario \(spec.name)")
+            }
+        }
+    }
+
+    @Test func everyAcceptanceRowEndsInTheStateOfItsFamily() async throws {
+        for row in 1...80 {
+            let level: Int = Core.acceptanceLevel(row)
+            let name: String = Core.acceptanceName(row)
+            let spec: ScenarioSpec = try #require(builtManifest.scenarios.first { $0.name == name })
+            #expect(spec.seed == UInt64(level - 1), "\(name)")
+            let played = try await playScenario(spec)
+            let core: Core = try #require(played.core, "\(name)")
+            let generated: HarmonicBridgesGenerated = try Core.generated(number: level)
+            let actions: [HarmonicBridgesAction] = generated.actions
+            let opening: String = played.initial
+            switch Core.acceptanceFamily(row) {
+            case .truth:
+                #expect(core.levelNumber == level && played.results.count == 2, "\(name)")
+                #expect(played.results[0] == "accepted" && played.results[1] != "accepted", "\(name)")
+                if (row - 1) % 5 == 4 {
+                    #expect(core.play.stage == .failed && core.outcome?.code == Core.failedCode, "\(name)")
+                    if case .broken? = core.play.failure {} else {
+                        Issue.record("\(name): \(String(describing: core.play.failure))")
+                    }
+                    #expect(played.results[1] == Core.stageCode, "\(name)")
+                } else {
+                    #expect(core.play.stage == .playing && core.play.records.count == 1, "\(name)")
+                    #expect(core.play.records[0].action == actions[0], "\(name)")
+                    let codes: [String] = [Core.kernelActionCode, Core.outOfRangeCode, Core.noopCode, Core.notWholeCode]
+                    let expected: String = codes[(row - 1) % 5]
+                    if (row - 1) % 5 == 0 {
+                        #expect(played.results[1] == Core.kernelActionCode || played.results[1] == Core.outOfRangeCode)
+                    } else {
+                        #expect(played.results[1] == expected, "\(name): \(played.results[1])")
+                    }
+                }
+            case .witness:
+                if row % 2 == 1 {
+                    #expect(core.play.stage == .won && core.outcome?.code == Core.wonCode, "\(name)")
+                    let kinds: [HarmonicBridgesRecordKind] = Self.kinds(core)
+                    #expect(kinds.filter { $0 == .undo }.count == 2 && kinds.filter { $0 == .test }.count == 2)
+                    #expect(core.play.actionsSpent == actions.count, "\(name)")
+                    let witnessed: Core? = Core.played(seed: spec.seed, entries: actions.map { Core.actionEntry($0) })
+                    #expect(core.play.pegs == witnessed?.play.pegs, "\(name): the certified pegs")
+                } else {
+                    #expect(core.play.stage == .failed && core.outcome?.code == Core.failedCode, "\(name)")
+                    #expect(core.play.failure == .budget(generated.level.budget - 1), "\(name)")
+                    #expect(played.results.last == Core.stageCode, "\(name)")
+                }
+            case .numeric:
+                #expect(played.final == opening && core.play.stage == .playing, "\(name)")
+                #expect(played.results.filter { $0 == Core.outOfRangeCode }.count == 2, "\(name)")
+                #expect(Self.kinds(core).suffix(2) == [.undo, .undo] && core.play.actionsSpent == 0, "\(name)")
+                let first: HarmonicBridgesRecord = core.play.records[0]
+                let second: HarmonicBridgesRecord = core.play.records[1]
+                var pegs: [Int] = []
+                for record in [first, second] { if case let .tune(_, peg)? = record.action { pegs.append(peg) } }
+                #expect(Set(pegs) == [1, 12], "\(name): the peg endpoints")
+            case .touch:
+                let tuned: String = try #require(Core.expectedDigest(for: scenarioID, seed: spec.seed,
+                                                                     entries: [Core.actionEntry(actions[0])]))
+                #expect(played.final == tuned && played.final != opening, "\(name)")
+                #expect(Self.kinds(core) == [.tune, .undo, .redo], "\(name)")
+                #expect(played.results.last == Core.kernelActionCode, "\(name)")
+            case .rendering:
+                #expect(core.play.stage == .won && core.outcome?.code == Core.wonCode, "\(name)")
+                #expect(core.play.records.map(\.action) == actions.map { Optional($0) }, "\(name)")
+                #expect(played.results.last == Core.stageCode, "\(name)")
+            case .accessibility:
+                #expect(played.final == opening && core.play.stage == .playing && core.outcome == nil, "\(name)")
+                #expect(Self.kinds(core) == [.test, .undo], "\(name)")
+                let tested: Core? = Core.played(seed: spec.seed, entries: [Core.actionEntry(.test)])
+                if case .broken? = tested?.play.failure {} else {
+                    Issue.record("\(name): the opening test does not break")
+                }
+            case .persistence:
+                #expect(core.play.stage == .won && core.outcome?.code == Core.wonCode, "\(name)")
+                #expect(Self.kinds(core).prefix(3) == [.tune, .undo, .redo], "\(name)")
+                let restored: Core = try Core.restore(payload: core.snapshotPayload(), seed: spec.seed)
+                let restoredDigest: String = try digest(of: restored)
+                #expect(restored == core && restoredDigest == played.final, "\(name)")
+            case .integration:
+                let next: Int = Core.nextLevel(after: level)
+                #expect(core.levelNumber == next && core.play.stage == .playing, "\(name)")
+                let nextOpening: String = try #require(Core.expectedDigest(for: scenarioID, seed: UInt64(next - 1),
+                                                                           entries: []))
+                #expect(played.final == nextOpening, "\(name)")
+                #expect(played.results == ["accepted", "accepted", "accepted", Core.kernelActionCode], "\(name)")
+            }
+        }
+    }
+
+    /// The JSON form with the control ids, named by `Catalog/registrations.json`. `UPDATE_SCENARIO_MANIFEST=1`
+    /// rewrites it.
+    @Test func theCommittedManifestFileMatches() throws {
+        let file: URL = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("scenario-manifest.json")
+        var object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: builtManifest.encoded()) as? [String: Any])
+        object["controls"] = Core.controls.map(\.id)
+        let data: Data = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .prettyPrinted])
+            + Data("\n".utf8)
+        if ProcessInfo.processInfo.environment["UPDATE_SCENARIO_MANIFEST"] == "1" { try data.write(to: file) }
+        #expect(try Data(contentsOf: file) == data, "run with UPDATE_SCENARIO_MANIFEST=1 and commit the file")
+    }
+}
+#endif
