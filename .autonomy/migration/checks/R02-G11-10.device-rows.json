@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g11.echo-cartographer"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g11.echo-cartographer",
+  "elapsed_seconds": 0.06,
+  "exit_code": 0,
+  "finished": "2026-11-23T15:08:11+00:00",
+  "gate": "R02-G11-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G11-10.device-rows.log",
+  "log_sha256": "83ceb1c633698cf584a4597cfcfba423d89f531ec419d75974a87a6aabff4343",
+  "name": "device-rows",
+  "started": "2026-11-23T15:08:10+00:00",
+  "timed_out": false
+}
