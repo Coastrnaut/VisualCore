@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G10-10: Backwards Aurora device rows).
+Last updated: 2026-11-23 (R02-G11-01: Echo Cartographer rule kernel; agreement walks sampled).
 
 ## 1. What is tested, and where
 
@@ -494,6 +494,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (`host-1`, `host-2`), and every attestation's `elapsed_seconds` is read after a check: anything above about 450 s is
   split before the next gate. The one failed attempt of that gate (sim26) came from an outside
   `simctl shutdown all && simctl erase all`, not from the code.
+- **Echo Cartographer rule kernel** (R02-G11-01, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
+  --filter EchoCartographer` (45 tests, about 2 s): rays against explicit coordinate stepping and path lengths against
+  fixed-point relaxation (no queue) on 500 seeded chambers; the play on 500 fixtures and 500 seeded traces; the rules'
+  legal moves against the real play on 200 walks. Checking every pulse and claim cell at every step of all 200 walks took
+  23 s because each attempt hashes a fingerprint, so 8 walks are exhaustive and 192 sample 24 cells per step. Write
+  fixtures' comments from the drawn ranges: energy 1 + 0 … 3 lets the known pulse end the level, which all four agents
+  found; the tests now rely on both kinds of fixture.
 - **Backwards Aurora device rows** (R02-G10-10, 2026-11-23). `python3 scripts/check_device_rows.py --experience
   r02-g10.backwards-aurora` (release step `device-rows-r02-g10`, tests `BackwardsAuroraDeviceRowsCheckTests`) checks
   the definition (rows BA-D1 … BA-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G10

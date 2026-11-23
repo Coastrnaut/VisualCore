@@ -588,3 +588,13 @@ examples (`BackwardsAuroraSchemaExamples`) stored by the app registration, app u
 Feature 400 (R02-G10-10) prepares Backwards Aurora's device campaign without touching a device:
 `docs/apps/backwards-aurora/device-rows.json` (rows BA-D1 … BA-D8, all pending), the written plan
 `docs/apps/backwards-aurora/device-campaign.md`, and the release step `device-rows-r02-g10`.
+
+## Echo Cartographer (R02-G11, `r02-g11.echo-cartographer`, free)
+
+`EchoCartographerCore` (feature 401, R02-G11-01) is the playable rule kernel: the grid chamber with its rays,
+breadth-first path lengths and pulse reports (`EchoCartographerChamber`, `EchoCartographerRay`, `EchoCartographerEcho`),
+the player's knowledge of each cell (`EchoCartographerKnowledge`), `EchoCartographerLevel` (immutable, fingerprinted,
+JSON schema 1, with the claim rule), the play state `EchoCartographerPlay` with `EchoCartographerAction`,
+`EchoCartographerStage`, `EchoCartographerEvent`, `EchoCartographerFailure` and append-only `EchoCartographerRecord`s,
+and `EchoCartographerRules` for the R02-F23 puzzle contract. Refusals are `EchoCartographerError` with `r02-g11.*`
+codes. Rules: [docs/architecture/echo-cartographer.md](../../docs/architecture/echo-cartographer.md).
