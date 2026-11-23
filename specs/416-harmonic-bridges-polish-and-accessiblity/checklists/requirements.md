@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Announcement wording, fade times, the audition and ambient recipes and the Reduce Flashing limits are left to `/speckit-clarify` (modelled on feature 406).
+- Announcement wording, fade times, the audition and ambient recipes and the Reduce Flashing limits were settled by `/speckit-clarify` (session 2026-11-23).

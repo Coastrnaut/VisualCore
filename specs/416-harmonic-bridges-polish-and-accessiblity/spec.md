@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G12-06 (migration ledger, game feature of experience R02-G12) · ID namespace FR-R02G1206-###,
 SC-R02G1206-###, T-R02G1206-###
@@ -25,6 +25,71 @@ Canonical overrides:
 - **Shared features used:** R02-F26 (input and accessibility contract, shared feedback route), the shared ambient loop
   player, and the kernel, content, adapter, renderer, gestures and teaching of R02-G12-01 … 05.
 - **Model:** feature 406 (Echo Cartographer's polish and accessibility).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+406's answers where the games agree. Facts checked in code (read-only, 2026-11-23): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` are those feature 406 used; Harmonic Bridges' strings
+swing with the presentation wave and level-0 adds two wave shells per resonating string, the shown step cycles every
+1.2 s, and the won lift reaches membranes and glow rings through a per-vertex won flag that switches at once when the
+level is won; a test always ends the level (won or broken); the adapter's refusal codes are `r02-g12.action`, `noop`,
+`stage`, `stale`, `level`, `malformed`, `locked`, `date` and `not-whole` (reported by the engine as `action.rule.<code>`),
+which the panel words through `HarmonicBridgesMirror.refusalText`; the level words strings "string i, island a to island
+b, peg p" (", locked") and progress "step 0: 2 bridges, goal reached; …; 3 actions left".
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted action (`state`), the change then the
+  progress: a tuning "String i tuned to peg p."; undo and redo "Undone." / "Redone."; each followed by " The start
+  reaches the goal in k of n steps, a actions left."; a win (`outcome`): "The crossing holds in every step. Level won
+  spending a actions, k of 3 stars." (without the stars in practice); a failure (`outcome`): the failure explanation of
+  feature 415; a level or mode change (`level`): "Level n, band b, <mode>." with the tutorial instruction when shown; a
+  refusal (`rejection`) in words: `r02-g12.locked` "That level is not open yet.", `r02-g12.date` "That date cannot be
+  used.", `r02-g12.action` "That string cannot be tuned to that peg.", `r02-g12.noop` "That string is already at that
+  peg.", `r02-g12.stage` "The level has ended.", `r02-g12.not-whole` "That value must be a whole number.", any other code
+  "That action was refused." (the engine's `action.rule.` prefix read as the bare code). A revealed hint is announced
+  (`state`) with its text. Choosing a string, previewing a peg and orbit are not announced. Texts are a pure function of
+  the old and new core (and the refusal code), so tests compare them exactly; the panel shows the same refusal text.
+  Impact: FR-R02G1206-002; SC-R02G1206-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted tuning, undo or redo; `success`
+  for a win; `warning` for a failure; `error` for a refusal; choosing, previewing, orbit and level changes play none. A
+  test always ends the level, so it plays only its outcome; a tuning that spends the last action without a win plays
+  only the warning. The shared planners' intervals apply. Impact: FR-R02G1206-003; SC-R02G1206-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: the presenter keeps light levels for the glow (0.7
+  while playing, 1 once won, 0.35 once failed) and the won brightening (1 once won, else 0), each easing toward its
+  target in presentation time (0.15 s normally, 0.45 s under Reduce Flashing, linear; under Reduce Flashing a fade that
+  has started finishes before it may turn back); the scene draws the eased levels (the glow gain times the glow level,
+  and the won lift scaled by its level through a uniform, so the per-vertex won flag no longer switches the brightness
+  at once); the state and digest never see them. The step cycle changes which membranes are drawn every 1.2 s, so under
+  Reduce Flashing the shown step is held (step 0, or the broken step) exactly as under Reduce Motion, the strings are at
+  rest and no wave shell is drawn; pegs, marks and membranes change only with the player's actions and are not faded.
+  The measure: sampling the drawn levels every 1/60 s through a scripted win and adversarial flicker (a tuning undone and
+  redone every frame, retry, level changes), no element crosses half its range more than 3 times per second, and every
+  complete one-way fade of more than half the range takes at least 0.4 s under Reduce Flashing; with Reduce Flashing no
+  wave shell is drawn in any frame. Impact: FR-R02G1206-004; SC-R02G1206-003.
+- Q: Where does the sound choice live, and what are the audition and ambient recipes? → A: a Sound toggle in the panel,
+  off by default, held by the presenter (presentation only; saving it is R02-G12-07). The audition of a plucked string
+  is a pure function of its peg and its resonant modes and tone strengths in the shown step: a fundamental of
+  110 Hz × 2^((peg − 1) / 12); one partial per resonant mode n with tone strength w at the fundamental × n and gain
+  0.04 × w; a string that sings no mode gets the fundamental alone at gain 0.02 (the muted pluck); 0.6 s with a linear
+  decay to silence; played once per pluck, a new pluck replacing the last. The ambient recipe is a pure function of the
+  actions left as a share of the budget, the steps in which the start reaches the goal and the stage: a root at 110 Hz
+  times (1, 9/8, 5/4, 4/3) for more than three quarters of the actions left, more than half, more than a quarter, or
+  less; one partial per step reached, up to four, at the root times (5/4, 3/2, 2, 5/2)[k − 1], each with the base gain,
+  the root alone when none is reached; an added octave when won and halved gains when failed; the loop's length is the
+  longest the shared player accepts at which every partial has a whole number of cycles (tested). The presenter rebuilds
+  the loop only when the level opens, an action, undo or redo changes the steps reached, the root step or the stage, or
+  the toggle turns on, never per frame. Sound plays exactly while the choice is on, the controls are on screen and the
+  scene is active. Impact: FR-R02G1206-006; SC-R02G1206-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the chosen string
+  and peg are accessibility-adjustable elements with their labels and values in words (the string as the level words it,
+  with its current peg and lock); a summary element reads "a actions left. The start reaches the goal in k of n steps.
+  Step s shows b bridges. Chosen: <the string in words>, tune to peg p. Level: <the level in words>."; on iPad the panel
+  keeps a readable width (at most 520 points). Impact: FR-R02G1206-001, 005; SC-R02G1206-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -66,8 +131,8 @@ panel lays out at the largest accessibility text size without clipping the contr
 1. **Given** Reduce Flashing, **When** a string is tuned, a step changes, the level is won or it fails, **Then** no wave
    shell is drawn and every change of the glow, the bridges' brightness and the won brightening is a fade of at least
    0.4 s, not a flash (what the player's action changes — pegs, marks, membranes — appears with the action).
-2. **Given** Reduce Motion, **When** two frames of the same state are drawn at different times, **Then** they are
-   identical.
+2. **Given** Reduce Motion or Reduce Flashing, **When** two frames of the same state are drawn at different times
+   (after any fade has finished), **Then** they are identical.
 
 ### User Story 3 - Gentle sound and haptics (Priority: P2)
 
