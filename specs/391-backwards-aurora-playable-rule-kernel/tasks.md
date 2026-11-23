@@ -30,7 +30,7 @@ in this feature (the wave and its bends are the CPU reference the renderer of R0
 
 ## Phase 3: Story 1 — fold the aurora back (P1) 🎯
 
-- [ ] T-R02G1001-003 [P] [US1] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraWaveTests.swift`
+- [X] T-R02G1001-003 [P] [US1] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraWaveTests.swift` — Verified 2026-11-22: host-2 (BackwardsAuroraWaveTests 8: 500 seeded waves incl. constant and extreme ones; reversal vs independent index formula; bends vs separate recomputation; bends outside the seams unchanged and inside ones carried in reverse; worst bend, smoothness, checkpoint matches, distance and palindromes vs brute force; seams vs brute-force sets for every section of 4 lengths) exit 0, lead retest; seams doc comment reworded per agent A
   (agent A: on 500 seeded waves and sections, the reversal equals an independent index formula; every bend equals a
   separate recomputation; comparing all bends before and after shows that no bend outside the seam positions changes;
   the worst bend, smoothness, checkpoint matches and the distance equal brute force; palindromes detected exactly);

@@ -64,8 +64,8 @@ public struct BackwardsAuroraWave: Sendable, Hashable {
     }
 
     /// The seam positions of the section [start, end] in a wave of `count` samples: the interior positions among
-    /// start − 1, start, end and end + 1, sorted and without repeats. Only the bends at these positions can change when
-    /// the section is reversed.
+    /// start − 1, start, end and end + 1, sorted and without repeats. Only the bends at these positions can take new
+    /// values when the section is reversed; the bends strictly inside are the old ones in reverse order.
     public static func seams(start: Int, end: Int, count: Int) -> [Int] {
         var result: [Int] = []
         for k in [start - 1, start, end, end + 1] where k >= 1 && k <= count - 2 && !result.contains(k) {
