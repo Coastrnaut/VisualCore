@@ -63,7 +63,7 @@ native control carries a value in words from the start).
 
 - [X] T-R02G1106-006 Docs: `docs/architecture/echo-cartographer.md` (polish and accessibility), — Verified 2026-11-23: round02-host (swift test --package-path Packages/ExperiencesRound02, 336 s) exit 0; architecture doc polish and accessibility, ExperiencesRound02 README feature 406, testing doc lesson (eased lights need moving frame times; compare refusal words); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1106-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1106-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: rendering-27, rendering-26, experiences, host-full, app-unit exit=0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1106-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1106-009 Reference regression chunk 2 (`--name reference-2`)
