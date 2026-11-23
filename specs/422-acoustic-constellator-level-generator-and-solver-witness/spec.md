@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G13-02 (migration ledger, game feature of experience R02-G13) · ID namespace FR-R02G1302-###,
 SC-R02G1302-###, T-R02G1302-###
@@ -27,6 +27,69 @@ Canonical overrides:
   figure, as for the earlier round-two games.
 - **Model:** feature 412 (Harmonic Bridges's content pipeline) for manifest, generator, witness files, digest and
   progression.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+412's answers where the games agree. Facts checked (read-only, 2026-11-23): R02-G13-01's `AcousticConstellatorLevel`
+(stars 3 … 8, rates and phases 0 … 11, fixed links 0 … 6, symbol 2 … 10 connected pairs, K 1 … 8, degree limit 2 … 4,
+link limit up to 16, snap limit 2 … 5, threshold 1 … n², hold 2 … 12, window up to 48, budget 1 … 40),
+`AcousticConstellatorListen`, `AcousticConstellatorPlay` and `AcousticConstellatorRules`; R02-F24's
+`PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most 1, jump at most 3);
+`SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (`planning_index.py levels
+--experience R02-G13`: bands 1 … 5 × 20, moves budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19). The acceptance
+ranges below were measured before they were written down: a prototype of this generator and solver over 60 candidates
+per band gave minimal plans in the band's range for 48, 33, 38, 17 and 21 of 60 (bands 1 … 5), with at most 6,657
+listens of work, and no candidate won at its start.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, budget) are a table
+  in `AcousticConstellatorManifest` with their provenance. Candidate c of entry n draws from `SeededRandom(seed:
+  SeedDerivation.derive(plannedSeed, index: c))`, in this order: the star count n by band (3 … 4, 4 … 5, 5 … 6, 6 … 7,
+  7 … 8); the symbol as a spanning tree (a shuffled order of the stars, each star after the first joined to a drawn
+  earlier one) plus, from band 3, one extra pair not already in it (a cycle); a base rate 0 … 11 and each star's rate
+  base + 0 or 1 (1 with chance 1 in 3), modulo 12; each star's starting phase 0 … 11; the missing count by band (1 … 2,
+  1 … 2, 2 … 3, 2 … 3, 3 … 4, at most the symbol's size) and the missing pairs as a drawn subset of the symbol, the rest
+  being the fixed links; the coupling K 2 … 8, the snap limit 3 … 5 and the hold 4 … 8; the window by band (24, 24, 32,
+  40, 48). Then the degree limit is min(4, max(2, the symbol's largest degree + 1)), the link limit min(16, the
+  symbol's size + 2) and the threshold ⌊3n²/5⌋. Budget = the manifest's; ids `acoustic-constellator-NNN`; tutorial on
+  levels 1 … 3; difficulty = band; star drawing positions are laid out from the symbol and never decide a rule. A
+  candidate the solver does not certify with a minimal plan in its band's range (1 … 2, 2 … 3, 3 … 4, 4 … 5, 5 … 6
+  actions before the listen) and at most budget − 1 actions within its work bound is skipped; at most 256 candidates,
+  then `generation(n)`. Impact: FR-R02G1302-001; SC-R02G1302-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing smaller wins? → A: every winning plan contains a
+  link for every missing symbol pair, so those are always in the plan. The other useful actions are helper links (pairs
+  not yet linked, in pair order) and nudges (star order, −1 then +1); unlinking is never useful (the player starts with
+  no links of their own) and opposite nudges on one star cancel, so a minimal plan contains neither. The solver tries
+  e = 0, 1, 2, … extra actions: every multiset of e options in option order, skipping a repeated helper link, opposite
+  nudges on one star and sets that break the degree or link limit; for each it runs the kernel's listen on the fixed,
+  missing and helper links with the nudged phases. The first set whose listen wins is the plan. Work = listens, counted
+  and bounded at 400,000; over the bound the candidate is skipped. The minimality proof is that every set of every
+  smaller size was tried and lost (their count is stored). The witness is the plan's links in pair order, then its
+  nudges in star order, then one listen, replayed through the kernel's play. Impact: FR-R02G1302-002; SC-R02G1302-001,
+  002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `AcousticConstellatorDifficulty` holds
+  the witness action count (before the listen), the stars, the symbol's pairs and cycles (pairs − stars + 1), the fixed
+  links, the rate spread (0 or 1), the window, the hold, the threshold, the sets tried at smaller sizes and the solver
+  work. The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on the
+  witness action count; the band ranges, each two values wide and meeting the next band's at one value, make band means
+  non-decreasing. Impact: FR-R02G1302-003, 005; SC-R02G1302-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/acoustic-constellator/levels/NNN.witness.json`,
+  JSON schema 1 with sorted keys: number, the level's stored form, the actions, the state digest after every action (16
+  hex characters of the SHA-256 of the links and phases), the play fingerprints after `begin` (and `dismissTutorial` when
+  the level has one) and after each action, the counterexample (the size one below the plan and the number of sets of
+  that size tried, none winning), the difficulty and the candidates skipped. A test rebuilds every witness and compares
+  bytes; it writes the files only with `ACOUSTIC_CONSTELLATOR_WRITE_WITNESSES=1`. Decoding refuses newer schemas,
+  damaged files and witnesses that no longer replay. Impact: FR-R02G1302-004; SC-R02G1302-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<AcousticConstellatorRules>.digest(id: "acoustic-constellator", identities:)` over the 100 level
+  fingerprints in manifest order, pinned in a test. Certification tests are split into groups of 5 levels so each runs
+  under 10 seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process.
+  New refusals: `generation(Int)` (`r02-g13.generation`) and `witness(String)` (`r02-g13.witness`). The independent check
+  of SC-R02G1302-002 brute-forces every multiset of one action fewer than the plan over all actions the play accepts
+  (every link, every unlink of a placed link, every nudge, no pruning of opposite nudges) on the two levels with the
+  fewest stars in each band. Impact: FR-R02G1302-005, 006; SC-R02G1302-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
