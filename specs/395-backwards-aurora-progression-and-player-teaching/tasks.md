@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 385
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1005-002 [P] [US2] [US3] Add `solve(_:from:reversalsLeft:workBound:)` to
+- [X] T-R02G1005-002 [P] [US2] [US3] Add `solve(_:from:reversalsLeft:workBound:)` to — Verified 2026-11-23: host-2 exit=0 (51 tests: BackwardsAuroraHintsTests — following exact hints from the opening wins all 100 levels (max work 2,042), 200 seeded states get legal hints that win where a plan exists (24 found none within the 20,000 bound and say so, per Q1), 500 seeded failures explained; solver, invariant, witness and catalog suites unchanged; agent B's files retested by the lead in a combined copy, 168 Core tests)
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSolver.swift` (the certification's iterative deepening
   over reversible sections, pruned by the seam-count bound ⌈β / 4⌉, started at the given wave and looking for the fewest
   further reversals that win within the reversals left; work bound 20,000 reversals evaluated; `solve(_:workBound:)`

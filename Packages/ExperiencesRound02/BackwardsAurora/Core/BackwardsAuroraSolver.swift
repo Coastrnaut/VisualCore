@@ -63,13 +63,22 @@ public enum BackwardsAuroraSolver {
     /// A winning sequence of the smallest length within the budget, or nil when the search finds none within
     /// `workBound` reversals evaluated (or none exists within the budget).
     public static func solve(_ level: BackwardsAuroraLevel, workBound: Int = workBound) -> BackwardsAuroraSolution? {
-        let start: Int = lowerBound(level).smallest
-        guard start <= level.budget else { return nil }
+        deepen(level, from: level.opening, most: level.budget, workBound: workBound)
+    }
+
+    /// The iterative deepening shared by the certification and the continuation search: from `wave`, bounds from
+    /// ⌈β / 4⌉ (β the bad bends of `wave`) up to `most`, each searched depth-first with the seam-count pruning; the
+    /// first winning sequence found, or nil when ⌈β / 4⌉ exceeds `most`, when no bound up to `most` wins or when the
+    /// search reaches `workBound` reversals evaluated.
+    static func deepen(_ level: BackwardsAuroraLevel, from wave: BackwardsAuroraWave, most: Int,
+                       workBound: Int) -> BackwardsAuroraSolution? {
+        let start: Int = (badBends(wave, limit: level.bendLimit) + 3) / 4
+        guard start <= most else { return nil }
         var search = Search(level: level, workBound: workBound)
         var bound: Int = start
-        while bound <= level.budget {
+        while bound <= most {
             var path: [BackwardsAuroraAction] = []
-            let found: Bool = search.dfs(level.opening, depth: 0, bound: bound, path: &path)
+            let found: Bool = search.dfs(wave, depth: 0, bound: bound, path: &path)
             if found { return BackwardsAuroraSolution(smallest: path.count, actions: path, work: search.work) }
             if search.exhausted { return nil }
             bound += 1
@@ -163,5 +172,30 @@ public enum BackwardsAuroraSolver {
             }
             return false
         }
+    }
+}
+
+// MARK: - Continuations — feature 395 (R02-G10-05) T-R02G1005-002 (FR-R02G1005-002; SC-R02G1005-002; clarification Q1)
+//
+// `solve(_:from:reversalsLeft:workBound:)` looks for the fewest further reversals that win from a wave of a play: the
+// certification's iterative deepening (the same section order, the same seam-count pruning, a tearing reversal a leaf)
+// started at the given wave, with the bound starting at ⌈β / 4⌉ of that wave and growing up to the reversals left. A
+// found sequence never tears, wins on its last reversal and not before (every shorter bound was searched completely
+// and every node is checked for a win before it is expanded), and fits in the reversals left, so the play never
+// reaches its budget before the win: the play's order tear, win, budget accepts it. From the opening wave with the
+// whole budget left it is exactly the certification. Following a found sequence one reversal at a time and searching
+// again from each new wave finds the rest within the same work: the second search's bounds below n − 1 are the
+// subtree under the first reversal that the first search explored completely at bounds below n, and its bound n − 1
+// is the part of the first search's bound n under that reversal, explored until the same win.
+
+extension BackwardsAuroraSolver {
+    /// The fewest further reversals (at most `reversalsLeft`) that win from `wave` in `level`, without tearing on the
+    /// way and winning on the last one only; nil when `reversalsLeft` is below 1, when ⌈β / 4⌉ of `wave` exceeds it,
+    /// when none exists within it or when the search reaches `workBound` reversals evaluated. The solution's
+    /// `smallest` is its reversal count and `work` the reversals evaluated.
+    public static func solve(_ level: BackwardsAuroraLevel, from wave: BackwardsAuroraWave, reversalsLeft: Int,
+                             workBound: Int = workBound) -> BackwardsAuroraSolution? {
+        guard reversalsLeft >= 1, wave.count == level.count else { return nil }
+        return deepen(level, from: wave, most: reversalsLeft, workBound: workBound)
     }
 }
