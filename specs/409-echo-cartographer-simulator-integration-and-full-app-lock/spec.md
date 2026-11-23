@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G11-09 (migration ledger, game feature of experience R02-G11) · ID namespace FR-R02G1109-###,
 SC-R02G1109-###, T-R02G1109-###
@@ -23,6 +23,55 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 399 (Backwards Aurora's simulator integration and full app lock).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+399's answers where the games agree. Facts checked in code (read-only, 2026-11-23): feature 399 (Backwards Aurora) is
+the model (`Apps/VisualCore/Tests/UI/BackwardsAurora`, namespace `BA`, serial chunk `s3`; identifiers through
+`port.identifier(name)`; `BackwardsAuroraSchemaExamples.swift`); Echo Cartographer's panel (`EchoCartographerControls`)
+has labels and values on every control (feature 406) but no identifiers, with two Undo buttons (the play row's and the
+failure section's), adjustable steppers for the chosen cell's column and row and for the level, Pulse, Claim and Mark,
+the replay controls (feature 407) and the Sound toggle; its registration in `Apps/VisualCore/App/ExperienceRegistry.swift`
+still says "Snapshot schema 1, so no earlier example is stored yet" although the snapshot is schema 3 since feature 407;
+the panel's "Chamber" element carries the summary and, when won, the canvas description says "Every beacon is located."
+followed by "Stars: k of 3."; the UI chunk keys in `release_check.py` end at `s3` (no `t3`); the namespace `EC` is taken
+by Effects Composer (`ECReleaseUITests`), and no `ECG` namespace exists among the UI test folders; level 1's witness is
+two pulses, from (0, 3) and (0, 2), then a claim at (1, 2), on a 6 × 6 chamber with energy 9 and its tutorial on.
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g11.echo-cartographer.<name>` through `port.identifier(name)`: the buttons `pulse`, `claim`, `mark`,
+  `undo`, `redo`, `next-level`, `reset-view`, `hint`, `dismiss-tutorial`, `failure-undo`, `retry`, `campaign`, `daily`,
+  `practice`, `play-level`, `replay`, `replay-step`, `replay-stop`, the steppers `column-picker`, `row-picker` and
+  `level-picker`, the toggle `sound` and the summary element `summary` (the "Chamber" element). The tests read the canvas
+  description for the level, the win and the stars, and the replay step's value for the replay position. Impact:
+  FR-R02G1109-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `ECG` in
+  `Apps/VisualCore/Tests/UI/EchoCartographer/ECGSupport.swift`; `ECGPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g11.echo-cartographer`: dismiss the tutorial, play level 1's
+  certified solution by setting the column and row steppers and tapping Pulse for each pulse and Claim for the claim;
+  read "Every beacon is located" and "Stars: 3 of 3", the level picker shows level 2 open; relaunch without reset after
+  sending the app to the background: the stars and level 2 are kept) and `ECGReplayUITests` (after the win, Replay best
+  solution, Step until the replay ends won, Stop back to the campaign). They run as a new serial chunk `t3` of
+  `release_check.py` (its key checked unique); each test stays under 90 s apart from the simulator's automation-session
+  setup of each app launch (about 30 s per launch, and a relaunch test launches twice). Level 1's certified actions are
+  pinned in `ECG` and checked against the Core by an app unit test. Impact: FR-R02G1109-002, 007; SC-R02G1109-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `EchoCartographerExperienceCore.schemaOneExample()` (the schema-1 saved state of a seeded play of level 1 with one
+  pulse that does not win) and `schemaTwoExample()` (schema 2 with progress and level 1 solved, no trace), both
+  `MigrationExample`s built in the Core (`EchoCartographerSchemaExamples.swift`, modelled on
+  `BackwardsAuroraSchemaExamples`), registered with `examples:`; the app's migration check restores both into schema 3
+  with progress kept (a schema-2 result without a trace keeps its stars unverified, as feature 407 reconciles). The
+  registration's comment is corrected. Impact: FR-R02G1109-003; SC-R02G1109-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `EchoCartographerGolden` is forbidden by feature 408, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G1109-004;
+  SC-R02G1109-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g11.echo-cartographer` as not available and the launcher cannot open it; the registry's candidates list contains
+  it and `all` does not. Impact: FR-R02G1109-006; SC-R02G1109-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
