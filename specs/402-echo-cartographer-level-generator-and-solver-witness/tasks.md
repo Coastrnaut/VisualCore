@@ -42,7 +42,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G1102-005 [P] [US4] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerWitness.swift`
+- [X] T-R02G1102-005 [P] [US4] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerWitness.swift` — Verified 2026-11-23: host-4 (incl. EchoCartographerWitnessTests 15: byte-stable round trip, digests and recounts, counterexample, every edited part refused by name, newer and damaged files refused, full solution re-run) exit 0, 2026-11-23; agent B's witness retested by the lead
   (agent B: schema 1 sorted-key JSON; echo digests "first 16 hex of SHA-256 of the canonical echo"; placements after each
   pulse; play fingerprints after begin (and dismissTutorial) and each action; counterexample; difficulty; skipped;
   decode refuses newer, damaged and non-replaying files) with
