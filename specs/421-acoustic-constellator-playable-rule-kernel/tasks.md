@@ -16,7 +16,7 @@ will consume).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1301-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `AcousticConstellatorCore`,
+- [X] T-R02G1301-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `AcousticConstellatorCore`, — Verified 2026-11-23: host (AcousticConstellatorLevelTests 14 tests: reason codes, every range and structural refusal with boundaries, gap reduction, coupling table = rounded 2 sin, orderParts = |sum e^(i pi phi/6)|^2 on 500 sets, exact comparison boundaries and 47k sweep, floor and clamp, snap at sigma vs sigma+1, disconnected and missing named, hold on the last tick, labels for isomorphic and non-isomorphic graphs, stored-form round trip and damage, 200 fixtures win by their known actions and not bare) exit 0, lead retest
   `AcousticConstellatorCoreTests`, product); create
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorError.swift` (codes "r02-g13.level, .action,
   .stage, .stale, .newer-schema, .malformed"),
