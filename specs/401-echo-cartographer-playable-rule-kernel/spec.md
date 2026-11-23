@@ -63,7 +63,8 @@ dragging markers; rotate 3D camera".
   the chamber, a pulse from a cell not known open, a claim on a known wall, a ninth marker (`r02-g11.action`); a claim
   whose cell is within the tolerance only of beacons already located (`r02-g11.noop`); a wrong stage (`r02-g11.stage`)
   or a stale fingerprint (`r02-g11.stale`). A claim locates the not-yet-located beacon within the tolerance that is
-  nearest (then lowest row, then lowest column); otherwise it is a miss. Undo and redo spend nothing; a new action
+  nearest (then lowest row, then lowest column) and makes that beacon's cell known open; otherwise it is a miss,
+  which reveals nothing. Undo and redo spend nothing; a new action
   clears the redo stack. The life of a level is loading → tutorial (when the level has one) → playing ⇄ paused → won or
   failed → result, entered by `begin`, `dismissTutorial`, `pause`, `resume` and `showResult`. Impact: FR-R02G1101-002,
   004, 006, 008, 011.
