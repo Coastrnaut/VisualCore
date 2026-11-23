@@ -43,7 +43,7 @@ change (the shaders and reference of R02-G11-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G1109-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G1109-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-23: app-unit exit 0, 123 of 123 tests incl. the four Echo Cartographer AppModelTests (stored examples restore with no migration problems; a candidate not available or openable without -vcCandidates; opens with the argument and level 1 is won by its certified actions with three stars, verified, level 2 open; ECG's pinned level 1 actions, starting cell and 6 x 6 chamber equal the Core); agent B's tests retested by the lead
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `ECG`'s pinned level 1 certified actions, the
   cursor's starting cell and the chamber size (the convergence lesson of feature 319) equal the Core's); `--name app-unit -- python3

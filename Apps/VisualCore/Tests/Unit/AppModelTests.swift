@@ -7,6 +7,7 @@ import AuroraLoomCore
 import BackwardsAuroraCore
 import ChronoConstellatorCore
 import ColorfallCanyonsCore
+import EchoCartographerCore
 import FacetedForgeCore
 import Foundation
 import HueCompassCore
@@ -2378,6 +2379,181 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(startingSection(fresh), pinnedOpeningSection, "a fresh play's section")
         XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
         XCTAssertEqual(BackwardsAuroraExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+
+    // MARK: Echo Cartographer in the app (feature 409, R02-G11-09; T-R02G1109-005, FR-R02G1109-003,
+    // FR-R02G1109-006; SC-R02G1109-002)
+
+    /// Echo Cartographer's registration: a candidate until X-R02-G11.
+    private func echoCartographerRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(EchoCartographerExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Echo Cartographer is a candidate")
+    }
+
+    /// FR-R02G1109-003, clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples
+    /// restore to their digests through the migrations (the app's migration check).
+    func testTheEchoCartographerRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try echoCartographerRegistration()
+        XCTAssertEqual(EchoCartographerExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(EchoCartographerExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(EchoCartographerExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1109-006, clarification Q5: without `-vcCandidates` Echo Cartographer is a candidate only: in
+    /// `candidates`, outside `all`, listed in the bundled catalog as not available, without a tile and not opened.
+    func testEchoCartographerIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(EchoCartographerExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g11.echo-cartographer")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1109-003, SC-R02G1109-002: with `-vcCandidates` Echo Cartographer is shown, opens through the registry
+    /// and engine with seed 0 (level 1), and level 1 is won by its certified actions
+    /// (`EchoCartographerExperienceCore.certifiedActions(1)`) sent as `cell.pulse [x, y]` and `cell.claim [x, y]` with
+    /// three stars (the opening play is already past the kernel's tutorial stage, so no `tutorial.dismiss` is needed);
+    /// the win opens level 2 and `level.next` plays it.
+    func testEchoCartographerOpensAsACandidateAndLevelOneIsWonByItsCertifiedActions() async throws {
+        let registration = try echoCartographerRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next",
+                        "tutorial.dismiss", "replay.start"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(EchoCartographerExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<EchoCartographerExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, EchoCartographerStage.playing, "the opening play accepts actions")
+        let actions: [EchoCartographerAction] = EchoCartographerExperienceCore.certifiedActions(1)
+        XCTAssertFalse(actions.isEmpty)
+        for action in actions {
+            switch action {
+            case .pulse(let x, let y):
+                let values: [Double] = [Double(x), Double(y)]
+                XCTAssertEqual(engine.handle(control: "cell.pulse", values: values), .accepted, "pulse \(values)")
+            case .claim(let x, let y):
+                let values: [Double] = [Double(x), Double(y)]
+                XCTAssertEqual(engine.handle(control: "cell.claim", values: values), .accepted, "claim \(values)")
+            case .mark(let x, let y):
+                let values: [Double] = [Double(x), Double(y)]
+                XCTAssertEqual(engine.handle(control: "cell.mark", values: values), .accepted, "mark \(values)")
+            }
+        }
+        XCTAssertEqual(engine.outcome?.code, EchoCartographerExperienceCore.wonCode)
+        XCTAssertEqual(EchoCartographerExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, EchoCartographerStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified actions earn three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `ECG` (their own literals in
+    /// Tests/UI/EchoCartographer/ECGSupport.swift, which this target cannot import); the same literals equal the
+    /// Core's certified level 1: pulses from (0, 3) and (0, 2), then a claim at (1, 2) (the stored witness
+    /// `docs/games/echo-cartographer/levels/001.witness.json`); the cursor starts on level 1's entry, column 0, row 3,
+    /// as `EchoCartographerPresenter`'s mirror sets it on a new level (`follow(_:)` puts it on `play.level.entry`);
+    /// the chamber is 6 × 6 and every pinned cell is reachable by the column and row steppers. Seed 0 opens level 1.
+    func testEchoCartographerLevelOnePinsInECGEqualTheCore() throws {
+        // An action is [kind, column, row]; the kind is "pulse", "claim" or "mark".
+        let pinnedKinds: [String] = ["pulse", "pulse", "claim"]
+        let pinnedCells: [[Int]] = [[0, 3], [0, 2], [1, 2]]
+        // [column, row]
+        let pinnedStartingCell: [Int] = [0, 3]
+        // [columns, rows]
+        let pinnedChamberSize: [Int] = [6, 6]
+
+        let certifiedActions: [EchoCartographerAction] = EchoCartographerExperienceCore.certifiedActions(1)
+        var coreKinds: [String] = []
+        var coreCells: [[Int]] = []
+        for action in certifiedActions {
+            switch action {
+            case .pulse(let x, let y):
+                coreKinds.append("pulse")
+                coreCells.append([x, y])
+            case .claim(let x, let y):
+                coreKinds.append("claim")
+                coreCells.append([x, y])
+            case .mark(let x, let y):
+                coreKinds.append("mark")
+                coreCells.append([x, y])
+            }
+        }
+        XCTAssertEqual(coreKinds, pinnedKinds, "level 1 certified action kinds")
+        XCTAssertEqual(coreCells, pinnedCells, "level 1 certified action cells")
+
+        let certified = try EchoCartographerExperienceCore.generated(number: 1)
+        let level: EchoCartographerLevel = certified.level
+        XCTAssertEqual(certified.actions, certifiedActions, "the certified witness is the generated level's")
+        var pinnedPulses: [[Int]] = []
+        var index: Int = 0
+        while index < pinnedKinds.count {
+            if pinnedKinds[index] == "pulse" { pinnedPulses.append(pinnedCells[index]) }
+            index += 1
+        }
+        var planPulses: [[Int]] = []
+        for cell in certified.plan.pulses {
+            planPulses.append([cell.x, cell.y])
+        }
+        XCTAssertEqual(planPulses, pinnedPulses, "the certified plan's pulses")
+
+        let chamberSize: [Int] = [level.chamber.width, level.chamber.height]
+        XCTAssertEqual(chamberSize, pinnedChamberSize, "level 1's chamber size")
+        for cell in pinnedCells {
+            XCTAssertEqual(cell.count, 2, "a cell is a column and a row \(cell)")
+            XCTAssertTrue((0...(level.chamber.width - 1)).contains(cell[0]), "column on the column stepper \(cell)")
+            XCTAssertTrue((0...(level.chamber.height - 1)).contains(cell[1]), "row on the row stepper \(cell)")
+        }
+
+        // The cursor's starting cell as EchoCartographerPresenter's mirror sets it on a new level (follow(_:)).
+        let entry: [Int] = [level.entry.x, level.entry.y]
+        XCTAssertEqual(entry, pinnedStartingCell, "level 1's entry")
+        let opening = try EchoCartographerExperienceCore.opening(number: 1)
+        let openingEntry: [Int] = [opening.play.level.entry.x, opening.play.level.entry.y]
+        XCTAssertEqual(openingEntry, pinnedStartingCell, "the opening cursor cell")
+        let fresh = try EchoCartographerExperienceCore.freshPlay(of: level)
+        let freshEntry: [Int] = [fresh.level.entry.x, fresh.level.entry.y]
+        XCTAssertEqual(freshEntry, pinnedStartingCell, "a fresh play's cursor cell")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(EchoCartographerExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
