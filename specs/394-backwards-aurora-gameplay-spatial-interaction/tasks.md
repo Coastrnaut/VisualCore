@@ -49,7 +49,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G1004-005 [P] [US5] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraPanelWinTests.swift`: all 100 certified levels won
+- [X] T-R02G1004-005 [P] [US5] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraPanelWinTests.swift`: all 100 certified levels won — Verified 2026-11-22: host-4 (132 tests incl. BackwardsAuroraPanelWinTests: all 100 certified levels won through the panel's start and end steppers and Reverse alone in 10 groups (each level won in exactly its certified count); panel Undo then Redo restore the digests) exit 0, lead retest
   through panel actions only (the start and end steppers then Reverse send `wave.reverse`), split so each test is
   under 10 s, plus panel Undo then Redo after a reversal restoring the digests before and after it; agent D; `--name
   host-4`
