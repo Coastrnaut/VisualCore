@@ -124,11 +124,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [backwardsAurora].compactMap { $0 }
 
-    /// R02-G10 Backwards Aurora (feature 393, R02-G10-03): a candidate until X-R02-G10. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G10 Backwards Aurora (feature 393, R02-G10-03): a candidate until X-R02-G10. Snapshot schema 3 (feature 397),
+    /// so the schema-1 and schema-2 examples are stored (feature 399, R02-G10-09).
     fileprivate static var backwardsAurora: ExperienceRegistration? {
         guard let id = BackwardsAuroraExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: BackwardsAuroraExperienceCore.self) { launch in
+        let examples = [BackwardsAuroraExperienceCore.schemaOneExample(),
+                        BackwardsAuroraExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: BackwardsAuroraExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return BackwardsAuroraExperience.make(
                 id: id, storage: launch.storage,
