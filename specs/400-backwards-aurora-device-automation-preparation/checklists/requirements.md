@@ -32,4 +32,4 @@
 ## Notes
 
 - Validated 2026-11-23 by the lead; every item passes. The row list, the scenario set, the coverage map and the check
-  are left to `/speckit-clarify`.
+  are settled by `/speckit-clarify`.
