@@ -61,7 +61,7 @@ native control carries a value in words from the start).
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1006-006 Docs: `docs/architecture/backwards-aurora.md` (polish and accessibility),
+- [X] T-R02G1006-006 Docs: `docs/architecture/backwards-aurora.md` (polish and accessibility), — Verified 2026-11-23: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; docs/architecture/backwards-aurora.md polish and accessibility, ExperiencesRound02 README feature 396, docs/automatedtesting.md entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1006-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

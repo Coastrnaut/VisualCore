@@ -121,3 +121,27 @@ opening wave that already wins is refused) and the fingerprint and refuses damag
 - **Panel.** The tutorial with Dismiss, Hint (each press reveals the next level), the goal with the level's band and best
   stars, the failure explanation with Undo and Retry, Campaign / Daily / Practice and a stepper over the open levels, all
   as wrapping text in the panel, never over the aurora.
+
+## Polish and accessibility (feature 396, R02-G10-06)
+
+- **Announcements.** `BackwardsAuroraFeedbackPlan` is a pure function of the old and new core: an accepted reversal
+  "Reversed samples i to j." with the checkpoints matched, the worst bend against the limit and the reversals left;
+  "Undone." / "Redone." with the same measure (`state`); a win with the reversals made and the stars, or a failure with
+  its explanation (`outcome`); a level or mode change with the band, the mode and the tutorial instruction (`level`);
+  refusals in words (`rejection`); a revealed hint as `state`. A reversal that ends the play plans only the outcome.
+- **Haptics.** Selection for an accepted reversal, undo or redo, success for a win, warning for a failure, error for a
+  refusal, through the shared `ExperienceFeedback` route and the person's switch.
+- **Lights.** `BackwardsAuroraLights` eases the glow (0.7 playing, 1 won, 0.35 failed), the won lift, the tear cross and
+  the freeze preview over 0.15 s, 0.45 s under Reduce Flashing (a started fade finishes first). The won lift and glow
+  ride their existing uniforms; `u_tearLight` and `u_previewLight` scale the tear cross's and the preview ribbon's
+  alphas, so a fade rebuilds no geometry. The cross stays on the last torn seam and the preview on its last samples
+  while they fade out. The shimmer (0.25 cycles per second) and pulses (at most 0.24 beads per second) stay below 3 per
+  second and stand still under Reduce Motion.
+- **Sound.** An optional ambient loop (`BackwardsAuroraSoundRecipe`): a 110 Hz root stepped by the worst bend against the
+  limit, one partial per matched checkpoint up to four, an octave when won, halved when failed, whole cycles in the loop;
+  rebuilt only when the recipe changes; plays exactly while the Sound toggle is on, the panel is on screen and the scene
+  is active (`BackwardsAuroraSound`).
+- **Panel.** Every control has a label and a value in words; the start and end steppers are adjustable and name the
+  sample and its height; the "Aurora" summary element reads the reversals left, the checkpoints, the bends and the
+  section; Dynamic Type up to the accessibility sizes with rows that become columns, system colours and a 520-point
+  readable width on iPad.

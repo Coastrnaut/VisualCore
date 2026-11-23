@@ -567,3 +567,8 @@ Feature 395 (R02-G10-05) adds teaching and progression: a solver entry point fro
 `BackwardsAuroraHints` (three hint levels and the failure explanation), `BackwardsAuroraProgress` (tutorial steps,
 stars, the frontier, the daily level and the modes), the adapter's level and mode controls with snapshot schema 2, and
 the panel's tutorial, Hint, goal with band and stars, Undo/Retry, mode buttons and level picker.
+
+Feature 396 (R02-G10-06) adds polish and accessibility: `BackwardsAuroraFeedbackPlan` (announcements and haptics),
+`BackwardsAuroraLights` (eased glow, won lift, tear cross and preview, with `u_tearLight` and `u_previewLight` in the
+aurora shader), `BackwardsAuroraSoundRecipe` and the experience's `BackwardsAuroraSound`, and the panel's values in
+words, adjustable ends, summary element, Sound toggle and Dynamic Type layout.

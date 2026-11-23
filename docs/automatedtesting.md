@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G10-05: Backwards Aurora teaching; hint tests count bounded "stuck" states; spread failure samples across bands).
+Last updated: 2026-11-23 (R02-G10-06: Backwards Aurora polish; fade lights as uniforms; frame checks after a fade draw later).
 
 ## 1. What is tested, and where
 
@@ -395,6 +395,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   and INV-10 failing in their copies; the shared test file is the lead's, so the lead added the picker, the freeze
   preview and the controller to the set in one edit before retesting. Name every new presentation file in the task that
   creates it.
+- **Fade lights through uniforms when the mesh has no free channel** (R02-G10-06, 2026-11-23). Backwards Aurora's tear
+  cross and preview ribbon carry their material code and timeline coordinate in the uv stream, leaving nothing for a
+  shade, so their eased lights became two aurora uniforms (`u_tearLight`, `u_previewLight`) instead of geometry; a fade
+  then rebuilds no mesh. The shader-source test's uniform list and vec4 slot count (9 → 11) changed with it. Frame
+  checks that compare a state change (the won lift) now draw the later frame 1 s on, after the 0.15 s fade.
 - **A bounded hint search can say "stuck" on a winnable state** (R02-G10-05, 2026-11-23). Backwards Aurora's hints use
   the certification's search with its 20,000-reversal bound; 24 of 200 seeded mid-play states found no plan within it,
   and a diagnostic run with a 2,000,000 bound found wins for 18 of them. The spec defines "can still win" as "a plan is
