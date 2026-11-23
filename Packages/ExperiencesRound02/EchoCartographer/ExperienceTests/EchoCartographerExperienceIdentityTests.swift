@@ -70,7 +70,8 @@ import VisualCoreExperienceHost
 
     /// The controls are the declared actions in order: the six of feature 403 with arities 2, 2, 2, 0, 0, 0 and ranges
     /// 0 … 15, then (feature 405) `level.select` [1 … 100], `mode.daily` [year, month, day], `mode.practice`,
-    /// `mode.campaign` and `tutorial.dismiss`.
+    /// `mode.campaign` and `tutorial.dismiss`, then (feature 407) `replay.start` [1 … 100], `replay.step`, `replay.stop`
+    /// and `settings.sound` [0 … 1].
     @Test func theControlsAreTheDeclaredActions() {
         var ids: [String] = []
         var arities: [Int] = []
@@ -79,9 +80,10 @@ import VisualCoreExperienceHost
             arities.append(control.ranges.count)
         }
         #expect(ids == ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next",
-                        "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
+                        "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                        "replay.start", "replay.step", "replay.stop", "settings.sound"])
         #expect(ids == EchoCartographerExperienceCore.actionIDs)
-        #expect(arities == [2, 2, 2, 0, 0, 0, 1, 3, 0, 0, 0])
+        #expect(arities == [2, 2, 2, 0, 0, 0, 1, 3, 0, 0, 0, 1, 0, 0, 1])
         for index in 0..<3 {
             let control: ExperienceControl = EchoCartographerExperienceCore.controls[index]
             for range in control.ranges {

@@ -50,7 +50,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1107-005 [US3] Edit `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerPresenter.swift` and
+- [X] T-R02G1107-005 [US3] Edit `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerPresenter.swift` and — Verified 2026-11-23: sim-27 (52 Echo Cartographer simulator tests incl. EchoCartographerReplayTests 5: replay through the port reproduces the win's fingerprints action by action with progress unchanged, the end and stop; play actions refused during replay with 'Stop the replay first.'; no saved solution refused in words; a tampered save's dropped result announced exactly once; the sound choice saved through settings.sound and applied on opening) exit 0; identity test lists the fifteen controls
   `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the Sound toggle sends `settings.sound` and the presenter applies the restored `soundOn`
   when the experience opens; the dropped results announced once: "n saved results could not be checked and were
