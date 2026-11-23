@@ -52,5 +52,5 @@ public struct BackwardsAuroraPlay: Sendable, Equatable {
 }
 public struct BackwardsAuroraRules: PuzzleRules { /* State = Position (wave, spent, outcome), Move = BackwardsAuroraAction;
     rulesID "r02-g10-backwards-aurora"; moves while playing in order of start, then end;
-    initialState(level:) -> Position; tearSeam(_ wave:, start:, end:) -> Int?  // the lowest seam beyond B, or nil */ }
+    var initialState: Position; func tearSeam(_ wave:, start:, end:) -> Int?  // the lowest seam beyond B, or nil */ }
 ```

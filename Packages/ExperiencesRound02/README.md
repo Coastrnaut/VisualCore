@@ -534,3 +534,12 @@ examples (`NocturneGardenSchemaExamples`) stored by the app registration, app un
 Feature 390 (R02-G09-10) prepares Nocturne Garden's device campaign without touching a device:
 `docs/apps/nocturne-garden/device-rows.json` (rows NG-D1 … NG-D8, all pending), the written plan
 `docs/apps/nocturne-garden/device-campaign.md`, and the release step `device-rows-r02-g09`.
+
+## Backwards Aurora (R02-G10, `r02-g10.backwards-aurora`, free)
+
+`BackwardsAuroraCore` (feature 391, R02-G10-01) is the playable rule kernel: the wave of signed integer samples with
+its bends, seam positions, reversals, palindrome test and distance (`BackwardsAuroraWave`), `BackwardsAuroraLevel`
+(immutable, fingerprinted, JSON schema 1), the play state `BackwardsAuroraPlay` with `BackwardsAuroraAction`,
+`BackwardsAuroraStage`, `BackwardsAuroraEvent`, `BackwardsAuroraFailure` and append-only `BackwardsAuroraRecord`s, and
+`BackwardsAuroraRules` for the R02-F23 puzzle contract. Refusals are `BackwardsAuroraError` with `r02-g10.*` codes.
+Rules: [docs/architecture/backwards-aurora.md](../../docs/architecture/backwards-aurora.md).

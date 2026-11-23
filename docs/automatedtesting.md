@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-10: Nocturne Garden device rows).
+Last updated: 2026-11-22 (R02-G10-01: Backwards Aurora kernel, seam bends against a whole-wave recomputation).
 
 ## 1. What is tested, and where
 
@@ -389,6 +389,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the
   enumeration guard caught (0/3 declared tests). The level-1 journey is one Turn − and two Advances, and its pinned
   values are checked against the Core by an app unit test.
+- **Seam bends against a whole-wave recomputation** (R02-G10-01, 2026-11-22). Backwards Aurora's tear rule looks only
+  at the bends at a reversal's seam positions; the wave tests compare every bend before and after 1 500 seeded
+  reversals (three on each of 500 waves) and prove that the others are unchanged or carried along in reverse order. The
+  first draft asserted that bends inside the section keep their positions, which is false (they move): state such
+  locality claims as "only these can take new values" and test exactly that.
 - **Exact cells against an independent ray cast** (R02-G09-01, 2026-11-22). Nocturne Garden's shadow cells are decided by
   an integer winding number on doubled coordinates with boundary centres counted inside; the bloom tests check every
   cell of the whole bed (not only the bounding box) against a separate even-odd ray cast on exact rationals with its own
