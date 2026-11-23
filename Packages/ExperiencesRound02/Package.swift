@@ -39,6 +39,8 @@ let package = Package(
         .library(name: "BackwardsAuroraCore", targets: ["BackwardsAuroraCore"]),
         // Feature 401 (R02-G11-01): Echo Cartographer's rule kernel, a candidate until X-R02-G11.
         .library(name: "EchoCartographerCore", targets: ["EchoCartographerCore"]),
+        // Feature 411 (R02-G12-01): Harmonic Bridges' rule kernel, a candidate until X-R02-G12.
+        .library(name: "HarmonicBridgesCore", targets: ["HarmonicBridgesCore"]),
         // Feature 403 (R02-G11-03): Echo Cartographer's experience (iOS only; a registered candidate until X-R02-G11).
         .library(name: "EchoCartographerExperience", targets: ["EchoCartographerExperience"]),
         // Feature 353 (R02-G06-03): Chrono Constellator's experience (iOS only; a registered candidate until X-R02-G06).
@@ -374,6 +376,26 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "EchoCartographer/CoreTests"),
+        // Feature 411 (R02-G12-01): Harmonic Bridges' pure rule kernel.
+        .target(name: "HarmonicBridgesCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
+                path: "HarmonicBridges/Core"),
+        .testTarget(name: "HarmonicBridgesCoreTests",
+                    dependencies: ["HarmonicBridgesCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
+                    path: "HarmonicBridges/CoreTests"),
         // Feature 403 (R02-G11-03): Echo Cartographer's experience (presenter, scene, controls) and its simulator tests.
         .target(name: "EchoCartographerExperience",
                 dependencies: ["EchoCartographerCore",

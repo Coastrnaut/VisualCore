@@ -15,7 +15,7 @@ consume).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1201-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `HarmonicBridgesCore`,
+- [X] T-R02G1201-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `HarmonicBridgesCore`, — Verified 2026-11-23: host exit 0 (HarmonicBridgesLevelTests 9: reason codes, every range refusal and accepted boundary, the swing table against 4 sin²(nπk/6), resonance hand cases [1,3,4,3,1] and [7,3,4,3,7], mode above 5, threshold met and one quarter short, reachability and broken-string hand cases, names in words, stored form round trip and damaged/edited/newer refusals, 500 fixtures valid); package gains HarmonicBridgesCore and its tests
   `HarmonicBridgesCoreTests`, product); create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesError.swift`
   (codes "r02-g12.level, .action, .noop, .stage, .stale, .newer-schema, .malformed"),
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesResonance.swift` (the swing table "q(n, k) ∈ {0, 1, 3,
