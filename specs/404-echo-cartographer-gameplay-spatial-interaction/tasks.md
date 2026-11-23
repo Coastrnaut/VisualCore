@@ -15,7 +15,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 ## Phase 2: Foundational — orbit, camera and picking
 
 - [ ] T-R02G1104-002 [P] Add `EchoCartographerOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)", `clamped()`) and
-  `camera(_:aspect:orbit:)` (yaw about the y axis through the box centre, pitch about the authored view; distance refit
+  `camera(_:aspect:orbit:)` (yaw about the y axis through the box centre, pitch about the authored view; field of view refit
   so the authored box x −1 … 1, z −1 … 1.1, y 0 … 0.8 stays inside the view with a 5 % margin at aspects 0.4 … 2.5;
   `camera(_:aspect:)` equals the authored orbit, bit-identical) to
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSceneGeometry.swift`; create

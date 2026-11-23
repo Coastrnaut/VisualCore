@@ -14,7 +14,7 @@
 - **R4 Markers by drag.** Decision: drag from a marker moves it (two mark actions: off, on); drag from an unmarked cell
   places one at the release cell. Rationale: the catalog's "triangulate via dragging markers" with only the declared
   mark control; each step is undoable.
-- **R5 Orbit and reset.** Decision: yaw ±35°, pitch −15° … +20° around the authored view, distance refitted per aspect;
+- **R5 Orbit and reset.** Decision: yaw ±35°, pitch −15° … +20° around the authored view, field of view refitted per aspect and orbit as the authored camera does;
   double tap on empty space or "Reset view". Rationale: feature 394's proven bounds; camera motion never touches the
   rules.
 - **R6 Panel parity.** Decision: every certified witness replays through the panel (cursor steppers, pulse, claim).

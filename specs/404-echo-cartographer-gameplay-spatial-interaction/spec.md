@@ -64,7 +64,7 @@ presentation state.
 - Q: How do two fingers behave, and what happens on a finished play? → A: a second finger cancels any one-finger
   gesture (nothing sent) and orbits: yaw ±35° about the y axis (90° per view width), pitch −15° … +20° (60° per view
   height) about the authored view; a third finger re-bases the midpoint; a double tap on empty space or "Reset view"
-  returns to the authored view. The camera distance refits so the authored box stays inside the view with a 5 % margin
+  returns to the authored view. The camera refits (its field of view, as the authored camera does) so the authored box stays inside the view with a 5 % margin
   at every orbit and aspect 0.4 … 2.5. Orbit is presentation only: not saved, so the snapshot schema stays 1. Gestures
   send kernel actions only while playing (loading, tutorial and paused send nothing). On a won,
   failed or result stage taps, drags and held presses send nothing and the description says the play is over (undo or
