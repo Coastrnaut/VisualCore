@@ -20,7 +20,8 @@ native control carries a value in words from the start).
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipe (P1, P2) 🎯
 
 - [ ] T-R02G1106-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerFeedbackPlan.swift` (texts and kinds of
-  clarification Q1 word for word, including the revealed hint as `state` (`hint(text:)`); haptics of Q2;
+  clarification Q1 word for word — a missed claim's m is the energy the miss actually took (energy before minus
+  after, never more than was left) — including the revealed hint as `state` (`hint(text:)`); haptics of Q2;
   `after(old:new:)`, `refused(code:)`, `refusalText(code:)`, `summaryText(core:cursor:)` of Q5) with
   `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerFeedbackPlanTests.swift` (scripted sequences of pulses, located and missed claims,
   markers placed and removed, undos, redos, refusals of every code, wins in campaign and practice, failures by a pulse
