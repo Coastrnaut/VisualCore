@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G12-08: Harmonic Bridges visual golden and solver regression).
+Last updated: 2026-11-23 (R02-G12-09: Harmonic Bridges simulator integration and full app lock).
 
 ## 1. What is tested, and where
 
@@ -450,6 +450,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `Apps/VisualCore/Tests/UI/EchoCartographer/` the first `app-ui-ios27-t3` run built the old project and executed 0
   tests ("NOT RUN or not passed", the enumeration guard failed). Run `xcodegen generate --spec project.yml` after adding
   or removing app source or test files, then the check.
+- **Harmonic Bridges interface journeys** (R02-G12-09, 2026-11-23). `HBPlayUITests` and `HBReplayUITests` run as
+  the serial chunk `u3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-u3`); they
+  play level 1's certified actions (string 0 from peg 11 to peg 12, Tune, Test) with the peg stepper, counting a press
+  only when the value moves. The pinned literals in `HB` are checked against the Core by
+  `testHarmonicBridgesLevelOnePinsInHBEqualTheCore`. The release-check summary log does not list the app's unit test
+  names: read the per-step log under `.autonomy/logs/app-tests/` for "Test Case … passed".
 - **Echo Cartographer interface journeys** (R02-G11-09, 2026-11-23). `ECGPlayUITests` and `ECGReplayUITests` run as
   the serial chunk `t3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-t3`); they
   play level 1's certified actions (pulses from column 0, row 3 and column 0, row 2, then a claim at column 1, row 2)

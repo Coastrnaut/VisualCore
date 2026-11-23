@@ -218,3 +218,21 @@ rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.m
 - **Running it.** `python3 scripts/harmonic_bridges_regression.py` runs the host part and the simulator classes with
   one summary line per part; CI runs the host part as "Harmonic Bridges regression (host)".
 
+## In-app integration (feature 419, R02-G12-09)
+
+- **Identifiers.** Every panel control and text element carries `experience.r02-g12.harmonic-bridges.<name>`
+  (`HarmonicBridgesControls.identifierNames`, 30 names: string, peg, tune, test, undo, redo, next-level, reset-view,
+  dismiss-tutorial, hint, failure-undo, retry, campaign, daily, practice, level-picker, play-level, replay, replay-step,
+  replay-stop, sound, summary, status, actions, message, failure, instruction, hint-text, goal, replay-position); an
+  experience test checks each is listed once and used exactly once in the panel.
+- **Interface tests.** `HBPlayUITests` wins level 1 through the panel (its certified actions: string 0 from peg 11 to
+  peg 12 with the peg stepper, Tune, then Test: "The crossing holds in every step.", "Stars: 3 of 3.", level 2 open)
+  and keeps the progress over a relaunch; `HBReplayUITests` replays the win (two actions) to its end and stops. They run
+  as serial chunk `u3`, each under 90 s apart from the simulator's automation-session setup per launch. Level 1's
+  certified actions, the opening choice (string 0, peg 11) and the budget (9) are pinned in `HB` and checked against the
+  Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`HarmonicBridgesSchemaExamples`, seed
+  7), which the app restores into schema 3; Harmonic Bridges stays a candidate (not available without
+  `-vcCandidates`) until X-R02-G12.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
+

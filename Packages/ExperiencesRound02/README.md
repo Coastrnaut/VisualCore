@@ -690,3 +690,7 @@ Feature 418 (R02-G12-08) adds the regression net: the solver regression over the
 alterations, `HarmonicBridgesGolden` with the pinned `golden-frames.json` (16 code-computed frame descriptions), the
 simulator golden-frame and memory classes, `scripts/harmonic_bridges_regression.py` and the CI step "Harmonic Bridges
 regression (host)".
+
+Feature 419 (R02-G12-09) adds the in-app integration: the pinned identifier list of the panel, the schema-1 and
+schema-2 examples (`HarmonicBridgesSchemaExamples`) stored by the app registration, app unit tests, and the interface
+tests `HBPlayUITests` and `HBReplayUITests` (serial chunk `u3`).

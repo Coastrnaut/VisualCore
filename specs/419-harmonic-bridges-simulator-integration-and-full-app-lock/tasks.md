@@ -63,7 +63,7 @@ change (the shaders and reference of R02-G12-03 are unchanged and re-proven by t
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1209-007 Docs: `docs/architecture/harmonic-bridges.md` (in-app integration),
+- [X] T-R02G1209-007 Docs: `docs/architecture/harmonic-bridges.md` (in-app integration), — Verified 2026-11-23: round02-host (355 s) and script-tests (alone) exit 0; architecture doc in-app integration, ExperiencesRound02 README feature 419, testing doc entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name script-tests`
   (alone)
 - [ ] T-R02G1209-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
