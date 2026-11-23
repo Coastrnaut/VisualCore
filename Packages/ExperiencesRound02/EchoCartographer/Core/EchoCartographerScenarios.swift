@@ -21,6 +21,10 @@
 // level's certified witness, a pulse) and then one illegal action — a pulse at column 16 (out of range) on odd rows, one
 // at row 16 on even rows. The expected digests are derived by playing the entries on a core exactly as the engine plays
 // them.
+// Feature 405 (R02-G11-05) T-R02G1105-004: the digests are now schema 2's ("…v2": level, play, progress and mode), and
+// `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`;
+// rejection also refuses the progression controls' wrong value counts (`level.select`, `mode.daily`, `mode.practice`,
+// `mode.campaign`, `tutorial.dismiss`); the manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`).
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -161,6 +165,11 @@ extension EchoCartographerExperienceCore {
             refusedEntry("play.undo", [1], wrongCount),
             refusedEntry("play.redo", [1], wrongCount),
             refusedEntry("level.next", [1], wrongCount),
+            refusedEntry("level.select", [], wrongCount),
+            refusedEntry("mode.daily", [2026, 1], wrongCount),
+            refusedEntry("mode.practice", [1], wrongCount),
+            refusedEntry("mode.campaign", [1], wrongCount),
+            refusedEntry("tutorial.dismiss", [1], wrongCount),
         ]
         return entries
     }

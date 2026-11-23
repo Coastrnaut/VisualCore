@@ -23,7 +23,8 @@
 //                            located beacons `r02-g11.noop`; any of them outside stage `playing` `r02-g11.stage`;
 //   play.undo, play.redo     the kernel's exact undo and redo (`r02-g11.action` when there is nothing to undo or redo;
 //                            undo works in a failed play and returns it to playing; a won play is final);
-//   level.next               the next certified level (100 wraps to 1) with a fresh play.
+//   level.next               the next certified level with a fresh play (since feature 405 the next open level; see
+//                            below).
 // The declared ranges are the widest any chamber allows (`EchoCartographerChamber.sizeRange`: at most 16 cells a side);
 // the level's own chamber is the kernel's to check. Every cell action is applied with the play's current fingerprint as
 // the expected one, so `r02-g11.stale` cannot arise. A kernel refusal (`EchoCartographerError`) becomes
@@ -35,6 +36,27 @@
 // (`EchoCartographerPlay.replay`) and throws `EchoCartographerRestoreRefusal` for a damaged payload, a level number
 // outside 1 … 100 or a trace the kernel refuses (a record of a newer schema or of another level's seed among them). An
 // envelope of a newer schema is refused by the engine before the core sees it.
+//
+// Feature 405 (R02-G11-05) T-R02G1105-004 (FR-R02G1105-001 … 007; clarifications Q2–Q5): the core also holds the
+// player's progress (`EchoCartographerProgress`: won levels with the least energy spent and stars, the open frontier),
+// the mode (campaign, practice with the energy raised to the kernel's maximum 60, daily) and the tutorial step. No
+// level is ever gated by payment: a locked level is one not yet unlocked (FR-R02G1105-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g11.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g11.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the energy raised to 60;
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing a level or a mode drops the left level's records (the play starts fresh). `level.next` moves to the next
+// open level in campaign mode and is refused with `r02-g11.locked` when there is none (100 does not wrap). A win (the
+// play reaching `won` on an accepted claim or redo) records `progress.record(level:energySpent:certified:mode:)` with
+// the energy spent (every pulse and claim record, undone ones included) and the certified plan's pulse count (campaign
+// opens the next level; daily never does; practice records nothing). The tutorial starts at
+// `EchoCartographerTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and advances after an
+// accepted new pulse or a newly located beacon; a redo only ends it when it ends the level; undo never moves it. Digest
+// "r02-g11.echo-cartographer.v2": level, play fingerprint, progress and mode (never the tutorial step). Snapshot schema
+// 2: `{"level", "mode", "progress", "records", "tutorial"}`; schema-1 payloads migrate (no won levels, the levels up to
+// the saved level open, campaign mode, the tutorial at its initial step).
 //
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `EchoCartographerTier.of(t)`: level-0 = rings, flare trails, 2 glow shells; level-1 =
@@ -49,11 +71,16 @@ import VisualCorePersistence
 public enum EchoCartographerExperienceRule {
     /// A value that must be a whole number (a cell's column or row) and is not.
     public static let notWhole = "r02-g11.not-whole"
+    /// A level that is not open yet, or no next open level (feature 405).
+    public static let locked = "r02-g11.locked"
+    /// An impossible calendar date (feature 405).
+    public static let date = "r02-g11.date"
 }
 
 /// Why a saved Echo Cartographer state was refused on restore (feature 403). A refused restore changes nothing.
 public enum EchoCartographerRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress or the mode is
+    /// invalid (feature 405).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -61,16 +88,19 @@ public enum EchoCartographerRestoreRefusal: Error, Equatable, Sendable {
     case kernel(EchoCartographerError)
 }
 
-/// The state of Echo Cartographer as an experience (see the file header). Snapshot schema 1.
+/// The state of Echo Cartographer as an experience (see the file header). Snapshot schema 2.
 public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g11.echo-cartographer"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g11.echo-cartographer.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g11.echo-cartographer.v2"
     /// The action ids in declaration order.
-    public static let actionIDs = ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next"]
+    public static let actionIDs = ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next",
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+    /// The energy of a practice play: the kernel's maximum (`EchoCartographerMode.practiceEnergy`, 60).
+    public static let practiceEnergy: Int = EchoCartographerMode.practiceEnergy
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a cell's column or row: the largest chamber's cells
@@ -83,22 +113,48 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: EchoCartographerPlay
+    /// The player's progress (feature 405): in the digest and the snapshot.
+    public private(set) var progress: EchoCartographerProgress
+    /// The mode (feature 405): in the digest and the snapshot.
+    public private(set) var mode: EchoCartographerMode
+    /// The tutorial step (feature 405): in the snapshot, not in the digest.
+    public private(set) var tutorial: EchoCartographerTutorialStep
+    /// The certified plan's pulse count of the current level (stars). Derived from the level number.
+    public private(set) var certifiedPulses: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: EchoCartographerPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
+
+    /// What a reset restores (feature 405).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: EchoCartographerPlay
+        /// The opening progress: the levels up to the opening level open, none won.
+        let progress: EchoCartographerProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: EchoCartographerTutorialStep
+        /// The opening level's certified plan pulse count.
+        let certifiedPulses: Int
+    }
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber`, whose reset returns to `openingPlay` of `openingNumber`.
-    init(levelNumber: Int, play: EchoCartographerPlay, openingNumber: Int, openingPlay: EchoCartographerPlay) {
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial`, whose reset returns to
+    /// `opening` of `openingNumber`.
+    init(levelNumber: Int, play: EchoCartographerPlay, progress: EchoCartographerProgress, mode: EchoCartographerMode,
+         tutorial: EchoCartographerTutorialStep, certifiedPulses: Int, openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedPulses = certifiedPulses
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
@@ -169,13 +225,40 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         try EchoCartographerPlay.replay(level: level, records: [])
     }
 
-    /// The opening state of manifest number `number`: a play begun and past its tutorial, ready to accept actions.
+    /// The practice copy of `level` (feature 405): every field kept, the energy raised to ``practiceEnergy``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: EchoCartographerLevel) throws(EchoCartographerError) -> EchoCartographerLevel {
+        try EchoCartographerLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, chamber: level.chamber,
+                                  entry: level.entry, beacons: level.beacons, tolerance: level.tolerance,
+                                  energy: EchoCartographerMode.practice.energy(base: level.energy),
+                                  missCost: level.missCost, tutorial: level.tutorial)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: EchoCartographerGenerated,
+                            mode: EchoCartographerMode) throws(EchoCartographerError) -> EchoCartographerLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
+    /// accept actions; campaign mode, the levels up to `number` open, none won, the tutorial at its initial step.
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(EchoCartographerError) -> EchoCartographerExperienceCore {
-        let play: EchoCartographerPlay = try freshPlay(of: try level(number: number))
-        return EchoCartographerExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                              openingPlay: play)
+        let certified: EchoCartographerGenerated = try generated(number: number)
+        let play: EchoCartographerPlay = try freshPlay(of: certified.level)
+        var progress: EchoCartographerProgress = EchoCartographerProgress()
+        progress.open(through: number)
+        let tutorial: EchoCartographerTutorialStep = EchoCartographerTutorialStep.initial(level: number)
+        let pulses: Int = certified.plan.pulses.count
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial, certifiedPulses: pulses)
+        return EchoCartographerExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                              tutorial: tutorial, certifiedPulses: pulses, openingNumber: number,
+                                              opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -221,15 +304,43 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the quality tier or
+    /// the opening level).
     public static func == (lhs: EchoCartographerExperienceCore, rhs: EchoCartographerExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 405): no won levels with the levels up
+    /// to the saved level open, campaign mode, no tutorial key (restore starts the tutorial at its initial step).
+    ///
+    /// - Throws: ``EchoCartographerRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw EchoCartographerRestoreRefusal.damaged
+        }
+        var progress: EchoCartographerProgress = EchoCartographerProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(EchoCartographerMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the ranges of the file header as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -239,6 +350,11 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.undo"),
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(EchoCartographerProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -246,7 +362,8 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The six controls with their declared ranges (see the file header); the last three take no values.
+    /// The eleven controls with their declared ranges (see the file header); `play.undo`, `play.redo`, `level.next`,
+    /// `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -282,20 +399,44 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         do throws(EchoCartographerError) {
             switch action.control {
             case "cell.pulse":
+                let located: Int = play.located.count
                 try play.apply(.pulse(values[0], values[1]), expecting: play.fingerprint)
+                advanceTutorial(afterPulse: true, locatedBefore: located)
             case "cell.claim":
+                let located: Int = play.located.count
                 try play.apply(.claim(values[0], values[1]), expecting: play.fingerprint)
+                advanceTutorial(afterPulse: false, locatedBefore: located)
+                recordIfWon()
             case "cell.mark":
                 try play.apply(.mark(values[0], values[1]), expecting: play.fingerprint)
             case "play.undo":
                 try play.undo()
             case "play.redo":
                 try play.redo()
-            default:   // level.next
-                let next: Int = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh: EchoCartographerPlay = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
+                advanceTutorial(afterPulse: false, locatedBefore: nil)
+                recordIfWon()
+            case "level.next":
+                guard let next = progress.nextOpen(after: levelNumber) else {
+                    return .rejected(.rule(code: EchoCartographerExperienceRule.locked))
+                }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(values[0]) else {
+                    return .rejected(.rule(code: EchoCartographerExperienceRule.locked))
+                }
+                try open(number: values[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = EchoCartographerProgress.dailyLevel(year: values[0], month: values[1],
+                                                                      day: values[2]) else {
+                    return .rejected(.rule(code: EchoCartographerExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            default:   // tutorial.dismiss
+                tutorial = tutorial.dismissed()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
@@ -309,10 +450,47 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose; the quality tier, which is not state, is kept.
+    /// Advances the tutorial step after an accepted pulse, claim or redo
+    /// (`EchoCartographerTutorialStep.advanced(afterPulse:located:ended:)`): a new pulse moves step pulse on, a newly
+    /// located beacon moves step narrow on (`locatedBefore` is the located count before a new action; nil for a redo),
+    /// the end of the level ends it; an undo never moves the step and a redo only ends it when it ends the level.
+    private mutating func advanceTutorial(afterPulse: Bool, locatedBefore: Int?) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        var located: Bool = false
+        if let before = locatedBefore { located = play.located.count > before }
+        tutorial = tutorial.advanced(afterPulse: afterPulse, located: located, ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's initial
+    /// tutorial step; the records of the level left are dropped. Changes nothing when the kernel refuses.
+    private mutating func open(number: Int, mode: EchoCartographerMode) throws(EchoCartographerError) {
+        let certified: EchoCartographerGenerated = try Self.generated(number: number)
+        let fresh: EchoCartographerPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedPulses = certified.plan.pulses.count
+        tutorial = EchoCartographerTutorialStep.initial(level: number)
+    }
+
+    /// After an accepted action that won the play: records the energy spent against the certified plan's pulse count
+    /// in the current mode (campaign opens the next level; daily does not; practice records nothing). A won play is
+    /// final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, energySpent: EchoCartographerProgress.energySpent(play),
+                        certified: certifiedPulses, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included); the quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedPulses = opening.certifiedPulses
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -324,37 +502,47 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g11.echo-cartographer.v1", then the level number and the play's fingerprint (level, knowledge, markers,
-    /// located beacons, energy, stage, failure).
+    /// "r02-g11.echo-cartographer.v2", then the level number, the play's fingerprint (level, knowledge, markers,
+    /// located beacons, energy, stage, failure), the progress and the mode (their sorted JSON); never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly.
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: EchoCartographerMode
+        /// The progress.
+        var progress: EchoCartographerProgress
         /// The play's records.
         var records: [EchoCartographerRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: EchoCartographerTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level; a reset returns to the level
-    /// `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the initial step when absent); a reset returns
+    /// to the opening state `seed` chooses.
     ///
-    /// - Throws: ``EchoCartographerRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level
-    ///   or trace the kernel refuses.
+    /// - Throws: ``EchoCartographerRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or a daily
+    ///   mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel
+    ///   refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> EchoCartographerExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw EchoCartographerRestoreRefusal.damaged
@@ -362,15 +550,21 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw EchoCartographerRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw EchoCartographerRestoreRefusal.damaged
+        }
         do throws(EchoCartographerError) {
-            let saved: EchoCartographerLevel = try level(number: decoded.level)
-            let play: EchoCartographerPlay = try EchoCartographerPlay.replay(level: saved, records: decoded.records)
-            let openingNumber: Int = levelNumber(forSeed: seed)
-            let openingPlay: EchoCartographerPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return EchoCartographerExperienceCore(levelNumber: decoded.level, play: play,
-                                                  openingNumber: openingNumber, openingPlay: openingPlay)
+            let certified: EchoCartographerGenerated = try generated(number: decoded.level)
+            let play: EchoCartographerPlay = try EchoCartographerPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: EchoCartographerTutorialStep = decoded.tutorial
+                ?? EchoCartographerTutorialStep.initial(level: decoded.level)
+            let openingCore: EchoCartographerExperienceCore = try opening(number: levelNumber(forSeed: seed))
+            return EchoCartographerExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                  mode: decoded.mode, tutorial: tutorial,
+                                                  certifiedPulses: certified.plan.pulses.count,
+                                                  openingNumber: openingCore.openingNumber,
+                                                  opening: openingCore.opening)
         } catch {
             throw EchoCartographerRestoreRefusal.kernel(error)
         }

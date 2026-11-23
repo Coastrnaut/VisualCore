@@ -9,6 +9,11 @@
 // payloads (damaged, level out of range, a trace of another level, a record of a newer schema, an edited trace, an
 // envelope of a newer schema); the certified-candidate table equals the 100 stored witnesses' `skipped` and the
 // directly certified levels equal the stored ones (level fingerprint); `snapshot(time:)` mirrors what the player knows.
+// Feature 405 (R02-G11-05) T-R02G1105-004: schema 2 and digest v2; eleven controls; `level.next` to the next open level
+// (refused with `r02-g11.locked` when none, no wrap); the progression controls (`level.select`, `mode.daily`,
+// `mode.practice`, `mode.campaign`, `tutorial.dismiss`) with their refusals; a campaign win records stars and opens the
+// next level, a daily win opens nothing, practice records nothing; progress and mode in the digest, the tutorial step
+// in the snapshot but not the digest; the migration of a schema-1 payload.
 // Fixture seed 2_403. Levels are certified once per process, so the run stays short. Explicit types, plain loops.
 import Foundation
 import Testing
@@ -98,16 +103,19 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g11.echo-cartographer" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g11.echo-cartographer.v1")
+        #expect(Core.experienceID == "r02-g11.echo-cartographer" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g11.echo-cartographer.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
-        let ids: [String] = ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next"]
+        let ids: [String] = ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next",
+                             "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
         #expect(Core.actionIDs == ids)
         let cellIndices: [Int] = [0, 1, 2]
         for index in cellIndices { #expect(Core.controls[index].ranges == [0...15, 0...15]) }
-        let plainIndices: [Int] = [3, 4, 5]
+        let plainIndices: [Int] = [3, 4, 5, 8, 9, 10]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 1)
+        #expect(Core.controls[6].ranges == [1...100])
+        #expect(Core.controls[7].ranges == [1...9999, 1...12, 1...31])
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == EchoCartographerTier.all.map(\.name))
@@ -335,10 +343,16 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         }
     }
 
-    @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+    @Test func nextLevelOpensOnlyAfterAWinAndResetReturnsToTheSeedsLevel() async throws {
         var core: Core = try await Core.prepare(seed: 40)
-        #expect(core.levelNumber == 41)
+        #expect(core.levelNumber == 41 && core.progress.frontier == 41)
         #expect(core.apply(Self.act("cell.mark", [0, 0])) == .accepted)
+        let before: StateDigest = try Self.digest(core)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: EchoCartographerExperienceRule.locked)))
+        #expect(try Self.digest(core) == before)
+        core.reset()
+        for step in try Core.generated(number: 41).actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.frontier == 42)
         #expect(core.apply(Self.act("level.next")) == .accepted)
         #expect(core.levelNumber == 42 && core.play.records.isEmpty && core.play.stage == .playing)
         core.reset()
@@ -346,13 +360,86 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let resetDigest: StateDigest = try Self.digest(core)
         let freshDigest: StateDigest = try Self.digest(fresh)
         #expect(core == fresh && resetDigest == freshDigest)
-        // The wrap: level 100 → 1.
+        // No wrap: after winning level 100 there is no next open level.
         var last: Core = try Core.opening(number: 100)
-        #expect(last.apply(Self.act("level.next")) == .accepted)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(last.levelNumber == 1 && last == first)
+        for step in try Core.generated(number: 100).actions { #expect(last.apply(Self.act(step)) == .accepted) }
+        #expect(last.play.stage == .won)
+        #expect(last.apply(Self.act("level.next")) == .rejected(.rule(code: EchoCartographerExperienceRule.locked)))
         last.reset()
         #expect(last.levelNumber == 100)
+    }
+
+    @Test func theProgressionControlsFollowTheirRules() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let locked: ActionResult = .rejected(.rule(code: EchoCartographerExperienceRule.locked))
+        // level.select: only open levels.
+        #expect(core.apply(Self.act("level.select", [2])) == locked)
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
+        // The tutorial of level 1: pulse first; dismiss ends it and is not digested.
+        #expect(core.tutorial == .pulse)
+        let tutorialDigest: StateDigest = try Self.digest(core)
+        var dismissed: Core = core
+        #expect(dismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(dismissed.tutorial == .done && dismissed != core)
+        #expect(try Self.digest(dismissed) == tutorialDigest)
+        // A campaign win of level 1: three stars at the certified energy, the tutorial done, level 2 open.
+        let generated: EchoCartographerGenerated = try Core.generated(number: 1)
+        let first: EchoCartographerAction = try #require(generated.actions.first)
+        #expect(core.apply(Self.act(first)) == .accepted)
+        #expect(core.tutorial == .narrow)
+        for step in generated.actions.dropFirst() { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.play.stage == .won && core.tutorial == .done)
+        let result: EchoCartographerProgress.Result = try #require(core.progress.solved[1])
+        #expect(result.energySpent == generated.plan.pulses.count && result.stars == 3)
+        #expect(core.progress.frontier == 2)
+        #expect(core.apply(Self.act("level.select", [2])) == .accepted && core.levelNumber == 2)
+        // Practice: the energy raised to 60, a win records nothing.
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.mode == .practice && core.play.energy == Core.practiceEnergy && core.levelNumber == 2)
+        let practiceProgress: EchoCartographerProgress = core.progress
+        for step in try Core.generated(number: 2).actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress == practiceProgress)
+        // Campaign returns to the current level when it is open.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 2 && core.play.records.isEmpty)
+        // Daily: an impossible date is refused; a daily level still locked is playable and a win opens nothing.
+        let dateRefused: ActionResult = .rejected(.rule(code: EchoCartographerExperienceRule.date))
+        let beforeDate: StateDigest = try Self.digest(core)
+        #expect(core.apply(Self.act("mode.daily", [2026, 2, 30])) == dateRefused)
+        #expect(try Self.digest(core) == beforeDate)
+        let daily: Int = try #require(EchoCartographerProgress.dailyLevel(year: 2026, month: 11, day: 23))
+        #expect(core.apply(Self.act("mode.daily", [2026, 11, 23])) == .accepted)
+        #expect(core.mode == .daily(level: daily) && core.levelNumber == daily)
+        let frontier: Int = core.progress.frontier
+        for step in try Core.generated(number: daily).actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.frontier == frontier)
+        #expect(core.progress.solved[daily] != nil)
+        // Progress and mode are digested: the same play in another mode digests differently.
+        var campaign: Core = try await Core.prepare(seed: 0)
+        var practice: Core = campaign
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        #expect(campaign.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(try Self.digest(practice) != (try Self.digest(campaign)))
+    }
+
+    @Test func aSchemaOnePayloadMigrates() async throws {
+        var core: Core = try await Core.prepare(seed: 2)
+        let generated: EchoCartographerGenerated = try Core.generated(number: 3)
+        let first: EchoCartographerAction = try #require(generated.actions.first)
+        #expect(core.apply(Self.act(first)) == .accepted)
+        let encoder: JSONEncoder = Core.payloadEncoder()
+        let records: Data = try encoder.encode(core.play.records)
+        let recordsObject: Any = try JSONSerialization.jsonObject(with: records)
+        let schemaOne: [String: Any] = ["level": 3, "records": recordsObject]
+        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 2)
+        #expect(restored.levelNumber == 3 && restored.play == core.play && restored.mode == .campaign)
+        #expect(restored.progress.frontier == 3 && restored.progress.solved.isEmpty)
+        #expect(restored.tutorial == EchoCartographerTutorialStep.initial(level: 3))
+        #expect(throws: EchoCartographerRestoreRefusal.damaged) {
+            try Core.migratedToSchemaTwo(["level": "3"])
+        }
     }
 
     @Test func snapshotRestoreRoundTripAndRefusals() async throws {
@@ -367,7 +454,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let payload: Data = try core.snapshotPayload()
         #expect(try core.snapshotPayload() == payload)
         let text: String = try #require(String(data: payload, encoding: .utf8))
-        #expect(text.hasPrefix("{\"level\":21,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":21,\"mode\":{\"mode\":\"campaign\"},\"progress\":"))
         let restored: Core = try Core.restore(payload: payload, seed: 20)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -393,11 +480,13 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(throws: EchoCartographerRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":\"21\",\"records\":[]}".utf8), seed: 20)
         }
+        let levelZero: Data = Data(text.replacingOccurrences(of: "\"level\":21", with: "\"level\":0").utf8)
         #expect(throws: EchoCartographerRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: levelZero, seed: 20)
         }
+        let levelBeyond: Data = Data(text.replacingOccurrences(of: "\"level\":21", with: "\"level\":101").utf8)
         #expect(throws: EchoCartographerRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: levelBeyond, seed: 20)
         }
         // The same records on another level: the records carry level 21's seed.
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":21", with: "\"level\":1").utf8)
@@ -432,14 +521,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(engine.handle(control: "cell.mark", values: [0, 1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)

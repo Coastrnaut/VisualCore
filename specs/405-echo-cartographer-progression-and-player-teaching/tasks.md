@@ -49,7 +49,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 395
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1105-004 Edit `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerExperienceCore.swift`
+- [X] T-R02G1105-004 Edit `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerExperienceCore.swift` — Verified 2026-11-23: host-4 (178 EchoCartographer core tests incl. the adapter's schema 2 and digest v2, eleven controls, level.next to the next open level (r02-g11.locked, no wrap), level.select, mode.daily (r02-g11.date), practice energy 60 with no stars, campaign return, a campaign win's stars and unlock, a daily win opening nothing, tutorial snapshotted not digested, the schema-1 migration; scenario manifest regenerated with the progression controls' rejections) exit 0
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g11.locked`, `r02-g11.date`; practice energy 60 on a copy of the level, no stars, no
   unlocks; a daily win records the level's best result and stars and opens nothing; progress and mode in the digest,
