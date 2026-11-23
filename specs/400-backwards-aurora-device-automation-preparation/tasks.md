@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for BA-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g10`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g10.backwards-aurora`
-- [ ] T-R02G1010-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Backwards Aurora definition passes; a
+- [X] T-R02G1010-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Backwards Aurora definition passes; a — Verified 2026-11-23: script-tests (run alone, incl. BackwardsAuroraDeviceRowsCheckTests 6: the real definition passes, a removed scenario, a missing BA-D1 pass field and an uncovered T-R02G1009-011 each fail by name, the release step runs the check) exit 0, 2026-11-23; agent A's tests retested by the lead
   copy with a scenario removed, a copy with BA-D1's `pass` field removed and a copy with T-R02G1009-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g10` runs the check for
   `r02-g10.backwards-aurora`); `--name script-tests` (alone)

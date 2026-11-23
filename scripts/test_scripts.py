@@ -6732,6 +6732,60 @@ class NocturneGardenDeviceRowsCheckTests(unittest.TestCase):
                          ["scripts/check_device_rows.py", "--experience", "r02-g09.nocturne-garden"])
 
 
+class BackwardsAuroraDeviceRowsCheckTests(unittest.TestCase):
+    """Feature 400 R02-G10-10 (T-R02G1010-003, FR-R02G1010-003, FR-R02G1010-004, SC-R02G1010-001, SC-R02G1010-002):
+    the device-row check accepts Backwards Aurora's real definition (BA-D1 ... BA-D8) and names each defect of a
+    temporary copy; the release check runs it as `device-rows-r02-g10`. Reuses the fixture helpers of
+    DeviceRowsCheckTests (feature 310)."""
+
+    GAME = "r02-g10.backwards-aurora"
+    DEFINITION = "docs/apps/backwards-aurora/device-rows.json"
+    MANIFEST = "Packages/ExperiencesRound02/BackwardsAurora/scenario-manifest.json"
+    SPECS = "specs/39[1-9]-backwards-aurora-*/tasks.md"
+    CODE = "R02-G10"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = load("check_device_rows")
+
+    setUp = DeviceRowsCheckTests.setUp
+    tearDown = DeviceRowsCheckTests.tearDown
+    run_main = DeviceRowsCheckTests.run_main
+    edit = DeviceRowsCheckTests.edit
+    assert_fails = DeviceRowsCheckTests.assert_fails
+
+    def test_real_repository_passes(self):
+        code, out = self.run_main(ROOT_DIR)
+        self.assertEqual(code, 0, out)
+        self.assertEqual(out.strip(), "device-rows r02-g10.backwards-aurora: PASS (8 rows, 12 scenarios)")
+
+    def test_minimal_copy_passes(self):
+        code, out = self.run_main(self.root)
+        self.assertEqual(code, 0, out)
+
+    def test_scenario_removed_from_manifest_fails(self):
+        self.edit(self.MANIFEST, lambda d: d.update(
+            scenarios=[s for s in d["scenarios"] if s["name"] != "fixture-level-1-solved"]))
+        self.assert_fails("scenario fixture-level-1-solved not in the manifest")
+
+    def test_missing_row_field_fails(self):
+        self.edit(self.DEFINITION, lambda d: d["rows"][0].pop("pass"))
+        self.assert_fails("BA-D1: missing field pass")
+
+    def test_uncovered_task_fails(self):
+        def drop(d):
+            for row in d["rows"]:
+                if "T-R02G1009-011" in row["covers"]:
+                    row["covers"].remove("T-R02G1009-011")
+        self.edit(self.DEFINITION, drop)
+        self.assert_fails("T-R02G1009-011 not covered by any row")
+
+    def test_release_check_runs_the_check(self):
+        steps = {s.name: s.argv for s in relcheck.steps("X")}
+        self.assertEqual(steps["device-rows-r02-g10"][1:],
+                         ["scripts/check_device_rows.py", "--experience", "r02-g10.backwards-aurora"])
+
+
 if __name__ == "__main__":
     tree_before = ledger_tree_hash()
     program = unittest.main(verbosity=2, exit=False)
