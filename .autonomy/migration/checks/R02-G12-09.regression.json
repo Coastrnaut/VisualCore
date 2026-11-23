@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/harmonic_bridges_regression.py"
+  ],
+  "command": "python3 scripts/harmonic_bridges_regression.py",
+  "elapsed_seconds": 14.529,
+  "exit_code": 0,
+  "finished": "2026-11-23T21:29:34+00:00",
+  "gate": "R02-G12-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G12-09.regression.log",
+  "log_sha256": "dacb771f0b2beca0c4c2afca9f6e17c362e8db7554524ecd8ee0fbdccf3125ae",
+  "name": "regression",
+  "started": "2026-11-23T21:29:19+00:00",
+  "timed_out": false
+}

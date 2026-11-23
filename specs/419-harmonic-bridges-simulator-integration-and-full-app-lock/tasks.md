@@ -57,7 +57,7 @@ change (the shaders and reference of R02-G12-03 are unchanged and re-proven by t
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G1209-006 [US3] Release build and symbols (`HarmonicBridgesGolden`, `acceptanceScenarios` already
+- [X] T-R02G1209-006 [US3] Release build and symbols (`HarmonicBridgesGolden`, `acceptanceScenarios` already — Verified 2026-11-23: release (app-release-build and app-release-symbols: HarmonicBridgesGolden and acceptanceScenarios absent) exit 0; regression (host 24 tests: 100 of 100 levels replayed and re-solved, golden digests; simulator 6 tests: golden frames and 12 memory cycles, growth under 0.6 MB) exit 0
   forbidden): `--name release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`;
   `--name regression -- python3 scripts/harmonic_bridges_regression.py` (100 of 100 levels, SC-R02G1209-004)
 
