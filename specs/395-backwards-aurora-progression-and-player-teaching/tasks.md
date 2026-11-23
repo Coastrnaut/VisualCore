@@ -52,7 +52,8 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 385
   the level's best result and stars and opens nothing; progress and mode in the digest, the tutorial step snapshotted
   but not digested; snapshot schema 2 `{level, records, progress, mode, tutorial}` with a migration from 1 "level 1 open
   plus the restored level, campaign mode, tutorial at its first step on tutorial levels"; `level.next` to the next open
-  level, refused with `r02-g10.locked` when none) with tests in
+  level, refused with `r02-g10.locked` when none; no level is ever gated by payment — locked means not yet unlocked
+  (FR-R02G1005-006)) with tests in
   `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraExperienceCoreTests.swift` (new controls,
   refusals, schema 2 round trip, migration from a schema-1 payload, newer schema refused); regenerate
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraScenarios.swift` entries where needed and
@@ -61,11 +62,12 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 385
 - [ ] T-R02G1005-005 Edit `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraPresenter.swift` (the
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it,
   the search off the main actor and a stale search never owning the hint state — and the failure explanation as panel
-  text; the description includes them) and
+  text, with the level's difficulty band (of the five bands of 20), its goal and its best stars (FR-R02G1005-004); the
+  description includes them) and
   `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraControls.swift` (Hint, Dismiss tutorial, level
   picker for open levels, Practice, Daily (today's local date from the presenter), Campaign); agent D writes
   `Packages/ExperiencesRound02/BackwardsAurora/ExperienceTests/BackwardsAuroraTeachingTests.swift` (the panel shows the
-  tutorial, the three hint levels and the failure text; mode and level controls reach the adapter); `--name sim-27 --
+  tutorial, the three hint levels, the failure text, the band and the stars; mode and level controls reach the adapter); `--name sim-27 --
   python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package
   --destination sim-27.2 --action test --only-testing BackwardsAuroraExperienceTests`
 
