@@ -40,7 +40,7 @@ consume).
 
 ## Phase 4: Stories 2 and 3 — breaks, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G1201-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesPlay.swift`
+- [X] T-R02G1201-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesPlay.swift` — Verified 2026-11-23: host-3 exit 0 (HarmonicBridgesPlayTests 10: stage table; 500 fixtures win on the test after their tunings with reports equal to the level's; failing tests name step and string incl. no crossing string; budget failure on the exact action with one either side, a test on the last action wins; refusals in order; pluck as a query in words; exact undo/redo incl. from failed; canonical fingerprint; 500 seeded traces replay; tampered and mismatched records refused); agent B's play retested by the lead
   (agent B: stages "loading, tutorial, playing, paused, won, failed, result"; pegs starting at the level's; `tune` and
   `test` validated in the order stage, previous fingerprint, action (unknown string, peg out of range, locked string),
   no-op (tuning to the current peg); each spends 1 action; a test wins when the goal is reached in every step, else fails
