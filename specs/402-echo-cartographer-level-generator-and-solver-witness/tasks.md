@@ -32,7 +32,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G1102-004 [US2] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerGenerator.swift`
+- [X] T-R02G1102-004 [US2] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerGenerator.swift` — Verified 2026-11-23: host-3 (incl. EchoCartographerGeneratorTests 8: band profiles, level ids, determinism, independent re-draw equal on 200 pairs, band values, sampled generation with skipped the first qualifying candidate, generation refusal, catalog digest) exit 0, 2026-11-23; all 100 entries generate (band pulse means 1.95, 2.6, 3.15, 4.45, 5.35; at most 33 candidates skipped); agent C's tests retested by the lead
   (lead: band profiles "band 1: 6 … 7, 1/5, 1, 1, 1, 1 … 2; band 2: 7 … 9, 1/5, 1 … 2, 1, 1, 2 … 3; band 3: 8 … 10, 1/4,
   2, 1, 2, 3 … 4; band 4: 9 … 12, 1/4, 2 … 3, 0, 2, 4 … 5; band 5: 10 … 14, 1/4, 3 … 4, 0, 3, 5 … 6"; candidates from
   `SeedDerivation.derive(plannedSeed, index: c)` in the drawing order of clarification Q1; region ≥ 12; at most 256
