@@ -48,7 +48,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   for extreme settings — 12 and 32 samples at ±64, every kink, a tear, a section at each end, budgets 1 and 40; every
   sample point, ring and gauge bar inside the view with margin at 7 aspects; same positions at every tier; ribbon
   vertices equal the samples; gauge bars at 0, half and the budget); agent B; `--name host-3`
-- [ ] T-R02G1003-005 [P] [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraExperienceCore.swift`
+- [X] T-R02G1003-005 [P] [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraExperienceCore.swift` — Verified 2026-11-22: host-4 (all BackwardsAurora tests incl. BackwardsAuroraExperienceCoreTests (conformance, undo restores the digest, snapshot round trip and restore refusals, the candidate table equals all 100 witnesses' skipped, level.next wraps, kernel refusal codes pass through) and BackwardsAuroraRendererPurityTests 2 (boundary times and sections at every tier; 200 seeded snapshots over 6 levels never change digest, state or verdict, fields mirror the play)) exit 0, lead retest
   (controls "wave.reverse [start, end], play.undo, play.redo, level.next"; digest "level number and play fingerprint";
   schema 1 `{level, records}`; quality profile of three levels; each level certified directly from a table of its
   witness's `skipped` candidate, the whole generator only if that fails; `snapshot(sectionStart:sectionEnd:time:)`) with
