@@ -10,6 +10,10 @@
 // the certified-candidate table equals the 100 stored witnesses' `skipped` and the directly certified levels equal the
 // stored ones; `snapshot(sectionStart:sectionEnd:time:)` mirrors the play. Fixture seed 2_393. Levels are certified
 // once per process, so the run stays short. Explicit types, plain loops.
+// Feature 395 (R02-G10-05) T-R02G1005-004 (FR-R02G1005-001, 004, 005, 006, 007; clarifications Q2–Q5): `level.next`
+// needs an open level (no wrap); a campaign win records stars by reversals made; daily, practice and campaign modes;
+// the tutorial advances, is dismissed and is not digested; schema 2's round trip and refusals; a schema-1 payload and
+// envelope migrate; an envelope of schema 3 is refused; the digest carries progress and mode. Progression seed 2_395.
 import Foundation
 import Testing
 @testable import BackwardsAuroraCore
@@ -28,6 +32,8 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
 
     /// The fixture seed of this feature.
     static let fixtureSeed: UInt64 = 2_393
+    /// The progression fixture seed (feature 395): it opens level 96.
+    static let progressionSeed: UInt64 = 2_395
 
     /// The digest of `core` as the engine computes it.
     static func digest(_ core: Core) throws -> StateDigest {
@@ -96,15 +102,19 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g10.backwards-aurora" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g10.backwards-aurora.v1")
+        #expect(Core.experienceID == "r02-g10.backwards-aurora" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g10.backwards-aurora.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
-        let ids: [String] = ["wave.reverse", "play.undo", "play.redo", "level.next"]
+        let ids: [String] = ["wave.reverse", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
+                             "mode.practice", "mode.campaign", "tutorial.dismiss"]
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [0...31, 0...31])
-        let plainIndices: [Int] = [1, 2, 3]
+        #expect(Core.controls[4].ranges == [1...100])
+        #expect(Core.controls[5].ranges == [1...9999, 1...12, 1...31])
+        let plainIndices: [Int] = [1, 2, 3, 6, 7, 8]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 1)
+        #expect(Core.practiceBudget == 40)
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == BackwardsAuroraTier.all.map(\.name))
@@ -327,25 +337,297 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(failed.play.stage == .playing && failed.play.failure == nil && retried == before)
     }
 
-    @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+    /// Feature 395 (clarification Q3): `level.next` and `level.select` need an open level (100 does not wrap); reset
+    /// returns to the seed's opening state.
+    @Test func nextLevelNeedsAnOpenLevelAndResetReturnsToTheSeedsLevel() async throws {
         var core: Core = try await Core.prepare(seed: 40)
-        #expect(core.levelNumber == 41)
+        #expect(core.levelNumber == 41 && core.progress.frontier == 41 && core.mode == .campaign)
         let neutral: ExperienceAction = try #require(Self.neutralReverse(core))
         #expect(core.apply(neutral) == .accepted)
+        let before: StateDigest = try Self.digest(core)
+        let locked: ActionResult = .rejected(.rule(code: BackwardsAuroraExperienceRule.locked))
+        let moved: Core = core
+        #expect(core.apply(Self.act("level.next")) == locked)
+        #expect(core.apply(Self.act("level.select", [42])) == locked)
+        let lockedDigest: StateDigest = try Self.digest(core)
+        #expect(core == moved && lockedDigest == before)
+        #expect(core.apply(Self.act("level.select", [12])) == .accepted)
+        #expect(core.levelNumber == 12 && core.play.records.isEmpty && core.mode == .campaign)
+        let twelve: BackwardsAuroraLevel = try Core.level(number: 12)
+        #expect(core.play.level == twelve && core.tutorial == .done)
         #expect(core.apply(Self.act("level.next")) == .accepted)
-        #expect(core.levelNumber == 42 && core.play.records.isEmpty && core.play.stage == .playing)
+        #expect(core.levelNumber == 13 && core.play.stage == .playing && core.play.records.isEmpty)
         core.reset()
         let fresh: Core = try await Core.prepare(seed: 40)
         let resetDigest: StateDigest = try Self.digest(core)
         let freshDigest: StateDigest = try Self.digest(fresh)
         #expect(core == fresh && resetDigest == freshDigest)
-        // The wrap: level 100 → 1.
+        // No wrap: level 100 has no next level.
         var last: Core = try Core.opening(number: 100)
-        #expect(last.apply(Self.act("level.next")) == .accepted)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(last.levelNumber == 1 && last == first)
+        #expect(last.progress.frontier == 100)
+        #expect(last.apply(Self.act("level.next")) == locked)
         last.reset()
         #expect(last.levelNumber == 100)
+    }
+
+    /// Applies `actions` to `core`, each accepted, after `detours` detours of (the first action, undo); returns the
+    /// reversals made.
+    static func win(_ core: inout Core, actions: [BackwardsAuroraAction], detours: Int) -> Int {
+        guard let first = actions.first else { return 0 }
+        for _ in 0..<detours {
+            #expect(core.apply(Self.act(first)) == .accepted)
+            #expect(core.play.stage == .playing)
+            #expect(core.apply(Self.act("play.undo")) == .accepted)
+        }
+        for action in actions { #expect(core.apply(Self.act(action)) == .accepted) }
+        #expect(core.play.stage == .won)
+        return BackwardsAuroraProgress.reversalsMade(core.play)
+    }
+
+    /// Feature 395 (clarification Q3): a campaign win records the reversals made (undone ones included) and its stars,
+    /// keeps the better result and opens the next level.
+    @Test func aCampaignWinRecordsStarsByReversalsMade() throws {
+        let first: BackwardsAuroraGenerated = try Core.generated(number: 1)
+        let second: BackwardsAuroraGenerated = try Core.generated(number: 2)
+        let smallest: Int = first.solution.smallest
+        var core: Core = try Core.opening(number: 1)
+        #expect(core.certifiedSmallest == smallest && core.progress.solved.isEmpty && core.progress.frontier == 1)
+        // Two detours: smallest + 2 reversals made, 2 stars; level 2 opens.
+        let twoDetours: Int = Self.win(&core, actions: first.solution.actions, detours: 2)
+        #expect(twoDetours == smallest + 2)
+        #expect(core.progress.solved[1] == BackwardsAuroraProgress.Result(reversalsMade: smallest + 2, stars: 2))
+        #expect(core.progress.frontier == 2 && core.outcome?.code == Core.wonCode)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        #expect(core.levelNumber == 2 && core.mode == .campaign && core.play.records.isEmpty)
+        // Level 1 again without a detour: the better result (3 stars) replaces the stored one.
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
+        let noDetour: Int = Self.win(&core, actions: first.solution.actions, detours: 0)
+        #expect(noDetour == smallest)
+        #expect(core.progress.solved[1] == BackwardsAuroraProgress.Result(reversalsMade: smallest, stars: 3))
+        // A worse result (three detours, 1 star) keeps it.
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
+        let threeDetours: Int = Self.win(&core, actions: first.solution.actions, detours: 3)
+        #expect(threeDetours == smallest + 3)
+        #expect(core.progress.solved[1] == BackwardsAuroraProgress.Result(reversalsMade: smallest, stars: 3))
+        #expect(core.progress.frontier == 2)
+        // Level 2 with three detours: 1 star; level 3 opens.
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        let secondReversals: Int = Self.win(&core, actions: second.solution.actions, detours: 3)
+        #expect(core.progress.solved[2] == BackwardsAuroraProgress.Result(reversalsMade: secondReversals, stars: 1))
+        #expect(secondReversals == second.solution.smallest + 3 && core.progress.frontier == 3)
+        // A redo before the win is no reversal made: level 3 with its first reversal undone and redone gets 3 stars.
+        let third: BackwardsAuroraGenerated = try Core.generated(number: 3)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        let firstAction: BackwardsAuroraAction = try #require(third.solution.actions.first)
+        #expect(core.apply(Self.act(firstAction)) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        #expect(core.apply(Self.act("play.redo")) == .accepted)
+        for action in third.solution.actions.dropFirst() { #expect(core.apply(Self.act(action)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.frontier == 4)
+        #expect(core.progress.solved[3] == BackwardsAuroraProgress.Result(reversalsMade: third.solution.smallest,
+                                                                         stars: 3))
+    }
+
+    /// Feature 395 (clarification Q4): daily mode opens nothing and plays a locked level; practice is a fresh play with
+    /// the budget 40 that records nothing; `mode.campaign` returns.
+    @Test func dailyPracticeAndCampaignModes() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.mode == .campaign && core.progress.frontier == 1 && core.tutorial == .mark)
+        let date: ActionResult = .rejected(.rule(code: BackwardsAuroraExperienceRule.date))
+        let opening: Core = core
+        #expect(core.apply(Self.act("mode.daily", [2027, 2, 29])) == date)
+        #expect(core == opening)
+        let daily: Int = try #require(BackwardsAuroraProgress.dailyLevel(year: 2026, month: 1, day: 2))
+        #expect(daily == 74)
+        #expect(core.apply(Self.act("mode.daily", [2026, 1, 2])) == .accepted)
+        #expect(core.mode == .daily(level: daily) && core.levelNumber == daily && core.progress.frontier == 1)
+        #expect(!core.progress.isOpen(daily) && core.tutorial == .done && core.play.records.isEmpty)
+        let dailyCertified: BackwardsAuroraGenerated = try Core.generated(number: daily)
+        #expect(core.play.level == dailyCertified.level && core.certifiedSmallest == dailyCertified.solution.smallest)
+        // A daily win on a locked level records its stars but opens nothing.
+        var dailyWin: Core = core
+        _ = Self.win(&dailyWin, actions: dailyCertified.solution.actions, detours: 0)
+        #expect(dailyWin.progress.solved[daily]?.stars == 3 && dailyWin.progress.frontier == 1)
+        #expect(dailyWin.apply(Self.act("level.next")) == .rejected(.rule(code: BackwardsAuroraExperienceRule.locked)))
+        // Practice of the daily level: the same level fresh with the budget 40.
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.mode == .practice && core.levelNumber == daily && core.play.level.budget == Core.practiceBudget)
+        // Campaign returns to the frontier when the current level is not open.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.tutorial == .mark)
+
+        // Practice on level 1 after a reversal: a fresh play of the practice copy; a win records nothing, opens nothing.
+        let certified: BackwardsAuroraGenerated = try Core.generated(number: 1)
+        let neutral: ExperienceAction = try #require(Self.neutralReverse(core))
+        #expect(core.apply(neutral) == .accepted)
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.play.records.isEmpty && core.play.spent == 0 && core.play.stage == .playing)
+        let practiced: BackwardsAuroraLevel = core.play.level
+        #expect(practiced.budget == 40 && certified.level.budget < 40)
+        #expect(practiced.opening == certified.level.opening && practiced.target == certified.level.target)
+        #expect(practiced.checkpoints == certified.level.checkpoints && practiced.id == certified.level.id)
+        #expect(practiced.bendLimit == certified.level.bendLimit
+            && practiced.breakingLimit == certified.level.breakingLimit)
+        #expect(practiced.shortest == certified.level.shortest && practiced.longest == certified.level.longest)
+        #expect(practiced.tutorial == certified.level.tutorial && practiced.seed == certified.level.seed)
+        #expect(core.tutorial == .mark && core.levelNumber == 1)
+        #expect(core.snapshot(sectionStart: 0, sectionEnd: 1, time: 0).budget == 40)
+        _ = Self.win(&core, actions: certified.solution.actions, detours: 0)
+        #expect(core.progress.solved.isEmpty && core.progress.frontier == 1)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: BackwardsAuroraExperienceRule.locked)))
+        // Campaign returns to level 1 with its certified budget, fresh.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.play.level == certified.level && core.play.records.isEmpty)
+        #expect(core.levelNumber == 1 && core.progress.solved.isEmpty)
+        // The progression seed: level 96 (seed 2_395); practice keeps the level, select returns to campaign.
+        var seeded: Core = try await Core.prepare(seed: Self.progressionSeed)
+        #expect(seeded.levelNumber == 96 && seeded.progress.frontier == 96)
+        #expect(seeded.apply(Self.act("mode.practice")) == .accepted)
+        #expect(seeded.levelNumber == 96 && seeded.play.level.budget == 40 && seeded.mode == .practice)
+        #expect(seeded.apply(Self.act("level.select", [96])) == .accepted)
+        let ninetySix: BackwardsAuroraLevel = try Core.level(number: 96)
+        #expect(seeded.mode == .campaign && seeded.play.level == ninetySix)
+    }
+
+    /// Feature 395 (clarification Q2): the tutorial starts on levels 1 … 3, advances on accepted reversals, ends with
+    /// the level, never moves back on undo or redo, can be dismissed, and is not part of the digest.
+    @Test func theTutorialAdvancesIsDismissedAndIsNotDigested() async throws {
+        for number in 1...3 {
+            let generated: BackwardsAuroraGenerated = try Core.generated(number: number)
+            var core: Core = try Core.opening(number: number)
+            #expect(core.tutorial == .mark, "level \(number)")
+            var seen: [BackwardsAuroraTutorialStep] = [core.tutorial]
+            for action in generated.solution.actions {
+                #expect(core.apply(Self.act(action)) == .accepted)
+                if seen.last != core.tutorial { seen.append(core.tutorial) }
+            }
+            var expected: [BackwardsAuroraTutorialStep] = [.mark, .reverse, .finish, .done]
+            if generated.solution.actions.count == 2 { expected = [.mark, .reverse, .done] }
+            if generated.solution.actions.count == 1 { expected = [.mark, .done] }
+            #expect(seen == expected, "level \(number): \(seen)")
+            #expect(core.play.stage == .won && core.tutorial == .done)
+        }
+        let four: Core = try Core.opening(number: 4)
+        #expect(four.tutorial == .done)
+        // Undo and redo never move the step; the digest ignores the step.
+        var core: Core = try Core.opening(number: 1)
+        let fresh: Core = core
+        let freshDigest: StateDigest = try Self.digest(fresh)
+        let neutral: ExperienceAction = try #require(Self.neutralReverse(core))
+        #expect(core.apply(neutral) == .accepted)
+        #expect(core.tutorial == .reverse)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        #expect(core.tutorial == .reverse && core.play.wave == fresh.play.wave)
+        #expect(try Self.digest(core) == freshDigest)
+        #expect(core != fresh)
+        #expect(core.apply(Self.act("play.redo")) == .accepted)
+        #expect(core.tutorial == .reverse)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        #expect(core.apply(neutral) == .accepted)
+        #expect(core.tutorial == .finish)
+        // A failing end ends it: the budget spent on a neutral reversal.
+        var failing: Core = try Core.opening(number: 2)
+        let failingNeutral: ExperienceAction = try #require(Self.neutralReverse(failing))
+        for _ in 0..<failing.play.level.budget { #expect(failing.apply(failingNeutral) == .accepted) }
+        #expect(failing.play.stage == .failed && failing.tutorial == .done)
+        // Dismissal ends it; later reversals keep it ended; the digest is unchanged by the dismissal.
+        var dismissed: Core = try await Core.prepare(seed: 0)
+        let before: StateDigest = try Self.digest(dismissed)
+        #expect(dismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        let dismissedDigest: StateDigest = try Self.digest(dismissed)
+        #expect(dismissed.tutorial == .done && dismissedDigest == before)
+        #expect(dismissed.apply(neutral) == .accepted)
+        #expect(dismissed.tutorial == .done)
+        var undismissed: Core = try await Core.prepare(seed: 0)
+        #expect(undismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(undismissed.apply(neutral) == .accepted && undismissed == dismissed)
+        // Reopening a tutorial level restarts the tutorial at its initial step.
+        #expect(dismissed.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(dismissed.tutorial == .mark)
+    }
+
+    /// Feature 395: a schema-1 payload migrates to schema 2 (the levels up to the saved level open, campaign mode, the
+    /// tutorial at its initial step).
+    @Test func aSchemaOnePayloadMigrates() throws {
+        var core: Core = try Core.opening(number: 7)
+        let neutral: ExperienceAction = try #require(Self.neutralReverse(core))
+        #expect(core.apply(neutral) == .accepted)
+        let records: Data = try JSONEncoder().encode(core.play.records)
+        let recordsText: String = String(decoding: records, as: UTF8.self)
+        let schemaOne: String = "{\"level\":7,\"records\":" + recordsText + "}"
+        let object: [String: Any] = try #require(
+            try JSONSerialization.jsonObject(with: Data(schemaOne.utf8)) as? [String: Any])
+        let migrated: [String: Any] = try Core.migratedToSchemaTwo(object)
+        #expect(migrated["tutorial"] == nil)
+        let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 6)
+        #expect(restored.levelNumber == 7 && restored.play == core.play)
+        #expect(restored.progress.frontier == 7 && restored.progress.solved.isEmpty)
+        #expect(restored.mode == .campaign && restored.tutorial == .done)
+        #expect(try Self.digest(restored) == Self.digest(core))
+        // A tutorial level starts its tutorial at the initial step.
+        let emptyTwo: [String: Any] = try Core.migratedToSchemaTwo(["level": 2, "records": [Any]()])
+        let tutorialLevel: Core = try Core.restore(
+            payload: try JSONSerialization.data(withJSONObject: emptyTwo, options: [.sortedKeys]), seed: 0)
+        #expect(tutorialLevel.levelNumber == 2 && tutorialLevel.tutorial == .mark)
+        #expect(tutorialLevel.progress.frontier == 2)
+        #expect(throws: BackwardsAuroraRestoreRefusal.damaged) {
+            try Core.migratedToSchemaTwo(["level": "7"])
+        }
+        #expect(throws: BackwardsAuroraRestoreRefusal.damaged) {
+            try Core.migratedToSchemaTwo(["level": 7])
+        }
+        #expect(Core.migrations.currentVersion == 2)
+    }
+
+    /// Feature 395: an engine restores a schema-1 envelope through the migration chain.
+    @Test func theEngineMigratesASchemaOneEnvelope() async throws {
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        var engine = ExperienceEngine<Core>(id: id)
+        try await engine.prepare(seed: 4)
+        try engine.activate()
+        var expected: Core = try Core.opening(number: 5)
+        let neutral: ExperienceAction = try #require(Self.neutralReverse(expected))
+        #expect(engine.handle(control: neutral.control, values: neutral.values) == .accepted)
+        let saved: ExperienceSnapshot = try engine.snapshot()
+        #expect(expected.apply(neutral) == .accepted)
+        let records: String = String(decoding: try JSONEncoder().encode(expected.play.records), as: UTF8.self)
+        let schemaOne: String = "{\"level\":5,\"records\":" + records + "}"
+        let old = try ExperienceSnapshot(experience: id, schemaVersion: 1, seed: saved.seed,
+                                         stepIndex: saved.stepIndex, digest: saved.digest,
+                                         payload: Data(schemaOne.utf8))
+        try engine.restore(old)
+        #expect(try engine.digest() == saved.digest)
+    }
+
+    /// Feature 395: the digest carries the progress and the mode but never the tutorial step.
+    @Test func theDigestCarriesProgressAndModeButNotTheTutorial() async throws {
+        let core: Core = try await Core.prepare(seed: 0)
+        let base: StateDigest = try Self.digest(core)
+        // Progress: a level-1 win and back to level 1 fresh differs from the opening only in progress.
+        var won: Core = core
+        _ = Self.win(&won, actions: try Core.generated(number: 1).solution.actions, detours: 0)
+        #expect(won.apply(Self.act("level.select", [1])) == .accepted)
+        #expect(won.play == core.play && won.mode == core.mode && won.progress != core.progress)
+        #expect(try Self.digest(won) != base)
+        // Mode: practice differs (its level is the practice copy); campaign back restores the digest.
+        var practice: Core = core
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        #expect(try Self.digest(practice) != base)
+        #expect(practice.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(try Self.digest(practice) == base && practice == core)
+        // Tutorial: dismissing changes `==` but not the digest.
+        var dismissed: Core = core
+        #expect(dismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        let dismissedDigest: StateDigest = try Self.digest(dismissed)
+        #expect(dismissed != core && dismissedDigest == base)
+        // The progression seed: a reset returns the opening digest after progression actions.
+        var seeded: Core = try await Core.prepare(seed: Self.progressionSeed)
+        let seededDigest: StateDigest = try Self.digest(seeded)
+        #expect(seeded.apply(Self.act("mode.daily", [2026, 11, 23])) == .accepted)
+        #expect(try Self.digest(seeded) != seededDigest)
+        seeded.reset()
+        #expect(try Self.digest(seeded) == seededDigest && seeded.mode == .campaign)
     }
 
     @Test func snapshotRestoreRoundTripAndRefusals() async throws {
@@ -359,7 +641,9 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let payload: Data = try core.snapshotPayload()
         #expect(try core.snapshotPayload() == payload)
         let text: String = try #require(String(data: payload, encoding: .utf8))
-        #expect(text.hasPrefix("{\"level\":32,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":32,\"mode\":{\"mode\":\"campaign\"},\"progress\":"
+            + "{\"frontier\":32,\"solved\":[]},\"records\":["))
+        #expect(text.hasSuffix(",\"tutorial\":\"done\"}"))
         let restored: Core = try Core.restore(payload: payload, seed: 31)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -385,12 +669,44 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(throws: BackwardsAuroraRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":\"32\",\"records\":[]}".utf8), seed: 31)
         }
+        // A schema-1 payload is not a schema-2 one (it migrates only through the chain).
+        #expect(throws: BackwardsAuroraRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("{\"level\":32,\"records\":[]}".utf8), seed: 31)
+        }
         #expect(throws: BackwardsAuroraRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":0").utf8),
+                             seed: 31)
         }
         #expect(throws: BackwardsAuroraRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 31)
+            try Core.restore(payload: Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":101").utf8),
+                             seed: 31)
         }
+        // Damaged progress or mode: a frontier outside 1 … 100, an unknown mode, a daily mode naming another level, an
+        // unknown tutorial step.
+        let damaged: [String] = [
+            text.replacingOccurrences(of: "\"frontier\":32", with: "\"frontier\":0"),
+            text.replacingOccurrences(of: "\"frontier\":32", with: "\"frontier\":101"),
+            text.replacingOccurrences(of: "{\"mode\":\"campaign\"}", with: "{\"mode\":\"arcade\"}"),
+            text.replacingOccurrences(of: "{\"mode\":\"campaign\"}", with: "{\"level\":5,\"mode\":\"daily\"}"),
+            text.replacingOccurrences(of: "\"tutorial\":\"done\"", with: "\"tutorial\":\"later\""),
+        ]
+        for variant in damaged {
+            #expect(variant != text)
+            #expect(throws: BackwardsAuroraRestoreRefusal.damaged) {
+                try Core.restore(payload: Data(variant.utf8), seed: 31)
+            }
+        }
+        // A daily mode naming its own level restores; a practice payload replays on the practice copy.
+        let dailyText: String = text.replacingOccurrences(of: "{\"mode\":\"campaign\"}",
+                                                          with: "{\"level\":32,\"mode\":\"daily\"}")
+        let daily: Core = try Core.restore(payload: Data(dailyText.utf8), seed: 31)
+        #expect(daily.mode == .daily(level: 32) && daily.play == core.play)
+        var practice: Core = try Core.opening(number: 32)
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        let practiceNeutral: ExperienceAction = try #require(Self.neutralReverse(practice))
+        #expect(practice.apply(practiceNeutral) == .accepted)
+        let practiceRestored: Core = try Core.restore(payload: try practice.snapshotPayload(), seed: 31)
+        #expect(practiceRestored == practice && practiceRestored.play.level.budget == 40)
         // The same records on another level: the records carry level 32's seed.
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":32", with: "\"level\":1").utf8)
         #expect(wrongLevel != payload)
@@ -424,14 +740,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(engine.handle(control: "wave.reverse", values: [0, 1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)

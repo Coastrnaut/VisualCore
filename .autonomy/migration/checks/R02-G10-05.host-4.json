@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "BackwardsAurora"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter BackwardsAurora",
+  "elapsed_seconds": 11.291,
+  "exit_code": 0,
+  "finished": "2026-11-23T05:38:38+00:00",
+  "gate": "R02-G10-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G10-05.host-4.log",
+  "log_sha256": "1188793689f261f945c677fce8778506456b1bf5841c1f5f7ef7f129fb471c61",
+  "name": "host-4",
+  "started": "2026-11-23T05:38:27+00:00",
+  "timed_out": false
+}
