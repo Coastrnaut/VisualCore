@@ -47,4 +47,5 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 ## Dependencies and parallel work
 
 001 → 002 (lead) → {003 (agent A), 004 (agent B)} → 005 … 008, 010. 009 stays open until device testing. Shared files
-(definition, release_check.py, docs) stay with the lead except the two agent files. MVP: Story 1.
+(definition, release_check.py, docs) stay with the lead except the two agent files. MVP: Story 1. Requirement coverage:
+FR-001 → 002; FR-002 → 004; FR-003 → 002, 003; FR-004 → 002, 003; FR-005 → 005 … 008.
