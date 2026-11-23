@@ -580,3 +580,7 @@ Feature 397 (R02-G10-07) adds persistence and replay: results with winning trace
 Feature 398 (R02-G10-08) adds the regression net: the solver regression over the 100 witnesses, `BackwardsAuroraGolden`
 with the pinned `golden-frames.json` (16 code-computed frame descriptions), the simulator golden-frame and memory
 classes, `scripts/backwards_aurora_regression.py` and the CI step "Backwards Aurora regression (host)".
+
+Feature 399 (R02-G10-09) adds the in-app integration: identifiers on every panel control, the schema-1 and schema-2
+examples (`BackwardsAuroraSchemaExamples`) stored by the app registration, app unit tests, and the interface tests
+`BAPlayUITests` and `BAReplayUITests` (serial chunk `s3`).

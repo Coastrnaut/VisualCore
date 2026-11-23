@@ -183,3 +183,20 @@ opening wave that already wins is refused) and the fingerprint and refuses damag
   alone (measured growth 0.42 MB) and leave the aurora scene with no GPU objects after every close and memory warning.
 - **Running it.** `python3 scripts/backwards_aurora_regression.py` runs the host part and the simulator classes with one
   summary line per part; CI runs the host part as "Backwards Aurora regression (host)".
+
+## In-app integration (feature 399, R02-G10-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g10.backwards-aurora.<name>`
+  (`BackwardsAuroraControls.identifierNames`, 21 names: reverse, undo, redo, next-level, reset-view, hint,
+  dismiss-tutorial, failure-undo, retry, campaign, daily, practice, play-level, replay, replay-step, replay-stop,
+  start-picker, end-picker, level-picker, sound, summary).
+- **Interface tests.** `BAPlayUITests` wins level 1 through the panel (its certified reversals: samples 3 to 4, then 8
+  to 11, each set by stepping the end and start steppers from their current values and tapping Reverse: "Every
+  checkpoint matches and every bend is within the limit.", "Stars: 3 of 3.", level 2 open) and keeps the progress over
+  a relaunch; `BAReplayUITests` replays the win (two reversals) to its end and stops. They run as serial chunk `s3`,
+  each under 90 s apart from the simulator's automation-session setup per launch. Level 1's certified reversals and
+  the steppers' starting section (samples 0 and 1) are pinned in `BA` and checked against the Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`BackwardsAuroraSchemaExamples`, seed
+  7), which the app restores into schema 3; Backwards Aurora stays a candidate (not available without
+  `-vcCandidates`) until X-R02-G10.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.

@@ -57,7 +57,7 @@ change (the shaders and reference of R02-G10-03 are unchanged and re-proven by t
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1009-007 Docs: `docs/architecture/backwards-aurora.md` (in-app integration),
+- [X] T-R02G1009-007 Docs: `docs/architecture/backwards-aurora.md` (in-app integration), — Verified 2026-11-23: docs written; round02-host and script-tests exit 0, 2026-11-23 (.autonomy/migration/checks/R02-G10-09.round02-host.json, R02-G10-09.script-tests.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name script-tests`
   (alone)
 - [ ] T-R02G1009-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
