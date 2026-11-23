@@ -132,7 +132,9 @@ refused.
 - **A claim on a known wall, outside the chamber, or where a beacon was already claimed:** refused without cost.
 - **A claim exactly at the tolerance:** counts; one cell further is a miss.
 - **A pulse that spends the last energy:** fails the level, since a pulse never locates a beacon.
-- **Win on the last energy:** a claim that locates the last beacon wins even with no energy left.
+- **Win with little energy left:** a claim that locates the last beacon wins whatever energy is left; since hits are
+  free and energy only falls on pulses and misses, no action both empties the energy and locates the last beacon, so
+  win and energy never meet on one action (found while testing, 2026-11-23).
 - **A level already solved at load:** never generated; every level hides at least one beacon.
 - **Actions after the end:** every action is refused once the level is won or failed, except undo.
 

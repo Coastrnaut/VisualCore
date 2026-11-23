@@ -40,7 +40,7 @@ in this feature (the chamber, its rays and echoes are the CPU reference the rend
 
 ## Phase 4: Stories 2 and 3 — energy, undo, redo, replay (P1)
 
-- [ ] T-R02G1101-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerPlay.swift`
+- [X] T-R02G1101-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerPlay.swift` — Verified 2026-11-23: host-3 (incl. EchoCartographerPlayTests 11: stage table; 500 fixtures win on the last known claim (energy-1 fixtures fail on the pulse, undo, then win); tolerance boundary and tie rule; energy failure on the exact action with one either side and miss clamping; refusals in order; markers cap 8; exact undo/redo; canonical fingerprint; 500 seeded traces replay, tampered records refused) exit 0, 2026-11-23; agent B's play retested by the lead; win and energy never meet on one action (spec edge case and research R5 reworded)
   (agent B: stages "loading, tutorial, playing, paused, won, failed, result"; knowledge starting with only the entry
   open; `pulse`, `claim`, `mark` validated in the order stage, previous fingerprint, action (outside, pulse not from a
   known-open cell, claim on a known wall, a ninth marker), no-op (claim near only located beacons); a pulse spends 1 and

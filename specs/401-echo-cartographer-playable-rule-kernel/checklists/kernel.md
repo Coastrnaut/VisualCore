@@ -38,7 +38,7 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-23; failu
   with its action? [Coverage, Spec §Edge Cases; Clarifications Q3, Q4, Q5]
 - [x] CHK009 Are malformed levels excluded (sizes or values out of range, a beacon on a wall, on the entry or
   unreachable, duplicate cells)? [Edge Case, Spec §Clarifications Q5; data-model]
-- [x] CHK010 Are the boundaries stated (a claim at the tolerance counts, one cell further misses; a win with no energy
+- [x] CHK010 Are the boundaries stated (a claim at the tolerance counts, one cell further misses; a win with any energy
   left wins; a pulse that spends the last energy fails)? [Edge Case, Spec §Edge Cases]
 
 ## Accessibility (colour independence)

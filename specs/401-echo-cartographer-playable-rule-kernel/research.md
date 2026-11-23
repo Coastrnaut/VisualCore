@@ -16,7 +16,9 @@
 - **R4 Delays in whole ticks.** Decision: 24 ticks per cell of distance (12 each way at 0.008333 s). Rationale:
   "deterministic time-of-flight per beam" as an exact integer the renderer can animate; it never decides a rule.
 - **R5 Win, then energy.** Decision: after each accepted action, win (every beacon located) is judged before energy
-  (zero energy with a beacon hidden fails). Rationale: a claim that locates the last beacon with the last energy wins.
+  (zero energy with a beacon hidden fails). Rationale: a claim that locates the last beacon always wins. Since hits are free and energy only falls on
+  pulses and misses, win and energy never meet on one action (found while testing, 2026-11-23); the closest case, a win
+  with 1 energy left after a miss, is tested.
 - **R6 Tolerance and nearest beacon.** Decision: a claim at column-or-row distance ≤ tolerance of an unlocated beacon
   locates the nearest such beacon (ties: lowest row, then lowest column); a claim near only located beacons is refused
   (noop); otherwise a miss spends min(miss cost, energy). Rationale: exact, deterministic, and a repeated claim is never
