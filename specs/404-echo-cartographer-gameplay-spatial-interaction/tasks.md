@@ -42,8 +42,8 @@ tests stay short (< 10 s each). No {owner} tasks.
   lift timestamp) without moving 10 points arms a claim, lifting sends `claim` of the held cell (a marker's cell for a
   marker) while playing, moving 10 points after arming cancels; drags and holds from empty space send nothing; 10 … 16
   points: nothing; the cursor follows each placed, moved or claimed cell (`moveCursor` after the kernel action); a
-  second finger cancels and orbits (yaw 90° per width, pitch 60° per height, clamped; a third re-bases); on a won,
-  failed or result stage only `moveCursor` and `resetView` are produced; cancelled phases send nothing; only event
+  second finger cancels and orbits (yaw 90° per width, pitch 60° per height, clamped; a third re-bases); in any stage
+  other than playing (loading, tutorial, paused, won, failed, result) only `moveCursor` and `resetView` are produced; cancelled phases send nothing; only event
   timestamps read) with `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerGestureControllerTests.swift`
   (500 seeded scripted taps, drags and held presses against an independent expectation over certified levels, 3 sizes
   and 3 orbits; second fingers, cancels and finished plays send no kernel action; orbit changes no digest); agent C;

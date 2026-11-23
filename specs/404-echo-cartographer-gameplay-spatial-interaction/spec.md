@@ -65,7 +65,8 @@ presentation state.
   gesture (nothing sent) and orbits: yaw ±35° about the y axis (90° per view width), pitch −15° … +20° (60° per view
   height) about the authored view; a third finger re-bases the midpoint; a double tap on empty space or "Reset view"
   returns to the authored view. The camera distance refits so the authored box stays inside the view with a 5 % margin
-  at every orbit and aspect 0.4 … 2.5. Orbit is presentation only: not saved, so the snapshot schema stays 1. On a won,
+  at every orbit and aspect 0.4 … 2.5. Orbit is presentation only: not saved, so the snapshot schema stays 1. Gestures
+  send kernel actions only while playing (loading, tutorial and paused send nothing). On a won,
   failed or result stage taps, drags and held presses send nothing and the description says the play is over (undo or
   next level); the cursor and orbit still work. A pulse, claim or mark the kernel refuses is refused by the adapter with
   its reason code, which the presenter logs and shows. Impact: FR-R02G1104-005, 007; SC-R02G1104-002, 004.
@@ -134,6 +135,8 @@ mark, undo, redo, next level, "Reset view"), including winning every certified l
 - **A finished play (won, failed or showing the result):** gestures send nothing and the description says the play is
   over (undo or next level); the cursor and orbit still work (a tap on a chamber cell moves the cursor).
 - **A drag or held press that starts on empty space:** sends nothing.
+- **A stage other than playing (loading, tutorial, paused, won, failed, result):** gestures send no kernel action; the
+  cursor and orbit still work.
 - **A pulse or claim the kernel refuses:** sent and refused with its reason, shown to the player.
 - **A second finger during a gesture:** cancels it (nothing sent) and starts an orbit.
 - **A cancelled touch:** changes nothing.
