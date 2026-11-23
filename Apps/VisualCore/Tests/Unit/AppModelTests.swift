@@ -10,6 +10,7 @@ import FacetedForgeCore
 import Foundation
 import HueCompassCore
 import LissajousLabyrinthCore
+import NocturneGardenCore
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -2069,6 +2070,167 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual([fresh.piece, fresh.direction, fresh.depth], pinnedStartChoice, "a fresh play's choice")
         XCTAssertEqual(pinnedStartChoice[1], FacetedForgePreviewChoice.facingDirection, "the facing direction")
         XCTAssertEqual(FacetedForgeExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Nocturne Garden in the app (feature 389, R02-G09-09; T-R02G0909-005, FR-R02G0909-003,
+    // FR-R02G0909-006; SC-R02G0909-002)
+
+    /// Nocturne Garden's registration: a candidate until X-R02-G09.
+    private func nocturneGardenRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(NocturneGardenExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Nocturne Garden is a candidate")
+    }
+
+    /// FR-R02G0909-003, clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples
+    /// restore to their digests through the migrations (the app's migration check).
+    func testTheNocturneGardenRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try nocturneGardenRegistration()
+        XCTAssertEqual(NocturneGardenExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(NocturneGardenExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(NocturneGardenExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G0909-006, clarification Q5: without `-vcCandidates` Nocturne Garden is a candidate only: in
+    /// `candidates`, outside `all`, listed in the bundled catalog as not available, without a tile and not opened.
+    func testNocturneGardenIsACandidateAndUnavailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(NocturneGardenExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g09.nocturne-garden")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G0909-003, SC-R02G0909-002: with `-vcCandidates` Nocturne Garden is shown, opens through the registry and
+    /// engine with seed 0 (level 1), and level 1 is won by its certified moves
+    /// (`NocturneGardenExperienceCore.certifiedActions(1)`) sent as `bloom.plant [kind, column, row, size]` (kind as
+    /// `NocturneGardenKind.order`) and `sun.set [elevation]` with three stars; the win opens level 2 and `level.next`
+    /// plays it.
+    func testNocturneGardenOpensAsACandidateAndLevelOneIsWonByItsCertifiedMoves() async throws {
+        let registration = try nocturneGardenRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["bloom.plant", "sun.set", "play.undo", "level.next", "tutorial.dismiss", "replay.start"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(NocturneGardenExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<NocturneGardenExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        let actions: [NocturneGardenAction] = NocturneGardenExperienceCore.certifiedActions(1)
+        XCTAssertFalse(actions.isEmpty)
+        for action in actions {
+            let control: String
+            let values: [Double]
+            switch action {
+            case .plant(let kind, let column, let row, let size):
+                control = "bloom.plant"
+                values = [Double(kind.order), Double(column), Double(row), Double(size)]
+            case .move(let bloom, let column, let row):
+                control = "bloom.move"
+                values = [Double(bloom), Double(column), Double(row)]
+            case .resize(let bloom, let size):
+                control = "bloom.resize"
+                values = [Double(bloom), Double(size)]
+            case .remove(let bloom):
+                control = "bloom.remove"
+                values = [Double(bloom)]
+            case .sun(let elevation):
+                control = "sun.set"
+                values = [Double(elevation)]
+            }
+            XCTAssertEqual(engine.handle(control: control, values: values), .accepted, "\(control) \(values)")
+        }
+        XCTAssertEqual(engine.outcome?.code, NocturneGardenExperienceCore.wonCode)
+        XCTAssertEqual(NocturneGardenExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, NocturneGardenStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified moves earn three stars")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `NG` (`NG.levelOneMoves` and
+    /// `NG.levelOneStartingPicks`, their own literals in Tests/UI/NocturneGarden/NGSupport.swift, which this target
+    /// cannot import); the same literals equal the Core's certified level 1: plants (kind, column, row, size)
+    /// (0 tulip, 4, 0, 2), (2 star, 11, 0, 2) and no sun move; certified smallest 2; the pickers start on the level's
+    /// first supplied kind (tulip, 0), column 0, row 0, its smallest size (2) and its opening sun (2). Seed 0 opens
+    /// level 1.
+    func testNocturneGardenLevelOneEqualsTheCore() throws {
+        // A plant is [kind, column, row, size]; a sun move is [elevation].
+        let pinnedMoves: [[Int]] = [[0, 4, 0, 2], [2, 11, 0, 2]]
+        let pinnedSmallest: Int = 2
+        // [kind, column, row, size, sun]
+        let pinnedStartingPicks: [Int] = [0, 0, 0, 2, 2]
+        func moves(_ actions: [NocturneGardenAction]) -> [[Int]] {
+            actions.map { action -> [Int] in
+                switch action {
+                case .plant(let kind, let column, let row, let size): return [kind.order, column, row, size]
+                case .sun(let elevation): return [elevation]
+                // The certified solution only plants and moves the sun; anything else fails the comparison.
+                case .move, .resize, .remove: return []
+                }
+            }
+        }
+        let certified = try NocturneGardenExperienceCore.generated(number: 1)
+        XCTAssertEqual(moves(NocturneGardenExperienceCore.certifiedActions(1)), pinnedMoves, "level 1 certified moves")
+        XCTAssertEqual(moves(certified.solution.actions), pinnedMoves, "level 1 solution moves")
+        XCTAssertEqual(certified.solution.smallest, pinnedSmallest, "level 1 smallest")
+        XCTAssertEqual(pinnedMoves.count, pinnedSmallest, "the certified moves are a shortest solution")
+        let level = certified.level
+        for move in pinnedMoves where move.count == 4 {
+            let kind = try XCTUnwrap(NocturneGardenExperienceCore.kind(move[0]), "declared kind \(move)")
+            XCTAssertGreaterThan(level.supplyCount(kind), 0, "supplied kind \(move)")
+            XCTAssertTrue((0..<level.width).contains(move[1]), "column on the bed \(move)")
+            XCTAssertTrue((0..<level.height).contains(move[2]), "row on the bed \(move)")
+            XCTAssertTrue(level.sizes.contains(move[3]), "allowed size \(move)")
+        }
+        for move in pinnedMoves where move.count == 1 {
+            XCTAssertTrue(level.elevations.contains(move[0]), "allowed elevation \(move)")
+        }
+        // The pickers' starting picks as NocturneGardenPresenter.follow(_:) sets them on a new level.
+        func startingPicks(_ play: NocturneGardenPlay) -> [Int] {
+            let kind: Int = NocturneGardenKind.allCases.first { play.level.supplyCount($0) > 0 }?.order ?? 0
+            return [kind, 0, 0, play.level.sizes.min() ?? 1, play.elevation]
+        }
+        let opening = try NocturneGardenExperienceCore.opening(number: 1)
+        XCTAssertEqual(startingPicks(opening.play), pinnedStartingPicks, "the opening picks")
+        let fresh = try NocturneGardenExperienceCore.freshPlay(of: level)
+        XCTAssertEqual(startingPicks(fresh), pinnedStartingPicks, "a fresh play's picks")
+        XCTAssertEqual(pinnedStartingPicks[4], level.sun, "the opening sun")
+        XCTAssertEqual(NocturneGardenExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
