@@ -145,9 +145,10 @@ refused.
 - **FR-R02G1001-004**: Every accepted reversal MUST spend one reversal; undo and redo MUST spend nothing.
 - **FR-R02G1001-005**: The level MUST be won exactly on the action after which every checkpoint equals its target height
   and the wave is smooth; it MUST fail with a named reason when a reversal leaves a bend beyond the breaking limit at
-  one of its two new seams (tear) or when the last reversal is spent without a win (budget).
-- **FR-R02G1001-006**: Every action MUST be validated (range, section length, stage, previous fingerprint, budget) and
-  refused without change when invalid.
+  one of its two new seams (tear, naming the reversal and the lowest breaking seam position among i − 1, i, j, j + 1) or
+  when the last reversal is spent without a win (budget).
+- **FR-R02G1001-006**: Every action MUST be validated (range, section length, stage, previous fingerprint) and refused
+  without change when invalid; a level whose budget is spent has failed, so further reversals are refused by stage.
 - **FR-R02G1001-007**: Undo and redo MUST restore exact states and fingerprints; replaying a record trace MUST reproduce
   every state.
 - **FR-R02G1001-008**: The level's life MUST follow a defined state machine (loading, tutorial, playing, paused, won,
