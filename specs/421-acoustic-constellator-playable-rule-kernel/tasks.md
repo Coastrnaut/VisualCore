@@ -69,7 +69,7 @@ will consume).
 - [ ] T-R02G1301-005 [P] [US4] Create
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorRules.swift` (agent C: `PuzzleRules`: State
   = position (links, phases, actions spent, outcome), Move = AcousticConstellatorAction; legal moves while playing "every
-  valid link (pair order), every valid unlink, every nudge (star, then −1, +1), then the listen") with
+  valid link (pair order), every valid unlink (pair order), every nudge (star, then −1, +1), then the listen") with
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorRulesTests.swift` (agreement with the
   play on 200 walks); `--name host-4`
 - [ ] T-R02G1301-006 [P] Create

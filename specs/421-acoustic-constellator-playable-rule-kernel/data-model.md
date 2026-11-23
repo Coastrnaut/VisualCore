@@ -9,4 +9,4 @@
 | `AcousticConstellatorAction` | link(a, b), unlink(a, b), nudge(star, ±1), listen | each spends 1 action |
 | `AcousticConstellatorPlay` | stage, links (fixed then placed, in index order), phases (starting), actions spent, last listen report, label and match, failure (`missing(pair)`, `disconnected(tick, link)`, `incoherent(run)` or `budget(action)`), records, undo/redo stacks | records carry previous and next fingerprints |
 | `AcousticConstellatorRecord` | schema, level seed, index, kind (link, unlink, nudge, listen, undo, redo), action, previous and next fingerprints | appended for every accepted action |
-| `AcousticConstellatorRules.Position` | links, phases, actions spent, outcome (playing, won, failed) | moves: every valid link (pair order), every valid unlink, every nudge (star, then −1, +1), then the listen |
+| `AcousticConstellatorRules.Position` | links, phases, actions spent, outcome (playing, won, failed) | moves: every valid link (pair order), every valid unlink (pair order), every nudge (star, then −1, +1), then the listen |
