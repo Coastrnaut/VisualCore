@@ -56,7 +56,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G1004-006 [US4] Wire `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraPresenter.swift` (`pointer(_:viewSize:port:)` routing
+- [X] T-R02G1004-006 [US4] Wire `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraPresenter.swift` (`pointer(_:viewSize:port:)` routing — Verified 2026-11-23: sim-27-pre (the existing 27 experience tests with the wiring compiled in) exit 0; sim-27 (34 tests incl. BackwardsAuroraGestureWiringTests 7: sample taps move the section's ends, an end drag moves that end, a swipe reverses the section (spent +1, record .reverse), a held press previews the kernel's reversal and lifting sends nothing, orbit and reset change no digest, a refused swipe is shown and logged, a swipe on a won play sends nothing and says the play is over) exit 0; presenter pointer entry, scene orbit and preview ribbon, panel Reset view and preview line
   through the gesture controller with the mirror's section; setStart and setEnd changing the mirror; reverse sent
   through the port; `resetView()`; the freeze preview drawn and described while it lasts; for a reverse on a finished
   play, "The play is over: undo or go to the next level"; a refused reversal shown in the mirror message and logged with

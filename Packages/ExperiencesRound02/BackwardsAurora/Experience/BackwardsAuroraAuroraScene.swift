@@ -9,7 +9,8 @@
 // tier or the mode change; the shimmer and the pulses move by uniforms. Reduce Flashing passes
 // `BackwardsAuroraShaders.glowLimit(reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls back to
 // the level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason;
-// nothing here can reach the kernel.
+// nothing here can reach the kernel. Feature 394 (R02-G10-04): the camera follows the presenter's orbit and the snapshot
+// may carry a freeze preview, drawn as a pale dashed ribbon.
 #if os(iOS)
 import BackwardsAuroraCore
 import Foundation
@@ -28,6 +29,8 @@ final class BackwardsAuroraAuroraScene {
     var reducedFlash = false
     /// Whether the pulses and the shimmer stand still (Reduce Motion).
     var reduceMotion = false
+    /// The camera orbit (presentation only), set by the presenter before each frame (feature 394, R02-G10-04).
+    var orbit: BackwardsAuroraOrbit = .authored
     /// The light direction of the aurora (from the upper front).
     static let lightDirection = SIMD3<Float>(0.2, 0.6, 0.77)
 
@@ -40,6 +43,8 @@ final class BackwardsAuroraAuroraScene {
         let stage: BackwardsAuroraStage
         let failure: BackwardsAuroraFailure?
         let spent: Int
+        let preview: [Int]
+        let orbit: BackwardsAuroraOrbit
         let tier: Int
         let fallback: Bool
     }
@@ -95,7 +100,7 @@ final class BackwardsAuroraAuroraScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = BackwardsAuroraSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = BackwardsAuroraSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let key = key(snapshot, tier: tier)
         if key != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = self.key(snapshot, tier: tier)
@@ -114,7 +119,8 @@ final class BackwardsAuroraAuroraScene {
     /// The geometry key of `snapshot` at `tier` in the current mode.
     private func key(_ s: BackwardsAuroraSceneSnapshot, tier: BackwardsAuroraTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, samples: s.samples, sectionStart: s.sectionStart,
-                    sectionEnd: s.sectionEnd, stage: s.stage, failure: s.failure, spent: s.spent, tier: tier.index,
+                    sectionEnd: s.sectionEnd, stage: s.stage, failure: s.failure, spent: s.spent, preview: s.preview,
+                    orbit: orbit, tier: tier.index,
                     fallback: fallbackReason != nil)
     }
 

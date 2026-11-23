@@ -6,6 +6,11 @@
 // never reaches the kernel except through the declared `wave.reverse` control. A memory warning releases the GPU
 // objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the kernel
 // (renderer purity). Its probes (two ground corners) let the verification runner check a frame.
+// Feature 394 (R02-G10-04): `pointer(_:viewSize:port:)` routes canvas touches through
+// `BackwardsAuroraGestureController` (a tap on a sample moves the nearer end of the section, an end drag moves that end,
+// a swipe along the section reverses it, a held press freezes the timeline and previews the reversal, two fingers
+// orbit, a double tap or "Reset view" resets); the preview is drawn and described while it lasts, with the shimmer and
+// pulses held; refused reversals are shown and kept in `refusalLog` with their reason codes.
 #if os(iOS)
 import BackwardsAuroraCore
 import Foundation
@@ -14,6 +19,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show and choose: the latest state the presenter described and the panel's section.
 @MainActor
@@ -37,6 +43,8 @@ final class BackwardsAuroraMirror {
     var play: BackwardsAuroraPlay?
     /// The text of the last refused change, if any.
     var message: String?
+    /// The freeze preview's words while it shows (feature 394), or nil.
+    var previewText: String?
 
     /// The wave's sample count (12 while no play is followed).
     var count: Int { play?.wave.count ?? 12 }
@@ -90,8 +98,16 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
     let scene = BackwardsAuroraAuroraScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G1003-004).
     private(set) var tierLog: [BackwardsAuroraTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot drawn (tests and the description); never carries a freeze preview.
     private(set) var lastSnapshot: BackwardsAuroraSceneSnapshot?
+    /// The play last drawn (the gestures read it).
+    private(set) var lastPlay: BackwardsAuroraPlay?
+    /// The gesture controller (feature 394): ends, swipes, freeze preview, orbit.
+    private(set) var gestures = BackwardsAuroraGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -131,7 +147,20 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
         let time = reduceMotion ? 0 : frame.time
         let snapshot = core.snapshot(sectionStart: mirror.start, sectionEnd: mirror.end, time: time)
         lastSnapshot = snapshot
-        try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
+        lastPlay = core.play
+        gestures.tick(at: ProcessInfo.processInfo.systemUptime, snapshot: snapshot, play: core.play)
+        scene.orbit = gestures.orbit
+        let shown: BackwardsAuroraSceneSnapshot
+        if let preview = gestures.preview {
+            shown = snapshot.withPreview(preview.samples)
+            mirror.previewText = preview.text
+        } else {
+            shown = snapshot
+            mirror.previewText = nil
+        }
+        // The timeline freezes while a preview shows: the shimmer and the pulses hold still.
+        try scene.render(shown, tier: drawn, context: context, frame: frame,
+                         animate: !reduceMotion && gestures.preview == nil)
     }
 
     func teardown(_ context: RenderContext) {
@@ -185,7 +214,73 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(BackwardsAuroraControls(port: port, mirror: mirror))
+        AnyView(BackwardsAuroraControls(port: port, mirror: mirror, resetView: { [weak self] in self?.resetView() },
+                                        sender: { [weak self] control, values in
+                                            self?.send(control, values, port: port)
+                                        }))
+    }
+
+    // MARK: Touch controls (feature 394, R02-G10-04)
+
+    /// The canvas gestures send reversals only; the ends are presentation state.
+    var gestureActions: Set<String> { ["wave.reverse"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(BackwardsAuroraExperienceCore.actionIDs) }
+
+    /// What a swipe on a finished play shows.
+    static let finishedMessage = "The play is over: undo or go to the next level"
+
+    /// Routes a canvas touch through the gesture controller with the panel's section and applies what it returns, in
+    /// order: new ends go to the mirror, a reversal is sent through the port; a swipe on a finished play explains that
+    /// the play is over.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let base = lastSnapshot, let play = lastPlay else { return }
+        let snapshot: BackwardsAuroraSceneSnapshot = BackwardsAuroraSceneSnapshot(
+            play: play, levelNumber: base.levelNumber, sectionStart: mirror.start, sectionEnd: mirror.end,
+            time: base.time)
+        let wasPlaying: Bool = play.stage == .playing
+        let before: BackwardsAuroraGestureController.State = gestures.state
+        let actions: [BackwardsAuroraGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot,
+                                                                      play: play)
+        if event.phase == .ended, !wasPlaying, actions.isEmpty, before == .swipe {
+            mirror.message = Self.finishedMessage
+        }
+        for action in actions {
+            switch action {
+            case let .setStart(k):
+                mirror.start = k
+                mirror.stepStart(0)
+            case let .setEnd(k):
+                mirror.end = k
+                mirror.stepEnd(0)
+            case let .reverse(start, end):
+                send("wave.reverse", [Double(start), Double(end)], port: port)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+    }
+
+    /// Sends `control` with `values`, shows a refusal in the panel and keeps its code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(result.code)"
+            refusalLog.append(result.code)
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        return result
     }
 }
 #endif

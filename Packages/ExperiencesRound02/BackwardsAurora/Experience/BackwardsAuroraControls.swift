@@ -1,7 +1,8 @@
 // BackwardsAuroraControls — feature 393 (R02-G10-03) T-R02G1003-006 (FR-R02G1003-005; clarification Q5). The minimal
 // control panel: labelled steppers for the section's start and end (presentation state only), reverse (the kernel
 // action through the action port), undo, redo and next level, each with an accessibility label and value. Tapping
-// segment ends, swiping to reverse and the timeline freeze preview come in R02-G10-04; full accessibility in R02-G10-06.
+// segment ends, swiping to reverse and the timeline freeze preview come in R02-G10-04 (feature 394 adds "Reset view"
+// and the preview line); full accessibility in R02-G10-06.
 #if os(iOS)
 import BackwardsAuroraCore
 import SwiftUI
@@ -11,6 +12,10 @@ import VisualCoreExperienceHost
 struct BackwardsAuroraControls: View {
     let port: ExperienceActionPort
     let mirror: BackwardsAuroraMirror
+    /// Returns the camera to the authored view (feature 394).
+    let resetView: () -> Void
+    /// Sends a control the way the presenter does (refusals shown and logged).
+    let sender: (String, [Double]) -> Void
 
     var body: some View {
         ScrollView(.vertical) {
@@ -30,6 +35,9 @@ struct BackwardsAuroraControls: View {
         Text(mirror.status).font(.subheadline)
         Text(mirror.measureLabel).font(.footnote)
         Text(mirror.targetLabel).font(.footnote)
+        if let preview = mirror.previewText {
+            Text(preview).font(.footnote)
+        }
         if let message = mirror.message {
             Text(message).font(.footnote)
         }
@@ -63,13 +71,14 @@ struct BackwardsAuroraControls: View {
                 .accessibilityLabel("Redo the reversal")
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
         }
     }
 
-    /// Sends `control` and shows a refusal.
+    /// Sends `control` through the presenter, which shows and logs a refusal.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        sender(control, values)
     }
 }
 #endif
