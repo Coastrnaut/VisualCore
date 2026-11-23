@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G10-02 (migration ledger, game feature of experience R02-G10) · ID namespace FR-R02G1002-###,
 SC-R02G1002-###, T-R02G1002-###
@@ -26,6 +26,67 @@ Canonical overrides:
   milestone figure, as for the earlier round-two games.
 - **Model:** feature 382 (Nocturne Garden's content pipeline) for manifest, generator, witness files, digest and
   progression.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+382's answers where the games agree. Facts checked in code (read-only, 2026-11-22): R02-G10-01's `BackwardsAuroraWave`
+(N 12 … 32, heights −64 … 64, bends, seams, reversal), `BackwardsAuroraLevel` (checkpoints 2 … 8, L 1 … 64, B L … 128,
+sections, budget 1 … 40, an opening that already wins refused), `BackwardsAuroraPlay` and `BackwardsAuroraRules`;
+R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most 1, jump at most 3);
+`SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (`planning_index.py levels
+--experience R02-G10`: bands 1 … 5 × 20, reversal budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19).
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, reversal budget)
+  are a table in `BackwardsAuroraManifest` with their provenance. Candidate c of entry n draws from `SeededRandom(seed:
+  SeedDerivation.derive(plannedSeed, index: c))`, in this order: the wave length N by band (14 … 16, 18 … 22, 22 … 26,
+  26 … 30, 30 … 32); the target, a gently curving wave (start height −24 … 24, slope −3 … 3, the slope changing by −2 …
+  2 per sample and kept within −6 … 6, heights kept within −64 … 64); the bend limit L = max(1, the target's worst
+  bend); the reversal count k in the band's range (2 … 3, 3 … 4, 4 … 5, 5 … 6, 6 … 7); k section lengths (2 … 4, 2 … 5,
+  2 … 6, 2 … 6, 2 … 6 by band) placed left to right with the first start at least 2, each start at least 3 after the
+  previous end and the last end at most N − 3, the spare samples spread by draws (so no two sections share a seam
+  position and every seam position is interior). A candidate is kept when no section is a palindrome in the target and
+  all 4 seam bends of every section, reversed alone, exceed L; the opening wave is the target with all k sections
+  reversed. Checkpoints: band + 1 of the k sections (drawn), one position in each where the opening differs from the
+  target. Breaking limit B: 128 in bands 1 … 2, then min(128, L + 48), L + 32, L + 16. Shortest section 2, longest N;
+  budget = manifest budget; ids `backwards-aurora-NNN`; tutorial on levels 1 … 3; difficulty = band. A candidate the
+  solver does not certify with exactly k reversals within its work bound is skipped; at most 256 candidates, then
+  `generation(n)`. Impact: FR-R02G1002-001, 006; SC-R02G1002-001, 003, 004.
+- Q: How does the solver decide the smallest reversal count, and what proves it? → A: the bad bends β are the interior
+  positions with |b| > L. A reversal gives new values only to the bends at its at most 4 seam positions (the others
+  keep their values; those inside move), so β falls by at most 4 per reversal, and a win needs β = 0: no sequence of
+  fewer than ⌈β / 4⌉ reversals wins. The generator's openings have β = 4k exactly. The solver is an iterative-deepening
+  depth-first search over reversible sections (start, then end, the rules' order) from the opening with the bound
+  starting at ⌈β / 4⌉, pruning a node when its depth plus ⌈β / 4⌉ exceeds the bound, never continuing from a torn or
+  failed state, and stopping at the first winning sequence; a sequence found at the starting bound proves it smallest.
+  Work = reversals evaluated, counted and bounded at 20,000 per level; over the bound the candidate is skipped. The
+  witness is the first sequence found, replayed through the kernel's play. Impact: FR-R02G1002-002; SC-R02G1002-001,
+  002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `BackwardsAuroraDifficulty` holds the
+  smallest reversal count, the wave length, the checkpoints, the samples reversed by the witness (the sum of its section
+  lengths), its longest section, the opening's bad bends, the bend limit, the breaking margin B − L and the solver work.
+  The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on the
+  smallest reversal count; the band ranges make band means non-decreasing. Impact: FR-R02G1002-003, 005;
+  SC-R02G1002-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/backwards-aurora/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the reversals, the state digest after every reversal (16
+  hex characters of the SHA-256 of the samples), the play fingerprints after `begin` (and `dismissTutorial` when the
+  level has one) and after each reversal, the smallest reversal count with the lower-bound argument (the opening's bad
+  bends and ⌈β / 4⌉), the near miss (the witness minus its last reversal: not won, its bad bends still above 0), the
+  difficulty and the candidates skipped. A test rebuilds every witness and compares bytes; it writes the files only with
+  `BACKWARDS_AURORA_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. Impact: FR-R02G1002-004; SC-R02G1002-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<BackwardsAuroraRules>.digest(id: "backwards-aurora", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split into groups of 5 levels so each runs under 10 seconds
+  on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New refusals:
+  `generation(Int)` (`r02-g10.generation`) and `witness(String)` (`r02-g10.witness`). The independent check of
+  SC-R02G1002-002 recomputes the bad bends by a separate formulation on every level, proves by brute force over every
+  single reversal from sampled states (the opening and each witness state, two levels per band) that none removes more
+  than 4 bad bends, and for two band-1 levels searches every sequence of fewer reversals exhaustively. Impact:
+  FR-R02G1002-002, 005, 006; SC-R02G1002-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -92,7 +153,8 @@ file is refused.
 - **FR-R02G1002-002**: A solver MUST find a winning sequence with the smallest number of reversals, with a proof that no
   shorter sequence wins, its work bounded and counted; every sequence it reports MUST be replayed through the kernel.
 - **FR-R02G1002-003**: Each level MUST carry difficulty metrics (smallest reversal count, wave length, checkpoints,
-  samples reversed by the witness, bend limit, breaking margin, solver work) derived from the level and the solver.
+  samples reversed by the witness and its longest section, the opening's bad bends, bend limit, breaking margin, solver
+  work) derived from the level and the solver.
 - **FR-R02G1002-004**: Each level MUST have a versioned witness record (level, reversals, per-reversal state digests,
   counterexamples); damaged, newer and edited files MUST be refused.
 - **FR-R02G1002-005**: The catalog of 100 levels MUST have a digest pinned in tests and MUST satisfy the shared
@@ -104,8 +166,8 @@ file is refused.
 
 - **Manifest entry**: number, planned seed, band, reversal budget.
 - **Solver result**: smallest reversal count, a winning reversal sequence, the work counted, the proof.
-- **Difficulty**: smallest reversals, wave length, checkpoints, samples reversed, bend limit, breaking margin, solver
-  work.
+- **Difficulty**: smallest reversals, wave length, checkpoints, samples reversed, longest witness section, opening bad
+  bends, bend limit, breaking margin, solver work.
 - **Witness**: schema, the level's stored form, reversals, per-reversal digests, counterexamples, skipped candidates.
 - **Catalog**: the 100 levels in manifest order with a digest.
 
