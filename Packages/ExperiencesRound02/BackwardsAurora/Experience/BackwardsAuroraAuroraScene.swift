@@ -10,7 +10,10 @@
 // `BackwardsAuroraShaders.glowLimit(reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls back to
 // the level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason;
 // nothing here can reach the kernel. Feature 394 (R02-G10-04): the camera follows the presenter's orbit and the snapshot
-// may carry a freeze preview, drawn as a pale dashed ribbon.
+// may carry a freeze preview, drawn as a pale dashed ribbon. Feature 396 (R02-G10-06) T-R02G1006-005: the presenter's
+// eased lights set `u_won` (`lights.won`), scale the glow gain (`lights.glow`) and the tear cross's and preview ribbon's
+// alphas (`u_tearLight`, `u_previewLight`); the tear cross is kept on `fadingTear` (the last torn seam) while its light
+// fades out after an undo. The lights are uniforms, so a fade rebuilds no geometry; only `fadingTear` joins the key.
 #if os(iOS)
 import BackwardsAuroraCore
 import Foundation
@@ -31,6 +34,11 @@ final class BackwardsAuroraAuroraScene {
     var reduceMotion = false
     /// The camera orbit (presentation only), set by the presenter before each frame (feature 394, R02-G10-04).
     var orbit: BackwardsAuroraOrbit = .authored
+    /// The eased light levels (presentation only), set by the presenter before each frame (feature 396); nil draws
+    /// the full levels (`u_won` from the stage, the full glow gain, the tear cross and the preview at full alpha).
+    var lights: BackwardsAuroraLights?
+    /// The last torn seam, where the tear cross fades out after an undo (feature 396), set by the presenter.
+    var fadingTear: Int?
     /// The light direction of the aurora (from the upper front).
     static let lightDirection = SIMD3<Float>(0.2, 0.6, 0.77)
 
@@ -44,6 +52,7 @@ final class BackwardsAuroraAuroraScene {
         let failure: BackwardsAuroraFailure?
         let spent: Int
         let preview: [Int]
+        let fadingTear: Int?
         let orbit: BackwardsAuroraOrbit
         let tier: Int
         let fallback: Bool
@@ -109,9 +118,12 @@ final class BackwardsAuroraAuroraScene {
             return
         }
         let time = Float(animate && !reduceMotion ? snapshot.time : 0)
-        try drawAurora(camera, time: time, tier: tier,
-                       won: BackwardsAuroraShaders.won(stage: snapshot.stage, failure: snapshot.failure))
-        let gain = BackwardsAuroraShaders.glowGain(for: tier)
+        let won: Float = lights.map { Float(min(max($0.won, 0), 1)) }
+            ?? BackwardsAuroraShaders.won(stage: snapshot.stage, failure: snapshot.failure)
+        try drawAurora(camera, time: time, tier: tier, won: won,
+                       tearLight: Float(min(max(lights?.tear ?? 1, 0), 1)),
+                       previewLight: Float(min(max(lights?.preview ?? 1, 0), 1)))
+        let gain = BackwardsAuroraShaders.glowGain(for: tier) * min(max(lights?.glow ?? 1, 0), 1)
         guard tier.glowShells > 0, gain > 0 else { return }
         try drawGlow(camera, gain: gain)
     }
@@ -120,7 +132,7 @@ final class BackwardsAuroraAuroraScene {
     private func key(_ s: BackwardsAuroraSceneSnapshot, tier: BackwardsAuroraTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, samples: s.samples, sectionStart: s.sectionStart,
                     sectionEnd: s.sectionEnd, stage: s.stage, failure: s.failure, spent: s.spent, preview: s.preview,
-                    orbit: orbit, tier: tier.index,
+                    fadingTear: s.tear == nil ? fadingTear : nil, orbit: orbit, tier: tier.index,
                     fallback: fallbackReason != nil)
     }
 
@@ -132,7 +144,8 @@ final class BackwardsAuroraAuroraScene {
         if fallbackReason == nil {
             do {
                 let aurora = try BackwardsAuroraSceneGeometry.auroraMesh(snapshot, tier: tier,
-                                                                          reduceMotion: reduceMotion)
+                                                                          reduceMotion: reduceMotion,
+                                                                          fadingTear: fadingTear)
                 auroraRenderer = try Self.renderer(aurora, vertex: BackwardsAuroraShaders.auroraVertex,
                                                    fragment: auroraFragment, name: "backwards-aurora-aurora",
                                                    registry: registry)
@@ -173,7 +186,7 @@ final class BackwardsAuroraAuroraScene {
     }
 
     private func drawAurora(_ camera: BackwardsAuroraCamera, time: Float, tier: BackwardsAuroraTier,
-                            won: Float) throws {
+                            won: Float, tearLight: Float, previewLight: Float) throws {
         guard let auroraRenderer else { return }
         let mvp = camera.viewProjection
         let eye = SIMD3<Float>(Float(camera.eye.x), Float(camera.eye.y), Float(camera.eye.z))
@@ -184,6 +197,8 @@ final class BackwardsAuroraAuroraScene {
             p.set(BackwardsAuroraShaders.timeUniform, time)
             p.set(BackwardsAuroraShaders.pulsesUniform, Float(tier.pulses))
             p.set(BackwardsAuroraShaders.wonUniform, won)
+            p.set(BackwardsAuroraShaders.tearLightUniform, tearLight)
+            p.set(BackwardsAuroraShaders.previewLightUniform, previewLight)
         }
     }
 

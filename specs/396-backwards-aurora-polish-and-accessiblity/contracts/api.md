@@ -23,7 +23,9 @@ public struct BackwardsAuroraLights: Sendable, Equatable {
 public enum BackwardsAuroraSoundRecipe {
     public static func rootStep(worstBend: Int, limit: Int) -> Int            // 0 … 3
     public static func recipe(play: BackwardsAuroraPlay) -> AmbientLoopRecipe }
-// BackwardsAuroraSceneGeometry's mesh builders gain an optional `lights:` argument: the tear cross's shade and the
-// preview ribbon's alpha from the lights; the scene multiplies the glow gain by `lights.glow` and `u_won` by
-// `lights.won`. Without lights the output is unchanged.
+// BackwardsAuroraSceneGeometry.auroraPart / auroraMesh gain `fadingTear: Int? = nil`: the tear cross is drawn on the
+// last torn seam while the snapshot shows no tear (nil: output unchanged). BackwardsAuroraShaders gains
+// `tearLightUniform` ("u_tearLight") and `previewLightUniform` ("u_previewLight"), scaling those materials' alphas; the
+// scene passes `lights.won` as `u_won`, multiplies the glow gain by `lights.glow` and passes `lights.tear` and
+// `lights.preview` (1 without lights).
 ```

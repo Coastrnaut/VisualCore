@@ -305,9 +305,12 @@ public enum BackwardsAuroraSceneGeometry {
     // MARK: Meshes
 
     /// The whole aurora (every layer but the glow) with fallback colours, in painter's order. `reduceMotion` is
-    /// accepted for parity with the shader path; no position depends on it.
+    /// accepted for parity with the shader path; no position depends on it. `fadingTear` (feature 396, R02-G10-06) is
+    /// the last torn seam, where the tear cross is drawn while the snapshot shows no tear, so its eased light
+    /// (`u_tearLight`) can fade it out after an undo; nil (the default) leaves the output unchanged.
     public static func auroraPart(_ snapshot: BackwardsAuroraSceneSnapshot, tier: BackwardsAuroraTier,
-                                  reduceMotion: Bool = false) throws(MeshError) -> BackwardsAuroraColouredMesh {
+                                  reduceMotion: Bool = false,
+                                  fadingTear: Int? = nil) throws(MeshError) -> BackwardsAuroraColouredMesh {
         typealias M = BackwardsAuroraSceneGeometry.Material
         _ = reduceMotion
         var parts: Parts = Parts(lit: true)
@@ -384,7 +387,7 @@ public enum BackwardsAuroraSceneGeometry {
             let p: SIMD3<Double> = samplePoint(k, snapshot)
             try parts.cross(centre: SIMD3(p.x, p.y, crossZ), span: kinkSpan, width: kinkWidth, code: M.kink)
         }
-        if let seam = snapshot.tear, n > 0 {
+        if let seam = snapshot.tear ?? fadingTear, seam >= 0, seam < n {
             let p: SIMD3<Double> = samplePoint(seam, snapshot)
             try parts.cross(centre: SIMD3(p.x, p.y, crossZ), span: tearSpan, width: tearWidth, code: M.tear)
         }
@@ -406,8 +409,8 @@ public enum BackwardsAuroraSceneGeometry {
 
     /// The aurora mesh for the custom shader (`auroraPart` without colours).
     public static func auroraMesh(_ snapshot: BackwardsAuroraSceneSnapshot, tier: BackwardsAuroraTier,
-                                  reduceMotion: Bool = false) throws(MeshError) -> Mesh {
-        try auroraPart(snapshot, tier: tier, reduceMotion: reduceMotion).mesh
+                                  reduceMotion: Bool = false, fadingTear: Int? = nil) throws(MeshError) -> Mesh {
+        try auroraPart(snapshot, tier: tier, reduceMotion: reduceMotion, fadingTear: fadingTear).mesh
     }
 
     /// The glow shells around the ribbon, outermost first (shell k: y ± (0.03 + 0.02·k) at z = −0.002·k), with the

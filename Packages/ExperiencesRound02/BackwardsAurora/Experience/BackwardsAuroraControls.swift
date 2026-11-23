@@ -5,7 +5,11 @@
 // and the preview line); full accessibility in R02-G10-06. Feature 395 (R02-G10-05) T-R02G1005-005: the tutorial
 // instruction with Dismiss, Hint (each press reveals the next level), the failure explanation with Undo and Retry, the
 // goal with the level's band and best stars, Campaign / Daily / Practice and a picker of the open levels; all as
-// wrapping text in the panel, never over the aurora.
+// wrapping text in the panel, never over the aurora. Feature 396 (R02-G10-06) T-R02G1006-005 (FR-R02G1006-001, 005,
+// 006; clarification Q5): the summary element ("Aurora"), adjustable start and end steppers whose values name the
+// sample and its height, a value in words on every control (feature 386's convergence lesson), refusals in words, the
+// Sound toggle (off by default), rows that become columns at accessibility text sizes, wrapping text and a 520-point
+// readable width.
 #if os(iOS)
 import BackwardsAuroraCore
 import SwiftUI
@@ -21,6 +25,13 @@ struct BackwardsAuroraControls: View {
     let resetView: () -> Void
     /// Sends a control the way the presenter does (refusals shown and logged).
     let sender: (String, [Double]) -> Void
+    /// The text size: rows become columns at accessibility sizes (feature 396).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the ambient loop plays only while it is.
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 396).
+    static let readableWidth: CGFloat = 520
 
     var body: some View {
         ScrollView(.vertical) {
@@ -30,39 +41,66 @@ struct BackwardsAuroraControls: View {
                 sectionRow
                 playRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 396).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 396; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Ambient sound")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
 
     /// The level, reversals and stage lines.
     @ViewBuilder private var header: some View {
         Text("Level \(mirror.levelNumber) · reversals \(mirror.spent) of \(mirror.budget)")
             .font(.headline)
+            .fixedSize(horizontal: false, vertical: true)
         Text(mirror.status).font(.subheadline)
-        Text(mirror.measureLabel).font(.footnote)
-        Text(mirror.targetLabel).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Aurora")
+            .accessibilityValue(mirror.summary)
+        Text(mirror.measureLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let preview = mirror.previewText {
-            Text(preview).font(.footnote)
+            Text(preview).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
     }
 
     /// The start and end steppers and the reverse button.
     @ViewBuilder private var sectionRow: some View {
         VStack(alignment: .leading, spacing: 6) {
+            // Feature 396: adjustable (swipe up or down); the value names the sample and its height.
             Stepper(mirror.startLabel,
-                    onIncrement: { mirror.stepStart(1) },
-                    onDecrement: { mirror.stepStart(-1) })
+                    onIncrement: { mirror.stepStart(1); presenter.refreshSummary() },
+                    onDecrement: { mirror.stepStart(-1); presenter.refreshSummary() })
                 .accessibilityLabel("Start of the section to reverse")
-                .accessibilityValue(mirror.startLabel)
+                .accessibilityValue(Self.values(mirror).start)
             Stepper(mirror.endLabel,
-                    onIncrement: { mirror.stepEnd(1) },
-                    onDecrement: { mirror.stepEnd(-1) })
+                    onIncrement: { mirror.stepEnd(1); presenter.refreshSummary() },
+                    onDecrement: { mirror.stepEnd(-1); presenter.refreshSummary() })
                 .accessibilityLabel("End of the section to reverse")
-                .accessibilityValue(mirror.endLabel)
+                .accessibilityValue(Self.values(mirror).end)
             Button("Reverse") { send("wave.reverse", [Double(mirror.start), Double(mirror.end)]) }
                 .accessibilityLabel("Reverse the chosen section in time")
                 .accessibilityValue(mirror.sectionLabel)
@@ -71,15 +109,19 @@ struct BackwardsAuroraControls: View {
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last reversal")
+                .accessibilityValue(Self.values(mirror).reversals)
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the reversal")
+                .accessibilityValue(Self.values(mirror).reversals)
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue(Self.values(mirror).nextLevel)
             Button("Reset view") { resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue(Self.viewValue(presenter.gestures.orbit == .authored))
         }
     }
 
@@ -90,9 +132,10 @@ struct BackwardsAuroraControls: View {
                 Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityValue(instruction)
             }
         }
-        HStack(spacing: 12) {
+        row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
@@ -104,11 +147,13 @@ struct BackwardsAuroraControls: View {
         if let failure = mirror.failureText {
             VStack(alignment: .leading, spacing: 4) {
                 Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 12) {
+                row {
                     Button("Undo") { presenter.undoReversal(port: port) }
                         .accessibilityLabel("Undo the last reversal")
+                        .accessibilityValue(Self.values(mirror).reversals)
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
+                        .accessibilityValue(Self.values(mirror).retry)
                 }
             }
         }
@@ -116,18 +161,18 @@ struct BackwardsAuroraControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 395).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
-                .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
-                .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with a larger reversal budget")
-                .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "practice"))
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -135,6 +180,7 @@ struct BackwardsAuroraControls: View {
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
+                .accessibilityValue(Self.values(mirror).playLevel)
         }
     }
 
@@ -153,6 +199,44 @@ struct BackwardsAuroraControls: View {
         case .daily: "daily"
         }
     }
+
+    /// The accessibility values in words of the controls that act on the section or the play (feature 396, after
+    /// feature 386's convergence lesson): every native control carries a value.
+    struct Values: Equatable {
+        /// Start: the start sample and its height.
+        let start: String
+        /// End: the end sample and its height.
+        let end: String
+        /// Undo and redo: the reversals spent of the budget.
+        let reversals: String
+        /// Next level: the next open level, or that none is open.
+        let nextLevel: String
+        /// Retry: the level and the mode.
+        let retry: String
+        /// Play level: the picked level.
+        let playLevel: String
+    }
+
+    /// The button values of `mirror` (see ``Values``).
+    static func values(_ mirror: BackwardsAuroraMirror) -> Values {
+        let samples: [Int] = mirror.play?.wave.samples ?? []
+        func sample(_ k: Int) -> String {
+            samples.indices.contains(k) ? "sample \(k), height \(samples[k])" : "sample \(k)"
+        }
+        let next: String = mirror.levelNumber < mirror.frontier ? "level \(mirror.levelNumber + 1)"
+            : "no further level open"
+        return Values(start: sample(mirror.start), end: sample(mirror.end),
+                      reversals: "\(mirror.spent) of \(mirror.budget) reversals spent",
+                      nextLevel: next,
+                      retry: "level \(mirror.levelNumber), " + modeName(mirror.mode),
+                      playLevel: "level \(mirror.pickedLevel)")
+    }
+
+    /// The Reset view value: "authored view" or "orbited view".
+    static func viewValue(_ authored: Bool) -> String { authored ? "authored view" : "orbited view" }
+
+    /// A mode button's value: "selected" or "not selected".
+    static func selectedValue(_ selected: Bool) -> String { selected ? "selected" : "not selected" }
 
     /// Sends `control` through the presenter, which shows and logs a refusal.
     private func send(_ control: String, _ values: [Double] = []) {

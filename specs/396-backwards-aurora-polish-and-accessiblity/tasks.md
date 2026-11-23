@@ -39,9 +39,10 @@ native control carries a value in words from the start).
 
 ## Phase 3: Wiring — geometry, presenter, scene, sound and panel
 
-- [ ] T-R02G1006-005 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneGeometry.swift` (optional `lights:` on the mesh
-  builders: the tear cross's shade and the preview ribbon's alpha from the lights; without lights the output is
-  unchanged, with tests in `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraSceneGeometryTests.swift`), add the new Core files that use
+- [X] T-R02G1006-005 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneGeometry.swift` (optional `fadingTear:` on the mesh — Verified 2026-11-23: sim-27 exit=0 (48 simulator tests incl. BackwardsAuroraAccessibilityTests 9: values in words on every control, the summary follows the section, level 1 won with the panel's operations and every step announced as planned, recorded announcements and haptics equal the plan through reversal, undo, redo, refusals and a tear, a revealed hint announced, Reduce Motion stills identical, the tear light fades in and out over at least 0.4 s under Reduce Flashing, the sound state table and toggle); u_tearLight and u_previewLight scale the tear and preview alphas, fadingTear keeps the cross on the last seam (geometry and shader tests); render and teaching tests updated for the fade and refusal words; agent C's tests retested by the lead)
+  builders: the tear cross kept on the last torn seam while its light fades out; without it the output is unchanged)
+  and `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraShaders.swift` (`u_tearLight` and `u_previewLight` scale the tear cross's and
+  the preview ribbon's alphas), with tests in `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraSceneGeometryTests.swift`), add the new Core files that use
   Doubles to `presentationSources` in `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraInvariantTests.swift` (lights, sound recipe), create
   `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraSound.swift` (the ambient loop over `AmbientLoopPlayer`, playing exactly while wanted,
   on screen and active), edit `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraPresenter.swift` (feedback through `ExperienceFeedback` with

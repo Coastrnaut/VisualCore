@@ -19,9 +19,10 @@ Quickstart: [quickstart.md](quickstart.md).
 **Audit (2026-11-23)**: `BackwardsAuroraCore` depends on VisualCoreSimulation, Math, Scenes, Experience, Diagnostics
 and Persistence; it needs VisualCoreAudioDSP (`AmbientLoopRecipe`) as NocturneGardenCore has; the experience target
 needs VisualCoreAudio (`AmbientLoopPlayer`, iOS) and already has VisualCoreExperienceHost (`ExperienceFeedback`).
-**Language/Version**: Swift 6, SwiftUI, OpenGL ES 3.0 through ANGLE (shaders unchanged: the glow gain uniform carries
-the eased glow level, `u_won` the eased won lift; the tear cross's shade and the preview ribbon's alpha come from the
-geometry).
+**Language/Version**: Swift 6, SwiftUI, OpenGL ES 3.0 through ANGLE (the glow gain uniform carries the eased glow
+level and `u_won` the eased won lift; two aurora uniforms, `u_tearLight` and `u_previewLight`, scale the tear cross's
+and the preview ribbon's alphas, so a fade rebuilds no geometry — decided at implementation, 2026-11-23, because the
+meshes have no free per-vertex channel for a shade).
 **Primary dependencies**: BackwardsAuroraCore; VisualCoreSimulation (`HapticKind`, `AnnouncementKind`);
 VisualCoreAudioDSP; VisualCoreAudio and VisualCoreExperienceHost in the experience. No new package, target or app
 change; no Objective-C++.
@@ -55,7 +56,8 @@ Packages/ExperiencesRound02/Package.swift                                 edit  
 Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraFeedbackPlan.swift       new   (agent A)
 Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraLights.swift             new   (agent B)
 Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSoundRecipe.swift        new   (agent B)
-Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneGeometry.swift      edit  tear cross and preview alpha from lights (lead)
+Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneGeometry.swift      edit  the tear cross kept on the last torn seam (lead)
+Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraShaders.swift            edit  u_tearLight, u_previewLight (lead)
 Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraFeedbackPlanTests.swift                         new  (agent A)
 Packages/ExperiencesRound02/BackwardsAurora/CoreTests/{BackwardsAuroraLightsTests, BackwardsAuroraSoundRecipeTests}.swift  new (agent B)
 Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraInvariantTests.swift                            edit presentation sources (lead)

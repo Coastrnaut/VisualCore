@@ -17,6 +17,16 @@
 // with their bands and stars and the goal; `retry` starts the level again in its mode, `undoReversal` takes back the
 // last reversal, and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`), never
 // in the core.
+// Feature 396 (R02-G10-06) T-R02G1006-005 (FR-R02G1006-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `BackwardsAuroraFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log; refusals are shown and announced in
+// words (`refused(code:)`), and a revealed hint is announced as `state`; changes of the section's ends and the freeze
+// preview are not announced (the ends speak their values). The scene's lights (`BackwardsAuroraLights`: the glow, the
+// won lift, the tear cross and the preview) step toward the drawn snapshot every frame (0.15 s fades, 0.45 s under
+// Reduce Flashing); the tear cross stays on the last torn seam and the preview on its last samples while their lights
+// fade out. The ambient loop (`BackwardsAuroraSound`) is offered the recipe of the worst bend, the checkpoints matched
+// and the stage (`BackwardsAuroraSoundRecipe`) when a level or mode opens and when that recipe changes. The mirror
+// carries the summary element's text and the sound choice. Presentation only.
 #if os(iOS)
 import BackwardsAuroraCore
 import Foundation
@@ -26,6 +36,8 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
+import VisualCoreAudioDSP
 
 /// What the controls show and choose: the latest state the presenter described and the panel's section.
 @MainActor
@@ -67,6 +79,10 @@ final class BackwardsAuroraMirror {
     var smallest = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
     var pickedLevel = 1
+    /// The summary element's text (feature 396).
+    var summary = ""
+    /// Whether the ambient sound is on (feature 396; off by default).
+    var soundOn = false
 
     /// The goal and the level's difficulty band, with its best stars when won (feature 395).
     var goalLabel: String {
@@ -150,10 +166,27 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
     static let searchingText = "Finding a hint…"
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 395).
     private(set) var dailyDate: DateComponents?
+    /// The feedback route of announcements and haptics (feature 396; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 396; tests and diagnostics).
+    private(set) var feedbackLog: [BackwardsAuroraFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 396).
+    private(set) var lights: BackwardsAuroraLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient sound (feature 396).
+    let sound: BackwardsAuroraSound
+    /// The last torn seam drawn, so its cross can fade out after an undo (feature 396).
+    private(set) var fadingTear: Int?
+    /// The last preview's samples, so the preview ribbon can fade out after the press lifts (feature 396).
+    private(set) var fadingPreview: [Int]?
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = BackwardsAuroraLights(reducedFlash: reduceFlashing)
+        sound = BackwardsAuroraSound(recipe: BackwardsAuroraSoundRecipe.recipe(rootStep: 0, matched: 0,
+                                                                               stage: .loading))
         scene.reducedFlash = reduceFlashing
         scene.reduceMotion = reduceMotion
     }
@@ -192,12 +225,35 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
         lastPlay = core.play
         gestures.tick(at: ProcessInfo.processInfo.systemUptime, snapshot: snapshot, play: core.play)
         scene.orbit = gestures.orbit
+        let previewing: Bool = gestures.preview != nil
+        // The lights settle on the very first frame only; every later change, a level change included, fades.
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, previewing: previewing, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot, previewing: previewing)
+        }
+        lastFrameTime = frame.time
+        // The tear cross fades out on the last torn seam after an undo.
+        if let seam = snapshot.tear {
+            fadingTear = seam
+        } else if lights.tear <= 0 {
+            fadingTear = nil
+        }
+        scene.lights = lights
+        scene.fadingTear = fadingTear
         let shown: BackwardsAuroraSceneSnapshot
         if let preview = gestures.preview {
             shown = snapshot.withPreview(preview.samples)
+            fadingPreview = preview.samples
             mirror.previewText = preview.text
         } else {
-            shown = snapshot
+            // The preview ribbon fades out on its last samples (same wave length) after the press lifts.
+            if lights.preview <= 0 { fadingPreview = nil }
+            if let last = fadingPreview, last.count == snapshot.count {
+                shown = snapshot.withPreview(last)
+            } else {
+                shown = snapshot
+            }
             mirror.previewText = nil
         }
         // The timeline freezes while a preview shows: the shimmer and the pulses hold still.
@@ -228,7 +284,18 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
         let level = play.level
         let wave = play.wave
         follow(core)
+        let previous: BackwardsAuroraExperienceCore? = latestCore
+        if let previous {
+            route(BackwardsAuroraFeedbackPlan.after(old: previous, new: core))
+            let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         absorbProgress(core)
+        mirror.summary = BackwardsAuroraFeedbackPlan.summaryText(core: core, sectionStart: mirror.start,
+                                                                 sectionEnd: mirror.end)
         mirror.levelNumber = core.levelNumber
         mirror.spent = play.spent
         mirror.budget = level.budget
@@ -299,9 +366,11 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
             case let .setStart(k):
                 mirror.start = k
                 mirror.stepStart(0)
+                refreshSummary()
             case let .setEnd(k):
                 mirror.end = k
                 mirror.stepEnd(0)
+                refreshSummary()
             case let .reverse(start, end):
                 send("wave.reverse", [Double(start), Double(end)], port: port)
             case .resetView:
@@ -385,9 +454,11 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
             clearHint()
             return
         }
+        let revealed: Bool = mirror.hintLevel != level || mirror.hintText != hint.text
         hintKey = key
         mirror.hintLevel = level
         mirror.hintText = hint.text
+        if revealed { route(BackwardsAuroraFeedbackPlan.hint(text: hint.text)) }   // feature 396: announced as state
     }
 
     /// Ends the tutorial of the current level.
@@ -450,13 +521,53 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(result.code)"
+            let plan = BackwardsAuroraFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(result.code)
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
             }
         }
         return result
+    }
+
+    // MARK: Feedback and sound (feature 396)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: BackwardsAuroraFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its worst bend, its checkpoints matched and its stage.
+    static func recipe(_ core: BackwardsAuroraExperienceCore) -> AmbientLoopRecipe {
+        BackwardsAuroraSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current aurora.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
+
+    /// The summary element's text for the current section (the ends are presentation state of the panel).
+    func refreshSummary() {
+        guard let core = latestCore else { return }
+        mirror.summary = BackwardsAuroraFeedbackPlan.summaryText(core: core, sectionStart: mirror.start,
+                                                                 sectionEnd: mirror.end)
     }
 }
 #endif

@@ -152,7 +152,9 @@ import VisualCoreMath
         let text: String = shell.presenter.describe(core)
         #expect(text.contains("Every checkpoint matches"), "\(text)")
         #expect(shell.presenter.mirror.status == "Won")
-        let rgba: [UInt8] = try BackwardsAuroraTest.still(session)
+        // Feature 396: the won lift fades in over 0.15 s of presentation time, so the frame is drawn 1 s later.
+        let rgba: [UInt8] = try BackwardsAuroraTest.still(session, time: 1)
+        #expect(shell.presenter.lights.won == 1, "the won lift has faded in")
         let snapshot: BackwardsAuroraSceneSnapshot = try #require(shell.presenter.lastSnapshot)
         #expect(snapshot.stage == .won)
         #expect(snapshot.spent == actions.count)

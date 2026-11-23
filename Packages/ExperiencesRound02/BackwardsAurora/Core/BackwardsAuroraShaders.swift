@@ -25,11 +25,14 @@
 // ``glowWeight`` times the same; the glow gain is `u_glow` capped by `u_glowLimit` (both clamped to ``maxGlowGain``);
 // under Reduce Flashing the presenter passes ``glowGainCap`` as the limit. The glow program has no time input: it never
 // pulses.
+// Feature 396 (R02-G10-06): `u_won` carries the presenter's eased won light and the glow gain its eased glow light;
+// `u_tearLight` and `u_previewLight` scale the tear cross's and the preview ribbon's alphas, so under Reduce Flashing
+// none of them appears or vanishes in one frame (`BackwardsAuroraLights`).
 //
 // Attributes follow VisualCoreRendering's `ShaderMeshRenderer`: `a_position` (location 0), `a_normal` (location 1) from
 // `Mesh.interleavedPositionNormal()` and `a_uv` (location 2) from `Mesh.uvs`. Every source starts with `#version 300 es`
 // (VisualCoreShaderSource's `ShaderLibrary.versionLine`) and states one float precision. Plain uniforms (at most 16
-// vec4 slots per program; the aurora program uses 8, the glow program 6), no texture samplers, no image assets, no
+// vec4 slots per program; the aurora program uses 11, the glow program 6), no texture samplers, no image assets, no
 // `discard` and one loop, bounded by a constant. Output is premultiplied alpha. Palette constants are written with six
 // fixed decimals from `BackwardsAuroraPalette`, so the shader colours equal the CPU's within 1/255.
 
@@ -72,6 +75,12 @@ public enum BackwardsAuroraShaders {
     public static func won(stage: BackwardsAuroraStage, failure: BackwardsAuroraFailure?) -> Float {
         stage == .won || (stage == .result && failure == nil) ? 1 : 0
     }
+    /// `float`: the eased light of the tear cross, 0 … 1 (aurora; feature 396, R02-G10-06): the cross's alpha is
+    /// multiplied by it, so a tear fades in and, after an undo, out (`BackwardsAuroraLights.tear`); 1 draws it fully.
+    public static let tearLightUniform = "u_tearLight"
+    /// `float`: the eased light of the freeze preview ribbon, 0 … 1 (aurora; feature 396, R02-G10-06): the ribbon's
+    /// alpha is multiplied by it (`BackwardsAuroraLights.preview`); 1 draws it fully.
+    public static let previewLightUniform = "u_previewLight"
     /// `float`: the glow gain (glow); see ``glowGain(for:)`` and ``glowGain(gain:limit:)``.
     public static let glowUniform = "u_glow"
     /// `float`: the glow limit (glow): ``glowLimit(reduceFlashing:)``.
@@ -79,7 +88,7 @@ public enum BackwardsAuroraShaders {
 
     /// Every uniform the aurora program declares, each once, in order of declaration (vertex stage first).
     public static let auroraUniforms: [String] = [mvpUniform, lightDirectionUniform, eyeUniform, timeUniform,
-                                                  pulsesUniform, wonUniform]
+                                                  pulsesUniform, wonUniform, tearLightUniform, previewLightUniform]
 
     /// Every uniform the glow program declares, exactly as declared (vertex stage first).
     public static let glowUniforms: [String] = [mvpUniform, glowUniform, glowLimitUniform]
@@ -345,6 +354,8 @@ public enum BackwardsAuroraShaders {
     uniform float u_time;
     uniform float u_pulses;
     uniform float u_won;
+    uniform float u_tearLight;
+    uniform float u_previewLight;
     out vec4 color;
     const vec3 BA_RIBBON = \(vec3Literal(ribbon));
     const vec3 BA_HIGHLIGHT = \(vec3Literal(ribbonHighlight));
@@ -373,6 +384,7 @@ public enum BackwardsAuroraShaders {
         float isFirstLayer = isCode(m, 2.0);
         float isSecondLayer = isCode(m, 12.0);
         float isPreview = isCode(m, 13.0);
+        float isTear = isCode(m, 9.0);
         float isLit = isCode(m, 0.0) + isCode(m, 1.0) + isCode(m, 11.0);
         vec3 n = v_normal / max(length(v_normal), 0.0001);
         vec3 l = u_lightDir / max(length(u_lightDir), 0.0001);
@@ -406,6 +418,8 @@ public enum BackwardsAuroraShaders {
         float dash = step(0.5, fract(abs(v_t) * BA_PREVIEW_DASHES));
         float alpha = 1.0 - isFirstLayer * (1.0 - BA_FIRST_LAYER_ALPHA) - isSecondLayer * (1.0 - BA_SECOND_LAYER_ALPHA)
             - isPreview * (1.0 - BA_PREVIEW_ALPHA * dash);
+        alpha *= 1.0 - isTear * (1.0 - clamp(u_tearLight, 0.0, 1.0));
+        alpha *= 1.0 - isPreview * (1.0 - clamp(u_previewLight, 0.0, 1.0));
         color = vec4(rgb * alpha, alpha);
     }
     """

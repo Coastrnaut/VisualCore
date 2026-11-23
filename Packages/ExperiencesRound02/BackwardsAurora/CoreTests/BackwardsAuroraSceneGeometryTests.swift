@@ -523,4 +523,33 @@ import VisualCoreScenes
             }
         }
     }
+
+    // MARK: Feature 396 (R02-G10-06) T-R02G1006-005: the fading tear cross
+
+    /// The tear cross is drawn on `fadingTear` only while the snapshot shows no tear; nil leaves every mesh unchanged.
+    @Test func aFadingTearDrawsTheCrossOnTheLastTornSeam() throws {
+        let torn: Snapshot = try Self.torn12()
+        let seam: Int = try #require(torn.tear)
+        let tier: BackwardsAuroraTier = BackwardsAuroraTier.of(2)
+        // With a tear in the snapshot, `fadingTear` changes nothing.
+        #expect(try Geometry.auroraMesh(torn, tier: tier, fadingTear: 0) == (try Geometry.auroraMesh(torn, tier: tier)))
+        // Without one (a mild play), nil changes nothing and a seam adds exactly the tear cross there.
+        let mild: Snapshot = try Self.spending(1, budget: 4)
+        #expect(mild.tear == nil)
+        let plain: Mesh = try Geometry.auroraMesh(mild, tier: tier)
+        #expect(try Geometry.auroraMesh(mild, tier: tier, fadingTear: nil) == plain)
+        let fading: Mesh = try Geometry.auroraMesh(mild, tier: tier, fadingTear: seam)
+        var plainCodes: Set<Int> = []
+        for k in plain.positions.indices { plainCodes.insert(Self.code(plain, k)) }
+        var tearPoints: [Vec3] = []
+        for k in fading.positions.indices where Self.code(fading, k) == 9 { tearPoints.append(fading.positions[k]) }
+        #expect(!plainCodes.contains(9) && !tearPoints.isEmpty)
+        let centre: SIMD3<Double> = Geometry.samplePoint(seam, mild)
+        for point in tearPoints {
+            #expect(abs(point.x - centre.x) <= Geometry.tearSpan && abs(point.y - centre.y) <= Geometry.tearSpan)
+        }
+        // A seam outside the wave draws nothing.
+        #expect(try Geometry.auroraMesh(mild, tier: tier, fadingTear: 99) == plain)
+        #expect(try Geometry.auroraMesh(mild, tier: tier, fadingTear: -1) == plain)
+    }
 }

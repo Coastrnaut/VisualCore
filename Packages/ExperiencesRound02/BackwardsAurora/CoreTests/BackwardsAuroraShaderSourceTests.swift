@@ -211,23 +211,34 @@ import Testing
             BackwardsAuroraShaders.mvpUniform, BackwardsAuroraShaders.lightDirectionUniform,
             BackwardsAuroraShaders.eyeUniform, BackwardsAuroraShaders.timeUniform,
             BackwardsAuroraShaders.pulsesUniform, BackwardsAuroraShaders.wonUniform,
+            BackwardsAuroraShaders.tearLightUniform, BackwardsAuroraShaders.previewLightUniform,
             BackwardsAuroraShaders.glowUniform, BackwardsAuroraShaders.glowLimitUniform,
         ]
-        let names: [String] = ["u_mvp", "u_lightDir", "u_eye", "u_time", "u_pulses", "u_won", "u_glow",
-                               "u_glowLimit"]
+        let names: [String] = ["u_mvp", "u_lightDir", "u_eye", "u_time", "u_pulses", "u_won", "u_tearLight",
+                               "u_previewLight", "u_glow", "u_glowLimit"]
         #expect(constants == names)
         let listed: Set<String> = Set(BackwardsAuroraShaders.auroraUniforms + BackwardsAuroraShaders.glowUniforms)
         #expect(Set(constants) == listed)
         let aurora: String = BackwardsAuroraShaders.auroraVertex + BackwardsAuroraShaders.auroraFragment
         let auroraDeclarations: [String] = [
             "uniform mat4 u_mvp;", "uniform vec3 u_lightDir;", "uniform vec3 u_eye;", "uniform float u_time;",
-            "uniform float u_pulses;", "uniform float u_won;",
+            "uniform float u_pulses;", "uniform float u_won;", "uniform float u_tearLight;",
+            "uniform float u_previewLight;",
         ]
         for declaration in auroraDeclarations { #expect(aurora.contains(declaration), "\(declaration)") }
         let glow: String = BackwardsAuroraShaders.glowVertex + BackwardsAuroraShaders.glowFragment
         let glowDeclarations: [String] = ["uniform mat4 u_mvp;", "uniform float u_glow;", "uniform float u_glowLimit;"]
         for declaration in glowDeclarations { #expect(glow.contains(declaration), "\(declaration)") }
         #expect(Self.wordCount("u_time", in: glow) == 0)
+    }
+
+    /// Feature 396 (R02-G10-06): the tear cross's and the preview ribbon's alphas are scaled by their eased lights.
+    @Test func theTearAndPreviewLightsScaleTheirAlphas() {
+        let fragment: String = BackwardsAuroraShaders.auroraFragment
+        #expect(fragment.contains("alpha *= 1.0 - isTear * (1.0 - clamp(u_tearLight, 0.0, 1.0));"))
+        #expect(fragment.contains("alpha *= 1.0 - isPreview * (1.0 - clamp(u_previewLight, 0.0, 1.0));"))
+        #expect(fragment.contains("float isTear = isCode(m, 9.0);"))
+        #expect(BackwardsAuroraShaders.auroraUniforms.suffix(2) == ["u_tearLight", "u_previewLight"])
     }
 
     /// A won level (stage won, or the result after a win) lifts the ribbon; every other stage leaves it.
@@ -255,7 +266,7 @@ import Testing
             #expect(slots <= BackwardsAuroraShaders.maxUniformVec4s, "\(program.name) uses \(slots) vec4 slots")
             slotsByProgram[program.name] = slots
         }
-        #expect(slotsByProgram == ["aurora": 9, "glow": 6])
+        #expect(slotsByProgram == ["aurora": 11, "glow": 6])   // feature 396: + u_tearLight, u_previewLight
     }
 
     @Test func noTextureSamplerNoDiscardAndLoopsBoundedByConstants() {
