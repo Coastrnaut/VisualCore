@@ -11,7 +11,7 @@
   Reverse.
   Rationale: no test-only hooks; the constants are checked. Alternatives: a debug argument that solves the level
   (rejected: it bypasses the controls under test).
-- **R3 — Stored examples.** Decision: the `schemaExample(version:)` envelope of `FacetedForgeSchemaExamples`
+- **R3 — Stored examples.** Decision: the `schemaExample(version:)` envelope of `NocturneGardenSchemaExamples`
   (payload of that schema, migrated and restored for the expected digest). Rationale: the registry's
   `SnapshotMigrationCheck` already consumes it, and the X gate's AppModelTests need registered examples for a schema
   above 1.
