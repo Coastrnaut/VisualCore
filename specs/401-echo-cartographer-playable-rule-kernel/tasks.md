@@ -74,7 +74,7 @@ in this feature (the chamber, its rays and echoes are the CPU reference the rend
 - [X] T-R02G1101-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-23: reference-1 exit 0, 2026-11-23
 - [X] T-R02G1101-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-23: reference-2 exit 0, 2026-11-23
 - [X] T-R02G1101-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: script-tests (run alone) exit 0, 2026-11-23
-- [ ] T-R02G1101-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G1101-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-23: converged clean; sealed (16 passing) and recorded pass, 2026-11-23 (.autonomy/migration/evidence/R02-G11-01.json)
 
 ## Dependencies and parallel work
 
