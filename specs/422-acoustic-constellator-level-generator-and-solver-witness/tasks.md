@@ -24,7 +24,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G1302-003 [US1] Implement `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSolver.swift`
+- [X] T-R02G1302-003 [US1] Implement `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSolver.swift` — Verified 2026-11-23: host-2 (AcousticConstellatorSolverTests 10 tests: hand levels with known minima (missing link only, one nudge, helper link, over maxActions, work bound, symbol over degree limit), plans win through the solver and the play, independent brute force over every play action at size plan-1 on 20 seeded candidates finds no win, smallerSets and work recounted independently, deterministic) exit 0, lead retest
   (lead: the missing symbol pairs always in the plan; options = helper links (unlinked pairs, pair order) then nudges
   (star order, −1 then +1); e = 0, 1, 2, … extra actions as multisets in option order, skipping a repeated helper link,
   opposite nudges on one star and sets over the degree or link limit; the kernel's listen on each; the first winning set
