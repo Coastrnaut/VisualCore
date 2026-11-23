@@ -37,6 +37,8 @@ let package = Package(
         .library(name: "NocturneGardenCore", targets: ["NocturneGardenCore"]),
         // Feature 391 (R02-G10-01): Backwards Aurora's rule kernel, a candidate until X-R02-G10.
         .library(name: "BackwardsAuroraCore", targets: ["BackwardsAuroraCore"]),
+        // Feature 401 (R02-G11-01): Echo Cartographer's rule kernel, a candidate until X-R02-G11.
+        .library(name: "EchoCartographerCore", targets: ["EchoCartographerCore"]),
         // Feature 353 (R02-G06-03): Chrono Constellator's experience (iOS only; a registered candidate until X-R02-G06).
         .library(name: "ChronoConstellatorExperience", targets: ["ChronoConstellatorExperience"]),
         // Feature 363 (R02-G07-03): Amethyst Escape's experience (iOS only; a registered candidate until X-R02-G07).
@@ -348,6 +350,16 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "BackwardsAurora/CoreTests"),
+        // Feature 401 (R02-G11-01): Echo Cartographer's pure rule kernel.
+        .target(name: "EchoCartographerCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "EchoCartographer/Core"),
+        .testTarget(name: "EchoCartographerCoreTests",
+                    dependencies: ["EchoCartographerCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "EchoCartographer/CoreTests"),
         .target(name: "ChronoConstellatorExperience",
                 dependencies: ["ChronoConstellatorCore",
                                .product(name: "VisualCoreMath", package: visualCore),

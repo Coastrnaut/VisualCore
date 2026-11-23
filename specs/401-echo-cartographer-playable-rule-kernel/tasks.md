@@ -14,7 +14,7 @@ in this feature (the chamber, its rays and echoes are the CPU reference the rend
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1101-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `EchoCartographerCore`,
+- [X] T-R02G1101-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `EchoCartographerCore`, — Verified 2026-11-23: host (swift test --filter EchoCartographer: EchoCartographerLevelTests 9: reason codes, every range refusal, hand rays, path lengths and echoes, claim rule incl. ties and tolerance boundary, knowledge growth, names in words, stored form round trip and damaged/edited/newer refusals, 500 fixtures valid) exit 0, 2026-11-23
   `EchoCartographerCoreTests`, product); create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerError.swift`
   (codes "r02-g11.level, .action, .noop, .stage, .stale, .newer-schema, .malformed"),
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerChamber.swift` ("width, height (5 … 16)", walls as
