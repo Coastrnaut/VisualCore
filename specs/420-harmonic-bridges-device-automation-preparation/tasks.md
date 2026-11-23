@@ -13,7 +13,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 2: Story 1 — the campaign knows what to run (P1) 🎯
 
-- [ ] T-R02G1210-002 [US1] Create `docs/apps/harmonic-bridges/device-rows.json` (data-model.md: "schema 1, sorted
+- [X] T-R02G1210-002 [US1] Create `docs/apps/harmonic-bridges/device-rows.json` (data-model.md: "schema 1, sorted — Verified 2026-11-23: device-rows (check_device_rows.py --experience r02-g12.harmonic-bridges: PASS, 8 rows, 12 scenarios; devices DEV1/2/3-R02-G12; all six {device} tasks of 413-419 and the UA-F13 measurements covered) exit 0; release step device-rows-r02-g12 added
   keys"; devices D1 → DEV1-R02-G12, D2 → DEV2-R02-G12, D3 → DEV3-R02-G12; the 12 scenarios of clarification Q2; rows
   HB-D1 … HB-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false
   only for HB-D6), covers, owner_steps, status "pending device campaign"; no result field); edit

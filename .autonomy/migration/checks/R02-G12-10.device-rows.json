@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g12.harmonic-bridges"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g12.harmonic-bridges",
+  "elapsed_seconds": 0.029,
+  "exit_code": 0,
+  "finished": "2026-11-23T21:55:03+00:00",
+  "gate": "R02-G12-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G12-10.device-rows.log",
+  "log_sha256": "c75e41e2b605d6c3273a557c7a3a65563ec58e629b14b475fa4a821975f7dd87",
+  "name": "device-rows",
+  "started": "2026-11-23T21:55:03+00:00",
+  "timed_out": false
+}
