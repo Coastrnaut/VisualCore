@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xr02g11-host-3",
+    "--only-testing",
+    "BackwardsAuroraCoreTests",
+    "BackwardsAuroraExperienceTests",
+    "EchoCartographerCoreTests",
+    "EchoCartographerExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g11-host-3 --only-testing BackwardsAuroraCoreTests BackwardsAuroraExperienceTests EchoCartographerCoreTests EchoCartographerExperienceTests",
+  "elapsed_seconds": 56.305,
+  "exit_code": 0,
+  "finished": "2026-11-23T15:40:46+00:00",
+  "gate": "X-R02-G11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G11.host-3.log",
+  "log_sha256": "118ce9df59b260ccb472891fcc85e3093d0406897e2cbf119834c880847e9d5b",
+  "name": "host-3",
+  "started": "2026-11-23T15:39:50+00:00",
+  "timed_out": false
+}
