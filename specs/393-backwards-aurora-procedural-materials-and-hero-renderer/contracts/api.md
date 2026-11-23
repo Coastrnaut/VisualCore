@@ -11,7 +11,7 @@ public struct BackwardsAuroraTier: Sendable, Equatable { public let name: String
 public struct BackwardsAuroraSceneSnapshot: Sendable, Equatable {
     public let samples: [Int]; public let target: [Int]; public let checkpoints: [Int]; public let matched: [Bool]
     public let bendLimit: Int; public let kinks: [Int]; public let tear: Int?
-    public let section: (start: Int, end: Int)   // stored as sectionStart, sectionEnd
+    public let sectionStart: Int; public let sectionEnd: Int   // the chosen section (presentation state)
     public let stage: BackwardsAuroraStage; public let failure: BackwardsAuroraFailure?; public let spent: Int
     public let budget: Int; public let levelNumber: Int; public let time: Double
     public init(play: BackwardsAuroraPlay, levelNumber: Int, sectionStart: Int, sectionEnd: Int, time: Double) }

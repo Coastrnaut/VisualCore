@@ -2,7 +2,7 @@
 
 | Entity | Fields | Rules |
 |---|---|---|
-| `BackwardsAuroraSceneSnapshot` | samples, target, checkpoints, matched, bendLimit, kinks (positions with \|b\| > L, sorted), tear (seam or nil), section (start, end), stage, failure, spent, budget, levelNumber, time | immutable; built from the adapter; positions within the wave |
+| `BackwardsAuroraSceneSnapshot` | samples, target, checkpoints, matched, bendLimit, kinks (positions with \|b\| > L, sorted), tear (seam or nil), sectionStart, sectionEnd, stage, failure, spent, budget, levelNumber, time | immutable; built from the adapter; positions within the wave |
 | `BackwardsAuroraPalette` | ground #070B1F, ribbon #1FC8D6, ribbonHighlight #9FF4FA, glow #6FE8F0, ghost #C9B8F0, ring #DCD3FA, matched #F4F0FF, kink #FF8A7A, tear #FF3B30, band #2A3570, spent #1FC8D6, unspent #2B3352 | linear colours in 0 … 1 |
 | `BackwardsAuroraTier` | level-0: 3 trailing layers, 2 pulses, 2 glow shells; level-1: 2, 1, 1; level-2: 1, 0, 0 | richest first; logged with reason on change |
 | `BackwardsAuroraExperienceCore` | level number, play | digest = level number + play fingerprint; snapshot schema 1 `{level, records}` |
