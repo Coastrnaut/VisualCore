@@ -576,3 +576,7 @@ words, adjustable ends, summary element, Sound toggle and Dynamic Type layout.
 Feature 397 (R02-G10-07) adds persistence and replay: results with winning traces and `BackwardsAuroraReconciliation`
 (replay-verified scores on restore), snapshot schema 3 with migrations from schemas 1 and 2, the replay mode
 (`replay.start`, `replay.step`, `replay.stop`) and the saved sound setting, with the panel's replay controls.
+
+Feature 398 (R02-G10-08) adds the regression net: the solver regression over the 100 witnesses, `BackwardsAuroraGolden`
+with the pinned `golden-frames.json` (16 code-computed frame descriptions), the simulator golden-frame and memory
+classes, `scripts/backwards_aurora_regression.py` and the CI step "Backwards Aurora regression (host)".

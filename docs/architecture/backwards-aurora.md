@@ -163,3 +163,23 @@ opening wave that already wins is refused) and the fingerprint and refuses damag
   time, `replay.stop` back to the campaign; every other play action is refused with `r02-g10.replay` (refusals in
   words); a replayed win claims no stars. The panel shows "Replay best solution", then the position with Step and Stop.
 - **Settings.** The Sound toggle is saved through `settings.sound [0 … 1]` and applied when the experience opens.
+
+## Regression net (feature 398, R02-G10-08)
+
+- **Solver regression.** For all 100 levels, in ten groups of ten: the generated level equals its witness, the witness's
+  reversals replay to a win in exactly the smallest count with the stored per-reversal digests and fingerprints, and
+  the solver re-finds exactly those reversals with the smallest count equal to the seam-count bound and work at most
+  20,000 (the largest is 2,042, level 91); ten kinds of alteration (a target sample, a checkpoint, the budget, the bend
+  and breaking limits, a solution reversal, a witness reversal, digest or fingerprint, the smallest count) each fail
+  naming the level and the part. Work is counted, never timed.
+- **Golden frames.** `BackwardsAuroraGolden` (test builds only; forbidden in the Release binary) describes 16 frames
+  (levels 1, 21, 41, 61, 81 at tiers 0 … 2 after their first certified reversals, plus the hero frame) at 1,152 × 768:
+  the ribbon's sample points and the checkpoint ring centres in 1/8 pixel, the kinks, the tear, the gauge and the
+  palette, hashed with SHA-256 and pinned in `golden-frames.json`; a recomputed frame passes on an equal digest or
+  within one quantum with equal counts and colours, and the file is rewritten only with `BACKWARDS_AURORA_WRITE_GOLDEN=1`.
+  On the simulator the same frames are rendered and checked against their descriptions with the feature-393 frame
+  checks.
+- **Memory.** Twelve open-draw-warn-close cycles keep the footprint within 16 MB of the first cycle when the class runs
+  alone (measured growth 0.42 MB) and leave the aurora scene with no GPU objects after every close and memory warning.
+- **Running it.** `python3 scripts/backwards_aurora_regression.py` runs the host part and the simulator classes with one
+  summary line per part; CI runs the host part as "Backwards Aurora regression (host)".
