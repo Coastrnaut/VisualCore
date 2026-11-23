@@ -11,7 +11,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G1203-001 Baselines on the committed tree: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on the committed tree; rendering baseline is R02-G12-02's rendering runs (exit 0)
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G12-02's
   rendering runs (exit 0)
-- [ ] T-R02G1203-002 Edit `Packages/ExperiencesRound02/Package.swift` (`HarmonicBridgesExperience` and its tests with
+- [X] T-R02G1203-002 Edit `Packages/ExperiencesRound02/Package.swift` (`HarmonicBridgesExperience` and its tests with — Verified 2026-11-23: host exit 0 (all Harmonic Bridges tests); HarmonicBridgesSceneSnapshot (islands, strings, pegs, the kernel's report, modes and strengths per step and string, threshold, start, goal, stage, failure, actions left, budget, level, time; shownStep cycling every 1.2 s, restingStep, failure text), HarmonicBridgesTier (level-0 motion, 2 wave shells, 2 glow shells; level-1 motion, 1 glow shell; level-2 at rest) and HarmonicBridgesPalette incl. brokenOutline; the invariant scan reads a fixed list of kernel files, so presentation sources are excluded without a change; the Core already links every product the renderer needs
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); make the renderer-purity scan
   of `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesInvariantTests.swift` skip the presentation
   sources (snapshot, geometry, shaders, scenarios, adapter), which use Doubles; create
