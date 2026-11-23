@@ -32,7 +32,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorShaders.swift` (constellation and glow
   sources, GLSL ES 3.00; signed-distance shading of stars, hands, filaments, guides and gauges from per-vertex local
   coordinates; the presentation pulse 1 + 0.15 · cos(2π · phase / 12) driven by uniforms, none at level-2 and under
-  Reduce Motion; wave shells expanding from radius 0 to 0.12 over 1 s; a won level lifts the symbol links' glow; uniform
+  Reduce Motion; the glow program shades the shells and glow built by T-004 (a wave shell fades as it expands); a won level lifts the symbol links' glow; uniform
   names; glow gain cap; palette constants equal to the CPU's) with
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorShaderSourceTests.swift` (version line,
   declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match); agent A;
@@ -47,13 +47,16 @@ tests stay short (< 10 s each). No {owner} tasks.
   x = −0.6 to 0.6 with ⌊12 · (A + B√3) / n²⌋ lit and a mark over bar ⌈12θ / n²⌉; hold pips at z = 1.0 from x = −0.4 to
   0.4, lit for the current run; moves gauge of `budget` bars at z = 1.15 from x = −0.9 to 0.9, each 1.8 / budget wide
   with a fifth as gap, 0.05 deep, lit for the actions left; a won level brightens every symbol link without moving any
-  position; camera from eye (0, 2.0, 1.7) to (0, 0, 0.2) fitted to x −0.9 … 0.9, z −0.7 … 1.25, y 0 … 0.3 with a 5 %
+  position; `glowMesh` per tier: wave shells (strip rings 0.01 wide at the star's height, expanding from
+  radius 0 to 0.12 over 1 s from each star on a coherent shown tick; 2 at level-0, none below) and glow shells around
+  teal links and stars (2 at level-0, 1 at level-1, none at level-2); camera from eye (0, 2.0, 1.7) to (0, 0, 0.2) fitted to x −0.9 … 0.9, z −0.7 … 1.25, y 0 … 0.3 with a 5 %
   margin for aspect 0.4 … 2.5; `project`; fallback coloured parts) with
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorSceneGeometryTests.swift` (finite and
   bounded for extreme settings — 3 and 8 stars, 0 and 16 links, every link snapped, none, budgets 1 and 40, holds 2 and
   12; every star centre, link check point, gauge bar and pip inside the view with margin at 7 aspects; same positions
   at every tier; teal exactly where the kernel's gap at the shown tick is at most 1; snapped exactly where the kernel's
-  report snaps; gauge bars at 0, half and the budget; a won level's links brighter and in place); agent B; `--name
+  report snaps; gauge bars at 0, half and the budget; a won level's links brighter and in place; the glow mesh empty at level-2 and its shell counts per tier; only the
+  glow mesh differs between tiers); agent B; `--name
   host-3`
 - [ ] T-R02G1303-005 [P] [US2] Create
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorExperienceCore.swift` (controls "link.add
