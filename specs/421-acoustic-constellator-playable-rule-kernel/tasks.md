@@ -87,7 +87,7 @@ will consume).
 - [X] T-R02G1301-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-23: reference-1 exit 0
 - [X] T-R02G1301-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-23: reference-2 exit 0
 - [X] T-R02G1301-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: script-tests (alone) exit 0
-- [ ] T-R02G1301-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1301-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-23: converge round 1 appended T-013 (data-model link order); round 2 appended nothing; README row, gate list and feature count updated
   README row and gate list updated
 
 ## Dependencies and parallel work
