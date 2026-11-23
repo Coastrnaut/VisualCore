@@ -80,3 +80,12 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 the progress and a new reconciliation file). Shared files (adapter, scenarios, feedback, presenter, panel, docs) stay
 with the lead. MVP: Stories 1 and 2. Requirement coverage: FR-001/002/005/007 → 003, 004; FR-003 → 002, 003, 004; FR-004 →
 003, 005; FR-006 → 006 … 010.
+
+## Phase 6: Convergence
+
+- [ ] T-R02G1207-013 Refuse as `damaged` a restored replay whose records are not exactly the first actions of its level's
+  verified trace (tunings and tests only, in order, no undo or redo) in
+  `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesExperienceCore.swift`, with a test in
+  `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesExperienceCoreTests.swift` (a replay saved
+  mid-way restores; a record changed, reordered or an undo added is refused `damaged`), per FR-R02G1207-006 (partial);
+  `--name host-4`
