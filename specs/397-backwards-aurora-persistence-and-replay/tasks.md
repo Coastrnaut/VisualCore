@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G1007-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraExperienceCore.swift` (schema 3, migration 2 → 3
+- [X] T-R02G1007-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraExperienceCore.swift` (schema 3, migration 2 → 3 — Verified 2026-11-23: host-2 exit=0 (212 Backwards Aurora host tests: schema 3 and digest v3, replay.start/step/stop with r02-g10.no-replay, replay-end and replay, other play actions refused in replay, replay never records, the sound setting snapshotted and not digested, migrations 1 to 3 and 2 to 3 through the engine, schema 4 refused, edited results dropped on restore with the frontier kept, a saved replay of a dropped result returns to campaign; replay refusal words and a replayed win without stars in the feedback plan; scenarios regenerated; the panel's and presenter's mode switches gain replay)
   "results with an empty trace and verified false, sound off", digest v3; a campaign or daily win records the winning
   effective-reversal trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start
   [1…100]" (`r02-g10.no-replay` without a verified traced result), "replay.step" (`r02-g10.replay-end` after the last

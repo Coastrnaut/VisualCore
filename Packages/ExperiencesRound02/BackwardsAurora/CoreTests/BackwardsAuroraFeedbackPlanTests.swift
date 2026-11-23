@@ -254,4 +254,44 @@ import VisualCoreSimulation
         #expect(Plan.hint(text: BackwardsAuroraHint.failedText)
             == Plan(text: "Undo the last reversal or retry the level.", kind: .state, haptic: nil))
     }
+
+    /// Feature 397 (clarification Q4): the replay refusals in words (raw and prefixed codes), the replay mode's name,
+    /// and a replayed win that claims no stars; a replay step is announced like the reversal it plays.
+    @Test func replayWordsAndAReplayedWin() throws {
+        let words: [(code: String, text: String)] = [
+            (code: "r02-g10.no-replay", text: "There is no saved solution to replay for this level."),
+            (code: "r02-g10.replay-end", text: "The replay is over."),
+            (code: "r02-g10.replay", text: "Stop the replay first."),
+        ]
+        for entry in words {
+            #expect(Plan.refusalText(code: entry.code) == entry.text)
+            #expect(Plan.refusalText(code: "action.rule." + entry.code) == entry.text)
+            let plan: Plan = Plan.refused(code: entry.code)
+            #expect(plan.kind == .rejection && plan.haptic == .error && plan.text == entry.text)
+        }
+        #expect(Plan.modeName(.replay(level: 4)) == "replay")
+        let actions: [BackwardsAuroraAction] = try Core.generated(number: 1).solution.actions
+        var core: Core = try Core.opening(number: 1)
+        for action in actions {
+            guard case let .reverse(start, end) = action else { continue }
+            let act: ExperienceAction = ExperienceAction(control: "wave.reverse", values: [Double(start), Double(end)],
+                                                         step: 0)
+            #expect(core.apply(act) == .accepted)
+        }
+        #expect(core.apply(ExperienceAction(control: "replay.start", values: [1], step: 0)) == .accepted)
+        var plans: [Plan] = []
+        for _ in actions {
+            let before: Core = core
+            #expect(core.apply(ExperienceAction(control: "replay.step", values: [], step: 0)) == .accepted)
+            plans.append(Plan.after(old: before, new: core))
+        }
+        let last: Plan = try #require(plans.last)
+        let text: String = try #require(last.text)
+        #expect(last.kind == .outcome && last.haptic == .success)
+        #expect(text.hasPrefix("Every checkpoint matches") && !text.contains("stars"), "\(text)")
+        if plans.count >= 2 {
+            let first: String = try #require(plans[0].text)
+            #expect(first.hasPrefix("Reversed samples") && plans[0].kind == .state, "\(first)")
+        }
+    }
 }

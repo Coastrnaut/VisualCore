@@ -27,6 +27,9 @@
 // `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`;
 // rejection also refuses the progression controls' wrong value counts (`level.select`, `mode.daily`, `mode.practice`,
 // `mode.campaign`, `tutorial.dismiss`); the manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`).
+// Feature 397 (R02-G10-07) T-R02G1007-003: the digests are schema 3's ("…v3": the same parts with traced results), the
+// controls gain replay and the sound setting (rejection also refuses their wrong value counts); the manifest was
+// regenerated.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -187,6 +190,10 @@ extension BackwardsAuroraExperienceCore {
             refusedEntry("mode.practice", [1], wrongCount),
             refusedEntry("mode.campaign", [1], wrongCount),
             refusedEntry("tutorial.dismiss", [1], wrongCount),
+            refusedEntry("replay.start", [], wrongCount),
+            refusedEntry("replay.step", [1], wrongCount),
+            refusedEntry("replay.stop", [1], wrongCount),
+            refusedEntry("settings.sound", [], wrongCount),
         ]
         return entries
     }

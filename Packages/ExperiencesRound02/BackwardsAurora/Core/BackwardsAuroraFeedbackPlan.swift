@@ -93,8 +93,16 @@ public struct BackwardsAuroraFeedbackPlan: Sendable, Equatable {
     /// (`r02-g10.date`), "That section cannot be reversed here." (`r02-g10.action`), "That section reads the same both
     /// ways; reversing it changes nothing." (`r02-g10.noop`), "The level has ended." (`r02-g10.stage`), "That value must
     /// be a whole number." (`r02-g10.not-whole`), otherwise (`r02-g10.stale`, `r02-g10.malformed`, the engine's own
-    /// codes such as `action.out-of-range`) "That reversal was refused.".
+    /// codes such as `action.out-of-range`) "That reversal was refused."; feature 397 adds "There is no saved
+    /// solution to replay for this level." (`r02-g10.no-replay`), "The replay is over." (`r02-g10.replay-end`) and "Stop
+    /// the replay first." (`r02-g10.replay`).
     public static func refusalText(code: String) -> String {
+        // Feature 397: the replay codes; `no-replay` and `replay-end` first, since both contain `r02-g10.replay`.
+        if code.contains(BackwardsAuroraExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        if code.contains(BackwardsAuroraExperienceRule.replayEnd) { return "The replay is over." }
+        if code.contains(BackwardsAuroraExperienceRule.replay) { return "Stop the replay first." }
         if code.contains(BackwardsAuroraExperienceRule.locked) { return "That level is not open yet." }
         if code.contains(BackwardsAuroraExperienceRule.date) { return "That date cannot be used." }
         if code.contains(BackwardsAuroraError.action("").reasonCode) { return "That section cannot be reversed here." }
@@ -132,7 +140,7 @@ public struct BackwardsAuroraFeedbackPlan: Sendable, Equatable {
             + samples + ". Checkpoints: " + checkpoints + ". Level: " + level.targetDescription() + "."
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay" (feature 397).
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay".
     public static func modeName(_ mode: BackwardsAuroraMode) -> String {
         switch mode {
         case .campaign: "campaign"
