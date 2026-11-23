@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G13-01 (migration ledger, game feature of experience R02-G13) · ID namespace FR-R02G1301-###,
 SC-R02G1301-###, T-R02G1301-###
@@ -31,6 +31,70 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract,
   so R02-G13-02 can certify levels).
 - **Model:** feature 411 (Harmonic Bridges's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+411's answers where the games agree. Facts checked in code (read-only, 2026-11-23): `Packages/ExperiencesRound02` holds
+Aurora Loom … Harmonic Bridges as the pattern (Core with level, play, records with previous and next fingerprints, rules
+as R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.*` reason codes); no `AcousticConstellator*` name exists;
+the catalog sets the timestep at 0.008333 s, the content at 85 stages, the controls "drag links between 3D stars, tap a
+node to phase nudge, orbit to inspect", the law phase_i += ω_i·dt + K Σ sin(phase_j − phase_i)·dt and the truth metric
+"Kuramoto order parameter and graph-isomorphism labeling". Checked by computation (2026-11-23): on a 12-step clock,
+|Σ e^{iπφ/6}|² equals A + B√3 with A = n + Σ_{i<j} a(gap) and B = Σ_{i<j} b(gap), where (a, b) for gaps 0 … 6 is (2, 0),
+(0, 1), (1, 0), (0, 0), (−1, 0), (0, −1), (−2, 0) (20,000 random phase sets, largest difference 2·10⁻¹⁴); the coupling
+table s(0 … 6) = 0, 1, 2, 2, 2, 1, 0 is 2·sin(πd/6) rounded to whole numbers; over 400 random spanning-tree constellations
+of 3 … 7 stars with rates 0 … 1 a coupling step clamped to ±1 per tick reaches a hold of 8 ticks at R² ≥ 3/4 in 58 % of
+cases, against 20 % or less for an unclamped step, which overshoots and oscillates.
+
+- Q: What are the stars, the links and the target symbol, exactly? → A: a level has 3 … 8 stars (index 0 … n − 1),
+  each with a natural rate ω in 0 … 11 phase steps per tick, a starting phase φ₀ in 0 … 11 and a drawing position on a
+  12 × 12 × 12 grid that never decides a rule; 0 … 6 fixed links (pairs of distinct stars that the player cannot
+  remove); a target symbol of 2 … 10 distinct star pairs whose graph is connected (its stars are the symbol's stars); a
+  coupling strength K in 1 … 8; a degree limit D in 2 … 4 (links per star, fixed links included); a link limit E (the
+  number of links at once, fixed included) at least the symbol's size and at most 16; a snap limit σ in 2 … 5 phase
+  steps; a coherence threshold θ in 1 … n² (compared with n²R²); a hold H in 2 … 12 ticks; a window W in H … 48 ticks;
+  an action budget of 1 … 40. A level whose fixed links break a limit is refused. Impact: FR-R02G1301-001; SC-R02G1301-001.
+- Q: How does a phase advance in one tick, exactly? → A: phases live on a 12-step clock (0 … 11, arithmetic modulo 12);
+  the signed gap from star i to star j is d = φⱼ − φᵢ reduced to −5 … 6; the coupling table is s(d) = sign(d) ·
+  t(|d|) with t(0 … 6) = 0, 1, 2, 2, 2, 1, 0; star i's pull is P = Σ s(d) over its current links; its coupling step is
+  c = ⌊K · P / 4⌋ (rounded toward minus infinity) clamped to −1 … 1; all stars then move at once to
+  (φᵢ + ωᵢ + c) mod 12, every pull being computed from the phases before the tick. Impact: FR-R02G1301-002;
+  SC-R02G1301-003.
+- Q: Which actions exist, what does each cost, and when is one refused? → A: `link(a, b)` adds a link between two
+  distinct stars and spends 1 action; `unlink(a, b)` removes a link the player made and spends 1; `nudge(i, δ)` with δ
+  = +1 or −1 shifts star i's starting phase by one step (mod 12) and spends 1; `listen` spends 1 and decides the level.
+  Refused without change: an unknown star, a link from a star to itself, a link that exists, a link that would take a
+  star above D or the links above E, removing a missing or fixed link, a nudge step other than ±1 (`r02-g13.action`); a
+  wrong stage (`r02-g13.stage`) or a stale fingerprint (`r02-g13.stale`). Undo and redo spend nothing; a new action
+  clears the redo stack. The life of a level is loading → tutorial (when the level has one) → playing ⇄ paused → won or
+  failed → result, entered by `begin`, `dismissTutorial`, `pause`, `resume` and `showResult`. Impact: FR-R02G1301-004,
+  006, 008, 011.
+- Q: In which order does a listen decide, and what is reported? → A: a listen first checks that every symbol pair is
+  linked (else it fails `missing`, naming the lowest-index missing pair); it then runs ticks 1 … W from the starting
+  phases with the current links: each tick moves all phases (as above), then snaps every link whose gap |d| exceeds σ
+  (all such links at once, for the rest of this listen only), then fails `disconnected` (naming the tick and the
+  lowest-index link snapped in it) if the remaining links no longer join all of the symbol's stars, then counts the tick
+  as coherent when every symbol pair is still linked and A + B√3 ≥ θ (decided exactly: with D′ = θ − A, true when
+  B ≥ 0 and (D′ ≤ 0 or 3B² ≥ D′²), or B < 0 and D′ ≤ 0 and D′² ≥ 3B²). H consecutive coherent ticks win the level on
+  that tick; if the window ends first the listen fails `incoherent`, reporting the longest coherent run. After any other
+  accepted action, a budget fully spent without a win fails the level (`budget`). Undo and redo restore the exact
+  earlier state; undo works in playing and paused; from failed, undo returns to playing (an honest retry, recorded); a
+  won level is final and refuses undo. The truth metric is reported after every action: a listen of the current state
+  (the phases at every tick, the links snapped per tick, A and B per tick, the coherent runs and the outcome it would
+  give) and the graph-isomorphism label of the player's link graph (the lexicographically smallest adjacency string
+  over all orderings of the stars) with whether it equals the label of the target symbol's graph; the metric never
+  decides the outcome by itself. Impact: FR-R02G1301-003, 005, 007, 008, 014; SC-R02G1301-002, 003, 004.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G12-01: every accepted action appends a
+  record (schema, level seed, action index, kind, stars, step, previous and next fingerprints); the play fingerprint is
+  the SHA-256 of the schema, the level fingerprint, the links, the starting phases, the actions spent, the stage and the
+  failure; levels are JSON schema 1 with sorted keys (stars as [x, y, z, ω, φ₀], fixed links and symbol as pairs, K, D,
+  E, σ, θ, H, W, budget, tutorial flag, seed, id) and a fingerprint, re-checked on decode; a level with a repeated or
+  self pair, a disconnected symbol, fixed links over a limit, or values out of range is refused; reason codes
+  `r02-g13.level`, `.action`, `.stage`, `.stale`, `.newer-schema`, `.malformed`. Impact: FR-R02G1301-006 … 011;
+  SC-R02G1301-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
