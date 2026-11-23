@@ -1,0 +1,213 @@
+{
+  "actions" : [
+    {
+      "tune" : {
+        "_0" : 0,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 2,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 4,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 5,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 7,
+        "_1" : 12
+      }
+    },
+    {
+      "test" : {
+
+      }
+    }
+  ],
+  "bridgeDigests" : [
+    "0fa188629d3ee27c",
+    "662b932720f6326d",
+    "7aeabc007633967c",
+    "993887723f071a54",
+    "0a121c69b550e5e4"
+  ],
+  "counterexample" : {
+    "choices" : 98,
+    "size" : 4
+  },
+  "difficulty" : {
+    "islands" : 6,
+    "locked" : 1,
+    "smallerChoices" : 98,
+    "steps" : 3,
+    "strings" : 8,
+    "threshold" : 3,
+    "tones" : 9,
+    "tunings" : 5,
+    "work" : 112
+  },
+  "fingerprints" : [
+    "438a5a5b1e6ab0ef5fc598a5d4ba2726911c371a4ed9140ad9846c49f4277adc",
+    "e41871ae660e93c21e0386224697881d58f8a877d7619a252eb218dc32259ab2",
+    "a4c5e39fabbcbe5c31733b69d9980d3167b44eb770548cf49c7ee2b0876005e5",
+    "648c41ed16c16ca1a577dc1b8d58c53eec56ec3630335f6d539d155a6c6f9cad",
+    "d96d035dbdaf9e6485aff1bf69398f36a7a84f484d902a6fac21af5a0c402ac7",
+    "c66766af7c6fc8c5a0573922f993ebceac730d4551bb4c5657aaefbbf5e9e9f4",
+    "13bfb1437e28004bd5c462f4fe1a09f93fe290c755c380066fdfb0f49b17bcae"
+  ],
+  "level" : {
+    "budget" : 16,
+    "difficulty" : 5,
+    "fingerprint" : "e1148e5fc0e297e7cdff65654e8f608aba9cd18d32c340aef77d0ba2406810ba",
+    "goal" : 5,
+    "id" : "harmonic-bridges-092",
+    "islands" : [
+      [
+        0,
+        3
+      ],
+      [
+        9,
+        6
+      ],
+      [
+        3,
+        6
+      ],
+      [
+        6,
+        3
+      ],
+      [
+        12,
+        3
+      ],
+      [
+        15,
+        6
+      ]
+    ],
+    "schema" : 1,
+    "seed" : 16424314682977409313,
+    "start" : 0,
+    "steps" : [
+      [
+        [
+          18,
+          1
+        ],
+        [
+          48,
+          2
+        ],
+        [
+          60,
+          3
+        ]
+      ],
+      [
+        [
+          72,
+          1
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          12,
+          1
+        ]
+      ],
+      [
+        [
+          12,
+          3
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          48,
+          1
+        ]
+      ]
+    ],
+    "strings" : [
+      [
+        1,
+        3,
+        1,
+        11,
+        false
+      ],
+      [
+        0,
+        4,
+        5,
+        10,
+        false
+      ],
+      [
+        1,
+        4,
+        1,
+        3,
+        false
+      ],
+      [
+        3,
+        4,
+        5,
+        8,
+        false
+      ],
+      [
+        0,
+        2,
+        1,
+        2,
+        false
+      ],
+      [
+        2,
+        3,
+        1,
+        6,
+        false
+      ],
+      [
+        0,
+        3,
+        6,
+        10,
+        true
+      ],
+      [
+        4,
+        5,
+        1,
+        8,
+        false
+      ]
+    ],
+    "threshold" : 3,
+    "tutorial" : false
+  },
+  "number" : 92,
+  "schema" : 1,
+  "skipped" : 9
+}

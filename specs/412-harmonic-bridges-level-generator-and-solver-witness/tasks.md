@@ -50,7 +50,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   of its choices tried; for a one-tuning plan the starting pegs' break); difficulty; skipped; decode refuses newer,
   damaged and non-replaying files) with
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G1202-006 [US2] [US3] [US4] Create
+- [X] T-R02G1202-006 [US2] [US3] [US4] Create — Verified 2026-11-23: host-5 exit 0 (HarmonicBridgesCatalogTests 9, 31 cases: 100 entries, 20 per band; pinned digest b832e7ee…; progression rule and band means; every stored witness wins within the budget and not without its test; peg brute force on the two fewest-string levels of bands 1–3 and pattern brute force on two levels of bands 4–5: no set of one tuning fewer wins; one full decode per band; the 100 witness files byte for byte in 20 groups); 100 files docs/games/harmonic-bridges/levels/001 … 100.witness.json
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the budget, and no set of one tuning fewer wins; the brute force
   on two levels per band (every peg in bands 1 … 3, every pattern in bands 4 and 5); pinned digest; progression rule and

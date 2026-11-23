@@ -1,0 +1,132 @@
+{
+  "actions" : [
+    {
+      "tune" : {
+        "_0" : 2,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 3,
+        "_1" : 12
+      }
+    },
+    {
+      "test" : {
+
+      }
+    }
+  ],
+  "bridgeDigests" : [
+    "efe95ddecae9f808",
+    "267a7de6709c032a"
+  ],
+  "counterexample" : {
+    "choices" : 2,
+    "size" : 1
+  },
+  "difficulty" : {
+    "islands" : 5,
+    "locked" : 0,
+    "smallerChoices" : 2,
+    "steps" : 1,
+    "strings" : 5,
+    "threshold" : 2,
+    "tones" : 2,
+    "tunings" : 2,
+    "work" : 3
+  },
+  "fingerprints" : [
+    "1639e9af7da35036f06962ba3daccaeda774b33b6812f43ca9fc3f8722ec842c",
+    "f3b588ac3c5543d9b7366ff72f38704e57f66096234f572e0ff9edb08e6008b6",
+    "12f2912574b2866ba535489f6cec53a3398fc180898bf6ad86e23fe169dd91b1",
+    "06adb5a2de46a15b8aef5dab98edbd62965383c99f7fdc17d72ab37b23e1e784"
+  ],
+  "level" : {
+    "budget" : 9,
+    "difficulty" : 1,
+    "fingerprint" : "a7b3ffa788902344033b5923c6192169addc060d72b69305e48f31fcfcad3a6c",
+    "goal" : 4,
+    "id" : "harmonic-bridges-013",
+    "islands" : [
+      [
+        0,
+        3
+      ],
+      [
+        2,
+        9
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        10,
+        3
+      ],
+      [
+        15,
+        6
+      ]
+    ],
+    "schema" : 1,
+    "seed" : 10793070482524867032,
+    "start" : 0,
+    "steps" : [
+      [
+        [
+          6,
+          1
+        ],
+        [
+          24,
+          1
+        ]
+      ]
+    ],
+    "strings" : [
+      [
+        0,
+        3,
+        5,
+        6,
+        false
+      ],
+      [
+        0,
+        2,
+        1,
+        6,
+        false
+      ],
+      [
+        2,
+        3,
+        2,
+        8,
+        false
+      ],
+      [
+        3,
+        4,
+        2,
+        6,
+        false
+      ],
+      [
+        0,
+        1,
+        4,
+        10,
+        false
+      ]
+    ],
+    "threshold" : 2,
+    "tutorial" : false
+  },
+  "number" : 13,
+  "schema" : 1,
+  "skipped" : 2
+}

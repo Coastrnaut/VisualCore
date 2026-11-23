@@ -1,0 +1,132 @@
+{
+  "actions" : [
+    {
+      "tune" : {
+        "_0" : 0,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 2,
+        "_1" : 6
+      }
+    },
+    {
+      "test" : {
+
+      }
+    }
+  ],
+  "bridgeDigests" : [
+    "b651e22522d2ed73",
+    "ec2c52936be58d22"
+  ],
+  "counterexample" : {
+    "choices" : 2,
+    "size" : 1
+  },
+  "difficulty" : {
+    "islands" : 4,
+    "locked" : 0,
+    "smallerChoices" : 2,
+    "steps" : 1,
+    "strings" : 5,
+    "threshold" : 2,
+    "tones" : 3,
+    "tunings" : 2,
+    "work" : 3
+  },
+  "fingerprints" : [
+    "35e4b47ee50b5b881776f3d72f371cf1ac057e558574d93695407ff67be411c7",
+    "ec6db94fdf035dffb81615085093b729cd8fd3afc0a2bbbdaa8e0793ccd4adec",
+    "943566838916337e02a8cc9efbab9a0eb1b545fb7127493560ba0977a68f634c",
+    "fd5bd1cede2873cb6968901817e63a22ecdf4dd453ceb3fd67202de494a9a0be"
+  ],
+  "level" : {
+    "budget" : 12,
+    "difficulty" : 2,
+    "fingerprint" : "9c0214fc1095b41b0ea48be09b829dafa5050fff0191c9cd794b073bb68bd1d4",
+    "goal" : 3,
+    "id" : "harmonic-bridges-030",
+    "islands" : [
+      [
+        0,
+        3
+      ],
+      [
+        2,
+        9
+      ],
+      [
+        7,
+        6
+      ],
+      [
+        15,
+        3
+      ]
+    ],
+    "schema" : 1,
+    "seed" : 18415859372429555028,
+    "start" : 0,
+    "steps" : [
+      [
+        [
+          36,
+          2
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          30,
+          1
+        ]
+      ]
+    ],
+    "strings" : [
+      [
+        0,
+        2,
+        2,
+        3,
+        false
+      ],
+      [
+        0,
+        1,
+        5,
+        11,
+        false
+      ],
+      [
+        2,
+        3,
+        1,
+        4,
+        false
+      ],
+      [
+        1,
+        2,
+        6,
+        1,
+        false
+      ],
+      [
+        0,
+        3,
+        5,
+        1,
+        false
+      ]
+    ],
+    "threshold" : 2,
+    "tutorial" : false
+  },
+  "number" : 30,
+  "schema" : 1,
+  "skipped" : 1
+}

@@ -1,0 +1,115 @@
+{
+  "actions" : [
+    {
+      "tune" : {
+        "_0" : 0,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 1,
+        "_1" : 12
+      }
+    },
+    {
+      "test" : {
+
+      }
+    }
+  ],
+  "bridgeDigests" : [
+    "36b52f1d4ef36cb8",
+    "35045b38c8e6fbcf"
+  ],
+  "counterexample" : {
+    "choices" : 2,
+    "size" : 1
+  },
+  "difficulty" : {
+    "islands" : 4,
+    "locked" : 0,
+    "smallerChoices" : 2,
+    "steps" : 1,
+    "strings" : 3,
+    "threshold" : 3,
+    "tones" : 2,
+    "tunings" : 2,
+    "work" : 3
+  },
+  "fingerprints" : [
+    "3d6745934fb3eb528633c8a1982ab7732dee609a24f7faa39ff7c075cce97be8",
+    "05ac33516acdda3104e6f32cc77f6a0dd6a8db56e66bc6ced3418c69fe456f39",
+    "30bf96a27baaa5c6ceb7e225b3eade17e1db36ab3f21c1d1ee8bb3c08eb29aa7",
+    "52b591a3da5cdc7ee50e4ebe7264e1f56b274a05fe4188acc2277c4c5da28ac2",
+    "79f9fa06d5ae814ab699a674b8d87cab4fdece93b2ab491481fef18b9d436626"
+  ],
+  "level" : {
+    "budget" : 11,
+    "difficulty" : 1,
+    "fingerprint" : "22fde011985b9012ecbaf8ba8b62db618f627d08b153f7bfd6e88316cb7f84be",
+    "goal" : 3,
+    "id" : "harmonic-bridges-003",
+    "islands" : [
+      [
+        0,
+        3
+      ],
+      [
+        7,
+        6
+      ],
+      [
+        2,
+        9
+      ],
+      [
+        15,
+        3
+      ]
+    ],
+    "schema" : 1,
+    "seed" : 1195133567044646237,
+    "start" : 0,
+    "steps" : [
+      [
+        [
+          12,
+          2
+        ],
+        [
+          60,
+          1
+        ]
+      ]
+    ],
+    "strings" : [
+      [
+        0,
+        1,
+        1,
+        8,
+        false
+      ],
+      [
+        1,
+        3,
+        1,
+        1,
+        false
+      ],
+      [
+        1,
+        2,
+        4,
+        5,
+        false
+      ]
+    ],
+    "threshold" : 3,
+    "tutorial" : true
+  },
+  "number" : 3,
+  "schema" : 1,
+  "skipped" : 1
+}

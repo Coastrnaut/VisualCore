@@ -1,0 +1,128 @@
+{
+  "actions" : [
+    {
+      "tune" : {
+        "_0" : 0,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 2,
+        "_1" : 12
+      }
+    },
+    {
+      "test" : {
+
+      }
+    }
+  ],
+  "bridgeDigests" : [
+    "dfe96add67467c5d",
+    "f90d18cc3a2d2933"
+  ],
+  "counterexample" : {
+    "choices" : 3,
+    "size" : 1
+  },
+  "difficulty" : {
+    "islands" : 4,
+    "locked" : 1,
+    "smallerChoices" : 3,
+    "steps" : 1,
+    "strings" : 5,
+    "threshold" : 2,
+    "tones" : 2,
+    "tunings" : 2,
+    "work" : 4
+  },
+  "fingerprints" : [
+    "c1a98cdb488808eab27232da5a59fad11cb8707ef0a05a509b44bbc19a4c652c",
+    "cd613ccee352cc5cebbc99d76464ef0da79de25f7e0622fb58481f14503d1797",
+    "67ca3af0cb7bb476672a35aeb2e9e491114f896300e9a95768f79216bf8e8a8c",
+    "f3a96c1d805c0e46c2ee1a4593576998b8249e6f5286cf3d8112ac0849142a02"
+  ],
+  "level" : {
+    "budget" : 9,
+    "difficulty" : 1,
+    "fingerprint" : "8b739483f059819a50765672ca7a83ca005d38e0d726f3ac4f0439badab90858",
+    "goal" : 3,
+    "id" : "harmonic-bridges-005",
+    "islands" : [
+      [
+        0,
+        3
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        10,
+        3
+      ],
+      [
+        15,
+        6
+      ]
+    ],
+    "schema" : 1,
+    "seed" : 18366432379030097031,
+    "start" : 0,
+    "steps" : [
+      [
+        [
+          60,
+          1
+        ],
+        [
+          12,
+          3
+        ]
+      ]
+    ],
+    "strings" : [
+      [
+        2,
+        3,
+        1,
+        8,
+        false
+      ],
+      [
+        0,
+        3,
+        3,
+        8,
+        true
+      ],
+      [
+        0,
+        1,
+        5,
+        4,
+        false
+      ],
+      [
+        1,
+        3,
+        5,
+        7,
+        false
+      ],
+      [
+        1,
+        2,
+        5,
+        12,
+        false
+      ]
+    ],
+    "threshold" : 2,
+    "tutorial" : false
+  },
+  "number" : 5,
+  "schema" : 1,
+  "skipped" : 1
+}

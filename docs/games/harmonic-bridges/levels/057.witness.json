@@ -1,0 +1,172 @@
+{
+  "actions" : [
+    {
+      "tune" : {
+        "_0" : 2,
+        "_1" : 6
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 5,
+        "_1" : 12
+      }
+    },
+    {
+      "tune" : {
+        "_0" : 6,
+        "_1" : 12
+      }
+    },
+    {
+      "test" : {
+
+      }
+    }
+  ],
+  "bridgeDigests" : [
+    "38947c04473c7ca7",
+    "072441f27c9a5143",
+    "5ec3fbcf62c0a9cb"
+  ],
+  "counterexample" : {
+    "choices" : 10,
+    "size" : 2
+  },
+  "difficulty" : {
+    "islands" : 5,
+    "locked" : 0,
+    "smallerChoices" : 10,
+    "steps" : 2,
+    "strings" : 7,
+    "threshold" : 4,
+    "tones" : 6,
+    "tunings" : 3,
+    "work" : 14
+  },
+  "fingerprints" : [
+    "cd0e0d02fd996ec70fc4cd8ed5b941a6811904b859130fe905e9701380e7dff2",
+    "36633ec6d6a82fa59444909bf23cb0c3403044944d30761c868332e08ea7d9ff",
+    "1ea28b1401393512304151c426f85b707308bca781c307d5bdb8d3ff958198c6",
+    "8dd03634dcbdd518ced919e1a4639cd6d2c8728e15694c747fa316cebfe6a221",
+    "5b1391ce5a000d9725582ece3e68bbfd31b71cda681515ad2bc0093e87b04e94"
+  ],
+  "level" : {
+    "budget" : 13,
+    "difficulty" : 3,
+    "fingerprint" : "ef277ffc900853dcfff1173d4e57e93fc075fd3c5da186c8c78d30b2905e79e6",
+    "goal" : 4,
+    "id" : "harmonic-bridges-057",
+    "islands" : [
+      [
+        0,
+        3
+      ],
+      [
+        2,
+        9
+      ],
+      [
+        10,
+        3
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        15,
+        6
+      ]
+    ],
+    "schema" : 1,
+    "seed" : 17846050922740180896,
+    "start" : 0,
+    "steps" : [
+      [
+        [
+          18,
+          1
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          60,
+          1
+        ]
+      ],
+      [
+        [
+          18,
+          3
+        ],
+        [
+          60,
+          3
+        ],
+        [
+          6,
+          3
+        ]
+      ]
+    ],
+    "strings" : [
+      [
+        1,
+        4,
+        3,
+        7,
+        false
+      ],
+      [
+        0,
+        1,
+        2,
+        2,
+        false
+      ],
+      [
+        2,
+        4,
+        1,
+        8,
+        false
+      ],
+      [
+        0,
+        2,
+        5,
+        10,
+        false
+      ],
+      [
+        0,
+        4,
+        4,
+        5,
+        false
+      ],
+      [
+        0,
+        3,
+        2,
+        6,
+        false
+      ],
+      [
+        2,
+        3,
+        2,
+        6,
+        false
+      ]
+    ],
+    "threshold" : 4,
+    "tutorial" : false
+  },
+  "number" : 57,
+  "schema" : 1,
+  "skipped" : 3
+}
