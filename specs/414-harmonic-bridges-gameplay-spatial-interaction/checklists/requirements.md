@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Exact gesture distances, times, pick order and orbit bounds are left to `/speckit-clarify` (modelled on feature 404).
+- Gesture distances, times, pick order and orbit bounds were settled by `/speckit-clarify` (session 2026-11-23).
