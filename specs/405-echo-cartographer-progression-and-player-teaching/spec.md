@@ -48,8 +48,8 @@ final; levels carry a tutorial flag; energies are 1 … 60; the adapter prepares
   echoes heard by the play's pulses are the observations; when exactly one beacon placement fits them the plan is a
   claim on the lowest-index beacon not yet located (its own cell, which always locates it); otherwise the plan is the
   solver's greedy next pulse (a new entry point continuing the certification's greedy rule from the current knowledge
-  and pulses) — and the whole continuation (further pulses until one placement fits) must fit in the energy left, or
-  else: "No way to locate every beacon was found in the energy left: undo the last action or retry the level." Level 1
+  and pulses) — and the whole continuation (further pulses until one placement fits) must leave at least 1 energy (a
+  play with no energy left and a beacon hidden fails at once, before any claim), or else: "No way to locate every beacon was found in the energy left: undo the last action or retry the level." Level 1
   names the kind ("Send a pulse to narrow down where the beacons can be" or "The echoes leave one place for the
   beacons: claim a beacon"), level 2 adds the row ("… from a known open cell in row 3" / "… in row 3"), level 3 names
   the cell ("Send a pulse from column 2, row 3" / "Claim column 2, row 3"). Hints never change the state, are unlimited,
