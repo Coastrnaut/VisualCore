@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1007-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing`
+- [X] T-R02G1007-001 Baselines: `--name baseline-round02`, `--name baseline-host`, `--name baseline-timing` — Verified 2026-11-23: baseline-round02, baseline-host, baseline-timing exit=0 on the committed tree
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
