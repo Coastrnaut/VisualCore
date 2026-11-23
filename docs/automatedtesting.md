@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-09: Nocturne Garden in the app; automation-session setup per launch).
+Last updated: 2026-11-22 (R02-G09-10: Nocturne Garden device rows).
 
 ## 1. What is tested, and where
 
@@ -435,6 +435,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (`host-1`, `host-2`), and every attestation's `elapsed_seconds` is read after a check: anything above about 450 s is
   split before the next gate. The one failed attempt of that gate (sim26) came from an outside
   `simctl shutdown all && simctl erase all`, not from the code.
+- **Nocturne Garden device rows** (R02-G09-10, 2026-11-22). `python3 scripts/check_device_rows.py --experience
+  r02-g09.nocturne-garden` (release step `device-rows-r02-g09`) checks the definition (rows NG-D1 … NG-D8, 12 device
+  scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G09 rows and the open {device} tasks of features
+  381 … 389; nothing contacts a device. When porting a model definition, re-read every row's procedure and pass text:
+  six texts still described the model game's controls after the identifiers were renamed.
 - **Faceted Forge device rows** (R02-G08-10, 2026-11-22). `python3 scripts/check_device_rows.py --experience
   r02-g08.faceted-forge` (release step `device-rows-r02-g08`) checks the definition against the scenario manifest, the
   ledger's DEV rows and the open {device} tasks of features 371 … 379; `FacetedForgeDeviceRowsCheckTests` in

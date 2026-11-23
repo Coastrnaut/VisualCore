@@ -530,3 +530,7 @@ tests, a CI step and `scripts/nocturne_garden_regression.py`.
 Feature 389 (R02-G09-09) adds the in-app integration: identifiers on every panel control, the schema-1 and schema-2
 examples (`NocturneGardenSchemaExamples`) stored by the app registration, app unit tests, and the interface tests
 `NGPlayUITests` and `NGReplayUITests` (serial chunk `r3`).
+
+Feature 390 (R02-G09-10) prepares Nocturne Garden's device campaign without touching a device:
+`docs/apps/nocturne-garden/device-rows.json` (rows NG-D1 … NG-D8, all pending), the written plan
+`docs/apps/nocturne-garden/device-campaign.md`, and the release step `device-rows-r02-g09`.

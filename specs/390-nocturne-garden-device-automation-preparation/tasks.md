@@ -33,7 +33,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G0910-005 Docs: `docs/architecture/nocturne-garden.md` (device preparation),
+- [X] T-R02G0910-005 Docs: `docs/architecture/nocturne-garden.md` (device preparation), — Verified 2026-11-22: round02-host exit 0; architecture device preparation, package README feature 390, testing entry (Nocturne Garden device rows); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G0910-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full` (nothing in the app changes)
