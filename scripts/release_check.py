@@ -156,6 +156,8 @@ def steps(stamp: str) -> list[Step]:
         Step("device-rows-r02-g07", [PY, "scripts/check_device_rows.py", "--experience", "r02-g07.amethyst-escape"]),
         # Feature 380 (R02-G08-10): Faceted Forge's device rows, checked like the earlier round-two games'.
         Step("device-rows-r02-g08", [PY, "scripts/check_device_rows.py", "--experience", "r02-g08.faceted-forge"]),
+        # Feature 390 (R02-G09-10): Nocturne Garden's device-row definition (no device is contacted).
+        Step("device-rows-r02-g09", [PY, "scripts/check_device_rows.py", "--experience", "r02-g09.nocturne-garden"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),

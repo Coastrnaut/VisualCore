@@ -13,7 +13,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 2: Story 1 — the campaign knows what to run (P1) 🎯
 
-- [ ] T-R02G0910-002 [US1] Create `docs/apps/nocturne-garden/device-rows.json` (data-model.md: "schema 1, sorted
+- [X] T-R02G0910-002 [US1] Create `docs/apps/nocturne-garden/device-rows.json` (data-model.md: "schema 1, sorted — Verified 2026-11-22: device-rows (check_device_rows.py --experience r02-g09.nocturne-garden: PASS, 8 rows, 12 scenarios, every open {device} task of 381-389 covered) exit 0; release step device-rows-r02-g09 added and passing; definition in the schema and key order of the model
   keys"; devices D1 → DEV1-R02-G09, D2 → DEV2-R02-G09, D3 → DEV3-R02-G09; the 12 scenarios of clarification Q2; rows
   NG-D1 … NG-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false
   only for NG-D6), covers, owner_steps, status "pending device campaign"; no result field); edit

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g09.nocturne-garden"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g09.nocturne-garden",
+  "elapsed_seconds": 0.033,
+  "exit_code": 0,
+  "finished": "2026-11-23T01:09:45+00:00",
+  "gate": "R02-G09-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G09-10.device-rows.log",
+  "log_sha256": "027c69c1a4cff75a52ca326f7e866119dcb488f24b130547a4b196e70790c42c",
+  "name": "device-rows",
+  "started": "2026-11-23T01:09:45+00:00",
+  "timed_out": false
+}
