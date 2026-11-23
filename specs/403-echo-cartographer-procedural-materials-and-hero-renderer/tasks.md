@@ -28,7 +28,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1103-003 [P] [US1] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerShaders.swift`
+- [X] T-R02G1103-003 [P] [US1] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerShaders.swift` — Verified 2026-11-23: host-2 (incl. EchoCartographerShaderSourceTests 15: version line, uniforms both ways, 12 and 6 vec4 slots within 16, no samplers, constant loop bounds, palette constants equal the CPU palette, material codes, soft edge, ring, echo, flare and glow references) exit 0, 2026-11-23; glslangValidator absent on this Mac (GLSL compile proven on the simulator in T-006); agent A's shaders retested by the lead
   (chamber and glow sources, GLSL ES 3.00; signed-distance shading of tiles, rings and edge strips from per-vertex local
   coordinates; the pulse ring and up to 4 echo rings driven by `u_time` and the echo delays (a cell per 0.1 s); wall
   flare when the ring reaches a struck wall, fading over 0.5 s; uniform names; glow gain cap; palette constants equal to
