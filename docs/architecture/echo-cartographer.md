@@ -207,3 +207,15 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g11.malformed`, `.
   7), which the app restores into schema 3; Echo Cartographer stays a candidate (not available without
   `-vcCandidates`) until X-R02-G11.
 - **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
+
+## Device preparation (feature 410, R02-G11-10)
+
+Nothing here touches a device. `docs/apps/echo-cartographer/device-rows.json` defines the device scenario set (the 11
+standard and game scenarios and `fixture-level-1-solved`) and rows EC-D1 … EC-D8 for D1, D2 and D3 (the ledger's
+DEV1/2/3-R02-G11 rows): launch and first frame, frame pacing and frame time per tier, memory and thermal state with the
+round-two stress session, touch feel and latency (taps that pulse, marker drags, the held claim, orbit), sound and
+haptics, a non-gating VoiceOver walk-through, progress across a real termination and the panel journeys. Every row is
+"pending device campaign" and covers the open {device} tasks of features 403, 404 and 406 … 409 and UA-F13's
+measurements; `scripts/check_device_rows.py --experience r02-g11.echo-cartographer` (release step
+`device-rows-r02-g11`) keeps it true. The written plan is `docs/apps/echo-cartographer/device-campaign.md`; D3 stays on
+iPadOS 26.5.

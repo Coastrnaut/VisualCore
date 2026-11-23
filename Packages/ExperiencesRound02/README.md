@@ -638,3 +638,7 @@ classes, `scripts/echo_cartographer_regression.py` and the CI step "Echo Cartogr
 Feature 409 (R02-G11-09) adds the in-app integration: identifiers on every panel control, the schema-1 and schema-2
 examples (`EchoCartographerSchemaExamples`) stored by the app registration, app unit tests, and the interface tests
 `ECGPlayUITests` and `ECGReplayUITests` (serial chunk `t3`).
+
+Feature 410 (R02-G11-10) prepares Echo Cartographer's device campaign without touching a device:
+`docs/apps/echo-cartographer/device-rows.json` (rows EC-D1 … EC-D8, all pending), the written plan
+`docs/apps/echo-cartographer/device-campaign.md`, and the release step `device-rows-r02-g11`.

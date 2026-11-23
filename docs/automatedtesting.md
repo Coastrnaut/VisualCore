@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G11-09: Echo Cartographer interface journeys; regenerate the project for new test folders).
+Last updated: 2026-11-23 (R02-G11-10: Echo Cartographer device rows; script test classes above the __main__ block).
 
 ## 1. What is tested, and where
 
@@ -562,6 +562,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   23 s because each attempt hashes a fingerprint, so 8 walks are exhaustive and 192 sample 24 cells per step. Write
   fixtures' comments from the drawn ranges: energy 1 + 0 … 3 lets the known pulse end the level, which all four agents
   found; the tests now rely on both kinds of fixture.
+- **Echo Cartographer device rows** (R02-G11-10, 2026-11-23). `python3 scripts/check_device_rows.py --experience
+  r02-g11.echo-cartographer` (release step `device-rows-r02-g11`, tests `EchoCartographerDeviceRowsCheckTests`) checks
+  the definition (rows EC-D1 … EC-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G11
+  rows and the open {device} tasks of features 401 … 409 (T-R02G1104-011 is an 011, not an 012); nothing contacts a
+  device. Ported from Backwards Aurora's definition with rows EC-D3 … EC-D8 and EC-D4's owner step rewritten for the
+  cell, marker and claim controls (and the journey chunk named `t3`); a case-insensitive scan for the model game's
+  words (band, reversal, section, swipe) found nothing left.
 - **Backwards Aurora device rows** (R02-G10-10, 2026-11-23). `python3 scripts/check_device_rows.py --experience
   r02-g10.backwards-aurora` (release step `device-rows-r02-g10`, tests `BackwardsAuroraDeviceRowsCheckTests`) checks
   the definition (rows BA-D1 … BA-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G10
