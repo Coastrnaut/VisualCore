@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Foundational — orbit, camera and picking
 
-- [ ] T-R02G1204-002 [P] Add `HarmonicBridgesOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)", `clamped()`) and
+- [X] T-R02G1204-002 [P] Add `HarmonicBridgesOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)", `clamped()`) and — Verified 2026-11-23: Verified 2026-11-23: host-2 exit 0 (HarmonicBridgesPickerTests 7: 500 seeded points × 3 sizes × 3 orbits over levels 1/50/100 against an independent projection and pick; the 22-point target at 21/23 points for pips, the goal and strings; pips beat the goal beats strings; ties to the lower index (equidistant overlapping strings of level 100); unusable input; HarmonicBridgesSceneGeometryTests 16 incl. 4 orbit tests: every island top, string end, gauge bar and pip inside 0.05…0.95 at the clamp corners and 7 aspects, tight fit, clamping, the authored orbit bit-identical to the fixed camera); agent B retested by the lead
   `camera(_:aspect:orbit:)` (yaw about the y axis through the box centre, pitch about the authored view; field of view
   refit so the authored box x −1 … 1, z −0.7 … 1.0, y 0 … 0.2 stays inside the view with a 5 % margin at aspects
   0.4 … 2.5; `camera(_:aspect:)` equals the authored orbit, bit-identical) to

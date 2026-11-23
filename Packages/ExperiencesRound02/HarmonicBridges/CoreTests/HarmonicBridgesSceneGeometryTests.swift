@@ -10,6 +10,11 @@
 // string. Painter's order (depth testing off, culling on): ground, flat rings, membranes, shells, strings and marks,
 // islands back to front (each complete), pips, gauge; every triangle winds to face up (flat) or outward (prisms).
 // Plain loops; well under 10 s each.
+//
+// Feature 414 (R02-G12-04) T-R02G1204-002 (FR-R02G1204-005; SC-R02G1204-004): at the authored orbit, the four clamp
+// corners and the centre of the range, at seven aspects 0.4 … 2.5, every island top, string end, pip and gauge bar
+// projects inside the view with a 5 % margin and the fit is tight; pitch raises, yaw turns about the box centre; the
+// orbit is clamped; the authored orbit is the fixed camera bit for bit.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -558,5 +563,118 @@ import VisualCoreScenes
                 #expect(p.y < q.y || (p.y == q.y && abs(2 * p.x - 15) >= abs(2 * q.x - 15)))
             }
         }
+    }
+
+    // MARK: Orbit (feature 414, R02-G12-04, T-R02G1204-002)
+
+    /// Six orbits: the authored one, the four clamp corners and the centre of the allowed range.
+    static func orbits() -> [HarmonicBridgesOrbit] {
+        let y: Double = HarmonicBridgesOrbit.yawLimit
+        let lo: Double = HarmonicBridgesOrbit.pitchRange.lowerBound
+        let hi: Double = HarmonicBridgesOrbit.pitchRange.upperBound
+        return [HarmonicBridgesOrbit.authored, HarmonicBridgesOrbit(yaw: y, pitch: hi),
+                HarmonicBridgesOrbit(yaw: -y, pitch: hi), HarmonicBridgesOrbit(yaw: y, pitch: lo),
+                HarmonicBridgesOrbit(yaw: -y, pitch: lo), HarmonicBridgesOrbit(yaw: 0, pitch: (lo + hi) / 2)]
+    }
+
+    /// NDC (x, y) of `p` through `camera`, or nil behind the eye.
+    static func ndc(_ p: SIMD3<Double>, _ camera: HarmonicBridgesCamera) -> SIMD2<Double>? {
+        let clip: Vec4 = camera.viewProjection * Vec4(Vec3(p.x, p.y, p.z), 1)
+        guard clip.w > 0 else { return nil }
+        return SIMD2(clip.x / clip.w, clip.y / clip.w)
+    }
+
+    @Test func everyOrbitKeepsTheSceneInsideTheMarginAtSevenAspects() throws {
+        var snapshots: [Snapshot] = [try Self.largeAllBridges(), try Self.largeNoBridges(), try Self.smallIdle(),
+                                     try Self.smallAllBridges()]
+        snapshots.append(Snapshot(play: try Self.play(try Self.smallLevel(budget: 60), []), levelNumber: 1, time: 0))
+        let bound: Double = 1 - 2 * Geometry.fitMargin
+        for s in snapshots {
+            var points: [SIMD3<Double>] = []
+            for i in s.islands.indices { points.append(Geometry.islandTop(i, s)) }
+            for i in s.strings.indices {
+                let ends = Geometry.stringEnds(i, s)
+                points.append(ends.a)
+                points.append(ends.b)
+            }
+            for bar in 0..<s.budget { points.append(Geometry.gaugeBar(bar, s)) }
+            for pip in 0..<s.steps { points.append(Geometry.stepPip(pip, s)) }
+            for orbit in Self.orbits() {
+                for aspect in Self.aspects {
+                    let camera: HarmonicBridgesCamera = Geometry.camera(s, aspect: aspect, orbit: orbit)
+                    var outside: Int = 0
+                    for p in points {
+                        guard let v = Geometry.project(p, camera: camera) else { outside += 1; continue }
+                        if v.x < 0.05 || v.x > 0.95 || v.y < 0.05 || v.y > 0.95 { outside += 1 }
+                    }
+                    #expect(outside == 0, "points outside the 5 % margin: \(outside) at \(orbit), aspect \(aspect)")
+                    // The field of view is the smallest that holds the box: some corner touches the margin.
+                    var largest: Double = 0
+                    for index in 0..<8 {
+                        guard let v = Self.ndc(Geometry.corner(index), camera) else {
+                            Issue.record("corner \(index) behind the eye at \(orbit), aspect \(aspect)")
+                            continue
+                        }
+                        largest = max(largest, abs(v.x), abs(v.y))
+                    }
+                    #expect(abs(largest - bound) < 1e-9, "fit not tight: \(largest) at \(orbit), aspect \(aspect)")
+                }
+            }
+        }
+    }
+
+    @Test func positivePitchRaisesTheEyeAndPositiveYawMovesItTowardsPlusX() throws {
+        let s: Snapshot = try Self.smallIdle()
+        let base: HarmonicBridgesCamera = Geometry.camera(s, aspect: 1)
+        let up: HarmonicBridgesCamera = Geometry.camera(s, aspect: 1, orbit: HarmonicBridgesOrbit(yaw: 0, pitch: 0.2))
+        let down: HarmonicBridgesCamera = Geometry.camera(s, aspect: 1, orbit: HarmonicBridgesOrbit(yaw: 0, pitch: -0.2))
+        let side: HarmonicBridgesCamera = Geometry.camera(s, aspect: 1, orbit: HarmonicBridgesOrbit(yaw: 0.3, pitch: 0))
+        #expect(up.eye.y > base.eye.y && up.eye.z < base.eye.z && up.eye.x == 0 && up.target == Geometry.lookAt)
+        #expect(down.eye.y < base.eye.y && down.eye.z > base.eye.z)
+        #expect(side.eye.x > 0 && side.eye.y == base.eye.y)
+        // Yaw turns the eye and the look-at point about the vertical axis through the box centre (0, ·, 0.15).
+        let centre: SIMD3<Double> = (Geometry.boxLow + Geometry.boxHigh) / 2
+        for p in [(base.eye, side.eye), (base.target, side.target)] {
+            let a: SIMD2<Double> = SIMD2(p.0.x - centre.x, p.0.z - centre.z)
+            let b: SIMD2<Double> = SIMD2(p.1.x - centre.x, p.1.z - centre.z)
+            #expect(abs((a * a).sum() - (b * b).sum()) < 1e-12)
+        }
+        let offset: SIMD3<Double> = up.eye - up.target
+        let authored: SIMD3<Double> = Geometry.eye - Geometry.lookAt
+        #expect(abs(Self.dot(offset, offset) - Self.dot(authored, authored)) < 1e-12)
+    }
+
+    @Test func theAuthoredOrbitIsTheFixedCameraBitForBit() throws {
+        let s: Snapshot = try Self.smallIdle()
+        var aspects: [Double] = Self.aspects
+        aspects.append(contentsOf: [0.05, 20, 0, -1, .nan, .infinity])
+        for aspect in aspects {
+            let fixed: HarmonicBridgesCamera = Geometry.camera(s, aspect: aspect)
+            let orbit: HarmonicBridgesCamera = Geometry.camera(s, aspect: aspect, orbit: .authored)
+            #expect(fixed == orbit)
+            #expect(fixed.fovY.bitPattern == orbit.fovY.bitPattern && fixed.near.bitPattern == orbit.near.bitPattern
+                    && fixed.far.bitPattern == orbit.far.bitPattern)
+            #expect(fixed.eye == SIMD3(0, 1.9, 1.6) && fixed.target == SIMD3(0, 0, 0.1))
+            let odd: HarmonicBridgesCamera = Geometry.camera(s, aspect: aspect,
+                                                             orbit: HarmonicBridgesOrbit(yaw: .nan, pitch: .infinity))
+            #expect(odd == fixed)
+        }
+    }
+
+    @Test func clampedBoundsTheOrbit() throws {
+        let y: Double = HarmonicBridgesOrbit.yawLimit
+        let lo: Double = HarmonicBridgesOrbit.pitchRange.lowerBound
+        let hi: Double = HarmonicBridgesOrbit.pitchRange.upperBound
+        #expect(abs(y - 35.0 * Double.pi / 180) < 1e-15)
+        #expect(abs(lo + 15.0 * Double.pi / 180) < 1e-15 && abs(hi - 20.0 * Double.pi / 180) < 1e-15)
+        #expect(HarmonicBridgesOrbit.authored == HarmonicBridgesOrbit(yaw: 0, pitch: 0))
+        #expect(HarmonicBridgesOrbit(yaw: 5, pitch: 5).clamped() == HarmonicBridgesOrbit(yaw: y, pitch: hi))
+        #expect(HarmonicBridgesOrbit(yaw: -5, pitch: -5).clamped() == HarmonicBridgesOrbit(yaw: -y, pitch: lo))
+        #expect(HarmonicBridgesOrbit(yaw: 0.2, pitch: -0.1).clamped() == HarmonicBridgesOrbit(yaw: 0.2, pitch: -0.1))
+        #expect(HarmonicBridgesOrbit(yaw: .nan, pitch: .infinity).clamped() == HarmonicBridgesOrbit.authored)
+        #expect(HarmonicBridgesOrbit(yaw: -.infinity, pitch: .nan).clamped() == HarmonicBridgesOrbit.authored)
+        let s: Snapshot = try Self.smallIdle()
+        let beyond: HarmonicBridgesCamera = Geometry.camera(s, aspect: 1, orbit: HarmonicBridgesOrbit(yaw: 9, pitch: -9))
+        #expect(beyond == Geometry.camera(s, aspect: 1, orbit: HarmonicBridgesOrbit(yaw: y, pitch: lo)))
     }
 }

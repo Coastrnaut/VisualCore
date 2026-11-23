@@ -47,15 +47,24 @@
 // outermost first): the glow colour in the normal slot, uv = (glow factor 0.5^k, won).
 // Wave and step move nothing here: every position other than the wave shells' is the same at every tier and under
 // Reduce Motion. Doubles are used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 414 (R02-G12-04) T-R02G1204-002 adds the player's orbit (`HarmonicBridgesOrbit`: yaw ±35° about the vertical
+// axis through the authored box centre (0, 0.1, 0.15), pitch −15° … +20° about the authored view's right axis, positive
+// raising the eye so the bridges are seen more from above; authored (0, 0)) and `camera(_:aspect:orbit:)`: the eye's
+// offset from the look-at point is pitched, then the eye and the look-at point are yawed together about that axis, and
+// the field of view is refitted exactly as for the fixed camera so the authored box x −1 … 1, z −0.7 … 1.0, y 0 … 0.2
+// keeps ``fitMargin`` (above the required 5 %) per side at every orbit and aspect 0.4 … 2.5. At the authored orbit the
+// eye and the look-at point are the authored ones, so `camera(_:aspect:)` (which calls it) is unchanged bit for bit.
+// The orbit is presentation only: never saved, never read by the rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
 /// The fixed authored camera of one frame: eye, target, lens and the matrices built from them.
 public struct HarmonicBridgesCamera: Sendable, Equatable {
-    /// The eye position in world units, (0, 1.9, 1.6).
+    /// The eye position in world units, (0, 1.9, 1.6) at the authored orbit.
     public let eye: SIMD3<Double>
-    /// The point looked at, (0, 0, 0.1).
+    /// The point looked at, (0, 0, 0.1) at the authored orbit.
     public let target: SIMD3<Double>
     /// The vertical field of view in radians (fitted to the authored box at `aspect`).
     public let fovY: Double
@@ -71,6 +80,38 @@ public struct HarmonicBridgesCamera: Sendable, Equatable {
     public let projection: Mat4
     /// projection · view (upload with `.floats`).
     public let viewProjection: Mat4
+}
+
+/// The player's view of the bridges: a yaw about the vertical axis through the authored box centre and a pitch about
+/// the authored view's right axis, both in radians (feature 414, R02-G12-04). Presentation only: never saved, never read
+/// by the rules.
+public struct HarmonicBridgesOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians about the view's right axis: positive raises the eye (the bridges seen more from above),
+    /// negative lowers it; allowed ``pitchRange`` (−15° … +20°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 0, the fixed camera of R02-G12-03.
+    public static let authored = HarmonicBridgesOrbit(yaw: 0, pitch: 0)
+    /// The largest yaw either way, 35° in radians.
+    public static let yawLimit: Double = 35.0 * Double.pi / 180
+    /// The allowed pitches, −15° … +20° in radians.
+    public static let pitchRange: ClosedRange<Double> = (-15.0 * Double.pi / 180)...(20.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −35° … 35° and pitch to −15° … 20°; a non-finite angle becomes 0.
+    public func clamped() -> HarmonicBridgesOrbit {
+        let y: Double = yaw.isFinite ? yaw : 0
+        let p: Double = pitch.isFinite ? pitch : 0
+        return HarmonicBridgesOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                    pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
 }
 
 /// A mesh with one RGBA colour per vertex, for the shared unlit `MeshRenderer` (the fallback path).
@@ -591,10 +632,50 @@ public enum HarmonicBridgesSceneGeometry {
     /// is the smallest that holds every corner of the box x −1 … 1, y 0 … 0.2, z −0.7 … 1.0 inside the view with
     /// ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it — every island top,
     /// string and membrane, pip and gauge bar — keeps a margin of at least 5 %). The snapshot is accepted for parity;
-    /// the camera never moves while a level is played.
+    /// the camera never moves while a level is played. Equals ``camera(_:aspect:orbit:)`` at
+    /// ``HarmonicBridgesOrbit/authored`` bit for bit.
     public static func camera(_ snapshot: HarmonicBridgesSceneSnapshot, aspect: Double) -> HarmonicBridgesCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The vertical axis the orbit yaws about passes through the authored box centre (0, 0.1, 0.15).
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `p` yawed by `yaw` radians about the vertical axis through ``orbitPivot`` (from +z towards +x).
+    static func yawed(_ p: SIMD3<Double>, _ yaw: Double) -> SIMD3<Double> {
+        let c: Double = cos(yaw)
+        let s: Double = sin(yaw)
+        let d: SIMD3<Double> = p - orbitPivot
+        return SIMD3(orbitPivot.x + d.x * c + d.z * s, p.y, orbitPivot.z - d.x * s + d.z * c)
+    }
+
+    /// The eye and the look-at point of `orbit` (clamped): the authored eye's offset from the look-at point,
+    /// e = (0, 1.9, 1.5), pitched about the x axis (positive p raises it: (0, e.y·cos p + e.z·sin p,
+    /// −e.y·sin p + e.z·cos p)) and added to the look-at point; then both points yawed about the vertical axis through
+    /// ``orbitPivot``. Exactly ``eye`` and ``lookAt`` at the authored orbit.
+    static func orbitView(_ orbit: HarmonicBridgesOrbit) -> (eye: SIMD3<Double>, target: SIMD3<Double>) {
+        let o: HarmonicBridgesOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return (eye: eye, target: lookAt) }
+        let e: SIMD3<Double> = eye - lookAt
+        let cp: Double = cos(o.pitch)
+        let sp: Double = sin(o.pitch)
+        let pitched: SIMD3<Double> = lookAt + SIMD3(e.x, e.y * cp + e.z * sp, -e.y * sp + e.z * cp)
+        return (eye: yawed(pitched, o.yaw), target: yawed(lookAt, o.yaw))
+    }
+
+    /// The camera for `orbit` (clamped, see ``HarmonicBridgesOrbit/clamped()``) and `aspect`: from the orbit's eye
+    /// looking at its look-at point (``orbitView(_:)``) with +y up (never parallel: the eye stays at least 36° above the
+    /// ground); the vertical field of view is the smallest that holds every corner of the box x −1 … 1, y 0 … 0.2,
+    /// z −0.7 … 1.0 inside the view with ``fitMargin`` per side, so everything inside the box — every island top, string
+    /// end, pip and gauge bar — keeps a margin of at least 5 % at every orbit and aspect 0.4 … 2.5. Presentation only;
+    /// independent of the snapshot, the tier and the time.
+    public static func camera(_ snapshot: HarmonicBridgesSceneSnapshot, aspect: Double,
+                              orbit: HarmonicBridgesOrbit) -> HarmonicBridgesCamera {
         _ = snapshot
         let a: Double = usableAspect(aspect)
+        let view0 = orbitView(orbit)
+        let eye: SIMD3<Double> = view0.eye
+        let lookAt: SIMD3<Double> = view0.target
         let forward: SIMD3<Double> = unit(lookAt - eye)
         let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
         let up: SIMD3<Double> = cross(right, forward)
