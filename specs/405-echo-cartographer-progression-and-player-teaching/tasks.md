@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 395
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1105-001 Baselines on the committed tree after R02-G11-04 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1105-001 Baselines on the committed tree after R02-G11-04 is recorded: `--name baseline-host`, `--name — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on the committed tree; rendering baseline is R02-G11-04's rendering runs (exit 0)
   baseline-timing`, `--name baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering
   baseline is R02-G11-04's rendering runs (exit 0)
 
