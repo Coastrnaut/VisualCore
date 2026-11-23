@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G12-09: Harmonic Bridges simulator integration and full app lock).
+Last updated: 2026-11-23 (R02-G12-10: Harmonic Bridges device automation preparation).
 
 ## 1. What is tested, and where
 
@@ -624,6 +624,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   23 s because each attempt hashes a fingerprint, so 8 walks are exhaustive and 192 sample 24 cells per step. Write
   fixtures' comments from the drawn ranges: energy 1 + 0 … 3 lets the known pulse end the level, which all four agents
   found; the tests now rely on both kinds of fixture.
+- **Harmonic Bridges device rows** (R02-G12-10, 2026-11-23). `python3 scripts/check_device_rows.py --experience
+  r02-g12.harmonic-bridges` (release step `device-rows-r02-g12`, tests `HarmonicBridgesDeviceRowsCheckTests`) checks the
+  definition (rows HB-D1 … HB-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G12 rows
+  and the open {device} tasks of features 411 … 419; nothing contacts a device. The written plan is generated from the
+  checked JSON (procedure, pass and owner steps copied row by row), so the prose cannot drift from the definition.
 - **Echo Cartographer device rows** (R02-G11-10, 2026-11-23). `python3 scripts/check_device_rows.py --experience
   r02-g11.echo-cartographer` (release step `device-rows-r02-g11`, tests `EchoCartographerDeviceRowsCheckTests`) checks
   the definition (rows EC-D1 … EC-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G11

@@ -236,3 +236,15 @@ rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.m
   `-vcCandidates`) until X-R02-G12.
 - **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
 
+## Device preparation (feature 420, R02-G12-10)
+
+Nothing here touches a device. `docs/apps/harmonic-bridges/device-rows.json` defines the device scenario set (the 11
+standard and game scenarios and `fixture-level-1-solved`) and rows HB-D1 … HB-D8 for D1, D2 and D3 (the ledger's
+DEV1/2/3-R02-G12 rows): launch and first frame, frame pacing and frame time per tier, memory and thermal state with the
+round-two stress session, touch feel and latency (string plucks, peg drags that tune, taps that test, orbit), sound and
+haptics, a non-gating VoiceOver walk-through, progress across a real termination and the panel journeys. Every row is
+"pending device campaign" and covers the open {device} tasks of features 413, 414 and 416 … 419 and UA-F13's
+measurements; `scripts/check_device_rows.py --experience r02-g12.harmonic-bridges` (release step
+`device-rows-r02-g12`) keeps it true. The written plan is `docs/apps/harmonic-bridges/device-campaign.md`; D3 stays on
+iPadOS 26.5.
+

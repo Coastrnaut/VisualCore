@@ -694,3 +694,7 @@ regression (host)".
 Feature 419 (R02-G12-09) adds the in-app integration: the pinned identifier list of the panel, the schema-1 and
 schema-2 examples (`HarmonicBridgesSchemaExamples`) stored by the app registration, app unit tests, and the interface
 tests `HBPlayUITests` and `HBReplayUITests` (serial chunk `u3`).
+
+Feature 420 (R02-G12-10) prepares Harmonic Bridges's device campaign without touching a device:
+`docs/apps/harmonic-bridges/device-rows.json` (rows HB-D1 … HB-D8, all pending), the written plan
+`docs/apps/harmonic-bridges/device-campaign.md`, and the release step `device-rows-r02-g12`.

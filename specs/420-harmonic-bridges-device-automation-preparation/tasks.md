@@ -33,7 +33,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1210-005 Docs: `docs/architecture/harmonic-bridges.md` (device preparation),
+- [X] T-R02G1210-005 Docs: `docs/architecture/harmonic-bridges.md` (device preparation), — Verified 2026-11-23: round02-host exit 0; architecture doc device preparation, ExperiencesRound02 README feature 420, testing doc entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1210-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full` (nothing in the app changes)
