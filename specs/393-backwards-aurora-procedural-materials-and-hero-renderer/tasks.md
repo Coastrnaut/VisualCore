@@ -102,3 +102,13 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → 002 → {003 (agent A), 004 (agent B), 005 (agent C)} → 006 (lead; agent D writes the simulator tests) → 007 … 011,
 013. 012 stays open until device testing. Shared files (Package.swift, snapshot, presenter, scene, controls, scenarios,
 registration, docs) stay with the lead. MVP: Stories 1 and 2.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G1003-014 Brighten the ribbon on a won level (a `u_won` uniform, 1 when the stage is won or the result
+  follows a win, mixing the ribbon and trailing layers toward `ribbonHighlight` by 0.35; set by
+  `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraAuroraScene.swift`) in
+  `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraShaders.swift`, with the uniform declared and
+  counted in `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraShaderSourceTests.swift` and a
+  render check in `Packages/ExperiencesRound02/BackwardsAurora/ExperienceTests/BackwardsAuroraRenderTests.swift` (level
+  1 solved: a ribbon pixel brighter than before the last reversal) per Spec §Edge Cases "A won level" (partial)
