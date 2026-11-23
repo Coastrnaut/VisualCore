@@ -12,7 +12,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1008-002 [P] [US1] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G1008-002 [P] [US1] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-23: host exit=0 (BackwardsAuroraRegressionSolverTests 14 tests, 112 cases: 100 levels in ten groups equal their witnesses, replay their reversals with the per-reversal digests and fingerprints to a win in exactly the smallest count within the budget, and re-solve to exactly the witness's reversals with smallest equal to the lower bound's and work at most 20,000 (max 2,042, level 91); the ten alterations of Q2 each fail naming the level and the part; agent A's file retested by the lead)
   level in ten groups of 10, "the generated level equals its witness's level; the witness's reversals replay to a win
   in exactly its smallest reversal count within the budget, with its per-reversal digests and fingerprints; solve returns
   exactly the witness's reversals with smallest equal to the witness's and to the lower bound's, with work ≤ workBound"; ten named
