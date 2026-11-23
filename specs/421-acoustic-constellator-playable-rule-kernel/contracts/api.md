@@ -37,8 +37,9 @@ public struct AcousticConstellatorPlay: Sendable, Equatable {
     public static var schema: Int { 1 }
     public let level: AcousticConstellatorLevel
     public private(set) var stage: AcousticConstellatorStage, links: [AcousticConstellatorLink], phases: [Int],
-        actionsSpent: Int, report: AcousticConstellatorListen, label: String, matchesSymbol: Bool,
+        actionsSpent: Int, report: AcousticConstellatorListen,
         failure: AcousticConstellatorFailure?, records: [AcousticConstellatorRecord]
+    public var label: String { get }; public var matchesSymbol: Bool { get }   // computed when read (8! orderings)
     public var actionsLeft: Int { get }; public var fingerprint: String { get }; public var canUndo, canRedo: Bool { get }
     public init(level: AcousticConstellatorLevel)
     public mutating func handle(_ event: AcousticConstellatorEvent) throws(AcousticConstellatorError)        // .stage

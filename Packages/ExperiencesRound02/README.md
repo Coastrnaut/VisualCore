@@ -698,3 +698,16 @@ tests `HBPlayUITests` and `HBReplayUITests` (serial chunk `u3`).
 Feature 420 (R02-G12-10) prepares Harmonic Bridges's device campaign without touching a device:
 `docs/apps/harmonic-bridges/device-rows.json` (rows HB-D1 … HB-D8, all pending), the written plan
 `docs/apps/harmonic-bridges/device-campaign.md`, and the release step `device-rows-r02-g12`.
+
+## Acoustic Constellator (R02-G13, `r02-g13.acoustic-constellator`, free)
+
+`AcousticConstellatorCore` (feature 421, R02-G13-01) is the playable rule kernel: the exact 12-step phase clock, the
+clamped whole-number coupling, snapping, the order parameter as A + B√3 with its exact comparison, connectivity, the
+listen and the graph-isomorphism label (`AcousticConstellatorClock`, `AcousticConstellatorLink`,
+`AcousticConstellatorListen`, `AcousticConstellatorOutcome`, `AcousticConstellatorLabel`), `AcousticConstellatorLevel`
+(immutable, fingerprinted, JSON schema 1, with names in words), the play state `AcousticConstellatorPlay` with
+`AcousticConstellatorAction`, `AcousticConstellatorStage`, `AcousticConstellatorEvent`, `AcousticConstellatorFailure` and
+append-only `AcousticConstellatorRecord`s, and `AcousticConstellatorRules` for the R02-F23 puzzle contract. Refusals are
+`AcousticConstellatorError` with `r02-g13.*` codes. Rules:
+[docs/architecture/acoustic-constellator.md](../../docs/architecture/acoustic-constellator.md).
+

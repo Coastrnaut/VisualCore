@@ -80,7 +80,7 @@ will consume).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1301-007 Docs: `docs/architecture/acoustic-constellator.md` (new: rules),
+- [X] T-R02G1301-007 Docs: `docs/architecture/acoustic-constellator.md` (new: rules), — Verified 2026-11-23: round02-host (341 s) exit 0; docs/architecture/acoustic-constellator.md (rules), ExperiencesRound02 README section, testing doc entry; contract notes label and matchesSymbol computed when read; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1301-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

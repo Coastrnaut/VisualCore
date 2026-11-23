@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G12-10: Harmonic Bridges device automation preparation).
+Last updated: 2026-11-23 (R02-G13-01: Acoustic Constellator playable rule kernel).
 
 ## 1. What is tested, and where
 
@@ -611,6 +611,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   byte for byte (regenerate only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`). A random generator left most candidates
   unsolvable in a Python prototype; the constructive one (a path whose strings can be bridges, k of them scrambled)
   reached each band's range in 37 … 60 of 60, so prototype the generator before writing ranges into the spec.
+- **Acoustic Constellator rule kernel** (R02-G13-01, 2026-11-23). `swift test --package-path
+  Packages/ExperiencesRound02 --filter AcousticConstellator` (46 tests, a few seconds): the coupling table against the
+  rounded sine; the exact comparison A + B√3 ≥ θ exhaustively over 1.27 million triples against rational bounds of √3;
+  ticks, order parameter, connectivity, listens and labels against an independent reference on 500 seeded levels; the
+  play on 200 fixtures and 520 seeded traces; the rules on 200 walks (10 fully applied, the rest validated). The
+  graph-isomorphism label is a brute force over all orderings (about 0.1 s for 8 stars in a debug build), so the play
+  computes it when read and tests keep 8-star labels to a few cases.
 - **Harmonic Bridges rule kernel** (R02-G12-01, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
   --filter HarmonicBridges` (40 tests, about 2 s): the swing table against exact quarter values of sin² at multiples of
   30°; resonance, swing, bridges and reachability against an independent reference (enumerated modes, explicit sums,
