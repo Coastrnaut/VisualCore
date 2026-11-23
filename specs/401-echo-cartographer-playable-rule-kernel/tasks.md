@@ -55,7 +55,7 @@ in this feature (the chamber, its rays and echoes are the CPU reference the rend
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1101-005 [P] [US4] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerRules.swift`
+- [X] T-R02G1101-005 [P] [US4] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerRules.swift` — Verified 2026-11-23: host-4 (incl. EchoCartographerRulesTests 8 and the 200-walk agreement with the real play: 8 walks exhaustive over every pulse and claim cell, 192 sampled at 24 cells per step) exit 0, 2026-11-23; agent C's rules retested by the lead against agent B's play
   (agent C: `PuzzleRules`: State = position (knowledge, located, energy, outcome), Move = EchoCartographerAction; legal
   moves while playing "every valid pulse, then every valid claim, each in cell-index order (markers are not moves)") with
   `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerRulesTests.swift` (agreement with the play on 200
