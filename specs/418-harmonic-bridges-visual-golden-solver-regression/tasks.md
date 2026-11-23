@@ -13,7 +13,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1208-002 [P] [US1] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G1208-002 [P] [US1] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-23: host (HarmonicBridgesRegressionSolverTests 15 tests: 100 levels in ten groups equal their witnesses, replay to a win in exactly the action count within the budget with bridge digests and fingerprints, plan equals the witness's tunings and smallerChoices with work within workBound; eleven named alterations each fail naming the level and part; a refused level copy named) exit 0, lead retest
   level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's actions replay
   on a fresh play to a win in exactly its action count within the budget, with its per-action fingerprints and per-step
   bridge digests; plan returns exactly the witness's tunings with its smallerChoices (the counterexample's choices) and
