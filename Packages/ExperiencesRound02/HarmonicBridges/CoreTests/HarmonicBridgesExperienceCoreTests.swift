@@ -592,7 +592,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(practice.play.level.budget == 60)
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
         let progressText: String = "\"progress\":{\"frontier\":2,"
-            + "\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3}]}"
+            + "\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3,\"trace\":[],\"verified\":false}]}"
         #expect(campaignText.contains(progressText))
         let dailyText: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
         #expect(dailyText.hasPrefix("{\"level\":59,\"mode\":{\"level\":59,\"mode\":\"daily\"},"))

@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1207-002 [P] [US2] Edit `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesProgress.swift` (Result gains "trace:
+- [X] T-R02G1207-002 [P] [US2] Edit `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesProgress.swift` (Result gains "trace: — Verified 2026-11-23: Verified 2026-11-23: host exit 0 (HarmonicBridgesCoreTests 225 incl. HarmonicBridgesReconciliationTests 15: all 100 certified witnesses verify as traces; edited stars, actions spent below the trace's, a changed step, illegal and over-long traces dropped and counted; untraced results kept unverified; frontier unchanged; netTrace over undo/redo equals the play's fingerprint); Result gains trace and verified with old payloads decodable; mode replay(level:); the feedback plan names the replay mode and the manifest digests moved with the result encoding; agent A retested by the lead
   [HarmonicBridgesAction]" (effective tunings and the test) and "verified: Bool";
   `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing only when better (ties keep the
   earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace = empty, missing verified =

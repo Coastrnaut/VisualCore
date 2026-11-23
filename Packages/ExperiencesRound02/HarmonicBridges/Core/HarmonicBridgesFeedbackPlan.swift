@@ -155,12 +155,13 @@ public struct HarmonicBridgesFeedbackPlan: Sendable, Equatable {
             + "\(level.goal); " + strings + "; " + steps + "; a budget of \(level.budget) actions"
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay".
     public static func modeName(_ mode: HarmonicBridgesMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 
