@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1107-001 Baselines after R02-G11-06 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1107-001 Baselines after R02-G11-06 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on the committed tree
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
