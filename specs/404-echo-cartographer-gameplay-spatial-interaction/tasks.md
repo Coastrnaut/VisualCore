@@ -90,3 +90,13 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → {002 (agent B), 004 (agent D)} → 003 (agent C, on B's picker contract) → 005 (lead; agent E writes the wiring
 tests) → 006 … 010, 012. 011 stays open until device testing. Shared files (geometry is B's only; presenter, scene,
 controls, invariant scan, docs) stay with the lead. MVP: Stories 1 to 3 and 5.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G1104-013 Make `EchoCartographerPresenter.describe` say on a won, failed or result play that the play is over
+  and to undo or go to the next level (`finishedMessage`), with a simulator test in
+  `Packages/ExperiencesRound02/EchoCartographer/ExperienceTests/EchoCartographerGestureWiringTests.swift`, per Spec Edge
+  Cases (finished play) and Clarifications Q4 (partial); `--name sim-27-2`
+- [ ] T-R02G1104-014 Restore the `///` documentation of `EchoCartographerSceneGeometry.struckDistances` (detached when
+  `wonFlag` was inserted) in `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSceneGeometry.swift`, per
+  FR-R02G1104-007 (partial); `--name host-5`
