@@ -79,3 +79,35 @@ rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.m
 - **Catalog.** `PuzzleCatalog<HarmonicBridgesRules>.digest(id: "harmonic-bridges", …)` over the 100 fingerprints is
   pinned; the standard progression rule holds on the witness tuning count; an independent brute force (every peg in
   bands 1 … 3, every pattern in bands 4 and 5) re-checks minimality on two levels per band.
+
+## Hero renderer and experience (feature 413, R02-G12-03)
+
+- **Scene.** The islands stand on the plane y = 0: island (gx, gy) of the 16 × 10 drawing grid is at
+  X = (gx − 7.5)·0.12, Z = (gy − 4.5)·0.12, a hexagonal copper prism (radius 0.07, height 0.1) with warm edge strips;
+  the start has a ring and the goal a four-pointed violet star. Every string is a strip between its islands' top centres
+  at y = 0.1 carrying five sample marks at u = k / 6: a filled square exactly where the kernel's swing reaches the
+  threshold, a hollow ring where it does not. A string that is a bridge in the shown step has a cyan membrane beneath
+  it; every island the start reaches has a glow ring. In front lie a pip per window step and the moves gauge (one bar per
+  action of the budget, lit for the actions left) (`HarmonicBridgesSceneGeometry`).
+- **Steps and wave.** The shown step cycles every 1.2 s (`HarmonicBridgesSceneSnapshot.shownStep`); a broken test holds
+  the broken step, outlines the broken string in #FF6B4A and crosses its pip. The strings' swing is a presentation wave
+  applied in the vertex shader, Σ 0.01·wᵢ·sin(nᵢπu)·cos(2πnᵢt / 1.6) over the step's resonant modes and tone
+  strengths, packed per vertex as m₀ + 24·m₁ + 576·m₂ with mᵢ = 4nᵢ + wᵢ; it never decides a bridge or a mark, which
+  come from the kernel's exact report (`HarmonicBridgesShaders`).
+- **Order and shading.** Depth testing is off: the bridge mesh is in painter's order (ground, flat rings, membranes,
+  wave shells, strings with their outline and marks, islands back to front and from the outside in, pips and gauge);
+  the glow mesh is drawn last, additively. A won level brightens every bridge and reached island through a per-vertex
+  flag without moving anything.
+- **Tiers.** level-0: string motion, two wave shells per resonating string, two glow shells; level-1: motion and one
+  glow shell; level-2: none. Islands, strings, membranes, marks, pips, the gauge, colours and positions are identical
+  at every tier; the presenter logs tier changes.
+- **Camera.** A fixed authored view from eye (0, 1.9, 1.6) towards (0, 0, 0.1), fitted to the box x −1 … 1,
+  z −0.7 … 1.0, y 0 … 0.2 with a 5 % margin for aspects 0.4 … 2.5.
+- **Adapter.** `HarmonicBridgesExperienceCore` opens certified level (seed mod 100) + 1 from its table of certified
+  candidates and accepts `string.tune` [string, peg], `crossing.test`, `play.undo`, `play.redo` and `level.next`; its
+  digest ("r02-g12.harmonic-bridges.v1") is the level number and the play fingerprint; snapshot schema 1.
+- **Fallback and settings.** A shader failure draws the level-2 geometry unlit and keeps the reason; Reduce Motion
+  draws the resting step at rest; Reduce Flashing caps the glow.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest b832e7ee…3c737) and linked into the app
+  as a candidate (`ExperienceRegistry.candidates`) until X-R02-G12; the scenario manifest holds the standard scenarios,
+  `full-playthrough`, `hero`, 80 acceptance scenarios and the fixtures.

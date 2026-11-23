@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G12-02: Harmonic Bridges content pipeline).
+Last updated: 2026-11-23 (R02-G12-03: Harmonic Bridges renderer).
 
 ## 1. What is tested, and where
 
@@ -542,6 +542,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (`host-1`, `host-2`), and every attestation's `elapsed_seconds` is read after a check: anything above about 450 s is
   split before the next gate. The one failed attempt of that gate (sim26) came from an outside
   `simctl shutdown all && simctl erase all`, not from the code.
+- **Harmonic Bridges renderer** (R02-G12-03, 2026-11-23). Host: the shader-source, geometry, adapter, purity and
+  scenario tests (`swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridges`); simulator:
+  `HarmonicBridgesExperienceTests` (frames against the CPU reference at three tiers on five levels, fallback, resize,
+  Reduce Motion, a broken crossing, a won level). The shader and geometry agents first wrote two incompatible vertex
+  streams (a uniform array of waves against per-vertex packed modes); the lead kept one contract and had the other agent
+  rewrite to it. Fix the stream contract (attribute by attribute) in the brief before shaders and geometry are written in
+  parallel.
 - **Echo Cartographer renderer** (R02-G11-03, 2026-11-23). Host: the shader-source, geometry, adapter, purity and
   scenario tests (`swift test --package-path Packages/ExperiencesRound02 --filter EchoCartographer`); simulator:
   `EchoCartographerExperienceTests` (frames against the CPU reference at three tiers, fallback, resize, Reduce Motion,

@@ -658,3 +658,10 @@ constructive seeded `HarmonicBridgesGenerator`, `HarmonicBridgesSolver` (bridge 
 retuned strings by increasing size, with the smaller choices as the proof), `HarmonicBridgesDifficulty`,
 `HarmonicBridgesWitness` and the 100 witness files in `docs/games/harmonic-bridges/levels/`, with the pinned catalog
 digest.
+
+Feature 413 (R02-G12-03) adds the hero renderer and the experience: `HarmonicBridgesSceneSnapshot` (palette, tiers, the
+shown step and the kernel's exact report), `HarmonicBridgesSceneGeometry` (island prisms, strings with their sample
+marks, membranes, pips and the moves gauge; camera; CPU reference), `HarmonicBridgesShaders` (bridge and glow programs
+with signed-distance shading, the presentation wave of the strings and the wave shells), the adapter
+`HarmonicBridgesExperienceCore`, the scenario manifest, and the iOS target `HarmonicBridgesExperience` (presenter, bridge
+scene, control panel), registered as a candidate.
