@@ -62,7 +62,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks pass.
 
-- [ ] T-R02G1103-006 [US3] [US4] Create `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerExperience.swift`,
+- [X] T-R02G1103-006 [US3] [US4] Create `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerExperience.swift`, — Verified 2026-11-23: sim-27 (EchoCartographerExperienceTests 28 on iOS 27.2: frames vs the CPU reference on levels 1, 21, 41, 61, 81 at three tiers, fallback, zero size and resize, memory warning, Reduce Motion, Reduce Flashing, energy failure empties the gauge, identity) exit 0; packages (36 experiences) exit 0; catalog-search exit 0; scenario tests 6 incl. the committed manifest (94 scenarios) — 2026-11-23; agent D's tests retested by the lead; candidate registered (registrations, catalog, registry, project.yml + xcodegen, AppModelTests example r02-g12.harmonic-bridges, test_scripts, RealCatalogTests)
   `…Presenter.swift`, `…ChamberScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and
   Reduce Flashing; the presenter declares `probes(_:)` — two ground corners, as the round-two X gates require — and its
   quality levels equal the Core's `qualityTiers`), `…Controls.swift` (labelled column − and +, row − and +, pulse,

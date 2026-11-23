@@ -44,6 +44,8 @@ import NocturneGardenCore
 import NocturneGardenExperience
 import BackwardsAuroraCore
 import BackwardsAuroraExperience
+import EchoCartographerCore
+import EchoCartographerExperience
 import HueCompassCore
 import HueCompassExperience
 import VisualCoreExperience
@@ -123,7 +125,26 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [echoCartographer].compactMap { $0 }
+
+    /// R02-G11 Echo Cartographer (feature 403, R02-G11-03): a candidate until X-R02-G11. Snapshot schema 1, so no
+    /// earlier example is stored yet.
+    fileprivate static var echoCartographer: ExperienceRegistration? {
+        guard let id = EchoCartographerExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: EchoCartographerExperienceCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return EchoCartographerExperience.make(
+                id: id, storage: launch.storage,
+                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        // Seed 0 opens certified level 1, as for the other round-two puzzles.
+        registration.openingSeed = 0
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = EchoCartographerExperienceCore.manifest(for: id)
+        #endif
+        return registration
+    }
 
     /// R02-G10 Backwards Aurora (features 391–400, R02-G10-01…10): integrated at X-R02-G10 (2026-11-23). Snapshot schema 3 (feature 397),
     /// so the schema-1 and schema-2 examples are stored (feature 399, R02-G10-09).

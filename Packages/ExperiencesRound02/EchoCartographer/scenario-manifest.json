@@ -1,0 +1,3267 @@
+{
+  "controls" : [
+    "cell.pulse",
+    "cell.claim",
+    "cell.mark",
+    "play.undo",
+    "play.redo",
+    "level.next"
+  ],
+  "experience" : "r02-g11.echo-cartographer",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "cell.mark",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9f5d816a304c8e42397e3cb06fa1e137c66e049728fe627131e14196d2c3a55c",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.claim",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0.5,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g11.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "cell.claim",
+            "values" : [
+              1,
+              1.5
+            ]
+          },
+          "result" : "action.rule.r02-g11.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g11.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "cell.mark",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g11.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g11.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g11.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "cell.mark",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9f5d816a304c8e42397e3cb06fa1e137c66e049728fe627131e14196d2c3a55c",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "cell.mark",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.claim",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.claim",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.claim",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5a3cf2c74f6d891ed9d89164e69c08f3eec45bbdae52fd2fe76f54e566ee6b68",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9f5d816a304c8e42397e3cb06fa1e137c66e049728fe627131e14196d2c3a55c",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9f5d816a304c8e42397e3cb06fa1e137c66e049728fe627131e14196d2c3a55c",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5"
+      },
+      "name" : "acceptance-001",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a1173e09280f42c25e1787179fd8f32fe3112eb117ee0672651fe70fc14ec150",
+        "initialDigest" : "1e8c227c2ce70f32861adcb9deb1e183f69ba1fc9e11c8572b91a0cd80f52ad8"
+      },
+      "name" : "acceptance-002",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8118f766df5c61fe149ba0bb9c6b31eee3ff4245a878bddddfc05443f52e9f64",
+        "initialDigest" : "7b3adb5f877c192e7f070f3164e8fec0076f9138e7b9ea22f6354b0f5be40859"
+      },
+      "name" : "acceptance-003",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1f3b6702e2c52566faf9842136918e89d209c9c419ec93b4bd922640824179db",
+        "initialDigest" : "4c30586f2ad1b6af924e783dd6b881a72baeac7219c203ca68cda3e92655b8d6"
+      },
+      "name" : "acceptance-004",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              3,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fa2d7300c013e1e5291a88225780735966a04870f76ea1415c7ef85e4975490f",
+        "initialDigest" : "60100b15a5d4a8fa7b40008de2cc504b6ed307f8c0352e6ad64790b7506d54f2"
+      },
+      "name" : "acceptance-005",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              7,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b41001748b059707ac0373f775a5a2288221233a4adc4a06da8758b19ccb50af",
+        "initialDigest" : "e45a58987775ea1512deac168fe50cfa13434804e5f7d8b16eb8db58a580bbf3"
+      },
+      "name" : "acceptance-006",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9f62111965d53352a885a1a90fa3070a2fdcdba35872bfb06440c46e15da58f1",
+        "initialDigest" : "8ed01b6b2c6790a1e166000a6a3db8e044eb084de27db23ea42a9ee0e9253564"
+      },
+      "name" : "acceptance-007",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "511730b1fcd13dbf68cb88ae7a2bde13705cad95aa7f580557f99cb4011e345f",
+        "initialDigest" : "6489b7c72262c0db38500902a093913c3cadcbddff38f3d4af9a89176e586b31"
+      },
+      "name" : "acceptance-008",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "86b13399bd5589cc76ce4f7281208f14391473812af51ebf8647703bc728c2a3",
+        "initialDigest" : "df71c49daacef87a8d4fc40607711a6914ad0dc57d894c0d2bfb95a40ec73788"
+      },
+      "name" : "acceptance-009",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              3,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "144849245ce16f94c374dee5c55626a3a25d2b8d2b34adcbb7b3d2b85f273f44",
+        "initialDigest" : "18b8e9ef1b997402f6c7f1357f5ac7cfde065b52f3fd8362c27d9d76f18102e5"
+      },
+      "name" : "acceptance-010",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c25eebaa8191de1a3090d85f754fda7b942c5213ebfc4d362b5a77fbc07c8998",
+        "initialDigest" : "d946a6074e9a277a90b7e3cd9bfbb195b32f689674ad92a98a360153d8208c52"
+      },
+      "name" : "acceptance-011",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ecc39e9d6419b3df0068020e2d36c90398d522e1fdaca99a03db7ea6ba0d2478",
+        "initialDigest" : "e6acb26b3a1371851061e81f34b5ed9ddef4dc3eaed12e7e9c6904e8b0735b20"
+      },
+      "name" : "acceptance-012",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b1fe4f6a57ddbaed53de8ab91d59b3d5289a77b45229330a3f8e423e33a7fe6a",
+        "initialDigest" : "4e60e5d3f3989198d19d9754d2840d2098a57b30d8fd7d90afe9cf14f029dd62"
+      },
+      "name" : "acceptance-013",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "187e9e8dcb6ed570afbdba2fe7d1cd7e7536add93a8f2a1ba8dc65daba26ab6b",
+        "initialDigest" : "5a63e6c7cc2e3a7e548cb2cd481425372a83fc550b3cea6e3865910f1f18c784"
+      },
+      "name" : "acceptance-014",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              7,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4c1a8bef0a445a1bde2f32d329a75d661b46f892f57cc2661a8660dc459477fe",
+        "initialDigest" : "6294d074323dc81a37a87de0dc538bdeb6f68ffd35cfe5e085c496171f384ec3"
+      },
+      "name" : "acceptance-015",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              5,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "655b699b4e4f97d61bbf7b9255083cec42c9536d3abdbcdf875e75d4ff04013a",
+        "initialDigest" : "2e7c6e82312da3dc69ff1d8cdb742b214e646d3ba6ad3e5a6e1f64c051c62728"
+      },
+      "name" : "acceptance-016",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8bed70562875d3eab35b37dd14ddb1f862bb072de1dbe7cc21a8e448b3e0b469",
+        "initialDigest" : "efe905a48ca45fa7a715ab14646d02c36f902eea6c59cea275319b52eb9c1158"
+      },
+      "name" : "acceptance-017",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "29301382de46848d39eff993fe445f756fffd3fd79a286a37f247415f90e0bc7",
+        "initialDigest" : "4add6ad67f0c9bcf9d8e11fcb48be894d72060ed863156723055cc139360021b"
+      },
+      "name" : "acceptance-018",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d70c84fde9f8124d232a1898737054368aae4d9dfd7b3432823d5832e0d27bf6",
+        "initialDigest" : "2115e75083c2c44c1ebb42a8dc56ed13d2fcd90098c5dbf12ad56aca940a4c91"
+      },
+      "name" : "acceptance-019",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              7,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "515d5dede2c3436445018fb98af7b5789203c612415099c4e6ec5bb25de58b12",
+        "initialDigest" : "9a2c3bfa8f0a78b24abcffeca48ea6f4f95097711d63f0e021b1c634c40e970b"
+      },
+      "name" : "acceptance-020",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2e81f7a468e0515a4dbbcfd03efbbc984cf390782c9a14fed8df656af65c3818",
+        "initialDigest" : "932f2d65f7cfa91ed341af8e5e5f0d4b4a9d44958bacae432f2cc822b0c4885e"
+      },
+      "name" : "acceptance-021",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              5,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5a1fff14d51777a478a64d4ed9db6414f43a373f4285d7e0ed829600de26e9c6",
+        "initialDigest" : "d6debe503a83bed1212db9428b83a80e90809d822cb7f1d6e666dc5019b1c80f"
+      },
+      "name" : "acceptance-022",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "633f2dfa2a06b3ae3d8d326f1fc0440547e61e1fa5b86a5899bd111f4e569fc7",
+        "initialDigest" : "1fa82c67b339efc118d94e5ab91e17ec4c1ba02fef58f75edcd70aa977f1813a"
+      },
+      "name" : "acceptance-023",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c8e24b8e2a2b6618a82d9d5baefa126aa4829540db5262e030587d901f242b71",
+        "initialDigest" : "0633f8ad68711f78d39e303af55a1b1b173d709944d7c88d230c98730df9298c"
+      },
+      "name" : "acceptance-024",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "35320a19a0469aa8b2101c2af592ea34e0b3ba139f997b9f80acb0c9a0f9e2c6",
+        "initialDigest" : "d8323eb3a8c728a4c93b9cead86441a1e48994861322767a9d9995d8dbd8c801"
+      },
+      "name" : "acceptance-025",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              7,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "490eff298114618c5f8ca804874f7ed685b662009a2812c6f4f33f22946941e8",
+        "initialDigest" : "bd0d40cadb1b6a4913f189f56d3d2c05c6e3f49b7fc85f2fcdb839d5fc6af58d"
+      },
+      "name" : "acceptance-026",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              10,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9542fc324a4559ef92f94f945f4cb687607720a643800f2e296ad7a2779f2ef6",
+        "initialDigest" : "a7583ca138988c5b3a39443104dca05069d0b4845c654b6f0d169ae091c8d86b"
+      },
+      "name" : "acceptance-027",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9b35eb04874322c6fa930190b948ab8204e735a31eb918d7a581e4e5ace1d803",
+        "initialDigest" : "4b7defd2139bf78b91e657066b34ad55656691510636dadcd1b2cf13863ebc3c"
+      },
+      "name" : "acceptance-028",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              5,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "94cbcf6c60d36d947da90744a0114d8c349364c7bec2275eec6701bfe1bec29f",
+        "initialDigest" : "71bb5d1a4b0dc161c3d4e6cdaa88c6b61f21266a7c1c30c888d349a6d96c13f4"
+      },
+      "name" : "acceptance-029",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d5498506c398d7212769667d818f21e031367c8f2081fbf921414db01d939f9a",
+        "initialDigest" : "48f043a987b98cc89cbc3234e28c48675105e7d7e7b4c3be9a11af208a7b92d2"
+      },
+      "name" : "acceptance-030",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6866bbc7c7153499309342e94101abe671d34588f4191aa8c6c76e902eb88fc1",
+        "initialDigest" : "165f3e78a4f3a9b8708b7f6abe9d9f8c795125bc296d70aa095059501bd5bbb8"
+      },
+      "name" : "acceptance-031",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1edf26bf8253202828d753340849440b96bb5d8808342e942e04c90bb61ea3b2",
+        "initialDigest" : "ab74feecb57e2e7dd7f6bbb9c9f89bee085f123a2f5713b74cb723be33be117c"
+      },
+      "name" : "acceptance-032",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "36d1e43ca000d5876e191bd638f969067d9544a45617b8fcbc1ac1564a9817df",
+        "initialDigest" : "3ec4799359135b45ac44e40c86cef16c9443d2bf631d150d76b0b6f4e438518a"
+      },
+      "name" : "acceptance-033",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "13fb627fe5dea12a3fe44d2f9918b53892e4421ace5acfff511ec9068e3de358",
+        "initialDigest" : "30f1a9ebae21c3bccc2d612b635a8527dce9ae4b88df2fb64c5202f229247b18"
+      },
+      "name" : "acceptance-034",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              5,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8c8aa91e28afcdb2572c99927107f1151ea8d23433f98701e23c7b3de0ca74cc",
+        "initialDigest" : "365b35b3279581f42dc03e7f23a8529f1e4162a6659d084da4b7888d5a4a15f9"
+      },
+      "name" : "acceptance-035",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3c745bef5be6c5057de6e7c5e4cd38a667954e3c588f0f5f29cc2b116643081f",
+        "initialDigest" : "1908e54fa95d6ed450be35c121a123d71d6b566699f3de4c00c6e3be4d5d747e"
+      },
+      "name" : "acceptance-036",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e962ef3a89e2a838ac3beca8b6302ef3cd9ed6299885f730f94e3eb0d11a51e9",
+        "initialDigest" : "b64007f05e7880904c08401253a7328b85c6eb057d1e0cef7b38b01ff2b72a45"
+      },
+      "name" : "acceptance-037",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b7beea42a20609f94e32b9a967c9e61f32105e761edd7d67b6c9ca21f61bae9d",
+        "initialDigest" : "478a5c447a74792dda3a230bd9ce98215efb83cbaf2a3618d245c1b1c75b9815"
+      },
+      "name" : "acceptance-038",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c1281fcffd0b9cba67b793f8f1d162af060b19f9dfbd9e2a5e688a392f51c282",
+        "initialDigest" : "f7c91728d65e9fd26353dd24657c4ca2460bc75751b1d0be363d9a2d7f0fca46"
+      },
+      "name" : "acceptance-039",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              10
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f5714726f3919833411a1576ce197ffc7d7ef3890b2fdc8b9d28ba5889e6e03b",
+        "initialDigest" : "2233ede017ffb253c1507cefd1fb2b8c9186ad1cc110b4ccbd9f1a64a2afad95"
+      },
+      "name" : "acceptance-040",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1fe13f307eaea6cea5865dac7c5676dcb33007133c2739c7067111c89d94c6eb",
+        "initialDigest" : "14b9278992b7f98846b730bd6d8061ae24398ff36dfccdcf32934edb3ddd8b76"
+      },
+      "name" : "acceptance-041",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b68c7b4c288a4de3ec9a91e4e971fd221abeadea9e4ce17669ac1b62ed24320d",
+        "initialDigest" : "e37e0e92df19faa494bb8340ccc089871579583258bb266e2fc56e8d1628e820"
+      },
+      "name" : "acceptance-042",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a798825a55884f3505111dc5435701bdbb2c440d2df6c72651d96438058418c4",
+        "initialDigest" : "efb36e5e343c6d142e36af386eb50af99fbf840fe2285345393b7750c8dff680"
+      },
+      "name" : "acceptance-043",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3c8fa48a0aa862eaf5141afd1aaa41b792a2cd459ab4379355c10b3b568e2c19",
+        "initialDigest" : "3b181a6525c67399c5720900dcbe0aac1cff8a752a0f901be3f805e8a5cb0e65"
+      },
+      "name" : "acceptance-044",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              3,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "59efb437246686b6ac7949ece04ff774eb40dcc6a712c8117c2869fbfe96b75c",
+        "initialDigest" : "bbb0b8c4b56a718fcb8e4588e60bc02c41f5b797760e12187efee282a23d2e6e"
+      },
+      "name" : "acceptance-045",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "57cda91111c592c4224cf2516ae7e0acaa71836c8b89f703509053744099421a",
+        "initialDigest" : "d0bdc2a1177780fa2888e9977ffd7706af3d3b39a326c5a7112e61140c961149"
+      },
+      "name" : "acceptance-046",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "95129a0887021c1d5c6b22c1989643e37a1ae33c9e780af56f931a9bf1d257c6",
+        "initialDigest" : "33a1ef86c0f6fa3c0eb96e2d8cacc5e8993748c1d1229290eadf84e6972c2bcd"
+      },
+      "name" : "acceptance-047",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6360453d1917dbba7498071d41afca2e324b8de30c03f8327dadee9f02e528ec",
+        "initialDigest" : "dbbb91463ffd26e8b8904a5eba8750fa3563d80b5ec763f4370a79d7eca436c0"
+      },
+      "name" : "acceptance-048",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8d1c7ec7de67ec110d067b34bdeadff730d6c6e56c69de468601c9d44912cdb2",
+        "initialDigest" : "9636105279a47766f401ec5e2455704be79c063b55809c724dad5cde7e6212e5"
+      },
+      "name" : "acceptance-049",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              5,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a8fa28dec352596927b32d3e5d5e9114f6ab1d65e5de24ef67ca9798ae1ef188",
+        "initialDigest" : "2d2e2061ff46ce5b0a8d710e11a2cf054bd712e5ad7e7f543359b46261f5c885"
+      },
+      "name" : "acceptance-050",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b9a9641e3e0f48b092404ae35362c23525ce8864df3aaa26707ab071c499b69e",
+        "initialDigest" : "2d50729319ec08944d381ce3774aaabedaa962c947ea21fb1e450efd85321159"
+      },
+      "name" : "acceptance-051",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a75d2820b55d623b9903a96445b7bb4ca5a6aa7242538fdfb1c1c700b2bcd06c",
+        "initialDigest" : "db660f8b0e283c5a111baf7447ca8cb0fdd5c3eeb5c68ff2843c795b60e99683"
+      },
+      "name" : "acceptance-052",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0fcdc30d7ea3dfd1cae9579c5e0b32c723ed816549bd51d6b92b2ddc62199744",
+        "initialDigest" : "778ae852cff5bc1a05801081cd0c3623e3deed861859de8c3f3810dd5bbe73a4"
+      },
+      "name" : "acceptance-053",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5cf2e27d7628806489545970b693d92fcd9fff82ed2ddb8a27f1f33548b3c24c",
+        "initialDigest" : "e8f0aac723e582a74a834ed114a00984538cb725fac8d78c81d09ee1c6617aa8"
+      },
+      "name" : "acceptance-054",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c9011d7e1d98da5f27c848f5cf89219f0917df8de468479ed25d059d2b631dcf",
+        "initialDigest" : "0170d7c120fba41bb6f8b910b455bd509583356d3dc91f82ee08143cbf183367"
+      },
+      "name" : "acceptance-055",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9adc356a2fc2b92d6de927549154bcef4e663d2ff90f901acd464574d265ca00",
+        "initialDigest" : "f223882c5b44eac50675f468c14fc6381ca17c0ba522182c673ebe4cfd0f67e2"
+      },
+      "name" : "acceptance-056",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              6,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e50b958d8060b944c6b2450aa2b3f613aef8a8134ee6a357a773f7f3d481df5d",
+        "initialDigest" : "b9047fb3319ee1cb8ecb74fb14e22093fabde89ee822c60578456c31667b5610"
+      },
+      "name" : "acceptance-057",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              13,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c34d246ab226286dc8f898a4791d252d7179e2dc8f1e92e9987ae142870d6ff9",
+        "initialDigest" : "580eabbf008428281efc8891d53ec8e1e72bd87c1f1470c42064e0d5bbc6e724"
+      },
+      "name" : "acceptance-058",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7183e0cb167f14e8a76ebffaf7868fd46b259bc294c365a4e80ff0e6b96305af",
+        "initialDigest" : "d0c3f748feca4c7c1aa7802b7f649a95bffc761e6f271e35153d35fa814c0572"
+      },
+      "name" : "acceptance-059",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              5,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fd5999e43d00b8186861ddece4d62d5cc485eaea5fda0d0e273055eb2eede868",
+        "initialDigest" : "2c2345540d1ce063785fe58f9617c53294a2fd273094362e77e3d5fb6ef029f1"
+      },
+      "name" : "acceptance-060",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "423f2dbbe4d1958eaabcdab98aff08106bdf60eb2dfe30a024845e5a2b743dfe",
+        "initialDigest" : "a6337e42fc466f93152155927a6f266d52420a3cf8236cc8a871cfe6ac02b63e"
+      },
+      "name" : "acceptance-061",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bd50c785d6a4fd47193c980a5b505d7e8cb3795fa7aed48be3080016d836b712",
+        "initialDigest" : "864ab74c9ed39760abee4b9ff3419f9e0f0180b4c37bab35c08b42dece65736a"
+      },
+      "name" : "acceptance-062",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e3d95e7071cb58c445e235b5d5bb3fab86fbf47ebbd625f82bc8b54a252d1a99",
+        "initialDigest" : "be45b1bdc3b7a766055ac3c5413de24c30684763c082e4681a41430192b2fae9"
+      },
+      "name" : "acceptance-063",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "211ecb8daad73cc675f93f444fbed94b3bcbde837b65d16d09e5109ee9de9830",
+        "initialDigest" : "85f576d621a6a685dbaee146b62ed0e30f94f3ee7cf8cb4ed1136e9014e61ab2"
+      },
+      "name" : "acceptance-064",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "424ee29b143209feb2c773eaaf2425611aac23c313013b8a4661c0285d6ec1aa",
+        "initialDigest" : "ce1d6e83076d88d8b714814d938b6a7c0398cbe7074749cb9a793e3957d79f23"
+      },
+      "name" : "acceptance-065",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7299b8f751ed75c74fc844cd732ea59b7077b2d2ed7b45c60f614e22ff12fb0b",
+        "initialDigest" : "683a1599f73fd885e6bdac69183a3979181063c12bd8e1140847feaaf391f3b8"
+      },
+      "name" : "acceptance-066",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf6a79827b981ba30d93cb635902b821d6dd86aa18f89baa120393298f8d5bd8",
+        "initialDigest" : "376f26bdc57e4ab22f9d6d9bd96db59226afa77464f98e501340365a7ee21a2d"
+      },
+      "name" : "acceptance-067",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              9,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3fa9ec1914a6ea7f642d415bbc6403d6eb15023769d3737a060f3fcf13110cb2",
+        "initialDigest" : "1c5d181392bb0c2ab0d97f1e7c000b7e636247303b19baff987fcebae7e70132"
+      },
+      "name" : "acceptance-068",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a69cc73df980e2feb9ab8ce6cdb1d43edbeff62ca97c6214badea76e5c98acb6",
+        "initialDigest" : "1b01a85cd3a31f9e9b37b4b01c3493675d55849e24f9d7c6a689b5d81e80908b"
+      },
+      "name" : "acceptance-069",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9d6591e4d7a7150a6d73c81f39cf4205803d4b29f65efe11a6068f51719f4442",
+        "initialDigest" : "3d1cdec2ca6d4ba4a0dd921a2b0d168fde72f1b0214f49ce3b0ccb5adc3185df"
+      },
+      "name" : "acceptance-070",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              10,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "799f1cd1b4edc3a2ecf3db4cc2ef50133a87bccbfdf82850b5d777ec7aae22b9",
+        "initialDigest" : "a27030899583f1ccff8e7bcd1d166c4658c7d346fde55407949b4d98a23546e0"
+      },
+      "name" : "acceptance-071",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              10,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b14e93c50f6ddd3029840a5ca5d19a0431764041ec85860107c771c52c3c0d76",
+        "initialDigest" : "73812bdfd86189b2391d2f4f02e2efb3c6fccc2018793654a1999c32328ad3cf"
+      },
+      "name" : "acceptance-072",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f8db3d5dd703236ab0dcafb529741de13d32dd11e9c356763a88a0c7e8f04996",
+        "initialDigest" : "abb169370b37b46856a58e4c59b519af552043725b246e577245b99f9da6458a"
+      },
+      "name" : "acceptance-073",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b8a2032fcd57f6f83363a3beeaa4ec11141c03a78be790b946674ebe3357d591",
+        "initialDigest" : "b91a547142b45c97f16ba6ea9be1b47ad4e20ed50c4150130e8bc295a1649b22"
+      },
+      "name" : "acceptance-074",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aab27a0ecdc50e16f34002e208648a42fdf72b9d4d257081618fda6502c9e7ff",
+        "initialDigest" : "0353960e56f406ee9c999a3278bc99bc95c9f33fa950bf08bb2a9c226a1409dc"
+      },
+      "name" : "acceptance-075",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9e4a47d2febad418f8c38c5ba7b52b4a0de75f79c9b9bc752125828e1ac40a1a",
+        "initialDigest" : "f6cb1e9f125f6f8150698fc9cddc60a9e27eee110f5f9130fbcbedcb5076a766"
+      },
+      "name" : "acceptance-076",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              5,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "426d130c138d04901eb3ae2127337efe615dbe5f738d30cd7182f8cff4a397e8",
+        "initialDigest" : "b17db310317c8e2b3207226866b3879877c55c3c7fac228d2b1bd5e9010b4329"
+      },
+      "name" : "acceptance-077",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2b781b28a6dcde8cb9f7cbc959168b854c834c8849109698122788ddb74dbece",
+        "initialDigest" : "71a0e02adaf29f556364724fd18b651ed76a5b8b5245e141064b43662c96630e"
+      },
+      "name" : "acceptance-078",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              8,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              16,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2358865e5bb9bd742e2bd8aaf401a4d9cda9f7402c6ea58111c6f70c4b8f878c",
+        "initialDigest" : "b0bb2e55a385f92ed1d83de0e88b2b02ef64aa0082d5a1bc62a229aa32771f1d"
+      },
+      "name" : "acceptance-079",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              16
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "69f243446a62598c4f75bef9454dde59198c5e9a7ab5900cb985143406d2d3ce",
+        "initialDigest" : "c0acd3b536df38f343e7f066e348badec54542d05f54d1240d7e2f36ec6136dc"
+      },
+      "name" : "acceptance-080",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.claim",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2ecd554c2f1dbf0d73bdf04807ed7a2455d257711f62f5b3535ba6f00b37d23f",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ead41c3343fb6800d8607217cbbb66f8ecbdee197e4bee28fcb1c36fac2b60ce",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-budget-out",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "cell.pulse",
+            "values" : [
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9f5d816a304c8e42397e3cb06fa1e137c66e049728fe627131e14196d2c3a55c",
+        "initialDigest" : "cbe177eeb46a4533f7418e2664b323bc3b032a8b9cad72e4fa02531f26f634f5"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

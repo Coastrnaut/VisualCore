@@ -1490,7 +1490,9 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     # Feature 383 (R02-G09-03): Nocturne Garden, integrated at X-R02-G09.
                                     "NocturneGardenCore", "NocturneGardenExperience",
                                     # Feature 393 (R02-G10-03): Backwards Aurora, integrated at X-R02-G10.
-                                    "BackwardsAuroraCore", "BackwardsAuroraExperience"])
+                                    "BackwardsAuroraCore", "BackwardsAuroraExperience",
+                                    # Feature 403 (R02-G11-03): Echo Cartographer, a registered candidate until X-R02-G11.
+                                    "EchoCartographerCore", "EchoCartographerExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

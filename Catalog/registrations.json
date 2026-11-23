@@ -886,6 +886,34 @@
       "manifest": "Packages/ExperiencesRound02/BackwardsAurora/scenario-manifest.json",
       "permissions": [],
       "summary": "Reverse sections of a glowing cyan aurora in time until every checkpoint shows its true height and every bend stays within the limit, without tearing it, within the reversal budget. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g11.echo-cartographer": {
+      "capabilities": [
+        "Map a dark chamber by echoes",
+        "Locate hidden beacons by reasoning",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#05070A",
+        "#3DF5C4",
+        "#3A4A46",
+        "#CFE3DD",
+        "#5FF7FF"
+      ],
+      "content": {
+        "catalog_sha256": "a32a593b898acf77bd86c25509a68e0b5f8a1227f356d2d3b91c8cfff5c8dca9",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/EchoCartographer/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Send sonar pulses through a dark chamber: walls flare into mint wireframe and hidden beacons answer with echoes. Work out where every beacon must be and claim it before the energy runs out. 100 certified levels. Drawn in code; offline."
     }
   }
 }

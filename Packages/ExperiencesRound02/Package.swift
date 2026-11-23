@@ -39,6 +39,8 @@ let package = Package(
         .library(name: "BackwardsAuroraCore", targets: ["BackwardsAuroraCore"]),
         // Feature 401 (R02-G11-01): Echo Cartographer's rule kernel, a candidate until X-R02-G11.
         .library(name: "EchoCartographerCore", targets: ["EchoCartographerCore"]),
+        // Feature 403 (R02-G11-03): Echo Cartographer's experience (iOS only; a registered candidate until X-R02-G11).
+        .library(name: "EchoCartographerExperience", targets: ["EchoCartographerExperience"]),
         // Feature 353 (R02-G06-03): Chrono Constellator's experience (iOS only; a registered candidate until X-R02-G06).
         .library(name: "ChronoConstellatorExperience", targets: ["ChronoConstellatorExperience"]),
         // Feature 363 (R02-G07-03): Amethyst Escape's experience (iOS only; a registered candidate until X-R02-G07).
@@ -369,6 +371,26 @@ let package = Package(
                                    .product(name: "VisualCoreDiagnostics", package: visualCore),
                                    .product(name: "VisualCorePersistence", package: visualCore)],
                     path: "EchoCartographer/CoreTests"),
+        // Feature 403 (R02-G11-03): Echo Cartographer's experience (presenter, scene, controls) and its simulator tests.
+        .target(name: "EchoCartographerExperience",
+                dependencies: ["EchoCartographerCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "EchoCartographer/Experience"),
+        .testTarget(name: "EchoCartographerExperienceTests",
+                    dependencies: ["EchoCartographerExperience", "EchoCartographerCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreSimulation", package: visualCore)],
+                    path: "EchoCartographer/ExperienceTests"),
         .target(name: "ChronoConstellatorExperience",
                 dependencies: ["ChronoConstellatorCore",
                                .product(name: "VisualCoreMath", package: visualCore),
