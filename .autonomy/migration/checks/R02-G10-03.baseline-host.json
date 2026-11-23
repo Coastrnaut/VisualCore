@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore"
+  ],
+  "command": "swift test --package-path Packages/VisualCore",
+  "elapsed_seconds": 38.318,
+  "exit_code": 0,
+  "finished": "2026-11-23T03:27:01+00:00",
+  "gate": "R02-G10-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G10-03.baseline-host.log",
+  "log_sha256": "472789258662734096ce157931d6645ff105d86c09827435d3ad6704a76339b8",
+  "name": "baseline-host",
+  "started": "2026-11-23T03:26:23+00:00",
+  "timed_out": false
+}
