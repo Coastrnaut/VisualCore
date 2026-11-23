@@ -59,7 +59,8 @@ tap within 0.35 s and 22 points, orbit 90° per view width and 60° per view hei
   swipe while it lasts, shows the wave as it would be after reversing the chosen section: the kernel's own reversal
   (`BackwardsAuroraWave.reversed(start:end:)`), its bends above the limit and the seam that would tear, drawn as a pale
   dashed copy of the ribbon with a line "would match 3 of 4 checkpoints, worst bend 9 of 12" or "would tear at seam 5";
-  the shimmer and pulses stop while it shows. Lifting a held press sends nothing. The preview is presentation only.
+  the shimmer and pulses stop while it shows. Lifting a held press sends nothing, and once a press has frozen, moving
+  the finger does not turn it into a swipe (corrected at the checklist, 2026-11-22). The preview is presentation only.
   Impact: FR-R02G1004-002; SC-R02G1004-003.
 - Q: How do two fingers behave, and what happens on a finished play? → A: a second finger cancels any one-finger gesture
   (nothing sent, the preview dropped) and orbits: yaw ±35° about the y axis (90° per view width), pitch −15° … +20° (60°
@@ -93,7 +94,7 @@ independent pick predicts; no kernel action is sent.
 **Acceptance Scenarios**:
 
 1. **Given** a level while playing, **When** the player taps a sample left of the section, **Then** the section's start
-   moves to it; right of the section, the end moves to it; inside, the nearer end moves.
+moves to it; right of the section, the end moves to it; inside, the nearer end moves.
 2. **Given** a tap off the timeline, **When** it lifts, **Then** nothing changes.
 
 ### User Story 2 - Swipe the section to reverse it, with a frozen preview (Priority: P1)
@@ -110,9 +111,9 @@ preview whose samples equal the kernel's reversal and send nothing.
 **Acceptance Scenarios**:
 
 1. **Given** a chosen section while playing, **When** the player swipes along it, **Then** one reversal of exactly that
-   section is sent.
+section is sent.
 2. **Given** a chosen section, **When** the player presses and holds on it, **Then** the would-be wave is previewed and
-   nothing is sent when the finger lifts.
+nothing is sent when the finger lifts.
 
 ### User Story 3 - Drag an end to resize the section (Priority: P1)
 
@@ -154,8 +155,8 @@ undo, redo, next level, "Reset view"), including winning every certified level i
 
 - **FR-R02G1004-001**: A tap on a sample MUST move the nearer qualifying end of the chosen section (presentation state)
   as stated; a tap elsewhere MUST change nothing; no tap sends a kernel action.
-- **FR-R02G1004-002**: A swipe along the chosen section while playing MUST send exactly one reversal of that section;
-  a press held on the section MUST preview the exact would-be wave (the kernel's reversal) and send nothing.
+- **FR-R02G1004-002**: A swipe along the chosen section while playing MUST send exactly one reversal of that section; a
+  press held on the section MUST preview the exact would-be wave (the kernel's reversal) and send nothing.
 - **FR-R02G1004-003**: A drag that starts on an end of the section MUST move that end to the sample under the finger,
   never past the other end.
 - **FR-R02G1004-004**: Picking MUST be analytic and deterministic: the touch ray through the drawn camera against the
@@ -165,14 +166,14 @@ undo, redo, next level, "Reset view"), including winning every certified level i
   "Reset view" returns to the authored view.
 - **FR-R02G1004-006**: The panel MUST keep every action available without gestures and gain "Reset view"; every
   certified solution MUST be replayable through panel actions.
-- **FR-R02G1004-007**: Gestures MUST be tested on the host by scripted pointer sequences and on the simulator through the
-  experience's pointer entry; existing tests pass; every new public name is documented; refusals are logged with their
-  reason code (observability).
+- **FR-R02G1004-007**: Gestures MUST be tested on the host by scripted pointer sequences and on the simulator through
+  the experience's pointer entry; existing tests pass; every new public name is documented; refusals are logged with
+  their reason code (observability).
 
 ### Key Entities
 
-- **Gesture controller**: state (idle, sample press, end drag, band press, swipe, freeze preview, orbiting,
-  cancelled), the touched end or sample, the start and last points, the press time, the last tap time and place.
+- **Gesture controller**: state (idle, sample press, end drag, band press, swipe, freeze preview, orbiting, cancelled),
+  the touched end or sample, the start and last points, the press time, the last tap time and place.
 - **Orbit**: yaw and pitch offsets from the authored view.
 - **Freeze preview**: the would-be samples, bends and tear of reversing the chosen section (presentation only).
 - **Gesture action**: setStart, setEnd, reverse, resetView; only reverse maps onto a declared kernel control.
@@ -186,8 +187,8 @@ undo, redo, next level, "Reset view"), including winning every certified level i
 - **SC-R02G1004-002**: Second fingers, cancels and gestures on a finished play send no action in every scripted case.
 - **SC-R02G1004-003**: Previews and orbit never change the digest in every scripted case; every freeze preview equals
   the kernel's reversal of the chosen section.
-- **SC-R02G1004-004**: At every orbit within bounds and every aspect 0.4 … 2.5 the scene stays inside the view with a
-  5 % margin.
+- **SC-R02G1004-004**: At every orbit within bounds and every aspect 0.4 … 2.5 the scene stays inside the view with a 5
+  % margin.
 - **SC-R02G1004-005**: All 100 certified levels are won through panel actions alone.
 - **SC-R02G1004-006**: Existing tests pass; the reference regression passes 7 of 7; each test under 10 seconds.
 - **SC-R02G1004-007** {device}: after ImplementationLock-100, touch feel and latency are checked on D1/D2/D3.
