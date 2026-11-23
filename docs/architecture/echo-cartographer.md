@@ -115,3 +115,23 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g11.malformed`, `.
   reach the kernel (`EchoCartographerGestureController`); outside the playing stage gestures send no kernel action and
   a finished play says so; refusals are shown with their reason code and logged.
 - **Panel.** Every certified level can be won with the column and row steppers, Pulse and Claim alone.
+
+## Teaching and progression (feature 405, R02-G11-05)
+
+- **Hints.** `EchoCartographerHints` plans from the current play: when the echoes heard leave exactly one beacon
+  placement the plan is a claim on the lowest-index beacon not yet located; otherwise it continues the certification's
+  greedy pulse rule from the current knowledge (`EchoCartographerSolver.continuation`), which must leave at least 1
+  energy. Three levels: the kind (pulse or claim), its row, the cell. From a level's opening the continuation is the
+  certified plan, so exact hints win every level; a hint never changes the state, and the presenter searches off the
+  main actor.
+- **Failure explanation.** `EchoCartographerFailureExplanation` names the action that spent the last energy (a pulse or
+  a missed claim and its cell), the beacons located, the pulses sent and the claims missed, with undo or retry.
+- **Tutorial.** Levels 1 … 3 show three instructions in order — pulse, narrow down with markers and pulses, claim — each
+  advancing after an accepted pulse, a located beacon or the level's end; undo never moves it back; it can be dismissed.
+- **Progress.** `EchoCartographerProgress`: level 1 open, a campaign win opens the next; stars by energy spent (undone
+  records included): 3 at the certified plan's pulse count, 2 within + 2, else 1; five bands of 20; the daily level
+  (days since 2026-01-01 × 79) mod 100 + 1 from the date the presenter reads; practice raises the energy to 60 and
+  records nothing.
+- **Adapter.** Controls `level.select`, `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss` (refusals
+  `r02-g11.locked`, `r02-g11.date`); digest v2 adds progress and mode; snapshot schema 2 `{level, mode, progress,
+  records, tutorial}` with a migration from schema 1.

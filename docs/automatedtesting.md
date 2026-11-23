@@ -395,6 +395,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   and INV-10 failing in their copies; the shared test file is the lead's, so the lead added the picker, the freeze
   preview and the controller to the set in one edit before retesting. Name every new presentation file in the task that
   creates it.
+- **Agents can start before the gate's baselines** (R02-G11-05, 2026-11-23). Echo Cartographer's hint and progress
+  agents worked in isolated package copies while the previous gate's evidence chain ran, and the lead built the adapter
+  in a third copy that combined their files; the baselines were then taken on the untouched tree, and each result was
+  copied in and retested one task at a time. Name the copies per gate and agent (`iso405B`, `iso405C`, `iso405L`) so
+  no two writers share one.
 - **A cancelled CI run can be a job limit, not a push** (R02-G11-04, 2026-11-23). Five `ci` runs in a row ended
   "cancelled" with no later push: `host-tests` reached its 30-minute limit while the round-two package's tests were
   still running (build about 6 minutes, tests past 17 minutes on a runner; Swift Testing's output arrives in late chunks,

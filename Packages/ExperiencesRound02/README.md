@@ -614,3 +614,9 @@ Feature 404 (R02-G11-04) adds the gestures: `EchoCartographerOrbit` and the orbi
 `EchoCartographerPicker` (floor-plane ray, 22-point marker targets) and the host-tested
 `EchoCartographerGestureController` (tap to pulse or move the cursor, drag to place or move markers, hold to claim,
 double tap to reset, two-finger orbit), wired through the presenter's pointer entry with a "Reset view" button.
+
+Feature 405 (R02-G11-05) adds teaching and progression: `EchoCartographerHints` (three hint levels from the solver's
+greedy continuation, `EchoCartographerSolver.continuation`), `EchoCartographerFailureExplanation`,
+`EchoCartographerProgress` (tutorial steps, stars by energy spent, unlocks, the daily level × 79, campaign, practice
+and daily modes), the adapter's progression controls with snapshot schema 2, and the panel's tutorial, hints, failure
+text, goal, stars and level picker.
