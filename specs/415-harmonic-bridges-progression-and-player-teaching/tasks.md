@@ -94,3 +94,11 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 405
 files (adapter, scenarios, presenter, controls, docs) stay with the lead. Agents B and C may start in isolated copies
 before 001, since their files are new or untouched by R02-G12-04 (the solver is untouched there). MVP: Stories 1–3
 (tutorial, hints, failure text); Story 4 (progress, daily, practice) follows in the same gate.
+
+## Phase 6: Convergence
+
+- [ ] T-R02G1205-012 Correct the `///` documentation of `HarmonicBridgesTutorialStep.advanced(afterTune:bridged:ended:)`
+  in `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesProgress.swift`: an undo passes `afterTune: false`
+  and the play's real end (an undo always lands before the end, so it never ends the tutorial), while a redo that
+  restores a won or failed play ends it, as the adapter does; per FR-R02G1205-007 (contradicts); `--name host-5 -- swift
+  test --package-path Packages/ExperiencesRound02 --filter HarmonicBridgesProgressTests`
