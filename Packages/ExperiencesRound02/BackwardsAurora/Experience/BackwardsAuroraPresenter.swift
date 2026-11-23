@@ -27,6 +27,12 @@
 // fade out. The ambient loop (`BackwardsAuroraSound`) is offered the recipe of the worst bend, the checkpoints matched
 // and the stage (`BackwardsAuroraSoundRecipe`) when a level or mode opens and when that recipe changes. The mirror
 // carries the summary element's text and the sound choice. Presentation only.
+// Feature 397 (R02-G10-07) T-R02G1007-005 (clarifications Q2, Q4, Q5): the mirror carries whether a verified replay
+// exists for the level and the replay position; `startReplay`, `stepReplay` and `stopReplay` send `replay.start
+// [level]`, `replay.step` and `replay.stop`; the Sound toggle saves the choice through `settings.sound [0/1]`
+// (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied when the experience opens or the value
+// changes; the results a restore dropped (`core.reconciliationDropped`) are announced once as `state` ("n saved
+// results could not be checked and were removed.", "1 saved result could not be checked and was removed.").
 #if os(iOS)
 import BackwardsAuroraCore
 import Foundation
@@ -83,6 +89,14 @@ final class BackwardsAuroraMirror {
     var summary = ""
     /// Whether the ambient sound is on (feature 396; off by default).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 397).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 397).
+    var replaying = false
+    /// The reversals of the running replay played so far (0 when no replay runs; feature 397).
+    var replayPosition = 0
+    /// The reversals of the running replay's trace (0 when no replay runs; feature 397).
+    var replayLength = 0
 
     /// The goal and the level's difficulty band, with its best stars when won (feature 395).
     var goalLabel: String {
@@ -296,6 +310,31 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
         absorbProgress(core)
         mirror.summary = BackwardsAuroraFeedbackPlan.summaryText(core: core, sectionStart: mirror.start,
                                                                  sectionEnd: mirror.end)
+        // Feature 397: the saved sound choice is applied when it first appears or changes.
+        if previous == nil || previous?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(BackwardsAuroraFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                              haptic: nil))
+        }
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
         mirror.levelNumber = core.levelNumber
         mirror.spent = play.spent
         mirror.budget = level.budget
@@ -553,6 +592,48 @@ final class BackwardsAuroraPresenter: ExperiencePresenter {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
         mirror.soundOn = on
+    }
+
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 397); the described change turns the loop on or
+    /// off.
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    // MARK: Replay (feature 397)
+
+    /// Starts the replay of the current level's best stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next reversal of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 397).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 397).
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 397).
+    static func isReplay(_ mode: BackwardsAuroraMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
     }
 
     /// The controls view appeared (the loop may play).

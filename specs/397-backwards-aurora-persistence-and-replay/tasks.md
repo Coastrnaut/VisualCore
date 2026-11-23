@@ -47,7 +47,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1007-005 [US3] Edit `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraPresenter.swift` and
+- [X] T-R02G1007-005 [US3] Edit `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraPresenter.swift` and — Verified 2026-11-23: sim-27 exit=0 (52 simulator tests incl. BackwardsAuroraReplayTests 4: replay reproduces the win reversal by reversal with the position text, other actions refused in words, replay-end and stop; replay without a saved solution refused in words; the dropped result announced exactly once; the saved sound choice applied on open and saved through settings.sound; identity test lists thirteen controls; agent C's tests retested by the lead)
   `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the Sound toggle sends `settings.sound` and the presenter applies the restored
   `soundOn` when the experience opens; the dropped results announced once: "n saved results could not be checked and
