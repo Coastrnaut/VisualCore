@@ -68,7 +68,7 @@ tests stay short (< 10 s each). No {owner} tasks. Model: feature 406's tasks.
 
 - [X] T-R02G1206-006 Docs: `docs/architecture/harmonic-bridges.md` (polish and accessibility), — Verified 2026-11-23: Verified 2026-11-23: round02-host exit 0 (swift test --package-path Packages/ExperiencesRound02, 371.6 s, under the 450 s split threshold); architecture doc polish and accessibility section, ExperiencesRound02 README, testing doc lesson (the won lift needed a uniform to fade)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1206-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1206-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: Verified 2026-11-23: rendering-27, rendering-26, experiences, host-full, app-unit exit=0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1206-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1206-009 Reference regression chunk 2 (`--name reference-2`)
