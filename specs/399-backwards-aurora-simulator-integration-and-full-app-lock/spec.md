@@ -112,7 +112,7 @@ solver regression proves all 100 levels solvable as certified.
 ## Assumptions
 
 - Interface tests follow the app's existing patterns (one namespace of helpers per experience, launch arguments,
-  identifiers, short waits), as Backwards Aurora's interface tests.
+  identifiers, short waits), as Nocturne Garden's interface tests.
 - The interface tests' 90-second bound sits inside the app's 180-second per-test allowance.
 - This feature adds no visuals: identifiers, tests and stored examples only, so the code-only graphics and their
   licensing stay those of features 393 and 396.
