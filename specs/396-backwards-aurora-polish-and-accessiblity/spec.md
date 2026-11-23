@@ -75,7 +75,7 @@ was refused: <code>" and logs their codes; samples are named "sample at position
   released), no element crosses half its range more than 3 times per second, and every complete one-way fade of more
   than half the range takes at least 0.4 s under Reduce Flashing. Impact: FR-R02G1006-004; SC-R02G1006-003.
 - Q: Where does the sound choice live, and what is the recipe? → A: a Sound toggle in the panel, off by default, held by
-  the presenter (presentation only; saving it is R02-G10-07). The recipe is a pure function of the wave, the checkpoints
+  the presenter (presentation only; saving it is R02-G10-07). The recipe is a pure function of the worst bend, the checkpoints
   matched and the stage: a root at 110 Hz times (1, 9/8, 5/4, 4/3) for a worst bend at most the limit, at most twice
   it, at most four times it, or more; one partial per matched checkpoint, up to four, at the root times
   (5/4, 3/2, 2, 5/2)[k − 1], each with the base gain, the root alone when none is matched; an added octave when won and
@@ -138,7 +138,7 @@ accessibility text size without clipping the controls.
 ### User Story 3 - Gentle sound and haptics (Priority: P2)
 
 Each accepted reversal gives a light selection haptic; a win a success haptic; a failure a warning; a refused action an
-error haptic; all subject to the person's haptics switch. An optional ambient sound, made in code from the wave, the
+error haptic; all subject to the person's haptics switch. An optional ambient sound, made in code from the worst bend, the
 checkpoints matched and the stage, plays while the experience is on screen and the sound choice is on, and falls silent
 off screen.
 
