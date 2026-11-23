@@ -32,7 +32,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   sorted keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/BackwardsAurora/golden-frames.json` with `BACKWARDS_AURORA_WRITE_GOLDEN=1`, and add `BackwardsAuroraGolden` to
   `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G1008-004 [P] [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G1008-004 [P] [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-23: host-2 exit=0 (BackwardsAuroraRegressionGoldenTests 9: the fixed 16-frame set, every frame's description of wave, rings, kinks, gauge and palette, deterministic digests, every frame matches the pinned file, every pinned digest is the digest of its description, missing, unreadable, renamed and incomplete manifests named, position moves beyond one quantum caught and within it passed, colour, count and tier changes caught, a hand-edited description with its old digest refused; agent B's file retested by the lead)
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a
   moved position beyond a quantum, a changed colour or count, a missing frame, an unknown frame, schema ≠ 1 and a
   hand-edited description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 --
