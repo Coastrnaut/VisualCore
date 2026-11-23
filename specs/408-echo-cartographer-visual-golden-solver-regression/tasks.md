@@ -42,7 +42,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1108-005 [US2] [US3] Create `Packages/ExperiencesRound02/EchoCartographer/ExperienceTests/EchoCartographerRegressionGoldenFrameTests.swift` and
+- [X] T-R02G1108-005 [US2] [US3] Create `Packages/ExperiencesRound02/EchoCartographer/ExperienceTests/EchoCartographerRegressionGoldenFrameTests.swift` and — Verified 2026-11-23: sim-27 (58 Echo Cartographer simulator tests incl. EchoCartographerRegressionGoldenFrameTests: the 16 frames rendered at 1,152 x 768 match their descriptions within one quantum and the feature-403 tolerances, the hero frame too; EchoCartographerRegressionMemoryTests: 12 open-draw-warn-close cycles with liveObjectCount 0 after each warning and close, footprint read each cycle, shed caches and reopen rebuild) exit 0, lead retest
   `Packages/ExperiencesRound02/EchoCartographer/ExperienceTests/EchoCartographerRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked against
   their descriptions with the feature-403 tolerances (known floor tile centres 0.1 from the ground in luminance, known wall
   tops 0.08 from the ground with green above red by 0.05, the first gauge bar 0.1 from the ground, the probe corners
