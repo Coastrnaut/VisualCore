@@ -26,7 +26,7 @@ tests stay short (< 10 s each). No {owner} tasks. Model: feature 406's tasks.
   tunings, undos, redos, refusals of every code (bare and prefixed), wins in campaign and practice, failures by a broken
   test and by the budget, and level and mode changes compare texts, kinds and haptics exactly; choosing and previewing
   plan nothing); agent A; `--name host-2`
-- [ ] T-R02G1206-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesLights.swift`
+- [X] T-R02G1206-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesLights.swift` — Verified 2026-11-23: Verified 2026-11-23: host-3 exit 0 (HarmonicBridgesLightsTests 7: settle and targets, 9- and 27-frame fades, no reversal mid-fade under Reduce Flashing, seven adversarial flicker patterns with at most 3 half-range crossings per second and every one-way fade ≥ 0.4 s; HarmonicBridgesSoundRecipeTests 9: exact audition frequencies and gains incl. the muted pluck, purity, root step boundaries for every budget, whole-cycle loops, distinct recipes over real plays); agent B retested by the lead
   ("glow 0.7 playing / 1 won / 0.35 failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce
   Flashing, no reversal mid-fade under Reduce Flashing; `maxHalfRangeCrossingsPerSecond`) and
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSoundRecipe.swift` (`HarmonicBridgesAudition`
