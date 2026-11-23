@@ -11,7 +11,7 @@ native control carries a value in words from the start).
 
 - [X] T-R02G1006-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit=0 on the committed tree; rendering baseline is R02-G10-05's rendering runs (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G10-05's rendering runs (exit 0)
-- [ ] T-R02G1006-002 Edit `Packages/ExperiencesRound02/Package.swift` (`BackwardsAuroraCore` and its tests gain
+- [X] T-R02G1006-002 Edit `Packages/ExperiencesRound02/Package.swift` (`BackwardsAuroraCore` and its tests gain — Verified 2026-11-23: host exit=0 (Backwards Aurora host tests with VisualCoreAudioDSP in the Core and VisualCoreAudioDSP/VisualCoreAudio in the experience)
   VisualCoreAudioDSP; `BackwardsAuroraExperience` gains VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as
   Nocturne Garden's targets have); `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
   BackwardsAurora`
