@@ -50,7 +50,7 @@ will consume).
 
 ## Phase 4: Stories 2 and 3 — failures, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G1301-004 [P] [US1] [US2] [US3] Create
+- [X] T-R02G1301-004 [P] [US1] [US2] [US3] Create — Verified 2026-11-23: host-3 (AcousticConstellatorPlayTests 9 tests: stage table, 200 fixtures win on the exact listen, missing/disconnected/incoherent named, budget failure on the exact action, refusals in order leave the play unchanged, undo exact incl. from failed, 500+20 seeded traces replay and tampered traces refused) exit 0, lead retest
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorPlay.swift` (agent B: stages "loading,
   tutorial, playing, paused, won, failed, result"; links starting at the level's fixed links, phases at the level's
   starting phases; `link`, `unlink`, `nudge` and `listen` validated in the order stage, previous fingerprint, action
