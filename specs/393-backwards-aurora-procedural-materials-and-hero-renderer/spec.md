@@ -22,9 +22,9 @@ Canonical overrides:
   candidate (not available) and linked into the one app, as Nocturne Garden was at R02-G09-03; it becomes available only
   at its gate X-R02-G10.
 - **Superseded parts of the source prompt:** price and "no IAP" (free under the shared purchase controller); the Round 2
-  lock and per-round device campaign (ImplementationLock-100); "content count 76" is a milestone figure — the catalog
-  is the 100 certified levels of R02-G10-02. **Device-only items:** frame-time and thermal budgets on D1/D2/D3, recorded
-  as `{device}` tasks for after ImplementationLock-100. **Owner-only items:** none.
+  lock and per-round device campaign (ImplementationLock-100); "content count 76" is a milestone figure — the catalog is
+  the 100 certified levels of R02-G10-02. **Device-only items:** frame-time and thermal budgets on D1/D2/D3, recorded as
+  `{device}` tasks for after ImplementationLock-100. **Owner-only items:** none.
 - **Shared features used:** R02-F05 (generated meshes), R02-F07 (emissive and glow passes), R02-F10 (quality tiers and
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G10-01 and -02.
@@ -58,11 +58,12 @@ synchronized waves" and the geometry "tessellated temporal ribbon with direction
   carries a larger cross (0.09) at its seam. The chosen section [start, end] is a band from x(start) − u/2 to x(end) +
   u/2, y −0.7 … 0.7, at z = −0.08, with dashed edges. The reversal gauge is a row of `budget` bars at y = −0.85 from x =
   −0.9 to 0.9, spent ones lit cyan. The ground is a midnight plane at z = −0.2. Trailing aurora layers are copies of the
-  ribbon behind it (layer i at z = −0.06·i, y + 0.04·i, fading). Direction-coded pulses are bright beads travelling
-  along the ribbon with presentation time, left to right outside the chosen section and right to left inside it (the way
-  a reversal will fold it). The camera is a fixed authored perspective from +z fitted to the box x −1 … 1, y −0.95 …
-  0.75 with a 5 % margin for aspect 0.4 … 2.5, so it never moves while a level is played. Nothing drawn is consulted by
-  the rules. Impact: FR-R02G1003-001, 002, 006.
+  ribbon behind it (layer i at z = −0.06·i, y + 0.04·i, fading), drawn back to front in the order ground, band, trailing
+  layers, ghost, ticks, ribbon, rings and discs, crosses, gauge (depth testing off; the order is the layering).
+  Direction-coded pulses are bright beads travelling along the ribbon with presentation time, left to right outside the
+  chosen section and right to left inside it (the way a reversal will fold it). The camera is a fixed authored
+  perspective from +z fitted to the box x −1 … 1, y −0.95 … 0.75 with a 5 % margin for aspect 0.4 … 2.5, so it never
+  moves while a level is played. Nothing drawn is consulted by the rules. Impact: FR-R02G1003-001, 002, 006.
 - Q: What do the three quality tiers change? → A: `level-0` (richest): 3 trailing layers, 2 pulses per section of the
   timeline, 2 glow shells around the ribbon; `level-1`: 2 trailing layers, 1 pulse, 1 glow shell; `level-2` (the
   design's "Tier 0, D3-safe"): the ribbon alone, no pulses, no glow. Samples, ghost, checkpoints, kinks, band, colours,
@@ -70,14 +71,15 @@ synchronized waves" and the geometry "tessellated temporal ribbon with direction
   with its reason. Impact: FR-R02G1003-004; SC-R02G1003-001.
 - Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every sample
   point, every checkpoint ring centre and the gauge's first bar through the same camera and gives the palette. Simulator
-  tests render offscreen at 1,152 × 768 and, at sample points at least 6 pixels from every ring, kink and tick, check
-  that the ribbon pixel is cyan (blue minus red at least 0.15) and differs from the ground by at least 0.15 in
-  luminance; at target points whose sample differs from the wave's by at least 8 units, that the ghost pixel differs
-  from the ground by at least 0.1 in luminance with red above green by at least 0.05 (lilac); that the gauge's first bar
-  differs from the ground by at least 0.1; and that the background matches the ground within 0.05 away from geometry.
-  Palette: ground #070B1F, ribbon #1FC8D6, ribbon highlight #9FF4FA, glow #6FE8F0, ghost #C9B8F0, checkpoint ring
-  #DCD3FA, matched disc #F4F0FF, kink cross #FF8A7A, tear cross #FF3B30, section band #2A3570, spent mark #1FC8D6,
-  unspent mark #2B3352. Impact: FR-R02G1003-006; SC-R02G1003-001.
+  tests render offscreen at 1,152 × 768 and, at sample and target points at least 6 pixels from every ring, kink and
+  tick (corrected at the checklist, 2026-11-22: the ghost points too), check that the ribbon pixel is cyan (blue minus
+  red at least 0.15) and differs from the ground by at least 0.15 in luminance; at target points whose sample differs
+  from the wave's by at least 8 units, that the ghost pixel differs from the ground by at least 0.1 in luminance with
+  red above green by at least 0.05 (lilac); that the gauge's first bar differs from the ground by at least 0.1; and that
+  the background matches the ground within 0.05 away from geometry. Palette: ground #070B1F, ribbon #1FC8D6, ribbon
+  highlight #9FF4FA, glow #6FE8F0, ghost #C9B8F0, checkpoint ring #DCD3FA, matched disc #F4F0FF, kink cross #FF8A7A,
+  tear cross #FF3B30, section band #2A3570, spent mark #1FC8D6, unspent mark #2B3352. Impact: FR-R02G1003-006;
+  SC-R02G1003-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
   `BackwardsAuroraSceneSnapshot` (the wave and target samples, the checkpoint positions and which are matched, the bend
   limit and the positions of sharp bends, the torn seam if any, the chosen section, stage, failure, reversals spent,
@@ -119,9 +121,9 @@ colours.
 **Acceptance Scenarios**:
 
 1. **Given** a certified level, **When** the experience opens it, **Then** a frame is rendered whose ribbon, ghost and
-   marker pixels match the CPU reference within stated bounds.
-2. **Given** an action from the rule kernel, **When** the next frame is drawn, **Then** the ribbon, the kink marks,
-   the checkpoint rings and the gauge follow, and the win or failure shown matches the kernel exactly.
+marker pixels match the CPU reference within stated bounds.
+2. **Given** an action from the rule kernel, **When** the next frame is drawn, **Then** the ribbon, the kink marks,  the
+checkpoint rings and the gauge follow, and the win or failure shown matches the kernel exactly.
 
 ### User Story 2 - The picture never decides the game (Priority: P1)
 
@@ -151,11 +153,11 @@ it as available, and the experience package, registry, catalog and content check
 
 - **A shader that fails to compile or link:** the scene shows the documented fallback (the minimal tier, unlit), keeps
   the program name and reason, and the logical state is unchanged.
-- **Zero-size or very small views, rotation and resize:** a zero-size view draws nothing and reports no error; for
-  every aspect ratio from 0.4 to 2.5 the camera fits the whole timeline, every possible height, the markers and the
-  gauge with a margin of at least 5 % on each side.
-- **Colour-blind players:** checkpoints are rings (filled when matched), sharp bends carry a kink cross, a tear carries a
-  larger cross at its seam, the chosen section is a band with dashed edges, and every sample, checkpoint, bend and
+- **Zero-size or very small views, rotation and resize:** a zero-size view draws nothing and reports no error; for every
+  aspect ratio from 0.4 to 2.5 the camera fits the whole timeline, every possible height, the markers and the gauge with
+  a margin of at least 5 % on each side.
+- **Colour-blind players:** checkpoints are rings (filled when matched), sharp bends carry a kink cross, a tear carries
+  a larger cross at its seam, the chosen section is a band with dashed edges, and every sample, checkpoint, bend and
   measure can be named in words by the kernel, so no information is carried by hue only.
 - **A tear failure:** the seam that broke is marked distinctly and the failure shown names the reversal and the seam, as
   the kernel's reason does.
@@ -174,8 +176,8 @@ it as available, and the experience package, registry, catalog and content check
 - **FR-R02G1003-002**: Materials MUST show a midnight ground, a glowing deep-ocean-cyan aurora ribbon with trailing
   layers and direction-coded pulses along the timeline, a pale lilac ghost trail and marker colours, computed in
   shaders; every element also has its shape or pattern.
-- **FR-R02G1003-003**: The renderer MUST read only an immutable snapshot of the kernel state; no rendering result,
-  tier, time or failure may change the kernel's state, digest or verdict; the samples drawn are the kernel's samples.
+- **FR-R02G1003-003**: The renderer MUST read only an immutable snapshot of the kernel state; no rendering result, tier,
+  time or failure may change the kernel's state, digest or verdict; the samples drawn are the kernel's samples.
 - **FR-R02G1003-004**: The experience MUST offer three quality tiers that change only trailing layers, pulses and glow,
   never samples, markers, colours, objective or indicators; the selected tier and the reason MUST be logged.
 - **FR-R02G1003-005**: The experience MUST adapt the kernel to the shared experience contract (preparation from a seed,
@@ -196,8 +198,8 @@ it as available, and the experience package, registry, catalog and content check
 - **Aurora geometry**: the ground, the ribbon and its trailing layers, the ghost trail, the checkpoint markers, the kink
   marks, the section band and the reversal gauge.
 - **Quality tier**: 0, 1 or 2, with its trailing layers, pulses and glow.
-- **Candidate registration**: catalog entry, quality tier names, palette, capabilities, content facts, scenario
-  manifest and app link.
+- **Candidate registration**: catalog entry, quality tier names, palette, capabilities, content facts, scenario manifest
+  and app link.
 
 ## Success Criteria *(mandatory)*
 
@@ -205,8 +207,8 @@ it as available, and the experience package, registry, catalog and content check
 
 - **SC-R02G1003-001**: On the simulator, frames of 5 certified levels at each tier match the CPU reference: ribbon,
   ghost and marker positions within the stated tolerance and palette colours within the stated distance.
-- **SC-R02G1003-002**: Across 200 seeded snapshots, tier changes, time steps and forced shader failures never change
-  the kernel digest or verdict.
+- **SC-R02G1003-002**: Across 200 seeded snapshots, tier changes, time steps and forced shader failures never change the
+  kernel digest or verdict.
 - **SC-R02G1003-003**: All generated vertex positions, normals and uniforms are finite and within stated bounds for
   every extreme setting.
 - **SC-R02G1003-004**: The candidate passes the experience package, registry, catalog and content checks and opens in
@@ -218,10 +220,10 @@ it as available, and the experience package, registry, catalog and content check
 
 ## Assumptions
 
-- Gestures (tapping segment ends, swiping to reverse, the timeline freeze preview) are R02-G10-04; hints and
-  progression R02-G10-05; accessibility and polish R02-G10-06; persistence R02-G10-07. This feature gives the
-  experience a minimal control panel (start −/+, end −/+, reverse, undo, redo, next level, each labelled) so it can be
-  exercised on the simulator.
+- Gestures (tapping segment ends, swiping to reverse, the timeline freeze preview) are R02-G10-04; hints and progression
+  R02-G10-05; accessibility and polish R02-G10-06; persistence R02-G10-07. This feature gives the experience a minimal
+  control panel (start −/+, end −/+, reverse, undo, redo, next level, each labelled) so it can be exercised on the
+  simulator.
 - The visual design is the project's own archived design; all geometry and shading are original code.
 - Like Nocturne Garden, the candidate's scenario manifest has the standard scenarios, `full-playthrough`, `hero`,
   fixtures and the 80 acceptance scenarios of the archived matrix (R2-G10-QA-001 … 080), and its registration carries
