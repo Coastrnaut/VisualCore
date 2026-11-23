@@ -399,7 +399,8 @@ import VisualCoreSimulation
                                                    "EchoCartographerPicker.swift",
                                                    "EchoCartographerGestureController.swift",
                                                    "EchoCartographerLights.swift",
-                                                   "EchoCartographerSoundRecipe.swift"]
+                                                   "EchoCartographerSoundRecipe.swift",
+                                                   "EchoCartographerGolden.swift"]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, without the presentation
     /// sources).

@@ -328,7 +328,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 388 (R02-G09-08): Nocturne Garden's golden frames, test builds only.
                      "NocturneGardenGolden",
                      # Feature 398 (R02-G10-08): Backwards Aurora's golden frames, test builds only.
-                     "BackwardsAuroraGolden"]
+                     "BackwardsAuroraGolden",
+                     # Feature 408 (R02-G11-08): Echo Cartographer's golden frames, test builds only.
+                     "EchoCartographerGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:

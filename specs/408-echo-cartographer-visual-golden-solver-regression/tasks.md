@@ -24,7 +24,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1108-003 [US2] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G1108-003 [US2] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-23: EchoCartographerGolden (DEBUG or VISUALCORE_AUTOMATION): 16 frames (levels 1, 21, 41, 61, 81 x tiers 0-2 plus the hero), descriptions with positions to 1/8 px, counts, colours, sorted-key JSON and SHA-256, manifest and compare; golden-frames.json schema 1 with 16 frames generated with ECHO_CARTOGRAPHER_WRITE_GOLDEN=1; invariant presentation source listed (24 tests pass); EchoCartographerGolden in RELEASE_FORBIDDEN (36 release script tests pass)
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 0 after the witness's first min(pulses − 1, 2) pulses (at least one)
   and one marker on the first known-open cell that is not the entry, plus the hero frame at tier 0; at 1,152 × 768 with
   the authored camera: every known floor tile centre, known wall top centre, marker ring centre and located pillar top
