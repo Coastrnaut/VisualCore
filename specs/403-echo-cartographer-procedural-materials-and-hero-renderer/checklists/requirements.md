@@ -31,5 +31,5 @@
 
 ## Notes
 
-- The scene layout, tiers, frame checks, fallback and registration are left to
+- The scene layout, tiers, frame checks, fallback and registration are settled by
   `/speckit-clarify`.
