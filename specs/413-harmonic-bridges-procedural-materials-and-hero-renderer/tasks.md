@@ -36,7 +36,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesShaderSourceTests.swift` (version line, declared
   uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match); agent A; `--name
   host-2`
-- [ ] T-R02G1203-004 [P] [US1] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSceneGeometry.swift`
+- [X] T-R02G1203-004 [P] [US1] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSceneGeometry.swift` — Verified 2026-11-23: Verified 2026-11-23: host-3 exit 0 (HarmonicBridgesSceneGeometryTests 13: finite and bounded for 2/8 islands, 1/12 strings, all/no bridges, budgets 1/60, 4 steps; island tops, membrane check points, gauge bars and pips in view with margin at 7 aspects; same positions at every tier; marks filled exactly where the kernel's swing reaches the threshold; gauge at 0, half and budget; a won level brighter and in place); agent B's geometry retested by the lead
   (clarification Q1: island (gx, gy) at X = (gx − 7.5) · 0.12, Z = (gy − 4.5) · 0.12; ground at y = −0.01 over x −1.1 …
   1.1, z −0.8 … 1.1; hexagonal island prisms radius 0.07, height 0.1, with top edge strips 0.008 thick; start ring radius
   0.1 line 0.012 at y = 0.005; goal four-pointed star radius 0.1; strings as strips 0.012 wide at y = 0.1 with 24
