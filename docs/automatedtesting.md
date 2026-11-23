@@ -395,6 +395,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   and INV-10 failing in their copies; the shared test file is the lead's, so the lead added the picker, the freeze
   preview and the controller to the set in one edit before retesting. Name every new presentation file in the task that
   creates it.
+- **CI's Xcode 26.6 type-checks some panel expressions much more slowly** (R02-G10-09, 2026-11-23). The R02-G10-07
+  record's CI app build failed on `NocturneGardenControls.swift` (the Plant button's seven-part `+` concatenation and
+  its four-element `Double(…)` array inside the view builder: "unable to type-check this expression in reasonable
+  time"), although the local Xcode 27 build reports nothing above 60 ms with `-warn-long-expression-type-checking`.
+  Keep string joins and action arrays of a panel in small `static func` helpers, never inline in a SwiftUI body.
 - **Backwards Aurora interface journeys** (R02-G10-09, 2026-11-23). `BAPlayUITests` and `BAReplayUITests` run as the
   serial chunk `s3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-s3`, about 260 s
   with the build); they play level 1's certified reversals (samples 3 to 4, then 8 to 11) with the start and end

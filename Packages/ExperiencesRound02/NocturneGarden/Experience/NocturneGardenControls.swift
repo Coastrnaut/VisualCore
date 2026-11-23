@@ -163,14 +163,10 @@ struct NocturneGardenControls: View {
                 .accessibilityLabel("Bloom size")
                 .accessibilityIdentifier(port.identifier("size-picker"))
                 .accessibilityValue(mirror.sizeLabel)
-            Button("Plant") {
-                send("bloom.plant", [Double(mirror.kind), Double(mirror.column), Double(mirror.row),
-                                     Double(mirror.size)])
-            }
-            .accessibilityLabel("Plant the chosen bloom at the chosen cell")
-            .accessibilityIdentifier(port.identifier("plant"))
-            .accessibilityValue(mirror.kindLabel + ", " + mirror.columnLabel + ", " + mirror.rowLabel + ", "
-                                + mirror.sizeLabel)
+            Button("Plant") { send("bloom.plant", Self.plantValues(mirror)) }
+                .accessibilityLabel("Plant the chosen bloom at the chosen cell")
+                .accessibilityIdentifier(port.identifier("plant"))
+                .accessibilityValue(Self.plantValue(mirror))
         }
     }
 
@@ -339,6 +335,19 @@ struct NocturneGardenControls: View {
                       nextLevel: next,
                       retry: "level \(mirror.levelNumber), " + modeName(mirror.mode),
                       playLevel: "level \(mirror.pickedLevel)")
+    }
+
+    /// The Plant action's values: kind, column, row and size (kept out of the view builder so the type checker stays
+    /// fast on CI, `docs/automatedtesting.md`).
+    static func plantValues(_ mirror: NocturneGardenMirror) -> [Double] {
+        let values: [Double] = [Double(mirror.kind), Double(mirror.column), Double(mirror.row), Double(mirror.size)]
+        return values
+    }
+
+    /// The Plant button's value: "kind, column, row, size" in words.
+    static func plantValue(_ mirror: NocturneGardenMirror) -> String {
+        let parts: [String] = [mirror.kindLabel, mirror.columnLabel, mirror.rowLabel, mirror.sizeLabel]
+        return parts.joined(separator: ", ")
     }
 
     /// The Reset view value: "authored view" or "orbited view".
