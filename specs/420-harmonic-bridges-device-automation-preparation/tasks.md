@@ -8,7 +8,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1210-001 Baselines after R02-G12-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1210-001 Baselines after R02-G12-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0; no Swift changes follow
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02` (no Swift changes follow; the rendering baseline is R02-G12-09's runs)
 
 ## Phase 2: Story 1 — the campaign knows what to run (P1) 🎯
