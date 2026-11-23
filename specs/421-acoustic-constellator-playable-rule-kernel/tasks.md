@@ -99,6 +99,6 @@ the lead. MVP: Story 1. Requirement coverage: FR-001, 009, 013 → 002; FR-002, 
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G1301-013 Align `specs/421-acoustic-constellator-playable-rule-kernel/data-model.md` (the play's links are
+- [X] T-R02G1301-013 Align `specs/421-acoustic-constellator-playable-rule-kernel/data-model.md` (the play's links are — Verified 2026-11-23: data-model.md now states the play keeps links sorted by star indices (as AcousticConstellatorPlay does: fixedLinks.sorted() and AcousticConstellatorLink.between) and that label and match are computed when read, matching contracts/api.md and docs/architecture/acoustic-constellator.md
   kept sorted by star indices, fixed and placed together, which decides the link a `disconnected` failure names; label
   and match are computed when read) with `AcousticConstellatorPlay` per plan: data-model (contradicts)
