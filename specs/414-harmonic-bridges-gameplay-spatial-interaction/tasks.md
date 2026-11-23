@@ -20,7 +20,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   0.4 … 2.5; `camera(_:aspect:)` equals the authored orbit, bit-identical) to
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSceneGeometry.swift`; create
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesPicker.swift` (`HarmonicBridgesPick` pip(step), goal,
-  string(index), empty; `viewPoint` projects a world point through the drawn camera into view points with the origin
+  string(index), empty (FR-R02G1204-004, 005; SC-R02G1204-001, 004); `viewPoint` projects a world point through the drawn camera into view points with the origin
   top-left, nil behind the eye; `segmentDistance`; in this order a step pip whose centre lies within 22 points (nearest,
   ties to the lower step), the goal island's top centre within 22 points, a string whose projected segment between its
   islands' top centres lies within 22 points (nearest, ties to the lower string index), else empty; empty for unusable
@@ -34,7 +34,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [ ] T-R02G1204-003 [US1] [US2] [US3] Create
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesGestureController.swift`
-  (`HarmonicBridgesGestureAction` choose(string, peg), preview(string, peg), tune(string, peg), test, resetView; states
+  (FR-R02G1204-001 … 003, 005; SC-R02G1204-001 … 003; `HarmonicBridgesGestureAction` choose(string, peg), preview(string, peg), tune(string, peg), test, resetView; states
   idle, stringPress, pegDrag, targetPress, orbiting, cancelled; a tap (< 10 points, lifted before 0.5 s) on a string:
   `choose` at its current peg in any stage; on a pip or the goal while playing: `test`; on empty space: nothing, two such
   taps within 0.35 s and 22 points: `resetView`; a press lifted at 0.5 s or later without moving: nothing; a drag
@@ -53,13 +53,13 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [ ] T-R02G1204-004 [P] [US5] Create
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesPanelWinTests.swift`: all 100 certified levels
-  won through panel actions only (the string and peg steppers, then Tune, and Test, as the witnesses play them), split
+  won through panel actions only (FR-R02G1204-006; SC-R02G1204-005; the string and peg steppers, then Tune, and Test, as the witnesses play them), split
   so each test is under 10 s, plus panel Undo then Redo restoring the digests; agent D; `--name host-4`
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter
 
 - [ ] T-R02G1204-005 [US4] Wire `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesPresenter.swift`
-  (`pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot; tune and test sent
+  (FR-R02G1204-001 … 003, 005 … 007; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot; tune and test sent
   through the port; choose and preview changing the mirror's string and peg; the chosen string's resonance described
   (its modes in the shown step and how many of its five samples reach the threshold); a locked string's drag described
   as locked; on a won or failed play `describe` says "The play is over: undo or go to the next level" (the lesson of
