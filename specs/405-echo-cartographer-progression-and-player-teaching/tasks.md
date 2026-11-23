@@ -81,7 +81,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 395
 - [X] T-R02G1105-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: rendering-27, rendering-26, experiences, host-full, app-unit exit=0
   `--name host-full`, `--name app-unit`
 - [X] T-R02G1105-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-23: reference-1 exit=0
-- [ ] T-R02G1105-009 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G1105-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-23: reference-2 exit=0
 - [ ] T-R02G1105-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1105-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
