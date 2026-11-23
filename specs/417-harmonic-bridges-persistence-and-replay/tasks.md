@@ -30,7 +30,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G1207-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesExperienceCore.swift` (schema 3, migration 2 → 3
+- [X] T-R02G1207-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesExperienceCore.swift` (schema 3, migration 2 → 3 — Verified 2026-11-23: Verified 2026-11-23: host-2 exit 0 (HarmonicBridgesCoreTests 230: schema 3 and digest v3, migrations 1 → 2 → 3, wins record their net trace verified, restore reconciles and exposes reconciliationDropped, replay.start/step/stop with no-replay, replay-end and replay codes, every other play control refused in replay except tutorial.dismiss and settings.sound, a replayed win claims no stars, settings.sound snapshotted and never digested; scenarios gain the four new controls' value-count refusals and the manifest is regenerated); drafted by an agent from feature 407's change, reviewed and retested by the lead
   "results with an empty trace and verified false, sound off", digest v3; a campaign or daily win records the winning
   effective-action trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start
   [1…100]" (`r02-g12.no-replay` without a verified traced result), "replay.step" (`r02-g12.replay-end` after the last

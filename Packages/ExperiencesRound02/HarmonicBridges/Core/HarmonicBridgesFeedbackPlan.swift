@@ -20,11 +20,11 @@
 //   2. an accepted action: the play gained exactly one record →
 //      a new end (the stage became won or failed; Q2: a test always ends the level and a tuning that spends the last
 //      action without a win ends it too, so each plans only the outcome):
-//        won: `outcome`, "The crossing holds in every step. Level won spending a actions, k of 3 stars." (practice:
-//             "… Level won spending a actions."), haptic `success`; a is `HarmonicBridgesProgress.actionsSpent(_:)`
-//             (undone actions included) and k is `HarmonicBridgesProgress.stars(actionsSpent:certified:)` of this win
-//             against the certified witness's action count (the stars this win earned; the progress keeps the better
-//             stored result);
+//        won: `outcome`, "The crossing holds in every step. Level won spending a actions, k of 3 stars." (practice
+//             and replay: "… Level won spending a actions."), haptic `success`; a is
+//             `HarmonicBridgesProgress.actionsSpent(_:)` (undone actions included) and k is
+//             `HarmonicBridgesProgress.stars(actionsSpent:certified:)` of this win against the certified witness's
+//             action count (the stars this win earned; the progress keeps the better stored result);
 //        failed: `outcome`, the failure explanation of feature 415 (`HarmonicBridgesFailureExplanation`), haptic
 //             `warning`;
 //      a tuning: "String i tuned to peg p."; an undo or redo: "Undone." or "Redone."; each followed by the progress,
@@ -35,6 +35,14 @@
 // Choosing a string, previewing a peg and orbit are presentation only and plan nothing (the core does not change; the
 // adjustable string and peg speak their own values). A revealed hint is `hint(text:)`: `state` with the hint's words and
 // no haptic. This file holds no floating-point value.
+//
+// Feature 417 (R02-G12-07) T-R02G1207-003 (clarification Q4): the replay codes' words ("There is no saved solution to
+// replay for this level." `r02-g12.no-replay`, "The replay is over." `r02-g12.replay-end`, "Stop the replay first."
+// `r02-g12.replay`). A replay step adds exactly one record to the play, so case 2 announces it like the action it
+// applies ("String i tuned to peg p." with the progress, or the outcome); a replayed win claims no stars (the replay
+// mode awards none: "… Level won spending a actions."); `replay.start` and `replay.stop` open a fresh play in another
+// mode, so case 1 announces "Level n, band b, replay." or "…, campaign." (the tutorial is done in replay). The
+// dropped-results sentence of Q2 is the presenter's, not a plan.
 import Foundation
 import VisualCoreSimulation
 
@@ -98,8 +106,10 @@ public struct HarmonicBridgesFeedbackPlan: Sendable, Equatable {
     /// engine's ``rulePrefix`` is read as the bare code: "That level is not open yet." (`r02-g12.locked`), "That date
     /// cannot be used." (`r02-g12.date`), "That string cannot be tuned to that peg." (`r02-g12.action`), "That string is
     /// already at that peg." (`r02-g12.noop`), "The level has ended." (`r02-g12.stage`), "That value must be a whole
-    /// number." (`r02-g12.not-whole`); any other code (`r02-g12.stale`, `r02-g12.level`, `r02-g12.malformed`, the
-    /// engine's own codes such as `action.out-of-range`) "That action was refused.".
+    /// number." (`r02-g12.not-whole`); feature 417's replay codes: "There is no saved solution to replay for this
+    /// level." (`r02-g12.no-replay`), "The replay is over." (`r02-g12.replay-end`), "Stop the replay first."
+    /// (`r02-g12.replay`); any other code (`r02-g12.stale`, `r02-g12.level`, `r02-g12.malformed`, the engine's own codes
+    /// such as `action.out-of-range`) "That action was refused.".
     public static func refusalText(code: String) -> String {
         let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
         switch bare {
@@ -109,6 +119,9 @@ public struct HarmonicBridgesFeedbackPlan: Sendable, Equatable {
         case HarmonicBridgesError.noop.reasonCode: return "That string is already at that peg."
         case HarmonicBridgesError.stage.reasonCode: return "The level has ended."
         case HarmonicBridgesExperienceRule.notWhole: return "That value must be a whole number."
+        case HarmonicBridgesExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case HarmonicBridgesExperienceRule.replayEnd: return "The replay is over."
+        case HarmonicBridgesExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }
@@ -203,7 +216,8 @@ public struct HarmonicBridgesFeedbackPlan: Sendable, Equatable {
         return HarmonicBridgesFeedbackPlan(text: text, kind: .level, haptic: nil)
     }
 
-    /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars outside practice), haptic
+    /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars in campaign and daily; never
+    /// in practice or replay), haptic
     /// `success`; or the failure explanation, haptic `warning`.
     static func outcomePlan(_ core: HarmonicBridgesExperienceCore) -> HarmonicBridgesFeedbackPlan {
         let play: HarmonicBridgesPlay = core.play
