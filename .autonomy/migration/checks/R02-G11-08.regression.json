@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/echo_cartographer_regression.py"
+  ],
+  "command": "python3 scripts/echo_cartographer_regression.py",
+  "elapsed_seconds": 14.036,
+  "exit_code": 0,
+  "finished": "2026-11-23T13:53:34+00:00",
+  "gate": "R02-G11-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G11-08.regression.log",
+  "log_sha256": "e787494e79abd4c75c36dac1c0f76621e5b0a91554a1e1ca9a8ffa2cee38df37",
+  "name": "regression",
+  "started": "2026-11-23T13:53:20+00:00",
+  "timed_out": false
+}

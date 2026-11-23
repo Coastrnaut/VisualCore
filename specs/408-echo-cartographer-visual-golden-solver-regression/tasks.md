@@ -55,7 +55,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1108-006 [P] [US4] Create `scripts/echo_cartographer_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G1108-006 [P] [US4] Create `scripts/echo_cartographer_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-23: regression (scripts/echo_cartographer_regression.py: host PASS, simulator PASS with TEST_RUNNER_ECHO_CARTOGRAPHER_MEMORY_ISOLATED=1, footprint 28.13 -> 28.97 MB over 12 cycles, 0.86 MB growth within 16 MB) exit 0; EchoCartographerRegressionTests 5 script tests pass; CI step 'Echo Cartographer regression (host)' in round02-host-tests
   (agent D: host filter `EchoCartographerRegression`, then the simulator classes through `xcodebuild_package.py
   --only-testing` with the isolation variable, one summary line per part with pass or fail and the first failing name,
   a non-zero exit on any failure), and add the named step "Echo Cartographer regression (host)" to the
