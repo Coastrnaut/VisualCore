@@ -35,7 +35,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 395
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1105-003 [P] [US1] [US4] Create
+- [X] T-R02G1105-003 [P] [US1] [US4] Create — Verified 2026-11-23: host-3 (176 EchoCartographer core tests incl. EchoCartographerProgressTests 12: tutorial steps on levels 1-3 by witness plays and a detour, undo and redo never move a step back; stars; energy spent counts undone records; a 100-level progress script; mode rules; every day 2026-2036 maps into 1-100, stable, the first 100 days hit every level; impossible dates nil; Codable round trips) exit 0, lead retest
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerProgress.swift` (`EchoCartographerTutorialStep`
   pulse → narrow → claim → done with the texts of clarification Q2, advanced by an accepted pulse (pulse → narrow), a
   located beacon (narrow → claim) or the level's end (→ done), never moved back by undo; `EchoCartographerProgress` "3
