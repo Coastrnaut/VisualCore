@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G10-01 (migration ledger, game feature of experience R02-G10) · ID namespace FR-R02G1001-###,
 SC-R02G1001-###, T-R02G1001-###
@@ -30,6 +30,54 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract, so
   R02-G10-02 can certify levels).
 - **Model:** feature 381 (Nocturne Garden's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+381's answers where the games agree. Facts checked in code (read-only, 2026-11-22): `Packages/ExperiencesRound02` holds
+Aurora Loom … Nocturne Garden as the pattern (Core with level, play, records with previous and next fingerprints, rules
+as R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.*` reason codes); no `BackwardsAurora*` name exists; the
+catalog sets the timestep at 0.008333 s, the content at 76 stages and the controls "tap segment ends, swipe the interval
+to reverse, timeline freeze preview".
+
+- Q: What are the wave, its samples and the checkpoints, exactly? → A: a wave is N samples, N in 12 … 32, at positions
+  0 … N − 1 along the timeline; each sample is a signed integer height in −64 … 64 (one unit is 1/64 of the aurora's
+  half-height). The target is a wave of the same length that holds exactly the same multiset of heights as the opening
+  wave (a reversal only reorders samples, so any other target could never be reached). Checkpoints are 2 … 8 distinct
+  positions; checkpoint k is matched when the wave's sample at its position equals the target's. Impact:
+  FR-R02G1001-001, 002, 013; SC-R02G1001-001.
+- Q: What is a bend, which bends does a reversal change, and how are the limits applied? → A: the bend at an interior
+  position k (1 … N − 2) is b(k) = s(k − 1) − 2·s(k) + s(k + 1), an exact integer. Reversing the section [i, j] (0 ≤ i <
+  j ≤ N − 1) reverses the order of its samples; the bends strictly inside the section are carried along (b(i + 1) … b(j
+  − 1) reversed), so only the bends at its new seams — positions i − 1, i, j and j + 1 where they exist — can change. The
+  bend limit L (1 … 64) and the breaking limit B (L … 128) apply to |b|: the wave is smooth when every |b(k)| ≤ L; a
+  reversal tears the aurora when any of its seam bends has |b| > B. Impact: FR-R02G1001-003, 005, 014; SC-R02G1001-003,
+  004.
+- Q: Which actions exist, what does each cost, and when is one refused? → A: `reverse(start, end)` with start < end;
+  each accepted reversal spends one reversal. Refused without change: an end outside 0 … N − 1, start ≥ end, or a
+  section length (end − start + 1) outside the level's shortest … longest section (2 … N) (`r02-g10.action`); a section
+  that reads the same both ways (`r02-g10.noop`); a wrong stage (`r02-g10.stage`) or a stale fingerprint
+  (`r02-g10.stale`). Undo and redo spend nothing; a new reversal clears the redo stack. The life of a level is loading →
+  tutorial (when the level has one) → playing ⇄ paused → won or failed → result, entered by `begin`,
+  `dismissTutorial`, `pause`, `resume` and `showResult`. Impact: FR-R02G1001-002, 004, 006, 008, 011.
+- Q: In which order are tear, win and budget decided, and from which stages can the player go back? → A: after an
+  accepted reversal: tear first (any seam bend of the reversal beyond B fails the level, naming the reversal and the
+  seam position), then win (every checkpoint matched and the wave smooth: won), then budget (reversals spent equal to
+  the budget: failed). Undo and redo restore the exact earlier state. Undo works in playing and paused; from failed,
+  undo returns to playing (an honest retry, recorded); a won level is final and refuses undo. The truth metric is the
+  distance Σ|s(k) − t(k)| / Σ|t(k)| as an exact fraction (0 / 1 when the target is all zero and the wave equals it) and
+  the worst bend max |b(k)|; both are reported after every action and never decide the outcome. Impact:
+  FR-R02G1001-004, 005, 007, 008, 014; SC-R02G1001-002, 004.
+- Q: How are records, fingerprints and stored forms defined? → A: as in R02-G09-01: every accepted action appends a
+  record (schema, level seed, reversal index, kind, operands, previous and next fingerprints); the play fingerprint is
+  the SHA-256 of the schema, the level fingerprint, the wave, the reversals spent, the stage and the failure; levels are
+  JSON schema 1 with sorted keys (opening wave, target wave, checkpoints as sorted positions, bend and breaking limits,
+  shortest and longest section, budget, tutorial flag, seed, id) and a fingerprint, re-checked on decode; a level whose
+  opening wave already wins, whose target is not a reordering of the opening wave, or whose values are out of range is
+  refused; reason codes `r02-g10.level`, `.action`, `.noop`, `.stage`, `.stale`, `.newer-schema`, `.malformed`.
+  Impact: FR-R02G1001-006 … 011; SC-R02G1001-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
