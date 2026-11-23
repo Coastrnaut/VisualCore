@@ -39,7 +39,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
   "The replay is over.", "Stop the replay first."; a replay step announced like the reversal; a replayed win claims no
   stars) with `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and 2 → 3,
   reconciliation on restore, replay rules and codes, sound setting); `--name host-2`
-- [ ] T-R02G1007-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraPersistenceTests.swift` (agent B: 500 seeded
+- [X] T-R02G1007-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraPersistenceTests.swift` (agent B: 500 seeded — Verified 2026-11-23: host-3 exit=0 (218 host tests incl. BackwardsAuroraPersistenceTests 6: 500 seeded states round-trip with equal digests and the sound choice never digested, 100 schema-1 and 100 schema-2 payloads migrate and restore (through the engine too), 200 seeded saves reconcile exactly with edited results dropped and counted, the same payload restores twice to equal digests, the daily level depends only on the date; agent B's file retested by the lead)
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
   dropped and counted; FR-R02G1007-005: the same save restores to an equal digest twice and the daily level depends only
