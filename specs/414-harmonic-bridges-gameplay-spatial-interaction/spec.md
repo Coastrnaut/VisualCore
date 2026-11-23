@@ -60,8 +60,9 @@ chosen string and peg are presentation state.
   current peg plus the upward movement since touch-down divided by 24 points, rounded to the nearest whole number
   (halves away from zero) and clamped to 1 … 12; the chosen string and peg follow the preview. On release while playing
   it sends `string.tune [string, peg]` when the string is unlocked and the previewed peg differs from the current one;
-  otherwise nothing, and for a locked string the description says it is locked. A drag that starts on a pip, the goal or
-  empty space sends nothing. Impact: FR-R02G1204-002; SC-R02G1204-001.
+  otherwise nothing, and for a locked string the description says it is locked. A drag from a locked string, or any
+  drag on a stage other than playing, chooses the string at its current peg and previews nothing. A drag that starts on
+  a pip, the goal or empty space sends nothing. Impact: FR-R02G1204-002; SC-R02G1204-001.
 - Q: How do two fingers behave, and what happens on a finished play? → A: as feature 404: a second finger cancels any
   one-finger gesture (nothing sent) and orbits: yaw ±35° about the y axis (90° per view width), pitch −15° … +20° (60°
   per view height) about the authored view; a third finger re-bases the midpoint; a double tap on empty space or "Reset
