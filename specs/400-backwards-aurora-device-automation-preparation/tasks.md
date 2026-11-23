@@ -26,7 +26,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G1010-004 [P] [US2] Create `docs/apps/backwards-aurora/device-campaign.md` (agent B, modelled on
+- [X] T-R02G1010-004 [P] [US2] Create `docs/apps/backwards-aurora/device-campaign.md` (agent B, modelled on — Verified 2026-11-23: docs (validate_docs.py) exit 0, 2026-11-23; docs/apps/backwards-aurora/device-campaign.md: devices in order, D3 on iPadOS 26.5, owner actions as BLOCKED_OWNER_ACTION, rows BA-D1 to BA-D8 pending, no number claimed; agent B's file reviewed by the lead
   `docs/apps/nocturne-garden/device-campaign.md`: devices and order, D3 on iPadOS 26.5, owner actions as
   BLOCKED_OWNER_ACTION, every row BA-D1 … BA-D8 with devices, procedure, pass condition and "pending device campaign",
   no number claimed, the stress session only in the device campaign); `--name docs -- python3 scripts/validate_docs.py`
