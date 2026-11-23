@@ -31,7 +31,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Stories 1 to 3 — tap ends, swipe with freeze preview, drag ends (P1) 🎯
 
-- [ ] T-R02G1004-004 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraFreezePreview.swift` (the would-be samples of
+- [X] T-R02G1004-004 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraFreezePreview.swift` (the would-be samples of — Verified 2026-11-23: host-3 (149 tests incl. BackwardsAuroraGestureControllerTests 10: 500 seeded gestures in 11 kinds on levels 1/21/41/61/81 over 3 stages, 3 views and 3 orbits against an independent expectation; every freeze preview equals the kernel's reversal (tear included); 10–16 point touches, second fingers, cancels and finished plays send nothing; the tap rule, end-drag clamping, freeze timing via tick, double tap, orbit clamp and re-base; previews and orbit change no digest) exit 0, lead retest against agent B's real picker
   reversing [start, end] with the kernel's `BackwardsAuroraWave.reversed(start:end:)`, its bends above L, the lowest
   seam beyond B, the checkpoints it would match; text "would match 3 of 4 checkpoints, worst bend 9 of 12" or "would
   tear at seam 5") and `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraGestureController.swift` (states idle, samplePress, endDrag, bandPress,
