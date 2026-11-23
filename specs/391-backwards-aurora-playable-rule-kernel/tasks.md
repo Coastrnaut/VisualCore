@@ -69,7 +69,7 @@ in this feature (the wave and its bends are the CPU reference the renderer of R0
 - [X] T-R02G1001-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-22: 2026-11-22: reference-1 exit 0
 - [X] T-R02G1001-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-22: 2026-11-22: reference-2 exit 0
 - [X] T-R02G1001-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-22: 2026-11-22: script-tests (run alone) exit 0
-- [ ] T-R02G1001-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
+- [X] T-R02G1001-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record — Verified 2026-11-22: 2026-11-22: converge clean (no findings); sealed (16 passing, 0 failed attempts) and recorded pass
 
 ## Dependencies and parallel work
 
