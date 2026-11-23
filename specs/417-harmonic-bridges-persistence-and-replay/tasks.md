@@ -62,7 +62,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G1207-006 Docs: `docs/architecture/harmonic-bridges.md` (persistence and replay),
+- [X] T-R02G1207-006 Docs: `docs/architecture/harmonic-bridges.md` (persistence and replay), — Verified 2026-11-23: Verified 2026-11-23: round02-host exit 0 (swift test --package-path Packages/ExperiencesRound02, 331.0 s); architecture doc persistence and replay section, ExperiencesRound02 README, testing doc lesson (tests written against a mirrored API compiled first time)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1207-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

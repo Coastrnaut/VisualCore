@@ -177,3 +177,18 @@ rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.m
 - **Panel.** Every control has a label and a value in words; the chosen string and peg are adjustable; a summary element
   reads the actions left, the steps reached, the shown step's bridges, the choice and the level; text follows Dynamic
   Type and Increase Contrast, rows wrap, and the panel keeps a readable width on iPad.
+
+## Persistence and replay (feature 417, R02-G12-07)
+
+- **Stored form.** Snapshot schema 3 `{level, mode, progress, records, sound, tutorial}` through the app's shared saved-
+  state store (atomic writes, unreadable files moved aside, newer schemas refused), with migrations 1 → 2 → 3 (2 → 3:
+  results with an empty trace, unverified; sound off). The digest ("r02-g12.harmonic-bridges.v3") covers the level, the
+  play, progress and mode; the sound choice and the count of dropped results are never digested.
+- **Reconcilable scores.** Each campaign or daily win stores its least actions spent, its stars and the winning trace —
+  the effective tunings and the test, with undone actions left out (`HarmonicBridgesReconciliation.netTrace`) — marked
+  verified. On restore every traced result is replayed on a fresh play of its certified level and kept only if it wins,
+  spends at most its recorded actions and its stars match the rule; edited results are dropped and counted, untraced
+  ones kept unverified, and the frontier restored as saved. The panel announces the dropped count once.
+- **Replay.** `replay.start [level]` replays a verified solution action by action (`replay.step`, `replay.stop`); other
+  play actions are refused in words during replay, which never changes progress or claims stars.
+- **Settings.** `settings.sound [0 … 1]` stores the sound choice in the snapshot; the presenter applies it on open.

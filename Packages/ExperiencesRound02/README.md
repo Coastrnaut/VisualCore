@@ -681,3 +681,7 @@ Feature 416 (R02-G12-06) adds polish and accessibility: `HarmonicBridgesFeedback
 `HarmonicBridgesLights` (eased glow and won brightening with Reduce Flashing fades), `HarmonicBridgesSoundRecipe` (the
 plucked string's audition and the ambient loop), the shader's won-light uniform, and the accessible panel (labels,
 values, the adjustable string and peg, the summary element, Dynamic Type, the Sound toggle).
+
+Feature 417 (R02-G12-07) adds persistence and replay: result traces and `HarmonicBridgesReconciliation` (every saved
+result replayed on its certified level on restore), snapshot schema 3 with migrations, `replay.start/step/stop`, the
+saved sound choice (`settings.sound`), and the panel's replay controls and dropped-results announcement.
