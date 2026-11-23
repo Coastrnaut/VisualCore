@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g09.nocturne-garden",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g09.nocturne-garden --runtime 27",
+  "elapsed_seconds": 42.173,
+  "exit_code": 0,
+  "finished": "2026-11-23T01:37:01+00:00",
+  "gate": "X-R02-G09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G09.sim27-2.log",
+  "log_sha256": "8707876ca73db8cfb072e2b0227ba5ef49554145a1f0563dc61a9fe8d15278b6",
+  "name": "sim27-2",
+  "started": "2026-11-23T01:36:19+00:00",
+  "timed_out": false
+}
