@@ -45,11 +45,18 @@
 //           an undo, an honest retry back to the opening digest;
 //  61 … 70  persistence and replay — the first certified tuning, undo, redo, then the rest of the witness (won; the
 //           saved trace replays to the same state);
-//  71 … 80  integration — `level.next` (the next certified level, a fresh play), its first certified tuning, an undo
-//           (the next level's opening digest) and a second undo refused `r02-g12.action`.
+//  71 … 80  integration — the certified witness (won, the next level opened), `level.next` (the next certified level,
+//           a fresh play), its first certified tuning, an undo (the next level's fresh play) and a second undo refused
+//           `r02-g12.action`.
 // The expected digests and outcomes are derived by playing the entries on a core exactly as the engine plays them; the
 // tests replay every scenario through `ExperienceEngine` and check each family's kernel state. No clock, no random
 // source.
+// Feature 415 (R02-G12-05) T-R02G1205-004: the digests are now schema 2's ("…v2": level, play, progress and mode), and
+// `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`;
+// the integration rows (71 … 80) therefore first win their level's certified witness (a campaign win opens the next
+// level) before `level.next`; rejection also refuses the progression controls' wrong value counts (`level.select`,
+// `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`); the manifest was regenerated
+// (`UPDATE_SCENARIO_MANIFEST=1`).
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -97,7 +104,7 @@ extension HarmonicBridgesExperienceCore {
         case accessibility
         /// Rows 61 … 70: a tuning undone and redone, then the rest of the witness.
         case persistence
-        /// Rows 71 … 80: the next level, its first tuning, an undo and a refused undo.
+        /// Rows 71 … 80: the witness won, the next level, its first tuning, an undo and a refused undo.
         case integration
     }
 
@@ -280,6 +287,11 @@ extension HarmonicBridgesExperienceCore {
             refusedEntry("play.undo", [1], wrongCountCode),
             refusedEntry("play.redo", [1], wrongCountCode),
             refusedEntry("level.next", [1], wrongCountCode),
+            refusedEntry("level.select", [], wrongCountCode),
+            refusedEntry("mode.daily", [2026, 1], wrongCountCode),
+            refusedEntry("mode.practice", [1], wrongCountCode),
+            refusedEntry("mode.campaign", [1], wrongCountCode),
+            refusedEntry("tutorial.dismiss", [1], wrongCountCode),
         ]
         return entries
     }
@@ -316,7 +328,8 @@ extension HarmonicBridgesExperienceCore {
     /// The seed that opens level `number`: `number − 1` (``levelNumber(forSeed:)`` gives `seed % 100 + 1`).
     public static func seed(forLevel number: Int) -> UInt64 { UInt64(max(number - 1, 0)) }
 
-    /// The level after `number` as `level.next` opens it (100 wraps to 1).
+    /// The level after `number` as the integration rows reach it with `level.next` after a campaign win (no row's
+    /// level is 100, whose `level.next` is refused).
     public static func nextLevel(after number: Int) -> Int { number % levelNumbers.upperBound + 1 }
 
     /// The lowest peg other than the certified one and `play`'s current one for which tuning `string` and testing
@@ -442,8 +455,9 @@ extension HarmonicBridgesExperienceCore {
                 + actions.dropFirst().map { actionEntry($0) }
         case .integration:
             guard let next = certifiedTunings(nextLevel(after: number)).first else { return [] }
-            return [acceptedEntry("level.next"), actionEntry(next), acceptedEntry("play.undo"),
-                    refusedEntry("play.undo", [], kernelActionCode, steps: 1)]
+            return actions.map { actionEntry($0) }
+                + [acceptedEntry("level.next"), actionEntry(next), acceptedEntry("play.undo"),
+                   refusedEntry("play.undo", [], kernelActionCode, steps: 1)]
         }
     }
 

@@ -129,7 +129,12 @@ import VisualCoreSimulation
     static func lockedCase() throws -> Case {
         let level: HarmonicBridgesLevel = HarmonicBridgesFixtures.handLevel(lockedLast: true)
         let play: Play = try Core.freshPlay(of: level)
-        let core: Core = Core(levelNumber: 1, play: play, openingNumber: 1, openingPlay: play)
+        // Feature 415: the adapter state also carries progress, mode and tutorial step (none matter to gestures).
+        let tutorial: HarmonicBridgesTutorialStep = HarmonicBridgesTutorialStep.initial(tutorial: level.tutorial)
+        let opening: Core.Opening = Core.Opening(play: play, progress: HarmonicBridgesProgress(), tutorial: tutorial,
+                                                 certifiedActions: 0)
+        let core: Core = Core(levelNumber: 1, play: play, progress: HarmonicBridgesProgress(), mode: .campaign,
+                              tutorial: tutorial, certifiedActions: 0, openingNumber: 1, opening: opening)
         return make(core)
     }
 

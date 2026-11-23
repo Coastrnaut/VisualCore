@@ -50,7 +50,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 405
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1205-004 Edit `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesExperienceCore.swift`
+- [X] T-R02G1205-004 Edit `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesExperienceCore.swift` — Verified 2026-11-23: Verified 2026-11-23: host-4 exit 0 (HarmonicBridgesCoreTests 185 tests in 19 suites: level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss with locked and date refusals; practice budget 60 on a copy, no stars or unlocks; daily wins record and open nothing; campaign wins record stars by actions spent incl. undone tunings and open the next; level.next only to an open level; tutorial advanced per action and not digested; digest v2 with progress and mode; schema 2 round trip in every mode, schema-1 migration, newer schema refused; scenarios updated (rejection of the new controls' wrong value counts; integration rows win before level.next) and the manifest regenerated); drafted by an agent from feature 405's change, reviewed and retested by the lead
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g12.locked`, `r02-g12.date`; practice budget 60 on a copy of the level, no stars, no
   unlocks; a daily win records the level's best result and stars and opens nothing; progress and mode in the digest,

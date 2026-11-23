@@ -5,7 +5,8 @@
 // gives when played as the runner plays them; the save-restore state survives a restore; every standard scenario and
 // fixture ends in the kernel state its actions describe; every acceptance row ends in the state of its family (a
 // refusal with the kernel's code, a broken test, a spent budget, a won witness, undo and redo restoring digests, the
-// next level's opening digest); and the committed `scenario-manifest.json` equal to the Swift manifest
+// next level's fresh play after a campaign win — since feature 415 `level.next` needs the next level open); and the
+// committed `scenario-manifest.json` equal to the Swift manifest
 // (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run (`swift test`); explicit types, plain loops.
 #if DEBUG || VISUALCORE_AUTOMATION
 @testable import HarmonicBridgesCore
@@ -241,12 +242,19 @@ private func digest(of core: HarmonicBridgesExperienceCore) throws -> String {
                 let restoredDigest: String = try digest(of: restored)
                 #expect(restored == core && restoredDigest == played.final, "\(name)")
             case .integration:
+                // Feature 415: `level.next` needs the next level open, so the row first wins its level's witness.
                 let next: Int = Core.nextLevel(after: level)
                 #expect(core.levelNumber == next && core.play.stage == .playing, "\(name)")
-                let nextOpening: String = try #require(Core.expectedDigest(for: scenarioID, seed: UInt64(next - 1),
-                                                                           entries: []))
-                #expect(played.final == nextOpening, "\(name)")
-                #expect(played.results == ["accepted", "accepted", "accepted", Core.kernelActionCode], "\(name)")
+                #expect(Self.kinds(core) == [.tune, .undo] && core.play.actionsSpent == 0, "\(name)")
+                #expect(core.progress.frontier == next && core.progress.solved[level] != nil, "\(name)")
+                let won: [ScenarioStep] = actions.map { Core.actionEntry($0) } + [Core.acceptedEntry("level.next")]
+                let nextFresh: String = try #require(Core.expectedDigest(for: scenarioID, seed: spec.seed,
+                                                                         entries: won))
+                #expect(played.final == nextFresh, "\(name)")
+                var results: [String] = []
+                for _ in actions { results.append("accepted") }
+                results += ["accepted", "accepted", "accepted", Core.kernelActionCode]
+                #expect(played.results == results, "\(name)")
             }
         }
     }

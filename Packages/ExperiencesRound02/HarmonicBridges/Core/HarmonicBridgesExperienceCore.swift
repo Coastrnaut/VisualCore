@@ -21,7 +21,8 @@
 //   crossing.test             tests the crossing over every step (1 action): won, or failed `broken(step, string)`;
 //   play.undo, play.redo      the kernel's exact undo and redo (`r02-g12.action` when there is nothing to undo or redo;
 //                             undo works in a failed play and returns it to playing; a won play is final);
-//   level.next                the next certified level (100 wraps to 1) with a fresh play.
+//   level.next                the next certified level with a fresh play (since feature 415 the next open level; see
+//                             below).
 // The declared string range is the widest any level allows (`HarmonicBridgesLevel.stringCounts`: at most 12 strings);
 // the level's own string count is the kernel's to check. Every tuning and test is applied with the play's current
 // fingerprint as the expected one, so `r02-g12.stale` cannot arise. A kernel refusal (`HarmonicBridgesError`) becomes
@@ -33,6 +34,30 @@
 // (`HarmonicBridgesPlay.replay`) and throws `HarmonicBridgesRestoreRefusal` for a damaged payload, a level number
 // outside 1 … 100 or a trace the kernel refuses (a record of a newer schema or of another level's seed among them). An
 // envelope of a newer schema is refused by the engine before the core sees it.
+//
+// Feature 415 (R02-G12-05) T-R02G1205-004 (FR-R02G1205-001, 004 … 007; clarifications Q2–Q5): the core also holds the
+// player's progress (`HarmonicBridgesProgress`: won levels with the least actions spent and stars, the open frontier),
+// the mode (campaign, practice with the budget raised to the kernel's maximum 60, daily) and the tutorial step. No
+// level is ever gated by payment: a locked level is one not yet unlocked (FR-R02G1205-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g12.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g12.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 60 (a copy of the level);
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing a level or a mode drops the left level's records (the play starts fresh). `level.next` moves to the next
+// open level in campaign mode and is refused with `r02-g12.locked` when there is none (100 does not wrap). A win (the
+// play reaching `won` on an accepted test) records `progress.record(level:actionsSpent:certified:mode:)` with the
+// actions spent (`HarmonicBridgesProgress.actionsSpent`: every tuning and test record, undone ones included) against
+// the certified witness's action count (its tunings plus the test): campaign opens the next level, daily records the
+// level's best result and stars and opens nothing, practice records nothing. The tutorial starts at
+// `HarmonicBridgesTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and is advanced after
+// every applied tuning, test, undo and redo by `advanced(afterTune:bridged:ended:)` (afterTune for a tuning; bridged
+// when the play's report reaches the goal in every step; ended when the play is won or failed — an undo never ends
+// it, a redo only when it restores a failed moment), never back. Digest "r02-g12.harmonic-bridges.v2": level, play
+// fingerprint, progress and mode (never the tutorial step). Snapshot schema 2: `{"level", "mode", "progress",
+// "records", "tutorial"}` with sorted keys; schema-1 payloads migrate (no won levels, level 1 open plus the levels up
+// to the saved level, campaign mode, the tutorial at its initial step — `tune` on the tutorial levels).
 //
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `HarmonicBridgesTier.of(t)`: level-0 = string motion, 2 wave shells, 2 glow shells;
@@ -47,11 +72,16 @@ import VisualCorePersistence
 public enum HarmonicBridgesExperienceRule {
     /// A value that must be a whole number (a string index or a peg) and is not.
     public static let notWhole = "r02-g12.not-whole"
+    /// A level that is not open yet, or no next open level (feature 415).
+    public static let locked = "r02-g12.locked"
+    /// An impossible calendar date (feature 415).
+    public static let date = "r02-g12.date"
 }
 
 /// Why a saved Harmonic Bridges state was refused on restore (feature 413). A refused restore changes nothing.
 public enum HarmonicBridgesRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress or the mode is
+    /// invalid (feature 415).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -59,16 +89,19 @@ public enum HarmonicBridgesRestoreRefusal: Error, Equatable, Sendable {
     case kernel(HarmonicBridgesError)
 }
 
-/// The state of Harmonic Bridges as an experience (see the file header). Snapshot schema 1.
+/// The state of Harmonic Bridges as an experience (see the file header). Snapshot schema 2.
 public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g12.harmonic-bridges"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g12.harmonic-bridges.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g12.harmonic-bridges.v2"
     /// The action ids in declaration order.
-    public static let actionIDs = ["string.tune", "crossing.test", "play.undo", "play.redo", "level.next"]
+    public static let actionIDs = ["string.tune", "crossing.test", "play.undo", "play.redo", "level.next",
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`HarmonicBridgesMode.practiceBudget`, 60).
+    public static let practiceBudget: Int = HarmonicBridgesMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a string index: the most strings any level has (`HarmonicBridgesLevel.stringCounts`,
@@ -83,22 +116,49 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: HarmonicBridgesPlay
+    /// The player's progress (feature 415): in the digest and the snapshot.
+    public private(set) var progress: HarmonicBridgesProgress
+    /// The mode (feature 415): in the digest and the snapshot.
+    public private(set) var mode: HarmonicBridgesMode
+    /// The tutorial step (feature 415): in the snapshot, not in the digest.
+    public private(set) var tutorial: HarmonicBridgesTutorialStep
+    /// The certified witness's action count of the current level (its tunings plus the test), against which a win's
+    /// stars are counted. Derived from the level number.
+    public private(set) var certifiedActions: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: HarmonicBridgesPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
+
+    /// What a reset restores (feature 415).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: HarmonicBridgesPlay
+        /// The opening progress: level 1 open plus the levels up to the opening level, none won.
+        let progress: HarmonicBridgesProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: HarmonicBridgesTutorialStep
+        /// The opening level's certified witness action count.
+        let certifiedActions: Int
+    }
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber`, whose reset returns to `openingPlay` of `openingNumber`.
-    init(levelNumber: Int, play: HarmonicBridgesPlay, openingNumber: Int, openingPlay: HarmonicBridgesPlay) {
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial`, whose reset returns to
+    /// `opening` of `openingNumber`.
+    init(levelNumber: Int, play: HarmonicBridgesPlay, progress: HarmonicBridgesProgress, mode: HarmonicBridgesMode,
+         tutorial: HarmonicBridgesTutorialStep, certifiedActions: Int, openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedActions = certifiedActions
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
@@ -167,13 +227,44 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
         try HarmonicBridgesPlay.replay(level: level, records: [])
     }
 
-    /// The opening state of manifest number `number`: a play begun and past its tutorial, ready to accept actions.
+    /// The practice copy of `level` (feature 415): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(
+        of level: HarmonicBridgesLevel
+    ) throws(HarmonicBridgesError) -> HarmonicBridgesLevel {
+        try HarmonicBridgesLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, islands: level.islands,
+                                 strings: level.strings, start: level.start, goal: level.goal, steps: level.steps,
+                                 threshold: level.threshold,
+                                 budget: HarmonicBridgesMode.practice.budget(base: level.budget),
+                                 tutorial: level.tutorial)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: HarmonicBridgesGenerated,
+                            mode: HarmonicBridgesMode) throws(HarmonicBridgesError) -> HarmonicBridgesLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
+    /// accept actions; campaign mode, level 1 open plus the levels up to `number`, none won, the tutorial at its
+    /// initial step.
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(HarmonicBridgesError) -> HarmonicBridgesExperienceCore {
-        let play: HarmonicBridgesPlay = try freshPlay(of: try level(number: number))
-        return HarmonicBridgesExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                             openingPlay: play)
+        let certified: HarmonicBridgesGenerated = try generated(number: number)
+        let play: HarmonicBridgesPlay = try freshPlay(of: certified.level)
+        var progress: HarmonicBridgesProgress = HarmonicBridgesProgress()
+        progress.open(through: number)
+        let tutorial: HarmonicBridgesTutorialStep = HarmonicBridgesTutorialStep.initial(level: number)
+        let actions: Int = certified.actions.count
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial, certifiedActions: actions)
+        return HarmonicBridgesExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                             tutorial: tutorial, certifiedActions: actions, openingNumber: number,
+                                             opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -219,15 +310,44 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the quality tier or
+    /// the opening level).
     public static func == (lhs: HarmonicBridgesExperienceCore, rhs: HarmonicBridgesExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 415): no won levels with level 1 open
+    /// plus the levels up to the saved level, campaign mode, no tutorial key (restore starts the tutorial at its
+    /// initial step: `tune` on the tutorial levels 1 … 3, else `done`).
+    ///
+    /// - Throws: ``HarmonicBridgesRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw HarmonicBridgesRestoreRefusal.damaged
+        }
+        var progress: HarmonicBridgesProgress = HarmonicBridgesProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(HarmonicBridgesMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the ranges of the file header as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -236,6 +356,11 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.undo"),
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(HarmonicBridgesProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -243,7 +368,8 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The five controls with their declared ranges (see the file header); the last four take no values.
+    /// The ten controls with their declared ranges (see the file header); `crossing.test`, `play.undo`, `play.redo`,
+    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -280,17 +406,40 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
             switch action.control {
             case "string.tune":
                 try play.apply(.tune(values[0], values[1]), expecting: play.fingerprint)
+                advanceTutorial(afterTune: true)
             case "crossing.test":
                 try play.apply(.test, expecting: play.fingerprint)
+                advanceTutorial(afterTune: false)
+                recordIfWon()
             case "play.undo":
                 try play.undo()
+                advanceTutorial(afterTune: false)
             case "play.redo":
                 try play.redo()
-            default:   // level.next
-                let next: Int = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh: HarmonicBridgesPlay = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
+                advanceTutorial(afterTune: false)
+                recordIfWon()
+            case "level.next":
+                guard let next = progress.nextOpen(after: levelNumber) else {
+                    return .rejected(.rule(code: HarmonicBridgesExperienceRule.locked))
+                }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(values[0]) else {
+                    return .rejected(.rule(code: HarmonicBridgesExperienceRule.locked))
+                }
+                try open(number: values[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = HarmonicBridgesProgress.dailyLevel(year: values[0], month: values[1],
+                                                                     day: values[2]) else {
+                    return .rejected(.rule(code: HarmonicBridgesExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            default:   // tutorial.dismiss
+                tutorial = tutorial.dismissed()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
@@ -304,10 +453,47 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose; the quality tier, which is not state, is kept.
+    /// Advances the tutorial step after an accepted tuning, test, undo or redo
+    /// (`HarmonicBridgesTutorialStep.advanced(afterTune:bridged:ended:)`): `afterTune` for a tuning, bridged when the
+    /// play's report reaches the goal in every step, ended when the play is won or failed (never after an undo, which
+    /// always lands on a moment before the end; after a redo only when it restores a failed moment). Never back.
+    private mutating func advanceTutorial(afterTune: Bool) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterTune: afterTune, bridged: play.report.goalReachedInEveryStep, ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's initial
+    /// tutorial step; the records of the level left are dropped. Changes nothing when the kernel refuses.
+    private mutating func open(number: Int, mode: HarmonicBridgesMode) throws(HarmonicBridgesError) {
+        let certified: HarmonicBridgesGenerated = try Self.generated(number: number)
+        let fresh: HarmonicBridgesPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedActions = certified.actions.count
+        tutorial = HarmonicBridgesTutorialStep.initial(level: number)
+    }
+
+    /// After an accepted action that won the play: records the actions spent
+    /// (`HarmonicBridgesProgress.actionsSpent(_:)`) against the certified witness's action count in the current mode
+    /// (campaign opens the next level; daily records the best result and stars and opens nothing; practice records
+    /// nothing). A won play is final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, actionsSpent: HarmonicBridgesProgress.actionsSpent(play),
+                        certified: certifiedActions, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode); the quality tier, which is not
+    /// state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedActions = opening.certifiedActions
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -319,37 +505,47 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g12.harmonic-bridges.v1", then the level number and the play's fingerprint (level, pegs, actions spent,
-    /// stage, failure).
+    /// "r02-g12.harmonic-bridges.v2", then the level number, the play's fingerprint (level, pegs, actions spent, stage,
+    /// failure), the progress and the mode (their sorted JSON); never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly.
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: HarmonicBridgesMode
+        /// The progress.
+        var progress: HarmonicBridgesProgress
         /// The play's records.
         var records: [HarmonicBridgesRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: HarmonicBridgesTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level; a reset returns to the level
-    /// `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the initial step when absent); a reset returns
+    /// to the opening state `seed` chooses.
     ///
-    /// - Throws: ``HarmonicBridgesRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level
-    ///   or trace the kernel refuses.
+    /// - Throws: ``HarmonicBridgesRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or a daily
+    ///   mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel
+    ///   refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> HarmonicBridgesExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw HarmonicBridgesRestoreRefusal.damaged
@@ -357,15 +553,21 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw HarmonicBridgesRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw HarmonicBridgesRestoreRefusal.damaged
+        }
         do throws(HarmonicBridgesError) {
-            let saved: HarmonicBridgesLevel = try level(number: decoded.level)
-            let play: HarmonicBridgesPlay = try HarmonicBridgesPlay.replay(level: saved, records: decoded.records)
-            let openingNumber: Int = levelNumber(forSeed: seed)
-            let openingPlay: HarmonicBridgesPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return HarmonicBridgesExperienceCore(levelNumber: decoded.level, play: play,
-                                                 openingNumber: openingNumber, openingPlay: openingPlay)
+            let certified: HarmonicBridgesGenerated = try generated(number: decoded.level)
+            let play: HarmonicBridgesPlay = try HarmonicBridgesPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: HarmonicBridgesTutorialStep = decoded.tutorial
+                ?? HarmonicBridgesTutorialStep.initial(level: decoded.level)
+            let openingCore: HarmonicBridgesExperienceCore = try opening(number: levelNumber(forSeed: seed))
+            return HarmonicBridgesExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                 mode: decoded.mode, tutorial: tutorial,
+                                                 certifiedActions: certified.actions.count,
+                                                 openingNumber: openingCore.openingNumber,
+                                                 opening: openingCore.opening)
         } catch {
             throw HarmonicBridgesRestoreRefusal.kernel(error)
         }
