@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for HB-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g12`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g12.harmonic-bridges`
-- [ ] T-R02G1210-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Harmonic Bridges definition passes; a
+- [X] T-R02G1210-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Harmonic Bridges definition passes; a — Verified 2026-11-23: script-tests (alone) exit 0, incl. HarmonicBridgesDeviceRowsCheckTests (8 tests: the real definition passes with 8 rows and 12 scenarios; a scenario removed from the manifest, an unknown scenario, HB-D1 without pass, T-R02G1209-011 and T-R02G1204-011 uncovered each fail by name; the release step device-rows-r02-g12 runs the check), lead retest
   copy with a scenario removed, a copy with HB-D1's `pass` field removed and a copy with T-R02G1209-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g12` runs the check for
   `r02-g12.harmonic-bridges`); `--name script-tests` (alone)
