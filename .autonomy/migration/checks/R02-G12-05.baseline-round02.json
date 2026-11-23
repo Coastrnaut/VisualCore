@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02",
+  "elapsed_seconds": 350.71,
+  "exit_code": 0,
+  "finished": "2026-11-23T18:57:53+00:00",
+  "gate": "R02-G12-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G12-05.baseline-round02.log",
+  "log_sha256": "27eb090948821a9e31b5f308b78026c91d3d7d4c8f844482c20f8e56a2cd0a02",
+  "name": "baseline-round02",
+  "started": "2026-11-23T18:52:02+00:00",
+  "timed_out": false
+}
