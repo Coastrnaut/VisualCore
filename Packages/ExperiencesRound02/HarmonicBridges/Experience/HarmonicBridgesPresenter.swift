@@ -38,6 +38,16 @@
 // (`HarmonicBridgesAudition.of(_:string:step:)` in the drawn step) when the sound is on, on screen and active. The
 // mirror carries the summary element's text (`HarmonicBridgesFeedbackPlan.summaryText(core:string:peg:)`) and the sound
 // choice (off by default). Presentation only.
+// Feature 417 (R02-G12-07) T-R02G1207-005 (clarifications Q2, Q4, Q5): the mirror carries whether a verified replay
+// exists for the level (`replayAvailable`: a verified result with a trace, outside replay), whether a replay runs and
+// its position (`replaying`, `replayPosition` = the records played, `replayLength` = the trace's actions);
+// `startReplay`, `stepReplay` and `stopReplay` send `replay.start [level]`, `replay.step` and `replay.stop` (a refusal,
+// `r02-g12.no-replay`, `r02-g12.replay-end` or `r02-g12.replay`, is shown and announced in the plan's words); Retry
+// during replay starts the replay again (`replay.start [level]`); the Sound toggle saves the choice through
+// `settings.sound [0/1]` (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied when the
+// experience opens (the first described state) and whenever it changes; the results a restore dropped
+// (`core.reconciliationDropped`) are announced once per presenter as `state` ("n saved results could not be checked
+// and were removed.", "1 saved result could not be checked and was removed.").
 #if os(iOS)
 import Foundation
 import HarmonicBridgesCore
@@ -96,8 +106,16 @@ final class HarmonicBridgesMirror {
     /// The summary element's text (feature 416): `HarmonicBridgesFeedbackPlan.summaryText(core:string:peg:)` of the
     /// latest core and the chosen string and peg.
     var summary = ""
-    /// Whether the sound is on (feature 416; off by default; presentation only).
+    /// Whether the sound is on (feature 416; off by default; since feature 417 the core's saved choice, `soundOn`).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 417).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 417).
+    var replaying = false
+    /// The actions of the running replay played so far (0 when no replay runs; feature 417).
+    var replayPosition = 0
+    /// The actions of the running replay's trace (0 when no replay runs; feature 417).
+    var replayLength = 0
 
     /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 415).
     var goalLabel: String {
@@ -365,6 +383,18 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         }
         absorbProgress(core)
         mirror.summary = HarmonicBridgesFeedbackPlan.summaryText(core: core, string: mirror.string, peg: mirror.peg)
+        // Feature 417: the saved sound choice is applied when it first appears (the experience opens) or changes.
+        if previous == nil || previous?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(HarmonicBridgesFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                              haptic: nil))
+        }
+        absorbReplay(core)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -565,6 +595,7 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])   // feature 417: replay from the start
         }
     }
 
@@ -683,11 +714,19 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
         HarmonicBridgesSoundRecipe.recipe(play: core.play)
     }
 
-    /// Turns the sound on or off; turning it on plays the recipe of the current crossing.
+    /// Turns the sound on or off without saving the choice (presentation only; the panel saves it with
+    /// ``saveSound(on:port:)``); turning it on plays the recipe of the current crossing.
     func setSound(on: Bool) {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
         mirror.soundOn = on
+    }
+
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 417); the described change turns the loop on or
+    /// off (`describe` applies `core.soundOn`).
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
     }
 
     /// The controls view appeared (the loop may play).
@@ -698,6 +737,60 @@ final class HarmonicBridgesPresenter: ExperiencePresenter {
 
     /// The scene became active or inactive.
     func sceneActive(_ active: Bool) { sound.setActive(active) }
+
+    // MARK: Replay (feature 417, R02-G12-07)
+
+    /// Starts the replay of the current level's verified stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next action of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 417).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 417).
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 417).
+    static func isReplay(_ mode: HarmonicBridgesMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
+    /// Takes the replay state of `core` into the mirror: Replay is offered for a level with a verified result that has
+    /// a trace (outside replay); during replay the position is the records played of the trace's actions.
+    private func absorbReplay(_ core: HarmonicBridgesExperienceCore) {
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
+    }
 
     /// The summary element's text for the chosen string and peg (the choice is presentation state of the panel).
     func refreshSummary() {

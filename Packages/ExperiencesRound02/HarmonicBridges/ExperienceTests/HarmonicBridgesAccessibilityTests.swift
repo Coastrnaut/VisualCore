@@ -286,6 +286,7 @@ enum HarmonicBridgesA11y {
         #expect(HarmonicBridgesControls.modeName(.campaign) == "campaign")
         #expect(HarmonicBridgesControls.modeName(.practice) == "practice")
         #expect(HarmonicBridgesControls.modeName(.daily(level: 59)) == "daily")
+        #expect(HarmonicBridgesControls.modeName(.replay(level: 3)) == "replay")
         #expect(HarmonicBridgesControls.readableWidth == 520)
 
         // The chosen string reads as the level words it, with its current peg.

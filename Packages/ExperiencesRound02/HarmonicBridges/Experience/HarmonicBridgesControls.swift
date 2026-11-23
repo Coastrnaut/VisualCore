@@ -16,6 +16,11 @@
 // "orbited view", Dismiss the instruction, Campaign / Daily / Practice "selected" or "not selected", Hint the level
 // shown, Sound "on" or "off"), refusals in words, the Sound toggle (off by default, identifier `sound`), rows that
 // become columns at accessibility text sizes, wrapping text and a 520-point readable width (iPad).
+// Feature 417 (R02-G12-07) T-R02G1207-005 (clarifications Q2, Q4, Q5): "Replay best solution" (identifier `replay`,
+// value the level) for a level with a verified stored solution, and during replay its position ("Replay: action k of
+// n", identifier `replay-position`) with Step (identifier `replay-step`, value "Action k of n") and Stop (identifier
+// `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
+// `settings.sound`; the mode's name includes "replay".
 #if os(iOS)
 import HarmonicBridgesCore
 import SwiftUI
@@ -51,6 +56,7 @@ struct HarmonicBridgesControls: View {
                 actionRow
                 playRow
                 progressRows
+                replaySection
                 soundToggle
             }
             .padding()
@@ -70,9 +76,9 @@ struct HarmonicBridgesControls: View {
         }
     }
 
-    /// The Sound toggle (feature 416; off by default; presentation only).
+    /// The Sound toggle (feature 416; off by default; saved through `settings.sound` since feature 417).
     @ViewBuilder private var soundToggle: some View {
-        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Sound of the strings")
             .accessibilityValue(Self.soundValue(mirror.soundOn))
             .accessibilityIdentifier(port.identifier("sound"))
@@ -251,12 +257,52 @@ struct HarmonicBridgesControls: View {
         return "Level \(level), band \(band)"
     }
 
-    /// The mode's name: campaign, daily or practice.
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 417).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text(Self.replayPositionText(mirror)).font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("replay-position"))
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next action of the replay")
+                    .accessibilityValue(Self.replayStepValue(mirror))
+                    .accessibilityIdentifier(port.identifier("replay-step"))
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue(Self.replayStopValue(mirror))
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
+        }
+    }
+
+    /// The replay position line: "Replay: action k of n" (feature 417).
+    static func replayPositionText(_ mirror: HarmonicBridgesMirror) -> String {
+        "Replay: action \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// Step's value: "Action k of n" (feature 417).
+    static func replayStepValue(_ mirror: HarmonicBridgesMirror) -> String {
+        "Action \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// Stop's value: the trace's actions, "n actions" ("1 action" for one) (feature 417).
+    static func replayStopValue(_ mirror: HarmonicBridgesMirror) -> String {
+        mirror.replayLength == 1 ? "1 action" : "\(mirror.replayLength) actions"
+    }
+
+    /// The mode's name: campaign, daily, practice or replay.
     static func modeName(_ mode: HarmonicBridgesMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 

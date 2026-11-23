@@ -50,7 +50,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1207-005 [US3] Edit `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesPresenter.swift` and
+- [X] T-R02G1207-005 [US3] Edit `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesPresenter.swift` and — Verified 2026-11-23: Verified 2026-11-23: sim-27 exit 0 (57 Harmonic Bridges simulator tests incl. HarmonicBridgesReplayTests 5: a win replayed through the port reproduces the bare core's fingerprints action by action and ends won with progress unchanged, replay-end and stop; play actions refused in words during replay and retry restarts it; no saved solution refused; a dropped result announced once as state after restoring an edited save; the saved sound choice applied on open); presenter and panel (Replay, Step, Stop with values and identifiers; Sound saved through settings.sound) drafted by one agent and the replay tests by agent C from feature 407's API, compiled (identity schema expectation 3), reviewed and retested by the lead
   `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the Sound toggle sends `settings.sound` and the presenter applies the restored `soundOn`
   when the experience opens; the dropped results announced once: "n saved results could not be checked and were
