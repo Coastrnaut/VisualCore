@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G10-04 (migration ledger, game feature of experience R02-G10) · ID namespace FR-R02G1004-###,
 SC-R02G1004-###, T-R02G1004-###
@@ -27,6 +27,56 @@ Canonical overrides:
   renderer of R02-G10-01 … 03.
 - **Model:** feature 384 (Nocturne Garden's gameplay spatial interaction) for the gesture controller, picker, preview,
   orbit and panel.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+384's answers where the games agree. Facts checked in code (read-only, 2026-11-22): Nocturne Garden's feature 384 solved
+the same problem with a host-tested gesture controller in its Core taking `PointerEvent`s (id, phase
+began/moved/ended/cancelled, location in view points with the origin top-left, timestamp) with the view size, the drawn
+snapshot and orbit, an analytic picker and a clamped orbit; tap below 10 points and 0.5 s, drag from 16 points, double
+tap within 0.35 s and 22 points, orbit 90° per view width and 60° per view height; Backwards Aurora's camera
+(`BackwardsAuroraSceneGeometry.camera(_:aspect:)`) looks from +z at the box x −1 … 1, y −0.95 … 0.75; sample k lies at x
+= −1 + (k + 0.5)·2/N, y = 0.6·s / 64 on z = 0; the adapter accepts `wave.reverse`, `play.undo`, `play.redo` and
+`level.next`; the panel's chosen section (start, end) is presentation state.
+
+- Q: How is a touch picked? → A: at touch-down the touch ray through the drawn camera meets the timeline plane z = 0 at
+  (x, y). In this order: an end of the chosen section (its sample point projected within 22 points of the touch; the
+  nearer end first, ties to the start), then the band (x within x(start) − u/2 … x(end) + u/2 and |y| ≤ 0.7), then a
+  sample (the sample k whose column x(k) ± u/2 contains x, with |y| ≤ 0.75); anything else is empty space. A tap is a
+  touch that moves less than 10 points and lifts within 0.5 s; a drag moves at least 16 points; 10 … 16 points is
+  neither. Impact: FR-R02G1004-001, 004; SC-R02G1004-001.
+- Q: What do taps, end drags and swipes do? → A: a tap on a sample, or on the band, takes the sample k under the finger:
+  k left of the start moves the start to k, k right of the end moves the end to k, a k strictly inside moves the nearer
+  end to k (ties to the start), and a k on an end changes nothing; the section always keeps start < end. A drag that
+  starts on an end moves that end to the sample column under the finger, clamped to 0 … end − 1 for the start and start
+  + 1 … N − 1 for the end. A drag that starts on the band and moves mostly sideways (|dx| ≥ 2·|dy|) is a swipe: on
+  release it sends one `wave.reverse [start, end]` while playing; any other drag from the band sends nothing. None of
+  taps or end drags sends a kernel action. Impact: FR-R02G1004-001 … 003; SC-R02G1004-001.
+- Q: What is the timeline freeze preview? → A: a touch held on the band for 0.5 s without moving 10 points, and every
+  swipe while it lasts, shows the wave as it would be after reversing the chosen section: the kernel's own reversal
+  (`BackwardsAuroraWave.reversed(start:end:)`), its bends above the limit and the seam that would tear, drawn as a pale
+  dashed copy of the ribbon with a line "would match 3 of 4 checkpoints, worst bend 9 of 12" or "would tear at seam 5";
+  the shimmer and pulses stop while it shows. Lifting a held press sends nothing. The preview is presentation only.
+  Impact: FR-R02G1004-002; SC-R02G1004-003.
+- Q: How do two fingers behave, and what happens on a finished play? → A: a second finger cancels any one-finger gesture
+  (nothing sent, the preview dropped) and orbits: yaw ±35° about the y axis (90° per view width), pitch −15° … +20° (60°
+  per view height) about the authored view; a third finger re-bases the midpoint; a double tap (two taps at most 0.35 s
+  and 22 points apart) on empty space or "Reset view" returns to the authored view. The camera distance refits so the
+  authored box stays inside the view with a 5 % margin at every orbit and aspect 0.4 … 2.5. Orbit is presentation only:
+  not saved, so the snapshot schema stays 1. On a won, failed or result stage a swipe sends nothing and the description
+  says the play is over (undo or next level); marking ends, previews and orbit still work. A reversal the kernel refuses
+  (a palindrome, a length outside the level's sections) is refused by the adapter with its reason code, which the
+  presenter logs and shows. Impact: FR-R02G1004-005, 007; SC-R02G1004-002, 004.
+- Q: How is everything tested? → A: the Core gesture controller (`BackwardsAuroraGestureController`) with a picker
+  (`BackwardsAuroraPicker`) takes pointer events with the view size, the drawn snapshot, the orbit and the section and
+  returns the gesture actions (setStart, setEnd, reverse, resetView), the freeze preview and the orbit; host tests feed
+  500 seeded taps, end drags, swipes and held presses on certified levels at several sizes and orbits and compare with
+  an independent pick computed in the test; simulator tests send the same touches through the experience's pointer
+  entry; a host test wins all 100 certified levels through panel actions alone (start and end steppers, reverse).
+  Impact: FR-R02G1004-006, 007; SC-R02G1004-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -89,7 +139,7 @@ undo, redo, next level, "Reset view"), including winning every certified level i
 ### Edge Cases
 
 - **A touch that never moves far enough:** a tap; two taps on empty space within 0.35 s and 22 points reset the view.
-- **A touch that moves a little:** neither a tap nor a drag nor a swipe; nothing changes.
+- **A touch that moves 10 … 16 points:** neither a tap nor a drag nor a swipe; nothing changes.
 - **A finished play (won, failed or showing the result):** gestures send nothing and the description says the play is
   over (undo or next level); marking ends, previews and orbit still work.
 - **A swipe over a section the kernel refuses (a palindrome, a length outside the level's sections):** the reversal is
