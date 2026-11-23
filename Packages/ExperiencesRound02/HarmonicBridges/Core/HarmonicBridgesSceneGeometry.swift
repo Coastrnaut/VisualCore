@@ -440,13 +440,22 @@ public enum HarmonicBridgesSceneGeometry {
 
     /// The bridges with fallback colours (unlit palette colours; won membranes and glow rings lifted) for the shared
     /// unlit renderer: the level-2 geometry — strings at rest, no wave shells. Positions equal the bridge mesh's.
-    /// The islands are in painter's order for `orbit` (``islandOrder(_:orbit:)``).
+    /// The islands are in painter's order for `orbit` (``islandOrder(_:orbit:)``). `wonLevel` (0 … 1, feature 416)
+    /// scales the won lift of the fallback colours so the unlit fallback fades with the presenter's lights; nil lifts
+    /// fully on a won level. The streams' won flag is never scaled.
     public static func bridgePart(_ snapshot: HarmonicBridgesSceneSnapshot, tier: HarmonicBridgesTier,
-                                  reduceMotion: Bool = false,
-                                  orbit: HarmonicBridgesOrbit = .authored) throws(MeshError) -> HarmonicBridgesColouredMesh {
+                                  reduceMotion: Bool = false, orbit: HarmonicBridgesOrbit = .authored,
+                                  wonLevel: Double? = nil) throws(MeshError) -> HarmonicBridgesColouredMesh {
         _ = tier
         return try build(snapshot, step: drawnStep(snapshot, reduceMotion: reduceMotion), motion: false, shells: 0,
-                         orbit: orbit)
+                         orbit: orbit, wonLevel: wonLevel)
+    }
+
+    /// The won lift of the fallback colours: the snapshot's won flag times `wonLevel` clamped to 0 … 1 (1 when nil or
+    /// not finite).
+    static func colourWon(_ snapshot: HarmonicBridgesSceneSnapshot, wonLevel: Double?) -> Double {
+        let level: Double = wonLevel.map { $0.isFinite ? min(max($0, 0), 1) : 1 } ?? 1
+        return wonFlag(snapshot) * level
     }
 
     /// The bridge mesh for the bridge program, in painter's order: strings at rest with their packed modes when
@@ -460,10 +469,12 @@ public enum HarmonicBridgesSceneGeometry {
 
     /// Builds the bridges for `step` in painter's order (see the header).
     static func build(_ snapshot: HarmonicBridgesSceneSnapshot, step: Int, motion: Bool, shells: Int,
-                      orbit: HarmonicBridgesOrbit = .authored) throws(MeshError) -> HarmonicBridgesColouredMesh {
+                      orbit: HarmonicBridgesOrbit = .authored,
+                      wonLevel: Double? = nil) throws(MeshError) -> HarmonicBridgesColouredMesh {
         var parts: Parts = Parts()
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
         let won: Double = wonFlag(snapshot)
+        let liftWon: Double = colourWon(snapshot, wonLevel: wonLevel)
         // Ground.
         let x0: Double = groundX.lowerBound
         let x1: Double = groundX.upperBound
@@ -476,7 +487,7 @@ public enum HarmonicBridgesSceneGeometry {
             let c: SIMD3<Double> = islandCentre(index, snapshot)
             try parts.ring(centre: SIMD3(c.x, glowRingY, c.z), radius: glowRingRadius, line: glowRingLine,
                            segments: ringSegments, material: .glowRing, slot: SIMD3(0, 1, won),
-                           colour: lifted(colour(.glowRing), won: won))
+                           colour: lifted(colour(.glowRing), won: liftWon))
         }
         let s: SIMD3<Double> = islandCentre(snapshot.start, snapshot)
         try parts.ring(centre: SIMD3(s.x, markerY, s.z), radius: startRadius, line: startLine, segments: ringSegments,
@@ -494,7 +505,7 @@ public enum HarmonicBridgesSceneGeometry {
         for index in snapshot.strings.indices where snapshot.isBridge(index, step: step) {
             try parts.strip(snapshot, string: index, y: membraneY, band: 0...(membraneWidth / 2), material: .membrane,
                             segments: 1, slot: { (_: Double) -> SIMD3<Double> in SIMD3(0, 1, won) },
-                            colour: lifted(colour(.membrane), won: won))
+                            colour: lifted(colour(.membrane), won: liftWon))
         }
         // Wave shells.
         if shells > 0 {
@@ -588,9 +599,10 @@ public enum HarmonicBridgesSceneGeometry {
     /// uv = (0.5^k, won); fallback colours the glow colour times the factor, lifted on a won level. Empty when the tier
     /// has no glow.
     /// The island shells are in painter's order for `orbit` (``islandOrder(_:orbit:)``).
+    /// `wonLevel` scales the fallback colours' won lift as in ``bridgePart(_:tier:reduceMotion:orbit:wonLevel:)``.
     public static func glowPart(_ snapshot: HarmonicBridgesSceneSnapshot, tier: HarmonicBridgesTier,
-                                reduceMotion: Bool = false,
-                                orbit: HarmonicBridgesOrbit = .authored) throws(MeshError) -> HarmonicBridgesColouredMesh {
+                                reduceMotion: Bool = false, orbit: HarmonicBridgesOrbit = .authored,
+                                wonLevel: Double? = nil) throws(MeshError) -> HarmonicBridgesColouredMesh {
         var parts: Parts = Parts()
         let shells: Int = min(max(tier.glowShells, 0), 2)
         guard shells > 0 else { return parts.built() }
@@ -599,7 +611,7 @@ public enum HarmonicBridgesSceneGeometry {
         let glow: SIMD3<Double> = HarmonicBridgesPalette.glow
         for k in stride(from: shells, through: 1, by: -1) {
             let factor: Double = pow(glowWeight, Double(k))
-            let tint: SIMD3<Double> = lifted(glow * factor, won: won)
+            let tint: SIMD3<Double> = lifted(glow * factor, won: colourWon(snapshot, wonLevel: wonLevel))
             let slotOf: (Double) -> SIMD3<Double> = { (_: Double) -> SIMD3<Double> in glow }
             for index in snapshot.strings.indices where snapshot.isBridge(index, step: step) {
                 try parts.strip(snapshot, string: index, y: membraneY + edgeLift * Double(k),

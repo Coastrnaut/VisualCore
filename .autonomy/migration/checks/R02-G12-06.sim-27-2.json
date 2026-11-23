@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "HarmonicBridgesExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing HarmonicBridgesExperienceTests",
+  "elapsed_seconds": 10.421,
+  "exit_code": 0,
+  "finished": "2026-11-23T20:05:23+00:00",
+  "gate": "R02-G12-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G12-06.sim-27-2.log",
+  "log_sha256": "3da0116d7c4cdb32cf87ffb09f7e33b9708aea6777cb96b922a5208a3bff1bb6",
+  "name": "sim-27-2",
+  "started": "2026-11-23T20:05:13+00:00",
+  "timed_out": false
+}

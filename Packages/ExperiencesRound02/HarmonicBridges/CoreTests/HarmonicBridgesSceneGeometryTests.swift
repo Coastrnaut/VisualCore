@@ -702,4 +702,30 @@ import VisualCoreScenes
             }
         }
     }
+
+    /// Feature 416 convergence task T-R02G1206-013: the fallback colours' won lift scales with the won level (0 … 1),
+    /// monotonically, positions never change, and the streams' won flag is unscaled; nil means the full lift.
+    @Test func theFallbackWonLiftScalesWithTheWonLevel() throws {
+        for s in try Self.fixtures(won: true) where Geometry.wonFlag(s) == 1 {
+            let full: HarmonicBridgesColouredMesh = try Geometry.bridgePart(s, tier: .of(2))
+            #expect(full == (try Geometry.bridgePart(s, tier: .of(2), wonLevel: 1)))
+            var previous: Double = -1
+            for tenth in 0...10 {
+                let level: Double = Double(tenth) / 10
+                let part: HarmonicBridgesColouredMesh = try Geometry.bridgePart(s, tier: .of(2), wonLevel: level)
+                #expect(part.mesh.positions == full.mesh.positions, "positions never change")
+                #expect(part.mesh.normals == full.mesh.normals, "the streams' won flag is unscaled")
+                var brightness: Double = 0
+                for colour in part.colours { brightness += colour.x + colour.y + colour.z }
+                #expect(brightness >= previous - 1e-9, "the lift grows with the level")
+                previous = brightness
+            }
+            let none: HarmonicBridgesColouredMesh = try Geometry.bridgePart(s, tier: .of(2), wonLevel: 0)
+            var lifted: Double = 0
+            var unlifted: Double = 0
+            for colour in full.colours { lifted += colour.x + colour.y + colour.z }
+            for colour in none.colours { unlifted += colour.x + colour.y + colour.z }
+            #expect(lifted > unlifted, "a won level's full lift is brighter than none")
+        }
+    }
 }

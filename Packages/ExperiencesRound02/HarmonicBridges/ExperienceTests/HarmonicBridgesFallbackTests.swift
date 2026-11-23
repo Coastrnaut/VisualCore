@@ -255,5 +255,41 @@ import VisualCoreMath
         #expect(HarmonicBridgesShaders.glowGainCap < HarmonicBridgesShaders.standardGlowLimit)
         #expect(HarmonicBridgesShaders.glowLimit(reduceFlashing: true) == HarmonicBridgesShaders.glowGainCap)
     }
+
+    /// Feature 416 convergence task T-R02G1206-013: with the bridge program broken and Reduce Flashing on, a winning
+    /// test brightens the unlit fallback over the 0.45 s fade, not at once: the frame's brightness rises from 0.1 s to
+    /// 0.4 s, the frame at 0.3 s still differs from the settled one, and frames after 0.5 s are identical.
+    @Test func aWonLevelInTheFallbackFadesUnderReduceFlashing() async throws {
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await HarmonicBridgesTest.open(session, seed: 0, reduceFlashing: true) {
+            (presenter: HarmonicBridgesPresenter) in presenter.breakBridgeShader()
+        }
+        let presenter: HarmonicBridgesPresenter = shell.presenter
+        #expect(try HarmonicBridgesTest.tune(shell))
+        let base: Double = 10
+        _ = try HarmonicBridgesTest.still(session, time: base - 1)
+        _ = try HarmonicBridgesTest.still(session, time: base)
+        #expect(presenter.fallbackReason != nil, "the fallback draws")
+        let winning: ActionResult = shell.handle(control: "crossing.test", values: [])
+        #expect(winning == .accepted, "\(winning.code)")
+        var previous: Int = -1
+        var middle: [UInt8] = []
+        for offset in [0.1, 0.2, 0.3, 0.4] {
+            let rgba: [UInt8] = try HarmonicBridgesTest.still(session, time: base + offset)
+            var sum: Int = 0
+            for byte in rgba { sum += Int(byte) }
+            #expect(sum >= previous, "the fallback brightens or holds at \(offset) s")
+            previous = sum
+            if offset == 0.3 { middle = rgba }
+        }
+        let settled: [UInt8] = try HarmonicBridgesTest.still(session, time: base + 0.6)
+        let later: [UInt8] = try HarmonicBridgesTest.still(session, time: base + 1.2)
+        #expect(middle != settled, "the fallback is still fading at 0.3 s")
+        #expect(settled == later, "the fallback is settled after the fade")
+        var settledSum: Int = 0
+        for byte in settled { settledSum += Int(byte) }
+        #expect(settledSum > previous || middle != settled, "the won lift ends brighter than mid-fade")
+    }
 }
 #endif

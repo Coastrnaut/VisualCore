@@ -87,7 +87,7 @@ controls, docs) stay with the lead. MVP: Stories 1 and 2. Requirement coverage: 
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G1206-013 Fade the won lift in the unlit fallback too: give `HarmonicBridgesSceneGeometry.bridgePart` and
+- [X] T-R02G1206-013 Fade the won lift in the unlit fallback too: give `HarmonicBridgesSceneGeometry.bridgePart` and — Verified 2026-11-23: Verified 2026-11-23: host-4 exit 0 (HarmonicBridgesSceneGeometryTests 19 incl. theFallbackWonLiftScalesWithTheWonLevel: the lift grows monotonically with the level 0…1, positions and the streams' won flag unchanged); sim-27-2 exit 0 (52 simulator tests incl. aWonLevelInTheFallbackFadesUnderReduceFlashing: with the bridge program broken, the fallback brightens over the fade — still changing at 0.3 s, settled by 0.6 s); bridgePart/glowPart take a won level, the scene passes lights.won and rebuilds the fallback per tenth
   `glowPart` (`Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSceneGeometry.swift`) a won level 0 … 1
   that scales the lift of their fallback colours (default: the snapshot's won flag, so existing callers are unchanged),
   have `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesBridgeScene.swift` pass `lights.won` in

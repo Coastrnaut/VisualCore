@@ -58,6 +58,9 @@ final class HarmonicBridgesBridgeScene {
         let fallback: Bool
         /// The islands' painter's order for the drawn orbit (feature 414): a turn that reorders them rebuilds.
         let islandOrder: [Int]
+        /// The fallback's won light in tenths (feature 416): the unlit fallback rebuilds as the won lift fades; 10 while
+        /// the shader programs draw (their uniform fades instead).
+        let fallbackWonTenths: Int
     }
 
     private var registry: ResourceRegistry?
@@ -149,7 +152,8 @@ final class HarmonicBridgesBridgeScene {
                     actionsLeft: s.actionsLeft,
                     step: HarmonicBridgesSceneGeometry.drawnStep(s, reduceMotion: still), tier: tier.index,
                     reduceMotion: still, fallback: fallbackReason != nil,
-                    islandOrder: HarmonicBridgesSceneGeometry.islandOrder(s, orbit: orbit))
+                    islandOrder: HarmonicBridgesSceneGeometry.islandOrder(s, orbit: orbit),
+                    fallbackWonTenths: fallbackReason != nil ? Int((wonLight * 10).rounded(.down)) : 10)
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
@@ -182,8 +186,10 @@ final class HarmonicBridgesBridgeScene {
         let minimal = HarmonicBridgesTier.of(HarmonicBridgesTier.all.count - 1)
         let up = Vec3(0, 1, 0)
         let parts: [HarmonicBridgesColouredMesh] = [
-            try HarmonicBridgesSceneGeometry.bridgePart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit),
-            try HarmonicBridgesSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit),
+            try HarmonicBridgesSceneGeometry.bridgePart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit,
+                                                        wonLevel: wonLight),
+            try HarmonicBridgesSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit,
+                                                      wonLevel: wonLight),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh
