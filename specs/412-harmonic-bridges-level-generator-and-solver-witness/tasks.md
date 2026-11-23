@@ -33,7 +33,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G1202-004 [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesGenerator.swift`
+- [X] T-R02G1202-004 [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesGenerator.swift` — Verified 2026-11-23: host-3 exit 0 (HarmonicBridgesGeneratorTests 9: band profiles, frequencies, level ids, determinism, an independent re-draw of 200 (entry, index) pairs following clarification Q1 equal to the generator incl. skipped draws, band values of candidates, generate on two entries per band (minimal tunings in range, at most budget − 1, never already won, witness wins, earlier candidates fail a filter), the generation(n) refusal, catalog digest determinism); agent C's tests retested by the lead
   (lead: band profiles "band 1: 1 … 2, 1, 2, 1 … 3, 1 … 2; band 2: 2 … 3, 1 … 2, 2 … 3, 2 … 4, 2 … 3; band 3: 3 … 4, 2,
   2 … 3, 2 … 5, 2 … 4; band 4: 4 … 5, 2 … 3, 2 … 3, 3 … 6, 3 … 4; band 5: 5 … 6, 3 … 4, 3, 3 … 6, 3 … 5" (scrambled,
   steps, tones, thresholds, decoys); frequencies {6, 12, 18, 24, 30, 36, 48, 60, 72}; candidates from
