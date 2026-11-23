@@ -31,7 +31,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Stories 1 to 3 — tap to pulse, drag markers, hold to claim (P1) 🎯
 
-- [ ] T-R02G1104-003 [US1] [US2] [US3] Create
+- [X] T-R02G1104-003 [US1] [US2] [US3] Create — Verified 2026-11-23: host-3 (156 EchoCartographer core tests incl. EchoCartographerGestureControllerTests 6: 500 seeded scripts in 12 kinds on levels 1/21/41/61/81 over playing, paused, won, result and failed plays, 3 views and 3 orbits against an independent expectation, every kernel action through the adapter; tap/hold boundary at 0.5 s and tick arming; 10-16 point touches, second fingers, cancels and non-playing stages send no kernel action; orbit clamp and re-base; double tap; digests unchanged by orbit) exit 0, lead retest against agent B's picker
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerGestureController.swift`
   (`EchoCartographerGestureAction` pulse, claim, mark, moveCursor, resetView; states idle, cellPress, markerDrag,
   cellDrag, held, orbiting, cancelled; a tap (< 10 points, lifted before 0.5 s) on a known-open cell while playing:
