@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G10-06: Backwards Aurora polish; fade lights as uniforms; frame checks after a fade draw later).
+Last updated: 2026-11-23 (R02-G10-07: Backwards Aurora persistence; stage a task's shared files by the task they belong to).
 
 ## 1. What is tested, and where
 
@@ -395,6 +395,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   and INV-10 failing in their copies; the shared test file is the lead's, so the lead added the picker, the freeze
   preview and the controller to the set in one edit before retesting. Name every new presentation file in the task that
   creates it.
+- **Stage a shared file with the task it belongs to** (R02-G10-07, 2026-11-23). Agent A's new replay mode made the
+  feedback plan's `modeName` switch non-exhaustive, so its copy carried a one-line fix in a lead-owned file, and its
+  regenerated scenario manifest already held the new digests. The lead committed that line and a manifest regenerated
+  for the T-002 tree with T-002, and the adapter's own feedback and manifest changes with T-003, so each commit builds
+  and passes on its own; the iOS panel's and presenter's mode switches gained the new case in the same commit as the
+  adapter.
 - **Fade lights through uniforms when the mesh has no free channel** (R02-G10-06, 2026-11-23). Backwards Aurora's tear
   cross and preview ribbon carry their material code and timeline coordinate in the uv stream, leaving nothing for a
   shade, so their eased lights became two aurora uniforms (`u_tearLight`, `u_previewLight`) instead of geometry; a fade

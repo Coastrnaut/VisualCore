@@ -572,3 +572,7 @@ Feature 396 (R02-G10-06) adds polish and accessibility: `BackwardsAuroraFeedback
 `BackwardsAuroraLights` (eased glow, won lift, tear cross and preview, with `u_tearLight` and `u_previewLight` in the
 aurora shader), `BackwardsAuroraSoundRecipe` and the experience's `BackwardsAuroraSound`, and the panel's values in
 words, adjustable ends, summary element, Sound toggle and Dynamic Type layout.
+
+Feature 397 (R02-G10-07) adds persistence and replay: results with winning traces and `BackwardsAuroraReconciliation`
+(replay-verified scores on restore), snapshot schema 3 with migrations from schemas 1 and 2, the replay mode
+(`replay.start`, `replay.step`, `replay.stop`) and the saved sound setting, with the panel's replay controls.

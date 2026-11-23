@@ -145,3 +145,21 @@ opening wave that already wins is refused) and the fingerprint and refuses damag
   sample and its height; the "Aurora" summary element reads the reversals left, the checkpoints, the bends and the
   section; Dynamic Type up to the accessibility sizes with rows that become columns, system colours and a 520-point
   readable width on iPad.
+
+## Persistence and replay (feature 397, R02-G10-07)
+
+- **Traces.** Every campaign or daily win stores the winning play's effective reversals (an undone reversal left out
+  unless redone; `BackwardsAuroraReconciliation.netTrace`) with the fewest reversals made (undone ones still counted)
+  and the stars; a better result replaces a worse one, ties keep the earlier trace; practice and replay record nothing.
+- **Reconciliation.** On restore every traced result is replayed on a fresh play of its certified level (campaign
+  budget) and kept only when it wins with a trace no longer than the recorded reversals made (at most 40) and stars that
+  match the stars rule; edited results are dropped, counted in `reconciliationDropped` and announced once; untraced
+  results from older saves are kept as unverified; the frontier is restored as saved.
+- **Schema 3.** `{level, mode, progress, records, sound, tutorial}` with the digest "r02-g10.backwards-aurora.v3"
+  (the sound choice and the dropped count never digested); migrations 1 → 2 → 3 (2 → 3: empty traces, unverified,
+  sound off); schema 4 or newer is refused by the shared store, which writes atomically and quarantines unreadable
+  files.
+- **Replay.** `replay.start [level]` plays the best verified trace from a fresh level, `replay.step` one reversal at a
+  time, `replay.stop` back to the campaign; every other play action is refused with `r02-g10.replay` (refusals in
+  words); a replayed win claims no stars. The panel shows "Replay best solution", then the position with Step and Stop.
+- **Settings.** The Sound toggle is saved through `settings.sound [0 … 1]` and applied when the experience opens.
