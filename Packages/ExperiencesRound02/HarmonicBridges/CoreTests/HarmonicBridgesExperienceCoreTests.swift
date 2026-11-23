@@ -916,6 +916,43 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(dropped.levelNumber == dropped.progress.frontier && dropped.progress.solved[59] == nil)
     }
 
+    /// Convergence task T-R02G1207-013: a saved replay's records must be the first actions of its verified trace; a
+    /// changed tuning or an added undo makes the payload damaged, while the honest mid-way replay restores.
+    @Test func aReplayWhoseRecordsLeaveTheTraceIsDamaged() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let generated: HarmonicBridgesGenerated = try Core.generated(number: 1)
+        for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.apply(Self.act("replay.step")) == .accepted)
+        let honest: Data = try core.snapshotPayload()
+        #expect((try? Core.restore(payload: honest, seed: 0)) != nil, "the honest mid-way replay restores")
+        let object: [String: Any] = try #require(try JSONSerialization.jsonObject(with: honest) as? [String: Any])
+
+        // The records of a campaign play of level 1 that tuned the first string to another peg, and one that tuned
+        // and undid it: neither is the trace's prefix.
+        guard case let .tune(string, peg)? = generated.actions.first else {
+            Issue.record("level 1's trace starts with a tuning")
+            return
+        }
+        var otherPeg: Int = peg == 1 ? 2 : 1
+        let fresh: Core = try await Core.prepare(seed: 0)
+        if fresh.play.pegs[string] == otherPeg { otherPeg = otherPeg == 1 ? 3 : 1 }
+        var changed: Core = fresh
+        #expect(changed.apply(Self.act("string.tune", [Double(string), Double(otherPeg)])) == .accepted)
+        var undone: Core = fresh
+        #expect(undone.apply(Self.act("string.tune", [Double(string), Double(peg)])) == .accepted)
+        #expect(undone.apply(Self.act("play.undo")) == .accepted)
+        #expect(undone.apply(Self.act("play.redo")) == .accepted)
+        for source in [changed, undone] {
+            let other: [String: Any] = try #require(
+                try JSONSerialization.jsonObject(with: try source.snapshotPayload()) as? [String: Any])
+            var edited: [String: Any] = object
+            edited["records"] = other["records"]
+            let data: Data = try JSONSerialization.data(withJSONObject: edited, options: [.sortedKeys])
+            #expect(throws: HarmonicBridgesRestoreRefusal.damaged) { _ = try Core.restore(payload: data, seed: 0) }
+        }
+    }
+
     @Test func restoreReconcilesAndKeepsTheSoundChoiceOutOfTheDigest() async throws {
         var core: Core = try await Core.prepare(seed: 0)
         #expect(!core.soundOn)

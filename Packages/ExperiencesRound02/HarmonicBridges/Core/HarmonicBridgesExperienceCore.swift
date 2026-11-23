@@ -669,6 +669,20 @@ public struct HarmonicBridgesExperienceCore: ExperienceCore, Equatable {
         if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
             throw HarmonicBridgesRestoreRefusal.damaged
         }
+        // Feature 417 (convergence task T-R02G1207-013): a saved replay's records are exactly the first actions of its
+        // level's saved trace — tunings and tests only, in order, no undo or redo — or the payload is damaged.
+        if case .replay(let replayed) = decoded.mode, let saved = decoded.progress.solved[replayed], saved.verified {
+            var applied: [HarmonicBridgesAction] = []
+            for record in decoded.records {
+                guard record.kind == .tune || record.kind == .test, let action = record.action else {
+                    throw HarmonicBridgesRestoreRefusal.damaged
+                }
+                applied.append(action)
+            }
+            guard applied.count <= saved.trace.count, Array(saved.trace.prefix(applied.count)) == applied else {
+                throw HarmonicBridgesRestoreRefusal.damaged
+            }
+        }
         do throws(HarmonicBridgesError) {
             let certified: HarmonicBridgesGenerated = try generated(number: decoded.level)
             let play: HarmonicBridgesPlay = try HarmonicBridgesPlay.replay(

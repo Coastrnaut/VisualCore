@@ -83,7 +83,7 @@ with the lead. MVP: Stories 1 and 2. Requirement coverage: FR-001/002/005/007 â†
 
 ## Phase 6: Convergence
 
-- [ ] T-R02G1207-013 Refuse as `damaged` a restored replay whose records are not exactly the first actions of its level's
+- [X] T-R02G1207-013 Refuse as `damaged` a restored replay whose records are not exactly the first actions of its level's â€” Verified 2026-11-23: Verified 2026-11-23: host-4 exit 0 (HarmonicBridgesCoreTests incl. aReplayWhoseRecordsLeaveTheTraceIsDamaged: the honest mid-way replay restores; records of a different tuning, or with an undo and redo, are refused damaged; persistence and reconciliation suites unchanged)
   verified trace (tunings and tests only, in order, no undo or redo) in
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesExperienceCore.swift`, with a test in
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesExperienceCoreTests.swift` (a replay saved
