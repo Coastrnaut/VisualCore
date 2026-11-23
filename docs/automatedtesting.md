@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G12-03: Harmonic Bridges renderer).
+Last updated: 2026-11-23 (R02-G12-04: Harmonic Bridges gestures).
 
 ## 1. What is tested, and where
 
@@ -542,6 +542,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (`host-1`, `host-2`), and every attestation's `elapsed_seconds` is read after a check: anything above about 450 s is
   split before the next gate. The one failed attempt of that gate (sim26) came from an outside
   `simctl shutdown all && simctl erase all`, not from the code.
+- **Harmonic Bridges gestures** (R02-G12-04, 2026-11-23). Host: the picker against an independent projection (500
+  seeded points × 3 sizes × 3 orbits), 500 seeded gesture scripts applied through the adapter, and all 100 levels won
+  through the panel model (`swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridges`);
+  simulator: `HarmonicBridgesGestureWiringTests`. Strings that overlap on one row of islands are exactly equidistant
+  from a touch, and floating-point rounding then picked either one; the picker and its independent oracle both keep the
+  lower index within 1e-6 points. The recorded checks of a gate cannot start before the previous gate is recorded
+  (`run-check` refuses: "not ready"), so a gate's baselines wait for that record even when its agents start earlier. The
+  wiring test also found that the panel had shown every kernel refusal as "not available": the engine reports a core's
+  refusal as `action.rule.<code>`, and the words table matched only bare codes; assert the refusal's words, not only
+  its code.
 - **Harmonic Bridges renderer** (R02-G12-03, 2026-11-23). Host: the shader-source, geometry, adapter, purity and
   scenario tests (`swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridges`); simulator:
   `HarmonicBridgesExperienceTests` (frames against the CPU reference at three tiers on five levels, fallback, resize,

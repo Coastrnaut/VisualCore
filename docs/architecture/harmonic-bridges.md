@@ -111,3 +111,25 @@ rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.m
 - **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest b832e7ee…3c737) and linked into the app
   as a candidate (`ExperienceRegistry.candidates`) until X-R02-G12; the scenario manifest holds the standard scenarios,
   `full-playthrough`, `hero`, 80 acceptance scenarios and the fixtures.
+
+## Gestures (feature 414, R02-G12-04)
+
+- **Picking.** At touch-down every target is projected through the drawn camera (orbit included) into view points: a
+  step pip whose centre lies within 22 points wins (the nearest, ties to the lower step), then the goal island's top
+  centre within 22 points, then the string whose projected segment between its islands' top centres is nearest within
+  22 points (ties to the lower string index; overlapping strings on one row of islands are exactly equidistant, so a
+  tolerance of 1e-6 points keeps the tie rule); anything else is empty space (`HarmonicBridgesPicker`).
+- **Pluck to audition.** A tap (under 10 points, lifted before 0.5 s by event timestamps) on a string chooses it in the
+  panel at its current peg and describes its resonance in the drawn step (the modes it sings and how many of its five
+  samples reach the threshold); no action is spent, in any stage.
+- **Drag the tuning peg.** A drag (16 points or more) from an unlocked string while playing previews the peg
+  current + round(upward movement / 24 points), half away from zero, clamped to 1 … 12, and tunes the string to it on
+  release when it differs (`string.tune`); a drag that ends without a tune puts the panel's peg back. A drag from a
+  locked string or on a stage other than playing only chooses the string.
+- **Tap freeze to test.** A tap on the goal island or a step pip while playing sends `crossing.test`.
+- **Orbit.** Two fingers orbit (yaw ±35° about the box centre, pitch −15° … +20°) with the field of view refitted at
+  every aspect 0.4 … 2.5; a double tap on empty space or "Reset view" returns to the authored view. Orbit, choice and
+  preview are never saved and never reach the kernel (`HarmonicBridgesGestureController`); on a won or failed play
+  gestures send no kernel action and the panel says the play is over; refusals are shown in words and logged with their
+  reason code.
+- **Panel.** Every certified level can be won with the string and peg steppers, Tune and Test alone.

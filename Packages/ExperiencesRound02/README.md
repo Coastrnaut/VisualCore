@@ -665,3 +665,9 @@ marks, membranes, pips and the moves gauge; camera; CPU reference), `HarmonicBri
 with signed-distance shading, the presentation wave of the strings and the wave shells), the adapter
 `HarmonicBridgesExperienceCore`, the scenario manifest, and the iOS target `HarmonicBridgesExperience` (presenter, bridge
 scene, control panel), registered as a candidate.
+
+Feature 414 (R02-G12-04) adds the gestures: `HarmonicBridgesOrbit` and the orbiting camera, the analytic
+`HarmonicBridgesPicker` (projected pips, goal and string segments with 22-point targets) and the host-tested
+`HarmonicBridgesGestureController` (tap a string to choose and audition it, drag up or down to tune its peg, tap the goal
+or a pip to test, double tap to reset, two-finger orbit), wired through the presenter's pointer entry with a "Reset
+view" button.
