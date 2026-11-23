@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G10-07 (migration ledger, game feature of experience R02-G10) · ID namespace FR-R02G1007-###,
 SC-R02G1007-###, T-R02G1007-###
@@ -28,6 +28,52 @@ Canonical overrides:
 - **Model:** feature 387 (Nocturne Garden's persistence and replay), including the lesson of features 377, 367, 357, 347,
   337 and 327: the saved frontier is restored as saved (raising it from the kept results would open levels for an honest
   daily win).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+387's answers where the games agree. Facts checked in code (read-only, 2026-11-23): the shared `SavedStateStore` keeps
+one `state.json` per experience, writes it atomically, moves an unreadable file aside and refuses a newer schema; the
+engine applies the experience's `MigrationChain`; Backwards Aurora's adapter writes snapshot schema 2 `{level, mode,
+progress, records, tutorial}` with a 1 → 2 step; `BackwardsAuroraProgress.Result` keeps `reversalsMade` (the play's
+reversal records, undone ones included) and `stars`; the play's records have kinds reverse, undo and redo; the controls
+are `wave.reverse`, `play.undo`, `play.redo`, `level.next`, `level.select`, `mode.daily`, `mode.practice`,
+`mode.campaign` and `tutorial.dismiss`; the presenter holds the sound choice (off by default) since R02-G10-06.
+
+- Q: What is stored for each result, and when is it written? → A: each result keeps its fewest reversals made, its stars
+  and the winning trace — the ordered effective reversals (start, end) of the play that earned it, each as the kernel
+  applied it; a reversal that was undone and not redone is left out, so the trace never contains an undo or a redo —
+  plus `verified`. Reversals made still counts every reversal record, undone ones included, as since R02-G10-05, so it
+  is at least the trace's length. A campaign or daily win replaces the stored result only when it is better (ties keep
+  the earlier trace); practice records nothing. The shared store writes at the app's save points; this feature does not
+  change when. Impact: FR-R02G1007-001, 003; SC-R02G1007-001.
+- Q: How are scores reconciled on restore? → A: for every result with a trace: the certified level is generated, a
+  fresh play (campaign budget) replays the trace (each reversal legal), and the result is kept only if the play ends
+  won, the trace's length is at most `reversalsMade`, and `stars` equals the stars rule for `reversalsMade` and the
+  level's certified smallest reversal count; otherwise it is dropped. (A lowered `reversalsMade` can never claim fewer
+  reversals than the trace proves; a raised one only worsens the score.) The adapter exposes the number dropped (never
+  in the digest) and the presenter announces it once as `state` ("n saved results could not be checked and were
+  removed.", "1 saved result could not be checked and was removed."). Results without a trace (schema 1 or 2) are kept,
+  marked unverified. The frontier is restored as saved. Impact: FR-R02G1007-003; SC-R02G1007-003.
+- Q: How do migrations work? → A: schema 3 adds the trace and `verified` to each result, the mode `replay(level)` and
+  the sound choice. 1 → 2 is the existing step; 2 → 3 copies results with an empty trace and `verified: false` and sets
+  the sound choice off. Schema 4 or newer is refused by the shared store; a damaged payload is refused with `damaged`
+  and the opening state is used. Impact: FR-R02G1007-002, 007; SC-R02G1007-002.
+- Q: How does replay work? → A: `replay.start [level]` opens mode `replay(level)` with a fresh play of that level when
+  a verified result with a trace exists (`r02-g10.no-replay` otherwise); `replay.step` applies the next reversal of the
+  trace (`r02-g10.replay-end` after the last or once the play ended); `replay.stop` returns to campaign at that level
+  (the frontier when it is not open). During replay every other play control except `tutorial.dismiss` and
+  `settings.sound` is refused with `r02-g10.replay` (the panel's section ends, the freeze preview and the camera are
+  presentation only and stay allowed); replay never changes progress; the tutorial is done during replay. The refusals
+  are shown and announced in words: "There is no saved solution to replay for this level.", "The replay is over." and
+  "Stop the replay first."; a replayed win claims no stars. Impact: FR-R02G1007-004; SC-R02G1007-004.
+- Q: Which inputs make the state deterministic, and how is the sound choice changed? → A: the seed (opening level),
+  the certified catalog (fixed planned seeds), the calendar date given to `mode.daily` and the recorded actions; the
+  state reads no clock and no random source. The sound choice is changed by `settings.sound [0 … 1]` (whole numbers; 1
+  on), stored in the snapshot, never in the digest, and applied by the presenter when the experience opens or the
+  value changes. Impact: FR-R02G1007-005, 007.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -99,7 +145,8 @@ other than stepping and stopping are refused during replay.
 - **FR-R02G1007-006**: Invalid requests MUST be refused with stable reason codes; existing tests pass; new public names
   documented; the reference regression passes.
 - **FR-R02G1007-007**: The player's settings MUST persist: the sound choice (the game's only setting of its own) is part
-  of the snapshot (not the digest) and is applied when the experience opens; migrated saves default it to off.
+  of the snapshot (not the digest), changed by `settings.sound [0 … 1]` and applied when the experience opens; migrated
+  saves default it to off.
 
 ### Key Entities
 
