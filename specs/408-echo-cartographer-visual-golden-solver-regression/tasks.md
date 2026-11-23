@@ -13,7 +13,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1108-002 [P] [US1] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G1108-002 [P] [US1] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-23: host (EchoCartographerRegressionSolverTests 15 tests, 114 cases: 100 levels in ten groups equal their witnesses, replay to a win in exactly the action count within the energy with echo digests and fingerprints, plan equals the witness's pulses, placements and counterexample with work within workBound; ten named alterations each fail naming the level and part; a refused level copy named) exit 0, lead retest
   level in ten groups of 10, "the generated level equals its witness's level; the witness's actions replay to a win in
   exactly its action count within the energy, with its per-pulse echo digests and per-action fingerprints; plan returns
   exactly the witness's pulses with its placements and placements before the last pulse, with work ≤ workBound"; ten
