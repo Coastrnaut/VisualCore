@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G11-06 (migration ledger, game feature of experience R02-G11) · ID namespace FR-R02G1106-###,
 SC-R02G1106-###, T-R02G1106-###
@@ -26,6 +26,73 @@ Canonical overrides:
   R02-G11-01 … 05.
 - **Model:** feature 396 (Backwards Aurora's polish and accessibility) for announcements, haptics, fades, sound and the
   panel's layout.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+396's answers where the games agree. Facts checked in code (read-only, 2026-11-23): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` are those feature 396 used; Echo Cartographer's pulse
+ring grows one cell per 0.1 s up to the longest ray and fades over 0.5 s, its echo rings shrink back at the same speed,
+and a struck wall's edges flare when the ring reaches it and fade over 0.5 s (a trail over 1.5 s at level-0) — all
+restarting whenever the play's last echo changes (a pulse, an undo or a redo), and drawn at rest under Reduce Motion;
+the glow limit is lower under Reduce Flashing; the won lift (0.5) appears at once when the level is won; rays, tiles,
+walls, markers, pillars and gauge bars change only with the player's actions; the adapter's refusal codes are
+`r02-g11.action`, `noop`, `stage`, `stale`, `malformed`, `locked`, `date` and `not-whole`; the presenter shows refusals
+as "That change was refused: <code>" and logs their codes; the level words cells "column x, row y: open" (or "wall",
+"unknown"), pulses "pulse from column x, row y; north: wall at 2 cells; …; echoes at 3, 7 cells" and progress "1 of 3
+beacons located, 7 energy left".
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted action (`state`), the change then the
+  progress: a pulse "Pulse from column x, row y; <the rays and echoes as the level words them>." ; a claim that locates
+  a beacon "Beacon located at column x, row y."; a missed claim "No beacon at column x, row y; m energy spent."; a marker
+  "Marker placed at column x, row y." or "Marker removed from column x, row y."; undo and redo "Undone." / "Redone.";
+  each followed by " k of n beacons located, e energy left." (the level's progress words); a win (`outcome`): "Every
+  beacon is located. Level won spending e energy, k of 3 stars." (without the stars in practice); a failure
+  (`outcome`): the failure explanation of feature 405; a level or mode change (`level`): "Level n, band b, <mode>." with
+  the tutorial instruction when shown; a refusal (`rejection`) in words: `r02-g11.locked` "That level is not open yet.",
+  `r02-g11.date` "That date cannot be used.", `r02-g11.action` "That action is not possible here.", `r02-g11.noop` "That
+  beacon is already located; claiming it again changes nothing.", `r02-g11.stage` "The level has ended.",
+  `r02-g11.not-whole` "That value must be a whole number.", any other code "That action was refused." A revealed hint is
+  announced (`state`) with its text. Cursor moves and orbit are not announced (the adjustable column and row speak their
+  own values). Texts are a pure function of the old and new core (and the refusal code), so tests compare them exactly;
+  the panel shows the same refusal text. Impact: FR-R02G1106-002; SC-R02G1106-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted pulse, claim, marker, undo or
+  redo; `success` for a win; `warning` for a failure; `error` for a refusal; cursor moves, orbit and level changes play
+  none. The shared planners' intervals apply; when one action both changes the play and ends it (the winning claim, the
+  pulse or missed claim that spends the last energy), only the outcome is planned, so an outcome is never dropped behind
+  a selection haptic. Impact: FR-R02G1106-003; SC-R02G1106-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: the presenter keeps light levels for the chamber's glow
+  (0.7 while playing, 1 once won, 0.35 once failed) and the won brightening (1 once won, else 0), each easing toward its
+  target in presentation time (0.15 s normally, 0.45 s under Reduce Flashing, linear; under Reduce Flashing a fade that
+  has started finishes before it may turn back); the scene draws the eased levels (the glow gain times the glow level,
+  the won lift times its level); the state and digest never see them. The pulse and echo rings and the wall flares
+  restart with every pulse, undo or redo, so under Reduce Flashing they are drawn at rest exactly as under Reduce Motion
+  (no rings, struck walls at their resting edge colour); the rays, tiles, walls, markers, pillars and gauge bars change
+  only with the player's actions, as feature 396's kink crosses do, and are not faded. The measure: sampling the drawn
+  levels every 1/60 s through a scripted win and adversarial flicker (a pulse undone and redone every frame, retry,
+  level changes), no element crosses half its range more than 3 times per second, and every complete one-way fade of
+  more than half the range takes at least 0.4 s under Reduce Flashing; with Reduce Flashing no ring or flare is drawn in
+  any frame. Impact: FR-R02G1106-004; SC-R02G1106-003.
+- Q: Where does the sound choice live, and what is the recipe? → A: a Sound toggle in the panel, off by default, held by
+  the presenter (presentation only; saving it is R02-G11-07). The recipe is a pure function of the energy left as a
+  share of the level's energy, the beacons located and the stage: a root at 110 Hz times (1, 9/8, 5/4, 4/3) for more
+  than three quarters of the energy left, more than half, more than a quarter, or less; one partial per located beacon,
+  up to four, at the root times (5/4, 3/2, 2, 5/2)[k − 1], each with the base gain, the root alone when none is located;
+  an added octave when won and halved gains when failed; the loop's length is the longest the shared player accepts at
+  which every partial has a whole number of cycles (tested). The presenter rebuilds the loop only when the level opens, an
+  action, undo or redo changes the located count, the root step or the stage, or the toggle turns on, never per frame.
+  The loop plays exactly while the choice is on, the controls are on screen and the scene is active. Impact:
+  FR-R02G1106-006; SC-R02G1106-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the chosen cell's
+  column and row are accessibility-adjustable elements with their labels and values in words (including what is known of
+  the cell); a summary element reads "e energy left. k of n beacons located. Last echo: <the last pulse in words, or
+  none>. Chosen cell: <the cell in words>. Level: <the level in words>."; on iPad the panel keeps a readable width (at
+  most 520 points). Impact: FR-R02G1106-001, 005; SC-R02G1106-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -105,9 +172,9 @@ a pure function of the state it is made from; the loop plays only while wanted, 
   refusals in words as `rejection`, through the shared route.
 - **FR-R02G1106-003**: Haptics MUST map selection → accepted pulse, claim, marker, undo or redo, success → win, warning →
   failure, error → refused action, through the shared route and the person's switch; they never change state.
-- **FR-R02G1106-004**: Reduce Flashing MUST cap the glow and turn every brightness change of the chamber's glow, the won
-  brightening and the wall flares into fades of at least 0.4 s, with every periodic motion below 3 cycles per second;
-  Reduce Motion MUST hold the rings and flares at rest; neither changes the state or its digest.
+- **FR-R02G1106-004**: Reduce Flashing MUST cap the glow, turn every brightness change of the chamber's glow and the won
+  brightening into fades of at least 0.4 s and draw the rings and wall flares at rest, with every periodic motion below
+  3 cycles per second; Reduce Motion MUST hold the rings and flares at rest; neither changes the state or its digest.
 - **FR-R02G1106-005**: The panel MUST support Dynamic Type up to the largest accessibility size and Increase Contrast on
   iPhone and iPad, scrolling instead of clipping.
 - **FR-R02G1106-006**: An optional ambient sound MUST be synthesized in code from the beacons located, the energy left
@@ -119,7 +186,7 @@ a pure function of the state it is made from; the loop plays only while wanted, 
 
 - **Announcement plan**: kind and text for each state change.
 - **Haptic plan**: kind for each outcome of an action.
-- **Light levels**: the chamber's glow, the won brightening and the wall flares, eased in presentation time.
+- **Light levels**: the chamber's glow and the won brightening, eased in presentation time.
 - **Ambient recipe**: partials (frequencies, gains) derived from the beacons located, the energy left and the stage.
 
 ## Success Criteria *(mandatory)*
