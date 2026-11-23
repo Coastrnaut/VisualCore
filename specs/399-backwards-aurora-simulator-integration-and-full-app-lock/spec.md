@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G10-09 (migration ledger, game feature of experience R02-G10) · ID namespace FR-R02G1009-###,
 SC-R02G1009-###, T-R02G1009-###
@@ -23,6 +23,54 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 389 (Nocturne Garden's simulator integration and full app lock).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+389's answers. Facts checked in code (read-only, 2026-11-23): feature 389 (Nocturne Garden) is the model
+(`Apps/VisualCore/Tests/UI/NocturneGarden`, namespace `NG`, serial chunk `r3`; identifiers through
+`port.identifier(name)`; `NocturneGardenSchemaExamples.swift`); Backwards Aurora's panel (`BackwardsAuroraControls`)
+has labels and values on every control (feature 396) but no identifiers, with two Undo buttons (the play row's and the
+failure section's), adjustable steppers for the section's start and end and the level, Reverse, the replay controls
+and the Sound toggle; its registration in `Apps/VisualCore/App/ExperienceRegistry.swift` still says "Snapshot schema 1,
+so no earlier example is stored yet" although the snapshot is schema 3 since feature 397; the panel's "Aurora" element
+carries the summary and, when won, the canvas description says "Every checkpoint matches and every bend is within the
+limit." followed by "Stars: k of 3."; the UI chunk keys in `release_check.py` end at `r3` (no `s3`); no `BA`
+namespace exists among the UI test folders.
+
+- Q: How do the interface tests find controls and what do they read? → A: every panel control gets the identifier
+  `experience.r02-g10.backwards-aurora.<name>` through `port.identifier(name)`: the buttons `reverse`, `undo`, `redo`,
+  `next-level`, `reset-view`, `hint`, `dismiss-tutorial`, `failure-undo`, `retry`, `campaign`, `daily`, `practice`,
+  `play-level`, `replay`, `replay-step`, `replay-stop`, the steppers `start-picker`, `end-picker` and `level-picker`,
+  the toggle `sound` and the summary element `summary` (the "Aurora" element). The tests read the canvas description for
+  the level, the win and the stars, and the replay step's value for the replay position. Impact: FR-R02G1009-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `BA` in
+  `Apps/VisualCore/Tests/UI/BackwardsAurora/BASupport.swift`; `BAPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g10.backwards-aurora`: dismiss the tutorial, play level 1's certified
+  solution by setting the start and end steppers and tapping Reverse for each reversal; read "Every checkpoint matches
+  and every bend is within the limit" and "Stars: 3 of 3", the level picker shows level 2 open; relaunch without reset
+  after sending the app to the background: the stars and level 2 are kept) and `BAReplayUITests` (after the win, Replay
+  best solution, Step until the replay ends won, Stop back to the campaign). They run as a new serial chunk `s3` of
+  `release_check.py` (its key checked unique); each test stays under 90 s apart from the simulator's automation-session
+  setup of each app launch (feature 389's lesson: about 30 s per launch, and a relaunch test launches twice). Level 1's
+  certified reversals are pinned in `BA` and checked against the Core by an app unit test. Impact: FR-R02G1009-002,
+  007; SC-R02G1009-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `BackwardsAuroraExperienceCore.schemaOneExample()` (the schema-1 saved state of a seeded play of level 1 with one
+  reversal that does not win) and `schemaTwoExample()` (schema 2 with progress and level 1 solved, no trace), both
+  `MigrationExample`s built in the Core (`BackwardsAuroraSchemaExamples.swift`, modelled on
+  `NocturneGardenSchemaExamples`), registered with `examples:`; the app's migration check restores both into schema 3
+  with progress kept (a schema-2 result without a trace keeps its stars, as feature 397 reconciles). The registration's
+  comment is corrected. Impact: FR-R02G1009-003; SC-R02G1009-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `BackwardsAuroraGolden` is forbidden by feature 398, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G1009-004;
+  SC-R02G1009-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g10.backwards-aurora` as not available and the launcher cannot open it; the registry's candidates list contains
+  it and `all` does not. Impact: FR-R02G1009-006; SC-R02G1009-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -101,7 +149,9 @@ solver regression proves all 100 levels solvable as certified.
 ### Measurable Outcomes
 
 - **SC-R02G1009-001**: The interface tests win level 1, keep progress over a relaunch and replay a solved level; each
-  test finishes in under 90 seconds on the simulator.
+  test finishes in under 90 seconds on the simulator, not counting the simulator's automation-session setup of each app
+  launch (about 30 s per launch, measured for feature 389's chunk `r3`; a relaunch test launches twice), and within the
+  app's 180-second per-test allowance.
 - **SC-R02G1009-002**: The app unit tests restore both earlier-schema examples and open the candidate; the candidate is
   not listed as available.
 - **SC-R02G1009-003**: Debug and release simulator builds of the app succeed.
