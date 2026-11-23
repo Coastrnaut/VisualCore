@@ -123,7 +123,7 @@ that grows and stays readable, and controls that stay usable.
 shells and brightening bridges are moving, bright subjects.
 
 **Independent Test**: with Reduce Flashing, no faded element changes brightness more than three times a second, no wave
-shell is drawn and the glow stays capped; with Reduce Motion, the strings are at rest and the shown step is held; the
+shell is drawn, the shown step is held and the glow stays capped; with Reduce Motion, the strings are at rest and the shown step is held; the
 panel lays out at the largest accessibility text size without clipping the controls.
 
 **Acceptance Scenarios**:
@@ -176,8 +176,9 @@ ambient recipes are pure functions of the state they are made from; sound plays 
 - **FR-R02G1206-003**: Haptics MUST map selection → accepted tuning, test, undo or redo, success → win, warning →
   failure, error → refused action, through the shared route and the person's switch; they never change state.
 - **FR-R02G1206-004**: Reduce Flashing MUST cap the glow, turn every brightness change of the glow, the bridges and the
-  won brightening into fades of at least 0.4 s and draw no wave shells, with every periodic motion below 3 cycles per
-  second; Reduce Motion MUST hold the strings at rest and the shown step; neither changes the state or its digest.
+  won brightening into fades of at least 0.4 s, hold the shown step and the strings at rest and draw no wave shells,
+  with every periodic motion below 3 cycles per second; Reduce Motion MUST hold the strings at rest and the shown step;
+  neither changes the state or its digest.
 - **FR-R02G1206-005**: The panel MUST support Dynamic Type up to the largest accessibility size and Increase Contrast on
   iPhone and iPad, scrolling instead of clipping.
 - **FR-R02G1206-006**: A plucked string's audition and an optional ambient sound MUST be synthesized in code — the
