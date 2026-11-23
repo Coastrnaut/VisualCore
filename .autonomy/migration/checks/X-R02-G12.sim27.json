@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g12.harmonic-bridges",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g12.harmonic-bridges --runtime 27",
+  "elapsed_seconds": 322.344,
+  "exit_code": 0,
+  "finished": "2026-11-23T22:30:12+00:00",
+  "gate": "X-R02-G12",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G12.sim27.log",
+  "log_sha256": "c52fa127b9ae0ae3195bf7095aa0fc78da50df0ee46adf5a8d0074402e5326ed",
+  "name": "sim27",
+  "started": "2026-11-23T22:24:49+00:00",
+  "timed_out": false
+}
