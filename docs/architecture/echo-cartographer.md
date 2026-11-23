@@ -153,3 +153,18 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g11.malformed`, `.
 - **Panel.** Every control has a label and a value in words; the column and row steppers are adjustable and name the
   cell and what is known of it; a summary element reads the energy, the beacons located, the last echo, the chosen cell
   and the level; rows become columns at accessibility text sizes and the panel is at most 520 points wide.
+
+## Persistence and replay (feature 407, R02-G11-07)
+
+- **Saves.** Snapshot schema 3 `{level, mode, progress, records, sound, tutorial}` in the app's shared saved-state store
+  (atomic writes, unreadable files moved aside, newer schemas refused); migrations 1 → 2 → 3 (2 → 3: results without
+  traces, unverified, sound off). Digest v3 adds the traces with the progress; the sound choice and the dropped count
+  never enter it.
+- **Reconcilable scores.** A campaign or daily win stores its trace — the effective pulses, claims and marks of the
+  winning play (`EchoCartographerReconciliation.netTrace`, an undone action left out unless redone) — as a verified
+  result. On restore every traced result is replayed on its certified level and kept only when it wins, the energy it
+  spends is at most the recorded energy spent and the stars match the rule; dropped results are counted and announced
+  once; the frontier is kept as saved.
+- **Replay.** `replay.start [level]` replays the best stored solution action by action (`replay.step`, `replay.stop`);
+  other play actions are refused with "Stop the replay first."; a replayed win records nothing.
+- **Settings.** `settings.sound [0 … 1]` saves the sound choice in the snapshot; the presenter applies it on opening.

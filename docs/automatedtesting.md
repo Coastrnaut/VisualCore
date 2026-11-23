@@ -395,6 +395,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   and INV-10 failing in their copies; the shared test file is the lead's, so the lead added the picker, the freeze
   preview and the controller to the set in one edit before retesting. Name every new presentation file in the task that
   creates it.
+- **A new Core enum case can break only the iOS build** (R02-G11-07, 2026-11-23). Adding `replay(level:)` to Echo
+  Cartographer's mode passed every host test, but the experience target's panel switches over the mode for its button
+  values, and the host run never compiles the iOS-only experience targets. Land the experience's switch in the same task
+  or run the simulator suite before ticking the Core task, so a host-green commit cannot leave the app unbuildable.
 - **Eased lights need moving frame times in stills** (R02-G11-06, 2026-11-23). Once Echo Cartographer's won brightening
   eased in over presentation time, an earlier render test that took two stills at the default time 0 saw no change:
   the lights step by the frame time, so the fade never advanced. Take the "after" still at a later time (10 s, past every

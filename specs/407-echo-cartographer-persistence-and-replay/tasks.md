@@ -62,7 +62,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G1107-006 Docs: `docs/architecture/echo-cartographer.md` (persistence and replay),
+- [X] T-R02G1107-006 Docs: `docs/architecture/echo-cartographer.md` (persistence and replay), — Verified 2026-11-23: round02-host (swift test --package-path Packages/ExperiencesRound02, 337 s) exit 0; architecture doc persistence and replay, ExperiencesRound02 README feature 407, testing doc lesson (a new Core enum case can break only the iOS build); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1107-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

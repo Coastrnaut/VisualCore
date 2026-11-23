@@ -625,3 +625,8 @@ Feature 406 (R02-G11-06) adds polish and accessibility: `EchoCartographerFeedbac
 `EchoCartographerLights` (eased glow and won brightening; rings and flares at rest under Reduce Flashing),
 `EchoCartographerSoundRecipe` with the experience's `EchoCartographerSound` loop, and the panel's labels, values,
 adjustable column and row, summary element, Sound toggle and Dynamic Type layout.
+
+Feature 407 (R02-G11-07) adds persistence and replay: results carry their winning traces
+(`EchoCartographerReconciliation` replays them on restore and drops what does not verify), snapshot schema 3 with
+migrations from 1 and 2, the replay mode (`replay.start`, `replay.step`, `replay.stop`) and the saved sound choice
+(`settings.sound`), with the panel's replay controls.
