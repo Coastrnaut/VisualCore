@@ -323,7 +323,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 378 (R02-G08-08): Faceted Forge's golden frames, test builds only.
                      "FacetedForgeGolden",
                      # Feature 388 (R02-G09-08): Nocturne Garden's golden frames, test builds only.
-                     "NocturneGardenGolden"]
+                     "NocturneGardenGolden",
+                     # Feature 398 (R02-G10-08): Backwards Aurora's golden frames, test builds only.
+                     "BackwardsAuroraGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:

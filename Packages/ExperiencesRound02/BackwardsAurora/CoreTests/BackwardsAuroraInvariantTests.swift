@@ -253,6 +253,9 @@ import VisualCoreSimulation
         // Feature 396 (R02-G10-06): the eased lights and the ambient sound recipe (Doubles, VisualCoreAudioDSP);
         // presentation only, covered by their own tests.
         "BackwardsAuroraLights.swift", "BackwardsAuroraSoundRecipe.swift",
+        // Feature 398 (R02-G10-08): the golden frame descriptions (projected pixel positions in Doubles; debug and
+        // automation builds only, forbidden in the Release binary); presentation only, covered by their own tests.
+        "BackwardsAuroraGolden.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, without the presentation

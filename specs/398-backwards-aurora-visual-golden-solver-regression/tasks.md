@@ -23,7 +23,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1008-003 [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G1008-003 [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-23: golden exit=0 (BackwardsAuroraGolden: 16 frames, levels 1, 21, 41, 61, 81 at tiers 0-2 after min(smallest - 1, 2) certified reversals plus the hero frame, described at 1,152 x 768 with ribbon sample points and ring centres in 1/8 px, kinks, tear, spent, budget, tier detail and ten palette colours, SHA-256; golden-frames.json generated with BACKWARDS_AURORA_WRITE_GOLDEN=1; the invariant scan lists the golden source as presentation; BackwardsAuroraGolden added to RELEASE_FORBIDDEN in scripts/release_check.py)
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at time 0 after the witness's first min(smallest − 1, 2) reversals, plus the
   hero frame at tier 0; at 1,152 × 768 with the authored camera: every ribbon sample point (wave order) and checkpoint
   ring centre (checkpoint order), positions rounded to 1/8 px and an off-screen point null; the kink count; the tear

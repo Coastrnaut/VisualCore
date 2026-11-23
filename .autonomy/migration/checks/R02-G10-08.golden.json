@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "BackwardsAuroraInvariant|BackwardsAuroraScenarios"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'BackwardsAuroraInvariant|BackwardsAuroraScenarios'",
+  "elapsed_seconds": 9.744,
+  "exit_code": 0,
+  "finished": "2026-11-23T07:13:01+00:00",
+  "gate": "R02-G10-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G10-08.golden.log",
+  "log_sha256": "b34edc9d91c6d3a98454e9a5a818768e3b9ddd31a93f6b0ab774ef580a08ac02",
+  "name": "golden",
+  "started": "2026-11-23T07:12:51+00:00",
+  "timed_out": false
+}
