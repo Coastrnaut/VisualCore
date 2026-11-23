@@ -32,7 +32,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 3: Stories 1 to 3 — pluck, drag the peg, tap freeze (P1) 🎯
 
-- [ ] T-R02G1204-003 [US1] [US2] [US3] Create
+- [X] T-R02G1204-003 [US1] [US2] [US3] Create — Verified 2026-11-23: Verified 2026-11-23: host-3 exit 0 (HarmonicBridgesGestureControllerTests 7: 500 seeded scripts in 12 kinds on levels 1/50/100 (opening, tuned, paused, won, failed) and a locked-string level, 3 views and 3 orbits, against an independent expectation, every tune and test applied through the adapter and accepted; finished plays, second fingers and cancels send no kernel action and leave the digest; preview rounding and clamping; tap and drag thresholds; orbit re-base and clamps; double tap); agent C retested by the lead
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesGestureController.swift`
   (FR-R02G1204-001 … 003, 005; SC-R02G1204-001 … 003; `HarmonicBridgesGestureAction` choose(string, peg), preview(string, peg), tune(string, peg), test, resetView; states
   idle, stringPress, pegDrag, targetPress, orbiting, cancelled; a tap (< 10 points, lifted before 0.5 s) on a string:
