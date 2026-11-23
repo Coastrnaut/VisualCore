@@ -58,7 +58,7 @@ change (the shaders and reference of R02-G09-03 are unchanged and re-proven by t
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G0909-007 Docs: `docs/architecture/nocturne-garden.md` (in-app integration),
+- [X] T-R02G0909-007 Docs: `docs/architecture/nocturne-garden.md` (in-app integration), — Verified 2026-11-22: round02-host exit 0; script-tests exit 0 (run alone); architecture in-app integration, package README, testing lesson (per-launch automation-session setup; xcodegen before new UI test files); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name script-tests`
   (alone)
 - [ ] T-R02G0909-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

@@ -526,3 +526,7 @@ Feature 388 (R02-G09-08) adds the regression net: solver and witness checks for 
 alterations, `NocturneGardenGolden` (test builds only) with 16 pinned golden frame descriptions in
 `NocturneGarden/golden-frames.json` (`NOCTURNE_GARDEN_WRITE_GOLDEN=1` rewrites them), simulator golden-frame and memory
 tests, a CI step and `scripts/nocturne_garden_regression.py`.
+
+Feature 389 (R02-G09-09) adds the in-app integration: identifiers on every panel control, the schema-1 and schema-2
+examples (`NocturneGardenSchemaExamples`) stored by the app registration, app unit tests, and the interface tests
+`NGPlayUITests` and `NGReplayUITests` (serial chunk `r3`).

@@ -202,3 +202,21 @@ Presentation only: no state, digest or snapshot field changes (schema 2 stays).
   after each close and memory warning.
 - **Where it runs.** CI's host job has a named "Nocturne Garden regression (host)" step; locally,
   `python3 scripts/nocturne_garden_regression.py` runs the host and simulator parts with one summary line each.
+
+## In-app integration (feature 389, R02-G09-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g09.nocturne-garden.<name>`
+  (`NocturneGardenControls.identifierNames`, 29 names: plant, move, resize, remove, set-sun, undo, redo, next-level,
+  reset-view, hint, dismiss-tutorial, failure-undo, retry, campaign, daily, practice, play-level, replay, replay-step,
+  replay-stop, kind-picker, column-picker, row-picker, size-picker, bloom-picker, sun-picker, level-picker, sound,
+  summary).
+- **Interface tests.** `NGPlayUITests` wins level 1 through the panel (its certified solution: a tulip at column 4 and a
+  star at column 11, both size 2 on row 0, each set by stepping the kind, column, row and size pickers from their
+  current values and tapping Plant: "The shadow matches the target.", "Stars: 3 of 3.", level 2 open) and keeps the
+  progress over a relaunch; `NGReplayUITests` replays the win (two moves) to its end and stops. They run as serial
+  chunk `r3`, each under 90 s apart from the simulator's automation-session setup per launch. Level 1's certified moves
+  and the pickers' starting picks are pinned in `NG` and checked against the Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`NocturneGardenSchemaExamples`), which
+  the app restores into schema 3 (a schema-2 result without a trace is kept, unverified); Nocturne Garden stays a
+  candidate (not available without `-vcCandidates`) until X-R02-G09.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
