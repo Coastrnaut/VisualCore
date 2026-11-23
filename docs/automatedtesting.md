@@ -259,7 +259,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   failed once by 0.0001 (square preset within8 0.9695 against a required floor − 0.01 = 0.9696) in a gate that touched
   only game logic; the rerun passed at 0.9752 against 0.9675. The threshold is measured from three engine runs in the same
   process, so a near-miss on the simulator is run-to-run variance: rerun the chunk under a new check name
-  (`reference-2-2`), keep the failed attempt in the evidence, and investigate only a repeated or larger miss.
+  (`reference-2-2`), keep the failed attempt in the evidence, and investigate only a repeated or larger miss. A second,
+  larger miss came at R02-G12-04 (`projectm-reference-ios27`, within8 0.9685 against a floor of 0.979) while an
+  outside device test run was using xcodebuild; the rerun passed. Check `pgrep -fl xcodebuild` before the reference
+  chunks and rerun once; two misses in a row would be investigated.
 - **Certify by a lower bound, not by enumeration** (R02-G06-02, 2026-11-21). Chrono Constellator's timelines (phases
   and holds) are too many to enumerate, so the solver proves its count with an argument (each edit moves one star) and a
   collision-free witness; the tests check it with an independent brute force kept small enough for 10 s (phase-only
