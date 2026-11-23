@@ -96,3 +96,9 @@ will consume).
 against the play contract in contracts/api.md; shared files (package, error, dynamics, level, fixtures, docs) stay with
 the lead. MVP: Story 1. Requirement coverage: FR-001, 009, 013 → 002; FR-002, 003, 014 → 002, 003; FR-004 … 008, 011 →
 004; FR-010 → 005; FR-012 → 006; SC-001 … 005 → 002 … 006; SC-006 → 007 … 011.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G1301-013 Align `specs/421-acoustic-constellator-playable-rule-kernel/data-model.md` (the play's links are
+  kept sorted by star indices, fixed and placed together, which decides the link a `disconnected` failure names; label
+  and match are computed when read) with `AcousticConstellatorPlay` per plan: data-model (contradicts)
