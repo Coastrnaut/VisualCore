@@ -38,7 +38,7 @@ will consume).
 
 ## Phase 3: Story 1 — link stars until they cohere as the symbol (P1) 🎯
 
-- [ ] T-R02G1301-003 [P] [US1] Create
+- [X] T-R02G1301-003 [P] [US1] Create — Verified 2026-11-23: host-2 (AcousticConstellatorDynamicsTests 10 tests: independent reference — coupling from rounded sine, exhaustive exact comparison over 1.27M triples with rational sqrt3 bounds, ticks and order parameter on 500 levels within 1e-9, connectivity by relaxation, listens re-implemented from the spec, labels by brute force and under relabelling, hand cases) exit 0, lead retest
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorDynamicsTests.swift` (agent A: the
   coupling table equals 2·sin(πd/6) rounded; on 500 seeded levels, links and starting phases, every tick equals an
   independent step (pulls recomputed from the rounded sine, the step clamped), every order parameter equals
