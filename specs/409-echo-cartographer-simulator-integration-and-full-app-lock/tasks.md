@@ -35,7 +35,7 @@ change (the shaders and reference of R02-G11-03 are unchanged and re-proven by t
   --destination sim-27.2 --action test --only-testing EchoCartographerExperienceTests`
 - [ ] T-R02G1109-004 [US1] Create `Apps/VisualCore/Tests/UI/EchoCartographer/ECGSupport.swift`, `ECGPlayUITests.swift`,
   `ECGReplayUITests.swift` (agent C: spec Clarifications Q2; level 1 certified actions and the cursor's starting cell (the
-  entry, column 0, row 3) pinned in `ECG`; each action played by stepping the column and row steppers from the cursor's
+  entry, column 0, row 3) and the chamber size (6 × 6) pinned in `ECG`; each action played by stepping the column and row steppers from the cursor's
   cell to the action's cell (reading each value), then Pulse or Claim; read "Every beacon is located" and "Stars: 3 of
   3"; background before terminate on relaunch); edit `scripts/release_check.py` (`UI_CHUNKS["t3"]`, `"t3"` in `SERIAL_CHUNKS`) and
   `scripts/test_scripts.py` (agent D; the key `t3` checked unique among the keys); `project.yml` + `xcodegen generate`
@@ -45,8 +45,8 @@ change (the shaders and reference of R02-G11-03 are unchanged and re-proven by t
 
 - [ ] T-R02G1109-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
-  `-vcCandidates` it is not available and not openable; `ECG`'s pinned level 1 certified actions and the
-  cursor's starting cell (the convergence lesson of feature 319) equal the Core's); `--name app-unit -- python3
+  `-vcCandidates` it is not available and not openable; `ECG`'s pinned level 1 certified actions, the
+  cursor's starting cell and the chamber size (the convergence lesson of feature 319) equal the Core's); `--name app-unit -- python3
   scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`
 
 ## Phase 5: Story 3 — builds and solvability (P2)
