@@ -38,7 +38,7 @@ in this feature (the wave and its bends are the CPU reference the renderer of R0
 
 ## Phase 4: Stories 2 and 3 — tear, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G1001-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraPlay.swift`
+- [X] T-R02G1001-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraPlay.swift` — Verified 2026-11-22: host-3 (25 tests incl. BackwardsAuroraPlayTests 11: stage table; 500 fixtures win on the exact last reversal with metrics vs an independent computation; win on the last reversal of the budget; hand seam bends: B survives, B+1 tears, lowest seam named, tear on reversal 2 names reversal 1; budget 1…5 on the exact reversal, undo from failed and redo; every refusal in order; exact undo/redo fingerprints; 500 seeded traces replay and tampered records refused) exit 0, lead retest. Tear-beats-win is vacuous (B ≥ L: a torn wave is never smooth); tested as a tearing reversal matching every checkpoint
   (agent B: stages "loading, tutorial, playing, paused, won, failed, result"; `reverse(start, end)` validated in the
   order stage, previous fingerprint, range and length, no-op; each accepted reversal spends one; after a reversal tear
   (first seam position beyond B, ascending), then win, then budget; failures tear (move, seam) and budget; records with
