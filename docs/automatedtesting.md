@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G11-02: Echo Cartographer content pipeline; measure filters with a prototype).
+Last updated: 2026-11-23 (R02-G11-03: Echo Cartographer renderer; depth-off painter order).
 
 ## 1. What is tested, and where
 
@@ -494,6 +494,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (`host-1`, `host-2`), and every attestation's `elapsed_seconds` is read after a check: anything above about 450 s is
   split before the next gate. The one failed attempt of that gate (sim26) came from an outside
   `simctl shutdown all && simctl erase all`, not from the code.
+- **Echo Cartographer renderer** (R02-G11-03, 2026-11-23). Host: the shader-source, geometry, adapter, purity and
+  scenario tests (`swift test --package-path Packages/ExperiencesRound02 --filter EchoCartographer`); simulator:
+  `EchoCartographerExperienceTests` (frames against the CPU reference at three tiers, fallback, resize, Reduce Motion,
+  an energy failure). The shared `ShaderMeshRenderer` allows depth testing only with a depth buffer, which the offscreen
+  and host framebuffers may lack, so a 3D chamber is drawn depth-off in painter's order (flat layers, then solids back to
+  front, each row from the outside in) and the geometry tests check the order and the outward winding. glslangValidator
+  is not installed here; GLSL compiles are proven by the simulator run.
 - **Echo Cartographer content pipeline** (R02-G11-02, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
   --filter EchoCartographer` (86 tests, about 7 s): all 100 levels generated and certified, witness files compared byte
   for byte in 20 groups (regenerate only with `ECHO_CARTOGRAPHER_WRITE_WITNESSES=1`), the pinned digest, and a brute

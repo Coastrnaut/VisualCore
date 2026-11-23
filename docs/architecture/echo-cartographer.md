@@ -72,3 +72,28 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g11.malformed`, `.
 - **Catalog.** `PuzzleCatalog<EchoCartographerRules>.digest(id: "echo-cartographer", …)` over the 100 fingerprints is
   pinned; the standard progression rule holds on the witness pulse count; an independent brute force (relaxed path
   lengths, every subset) re-checks the proof on the two smallest regions of each band.
+
+## Hero renderer and experience (feature 403, R02-G11-03)
+
+- **Scene.** The chamber floor is the plane y = 0; with s = 1.8 / max(W, H), cell (x, y) is centred at
+  X = (x + 0.5 − W / 2)·s, Z = (y + 0.5 − H / 2)·s. Only what the player knows is drawn: opal floor tiles on known open
+  cells, the entry diamond, marker rings, known walls as dark blocks 0.92·s wide and 0.5·s high with sonar-mint edge
+  strips, located beacons as cyan pillars and the energy gauge in front of the chamber; unknown cells show the abyss
+  ground and unlocated beacons are never drawn (`EchoCartographerSceneSnapshot` holds neither). The last pulse adds its
+  rays, an expanding cyan pulse ring (one cell per 0.1 s), echo rings that return at each echo's delay and a flare on
+  every wall it struck when the ring reaches it (`EchoCartographerSceneGeometry`, `EchoCartographerShaders`).
+- **Order and shading.** Depth testing is off (the shared mesh renderer's path): the flat layers come first, then the
+  blocks and pillars back to front by row from the far side (each row from the outside in, for the centred camera),
+  then the gauge; tiles, rings and edges are shaded by signed distance from per-vertex local coordinates.
+- **Tiers.** level-0: rings, flare trails and two glow shells; level-1: rings and one shell; level-2: none. Cells,
+  markers, pillars, rays, colours and the gauge are identical at every tier; the presenter logs tier changes.
+- **Camera.** A fixed authored view from above and in front (eye (0, 2.4, 1.9)) fitted to the box x −1 … 1,
+  z −1 … 1.1, y 0 … 0.8 with a 5 % margin for aspects 0.4 … 2.5.
+- **Adapter.** `EchoCartographerExperienceCore` opens certified level (seed mod 100) + 1 from its table of certified
+  candidates and accepts `cell.pulse`, `cell.claim`, `cell.mark` [x, y], `play.undo`, `play.redo` and `level.next`; its
+  digest is the level number and the play fingerprint; snapshot schema 1 `{level, records}`.
+- **Fallback and settings.** A shader failure draws the level-2 geometry unlit and keeps the reason; Reduce Motion draws
+  the rings and flares at rest; Reduce Flashing caps the glow.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest a32a593b…dca9) and linked into the app
+  as a candidate (`ExperienceRegistry.candidates`) until X-R02-G11; the scenario manifest holds the standard scenarios,
+  `full-playthrough`, `hero`, 80 acceptance scenarios and three fixtures.

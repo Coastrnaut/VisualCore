@@ -87,7 +87,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1103-007 Docs: `docs/architecture/echo-cartographer.md` (renderer and experience),
+- [X] T-R02G1103-007 Docs: `docs/architecture/echo-cartographer.md` (renderer and experience), — Verified 2026-11-23: round02-host (swift test --package-path Packages/ExperiencesRound02, 334 s) exit 0, 2026-11-23; architecture renderer and experience, package README feature 403, testing doc entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1103-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

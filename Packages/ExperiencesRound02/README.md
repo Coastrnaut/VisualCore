@@ -603,3 +603,9 @@ Feature 402 (R02-G11-02) adds the content pipeline: the 100-entry `EchoCartograp
 seeded `EchoCartographerGenerator`, `EchoCartographerSolver` (fitting beacon placements counted by a pruned enumeration;
 a greedy pulse plan until exactly one placement fits), `EchoCartographerDifficulty`, `EchoCartographerWitness` and the
 100 witness files in `docs/games/echo-cartographer/levels/`, with the pinned catalog digest.
+
+Feature 403 (R02-G11-03) adds the hero renderer and the experience: `EchoCartographerSceneSnapshot` (palette, tiers;
+only what the player knows), `EchoCartographerSceneGeometry` (chamber meshes, camera, CPU reference),
+`EchoCartographerShaders` (chamber and glow programs with signed-distance shading and the pulse, echo rings and wall
+flares), the adapter `EchoCartographerExperienceCore`, the scenario manifest, and the iOS target
+`EchoCartographerExperience` (presenter, chamber scene, control panel), registered as a candidate.
