@@ -59,7 +59,8 @@ and the geometry "swept strings and radial wave-shell strip meshes".
   shown step as a membrane strip 0.05 wide beneath it; on each string the five samples k = 1 … 5 at u = k / 6 as marks
   0.02 wide at y = 0.11, a filled square when the kernel's swing E(k) reaches the threshold and a hollow ring when it
   does not; every island the start reaches in the shown step lit with a glow ring; the window's steps as a row of pips
-  at z = 0.8 (filled for the shown step, outlined otherwise, a cross on a broken step) and the moves gauge, a row of
+  at z = 0.8, y = 0 (squares 0.06 wide spread evenly from x = −0.3 to 0.3; filled for the shown step, outlined
+  otherwise, a cross on a broken step; corrected at the checklist, 2026-11-23: the pips' extent and size were added) and the moves gauge, a row of
   `budget` bars at z = 0.95, y = 0, spread evenly from x = −0.9 to 0.9 (each 1.8 / budget wide with a gap of a fifth of
   that, 0.05 deep), lit for the actions left. The shown step cycles every 1.2 s of presentation time while playing
   (a test or a win shows every step in turn as well); at time 0 it is step 0. Depth testing is off (the shared mesh
@@ -69,8 +70,9 @@ and the geometry "swept strings and radial wave-shell strip meshes".
   (0, 0, 0.1)) fitted to the box x −1 … 1, z −0.7 … 1.0, y 0 … 0.2 with a 5 % margin for aspect 0.4 … 2.5. Nothing drawn
   is consulted by the rules; the drawn wave never replaces the kernel's exact swing. Impact: FR-R02G1203-001, 002, 003,
   006.
-- Q: What do the three quality tiers change? → A: `level-0` (richest): strings swing, 2 radial wave shells (strip rings
-  expanding from each resonating string's midpoint over 1.6 s) and 2 glow shells around membranes and reached islands;
+- Q: What do the three quality tiers change? → A: `level-0` (richest): strings swing, 2 radial wave shells (strip rings 0.01
+  wide expanding from each resonating string's midpoint from radius 0 to 0.15 over 1.6 s, at y = 0.1; corrected at
+  the checklist, 2026-11-23: the shells' size was added) and 2 glow shells around membranes and reached islands;
   `level-1`: strings swing, no wave shells, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): strings at rest
   (straight), no shells, no glow. Islands, strings, membranes, marks, pips, gauge, colours and positions are the same at
   every tier. Levels are ordered richest first; the presenter logs each tier change with its reason. Impact:
