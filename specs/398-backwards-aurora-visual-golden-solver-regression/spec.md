@@ -190,8 +190,9 @@ simulator parts and reports one summary.
 
 - **SC-R02G1008-001**: All 100 levels replay their witnesses and re-solve to their certified smallest reversal count with
   the witness's reversals, within the solver's work bound; 100 of 100.
-- **SC-R02G1008-002**: Each kind of alteration (a level's opening wave, budget, bend limit, breaking limit,
-  target or checkpoints; a witness reversal; a stored smallest count or digest) is detected and named.
+- **SC-R02G1008-002**: Each of the ten kinds of alteration of clarification Q2 (a level's target sample, checkpoint,
+  budget, bend limit or breaking limit; a solution reversal; a witness reversal, per-reversal digest or per-reversal
+  fingerprint; the stored smallest reversal count) is detected and named.
 - **SC-R02G1008-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry (equal digest, or
   within one 1/8-pixel quantum with equal colours).
