@@ -66,7 +66,7 @@ will consume).
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1301-005 [P] [US4] Create
+- [X] T-R02G1301-005 [P] [US4] Create — Verified 2026-11-23: host-4 (AcousticConstellatorRules 4 tests: initial position, move order, 200 seeded walks agree with the play step by step, terminal positions) exit 0, lead retest
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorRules.swift` (agent C: `PuzzleRules`: State
   = position (links, phases, actions spent, outcome), Move = AcousticConstellatorAction; legal moves while playing "every
   valid link (pair order), every valid unlink (pair order), every nudge (star, then −1, +1), then the listen") with
