@@ -80,7 +80,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 405
 
 - [X] T-R02G1205-006 Docs: `docs/architecture/harmonic-bridges.md` (teaching and progression), — Verified 2026-11-23: Verified 2026-11-23: round02-host exit 0 (swift test --package-path Packages/ExperiencesRound02, 344.7 s); architecture doc teaching and progression section, ExperiencesRound02 README, testing doc lesson (level.next needs an open level; digests include progress)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1205-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1205-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: Verified 2026-11-23: rendering-27, rendering-26, experiences, host-full, app-unit exit=0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1205-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1205-009 Reference regression chunk 2 (`--name reference-2`)
