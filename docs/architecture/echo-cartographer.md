@@ -189,3 +189,21 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g11.malformed`, `.
   alone (measured growth 0.86 MB) and leave the chamber scene with no GPU objects after every close and memory warning.
 - **Running it.** `python3 scripts/echo_cartographer_regression.py` runs the host part and the simulator classes with one
   summary line per part; CI runs the host part as "Echo Cartographer regression (host)".
+
+## In-app integration (feature 409, R02-G11-09)
+
+- **Identifiers.** Every panel control carries `experience.r02-g11.echo-cartographer.<name>`
+  (`EchoCartographerControls.identifierNames`, 23 names: pulse, claim, mark, undo, redo, next-level, reset-view, hint,
+  dismiss-tutorial, failure-undo, retry, campaign, daily, practice, play-level, replay, replay-step, replay-stop,
+  column-picker, row-picker, level-picker, sound, summary).
+- **Interface tests.** `ECGPlayUITests` wins level 1 through the panel (its certified actions: pulses from column 0, row
+  3 and column 0, row 2, then a claim at column 1, row 2, each cell chosen by stepping the column and row steppers from
+  the cursor's cell and tapping Pulse or Claim: "Every beacon is located.", "Stars: 3 of 3.", level 2 open) and keeps
+  the progress over a relaunch; `ECGReplayUITests` replays the win (three actions) to its end and stops. They run as
+  serial chunk `t3`, each under 90 s apart from the simulator's automation-session setup per launch. Level 1's certified
+  actions, the cursor's starting cell (the entry, column 0, row 3) and the 6 × 6 chamber are pinned in `ECG` and
+  checked against the Core by an app unit test. The namespace is `ECG` because `EC` is Effects Composer's.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`EchoCartographerSchemaExamples`, seed
+  7), which the app restores into schema 3; Echo Cartographer stays a candidate (not available without
+  `-vcCandidates`) until X-R02-G11.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.

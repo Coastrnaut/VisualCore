@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G11-08: Echo Cartographer regression net; cached host builds).
+Last updated: 2026-11-23 (R02-G11-09: Echo Cartographer interface journeys; regenerate the project for new test folders).
 
 ## 1. What is tested, and where
 
@@ -438,6 +438,17 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `BACKWARDS_AURORA_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
   BackwardsAuroraRegressionGoldenTests`. Agents that write files while an evidence chain runs write them to a scratch
   folder for the lead to copy in, so the chain tests the tree it started with.
+- **A new UI test folder needs `xcodegen generate` first** (R02-G11-09, 2026-11-23). `VisualCore.xcodeproj` is
+  generated and not tracked; `release_check.py` regenerates it only when it is missing, so after adding
+  `Apps/VisualCore/Tests/UI/EchoCartographer/` the first `app-ui-ios27-t3` run built the old project and executed 0
+  tests ("NOT RUN or not passed", the enumeration guard failed). Run `xcodegen generate --spec project.yml` after adding
+  or removing app source or test files, then the check.
+- **Echo Cartographer interface journeys** (R02-G11-09, 2026-11-23). `ECGPlayUITests` and `ECGReplayUITests` run as
+  the serial chunk `t3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-t3`); they
+  play level 1's certified actions (pulses from column 0, row 3 and column 0, row 2, then a claim at column 1, row 2)
+  with the column and row steppers. The pinned literals in `ECG` are checked against the Core by
+  `testEchoCartographerLevelOnePinsInECGEqualTheCore` in the app unit tests; `EC` was taken (Effects Composer), and the
+  chunk key was checked unused in `scripts/release_check.py` before it was named.
 - **Echo Cartographer regression net** (R02-G11-08, 2026-11-23). `python3 scripts/echo_cartographer_regression.py` runs
   the solver regression and golden digests on the host, then the golden-frame and memory classes on sim-27.2 with
   `TEST_RUNNER_ECHO_CARTOGRAPHER_MEMORY_ISOLATED=1` (measured growth 0.86 MB over 12 cycles); regenerate the pinned
