@@ -25,7 +25,7 @@ change (the shaders and reference of R02-G10-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1009-003 [US1] Edit `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraControls.swift`:
+- [X] T-R02G1009-003 [US1] Edit `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraControls.swift`: — Verified 2026-11-23: sim-27 exit=0 (61 simulator tests incl. BackwardsAuroraIdentifierTests: the 21 identifier names of Q1 listed once each, well formed, built through the port with the experience prefix and unique; every panel control carries experience.r02-g10.backwards-aurora.<name>; agent E's tests retested by the lead)
   identifiers `experience.r02-g10.backwards-aurora.<name>` through `port.identifier` (spec Clarifications Q1 names:
   reverse, undo, redo, next-level, reset-view, hint, dismiss-tutorial, failure-undo, retry, campaign, daily,
   practice, play-level, replay, replay-step, replay-stop, start-picker, end-picker, level-picker, sound, summary; unique; `identifierNames` lists them) with

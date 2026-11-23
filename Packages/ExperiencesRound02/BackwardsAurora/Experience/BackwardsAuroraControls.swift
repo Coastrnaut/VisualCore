@@ -12,6 +12,8 @@
 // readable width. Feature 397 (R02-G10-07) T-R02G1007-005 (clarifications Q2, Q4, Q5): "Replay best solution" for a
 // level with a verified stored solution, and during replay its position ("Replay: reversal k of n") with Step and Stop,
 // each with a label and a value; the Sound toggle saves the choice through `settings.sound`.
+// Feature 399 (R02-G10-09) T-R02G1009-003 (FR-R02G1009-001; clarification Q1): every control also carries the stable
+// identifier `experience.r02-g10.backwards-aurora.<name>` (`port.identifier`), the names listed in ``identifierNames``.
 #if os(iOS)
 import BackwardsAuroraCore
 import SwiftUI
@@ -31,6 +33,14 @@ struct BackwardsAuroraControls: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the ambient loop plays only while it is.
     @Environment(\.scenePhase) private var scenePhase
+
+    /// Every control's identifier name (clarification Q1 of feature 399), each once; the identifier is
+    /// `experience.r02-g10.backwards-aurora.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "reverse", "undo", "redo", "next-level", "reset-view", "hint", "dismiss-tutorial", "failure-undo", "retry",
+        "campaign", "daily", "practice", "play-level", "replay", "replay-step", "replay-stop", "start-picker",
+        "end-picker", "level-picker", "sound", "summary",
+    ]
 
     /// The widest the panel's content grows, padding included (clarification Q5 of feature 396).
     static let readableWidth: CGFloat = 520
@@ -72,14 +82,17 @@ struct BackwardsAuroraControls: View {
                 Button("Step") { presenter.stepReplay(port: port) }
                     .accessibilityLabel("Play the next reversal of the replay")
                     .accessibilityValue("Reversal \(mirror.replayPosition) of \(mirror.replayLength)")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                 Button("Stop") { presenter.stopReplay(port: port) }
                     .accessibilityLabel("Stop the replay")
                     .accessibilityValue("\(mirror.replayLength) reversals")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
                 .accessibilityLabel("Replay your best solution of this level")
                 .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
         }
     }
 
@@ -93,6 +106,7 @@ struct BackwardsAuroraControls: View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
     }
 
     /// The level, reversals and stage lines.
@@ -105,6 +119,7 @@ struct BackwardsAuroraControls: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Aurora")
             .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
         Text(mirror.measureLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let preview = mirror.previewText {
@@ -124,14 +139,17 @@ struct BackwardsAuroraControls: View {
                     onDecrement: { mirror.stepStart(-1); presenter.refreshSummary() })
                 .accessibilityLabel("Start of the section to reverse")
                 .accessibilityValue(Self.values(mirror).start)
+                .accessibilityIdentifier(port.identifier("start-picker"))
             Stepper(mirror.endLabel,
                     onIncrement: { mirror.stepEnd(1); presenter.refreshSummary() },
                     onDecrement: { mirror.stepEnd(-1); presenter.refreshSummary() })
                 .accessibilityLabel("End of the section to reverse")
                 .accessibilityValue(Self.values(mirror).end)
+                .accessibilityIdentifier(port.identifier("end-picker"))
             Button("Reverse") { send("wave.reverse", [Double(mirror.start), Double(mirror.end)]) }
                 .accessibilityLabel("Reverse the chosen section in time")
                 .accessibilityValue(mirror.sectionLabel)
+                .accessibilityIdentifier(port.identifier("reverse"))
         }
     }
 
@@ -141,15 +159,19 @@ struct BackwardsAuroraControls: View {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last reversal")
                 .accessibilityValue(Self.values(mirror).reversals)
+                .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the reversal")
                 .accessibilityValue(Self.values(mirror).reversals)
+                .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
                 .accessibilityValue(Self.values(mirror).nextLevel)
+                .accessibilityIdentifier(port.identifier("next-level"))
             Button("Reset view") { resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
                 .accessibilityValue(Self.viewValue(presenter.gestures.orbit == .authored))
+                .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 
@@ -161,12 +183,14 @@ struct BackwardsAuroraControls: View {
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
                     .accessibilityValue(instruction)
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
             }
         }
         row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+                .accessibilityIdentifier(port.identifier("hint"))
             Text(mirror.goalLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
         if let hint = mirror.hintText {
@@ -179,9 +203,11 @@ struct BackwardsAuroraControls: View {
                     Button("Undo") { presenter.undoReversal(port: port) }
                         .accessibilityLabel("Undo the last reversal")
                         .accessibilityValue(Self.values(mirror).reversals)
+                        .accessibilityIdentifier(port.identifier("failure-undo"))
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
                         .accessibilityValue(Self.values(mirror).retry)
+                        .accessibilityIdentifier(port.identifier("retry"))
                 }
             }
         }
@@ -193,12 +219,15 @@ struct BackwardsAuroraControls: View {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "campaign"))
+                .accessibilityIdentifier(port.identifier("campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "daily"))
+                .accessibilityIdentifier(port.identifier("daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with a larger reversal budget")
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "practice"))
+                .accessibilityIdentifier(port.identifier("practice"))
         }
         row {
             Stepper(levelLabel(mirror.pickedLevel),
@@ -206,9 +235,11 @@ struct BackwardsAuroraControls: View {
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
                 .accessibilityLabel("Level to play")
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("level-picker"))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
                 .accessibilityValue(Self.values(mirror).playLevel)
+                .accessibilityIdentifier(port.identifier("play-level"))
         }
     }
 
