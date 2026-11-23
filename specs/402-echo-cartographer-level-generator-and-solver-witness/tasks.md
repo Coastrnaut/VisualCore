@@ -62,7 +62,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   `--name host-full`
 - [X] T-R02G1102-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-23: reference-1 exit 0, 2026-11-23
 - [X] T-R02G1102-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-23: reference-2 exit 0, 2026-11-23
-- [ ] T-R02G1102-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1102-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: script-tests (run alone) exit 0, 2026-11-23
 - [ ] T-R02G1102-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record
 
 ## Dependencies and parallel work
