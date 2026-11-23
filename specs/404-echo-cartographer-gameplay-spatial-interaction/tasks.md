@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Foundational — orbit, camera and picking
 
-- [ ] T-R02G1104-002 [P] Add `EchoCartographerOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)", `clamped()`) and
+- [X] T-R02G1104-002 [P] Add `EchoCartographerOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)", `clamped()`) and — Verified 2026-11-23: host-2 (150 EchoCartographer core tests incl. EchoCartographerPickerTests 4: 4,500 seeded picks over levels 1/41/100, 3 sizes and 3 orbits against an independent pick; the 22-point target at 21/23 points; markers beat cells; unusable input; and 4 orbit geometry tests: 9 orbits x 7 aspects inside the 5 % margin, camera(_:aspect:) bit-identical to the authored orbit, clamp) exit 0, lead retest; picker and gesture controller join the invariant scan's presentation sources
   `camera(_:aspect:orbit:)` (yaw about the y axis through the box centre, pitch about the authored view; field of view refit
   so the authored box x −1 … 1, z −1 … 1.1, y 0 … 0.8 stays inside the view with a 5 % margin at aspects 0.4 … 2.5;
   `camera(_:aspect:)` equals the authored orbit, bit-identical) to

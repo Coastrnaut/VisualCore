@@ -663,4 +663,102 @@ import VisualCoreScenes
         }
         #expect(edgesBefore > 0 && edgesAfter >= edgesBefore)
     }
+
+    // MARK: Orbit (feature 404, R02-G11-04, T-R02G1104-002)
+
+    /// Nine orbits: the authored one, the four clamp corners, the pitch extremes at yaw 0, the yaw extreme at pitch 0 and
+    /// a middle one.
+    static func orbits() -> [EchoCartographerOrbit] {
+        let y: Double = EchoCartographerOrbit.yawLimit
+        let lo: Double = EchoCartographerOrbit.pitchRange.lowerBound
+        let hi: Double = EchoCartographerOrbit.pitchRange.upperBound
+        return [EchoCartographerOrbit.authored, EchoCartographerOrbit(yaw: y, pitch: hi),
+                EchoCartographerOrbit(yaw: -y, pitch: hi), EchoCartographerOrbit(yaw: y, pitch: lo),
+                EchoCartographerOrbit(yaw: -y, pitch: lo), EchoCartographerOrbit(yaw: 0, pitch: lo),
+                EchoCartographerOrbit(yaw: 0, pitch: hi), EchoCartographerOrbit(yaw: y, pitch: 0),
+                EchoCartographerOrbit(yaw: -0.3, pitch: 0.1)]
+    }
+
+    /// NDC (x, y) of `p` through `camera`, or nil behind the eye.
+    static func ndc(_ p: SIMD3<Double>, _ camera: EchoCartographerCamera) -> SIMD2<Double>? {
+        let clip: Vec4 = camera.viewProjection * Vec4(Vec3(p.x, p.y, p.z), 1)
+        guard clip.w > 0 else { return nil }
+        return SIMD2(clip.x / clip.w, clip.y / clip.w)
+    }
+
+    @Test func everyOrbitKeepsTheAuthoredBoxInsideTheMargin() throws {
+        let s: Snapshot = try Self.tiny5(pulsed: false)
+        let bound: Double = 1 - 2 * Geometry.fitMargin
+        #expect(bound <= 0.9)
+        for orbit in Self.orbits() {
+            for aspect in Self.aspects {
+                let camera: EchoCartographerCamera = Geometry.camera(s, aspect: aspect, orbit: orbit)
+                var largest: Double = 0
+                for index in 0..<8 {
+                    guard let v = Self.ndc(Geometry.corner(index), camera) else {
+                        Issue.record("corner \(index) behind the eye at \(orbit), aspect \(aspect)")
+                        continue
+                    }
+                    #expect(abs(v.x) <= bound + 1e-9 && abs(v.y) <= bound + 1e-9,
+                            "corner \(index) at \(v) outside the margin at \(orbit), aspect \(aspect)")
+                    largest = max(largest, abs(v.x), abs(v.y))
+                }
+                // The field of view is the smallest that fits: some corner touches the margin.
+                #expect(abs(largest - bound) < 1e-9, "fit not tight: \(largest) at \(orbit), aspect \(aspect)")
+                #expect(camera.target == Geometry.lookAt)
+                let offset: SIMD3<Double> = camera.eye - Geometry.lookAt
+                let authored: SIMD3<Double> = Geometry.eye - Geometry.lookAt
+                let lengths: Double = Self.dot(offset, offset).squareRoot() - Self.dot(authored, authored).squareRoot()
+                #expect(abs(lengths) < 1e-12)
+            }
+        }
+    }
+
+    @Test func positivePitchRaisesTheEyeAndPositiveYawMovesItTowardsPlusX() throws {
+        let s: Snapshot = try Self.tiny5(pulsed: false)
+        let base: EchoCartographerCamera = Geometry.camera(s, aspect: 1)
+        let up: EchoCartographerCamera = Geometry.camera(s, aspect: 1, orbit: EchoCartographerOrbit(yaw: 0, pitch: 0.2))
+        let down: EchoCartographerCamera = Geometry.camera(s, aspect: 1,
+                                                           orbit: EchoCartographerOrbit(yaw: 0, pitch: -0.2))
+        let side: EchoCartographerCamera = Geometry.camera(s, aspect: 1, orbit: EchoCartographerOrbit(yaw: 0.3, pitch: 0))
+        #expect(up.eye.y > base.eye.y && up.eye.z < base.eye.z && up.eye.x == 0)
+        #expect(down.eye.y < base.eye.y && down.eye.z > base.eye.z)
+        #expect(side.eye.x > 0 && side.eye.y == base.eye.y)
+    }
+
+    @Test func theAuthoredOrbitIsTheFixedCameraBitForBit() throws {
+        let s: Snapshot = try Self.tiny5(pulsed: false)
+        var aspects: [Double] = Self.aspects
+        aspects.append(contentsOf: [0.05, 20, 0, -1, .nan, .infinity])
+        for aspect in aspects {
+            let fixed: EchoCartographerCamera = Geometry.camera(s, aspect: aspect)
+            let orbit: EchoCartographerCamera = Geometry.camera(s, aspect: aspect, orbit: .authored)
+            #expect(fixed == orbit)
+            #expect(fixed.fovY.bitPattern == orbit.fovY.bitPattern && fixed.near.bitPattern == orbit.near.bitPattern
+                    && fixed.far.bitPattern == orbit.far.bitPattern)
+            #expect(fixed.eye.x.bitPattern == orbit.eye.x.bitPattern && fixed.eye.y.bitPattern == orbit.eye.y.bitPattern
+                    && fixed.eye.z.bitPattern == orbit.eye.z.bitPattern)
+            #expect(fixed.eye == Geometry.eye)
+            // A non-finite orbit is the authored one.
+            let odd: EchoCartographerCamera = Geometry.camera(s, aspect: aspect,
+                                                              orbit: EchoCartographerOrbit(yaw: .nan, pitch: .infinity))
+            #expect(odd == fixed)
+        }
+    }
+
+    @Test func clampedBoundsTheOrbit() {
+        let y: Double = EchoCartographerOrbit.yawLimit
+        let lo: Double = EchoCartographerOrbit.pitchRange.lowerBound
+        let hi: Double = EchoCartographerOrbit.pitchRange.upperBound
+        #expect(abs(y - 35.0 * Double.pi / 180) < 1e-15)
+        #expect(abs(lo + 15.0 * Double.pi / 180) < 1e-15 && abs(hi - 20.0 * Double.pi / 180) < 1e-15)
+        #expect(EchoCartographerOrbit.authored == EchoCartographerOrbit(yaw: 0, pitch: 0))
+        #expect(EchoCartographerOrbit(yaw: 5, pitch: 5).clamped() == EchoCartographerOrbit(yaw: y, pitch: hi))
+        #expect(EchoCartographerOrbit(yaw: -5, pitch: -5).clamped() == EchoCartographerOrbit(yaw: -y, pitch: lo))
+        #expect(EchoCartographerOrbit(yaw: 0.2, pitch: -0.1).clamped() == EchoCartographerOrbit(yaw: 0.2, pitch: -0.1))
+        #expect(EchoCartographerOrbit(yaw: .nan, pitch: .infinity).clamped() == EchoCartographerOrbit.authored)
+        #expect(EchoCartographerOrbit(yaw: -.infinity, pitch: .nan).clamped() == EchoCartographerOrbit.authored)
+        let s: SIMD3<Double> = Geometry.orbitEye(EchoCartographerOrbit(yaw: 9, pitch: -9))
+        #expect(s == Geometry.orbitEye(EchoCartographerOrbit(yaw: y, pitch: lo)))
+    }
 }

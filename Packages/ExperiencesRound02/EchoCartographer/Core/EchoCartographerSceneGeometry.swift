@@ -33,13 +33,20 @@
 // tier. The fixed camera looks from eye (0, 2.4, 1.9) at (0, 0, 0.05) with +y up; its vertical field of view is fitted
 // so the box x −1 … 1, z −1 … 1.1, y 0 … 0.8 fits with ``fitMargin`` (above the required 5 %) per side for aspect
 // 0.4 … 2.5. Doubles are used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 404 (R02-G11-04) T-R02G1104-002 adds the player's orbit (`EchoCartographerOrbit`: yaw ±35° about the world
+// y axis through the look-at point, pitch −15° … +20° about the camera's right axis, positive raising the eye so the
+// chamber is seen more from above; authored (0, 0)) and `camera(_:aspect:orbit:)`: the authored eye rotated about the
+// look-at point (0, 0, 0.05), the field of view refitted exactly as for the fixed camera so the same box keeps
+// ``fitMargin`` per side at every orbit and aspect 0.4 … 2.5. At the authored orbit the eye is the authored one, so
+// `camera(_:aspect:)` (which calls it) is unchanged bit for bit.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
 /// The fixed authored camera of one frame: eye, target, lens and the matrices built from them.
 public struct EchoCartographerCamera: Sendable, Equatable {
-    /// The eye position in world units, (0, 2.4, 1.9).
+    /// The eye position in world units, (0, 2.4, 1.9) at the authored orbit.
     public let eye: SIMD3<Double>
     /// The point looked at, (0, 0, 0.05).
     public let target: SIMD3<Double>
@@ -57,6 +64,38 @@ public struct EchoCartographerCamera: Sendable, Equatable {
     public let projection: Mat4
     /// projection · view (upload with `.floats`).
     public let viewProjection: Mat4
+}
+
+/// The player's view of the chamber: a yaw about the world y axis and a pitch about the camera's right axis, both in
+/// radians, applied to the authored eye about the authored look-at point (feature 404, R02-G11-04). Presentation only:
+/// never saved, never read by the rules.
+public struct EchoCartographerOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians about the camera's right axis: positive raises the eye (the chamber seen more from above),
+    /// negative lowers it; allowed ``pitchRange`` (−15° … +20°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 0, the fixed camera of R02-G11-03.
+    public static let authored = EchoCartographerOrbit(yaw: 0, pitch: 0)
+    /// The largest yaw either way, 35° in radians.
+    public static let yawLimit: Double = 35.0 * Double.pi / 180
+    /// The allowed pitches, −15° … +20° in radians.
+    public static let pitchRange: ClosedRange<Double> = (-15.0 * Double.pi / 180)...(20.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −35° … 35° and pitch to −15° … 20°; a non-finite angle becomes 0.
+    public func clamped() -> EchoCartographerOrbit {
+        let y: Double = yaw.isFinite ? yaw : 0
+        let p: Double = pitch.isFinite ? pitch : 0
+        return EchoCartographerOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                     pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
 }
 
 /// A mesh with one RGBA colour per vertex, for the shared unlit `MeshRenderer` (the fallback path).
@@ -459,10 +498,36 @@ public enum EchoCartographerSceneGeometry {
     /// is the smallest that holds every corner of the box x −1 … 1, y 0 … 0.8, z −1 … 1.1 inside the view with
     /// ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it — every cell centre,
     /// wall top, pillar and gauge bar — keeps a margin of at least 5 %). The snapshot is accepted for parity; the camera
-    /// never moves while a level is played.
+    /// never moves while a level is played. Equals ``camera(_:aspect:orbit:)`` at ``EchoCartographerOrbit/authored``
+    /// bit for bit.
     public static func camera(_ snapshot: EchoCartographerSceneSnapshot, aspect: Double) -> EchoCartographerCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The eye of `orbit` (clamped): the authored eye's offset from the look-at point, with e = (0, 2.4, 1.85), first
+    /// pitched about the x axis (positive p raises it: (0, e.y·cos p + e.z·sin p, −e.y·sin p + e.z·cos p)), then yawed
+    /// about +y (z′ → (z′·sin y, z′·cos y)), added back to the look-at point. Exactly ``eye`` at the authored orbit.
+    public static func orbitEye(_ orbit: EchoCartographerOrbit) -> SIMD3<Double> {
+        let o: EchoCartographerOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return eye }
+        let e: SIMD3<Double> = eye - lookAt
+        let cp: Double = cos(o.pitch)
+        let sp: Double = sin(o.pitch)
+        let y: Double = e.y * cp + e.z * sp
+        let z: Double = -e.y * sp + e.z * cp
+        return lookAt + SIMD3(z * sin(o.yaw), y, z * cos(o.yaw))
+    }
+
+    /// The camera for `orbit` (clamped, see ``EchoCartographerOrbit/clamped()``) and `aspect`: from ``orbitEye(_:)``
+    /// looking at (0, 0, 0.05) with +y up (never parallel: the eye stays at least 37° above the floor); the vertical
+    /// field of view is the smallest that holds every corner of the box x −1 … 1, y 0 … 0.8, z −1 … 1.1 inside the view
+    /// with ``fitMargin`` per side, so everything inside the box keeps a margin of at least 5 % at every orbit and
+    /// aspect 0.4 … 2.5. Presentation only; independent of the snapshot, the tier and the time.
+    public static func camera(_ snapshot: EchoCartographerSceneSnapshot, aspect: Double,
+                              orbit: EchoCartographerOrbit) -> EchoCartographerCamera {
         _ = snapshot
         let a: Double = usableAspect(aspect)
+        let eye: SIMD3<Double> = orbitEye(orbit)
         let forward: SIMD3<Double> = unit(lookAt - eye)
         let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
         let up: SIMD3<Double> = cross(right, forward)
