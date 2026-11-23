@@ -277,9 +277,17 @@
       "name": "Faceted Forge",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G09",
+      "id": "r02-g09.nocturne-garden",
+      "name": "Nocturne Garden",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "4471ef8f4297dfc002bbbc0f94478cdbbd80d82065ea11af6ff6b4f72cc8bf35",
+  "ledger_sha256": "3ff45b17627ad8ae6a7fb4b6712bdf53a1f9b3d3372eebd778c9d2b50f9a6c0b",
   "privacy_answers": "unproven",
   "schema": 1
 }

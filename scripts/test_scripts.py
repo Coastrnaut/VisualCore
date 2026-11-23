@@ -1473,7 +1473,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "AmethystEscapeCore", "AmethystEscapeExperience",
                                     # Feature 373 (R02-G08-03): Faceted Forge, integrated at X-R02-G08.
                                     "FacetedForgeCore", "FacetedForgeExperience",
-                                    # Feature 383 (R02-G09-03): Nocturne Garden, a candidate until X-R02-G09.
+                                    # Feature 383 (R02-G09-03): Nocturne Garden, integrated at X-R02-G09.
                                     "NocturneGardenCore", "NocturneGardenExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

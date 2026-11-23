@@ -1,7 +1,7 @@
 // NGSupport — feature 389 (R02-G09-09) T-R02G0909-004 (FR-R02G0909-002; SC-R02G0909-001; clarifications Q1, Q2;
 // research R2): helpers of the interface tests of Nocturne Garden (R02-G09) inside the one app, modelled on `FFSupport`
-// (feature 379). Nocturne Garden is a candidate until X-R02-G09; every launch carries `-vcCandidates` (DebugLaunch: the
-// candidates' catalog entries become available and are registered). A fresh start erases the data (`-vcResetData`, so
+// (feature 379). Nocturne Garden was a candidate until X-R02-G09 (2026-11-22); every launch still carries
+// `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh start erases the data (`-vcResetData`, so
 // no level is solved), skips the welcome and opens the experience directly with `-openExperience
 // r02-g09.nocturne-garden`; a relaunch (`NG.reopen`) backgrounds the app first (its save point), terminates it and
 // starts again without the reset, so the stored progress (solved levels, stars, the frontier, the verified winning
