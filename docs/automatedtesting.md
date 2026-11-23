@@ -550,7 +550,9 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   explained with independently computed numbers, and the progress, daily (× 83, 2026–2036) and schema 1 → 2 rules
   (`swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridges`); simulator:
   `HarmonicBridgesTeachingTests`. Once `level.next` needs an open level, scenario and identity tests that called it on
-  a fresh level must win first; the digest then includes progress, so expected digests move with it.
+  a fresh level must win first; the digest then includes progress, so expected digests move with it. The gate's
+  first script-tests run failed only because a convergence run-check and its tick wrote `.autonomy/migration/` while
+  the script tests ran (their ledger-tree guard, FR-U00-038); nothing writes there during script-tests.
 - **Harmonic Bridges gestures** (R02-G12-04, 2026-11-23). Host: the picker against an independent projection (500
   seeded points × 3 sizes × 3 orbits), 500 seeded gesture scripts applied through the adapter, and all 100 levels won
   through the panel model (`swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridges`);
