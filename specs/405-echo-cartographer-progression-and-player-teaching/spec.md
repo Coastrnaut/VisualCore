@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G11-05 (migration ledger, game feature of experience R02-G11) · ID namespace FR-R02G1105-###,
 SC-R02G1105-###, T-R02G1105-###
@@ -26,6 +26,61 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G11-01 … 04.
 - **Model:** feature 395 (Backwards Aurora's progression and teaching) for hints, tutorial, failure text, progress, daily
   and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+395's answers where the games agree. Facts checked in code (read-only, 2026-11-23): `EchoCartographerSolver` certifies a
+level by a greedy pulse plan from the opening knowledge — at each turn every cell known open and not yet pulsed is tried
+in cell-index order and the one whose echo leaves the fewest fitting beacon placements is pulsed (ties: lowest index)
+— until exactly one placement fits (at most 6 pulses, 400,000 enumeration nodes); its witness is those pulses then one
+claim on each beacon's own cell; a pulse spends 1 energy, a claim that locates a beacon is free, a missed claim spends
+the level's miss cost (1 … 3, never more than the energy left); a play fails only when the energy runs out with a beacon
+hidden (`energy(index)`, the 0-based index of the action); undo works in playing, paused and failed, a won play is
+final; levels carry a tutorial flag; energies are 1 … 60; the adapter prepares level (seed mod 100) + 1 and snapshots
+`{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily multipliers include 37,
+41, 43, 47, 53, 59, 61, 67, 71 and 73.
+
+- Q: How is a hint computed and what does each level reveal? → A: the plan comes from the current state and the level's
+  truth. A won play has no hint; a failed play's hint is "Undo the last action or retry the level." While playing: the
+  echoes heard by the play's pulses are the observations; when exactly one beacon placement fits them the plan is a
+  claim on the lowest-index beacon not yet located (its own cell, which always locates it); otherwise the plan is the
+  solver's greedy next pulse (a new entry point continuing the certification's greedy rule from the current knowledge
+  and pulses) — and the whole continuation (further pulses until one placement fits) must fit in the energy left, or
+  else: "No way to locate every beacon was found in the energy left: undo the last action or retry the level." Level 1
+  names the kind ("Send a pulse to narrow down where the beacons can be" or "The echoes leave one place for the
+  beacons: claim a beacon"), level 2 adds the row ("… from a known open cell in row 3" / "… in row 3"), level 3 names
+  the cell ("Send a pulse from column 2, row 3" / "Claim column 2, row 3"). Hints never change the state, are unlimited,
+  do not affect stars and reset to level 1 after any change of the play. Impact: FR-R02G1105-002; SC-R02G1105-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag, three instructions
+  in order: (1) "Tap a lit floor cell to send a pulse (or use the panel) — the echoes tell how far each beacon is along
+  the open floor" — it advances once a pulse has been accepted; (2) "Drag markers onto cells where a beacon could be and
+  pulse again to narrow them down — a hint shows where" — until a beacon is located or the level ends; (3) "Hold a cell
+  to claim a beacon there; a miss costs energy — locate every beacon before the energy runs out" — until the level ends.
+  `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G1105-001; SC-R02G1105-001.
+- Q: What are the progress and star rules? → A: stars measure the energy spent by every accepted pulse and claim record,
+  undone ones included: 3 when at most the certified plan's pulse count (its witness energy, claims being free), 2 when
+  at most that + 2, else 1; per level the best (least) energy spent of a won campaign play and its stars, a better
+  result replacing a worse one; level 1 open; a campaign win opens the next; `level.select [n]` opens any open level and
+  refuses others (`r02-g11.locked`); `level.next` moves to the next open level (refused when none, `r02-g11.locked`);
+  the five bands of 20 are the certified difficulty bands. Impact: FR-R02G1105-004; SC-R02G1105-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 79) mod 100 + 1, negative day counts wrapped into 0 … 99 (79 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g11.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the energy raised to the kernel's
+  maximum (60); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G1105-005;
+  SC-R02G1105-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 395: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the snapshot payload becomes schema 2
+  (`{level, records, progress, mode, tutorial}`) with a migration from schema 1 (level 1 open plus the restored level,
+  campaign mode, tutorial at its first step on tutorial levels). A failure is explained from the action that spent the
+  last energy: "Action m (a pulse from column x, row y | a missed claim at column x, row y) spent the last energy: k of
+  n beacons located after p pulses and q missed claims." followed by "Undo the last action or retry the level."
+  Impact: FR-R02G1105-003, 007; SC-R02G1105-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
