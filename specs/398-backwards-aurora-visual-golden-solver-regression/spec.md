@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G10-08 (migration ledger, game feature of experience R02-G10) · ID namespace FR-R02G1008-###,
 SC-R02G1008-###, T-R02G1008-###
@@ -22,6 +22,63 @@ Canonical overrides:
   "content count 76" milestone figure. **Device-only items:** frame time and memory on D1/D2/D3 after
   ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 388 (Nocturne Garden's visual golden and solver regression).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+388's answers where the games agree. Facts checked in code (read-only audit, 2026-11-23): `BackwardsAuroraSolver.solve`
+certifies a level by iterative deepening over reversible sections from the seam-count lower bound ⌈β / 4⌉
+(`lowerBound(level)`) within `workBound` (20,000 reversals evaluated), returning `smallest`, the actions and `work`; the
+100 witness files in `docs/games/backwards-aurora/levels/` hold the number, the level, the actions, per-reversal digests
+and fingerprints, the smallest reversal count, the bound, the near miss, the difficulty and the skipped candidate count,
+and are byte-checked by `BackwardsAuroraCatalogTests`; the catalog digest is pinned there; the simulator frame checks of
+feature 393 compare rendered frames with the CPU reference (every sample point away from the rings, ticks and crosses
+within 3 px of a ribbon pixel at least 0.15 cooler and 0.15 away from the ground, every ghost point that differs from
+the wave within 3 px of a lilac ghost pixel at least 0.1 from the ground, the gauge's first bar 0.1 away from the
+ground, the probe corners within 0.05 of the ground); `BackwardsAuroraAuroraScene.release()` frees every renderer and
+the next draw rebuilds them (memory warning, teardown) and `liveObjectCount` counts them; the CI host job runs all
+round-two host tests and has a named regression step per earlier round-two game (Nocturne Garden's the latest);
+`scripts/xcodebuild_package.py` runs simulator tests with `--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's reversals replay on a
+  fresh play to a win in exactly its smallest reversal count (equal to the bound's), within the budget, with exactly its
+  per-reversal digests and fingerprints; and `solve` returns exactly the witness's reversals with `smallest` equal to
+  the witness's and to the lower bound's; `work` is at most `workBound` (counted, never timed). The run is split into
+  tests of 10 levels so each stays short. Impact: FR-R02G1008-001; SC-R02G1008-001.
+- Q: Which alterations must the regression detect and how is each named? → A: ten kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a target sample, a checkpoint, the budget, the bend
+  limit, the breaking limit; a solution reversal; a witness reversal, a per-reversal digest, a per-reversal
+  fingerprint; the smallest reversal count. Impact: FR-R02G1008-002; SC-R02G1008-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after the witness's first min(smallest − 1, 2) reversals so the
+  reshaped wave, its kinks and the reversal gauge show, at presentation time 0 (the shimmer and pulses are shader
+  uniforms; positions do not depend on time) and the authored camera, plus the hero frame of the scenario manifest's
+  hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the projected pixel positions of every sample
+  point of the ribbon and of every checkpoint ring centre, rounded to 1/8 pixel, the kink count, the tear seam (or
+  none), the gauge's spent and total counts, and the expected colours as 8-bit sRGB (ground, band, ribbon, ghost, ring,
+  matched, kink, tear, spent, unspent); serialized as JSON with sorted keys and hashed with SHA-256. The 16 descriptions
+  and their digests live in `Packages/ExperiencesRound02/BackwardsAurora/golden-frames.json`; the host test recomputes
+  each: an equal digest passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and
+  every count and colour must be equal, or the test fails naming the frame and the first differing value; each pinned
+  digest must also equal the digest of its pinned description. The file is rewritten only when
+  `BACKWARDS_AURORA_WRITE_GOLDEN=1` is set. The simulator test renders the 16 frames and checks them against the same
+  descriptions with the feature-393 tolerances. Impact: FR-R02G1008-003, 004; SC-R02G1008-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_BACKWARDS_AURORA_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU
+  objects of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a
+  named reason. Impact: FR-R02G1008-005; SC-R02G1008-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's host job keeps running all round-two host
+  tests and adds a named step "Backwards Aurora regression (host)" that runs the Backwards Aurora regression filter
+  alone. The local command `python3 scripts/backwards_aurora_regression.py` runs the host regression filter and then
+  the simulator regression test classes through `xcodebuild_package.py --only-testing`, and prints one summary line per
+  part with pass or fail and the first failing name; its exit code is non-zero on any failure. Nothing is timed against
+  the wall clock. Impact: FR-R02G1008-006, 007; SC-R02G1008-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -104,9 +161,10 @@ simulator parts and reports one summary.
 - **FR-R02G1008-002**: An altered level, solution or witness MUST make the regression fail, naming the level and the
   differing part.
 - **FR-R02G1008-003**: A golden set of frames (levels, tiers, frame times, including the hero frame) MUST have a
-  code-computed description (projected sample points of the ribbon, checkpoint ring centres and the tear seam, the
-  reversal gauge's spent and total counts, palette colours) pinned in the repository with its digest; a recomputed description matches when its
-  digest is equal or every position lies within one 1/8-pixel quantum and every colour is equal.
+  code-computed description (projected sample points of the ribbon and checkpoint ring centres, the kink count, the
+  tear seam, the reversal gauge's spent and total counts, palette colours) pinned in the repository with its digest; a
+  recomputed description matches when its digest is equal or every position lies within one 1/8-pixel quantum and
+  every count and colour is equal.
 - **FR-R02G1008-004**: Rendered frames of the golden set on the simulator MUST match their descriptions within the
   tolerances of User Story 2; regenerating a baseline MUST need an explicit switch.
 - **FR-R02G1008-005**: Repeatedly opening, drawing, closing the experience and memory warnings MUST keep the footprint
