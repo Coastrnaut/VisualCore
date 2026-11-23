@@ -62,7 +62,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 395
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerScenarios.swift` entries where needed and
   `Packages/ExperiencesRound02/EchoCartographer/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); lead; `--name
   host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter EchoCartographerCoreTests`
-- [ ] T-R02G1105-005 Edit `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerPresenter.swift` (the
+- [X] T-R02G1105-005 Edit `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerPresenter.swift` (the — Verified 2026-11-23: sim-27 (41 Echo Cartographer simulator tests incl. EchoCartographerTeachingTests 5: tutorial shown and dismissed, three hint levels equal the Core's and following them wins level 1, an energy failure explained with Undo and Retry, a campaign win records stars with band and opens level 2 (level 3 refused as locked), daily, practice (energy 60) and campaign modes; identity and fallback tests updated for the progression controls and failure text) exit 0
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it,
   the search off the main actor and a stale search never owning the hint state — and the failure explanation as panel
   text, with the level's difficulty band (of the five bands of 20), its goal and its best stars (FR-R02G1105-004); the

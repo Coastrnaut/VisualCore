@@ -258,7 +258,11 @@ import VisualCoreMath
         #expect(core.play.failure == .energy(budget - 1))
         #expect(core.outcome?.code == EchoCartographerExperienceCore.failedCode)
         let text: String = shell.presenter.describe(core)
-        let named: String = "The energy ran out on action \(budget)."
+        // Since feature 405 the description names the failure with its explanation (the action that spent the last
+        // energy, the beacons located, the pulses and the missed claims) and offers undo or retry.
+        let explanation: EchoCartographerFailureExplanation = try #require(EchoCartographerFailureExplanation(play: core.play))
+        let named: String = explanation.text
+        #expect(named.hasPrefix("Action \(budget) "), "\(named)")
         #expect(text.contains(named), "\(text)")
         #expect(text.contains("0 energy left"), "\(text)")
         let status: String = shell.presenter.mirror.status

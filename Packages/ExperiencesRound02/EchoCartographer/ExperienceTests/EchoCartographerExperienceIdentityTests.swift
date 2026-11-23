@@ -68,17 +68,20 @@ import VisualCoreExperienceHost
         #expect(experience.frameProbes.isEmpty, "no probes before a frame")
     }
 
-    /// The controls are the six declared actions in order, with arities 2, 2, 2, 0, 0, 0 and ranges 0 … 15.
-    @Test func theControlsAreTheSixActions() {
+    /// The controls are the declared actions in order: the six of feature 403 with arities 2, 2, 2, 0, 0, 0 and ranges
+    /// 0 … 15, then (feature 405) `level.select` [1 … 100], `mode.daily` [year, month, day], `mode.practice`,
+    /// `mode.campaign` and `tutorial.dismiss`.
+    @Test func theControlsAreTheDeclaredActions() {
         var ids: [String] = []
         var arities: [Int] = []
         for control in EchoCartographerExperienceCore.controls {
             ids.append(control.id)
             arities.append(control.ranges.count)
         }
-        #expect(ids == ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next"])
+        #expect(ids == ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next",
+                        "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
         #expect(ids == EchoCartographerExperienceCore.actionIDs)
-        #expect(arities == [2, 2, 2, 0, 0, 0])
+        #expect(arities == [2, 2, 2, 0, 0, 0, 1, 3, 0, 0, 0])
         for index in 0..<3 {
             let control: ExperienceControl = EchoCartographerExperienceCore.controls[index]
             for range in control.ranges {
@@ -197,7 +200,11 @@ import VisualCoreExperienceHost
         try EchoCartographerTest.draw(session)
         #expect(try EchoCartographerTest.digest(shell) == before)
         #expect(mirror.column == 5 && mirror.row == 5, "a frame of the same level keeps the cursor")
-        // The next level puts the cursor on its entry.
+        // The next level puts the cursor on its entry (since feature 405 level 2 opens with level 1's win).
+        for action in try EchoCartographerTest.certifiedActions(1) {
+            let step: (control: String, values: [Double]) = EchoCartographerTest.control(action)
+            #expect(shell.handle(control: step.control, values: step.values) == .accepted)
+        }
         #expect(shell.handle(control: "level.next") == .accepted)
         try EchoCartographerTest.draw(session)
         let entry: EchoCartographerCell = try EchoCartographerExperienceCore.level(number: 2).entry
