@@ -51,7 +51,7 @@ change (the shaders and reference of R02-G10-03 are unchanged and re-proven by t
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G1009-006 [US3] Release build and symbols (`BackwardsAuroraGolden`, `acceptanceScenarios` already
+- [X] T-R02G1009-006 [US3] Release build and symbols (`BackwardsAuroraGolden`, `acceptanceScenarios` already — Verified 2026-11-23: release and regression checks exit 0, 2026-11-23 (.autonomy/migration/checks/R02-G10-09.release.json, R02-G10-09.regression.json)
   forbidden): `--name release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`;
   `--name regression -- python3 scripts/backwards_aurora_regression.py` (100 of 100 levels, SC-R02G1009-004)
 
