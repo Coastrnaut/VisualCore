@@ -59,7 +59,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1202-007 Docs: `docs/architecture/harmonic-bridges.md` (content pipeline),
+- [X] T-R02G1202-007 Docs: `docs/architecture/harmonic-bridges.md` (content pipeline), — Verified 2026-11-23: round02-host exit 0 (345 s); architecture doc content pipeline, ExperiencesRound02 README feature 412, testing doc entry (prototype the generator before writing ranges); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1202-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G12-01: Harmonic Bridges rule kernel).
+Last updated: 2026-11-23 (R02-G12-02: Harmonic Bridges content pipeline).
 
 ## 1. What is tested, and where
 
@@ -555,6 +555,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   force over every beacon subset on the two smallest regions of each band. The band filters (pulse ranges, sizes,
   beacons) were measured with a short Python prototype of the greedy solver before the clarification was written, as
   R02-G10-02 taught; every entry then generated on the first Swift run.
+- **Harmonic Bridges content pipeline** (R02-G12-02, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
+  --filter HarmonicBridges`: the solver's minimum against an independent brute force over every peg (no pattern pruning)
+  on 120 fixtures and band 1–3 candidates; an independent re-draw of 200 generator candidates; the 100 witness files
+  byte for byte (regenerate only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`). A random generator left most candidates
+  unsolvable in a Python prototype; the constructive one (a path whose strings can be bridges, k of them scrambled)
+  reached each band's range in 37 … 60 of 60, so prototype the generator before writing ranges into the spec.
 - **Harmonic Bridges rule kernel** (R02-G12-01, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
   --filter HarmonicBridges` (40 tests, about 2 s): the swing table against exact quarter values of sin² at multiples of
   30°; resonance, swing, bridges and reachability against an independent reference (enumerated modes, explicit sums,

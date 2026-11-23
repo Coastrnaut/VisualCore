@@ -652,3 +652,9 @@ fingerprinted, JSON schema 1, with names in words), the play state `HarmonicBrid
 `HarmonicBridgesStage`, `HarmonicBridgesEvent`, `HarmonicBridgesFailure` and append-only `HarmonicBridgesRecord`s, and
 `HarmonicBridgesRules` for the R02-F23 puzzle contract. Refusals are `HarmonicBridgesError` with `r02-g12.*` codes. Rules:
 [docs/architecture/harmonic-bridges.md](../../docs/architecture/harmonic-bridges.md).
+
+Feature 412 (R02-G12-02) adds the content pipeline: the 100-entry `HarmonicBridgesManifest`, band profiles and the
+constructive seeded `HarmonicBridgesGenerator`, `HarmonicBridgesSolver` (bridge patterns per peg; the minimal set of
+retuned strings by increasing size, with the smaller choices as the proof), `HarmonicBridgesDifficulty`,
+`HarmonicBridgesWitness` and the 100 witness files in `docs/games/harmonic-bridges/levels/`, with the pinned catalog
+digest.

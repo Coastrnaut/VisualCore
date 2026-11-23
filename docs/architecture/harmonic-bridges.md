@@ -51,3 +51,31 @@ on their own. Every resonance, swing, bridge and reachable set agrees with an in
 Levels are JSON schema 1 with sorted keys (islands as [x, y], strings as [a, b, length, peg, locked], start, goal, steps
 as lists of [F, w], threshold, budget, difficulty, tutorial, seed, id) and their fingerprint; decoding re-checks every
 rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.malformed`, `.newer-schema`).
+
+## Content pipeline (feature 412, R02-G12-02)
+
+- **Manifest.** The 100 planned levels of the archived design (`HarmonicBridgesManifest`): number, planned seed, band
+  1 … 5 (20 each) and moves budget 8 … 19.
+- **Generator.** Candidate c of entry n draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: c))` and
+  is built constructively: a scrambled count k in the band's range, a path of k or k + 1 strings from island 0 to the
+  last island, the steps and their tones (frequencies from 6, 12, 18, 24, 30, 36, 48, 60, 72, strengths 1 … 3), a
+  threshold, a (length, peg) for every path string that is a bridge in every step, k path strings scrambled to a peg that
+  is not, decoys on unused pairs (locked with chance 3 in 10), all shuffled. Band profiles: scrambled 1 … 2 up to 5 … 6,
+  steps 1 up to 3 … 4, thresholds 1 … 3 up to 3 … 6; tutorial on levels 1 … 3. A candidate is kept when its minimal plan
+  has a tuning count in the band's range and at most budget − 1, and the witness wins through the play; at most 256
+  candidates (`r02-g12.generation`). The ranges were measured with a prototype before they were written down; over the
+  catalog the band means are 1.65, 2.45, 3.4, 4.5 and 5.35 tunings.
+- **Minimal plan and proof.** For every string and peg the bridge pattern (the steps in which it is a bridge); a retuned
+  string's options are the maximal patterns among its other pegs not contained in its current pattern, each by its
+  lowest peg (bridges only ever help reachability, so nothing smaller is missed). `HarmonicBridgesSolver.plan` tries 1 …
+  6 retuned strings, subsets in lexicographic order and the product of their options, and returns the first winning
+  choice; the choices tried at smaller sizes are the minimality proof. Work (choices) is bounded at 400 000; the largest
+  catalog plan used 242.
+- **Witness files.** `docs/games/harmonic-bridges/levels/NNN.witness.json` (schema 1, sorted keys): the level, the actions
+  (tunings in string order, then a test), a bridge digest after each tuning, the play fingerprints, the counterexample
+  (the size one below and the choices tried, none winning; for a one-tuning plan the starting pegs' break), the
+  difficulty and the candidates skipped. Regenerated only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`; decoding re-runs the
+  replay, the recount and the plan (`r02-g12.witness`).
+- **Catalog.** `PuzzleCatalog<HarmonicBridgesRules>.digest(id: "harmonic-bridges", …)` over the 100 fingerprints is
+  pinned; the standard progression rule holds on the witness tuning count; an independent brute force (every peg in
+  bands 1 … 3, every pattern in bands 4 and 5) re-checks minimality on two levels per band.
