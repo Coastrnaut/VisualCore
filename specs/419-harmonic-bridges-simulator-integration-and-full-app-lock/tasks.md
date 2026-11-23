@@ -15,7 +15,7 @@ change (the shaders and reference of R02-G12-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1209-002 Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSchemaExamples.swift`
+- [X] T-R02G1209-002 Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSchemaExamples.swift` — Verified 2026-11-23: host (HarmonicBridgesSchemaExampleTests 7 tests: schema-1 {level 1, records} with the certified tuning and schema-2 (campaign, frontier 2, level 1 solved, 3 actions, 2 stars, no trace) restore through migrations to schema 3, digests match, other versions nil, deterministic) exit 0, lead retest; registration stores both examples with the comment corrected (app-unit: testTheHarmonicBridgesRegistrationRestoresItsStoredExamples passes)
   (contracts/api.md; data-model: schema 1 "`{level: 1, records}` of a seeded play of level 1 with its one certified
   tuning applied (playing, not won), seed 7"; schema 2 "campaign mode, progress (level 2 open, level 1 solved with its
   actions spent and stars), records []", "the result is kept, unverified, without a trace"; the envelope of

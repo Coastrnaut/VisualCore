@@ -129,11 +129,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [harmonicBridges].compactMap { $0 }
 
-    /// R02-G12 Harmonic Bridges (feature 413, R02-G12-03): a candidate until X-R02-G12. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G12 Harmonic Bridges (features 411–419, R02-G12-01…09): a candidate until X-R02-G12. Snapshot schema 3
+    /// (feature 417), so the schema-1 and schema-2 examples are stored (feature 419, R02-G12-09).
     fileprivate static var harmonicBridges: ExperienceRegistration? {
         guard let id = HarmonicBridgesExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: HarmonicBridgesExperienceCore.self) { launch in
+        let examples = [HarmonicBridgesExperienceCore.schemaOneExample(),
+                        HarmonicBridgesExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: HarmonicBridgesExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return HarmonicBridgesExperience.make(
                 id: id, storage: launch.storage,
