@@ -17,9 +17,9 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 395
 - [ ] T-R02G1105-002 [P] [US2] [US3] Add `continuation(_:knowledge:pulsed:energyLeft:workBound:)` to
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSolver.swift` (the certification's greedy rule —
   every cell known open and not yet pulsed tried in cell-index order, the one leaving the fewest fitting placements
-  pulsed, ties to the lowest index — started from the given knowledge and pulses until one placement fits; [] when one
-  already fits; nil when more than `maxPulses` pulses in all, over the work bound, or when the further pulses would not
-  leave at least 1 energy; `plan(_:workBound:)` unchanged and equal to the continuation from the opening) and create
+  pulsed, ties to the lowest index — started from the given knowledge and pulses (the echoes of the play's current
+  pulses, undone ones excluded) until one placement fits; [] when one already fits; nil when more than `maxPulses`
+  further pulses are needed, over the work bound, or when the further pulses would not leave at least 1 energy; `plan(_:workBound:)` unchanged and equal to the continuation from the opening) and create
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerHints.swift` (`EchoCartographerHintPlan`,
   `EchoCartographerHintKind` pulse/claim/stuck, `EchoCartographerHint` with levels 1 … 3 and the texts of clarification
   Q1 — "Send a pulse to narrow down where the beacons can be", "… from a known open cell in row y", "Send a pulse from
