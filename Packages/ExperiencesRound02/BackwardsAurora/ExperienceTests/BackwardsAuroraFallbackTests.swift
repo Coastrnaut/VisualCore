@@ -238,7 +238,10 @@ import VisualCoreMath
         #expect(core.play.failure == .tear(0, found.seam))
         #expect(core.outcome?.code == BackwardsAuroraExperienceCore.failedCode)
         let text: String = shell.presenter.describe(core)
-        #expect(text.contains("The aurora tore at seam \(found.seam) on reversal 1."), "\(text)")
+        // Since feature 395 (R02-G10-05) the description gives the failure explanation (clarification Q5).
+        let explanation: BackwardsAuroraFailureExplanation = try #require(BackwardsAuroraFailureExplanation(play: core.play))
+        #expect(explanation.seam == found.seam && explanation.reversal == 1)
+        #expect(text.contains(explanation.text), "\(text)")
         #expect(shell.presenter.mirror.status.hasPrefix("Failed: "), "\(shell.presenter.mirror.status)")
         // Level-2 draws no glow shells, so nothing additive lies over the cross.
         BackwardsAuroraTest.pin(session, shell, tier: 2)

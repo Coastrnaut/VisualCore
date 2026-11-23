@@ -63,16 +63,18 @@ import VisualCoreExperienceHost
         #expect(experience.frameProbes.isEmpty, "no probes before a frame")
     }
 
-    @Test func theControlsAreTheFourActions() {
+    /// The four play actions and, since feature 395 (R02-G10-05), the five teaching and progression actions.
+    @Test func theControlsAreTheNineActions() {
         var ids: [String] = []
         var arities: [Int] = []
         for control in BackwardsAuroraExperienceCore.controls {
             ids.append(control.id)
             arities.append(control.ranges.count)
         }
-        #expect(ids == ["wave.reverse", "play.undo", "play.redo", "level.next"])
+        #expect(ids == ["wave.reverse", "play.undo", "play.redo", "level.next", "level.select", "mode.daily",
+                        "mode.practice", "mode.campaign", "tutorial.dismiss"])
         #expect(ids == BackwardsAuroraExperienceCore.actionIDs)
-        #expect(arities == [2, 0, 0, 0])
+        #expect(arities == [2, 0, 0, 0, 1, 3, 0, 0, 0])
         let reverse: ExperienceControl = BackwardsAuroraExperienceCore.controls[0]
         for range in reverse.ranges {
             #expect(range == 0.0...31.0, "\(range)")

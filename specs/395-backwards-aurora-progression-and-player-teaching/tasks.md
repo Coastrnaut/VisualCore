@@ -59,7 +59,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 385
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraScenarios.swift` entries where needed and
   `Packages/ExperiencesRound02/BackwardsAurora/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); lead; `--name
   host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter BackwardsAurora`
-- [ ] T-R02G1005-005 Edit `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraPresenter.swift` (the
+- [X] T-R02G1005-005 Edit `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraPresenter.swift` (the — Verified 2026-11-23: sim-27 exit=0 (39 simulator tests incl. BackwardsAuroraTeachingTests 5: tutorial shown and dismissed, three hint levels equal the Core's and following them wins level 1, a budget failure explained with Undo and Retry, a campaign win records stars with band and goal and opens the next level with a locked level refused, practice, daily and campaign modes; identity test lists nine controls; the fallback test reads the failure explanation; hint search off the main actor, stale search owns nothing; agent D's tests retested by the lead)
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it,
   the search off the main actor and a stale search never owning the hint state — and the failure explanation as panel
   text, with the level's difficulty band (of the five bands of 20), its goal and its best stars (FR-R02G1005-004); the
