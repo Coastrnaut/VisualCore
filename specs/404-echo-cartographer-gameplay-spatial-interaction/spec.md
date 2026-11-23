@@ -56,9 +56,11 @@ presentation state.
   `cell.mark` on the new cell (adding it); over its own cell, a marked cell or empty space it sends nothing. A drag that
   starts on a cell without a marker places one: on release over a cell of the chamber without a marker it sends
   `cell.mark` there (the kernel refuses a ninth marker); otherwise nothing. A press held 0.5 s without moving 10 points
-  arms a claim; lifting it sends `cell.claim [x, y]` for the held cell while playing; moving 10 points after it armed
-  cancels it and nothing is sent. The cursor follows every placed, moved or claimed cell. Impact: FR-R02G1104-002, 003;
-  SC-R02G1104-001.
+  arms a claim; lifting it sends `cell.claim [x, y]` for the held cell while playing (a press held on a marker counts
+  as held on the marker's cell); moving 10 points after it armed cancels it and nothing is sent. Tap and hold are told
+  apart by the event timestamps: lifted before 0.5 s is a tap, at 0.5 s or later a held press. A drag or a held press
+  that starts on empty space sends nothing. The cursor follows every placed, moved or claimed cell. Impact:
+  FR-R02G1104-002, 003; SC-R02G1104-001.
 - Q: How do two fingers behave, and what happens on a finished play? → A: a second finger cancels any one-finger
   gesture (nothing sent) and orbits: yaw ±35° about the y axis (90° per view width), pitch −15° … +20° (60° per view
   height) about the authored view; a third finger re-bases the midpoint; a double tap on empty space or "Reset view"
@@ -130,7 +132,8 @@ mark, undo, redo, next level, "Reset view"), including winning every certified l
   points reset the view.
 - **A touch that moves 10 … 16 points:** neither a tap nor a drag; nothing changes.
 - **A finished play (won, failed or showing the result):** gestures send nothing and the description says the play is
-  over (undo or next level); the cursor and orbit still work.
+  over (undo or next level); the cursor and orbit still work (a tap on a chamber cell moves the cursor).
+- **A drag or held press that starts on empty space:** sends nothing.
 - **A pulse or claim the kernel refuses:** sent and refused with its reason, shown to the player.
 - **A second finger during a gesture:** cancels it (nothing sent) and starts an orbit.
 - **A cancelled touch:** changes nothing.
