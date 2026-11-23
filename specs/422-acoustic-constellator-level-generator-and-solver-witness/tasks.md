@@ -37,7 +37,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G1302-004 [US2] Create
+- [X] T-R02G1302-004 [US2] Create — Verified 2026-11-23: host-3 (AcousticConstellatorGeneratorTests 8 tests: band profiles, derived limits and threshold, candidate determinism, drawing order re-drawn independently on 200 pairs, band values, generated filters and determinism on 6 entries, generation(n) refusal, catalog digest order-sensitive) exit 0, lead retest; candidate doc comment corrected (degree-5 symbol star)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorGenerator.swift` (lead: band profiles "band
   1: 3 … 4, 1 … 2, 24, 1 … 2; band 2: 4 … 5, 1 … 2, 24, 2 … 3; band 3: 5 … 6, 2 … 3, 32, 3 … 4; band 4: 6 … 7, 2 … 3, 40,
   4 … 5; band 5: 7 … 8, 3 … 4, 48, 5 … 6" (stars, missing, window, plan range) with a cycle from band 3; candidates from
