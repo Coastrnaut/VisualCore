@@ -101,3 +101,12 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 001 → 002 → {003 (agent A), 004 (agent B), 005 (agent C)} → 006 (lead; agent D writes the simulator tests) → 007 … 011,
 013. 012 stays open until device testing.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G1103-014 Brighten the known walls' edge strips on a won level (the edge case "a won level: every beacon
+  stands as a pillar and the chamber's known walls brighten"), without moving any position, in
+  `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSceneGeometry.swift` and/or
+  `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerShaders.swift`, with a host geometry or shader test
+  and a simulator check that a won frame's wall edges are brighter than the same walls before the win, per Spec §Edge
+  Cases and FR-R02G1103-002 (missing)
