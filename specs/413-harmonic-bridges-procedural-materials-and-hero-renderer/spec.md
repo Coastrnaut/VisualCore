@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G12-03 (migration ledger, game feature of experience R02-G12) · ID namespace FR-R02G1203-###,
 SC-R02G1203-###, T-R02G1203-###
@@ -29,6 +29,84 @@ Canonical overrides:
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G12-01 and -02.
 - **Model:** feature 403 (Echo Cartographer's hero renderer).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+403's answers where the games agree. Facts checked in code (read-only, 2026-11-23): Echo Cartographer's experience
+(R02-G11-03 … 10) is the pattern in this package — a Core adapter with a table of certified candidates, an immutable
+scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+(`…Experience.swift`, presenter, scene, controls), a scenario manifest with 80 acceptance scenarios, a registration with
+content facts in `Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Harmonic Bridges kernel provides
+the level (islands with drawing positions on a 16 × 10 grid, strings with lengths, pegs and locks, steps of tones,
+threshold, budget), the report (swings per step, string and sample; bridges; reached islands), the play (tune, test,
+undo, redo, stages, failures broken(step, string) and budget(action)) and the certified catalog with its pinned digest
+(b832e7ee…c737); `AppModelTests` uses `r02-g12.harmonic-bridges` as its example of an unregistered candidate and the
+next round-two game is `r02-g13.acoustic-constellator`; the catalog's design gives the palette "warm copper, cyan
+membranes and mist violet", the hero "strings swelling into translucent glowing architecture as they find resonance"
+and the geometry "swept strings and radial wave-shell strip meshes".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the islands stand on the plane
+  y = 0 with x to the right and z towards the viewer: island (gx, gy) of the 16 × 10 drawing grid is at
+  X = (gx − 7.5) · 0.12, Z = (gy − 4.5) · 0.12. Drawn in this order: the mist ground (a plane at y = −0.01 covering
+  x −1.1 … 1.1, z −0.8 … 1.1); each island as a hexagonal prism (radius 0.07, height 0.1) with copper faces and its
+  top edges as strips 0.008 thick; a ring (radius 0.1, line 0.012) at y = 0.005 around the start island and a
+  four-pointed star (radius 0.1) around the goal; every string as a swept strip 0.012 wide between its islands' top
+  centres at y = 0.1, deflected sideways by its drawn wave (presentation only: Σ over its resonant modes in the shown
+  step of 0.03 · w · sin(nπu) · cos(2π · n · t / 1.6), u along the string, 24 segments); a string that is a bridge in the
+  shown step as a membrane strip 0.05 wide beneath it; on each string the five samples k = 1 … 5 at u = k / 6 as marks
+  0.02 wide at y = 0.11, a filled square when the kernel's swing E(k) reaches the threshold and a hollow ring when it
+  does not; every island the start reaches in the shown step lit with a glow ring; the window's steps as a row of pips
+  at z = 0.8 (filled for the shown step, outlined otherwise, a cross on a broken step) and the moves gauge, a row of
+  `budget` bars at z = 0.95, y = 0, spread evenly from x = −0.9 to 0.9 (each 1.8 / budget wide with a gap of a fifth of
+  that, 0.05 deep), lit for the actions left. The shown step cycles every 1.2 s of presentation time while playing
+  (a test or a win shows every step in turn as well); at time 0 it is step 0. Depth testing is off (the shared mesh
+  renderer's path): the ground and the flat layers first, then the membranes, the strings and the marks, then the
+  islands back to front (by z from the far side, then by x) with back faces culled, then the pips and the gauge; the
+  glow is additive and drawn last. The camera is a fixed authored perspective (eye (0, 1.9, 1.6) looking at
+  (0, 0, 0.1)) fitted to the box x −1 … 1, z −0.7 … 1.0, y 0 … 0.2 with a 5 % margin for aspect 0.4 … 2.5. Nothing drawn
+  is consulted by the rules; the drawn wave never replaces the kernel's exact swing. Impact: FR-R02G1203-001, 002, 003,
+  006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): strings swing, 2 radial wave shells (strip rings
+  expanding from each resonating string's midpoint over 1.6 s) and 2 glow shells around membranes and reached islands;
+  `level-1`: strings swing, no wave shells, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): strings at rest
+  (straight), no shells, no glow. Islands, strings, membranes, marks, pips, gauge, colours and positions are the same at
+  every tier. Levels are ordered richest first; the presenter logs each tier change with its reason. Impact:
+  FR-R02G1203-004; SC-R02G1203-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every island's
+  top centre, every bridge membrane's midpoint (in the shown step, strings at rest), every string's midpoint, the first
+  gauge bar and the first step pip through the same camera and gives the palette. Simulator tests render offscreen at
+  1,152 × 768 at time 0 and check, at points at least 6 pixels from any other element, that an island's top centre
+  differs from the ground by at least 0.1 in luminance with red above blue by at least 0.05 (copper); that a membrane's
+  midpoint differs from the ground by at least 0.08 with blue above red by at least 0.05 (cyan); that the gauge's first
+  bar differs from the ground by at least 0.1; and that the background matches the ground within 0.05 away from geometry.
+  Palette: ground #07060C, island face #7A4A2E, island edge #E0A070, string #C88A5A, membrane #4FD8E8, filled mark
+  #B8F4FF, hollow mark #7A6A9C, start ring #F2D2A8, goal star #A894FF, reached glow #8FF4FF, wave shell #6FE0F0, pip
+  #4FD8E8, unlit pip #3A3348, lit gauge bar #E0A070, unlit gauge bar #2A2433. Impact: FR-R02G1203-006; SC-R02G1203-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `HarmonicBridgesSceneSnapshot` (islands with positions, strings with ends, lengths, current pegs and locks, the
+  kernel's report, the steps' resonant modes per string, threshold, start, goal, stage, failure, actions left, budget,
+  level number and presentation time) made by the adapter; it never holds the kernel. If a program fails to compile or
+  link, the scene draws the level-2 geometry unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps
+  running; tier changes go to its `tierLog`. Reduce Motion draws strings at rest and does not cycle the shown step
+  (step 0, or the broken step after a failed test); Reduce Flashing caps the glow gain. A failure outlines the broken
+  step's pip and the broken string, and the failure text names them, as the kernel's reason does. Impact:
+  FR-R02G1203-003, 007; SC-R02G1203-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g12.harmonic-bridges` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/HarmonicBridges/scenario-manifest.json`, no permissions, a summary of
+  at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's
+  experience registry link `HarmonicBridgesExperience` as a candidate (`available: false` until X-R02-G12), opening at
+  seed 0 (level 1); `AppModelTests` switches its unregistered example to the next round-two game
+  (`r02-g13.acoustic-constellator`). The adapter (`HarmonicBridgesExperienceCore`) prepares certified level (seed mod
+  100) + 1 from its table of certified candidates (the whole generator only if that candidate no longer certifies) and
+  accepts `string.tune [s, p]`, `crossing.test`, `play.undo`, `play.redo` and `level.next` (whole numbers only); the
+  kernel refuses everything out of range or out of stage; its digest is the level number and the play's fingerprint
+  (never the record history, so undo restores the earlier digest); snapshot schema 1 `{level, records}`. The panel's
+  chosen string and peg are presentation state of the controls, not kernel state: a level opens with string 0 chosen at
+  its current peg, both clamped. Impact: FR-R02G1203-005, 008, 009; SC-R02G1203-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
