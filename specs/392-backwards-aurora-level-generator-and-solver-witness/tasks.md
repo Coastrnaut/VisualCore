@@ -39,7 +39,7 @@ logic); no GLSL in this feature.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G1002-004 [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraGenerator.swift`
+- [X] T-R02G1002-004 [US2] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraGenerator.swift` — Verified 2026-11-22: host-3 (BackwardsAuroraGeneratorTests 16: band profiles (N ≥ 4k + 2), breaking limits, ids; candidate and generation determinism; all 100 entries checked field by field per band (ids, budgets, tutorial, lengths, L = target worst bend, separated sections within the band's lengths, β = 4k, checkpoints inside differing positions, breaking limit, the solution wins, difficulty recomputed); skipped re-checked; placement shape; accepts on sloped and flat hand cases) exit 0, lead retest
   (BackwardsAuroraBandProfile "band 1: 14 … 16, 2 … 3, 2 … 4, 2, none (B = 128); band 2: 18 … 22, 3 … 4, 2 … 5, 3, none;
   band 3: 22 … 26, 4 … 5, 2 … 6, 4, 48; band 4: 26 … 30, 5 … 6, 2 … 6, 5, 32; band 5: 30 … 32, 6 … 7, 2 … 6, 6, 16 (B =
   min(128, L + margin))", `candidate(_:index:)` drawing in the order of clarification Q1 from `SeededRandom(seed:
