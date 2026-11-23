@@ -54,7 +54,7 @@ consume).
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1201-005 [P] [US4] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesRules.swift`
+- [X] T-R02G1201-005 [P] [US4] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesRules.swift` — Verified 2026-11-23: host-4 exit 0 (HarmonicBridgesRulesTests 4: rules id and initial position; move order on the hand level (34 and 45 moves); 200 seeded walks agree with the play move for move (first 20 through the real apply for every candidate, the rest through its validation plus 8 real applies per step, for CI time); terminal positions have no moves); agent C's rules retested by the lead against agent B's play
   (agent C: `PuzzleRules`: State = position (pegs, actions spent, outcome), Move = HarmonicBridgesAction; legal moves while
   playing "every valid tuning (string, then peg order), then the test") with
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesRulesTests.swift` (agreement with the play on 200
