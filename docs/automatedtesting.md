@@ -438,6 +438,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `BACKWARDS_AURORA_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
   BackwardsAuroraRegressionGoldenTests`. Agents that write files while an evidence chain runs write them to a scratch
   folder for the lead to copy in, so the chain tests the tree it started with.
+- **Script test classes go above the `__main__` block** (R02-G11-09, 2026-11-23). `scripts/test_scripts.py` ends
+  with `if __name__ == "__main__":`; a class appended after it (feature 408's `EchoCartographerRegressionTests`) is
+  found by `python3 -m unittest` but never run by `python3 scripts/test_scripts.py`, the `script-tests` check (669
+  instead of 674 tests). Insert new classes before that block and compare the "Ran N tests" count with the last run.
 - **A new UI test folder needs `xcodegen generate` first** (R02-G11-09, 2026-11-23). `VisualCore.xcodeproj` is
   generated and not tracked; `release_check.py` regenerates it only when it is missing, so after adding
   `Apps/VisualCore/Tests/UI/EchoCartographer/` the first `app-ui-ios27-t3` run built the old project and executed 0

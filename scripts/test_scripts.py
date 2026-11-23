@@ -6802,17 +6802,6 @@ class BackwardsAuroraDeviceRowsCheckTests(unittest.TestCase):
                          ["scripts/check_device_rows.py", "--experience", "r02-g10.backwards-aurora"])
 
 
-if __name__ == "__main__":
-    tree_before = ledger_tree_hash()
-    program = unittest.main(verbosity=2, exit=False)
-    tree_after = ledger_tree_hash()
-    if tree_before != tree_after:
-        print("FAIL: the self-tests changed .autonomy/migration/ (FR-U00-038)")
-        sys.exit(1)
-    print(f"ledger tree unchanged: {tree_before[:16]}")
-    sys.exit(0 if program.result.wasSuccessful() else 1)
-
-
 class EchoCartographerRegressionTests(unittest.TestCase):
     """The local Echo Cartographer regression command (feature 408, T-R02G1108-006, FR-R02G1108-006 and
     FR-R02G1108-007, SC-R02G1108-005): the commands in order (the simulator part with its memory isolation variable),
@@ -6899,3 +6888,14 @@ class EchoCartographerRegressionTests(unittest.TestCase):
         code, out, _ = self.run_main("--skip-simulator", codes=(1,), outputs=("error: build failed",))
         self.assertEqual(code, 1)
         self.assertIn("echo-cartographer-regression host: FAIL (exit 1; first failing: unknown)", out)
+
+
+if __name__ == "__main__":
+    tree_before = ledger_tree_hash()
+    program = unittest.main(verbosity=2, exit=False)
+    tree_after = ledger_tree_hash()
+    if tree_before != tree_after:
+        print("FAIL: the self-tests changed .autonomy/migration/ (FR-U00-038)")
+        sys.exit(1)
+    print(f"ledger tree unchanged: {tree_before[:16]}")
+    sys.exit(0 if program.result.wasSuccessful() else 1)

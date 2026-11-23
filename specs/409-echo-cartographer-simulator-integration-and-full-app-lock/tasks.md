@@ -78,7 +78,7 @@ FR-005 → 006; FR-006 → 005; FR-007 → 004, 005, 007 … 010.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G1109-013 Move `class EchoCartographerRegressionTests` in `scripts/test_scripts.py` above the
+- [X] T-R02G1109-013 Move `class EchoCartographerRegressionTests` in `scripts/test_scripts.py` above the — Verified 2026-11-23: script-tests-2 exit 0: 674 tests (was 669), EchoCartographerRegressionTests now above the __main__ block and run by python3 scripts/test_scripts.py; testing doc lesson added
   `if __name__ == "__main__":` block, so the `script-tests` check (`python3 scripts/test_scripts.py`) runs its 5 tests;
   re-run `--name script-tests-2 -- python3 scripts/test_scripts.py` alone and confirm the class runs per FR-R02G1109-007
   (partial)
