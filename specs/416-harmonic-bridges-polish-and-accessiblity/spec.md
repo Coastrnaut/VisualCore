@@ -129,7 +129,7 @@ panel lays out at the largest accessibility text size without clipping the contr
 **Acceptance Scenarios**:
 
 1. **Given** Reduce Flashing, **When** a string is tuned, a step changes, the level is won or it fails, **Then** no wave
-   shell is drawn and every change of the glow, the bridges' brightness and the won brightening is a fade of at least
+   shell is drawn and every change of the glow and of the won brightening of the bridges is a fade of at least
    0.4 s, not a flash (what the player's action changes — pegs, marks, membranes — appears with the action).
 2. **Given** Reduce Motion or Reduce Flashing, **When** two frames of the same state are drawn at different times
    (after any fade has finished), **Then** they are identical.
@@ -175,8 +175,8 @@ ambient recipes are pure functions of the state they are made from; sound plays 
   refusals in words as `rejection`, through the shared route.
 - **FR-R02G1206-003**: Haptics MUST map selection → accepted tuning, test, undo or redo, success → win, warning →
   failure, error → refused action, through the shared route and the person's switch; they never change state.
-- **FR-R02G1206-004**: Reduce Flashing MUST cap the glow, turn every brightness change of the glow, the bridges and the
-  won brightening into fades of at least 0.4 s, hold the shown step and the strings at rest and draw no wave shells,
+- **FR-R02G1206-004**: Reduce Flashing MUST cap the glow, turn every brightness change of the glow and of the won
+  brightening of the bridges into fades of at least 0.4 s, hold the shown step and the strings at rest and draw no wave shells,
   with every periodic motion below 3 cycles per second; Reduce Motion MUST hold the strings at rest and the shown step;
   neither changes the state or its digest.
 - **FR-R02G1206-005**: The panel MUST support Dynamic Type up to the largest accessibility size and Increase Contrast on
@@ -192,7 +192,7 @@ ambient recipes are pure functions of the state they are made from; sound plays 
 
 - **Announcement plan**: kind and text for each state change.
 - **Haptic plan**: kind for each outcome of an action.
-- **Light levels**: the glow, the bridges' brightness and the won brightening, eased in presentation time.
+- **Light levels**: the glow and the won brightening of the bridges, eased in presentation time.
 - **Audition recipe**: partials (frequencies, gains, decay) derived from a string's resonant modes and tone strengths.
 - **Ambient recipe**: partials (frequencies, gains) derived from the steps bridged, the actions left and the stage.
 

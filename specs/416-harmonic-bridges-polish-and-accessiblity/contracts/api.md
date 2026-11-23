@@ -19,8 +19,9 @@ public struct HarmonicBridgesLights: Sendable, Equatable {
     public var isSettled: Bool
     public static func maxHalfRangeCrossingsPerSecond(_ samples: [[Double]], frameRate: Double) -> Double
 }
+public struct HarmonicBridgesPartial: Sendable, Equatable { public let frequency: Double; public let gain: Double }
 public struct HarmonicBridgesAudition: Sendable, Equatable {
-    public let partials: [(frequency: Double, gain: Double)]  // as Equatable pairs
+    public let partials: [HarmonicBridgesPartial]
     public static let duration = 0.6
     public static func of(_ snapshot: HarmonicBridgesSceneSnapshot, string: Int, step: Int) -> HarmonicBridgesAudition }
 public enum HarmonicBridgesSoundRecipe {
