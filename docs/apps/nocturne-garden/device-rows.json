@@ -108,7 +108,7 @@
       ],
       "owner_steps": [
         "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
-        "The owner taps pieces, drags the plane's rim and depth, taps to cut and orbits with two fingers; the campaign does not synthesise touches on hardware."
+        "The owner taps bed cells, drags blooms and the lantern, pinches and orbits with two fingers; the campaign does not synthesise touches on hardware."
       ],
       "pass": "Touch-to-frame latency recorded for 200 samples per device; a tap plants exactly one bloom at the touched cell; a drag shows the exact would-be shadow and commits one move; a pinch settles on one allowed size; a lantern drag settles on one allowed elevation; Reset view restores the authored camera.",
       "procedure": "Tap a bed cell to plant, drag a bloom to move it (and off the bed to remove it, with the preview shown), pinch to resize, drag the lantern to change the sun and orbit the camera with two fingers on each device; the campaign records the interval from touch to the first frame showing the change.",

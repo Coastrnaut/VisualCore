@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g10.backwards-aurora"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g10.backwards-aurora",
+  "elapsed_seconds": 0.027,
+  "exit_code": 0,
+  "finished": "2026-11-23T08:18:30+00:00",
+  "gate": "R02-G10-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G10-10.device-rows.log",
+  "log_sha256": "b6c4a21c91444811b1d92e047c232bf12c6445cf35740b8f72db31eee42adb8f",
+  "name": "device-rows",
+  "started": "2026-11-23T08:18:30+00:00",
+  "timed_out": false
+}

@@ -158,6 +158,8 @@ def steps(stamp: str) -> list[Step]:
         Step("device-rows-r02-g08", [PY, "scripts/check_device_rows.py", "--experience", "r02-g08.faceted-forge"]),
         # Feature 390 (R02-G09-10): Nocturne Garden's device-row definition (no device is contacted).
         Step("device-rows-r02-g09", [PY, "scripts/check_device_rows.py", "--experience", "r02-g09.nocturne-garden"]),
+        # Feature 400 (R02-G10-10): Backwards Aurora's device-row definition (no device is contacted).
+        Step("device-rows-r02-g10", [PY, "scripts/check_device_rows.py", "--experience", "r02-g10.backwards-aurora"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),
