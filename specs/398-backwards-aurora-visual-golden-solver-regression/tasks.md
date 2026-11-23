@@ -40,7 +40,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1008-005 [US2] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/ExperienceTests/BackwardsAuroraRegressionGoldenFrameTests.swift` and
+- [X] T-R02G1008-005 [US2] [US3] Create `Packages/ExperiencesRound02/BackwardsAurora/ExperienceTests/BackwardsAuroraRegressionGoldenFrameTests.swift` and — Verified 2026-11-23: sim-27 exit=65 (one #expect message built with + did not compile; fixed); sim-27-2 exit=0 (58 simulator tests incl. BackwardsAuroraRegressionGoldenFrameTests: the 16 golden frames rendered at 1,152 x 768 match their descriptions, sample points and ring centres within one quantum of the CPU reference and drawn there, gauge spent and total, the feature-393 frame checks; BackwardsAuroraRegressionMemoryTests: 12 open-draw-warn-close cycles with the aurora scene at 0 GPU objects after each close and warning, footprint bound applied when isolated; agent C's files retested by the lead)
   `Packages/ExperiencesRound02/BackwardsAurora/ExperienceTests/BackwardsAuroraRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked against
   their descriptions with the feature-393 tolerances (sample points away from the markers within 3 px of a ribbon pixel
   0.15 cooler and 0.15 from the ground, ghost points near a lilac pixel 0.1 from the ground, the first gauge bar at least

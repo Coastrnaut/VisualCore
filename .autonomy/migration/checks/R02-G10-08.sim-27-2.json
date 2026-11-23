@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "BackwardsAuroraExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing BackwardsAuroraExperienceTests",
+  "elapsed_seconds": 9.526,
+  "exit_code": 0,
+  "finished": "2026-11-23T07:14:32+00:00",
+  "gate": "R02-G10-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G10-08.sim-27-2.log",
+  "log_sha256": "7c3b015cb0ba808b2b2368299117f2e986cfd0798297160108e3aa5deee00216",
+  "name": "sim-27-2",
+  "started": "2026-11-23T07:14:23+00:00",
+  "timed_out": false
+}
