@@ -11,7 +11,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G1103-001 Baselines on the committed tree: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0, 2026-11-23; rendering baseline is R02-G11-02's rendering runs (exit 0)
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G11-02's
   rendering runs (exit 0)
-- [ ] T-R02G1103-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes,
+- [X] T-R02G1103-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes, — Verified 2026-11-23: host (86 EchoCartographer tests) exit 0, 2026-11-23; Core dependencies added; purity scan skips the five presentation sources; snapshot, palette and tiers
   VisualCoreExperience, VisualCoreDiagnostics, VisualCorePersistence now; `EchoCartographerExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); make the renderer-purity scan
   of `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerInvariantTests.swift` skip the presentation

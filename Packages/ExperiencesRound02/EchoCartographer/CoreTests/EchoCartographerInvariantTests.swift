@@ -389,9 +389,13 @@ import VisualCoreSimulation
         EchoCartographerFixtures.fixture(seed &+ UInt64(index))
     }
 
-    /// The presentation sources of the Core. Echo Cartographer's Core has none yet (drawing comes in R02-G11-03), so
-    /// the kernel scan covers every Core file; later presentation files are listed here.
-    static let presentationSources: Set<String> = []
+    /// The presentation sources of feature 403 (R02-G11-03), which use Doubles for drawing and import the experience
+    /// packages; the purity scan covers the kernel files only.
+    static let presentationSources: Set<String> = ["EchoCartographerSceneSnapshot.swift",
+                                                   "EchoCartographerSceneGeometry.swift",
+                                                   "EchoCartographerShaders.swift",
+                                                   "EchoCartographerScenarios.swift",
+                                                   "EchoCartographerExperienceCore.swift"]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, without the presentation
     /// sources).
