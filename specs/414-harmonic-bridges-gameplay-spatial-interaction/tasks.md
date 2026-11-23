@@ -89,3 +89,11 @@ tests stay short (< 10 s each). No {owner} tasks.
 001 → {002 (agent B), 004 (agent D)} → 003 (agent C, on B's picker contract in contracts/api.md) → 005 (lead; agent E
 writes the wiring tests) → 006 … 010, 012. 011 stays open until device testing. Shared files (geometry is B's only;
 presenter, scene, controls, docs) stay with the lead. MVP: Stories 1 to 3 and 5.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G1204-013 Order the island prisms by distance from the drawn camera's eye (far first; ties as today) so the
+  painter's order stays correct at every orbit: give `HarmonicBridgesSceneGeometry.islandOrder` and the bridge mesh the
+  orbit's eye (the authored eye keeps today's order), rebuild the scene's geometry when the orbit changes, and test in
+  `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesSceneGeometryTests.swift` that at the orbit's
+  corners every island is drawn after every island farther from the eye, per FR-R02G1204-005 (partial); `--name host-5`
