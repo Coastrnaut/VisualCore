@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G10-03 (migration ledger, game feature of experience R02-G10) · ID namespace FR-R02G1003-###,
 SC-R02G1003-###, T-R02G1003-###
@@ -30,6 +30,75 @@ Canonical overrides:
   packages; the kernel and certified levels of R02-G10-01 and -02.
 - **Model:** feature 383 (Nocturne Garden's hero renderer) for the adapter, snapshot, geometry, CPU reference,
   scenarios, presenter, scene, fallback and registration.
+
+## Clarifications
+
+### Session 2026-11-22
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+383's answers where the games agree. Facts checked in code (read-only, 2026-11-22): Nocturne Garden's experience
+(R02-G09-03 … 10) is the pattern in this package — a Core adapter with a table of certified candidates, an immutable
+scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+(`…Experience.swift`, presenter, scene, controls), a scenario manifest with 80 acceptance scenarios, a registration with
+content facts in `Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Backwards Aurora kernel provides
+the level (opening and target waves of N samples, checkpoints, bend and breaking limits, sections, budget), the wave
+(bends, seams, reversal, distance), the play (reverse, undo, redo, stages, failure tear(reversal, seam) or budget) and
+the certified catalog with its pinned digest (6eb242e6…d06e); `AppModelTests` uses `r02-g10.backwards-aurora` as its
+example of an unregistered candidate and the next round-two game is `r02-g11.echo-cartographer`; the catalog's design
+gives the palette "deep ocean cyan, pale lilac, midnight", the hero "rivers of aurora folding backward through time in
+synchronized waves" and the geometry "tessellated temporal ribbon with direction-coded pulses".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the timeline stands upright as the
+  plane z = 0 with y up: with u = 2 / N, sample k sits at x = −1 + (k + 0.5)·u and y = 0.6·s(k) / 64. The ribbon is a
+  strip 0.06 high (y ± 0.03) through the sample points, each segment between neighbouring samples tessellated into 4
+  straight steps (the drawn path is the polyline of the kernel's samples, never a smoothed curve). The ghost trail is
+  the target's polyline, 0.024 high, at z = −0.05. Each checkpoint is a vertical tick at its x from y = −0.7 to 0.7 at z
+  = −0.02 with a ring (radius 0.045, line 0.012) at the target height at z = 0.02, filled as a disc when matched. Every
+  interior bend with |b| > L carries a kink cross (two bars, 0.05 across) at its sample point at z = 0.03; a tear
+  carries a larger cross (0.09) at its seam. The chosen section [start, end] is a band from x(start) − u/2 to x(end) +
+  u/2, y −0.7 … 0.7, at z = −0.08, with dashed edges. The reversal gauge is a row of `budget` bars at y = −0.85 from x =
+  −0.9 to 0.9, spent ones lit cyan. The ground is a midnight plane at z = −0.2. Trailing aurora layers are copies of the
+  ribbon behind it (layer i at z = −0.06·i, y + 0.04·i, fading). Direction-coded pulses are bright beads travelling
+  along the ribbon with presentation time, left to right outside the chosen section and right to left inside it (the way
+  a reversal will fold it). The camera is a fixed authored perspective from +z fitted to the box x −1 … 1, y −0.95 …
+  0.75 with a 5 % margin for aspect 0.4 … 2.5, so it never moves while a level is played. Nothing drawn is consulted by
+  the rules. Impact: FR-R02G1003-001, 002, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): 3 trailing layers, 2 pulses per section of the
+  timeline, 2 glow shells around the ribbon; `level-1`: 2 trailing layers, 1 pulse, 1 glow shell; `level-2` (the
+  design's "Tier 0, D3-safe"): the ribbon alone, no pulses, no glow. Samples, ghost, checkpoints, kinks, band, colours,
+  gauge and positions are the same at every tier. Levels are ordered richest first; the presenter logs each tier change
+  with its reason. Impact: FR-R02G1003-004; SC-R02G1003-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects every sample
+  point, every checkpoint ring centre and the gauge's first bar through the same camera and gives the palette. Simulator
+  tests render offscreen at 1,152 × 768 and, at sample points at least 6 pixels from every ring, kink and tick, check
+  that the ribbon pixel is cyan (blue minus red at least 0.15) and differs from the ground by at least 0.15 in
+  luminance; at target points whose sample differs from the wave's by at least 8 units, that the ghost pixel differs
+  from the ground by at least 0.1 in luminance with red above green by at least 0.05 (lilac); that the gauge's first bar
+  differs from the ground by at least 0.1; and that the background matches the ground within 0.05 away from geometry.
+  Palette: ground #070B1F, ribbon #1FC8D6, ribbon highlight #9FF4FA, glow #6FE8F0, ghost #C9B8F0, checkpoint ring
+  #DCD3FA, matched disc #F4F0FF, kink cross #FF8A7A, tear cross #FF3B30, section band #2A3570, spent mark #1FC8D6,
+  unspent mark #2B3352. Impact: FR-R02G1003-006; SC-R02G1003-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `BackwardsAuroraSceneSnapshot` (the wave and target samples, the checkpoint positions and which are matched, the bend
+  limit and the positions of sharp bends, the torn seam if any, the chosen section, stage, failure, reversals spent,
+  budget, level number and presentation time) made by the adapter; it never holds the kernel. If a program fails to
+  compile or link, the scene draws the level-2 geometry unlit with the shared unlit mesh renderer, keeps
+  `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion holds the pulses and shimmer at
+  time 0; Reduce Flashing caps the glow gain. A tear marks its seam with the tear cross and the failure text names the
+  reversal and the seam, as the kernel's reason does. Impact: FR-R02G1003-003, 007; SC-R02G1003-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g10.backwards-aurora` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/BackwardsAurora/scenario-manifest.json`, no permissions, a summary of
+  at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's
+  experience registry link `BackwardsAuroraExperience` as a candidate (`available: false` until X-R02-G10), opening at
+  seed 0 (level 1); `AppModelTests` switches its unregistered example to the next round-two game
+  (`r02-g11.echo-cartographer`). The adapter (`BackwardsAuroraExperienceCore`) prepares certified level (seed mod 100) +
+  1 from its table of certified candidates (the whole generator only if that candidate no longer certifies) and accepts
+  `wave.reverse [start, end]`, `play.undo`, `play.redo` and `level.next` (whole numbers only); the kernel refuses
+  everything out of range or out of stage; its digest is the level number and the play's fingerprint (never the record
+  history, so undo restores the earlier digest); snapshot schema 1 `{level, records}`. The panel's chosen section
+  (start, end) is presentation state of the controls, not kernel state: a level opens with start 0 and end 1, and both
+  stay clamped to the wave. Impact: FR-R02G1003-005, 008, 009; SC-R02G1003-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
