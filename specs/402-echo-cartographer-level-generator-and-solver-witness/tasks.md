@@ -56,7 +56,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1102-007 Docs: `docs/architecture/echo-cartographer.md` (content pipeline),
+- [X] T-R02G1102-007 Docs: `docs/architecture/echo-cartographer.md` (content pipeline), — Verified 2026-11-23: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0, 2026-11-23; architecture content pipeline, package README feature 402, testing doc entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1102-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G11-01: Echo Cartographer rule kernel; agreement walks sampled).
+Last updated: 2026-11-23 (R02-G11-02: Echo Cartographer content pipeline; measure filters with a prototype).
 
 ## 1. What is tested, and where
 
@@ -494,6 +494,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (`host-1`, `host-2`), and every attestation's `elapsed_seconds` is read after a check: anything above about 450 s is
   split before the next gate. The one failed attempt of that gate (sim26) came from an outside
   `simctl shutdown all && simctl erase all`, not from the code.
+- **Echo Cartographer content pipeline** (R02-G11-02, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
+  --filter EchoCartographer` (86 tests, about 7 s): all 100 levels generated and certified, witness files compared byte
+  for byte in 20 groups (regenerate only with `ECHO_CARTOGRAPHER_WRITE_WITNESSES=1`), the pinned digest, and a brute
+  force over every beacon subset on the two smallest regions of each band. The band filters (pulse ranges, sizes,
+  beacons) were measured with a short Python prototype of the greedy solver before the clarification was written, as
+  R02-G10-02 taught; every entry then generated on the first Swift run.
 - **Echo Cartographer rule kernel** (R02-G11-01, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
   --filter EchoCartographer` (45 tests, about 2 s): rays against explicit coordinate stepping and path lengths against
   fixed-point relaxation (no queue) on 500 seeded chambers; the play on 500 fixtures and 500 seeded traces; the rules'

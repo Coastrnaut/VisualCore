@@ -598,3 +598,8 @@ JSON schema 1, with the claim rule), the play state `EchoCartographerPlay` with 
 `EchoCartographerStage`, `EchoCartographerEvent`, `EchoCartographerFailure` and append-only `EchoCartographerRecord`s,
 and `EchoCartographerRules` for the R02-F23 puzzle contract. Refusals are `EchoCartographerError` with `r02-g11.*`
 codes. Rules: [docs/architecture/echo-cartographer.md](../../docs/architecture/echo-cartographer.md).
+
+Feature 402 (R02-G11-02) adds the content pipeline: the 100-entry `EchoCartographerManifest`, band profiles and the
+seeded `EchoCartographerGenerator`, `EchoCartographerSolver` (fitting beacon placements counted by a pruned enumeration;
+a greedy pulse plan until exactly one placement fits), `EchoCartographerDifficulty`, `EchoCartographerWitness` and the
+100 witness files in `docs/games/echo-cartographer/levels/`, with the pinned catalog digest.
