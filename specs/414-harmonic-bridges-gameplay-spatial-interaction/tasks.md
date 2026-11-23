@@ -51,7 +51,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G1204-004 [P] [US5] Create
+- [X] T-R02G1204-004 [P] [US5] Create — Verified 2026-11-23: Verified 2026-11-23: host-4 exit 0 (HarmonicBridgesPanelWinTests: all 100 certified levels won through the string and peg steppers, Tune and Test alone in 10 groups, each in exactly its witness's action count; panel Undo then Redo restore the digests); agent D retested by the lead
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesPanelWinTests.swift`: all 100 certified levels
   won through panel actions only (FR-R02G1204-006; SC-R02G1204-005; the string and peg steppers, then Tune, and Test, as the witnesses play them), split
   so each test is under 10 s, plus panel Undo then Redo restoring the digests; agent D; `--name host-4`
