@@ -42,7 +42,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
   "The replay is over.", "Stop the replay first."; a replay step announced like the action it applies; a replayed win
   claims no stars) with `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and
   2 → 3, reconciliation on restore, replay rules and codes, sound setting); `--name host-2`
-- [ ] T-R02G1207-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesPersistenceTests.swift` (agent B: 500 seeded
+- [X] T-R02G1207-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesPersistenceTests.swift` (agent B: 500 seeded — Verified 2026-11-23: Verified 2026-11-23: host-3 exit 0 (HarmonicBridgesPersistenceTests 7: 500 seeded states round-trip with equal digests, the sound choice in == but never digested; schema 1 and 2 payloads of 100 seeded states migrate with progress kept; 200 seeded saves keep honest results and drop and count edited stars, actions spent, trace steps; the same save restores twice to equal digests; the daily level depends only on the date); agent B's tests retested by the lead
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
   dropped and counted; FR-R02G1207-005: the same save restores to an equal digest twice and the daily level depends only
