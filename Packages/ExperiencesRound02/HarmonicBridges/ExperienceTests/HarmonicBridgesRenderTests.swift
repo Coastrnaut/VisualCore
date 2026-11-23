@@ -168,7 +168,13 @@ import VisualCoreMath
         let string: Int = try #require(brokenString, "the crossing breaks at a string")
         #expect(step == 0 && string == 1, "broken at step \(step), string \(string)")
         #expect(core.outcome?.code == HarmonicBridgesExperienceCore.failedCode)
-        let named: String = try #require(HarmonicBridgesSceneSnapshot.failureText(failure))
+        // Since feature 415 the description and the mirror name the failure with its explanation (the failing test,
+        // the broken step and string, the steps reached) and offer undo or retry.
+        #expect(HarmonicBridgesSceneSnapshot.failureText(failure) != nil)
+        let explanation: HarmonicBridgesFailureExplanation =
+            try #require(HarmonicBridgesFailureExplanation(play: core.play))
+        let named: String = explanation.text
+        #expect(named.hasPrefix("Action 1 (the test) broke the crossing in step 0 at string 1"), "\(named)")
         let text: String = shell.presenter.describe(core)
         #expect(text.contains(named), "\(text)")
         #expect(shell.presenter.mirror.failureText == named)

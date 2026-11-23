@@ -28,7 +28,7 @@ import VisualCoreExperienceHost
     @Test func theRegistrationFactsHold() {
         #expect(HarmonicBridgesExperienceCore.levelNumbers == 1...100)
         #expect(HarmonicBridgesExperienceCore.certifiedCandidates.count == 100)
-        #expect(HarmonicBridgesExperienceCore.schemaVersion == 1)
+        #expect(HarmonicBridgesExperienceCore.schemaVersion == 2)   // schema 2 since feature 415
         #expect(HarmonicBridgesExperienceCore.levelNumber(forSeed: 0) == 1)
         #expect(HarmonicBridgesExperienceCore.levelNumber(forSeed: 199) == 100)
         #expect(HarmonicBridgesPalette.hex == ["#07060C", "#E0A070", "#4FD8E8", "#7A6A9C", "#A894FF"])
@@ -81,24 +81,30 @@ import VisualCoreExperienceHost
         #expect(experience.frameProbes.isEmpty, "no probes before a frame")
     }
 
-    /// The controls are the five declared actions in order: `string.tune` [string 0 … 11, peg 1 … 12], then four
-    /// without values.
-    @Test func theControlsAreTheFiveActions() {
+    /// The controls are the declared actions in order: the five of feature 413 (`string.tune` [string 0 … 11, peg
+    /// 1 … 12], then four without values), then (feature 415) `level.select` [1 … 100], `mode.daily` [year 1 … 9999,
+    /// month 1 … 12, day 1 … 31], `mode.practice`, `mode.campaign` and `tutorial.dismiss`.
+    @Test func theControlsAreTheDeclaredActions() {
         var ids: [String] = []
         var arities: [Int] = []
         for control in HarmonicBridgesExperienceCore.controls {
             ids.append(control.id)
             arities.append(control.ranges.count)
         }
-        #expect(ids == ["string.tune", "crossing.test", "play.undo", "play.redo", "level.next"])
+        #expect(ids == ["string.tune", "crossing.test", "play.undo", "play.redo", "level.next",
+                        "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
         #expect(ids == HarmonicBridgesExperienceCore.actionIDs)
-        #expect(arities == [2, 0, 0, 0, 0])
+        #expect(arities == [2, 0, 0, 0, 0, 1, 3, 0, 0, 0])
         let tune: ExperienceControl = HarmonicBridgesExperienceCore.controls[0]
         #expect(tune.ranges.count == 2)
         if tune.ranges.count == 2 {
             #expect(tune.ranges[0] == 0.0...11.0, "string range \(tune.ranges[0])")
             #expect(tune.ranges[1] == 1.0...12.0, "peg range \(tune.ranges[1])")
         }
+        let select: ExperienceControl = HarmonicBridgesExperienceCore.controls[5]
+        #expect(select.ranges == [1.0...100.0], "level range \(select.ranges)")
+        let daily: ExperienceControl = HarmonicBridgesExperienceCore.controls[6]
+        #expect(daily.ranges == [1.0...9999.0, 1.0...12.0, 1.0...31.0], "date ranges \(daily.ranges)")
     }
 
     /// The quality profile names level-0 … level-2 and equals the presenter's (the X follow-through declares the same
@@ -211,7 +217,11 @@ import VisualCoreExperienceHost
         try HarmonicBridgesTest.draw(session)
         #expect(try HarmonicBridgesTest.digest(shell) == before)
         #expect(mirror.string == strings - 1 && mirror.peg == 12, "a frame of the same level keeps the choice")
-        // The next level chooses its string 0 at its current peg.
+        // The next level chooses its string 0 at its current peg (since feature 415 level 32 opens with level 31's
+        // win; before it `level.next` is refused `r02-g12.locked`).
+        #expect(shell.handle(control: "level.next") == .rejected(.rule(code: HarmonicBridgesExperienceRule.locked)))
+        HarmonicBridgesTest.issue(shell, try HarmonicBridgesTest.certifiedActions(31))
+        #expect(try HarmonicBridgesTest.core(shell).play.stage == .won)
         #expect(shell.handle(control: "level.next") == .accepted)
         try HarmonicBridgesTest.draw(session)
         let next: HarmonicBridgesExperienceCore = try HarmonicBridgesTest.core(shell)
