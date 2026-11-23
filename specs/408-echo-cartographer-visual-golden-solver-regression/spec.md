@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G11-08 (migration ledger, game feature of experience R02-G11) · ID namespace FR-R02G1108-###,
 SC-R02G1108-###, T-R02G1108-###
@@ -22,6 +22,66 @@ Canonical overrides:
   "content count 90" milestone figure. **Device-only items:** frame time and memory on D1/D2/D3 after
   ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 398 (Backwards Aurora's visual golden and solver regression).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+398's answers where the games agree. Facts checked in code (read-only audit, 2026-11-23): `EchoCartographerSolver.plan`
+certifies a level by a greedy pulse plan until one beacon placement fits (at most 6 pulses within `workBound`, 400,000
+enumeration nodes), returning the pulses, the placements after each, the placements one pulse short with a
+counterexample and `work`; the 100 witness files in `docs/games/echo-cartographer/levels/` hold the number, the level,
+the actions (the plan's pulses then one claim per beacon), per-pulse echo digests, per-action fingerprints, the
+placements, the placements before the last pulse, the counterexample, the difficulty and the skipped candidate count,
+and are byte-checked by `EchoCartographerCatalogTests` with the catalog digest pinned there; the simulator frame checks
+of feature 403 compare rendered frames with the CPU reference (`referencePoints`: every known floor tile's centre 0.1
+from the ground in luminance, every known wall's top-face centre 0.08 from the ground with green above red by 0.05, the
+gauge's first bar 0.1 from the ground, the probe corners within 0.05 of the ground, each point at least 6 px from other
+elements) at 1,152 × 768; `EchoCartographerChamberScene.release()` frees every renderer and the next draw rebuilds them
+and `liveObjectCount` counts them; the CI job `round02-host-tests` runs all round-two host tests and has a named
+regression step per earlier round-two game (Backwards Aurora's the latest); `scripts/xcodebuild_package.py` runs
+simulator tests with `--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win in exactly its action count, within the energy, with exactly its per-pulse echo digests and per-action
+  fingerprints; and `plan` returns exactly the witness's pulses with exactly its placements and placements before the
+  last pulse; `work` is at most `workBound` (counted, never timed). The run is split into tests of 10 levels so each
+  stays short. Impact: FR-R02G1108-001; SC-R02G1108-001.
+- Q: Which alterations must the regression detect and how is each named? → A: ten kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a beacon cell, a chamber wall, the energy, the
+  tolerance, the miss cost; a plan pulse; a witness action, a per-pulse echo digest, a per-action fingerprint; the
+  placements count. Impact: FR-R02G1108-002; SC-R02G1108-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after the witness's first min(pulses − 1, 2) pulses (at least
+  one) and one marker on the first cell of the chamber that is known open and not the entry (none when there is none),
+  so walls, rays, a marker and the gauge show, at presentation time 0 and the authored camera, plus the hero frame of
+  the scenario manifest's hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the projected pixel
+  positions of every known floor tile's centre, every known wall's top-face centre, the entry, every marker ring centre,
+  every located beacon pillar's top and the gauge's first bar, rounded to 1/8 pixel, the counts of known open cells,
+  known walls, markers, located beacons, rays and lit and total gauge bars, and the expected colours as 8-bit sRGB
+  (ground, floor, entry, marker, wall face, wall edge, pillar, ray, gauge lit, gauge unlit); serialized as JSON with
+  sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
+  `Packages/ExperiencesRound02/EchoCartographer/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every count and colour
+  must be equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal
+  the digest of its pinned description. The file is rewritten only when `ECHO_CARTOGRAPHER_WRITE_GOLDEN=1` is set. The
+  simulator test renders the 16 frames and checks them against the same descriptions with the feature-403 tolerances.
+  Impact: FR-R02G1108-003, 004; SC-R02G1108-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_ECHO_CARTOGRAPHER_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU
+  objects of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a
+  named reason. Impact: FR-R02G1108-005; SC-R02G1108-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's `round02-host-tests` job keeps running all
+  round-two host tests and adds a named step "Echo Cartographer regression (host)" that runs the Echo Cartographer
+  regression filter alone. The local command `python3 scripts/echo_cartographer_regression.py` runs the host regression
+  filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`, and prints one
+  summary line per part with pass or fail and the first failing name; its exit code is non-zero on any failure. Nothing
+  is timed against the wall clock. Impact: FR-R02G1108-006, 007; SC-R02G1108-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -132,11 +192,13 @@ simulator parts and reports one summary.
 
 - **SC-R02G1108-001**: All 100 levels replay their witnesses and re-plan to their certified pulses within the solver's
   work bound; 100 of 100.
-- **SC-R02G1108-002**: Each kind of alteration named by the clarification is detected and named.
+- **SC-R02G1108-002**: Each of the ten kinds of alteration of clarification Q2 (a level's beacon cell, chamber wall,
+  energy, tolerance or miss cost; a plan pulse; a witness action, per-pulse echo digest or per-action fingerprint; the
+  placements count) is detected and named.
 - **SC-R02G1108-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry.
-- **SC-R02G1108-004**: Over 12 open-draw-warn-close cycles, the footprint stays within the stated bound of the first
-  cycle's reading, and the game's GPU objects are released after each close and each memory warning.
+- **SC-R02G1108-004**: Over 12 open-draw-warn-close cycles, every footprint reading of cycles 2 … 12 stays within 16 MB
+  of cycle 1's, and the game's GPU objects are released after each close and each memory warning.
 - **SC-R02G1108-005**: The workflow runs the host part on every push and passes; the local command runs all parts and
   prints one summary.
 - **SC-R02G1108-006**: Existing tests pass; the reference regression passes 7 of 7; each test finishes in under 10
