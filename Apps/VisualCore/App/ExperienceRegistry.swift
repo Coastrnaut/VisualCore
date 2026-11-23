@@ -122,11 +122,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [nocturneGarden].compactMap { $0 }
 
-    /// R02-G09 Nocturne Garden (feature 383, R02-G09-03): a candidate until X-R02-G09. Snapshot schema 1, so no earlier
-    /// example is stored yet.
+    /// R02-G09 Nocturne Garden (features 381–389, R02-G09-01…09): a candidate until X-R02-G09. Snapshot schema 3
+    /// (feature 387), so the schema-1 and schema-2 examples are stored (feature 389, R02-G09-09).
     fileprivate static var nocturneGarden: ExperienceRegistration? {
         guard let id = NocturneGardenExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: NocturneGardenExperienceCore.self) { launch in
+        let examples = [NocturneGardenExperienceCore.schemaOneExample(),
+                        NocturneGardenExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: NocturneGardenExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return NocturneGardenExperience.make(
                 id: id, storage: launch.storage,

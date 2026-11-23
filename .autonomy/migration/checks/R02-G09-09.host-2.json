@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02",
+  "elapsed_seconds": 315.97,
+  "exit_code": 0,
+  "finished": "2026-11-23T00:30:26+00:00",
+  "gate": "R02-G09-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G09-09.host-2.log",
+  "log_sha256": "490d9edd889d05726878250e66ebb49fa48058f2f4ec837e78e13dfd34363574",
+  "name": "host-2",
+  "started": "2026-11-23T00:25:10+00:00",
+  "timed_out": false
+}

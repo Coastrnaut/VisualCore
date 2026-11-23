@@ -286,6 +286,9 @@ import VisualCoreSimulation
         // Feature 388 (R02-G09-08): the golden frame descriptions (projected pixel positions in Doubles; debug and
         // automation builds only, forbidden in the Release binary); presentation only, covered by their own tests.
         "NocturneGardenGolden.swift",
+        // Feature 389 (R02-G09-09): the stored schema examples (snapshot envelopes for the app's migration check, built
+        // through the adapter); not kernel sources.
+        "NocturneGardenSchemaExamples.swift",
     ]
 
     /// The Swift sources of the kernel (the Core directory next to this test directory, less the presentation

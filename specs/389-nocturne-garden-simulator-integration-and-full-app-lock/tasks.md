@@ -14,7 +14,7 @@ change (the shaders and reference of R02-G09-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G0909-002 Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSchemaExamples.swift`
+- [X] T-R02G0909-002 Create `Packages/ExperiencesRound02/NocturneGarden/Core/NocturneGardenSchemaExamples.swift` — Verified 2026-11-22: host exit=1 (the kernel import scan flagged the new examples file, which imports VisualCoreExperience; listed with the adapter sources), host-2 (swift test --package-path Packages/ExperiencesRound02 incl. NocturneGardenSchemaExampleTests 7: both examples restore through migrations to schema 3 with level 1, the move and progress kept, the registry check reports no problems, other versions nil, identical bytes) exit 0; registration stores both examples, stale comment corrected; agent A's tests retested by the lead
   (contracts/api.md; data-model: schema 1 "a seeded play of level 1 with one plant that does not win, seed 7";
   schema 2 "campaign mode, progress {frontier 2, solved [level 1, moves made, stars]}, tutorial", "the result is kept,
   unverified, without a trace"; the envelope of `FacetedForgeSchemaExamples`, feature 379) with
