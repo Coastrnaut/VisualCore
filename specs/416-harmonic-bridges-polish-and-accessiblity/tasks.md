@@ -84,3 +84,16 @@ tests stay short (< 10 s each). No {owner} tasks. Model: feature 406's tasks.
 A needs R02-G12-05's adapter for level and mode changes). Shared files (Package.swift, shaders, presenter, scene,
 controls, docs) stay with the lead. MVP: Stories 1 and 2. Requirement coverage: FR-001/005 → 005; FR-002/003 → 003,
 005; FR-004 → 004, 005; FR-006 → 004, 005; FR-007 → 006 … 010.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G1206-013 Fade the won lift in the unlit fallback too: give `HarmonicBridgesSceneGeometry.bridgePart` and
+  `glowPart` (`Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSceneGeometry.swift`) a won level 0 … 1
+  that scales the lift of their fallback colours (default: the snapshot's won flag, so existing callers are unchanged),
+  have `Packages/ExperiencesRound02/HarmonicBridges/Experience/HarmonicBridgesBridgeScene.swift` pass `lights.won` in
+  the fallback path and rebuild the fallback when the level moves by a tenth or more (the geometry key), and test in
+  `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesSceneGeometryTests.swift` that the lift scales
+  monotonically with the level and positions never change, and in
+  `Packages/ExperiencesRound02/HarmonicBridges/ExperienceTests/HarmonicBridgesFallbackTests.swift` that a won level in
+  fallback mode under Reduce Flashing brightens over at least 0.4 s; per FR-R02G1206-004 (partial); `--name host-4`,
+  `--name sim-27-2`
