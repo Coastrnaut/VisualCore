@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 405
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1205-002 [P] [US2] [US3] Add `plan(_:pegs:workBound:)` to
+- [X] T-R02G1205-002 [P] [US2] [US3] Add `plan(_:pegs:workBound:)` to — Verified 2026-11-23: Verified 2026-11-23: host-2 exit 0 (31 tests: HarmonicBridgesHintsTests 8 — plan(_:pegs:) equals the certified plan on all 100 levels, exact hints from every opening win in the witness's action count, 200 seeded states' hints accepted and winning, the stuck case, the texts at levels 1–3, 500 seeded failures (236 broken, 264 budget) explained with their true action, step, string and counts computed independently; solver and catalog suites unchanged); agent B retested by the lead
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSolver.swift` (the minimal-plan search of
   `plan(_:workBound:)` run on the level with every string at the given peg, locks kept; `plan(_:workBound:)` unchanged
   and equal to `plan(_:pegs:)` at the starting pegs) and create

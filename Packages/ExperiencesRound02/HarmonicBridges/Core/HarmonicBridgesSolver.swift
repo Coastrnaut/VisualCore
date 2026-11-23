@@ -143,6 +143,37 @@ public enum HarmonicBridgesSolver {
         return nil
     }
 
+    /// The minimal plan of `level` with every string at the given peg (feature 415, R02-G12-05, T-R02G1205-002;
+    /// clarification Q1): ``plan(_:workBound:)`` run on ``level(_:pegs:)``, locks kept. At the level's starting pegs it
+    /// equals ``plan(_:workBound:)``. Nil when `pegs` does not hold one peg in 1 … 12 per string, when no choice of at
+    /// most ``maxTunings`` tunings wins or when more than `workBound` choices would be tried.
+    public static func plan(_ level: HarmonicBridgesLevel, pegs: [Int],
+                            workBound: Int = workBound) -> HarmonicBridgesPlan? {
+        guard let copy = self.level(level, pegs: pegs) else { return nil }
+        return plan(copy, workBound: workBound)
+    }
+
+    /// A copy of `level` whose strings start at `pegs` (one per string; ends, lengths and locks kept); nil when `pegs`
+    /// does not hold one peg in 1 … 12 per string. Only the starting pegs (and so the fingerprint) differ.
+    static func level(_ level: HarmonicBridgesLevel, pegs: [Int]) -> HarmonicBridgesLevel? {
+        guard pegs.count == level.strings.count else { return nil }
+        if pegs == level.startingPegs { return level }
+        var strings: [HarmonicBridgesString] = []
+        for (index, string) in level.strings.enumerated() {
+            guard HarmonicBridgesLevel.pegs.contains(pegs[index]) else { return nil }
+            strings.append(HarmonicBridgesString(a: string.a, b: string.b, length: string.length, peg: pegs[index],
+                                                 locked: string.locked))
+        }
+        do {
+            return try HarmonicBridgesLevel(id: level.id, seed: level.seed, difficulty: level.difficulty,
+                                            islands: level.islands, strings: strings, start: level.start,
+                                            goal: level.goal, steps: level.steps, threshold: level.threshold,
+                                            budget: level.budget, tutorial: level.tutorial)
+        } catch {
+            return nil
+        }
+    }
+
     /// The witness actions of `plan`: its tunings in string order, then one test.
     public static func actions(_ plan: HarmonicBridgesPlan) -> [HarmonicBridgesAction] {
         var result: [HarmonicBridgesAction] = []
