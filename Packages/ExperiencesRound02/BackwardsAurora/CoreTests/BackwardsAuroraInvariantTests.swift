@@ -241,13 +241,22 @@ import VisualCoreSimulation
         BackwardsAuroraFixtures.fixture(seed &+ UInt64(index))
     }
 
-    /// The Swift sources of the kernel (the Core directory next to this test directory).
+    /// The presentation sources of the Core (feature 393, R02-G10-03): the scene snapshot, geometry, shaders, adapter
+    /// and scenarios use Doubles and the experience frameworks; they never decide a rule and are covered by their own
+    /// tests and the renderer-purity tests, so the kernel scan skips them.
+    static let presentationSources: Set<String> = [
+        "BackwardsAuroraSceneSnapshot.swift", "BackwardsAuroraSceneGeometry.swift", "BackwardsAuroraShaders.swift",
+        "BackwardsAuroraExperienceCore.swift", "BackwardsAuroraScenarios.swift",
+    ]
+
+    /// The Swift sources of the kernel (the Core directory next to this test directory, without the presentation
+    /// sources).
     static func kernelSources() throws -> [(name: String, text: String)] {
         let tests: URL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
         let core: URL = tests.deletingLastPathComponent().appendingPathComponent("Core")
         let names: [String] = try FileManager.default.contentsOfDirectory(atPath: core.path).sorted()
         var sources: [(name: String, text: String)] = []
-        for name in names where name.hasSuffix(".swift") {
+        for name in names where name.hasSuffix(".swift") && !presentationSources.contains(name) {
             let text: String = try String(contentsOf: core.appendingPathComponent(name), encoding: .utf8)
             sources.append((name, text))
         }

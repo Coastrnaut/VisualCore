@@ -11,7 +11,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G1003-001 Baselines on the committed tree: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-22: 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit 0; rendering baseline is R02-G10-02's rendering runs (exit 0)
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G10-02's
   rendering runs (exit 0)
-- [ ] T-R02G1003-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes,
+- [X] T-R02G1003-002 Edit `Packages/ExperiencesRound02/Package.swift` (Core dependencies VisualCoreScenes, — Verified 2026-11-22: host (swift test --filter BackwardsAurora, 91 tests: the Core gains Scenes, Experience, Diagnostics, Persistence; the snapshot, palette and tiers; the invariant test's kernel scan skips the five presentation sources) exit 0, lead
   VisualCoreExperience, VisualCoreDiagnostics, VisualCorePersistence now; `BackwardsAuroraExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); make the renderer-purity scan
   of `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraInvariantTests.swift` skip the presentation
