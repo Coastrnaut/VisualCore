@@ -104,7 +104,8 @@ final class BackwardsAuroraAuroraScene {
             return
         }
         let time = Float(animate && !reduceMotion ? snapshot.time : 0)
-        try drawAurora(camera, time: time, tier: tier)
+        try drawAurora(camera, time: time, tier: tier,
+                       won: BackwardsAuroraShaders.won(stage: snapshot.stage, failure: snapshot.failure))
         let gain = BackwardsAuroraShaders.glowGain(for: tier)
         guard tier.glowShells > 0, gain > 0 else { return }
         try drawGlow(camera, gain: gain)
@@ -165,7 +166,8 @@ final class BackwardsAuroraAuroraScene {
                                vertexName: name + ".vert", fragmentName: name + ".frag")
     }
 
-    private func drawAurora(_ camera: BackwardsAuroraCamera, time: Float, tier: BackwardsAuroraTier) throws {
+    private func drawAurora(_ camera: BackwardsAuroraCamera, time: Float, tier: BackwardsAuroraTier,
+                            won: Float) throws {
         guard let auroraRenderer else { return }
         let mvp = camera.viewProjection
         let eye = SIMD3<Float>(Float(camera.eye.x), Float(camera.eye.y), Float(camera.eye.z))
@@ -175,6 +177,7 @@ final class BackwardsAuroraAuroraScene {
             p.set(BackwardsAuroraShaders.eyeUniform, eye)
             p.set(BackwardsAuroraShaders.timeUniform, time)
             p.set(BackwardsAuroraShaders.pulsesUniform, Float(tier.pulses))
+            p.set(BackwardsAuroraShaders.wonUniform, won)
         }
     }
 

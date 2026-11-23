@@ -210,23 +210,35 @@ import Testing
         let constants: [String] = [
             BackwardsAuroraShaders.mvpUniform, BackwardsAuroraShaders.lightDirectionUniform,
             BackwardsAuroraShaders.eyeUniform, BackwardsAuroraShaders.timeUniform,
-            BackwardsAuroraShaders.pulsesUniform, BackwardsAuroraShaders.glowUniform,
-            BackwardsAuroraShaders.glowLimitUniform,
+            BackwardsAuroraShaders.pulsesUniform, BackwardsAuroraShaders.wonUniform,
+            BackwardsAuroraShaders.glowUniform, BackwardsAuroraShaders.glowLimitUniform,
         ]
-        let names: [String] = ["u_mvp", "u_lightDir", "u_eye", "u_time", "u_pulses", "u_glow", "u_glowLimit"]
+        let names: [String] = ["u_mvp", "u_lightDir", "u_eye", "u_time", "u_pulses", "u_won", "u_glow",
+                               "u_glowLimit"]
         #expect(constants == names)
         let listed: Set<String> = Set(BackwardsAuroraShaders.auroraUniforms + BackwardsAuroraShaders.glowUniforms)
         #expect(Set(constants) == listed)
         let aurora: String = BackwardsAuroraShaders.auroraVertex + BackwardsAuroraShaders.auroraFragment
         let auroraDeclarations: [String] = [
             "uniform mat4 u_mvp;", "uniform vec3 u_lightDir;", "uniform vec3 u_eye;", "uniform float u_time;",
-            "uniform float u_pulses;",
+            "uniform float u_pulses;", "uniform float u_won;",
         ]
         for declaration in auroraDeclarations { #expect(aurora.contains(declaration), "\(declaration)") }
         let glow: String = BackwardsAuroraShaders.glowVertex + BackwardsAuroraShaders.glowFragment
         let glowDeclarations: [String] = ["uniform mat4 u_mvp;", "uniform float u_glow;", "uniform float u_glowLimit;"]
         for declaration in glowDeclarations { #expect(glow.contains(declaration), "\(declaration)") }
         #expect(Self.wordCount("u_time", in: glow) == 0)
+    }
+
+    /// A won level (stage won, or the result after a win) lifts the ribbon; every other stage leaves it.
+    @Test func aWonLevelLiftsTheRibbon() {
+        #expect(BackwardsAuroraShaders.won(stage: .won, failure: nil) == 1)
+        #expect(BackwardsAuroraShaders.won(stage: .result, failure: nil) == 1)
+        #expect(BackwardsAuroraShaders.won(stage: .result, failure: .budget) == 0)
+        #expect(BackwardsAuroraShaders.won(stage: .failed, failure: .budget) == 0)
+        #expect(BackwardsAuroraShaders.won(stage: .playing, failure: nil) == 0)
+        #expect(BackwardsAuroraShaders.wonLift == 0.35)
+        #expect(BackwardsAuroraShaders.auroraFragment.contains("BA_WON_LIFT"))
     }
 
     @Test func atMostSixteenVec4UniformsPerProgram() {
@@ -243,7 +255,7 @@ import Testing
             #expect(slots <= BackwardsAuroraShaders.maxUniformVec4s, "\(program.name) uses \(slots) vec4 slots")
             slotsByProgram[program.name] = slots
         }
-        #expect(slotsByProgram == ["aurora": 8, "glow": 6])
+        #expect(slotsByProgram == ["aurora": 9, "glow": 6])
     }
 
     @Test func noTextureSamplerNoDiscardAndLoopsBoundedByConstants() {

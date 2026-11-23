@@ -134,7 +134,13 @@ import VisualCoreMath
         defer { session.close() }
         let shell = try await BackwardsAuroraTest.open(session, seed: 0)
         let before: String = try BackwardsAuroraTest.digest(shell)
+        var beforeWin: [UInt8] = []
+        var beforeSnapshot: BackwardsAuroraSceneSnapshot?
         for (index, action) in actions.enumerated() {
+            if index == actions.count - 1 {
+                beforeWin = try BackwardsAuroraTest.still(session)
+                beforeSnapshot = shell.presenter.lastSnapshot
+            }
             let issued = BackwardsAuroraTest.control(action)
             let result: ActionResult = shell.handle(control: issued.control, values: issued.values)
             #expect(result == .accepted, "action \(index) \(issued.control) \(issued.values): \(result.code)")
@@ -152,6 +158,30 @@ import VisualCoreMath
         #expect(snapshot.spent == actions.count)
         #expect(snapshot.kinks.isEmpty, "a won wave is smooth")
         BackwardsAuroraTest.checkFrame(rgba, snapshot: snapshot, "level 1 won")
+        // T-R02G1003-014: the won ribbon is brighter than before the winning reversal, at a sample the reversal left in
+        // place, away from every checkpoint, kink and the reversal's seams. The ribbon's centre is already close to the
+        // highlight at tier 0 (luminance about 0.9), so the lift measured +0.026 … 0.028 on the iOS 27.2 simulator
+        // (2026-11-22); the check asks for half of it.
+        let earlier: BackwardsAuroraSceneSnapshot = try #require(beforeSnapshot)
+        guard case let .reverse(start, end) = try #require(actions.last) else { return }
+        var compared: Int = 0
+        for k in 0..<snapshot.count where k < start - 2 || k > end + 2 {
+            var clear: Bool = true
+            for near in (k - 2)...(k + 2) where earlier.checkpoints.contains(near) || earlier.kinks.contains(near) {
+                clear = false
+            }
+            guard clear, let p = BackwardsAuroraTest.pixel(BackwardsAuroraSceneGeometry.samplePoint(k, snapshot), snapshot),
+                  let q = BackwardsAuroraTest.pixel(BackwardsAuroraSceneGeometry.samplePoint(k, earlier), earlier) else { continue }
+            let x: Int = Int(p.x.rounded())
+            let y: Int = Int(p.y.rounded())
+            let after: Double = BackwardsAuroraTest.luminance(BackwardsAuroraTest.colour(rgba, x: x, y: y,
+                                                                                        width: BackwardsAuroraTest.width))
+            let prior: Double = BackwardsAuroraTest.luminance(BackwardsAuroraTest.colour(
+                beforeWin, x: Int(q.x.rounded()), y: Int(q.y.rounded()), width: BackwardsAuroraTest.width))
+            #expect(after > prior + 0.015, "sample \(k): won \(after), before \(prior)")
+            compared += 1
+        }
+        #expect(compared > 0, "a sample away from the markers was compared")
     }
 }
 #endif

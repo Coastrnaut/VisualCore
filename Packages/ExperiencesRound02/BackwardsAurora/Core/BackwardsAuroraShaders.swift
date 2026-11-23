@@ -63,6 +63,15 @@ public enum BackwardsAuroraShaders {
     /// `float`: the tier's pulse count 0, 1 or 2, clamped by the shader to 0 ... ``maxPulses`` (aurora); see
     /// ``pulses(for:)``.
     public static let pulsesUniform = "u_pulses"
+    /// `float`: 1 on a won level (stage won, or the result after a win), 0 otherwise (aurora): the ribbon and its
+    /// trailing layers brighten toward the highlight by ``wonLift`` (feature 393 convergence, T-R02G1003-014).
+    public static let wonUniform = "u_won"
+    /// How far a won level's ribbon moves toward ``ribbonHighlight``.
+    public static let wonLift: Double = 0.35
+    /// The value the scene passes as `u_won` for `stage` and `failure`: 1 on a won level, 0 otherwise.
+    public static func won(stage: BackwardsAuroraStage, failure: BackwardsAuroraFailure?) -> Float {
+        stage == .won || (stage == .result && failure == nil) ? 1 : 0
+    }
     /// `float`: the glow gain (glow); see ``glowGain(for:)`` and ``glowGain(gain:limit:)``.
     public static let glowUniform = "u_glow"
     /// `float`: the glow limit (glow): ``glowLimit(reduceFlashing:)``.
@@ -70,7 +79,7 @@ public enum BackwardsAuroraShaders {
 
     /// Every uniform the aurora program declares, each once, in order of declaration (vertex stage first).
     public static let auroraUniforms: [String] = [mvpUniform, lightDirectionUniform, eyeUniform, timeUniform,
-                                                  pulsesUniform]
+                                                  pulsesUniform, wonUniform]
 
     /// Every uniform the glow program declares, exactly as declared (vertex stage first).
     public static let glowUniforms: [String] = [mvpUniform, glowUniform, glowLimitUniform]
@@ -322,6 +331,7 @@ public enum BackwardsAuroraShaders {
     uniform vec3 u_eye;
     uniform float u_time;
     uniform float u_pulses;
+    uniform float u_won;
     out vec4 color;
     const vec3 BA_RIBBON = \(vec3Literal(ribbon));
     const vec3 BA_HIGHLIGHT = \(vec3Literal(ribbonHighlight));
@@ -338,6 +348,7 @@ public enum BackwardsAuroraShaders {
     const float BA_PULSE_WIDTH = \(fixed(pulseWidth));
     const float BA_FIRST_LAYER_ALPHA = \(fixed(firstLayerAlpha));
     const float BA_SECOND_LAYER_ALPHA = \(fixed(secondLayerAlpha));
+    const float BA_WON_LIFT = \(fixed(wonLift));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
@@ -373,6 +384,8 @@ public enum BackwardsAuroraShaders {
         }
         ribbon = mix(ribbon, BA_HIGHLIGHT, bead);
         vec3 rgb = mix(shaded, ribbon * glowLight, isRibbon);
+        float isAurora = clamp(isRibbon + isFirstLayer + isSecondLayer, 0.0, 1.0);
+        rgb = mix(rgb, BA_HIGHLIGHT * glowLight, isAurora * clamp(u_won, 0.0, 1.0) * BA_WON_LIFT);
         rgb = clamp(rgb, 0.0, 1.0);
         float alpha = 1.0 - isFirstLayer * (1.0 - BA_FIRST_LAYER_ALPHA) - isSecondLayer * (1.0 - BA_SECOND_LAYER_ALPHA);
         color = vec4(rgb * alpha, alpha);

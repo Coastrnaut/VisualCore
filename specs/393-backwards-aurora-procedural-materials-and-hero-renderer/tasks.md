@@ -105,7 +105,7 @@ registration, docs) stay with the lead. MVP: Stories 1 and 2.
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G1003-014 Brighten the ribbon on a won level (a `u_won` uniform, 1 when the stage is won or the result
+- [X] T-R02G1003-014 Brighten the ribbon on a won level (a `u_won` uniform, 1 when the stage is won or the result — Verified 2026-11-22: host-6 (130 BackwardsAurora host tests incl. the new u_won shader test) exit 0; sim-27-2 exit 65 (the won-ribbon lift of +0.026 … 0.028 missed a 0.03 threshold: the ribbon is already near the highlight), sim-27-3 exit 0 with the threshold at 0.015; u_won set by the scene on a won stage or a result after a win
   follows a win, mixing the ribbon and trailing layers toward `ribbonHighlight` by 0.35; set by
   `Packages/ExperiencesRound02/BackwardsAurora/Experience/BackwardsAuroraAuroraScene.swift`) in
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraShaders.swift`, with the uniform declared and
