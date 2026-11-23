@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G12-09 (migration ledger, game feature of experience R02-G12) · ID namespace FR-R02G1209-###,
 SC-R02G1209-###, T-R02G1209-###
@@ -24,6 +24,58 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 409 (Echo Cartographer's simulator integration and full app lock).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+409's answers where the games agree. Facts checked in code (read-only, 2026-11-23): feature 409 (Echo Cartographer) is
+the model (`Apps/VisualCore/Tests/UI/EchoCartographer`, namespace `ECG`, serial chunk `t3`;
+`EchoCartographerControls.identifierNames`; `EchoCartographerSchemaExamples.swift`); Harmonic Bridges's panel
+(`HarmonicBridgesControls`) already gives every control a label, a value and an identifier through
+`port.identifier(name)` (features 413–417: `string`, `peg`, `tune`, `test`, `undo`, `redo`, `next-level`, `reset-view`,
+`dismiss-tutorial`, `hint`, `failure-undo`, `retry`, `campaign`, `daily`, `practice`, `level-picker`, `play-level`,
+`replay`, `replay-step`, `replay-stop`, `sound`, and the text elements `summary`, `status`, `actions`, `message`,
+`failure`, `instruction`, `hint-text`, `goal`, `replay-position`), but no list of those names is pinned; the two Undo
+buttons are `undo` and `failure-undo`; its registration in `Apps/VisualCore/App/ExperienceRegistry.swift` still says
+"Snapshot schema 1, so no earlier example is stored yet" although the snapshot is schema 3 since feature 417 (migration
+1 → 2 adds progress and the campaign mode to `{level, records}`); a won level's description says "The crossing holds in
+every step." followed by "Stars: k of 3."; the UI chunk keys in `release_check.py` end at `t3` (no `u3`); no UI test
+class uses the prefix `HB`; level 1's witness is one tuning (string 0 to peg 12) then the test, with a budget of 9 and its
+tutorial on.
+
+- Q: How do the interface tests find controls and what do they read? → A: through the identifiers the panel already
+  carries (`experience.r02-g12.harmonic-bridges.<name>`); this feature pins the full list as
+  `HarmonicBridgesControls.identifierNames` (the 30 names above) with a host-visible test that every name is unique and
+  used once in the panel. The tests read the canvas description for the level, the win and the stars, and the replay
+  step's value for the replay position. Impact: FR-R02G1209-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `HB` in
+  `Apps/VisualCore/Tests/UI/HarmonicBridges/HBSupport.swift`; `HBPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g12.harmonic-bridges`: dismiss the tutorial, play level 1's certified
+  solution by stepping the string and peg steppers to its tuning (counting a press only when the value moves), tapping
+  Tune, then Test; read "The crossing holds in every step" and "Stars: 3 of 3", the level picker shows level 2 open;
+  relaunch without reset after sending the app to the background: the stars and level 2 are kept) and `HBReplayUITests`
+  (after the win, Replay best solution, Step until the replay ends won, Stop back to the campaign). They run as a new
+  serial chunk `u3` of `release_check.py` (its key checked unique); each test stays under 90 s apart from the simulator's
+  automation-session setup of each app launch (about 30 s per launch, and a relaunch test launches twice). Level 1's
+  certified actions are pinned in `HB` and checked against the Core by an app unit test. Impact: FR-R02G1209-002, 007;
+  SC-R02G1209-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `HarmonicBridgesExperienceCore.schemaOneExample()` (the schema-1 saved state `{level: 1, records}` of a seeded play of
+  level 1 with its one certified tuning applied, so it is still playing and not won) and `schemaTwoExample()` (schema 2
+  with progress, the campaign mode and level 1 solved with its stars, no trace), both `MigrationExample`s built in the
+  Core (`HarmonicBridgesSchemaExamples.swift`, modelled on `EchoCartographerSchemaExamples`), registered with
+  `examples:`; the app's migration check restores both into schema 3 with progress kept (a schema-2 result without a
+  trace keeps its stars unverified, as feature 417 reconciles). The registration's comment is corrected. Impact:
+  FR-R02G1209-003; SC-R02G1209-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `HarmonicBridgesGolden` is forbidden by feature 418, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G1209-004;
+  SC-R02G1209-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g12.harmonic-bridges` as not available and the launcher cannot open it; the registry's candidates list contains
+  it and `all` does not. Impact: FR-R02G1209-006; SC-R02G1209-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -82,7 +134,7 @@ solver regression proves all 100 levels solvable as certified.
 ### Functional Requirements
 
 - **FR-R02G1209-001**: The panel's controls MUST carry stable accessibility identifiers (experience prefix plus control
-  name) in addition to their labels and values.
+  name) in addition to their labels and values, and the list of names MUST be pinned and checked unique.
 - **FR-R02G1209-002**: Interface tests in the one app MUST open Harmonic Bridges with the candidate testing argument,
   win level 1 through the panel alone, see the stars and the next level, relaunch with progress kept, and replay a
   solved level to its end.
