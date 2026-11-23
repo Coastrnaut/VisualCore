@@ -14,6 +14,10 @@
 // `mode.practice`, `mode.campaign`, `tutorial.dismiss`) with their refusals; a campaign win records stars and opens the
 // next level, a daily win opens nothing, practice records nothing; progress and mode in the digest, the tutorial step
 // in the snapshot but not the digest; the migration of a schema-1 payload.
+// Feature 407 (R02-G11-07) T-R02G1107-003: schema 3 and digest v3; fifteen controls; a win stores its verified trace;
+// restore reconciles (a tampered result dropped and counted, the frontier as saved); replay starts only for a verified
+// traced result, steps through the trace to a win without changing progress and refuses other play actions; the sound
+// setting is snapshotted and never digested; migrations 1 → 3 and 2 → 3.
 // Fixture seed 2_403. Levels are certified once per process, so the run stays short. Explicit types, plain loops.
 import Foundation
 import Testing
@@ -103,19 +107,21 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g11.echo-cartographer" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g11.echo-cartographer.v2")
+        #expect(Core.experienceID == "r02-g11.echo-cartographer" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g11.echo-cartographer.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next",
-                             "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                             "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                             "replay.start", "replay.step", "replay.stop", "settings.sound"]
         #expect(Core.actionIDs == ids)
         let cellIndices: [Int] = [0, 1, 2]
         for index in cellIndices { #expect(Core.controls[index].ranges == [0...15, 0...15]) }
-        let plainIndices: [Int] = [3, 4, 5, 8, 9, 10]
+        let plainIndices: [Int] = [3, 4, 5, 8, 9, 10, 12, 13]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.controls[6].ranges == [1...100])
         #expect(Core.controls[7].ranges == [1...9999, 1...12, 1...31])
-        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 2)
+        #expect(Core.controls[11].ranges == [1...100] && Core.controls[14].ranges == [0...1])
+        #expect(Core.qualityTiers == 3 && Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == EchoCartographerTier.all.map(\.name))
@@ -521,14 +527,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(engine.handle(control: "cell.mark", values: [0, 1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -589,5 +595,91 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         }
         core.shedCaches()
         #expect(try Self.digest(core) == digest && core == before)
+    }
+
+    @Test func aWinStoresItsTraceAndReplayReplaysIt() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let generated: EchoCartographerGenerated = try Core.generated(number: 1)
+        // Without a stored trace there is nothing to replay.
+        let noReplay: ActionResult = .rejected(.rule(code: EchoCartographerExperienceRule.noReplay))
+        #expect(core.apply(Self.act("replay.start", [1])) == noReplay)
+        #expect(core.apply(Self.act("replay.step")) == noReplay)
+        // A mark undone and an honest win: the trace holds only the effective actions.
+        #expect(core.apply(Self.act("cell.mark", [0, 0])) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        let result: EchoCartographerProgress.Result = try #require(core.progress.solved[1])
+        #expect(result.verified && result.trace == generated.actions)
+        let progress: EchoCartographerProgress = core.progress
+        // Replay: a fresh play stepped through the trace to a win; other play actions refused; progress unchanged.
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.play.records.isEmpty && core.tutorial == .done)
+        let refused: ActionResult = .rejected(.rule(code: EchoCartographerExperienceRule.replay))
+        #expect(core.apply(Self.act("cell.mark", [0, 0])) == refused)
+        #expect(core.apply(Self.act("level.select", [1])) == refused)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        for index in 0..<result.trace.count {
+            #expect(core.apply(Self.act("replay.step")) == .accepted, "step \(index)")
+        }
+        #expect(core.play.stage == .won && core.progress == progress)
+        #expect(core.apply(Self.act("replay.step")) == .rejected(.rule(code: EchoCartographerExperienceRule.replayEnd)))
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.play.records.isEmpty)
+        #expect(core.apply(Self.act("replay.stop")) == noReplay)
+    }
+
+    @Test func restoreReconcilesAndKeepsTheSoundChoiceOutOfTheDigest() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        for step in try Core.generated(number: 1).actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted)
+        let digest: StateDigest = try Self.digest(core)
+        var silent: Core = core
+        #expect(silent.apply(Self.act("settings.sound", [0])) == .accepted && !silent.soundOn)
+        #expect(try Self.digest(silent) == digest)
+        let payload: Data = try core.snapshotPayload()
+        let restored: Core = try Core.restore(payload: payload, seed: 0)
+        #expect(restored == core && restored.soundOn && restored.reconciliationDropped == 0)
+        #expect(try Self.digest(restored) == digest)
+        // A tampered result (its stars raised by one where possible, else lowered) is dropped and counted.
+        let text: String = try #require(String(data: payload, encoding: .utf8))
+        let stars: Int = try #require(core.progress.solved[1]).stars
+        let edited: String = text.replacingOccurrences(of: "\"stars\":\(stars)",
+                                                       with: "\"stars\":\(stars == 3 ? 2 : stars + 1)")
+        #expect(edited != text)
+        let tampered: Core = try Core.restore(payload: Data(edited.utf8), seed: 0)
+        #expect(tampered.reconciliationDropped == 1 && tampered.progress.solved[1] == nil)
+        #expect(tampered.progress.frontier == core.progress.frontier)
+    }
+
+    @Test func schemaOneAndTwoPayloadsMigrateToThree() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        for step in try Core.generated(number: 1).actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        let payload: Data = try core.snapshotPayload()
+        var object: [String: Any] = try #require(try JSONSerialization.jsonObject(with: payload) as? [String: Any])
+        // A schema-2 object: no sound key and results without trace or verified.
+        object.removeValue(forKey: "sound")
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        var solved: [Any] = []
+        for entry in try #require(progress["solved"] as? [Any]) {
+            guard var result = entry as? [String: Any] else { continue }
+            result.removeValue(forKey: "trace")
+            result.removeValue(forKey: "verified")
+            solved.append(result)
+        }
+        progress["solved"] = solved
+        object["progress"] = progress
+        let three: [String: Any] = try Core.migratedToSchemaThree(object)
+        let data: Data = try JSONSerialization.data(withJSONObject: three, options: [.sortedKeys])
+        let restored: Core = try Core.restore(payload: data, seed: 0)
+        let kept: EchoCartographerProgress.Result = try #require(restored.progress.solved[1])
+        #expect(!kept.verified && kept.trace.isEmpty && !restored.soundOn && restored.reconciliationDropped == 0)
+        #expect(restored.progress.frontier == core.progress.frontier)
+        // Schema 1 → 2 → 3.
+        let one: [String: Any] = ["level": 1, "records": [Any]()]
+        let viaTwo: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(one))
+        let oneData: Data = try JSONSerialization.data(withJSONObject: viaTwo, options: [.sortedKeys])
+        let fromOne: Core = try Core.restore(payload: oneData, seed: 0)
+        #expect(fromOne.levelNumber == 1 && fromOne.progress.solved.isEmpty && !fromOne.soundOn)
+        #expect(throws: EchoCartographerRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
     }
 }

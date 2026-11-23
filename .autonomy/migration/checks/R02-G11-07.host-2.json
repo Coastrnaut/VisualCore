@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "EchoCartographerCoreTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter EchoCartographerCoreTests",
+  "elapsed_seconds": 19.824,
+  "exit_code": 0,
+  "finished": "2026-11-23T13:20:42+00:00",
+  "gate": "R02-G11-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G11-07.host-2.log",
+  "log_sha256": "b4766f1f2e6ac0cf920a6f855969c519d0ef34e81a635575438b9f41b960284f",
+  "name": "host-2",
+  "started": "2026-11-23T13:20:22+00:00",
+  "timed_out": false
+}

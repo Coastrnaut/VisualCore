@@ -58,6 +58,24 @@
 // 2: `{"level", "mode", "progress", "records", "tutorial"}`; schema-1 payloads migrate (no won levels, the levels up to
 // the saved level open, campaign mode, the tutorial at its initial step).
 //
+// Feature 407 (R02-G11-07) T-R02G1107-003 (FR-R02G1107-001 … 007; clarifications Q1–Q5; research R2–R7): a campaign or
+// daily win records its winning trace (`EchoCartographerReconciliation.netTrace` of the play's records: the effective
+// pulses, claims and marks, an undone action left out unless redone) as a verified result; restore reconciles every
+// result (`EchoCartographerReconciliation.reconcile`, the frontier as saved) and exposes `reconciliationDropped` (not
+// digested, not in `==`); the replay mode `replay(level)` plays a verified trace action by action:
+//   replay.start [1…100]  a fresh play of that level in mode `replay(level)` with the tutorial done
+//                         (`r02-g11.no-replay` without a verified result with a trace);
+//   replay.step           the next action of the trace (`r02-g11.replay-end` after the last or once the play ended;
+//                         `r02-g11.no-replay` outside replay);
+//   replay.stop           campaign at that level, the frontier when it is not open (`r02-g11.no-replay` outside
+//                         replay);
+//   settings.sound [0…1]  the sound choice (FR-R02G1107-007): 1 on, 0 off; whole; allowed in every mode.
+// In replay every other action except `tutorial.dismiss` and `settings.sound` is refused with `r02-g11.replay`, and
+// nothing is recorded. Digest "r02-g11.echo-cartographer.v3" (the same parts as v2, the progress now with traces; never
+// the sound choice or the dropped count); snapshot schema 3 `{"level", "mode", "progress", "records", "sound",
+// "tutorial"}` (results carry `trace` and `verified`), migrating 1 → 2 → 3 (2 → 3: every result an empty trace and
+// `verified` false, sound off).
+//
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `EchoCartographerTier.of(t)`: level-0 = rings, flare trails, 2 glow shells; level-1 =
 // rings, 1 shell; level-2 = none. Outcome: `won` or `failed` while the play is in that stage, else nil.
@@ -75,6 +93,12 @@ public enum EchoCartographerExperienceRule {
     public static let locked = "r02-g11.locked"
     /// An impossible calendar date (feature 405).
     public static let date = "r02-g11.date"
+    /// No verified result with a trace to replay, or a replay control outside replay (feature 407).
+    public static let noReplay = "r02-g11.no-replay"
+    /// The replay has no further action: the trace is over or the play ended (feature 407).
+    public static let replayEnd = "r02-g11.replay-end"
+    /// An action that is not allowed during replay (feature 407).
+    public static let replay = "r02-g11.replay"
 }
 
 /// Why a saved Echo Cartographer state was refused on restore (feature 403). A refused restore changes nothing.
@@ -88,17 +112,20 @@ public enum EchoCartographerRestoreRefusal: Error, Equatable, Sendable {
     case kernel(EchoCartographerError)
 }
 
-/// The state of Echo Cartographer as an experience (see the file header). Snapshot schema 2.
+/// The state of Echo Cartographer as an experience (see the file header). Snapshot schema 3.
 public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g11.echo-cartographer"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g11.echo-cartographer.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g11.echo-cartographer.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["cell.pulse", "cell.claim", "cell.mark", "play.undo", "play.redo", "level.next",
-                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                                   "replay.start", "replay.step", "replay.stop", "settings.sound"]
+    /// The declared range of `settings.sound`: 0 off, 1 on (feature 407).
+    public static let soundRange: ClosedRange<Int> = 0...1
     /// The energy of a practice play: the kernel's maximum (`EchoCartographerMode.practiceEnergy`, 60).
     public static let practiceEnergy: Int = EchoCartographerMode.practiceEnergy
     /// The level numbers of the catalog.
@@ -121,6 +148,12 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
     public private(set) var mode: EchoCartographerMode
     /// The tutorial step (feature 405): in the snapshot, not in the digest.
     public private(set) var tutorial: EchoCartographerTutorialStep
+    /// How many saved results the last restore dropped because they did not verify (feature 407); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
+    /// The player's sound choice (feature 407, FR-R02G1107-007), set by `settings.sound`: in the snapshot (key
+    /// `"sound"`) and `==`, never in the digest; off at an opening, after a reset and in a migrated save.
+    public private(set) var soundOn = false
     /// The certified plan's pulse count of the current level (stars). Derived from the level number.
     public private(set) var certifiedPulses: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
@@ -308,14 +341,41 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
     /// the opening level).
     public static func == (lhs: EchoCartographerExperienceCore, rhs: EchoCartographerExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial && lhs.soundOn == rhs.soundOn
     }
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object (feature 407): every won result gains an empty `trace` and `verified`
+    /// false, and the sound choice is off.
+    ///
+    /// - Throws: ``EchoCartographerRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw EchoCartographerRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated: [String: Any] = object
+        migrated["progress"] = progress
+        migrated["sound"] = false
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 405): no won levels with the levels up
@@ -355,6 +415,10 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
+        ExperienceControl(id: "settings.sound", ranges: [declared(soundRange)]),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -362,8 +426,8 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The eleven controls with their declared ranges (see the file header); `play.undo`, `play.redo`, `level.next`,
-    /// `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
+    /// The fifteen controls with their declared ranges (see the file header); `play.undo`, `play.redo`, `level.next`,
+    /// `mode.practice`, `mode.campaign`, `tutorial.dismiss`, `replay.step` and `replay.stop` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -395,6 +459,9 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
                 return .rejected(.rule(code: EchoCartographerExperienceRule.notWhole))
             }
             values.append(whole)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: EchoCartographerExperienceRule.replay))
         }
         do throws(EchoCartographerError) {
             switch action.control {
@@ -435,6 +502,29 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
                 try open(number: levelNumber, mode: .practice)
             case "mode.campaign":
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "replay.start":
+                guard let result = progress.solved[values[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: EchoCartographerExperienceRule.noReplay))
+                }
+                try open(number: values[0], mode: .replay(level: values[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: EchoCartographerExperienceRule.noReplay))
+                }
+                // Replay never undoes, so each trace action made exactly one record.
+                let index: Int = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: EchoCartographerExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: EchoCartographerExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
+            case "settings.sound":
+                soundOn = values[0] == 1
             default:   // tutorial.dismiss
                 tutorial = tutorial.dismissed()
             }
@@ -479,9 +569,19 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
     /// final, so a win is recorded once.
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
+        if case .replay = mode { return }
         progress.record(level: levelNumber, energySpent: EchoCartographerProgress.energySpent(play),
-                        certified: certifiedPulses, mode: mode)
+                        certified: certifiedPulses, mode: mode, trace: winningTrace)
     }
+
+    /// The controls accepted during replay (feature 407); the panel's cursor and the camera are presentation only and
+    /// send no action.
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "settings.sound"]
+
+    /// The winning trace of the current play (feature 407): its effective actions in order
+    /// (``EchoCartographerReconciliation/netTrace(_:)``), never an undo or a redo.
+    var winningTrace: [EchoCartographerAction] { EchoCartographerReconciliation.netTrace(play.records) }
 
     /// Back to the opening state the seed chose (progress included); the quality tier, which is not state, is kept.
     public mutating func reset() {
@@ -491,6 +591,7 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         mode = .campaign
         tutorial = opening.tutorial
         certifiedPulses = opening.certifiedPulses
+        soundOn = false
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -502,7 +603,7 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g11.echo-cartographer.v2", then the level number, the play's fingerprint (level, knowledge, markers,
+    /// "r02-g11.echo-cartographer.v3", then the level number, the play's fingerprint (level, knowledge, markers,
     /// located beacons, energy, stage, failure), the progress and the mode (their sorted JSON); never the tutorial step.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
@@ -516,7 +617,8 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload and `sound` (absent
+    /// means off) is written by every schema-3 payload and by the 2 → 3 migration.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
@@ -526,22 +628,27 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         var progress: EchoCartographerProgress
         /// The play's records.
         var records: [EchoCartographerRecord]
+        /// The sound choice; nil (off) in a payload written before schema 3.
+        var sound: Bool?
         /// The tutorial step; nil in a migrated schema-1 payload.
         var tutorial: EchoCartographerTutorialStep?
     }
 
-    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "sound", "tutorial"}` with sorted keys and unescaped
+    /// slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
-                                                 records: play.records, tutorial: tutorial))
+                                                 records: play.records, sound: soundOn, tutorial: tutorial))
     }
 
-    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
-    /// practice mode) with the saved progress, mode and tutorial step (the initial step when absent); a reset returns
-    /// to the opening state `seed` chooses.
+    /// The core of `payload` (schema 3): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the reconciled progress (``EchoCartographerReconciliation/reconcile(_:)``, the frontier as
+    /// saved, the number dropped in ``reconciliationDropped``), the saved mode, tutorial step (the initial step when
+    /// absent) and sound choice (off when absent); a saved replay whose result did not survive the check returns to
+    /// campaign at that level (the frontier when it is not open). A reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``EchoCartographerRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or a daily
-    ///   mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel
+    /// - Throws: ``EchoCartographerRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode, or a daily
+    ///   or replay mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel
     ///   refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> EchoCartographerExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
@@ -553,6 +660,9 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw EchoCartographerRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw EchoCartographerRestoreRefusal.damaged
+        }
         do throws(EchoCartographerError) {
             let certified: EchoCartographerGenerated = try generated(number: decoded.level)
             let play: EchoCartographerPlay = try EchoCartographerPlay.replay(
@@ -560,11 +670,19 @@ public struct EchoCartographerExperienceCore: ExperienceCore, Equatable {
             let tutorial: EchoCartographerTutorialStep = decoded.tutorial
                 ?? EchoCartographerTutorialStep.initial(level: decoded.level)
             let openingCore: EchoCartographerExperienceCore = try opening(number: levelNumber(forSeed: seed))
-            return EchoCartographerExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                                  mode: decoded.mode, tutorial: tutorial,
-                                                  certifiedPulses: certified.plan.pulses.count,
-                                                  openingNumber: openingCore.openingNumber,
-                                                  opening: openingCore.opening)
+            // Feature 407: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = EchoCartographerReconciliation.reconcile(decoded.progress)
+            var core: EchoCartographerExperienceCore = EchoCartographerExperienceCore(
+                levelNumber: decoded.level, play: play, progress: reconciled.progress, mode: decoded.mode,
+                tutorial: tutorial, certifiedPulses: certified.plan.pulses.count,
+                openingNumber: openingCore.openingNumber, opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            core.soundOn = decoded.sound ?? false
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw EchoCartographerRestoreRefusal.kernel(error)
         }

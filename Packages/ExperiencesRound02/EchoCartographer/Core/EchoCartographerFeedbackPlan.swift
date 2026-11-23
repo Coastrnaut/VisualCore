@@ -94,7 +94,9 @@ public struct EchoCartographerFeedbackPlan: Sendable, Equatable {
     /// (`r02-g11.date`), "That action is not possible here." (`r02-g11.action`), "That beacon is already located;
     /// claiming it again changes nothing." (`r02-g11.noop`), "The level has ended." (`r02-g11.stage`), "That value must
     /// be a whole number." (`r02-g11.not-whole`), otherwise (`r02-g11.stale`, `r02-g11.malformed`, the engine's own
-    /// codes such as `action.out-of-range`) "That action was refused.".
+    /// codes such as `action.out-of-range`) "That action was refused."; feature 407's replay codes: "There is no saved
+    /// solution to replay for this level." (`r02-g11.no-replay`), "The replay is over." (`r02-g11.replay-end`), "Stop
+    /// the replay first." (`r02-g11.replay`).
     public static func refusalText(code: String) -> String {
         if code.contains(EchoCartographerExperienceRule.locked) { return "That level is not open yet." }
         if code.contains(EchoCartographerExperienceRule.date) { return "That date cannot be used." }
@@ -104,6 +106,12 @@ public struct EchoCartographerFeedbackPlan: Sendable, Equatable {
         }
         if code.contains(EchoCartographerError.stage.reasonCode) { return "The level has ended." }
         if code.contains(EchoCartographerExperienceRule.notWhole) { return "That value must be a whole number." }
+        // Feature 407: the replay codes (`replay-end` first, since it contains `replay`).
+        if code.contains(EchoCartographerExperienceRule.noReplay) {
+            return "There is no saved solution to replay for this level."
+        }
+        if code.contains(EchoCartographerExperienceRule.replayEnd) { return "The replay is over." }
+        if code.contains(EchoCartographerExperienceRule.replay) { return "Stop the replay first." }
         return "That action was refused."
     }
 
