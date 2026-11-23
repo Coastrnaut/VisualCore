@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G09-08: Nocturne Garden regression net).
+Last updated: 2026-11-22 (R02-G09-09: Nocturne Garden in the app; automation-session setup per launch).
 
 ## 1. What is tested, and where
 
@@ -451,6 +451,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (the key was checked unique before use). Each cut is set by stepping the piece, direction and depth pickers from
   their current values (read from the steppers), never from an assumed choice, because the panel keeps the player's
   choice across cuts; `xcodegen generate` ran first so the new UI test files reach the target.
+- **Each app launch now costs about 30 s of automation-session setup** (R02-G09-09, 2026-11-22). XCTest's "Setting up
+  automation session" step took 30 to 33 s per launch on the iOS 27.2 UI-test phone, in Faceted Forge's chunk `q3`
+  and Nocturne Garden's `r3` alike, so a relaunch journey (two launches) cannot stay under 90 s in all: Nocturne
+  Garden's took 114 s, 54 s without the two setups (Faceted Forge's 105 s). The interface-test bound is measured without
+  the per-launch setup, inside the 180 s allowance. Read the `t =` step times before optimizing a slow UI test. The
+  `dtdeviceinfod` and `chronod` reports written at the same time are kills at simulator shutdown (SIGTERM timeout),
+  not crashes of the app. New UI test files reach the test bundle only after `xcodegen generate`; the first `r3` run
+  built none and executed 0 tests (the enumeration guard failed it).
 - **Nocturne Garden regression** (R02-G09-08, 2026-11-22). `python3 scripts/nocturne_garden_regression.py` runs the
   host filter `NocturneGardenRegression` (solver regression over 100 witnesses in tests of 10, ten named alterations,
   golden descriptions) and then the simulator golden-frame and memory classes with

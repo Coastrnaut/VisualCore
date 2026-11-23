@@ -25,7 +25,8 @@ Data: [data-model.md](data-model.md). Contract: [contracts/api.md](contracts/api
 `ExperienceSnapshot`, `DigestBuilder`); the app's registry, `DebugLaunch` and UI test support.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02`; `release_check.py --only
 app-build-for-testing-ios27 app-unit-ios27 app-ui-ios27-r3 app-release-build app-release-symbols`; the 388 regression.
-**Constraints**: no new target; Nocturne Garden stays in `candidates`; interface tests each under 90 s; no device.
+**Constraints**: no new target; Nocturne Garden stays in `candidates`; interface tests each under 90 s apart from the simulator's automation-session setup per launch (SC-R02G0909-001);
+no device.
 
 No NEEDS CLARIFICATION remains.
 
