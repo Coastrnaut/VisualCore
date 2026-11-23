@@ -11,7 +11,8 @@
   target is not a reordering is refused. Rationale: a reversal only reorders samples, so any other target is
   unreachable and could never be certified.
 - **R4 Tear, then win, then budget.** Decision: judged after each accepted reversal in that order. Rationale: a tear is
-  always a failure, even on a move that would otherwise win; a win on the last reversal counts.
+  always a failure; a win on the last reversal counts. Since B ≥ L, a torn wave is never smooth, so tear and win never
+  meet on one reversal (found while testing, 2026-11-22); a tearing reversal that matches every checkpoint is a tear.
 - **R5 Bounds inclusive.** Decision: |b| ≤ L is smooth; |b| ≤ B survives; |b| = B + 1 tears. Rationale: the boundary
   cases of SC-R02G1001-004 are one unit either side.
 - **R6 Distance as an exact fraction.** Decision: (Σ|s − t|, Σ|t|), reported unreduced, 0/1 when Σ|t| = 0, with the

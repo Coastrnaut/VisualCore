@@ -50,7 +50,7 @@ in this feature (the wave and its bends are the CPU reference the renderer of R0
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1001-005 [P] [US4] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraRules.swift`
+- [X] T-R02G1001-005 [P] [US4] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraRules.swift` — Verified 2026-11-22: host-4 (32 tests incl. BackwardsAuroraRulesTests 7: rules id and start; move order and counts vs a formula and brute force incl. palindromic sections; refusals agree with the play; 100 fixtures' reversals legal and winning on the last; terminal positions; tear before budget with the lowest seam named; 200 seeded walks agree with the real play at every step) exit 0, lead retest against agent B's play; contract lists initialState and tearSeam
   (agent C: `PuzzleRules`: State = position (wave, spent, outcome), Move = BackwardsAuroraAction; legal moves while
   playing "every valid, non-noop reversal in order of start, then end") with
   `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraRulesTests.swift` (agreement with the play on 200
