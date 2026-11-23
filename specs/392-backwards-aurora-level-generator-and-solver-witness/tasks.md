@@ -57,7 +57,7 @@ logic); no GLSL in this feature.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G1002-005 [P] [US4] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraWitness.swift`
+- [X] T-R02G1002-005 [P] [US4] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraWitness.swift` — Verified 2026-11-22: host-4 (BackwardsAuroraWitnessTests 14: fixtures of bands 1–4 round trip byte for byte; parts equal the solver's and an independent replay; the near miss as recorded; edited actions, digests, fingerprints, level, smallest, bound, near miss, difficulty, number and skipped each refused by name; a different winning sequence refused by the solver re-run (.witness("solution")); newer, older and damaged forms refused; make refuses a losing solution, wrong bound and wrong difficulty) exit 0, lead retest
   (schema 1; built by replaying the solution's reversals on a `BackwardsAuroraPlay`: the 16-hex sample digest after
   every reversal, fingerprints after begin (and dismissTutorial) and each reversal; smallest and the bound (bad bends);
   the near miss (the witness minus its last reversal: not won, bad bends above 0); difficulty; skipped; sorted-key
