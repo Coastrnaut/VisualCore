@@ -1,7 +1,8 @@
 // EchoCartographerControls — feature 403 (R02-G11-03) T-R02G1103-006 (FR-R02G1103-005; clarification Q5). The minimal
 // control panel: labelled steppers for the cursor's column and row (presentation state only), pulse, claim and mark at
 // the cursor (kernel actions through the action port), undo, redo and next level, each with an accessibility label and
-// value. Tapping to emit, dragging markers and orbiting come in R02-G11-04; full accessibility in R02-G11-06.
+// value. Feature 404 (R02-G11-04) adds "Reset view" (the authored camera) and sends through the presenter, which shows
+// and logs refusals; full accessibility comes in R02-G11-06.
 #if os(iOS)
 import EchoCartographerCore
 import SwiftUI
@@ -9,8 +10,11 @@ import VisualCoreExperienceHost
 
 /// The control panel of Echo Cartographer.
 struct EchoCartographerControls: View {
-    let port: ExperienceActionPort
     let mirror: EchoCartographerMirror
+    /// Returns the camera to the authored view.
+    let resetView: () -> Void
+    /// Sends a control with its values through the presenter (which shows and logs a refusal).
+    let sender: (String, [Double]) -> Void
 
     var body: some View {
         ScrollView(.vertical) {
@@ -76,16 +80,17 @@ struct EchoCartographerControls: View {
                 .accessibilityLabel("Redo the action")
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
         }
     }
 
     /// The cursor as the values of a `cell.*` control.
     private var cursorValues: [Double] { [Double(mirror.column), Double(mirror.row)] }
 
-    /// Sends `control` and shows a refusal.
+    /// Sends `control` through the presenter.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted ? nil : "That change was refused: \(result.code)"
+        sender(control, values)
     }
 }
 #endif

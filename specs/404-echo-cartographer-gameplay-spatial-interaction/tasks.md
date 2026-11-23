@@ -59,7 +59,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G1104-005 [US4] Wire `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerPresenter.swift`
+- [X] T-R02G1104-005 [US4] Wire `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerPresenter.swift` — Verified 2026-11-23: sim-27 (36 Echo Cartographer simulator tests incl. EchoCartographerGestureWiringTests 7: a tap on the entry pulses, a tap on an unknown cell moves the cursor, a drag places a marker and a marker drag moves it, a held press claims or is refused with its code shown and logged, orbit and reset change no digest, a tap on a won play sends nothing and says the play is over) exit 0; presenter pointer entry, scene orbit, panel Reset view
   (`pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot and play; pulse, claim and
   mark sent through the port; moveCursor changing the mirror's cursor; `resetView()`; a kernel action on a finished
   play described as "The play is over: undo or go to the next level"; a refused action shown in the mirror message and

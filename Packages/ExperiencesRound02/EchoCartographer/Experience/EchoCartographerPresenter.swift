@@ -8,6 +8,10 @@
 // warning releases the GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing
 // result reaches the kernel (renderer purity). Its probes (two ground corners) let the verification runner check a
 // frame.
+// Feature 404 (R02-G11-04): `pointer(_:viewSize:port:)` routes canvas touches through
+// `EchoCartographerGestureController` with the drawn snapshot and play: pulses, claims and marks go through the port
+// (refusals are shown and kept with their code in `refusalLog`), cursor moves go to the mirror, and the scene draws the
+// controller's orbit; "Reset view" and a double tap on empty space return to the authored view.
 #if os(iOS)
 import EchoCartographerCore
 import Foundation
@@ -16,6 +20,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show and choose: the latest state the presenter described and the panel's cursor.
 @MainActor
@@ -98,6 +103,14 @@ final class EchoCartographerPresenter: ExperiencePresenter {
     private var pulseEcho: EchoCartographerEcho?
     private var pulseSeen = false
     private var pulseStart: Double = 0
+    /// The play last drawn (the gestures read it).
+    private(set) var lastPlay: EchoCartographerPlay?
+    /// The gesture controller (feature 404): taps, marker drags, held claims, double taps, orbit.
+    private(set) var gestures = EchoCartographerGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
@@ -149,6 +162,9 @@ final class EchoCartographerPresenter: ExperiencePresenter {
         let time = pulseTime(core, now: frame.time)
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        lastPlay = core.play
+        gestures.tick(at: ProcessInfo.processInfo.systemUptime)
+        scene.orbit = gestures.orbit
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
@@ -198,7 +214,77 @@ final class EchoCartographerPresenter: ExperiencePresenter {
     }
 
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(EchoCartographerControls(port: port, mirror: mirror))
+        AnyView(EchoCartographerControls(mirror: mirror,
+                                         resetView: { [weak self] in self?.resetView() },
+                                         sender: { [weak self] control, values in
+                                             self?.send(control, values, port: port)
+                                         }))
+    }
+
+    // MARK: Touch controls (feature 404, R02-G11-04)
+
+    /// The canvas gestures send pulses, claims and marks; the cursor and the orbit are presentation state.
+    var gestureActions: Set<String> { ["cell.pulse", "cell.claim", "cell.mark"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(EchoCartographerExperienceCore.actionIDs) }
+
+    /// What a gesture on a finished play shows.
+    static let finishedMessage = "The play is over: undo or go to the next level"
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and play and applies what it
+    /// returns, in order: pulses, claims and marks are sent through the port, cursor moves go to the mirror; a
+    /// one-finger gesture that ends on a won, failed or finished play explains that the play is over.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot, let play = lastPlay else { return }
+        let before: EchoCartographerGestureController.State = gestures.state
+        let actions: [EchoCartographerGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot,
+                                                                       play: play)
+        let finished: Bool = play.stage == .won || play.stage == .failed || play.stage == .result
+        let oneFinger: Bool = before == .cellPress || before == .markerDrag || before == .cellDrag || before == .held
+        if event.phase == .ended, finished, oneFinger {
+            mirror.message = Self.finishedMessage
+        }
+        for action in actions {
+            switch action {
+            case let .pulse(x, y):
+                send("cell.pulse", [Double(x), Double(y)], port: port)
+            case let .claim(x, y):
+                send("cell.claim", [Double(x), Double(y)], port: port)
+            case let .mark(x, y):
+                send("cell.mark", [Double(x), Double(y)], port: port)
+            case let .moveCursor(x, y):
+                mirror.column = x
+                mirror.row = y
+                mirror.stepColumn(0)
+                mirror.stepRow(0)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+        scene.orbit = gestures.orbit
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Sends `control` with `values`, shows a refusal in the panel and keeps its code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(result.code)"
+            refusalLog.append(result.code)
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        return result
     }
 }
 #endif

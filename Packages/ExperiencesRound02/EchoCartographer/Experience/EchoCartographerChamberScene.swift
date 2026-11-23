@@ -28,6 +28,8 @@ final class EchoCartographerChamberScene {
     var reducedFlash = false
     /// Whether the rings and flares are drawn at rest (Reduce Motion).
     var reduceMotion = false
+    /// The orbit drawn (feature 404): presentation only, never part of the snapshot or the digest.
+    var orbit: EchoCartographerOrbit = .authored
     /// The light direction of the chamber (from above and in front).
     static let lightDirection = SIMD3<Float>(0.25, 0.85, 0.46)
 
@@ -95,7 +97,7 @@ final class EchoCartographerChamberScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = EchoCartographerSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = EchoCartographerSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         if key(snapshot, tier: tier) != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = key(snapshot, tier: tier)
         if fallbackReason != nil {
