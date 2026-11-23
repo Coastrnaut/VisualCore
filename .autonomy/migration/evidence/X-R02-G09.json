@@ -1,0 +1,102 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "python3 scripts/verify_experiences.py --only r02-g09.nocturne-garden --runtime 27",
+      "exit_code": 1,
+      "log": ".autonomy/logs/migration/X-R02-G09.sim27.log",
+      "log_sha256": "3cb4655982fc29fbbfb9af4f4ce3caff05192ce4ce27a65d34ecc340e030e8ae",
+      "name": "sim27",
+      "timed_out": false
+    }
+  ],
+  "gate": "X-R02-G09",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/verify_experiences.py --audits",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:52:30+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.audits.log",
+      "log_sha256": "da7091eed392fa9d987cc299951746e826d6ae383188ab8c47a346bd4adcf496",
+      "name": "audits"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g09-host-1 --only-testing AuroraLoomCoreTests AuroraLoomExperienceTests LissajousLabyrinthCoreTests LissajousLabyrinthExperienceTests HueCompassCoreTests HueCompassExperienceTests WaveKnotKeeperCoreTests WaveKnotKeeperExperienceTests ColorfallCanyonsCoreTests ColorfallCanyonsExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:48:18+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.host-1.log",
+      "log_sha256": "9ea9a0eb73a5d2f1e1750b755911565d089bb90d2c51d2701a82df827d2e85e5",
+      "name": "host-1"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g09-host-2 --only-testing ChronoConstellatorCoreTests ChronoConstellatorExperienceTests AmethystEscapeCoreTests AmethystEscapeExperienceTests FacetedForgeCoreTests FacetedForgeExperienceTests NocturneGardenCoreTests NocturneGardenExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:52:22+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.host-2.log",
+      "log_sha256": "26faadd7a0bc5bf99cb95f7079d9562a269f1049c6d3b710d6ab28c3b59fc769",
+      "name": "host-2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:59:15+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.reference-1.log",
+      "log_sha256": "f43a7a5d9faac1f990314b07c5eb74a7fe1fe8cc42bb76fd909e8c1f8fc8876d",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:59:39+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.reference-2.log",
+      "log_sha256": "e495764dc385477a3d3eb14c46e7b1352c101aa7eab41fec1a886576601bf9e8",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only r02-g09.nocturne-garden --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:42:11+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.sim26.log",
+      "log_sha256": "72380128ca76365c84ad117e496d636c0febbf3a89d0e422286877af24784926",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only r02-g09.nocturne-garden --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:37:01+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.sim27-2.log",
+      "log_sha256": "8707876ca73db8cfb072e2b0227ba5ef49554145a1f0563dc61a9fe8d15278b6",
+      "name": "sim27-2"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-r3",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:58:46+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.ui-r3.log",
+      "log_sha256": "793339f4523ce882c069f160568d1cd5947bca2edc9a78d962485809c5a4d0ca",
+      "name": "ui-r3"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:53:08+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.visualcore-host.log",
+      "log_sha256": "8e441cffe6d4ac32d5fff88ae75d46cbdb52dfcfb2693195025434552f19967f",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xr02g09-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-23T01:53:56+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G09.visualcore-rendering.log",
+      "log_sha256": "157942a18a7138952d041d8a35947789e0637a08b10425d92c97f14a50c6dccf",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "c2fec09193856c9b2937d5380756400f3c09b182",
+  "revision_number": 1,
+  "sealed": "2026-11-23T01:59:47+00:00"
+}
