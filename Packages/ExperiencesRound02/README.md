@@ -642,3 +642,13 @@ examples (`EchoCartographerSchemaExamples`) stored by the app registration, app 
 Feature 410 (R02-G11-10) prepares Echo Cartographer's device campaign without touching a device:
 `docs/apps/echo-cartographer/device-rows.json` (rows EC-D1 … EC-D8, all pending), the written plan
 `docs/apps/echo-cartographer/device-campaign.md`, and the release step `device-rows-r02-g11`.
+
+## Harmonic Bridges (R02-G12, `r02-g12.harmonic-bridges`, free)
+
+`HarmonicBridgesCore` (feature 411, R02-G12-01) is the playable rule kernel: the exact swing table, string resonance,
+averaged swings, bridges and the bridge graph's reachability per step (`HarmonicBridgesSwing`, `HarmonicBridgesString`,
+`HarmonicBridgesTone`, `HarmonicBridgesResonance`, `HarmonicBridgesReport`), `HarmonicBridgesLevel` (immutable,
+fingerprinted, JSON schema 1, with names in words), the play state `HarmonicBridgesPlay` with `HarmonicBridgesAction`,
+`HarmonicBridgesStage`, `HarmonicBridgesEvent`, `HarmonicBridgesFailure` and append-only `HarmonicBridgesRecord`s, and
+`HarmonicBridgesRules` for the R02-F23 puzzle contract. Refusals are `HarmonicBridgesError` with `r02-g12.*` codes. Rules:
+[docs/architecture/harmonic-bridges.md](../../docs/architecture/harmonic-bridges.md).

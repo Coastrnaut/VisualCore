@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G11-10: Echo Cartographer device rows; script test classes above the __main__ block).
+Last updated: 2026-11-23 (R02-G12-01: Harmonic Bridges rule kernel).
 
 ## 1. What is tested, and where
 
@@ -555,6 +555,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   force over every beacon subset on the two smallest regions of each band. The band filters (pulse ranges, sizes,
   beacons) were measured with a short Python prototype of the greedy solver before the clarification was written, as
   R02-G10-02 taught; every entry then generated on the first Swift run.
+- **Harmonic Bridges rule kernel** (R02-G12-01, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
+  --filter HarmonicBridges` (40 tests, about 2 s): the swing table against exact quarter values of sin² at multiples of
+  30°; resonance, swing, bridges and reachability against an independent reference (enumerated modes, explicit sums,
+  fixed-point relaxation) on 1,502 seeded cases; the play on 500 fixtures and 500 seeded traces; the rules' legal moves
+  against the real play on 200 walks (the first 20 through the real apply for every candidate, the rest through its
+  validation plus 8 real applies per step: all-real took 7.1 s in a debug build, too close to 10 s with CI 3× slower).
 - **Echo Cartographer rule kernel** (R02-G11-01, 2026-11-23). `swift test --package-path Packages/ExperiencesRound02
   --filter EchoCartographer` (45 tests, about 2 s): rays against explicit coordinate stepping and path lengths against
   fixed-point relaxation (no queue) on 500 seeded chambers; the play on 500 fixtures and 500 seeded traces; the rules'

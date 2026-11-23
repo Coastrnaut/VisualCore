@@ -66,7 +66,7 @@ consume).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1201-007 Docs: `docs/architecture/harmonic-bridges.md` (new: rules), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G1201-007 Docs: `docs/architecture/harmonic-bridges.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-23: round02-host exit 0; docs/architecture/harmonic-bridges.md (new: rules), ExperiencesRound02 README Harmonic Bridges section, testing doc entry; validate_docs passes
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`
