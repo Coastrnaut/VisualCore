@@ -51,7 +51,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G1104-004 [P] [US5] Create
+- [X] T-R02G1104-004 [P] [US5] Create — Verified 2026-11-23: host-4 (EchoCartographerPanelWinTests: all 100 certified levels won through the cursor steppers, Pulse and Claim alone in 10 groups, each in exactly its witness's action count; panel Undo then Redo restore the digests) exit 0, lead retest
   `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerPanelWinTests.swift`: all 100 certified
   levels won through panel actions only (the cursor's column and row steppers, then Pulse or Claim at the cursor, as
   the witnesses play them), split so each test is under 10 s, plus panel Undo then Redo restoring the digests; agent D;
