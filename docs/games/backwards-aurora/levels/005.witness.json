@@ -1,0 +1,121 @@
+{
+  "actions" : [
+    {
+      "reverse" : {
+        "_0" : 2,
+        "_1" : 5
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 8,
+        "_1" : 9
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 12,
+        "_1" : 13
+      }
+    }
+  ],
+  "bound" : {
+    "badBends" : 12
+  },
+  "difficulty" : {
+    "badBends" : 12,
+    "bendLimit" : 1,
+    "breakingMargin" : 127,
+    "checkpoints" : 2,
+    "length" : 16,
+    "longestSection" : 4,
+    "reversedSamples" : 8,
+    "smallest" : 3,
+    "work" : 235
+  },
+  "digests" : [
+    "056d7166e265fadb",
+    "e9c969c28c811ffb",
+    "d54e2696a0970529"
+  ],
+  "fingerprints" : [
+    "ceed78b917e59317f871b68ee2b669500baeb42de1e790f88b5a04aab3d41b2a",
+    "d670d0cf9de75108aab187e73ed6c8edcf66a422bcee60583d22ef3ec185c5f8",
+    "c5beb30e16087cfa3a22cd073cdcdb4d96026bcf1e4e7d01f2d0e998d90da159",
+    "6515d32dd36fd4bf78ecea9425a0e41154ad642bdb99125ce28f26b76d6623a6"
+  ],
+  "level" : {
+    "bendLimit" : 1,
+    "breakingLimit" : 128,
+    "budget" : 9,
+    "checkpoints" : [
+      9,
+      13
+    ],
+    "difficulty" : 1,
+    "fingerprint" : "ad5c30ba936d9a4d9a3cdad0462266adf8ee37421fe0367a7d22fe71deeeb5da",
+    "id" : "backwards-aurora-005",
+    "longest" : 16,
+    "opening" : [
+      22,
+      24,
+      23,
+      24,
+      25,
+      25,
+      21,
+      19,
+      15,
+      17,
+      13,
+      11,
+      7,
+      9,
+      5,
+      4
+    ],
+    "schema" : 1,
+    "seed" : 7359209292443612785,
+    "shortest" : 2,
+    "target" : [
+      22,
+      24,
+      25,
+      25,
+      24,
+      23,
+      21,
+      19,
+      17,
+      15,
+      13,
+      11,
+      9,
+      7,
+      5,
+      4
+    ],
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "reverse" : {
+          "_0" : 2,
+          "_1" : 5
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 8,
+          "_1" : 9
+        }
+      }
+    ],
+    "badBends" : 4
+  },
+  "number" : 5,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 3
+}

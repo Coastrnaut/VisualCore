@@ -1,0 +1,130 @@
+{
+  "actions" : [
+    {
+      "reverse" : {
+        "_0" : 3,
+        "_1" : 6
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 9,
+        "_1" : 11
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 14,
+        "_1" : 17
+      }
+    }
+  ],
+  "bound" : {
+    "badBends" : 12
+  },
+  "difficulty" : {
+    "badBends" : 12,
+    "bendLimit" : 1,
+    "breakingMargin" : 127,
+    "checkpoints" : 3,
+    "length" : 20,
+    "longestSection" : 4,
+    "reversedSamples" : 11,
+    "smallest" : 3,
+    "work" : 372
+  },
+  "digests" : [
+    "3363d5bdcfad3187",
+    "fafddafedf08af9f",
+    "9746adcdedf770d8"
+  ],
+  "fingerprints" : [
+    "ef5d3740d65021528a22a931c3900dd21e0ae18960c328c23ffe4d6889f01b7e",
+    "6f60c03063277d96900f5ed3ae807dc90c4326f406f317fc7260d0c08e2f4627",
+    "d0c2e91e785d3746e16687fe2331f9046bd97de63b5249ea7aae16b6b6db4466",
+    "60bb35ca3d4ca9d974f2d8b8f432b133b8486a6fa36175acca4fc6767e1660c5"
+  ],
+  "level" : {
+    "bendLimit" : 1,
+    "breakingLimit" : 128,
+    "budget" : 11,
+    "checkpoints" : [
+      3,
+      9,
+      17
+    ],
+    "difficulty" : 2,
+    "fingerprint" : "b29ea5ae2c3506c89ddfc0cd17adeb35505f9ad9de3338cda8b04f8f3792d2bd",
+    "id" : "backwards-aurora-021",
+    "longest" : 20,
+    "opening" : [
+      -7,
+      -3,
+      1,
+      17,
+      13,
+      9,
+      5,
+      20,
+      22,
+      30,
+      28,
+      25,
+      32,
+      33,
+      38,
+      37,
+      36,
+      35,
+      38,
+      38
+    ],
+    "schema" : 1,
+    "seed" : 13769402123726602265,
+    "shortest" : 2,
+    "target" : [
+      -7,
+      -3,
+      1,
+      5,
+      9,
+      13,
+      17,
+      20,
+      22,
+      25,
+      28,
+      30,
+      32,
+      33,
+      35,
+      36,
+      37,
+      38,
+      38,
+      38
+    ],
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "reverse" : {
+          "_0" : 3,
+          "_1" : 6
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 9,
+          "_1" : 11
+        }
+      }
+    ],
+    "badBends" : 4
+  },
+  "number" : 21,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 3
+}

@@ -1,0 +1,132 @@
+{
+  "actions" : [
+    {
+      "reverse" : {
+        "_0" : 2,
+        "_1" : 6
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 9,
+        "_1" : 11
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 15,
+        "_1" : 18
+      }
+    }
+  ],
+  "bound" : {
+    "badBends" : 12
+  },
+  "difficulty" : {
+    "badBends" : 12,
+    "bendLimit" : 1,
+    "breakingMargin" : 127,
+    "checkpoints" : 3,
+    "length" : 21,
+    "longestSection" : 5,
+    "reversedSamples" : 12,
+    "smallest" : 3,
+    "work" : 380
+  },
+  "digests" : [
+    "f209b6c5aff73633",
+    "a9a966dab9fa6796",
+    "a04ab6346a2308f7"
+  ],
+  "fingerprints" : [
+    "83700357b91fb55b7d0e32158cef64810b3f58d42bad6e3172f06debfb00839f",
+    "0dd804aaea68a307b903f5d3c905a29f38e50e8b50309fc8bf25335c705f9396",
+    "c1e76c79cbfb0ce980efce451629b68d0ec5c4ab714418d88b40b2f50fcf7950",
+    "060f0a2fce8f55b1424254e0d25d4a8690482edea70835ced0779ad3c4b2e4c1"
+  ],
+  "level" : {
+    "bendLimit" : 1,
+    "breakingLimit" : 128,
+    "budget" : 10,
+    "checkpoints" : [
+      2,
+      9,
+      15
+    ],
+    "difficulty" : 2,
+    "fingerprint" : "c28e3373591fb51d135398b087fe6aa6b4aa5eff0ceef6077c409b535cc865f7",
+    "id" : "backwards-aurora-032",
+    "longest" : 21,
+    "opening" : [
+      -13,
+      -11,
+      -14,
+      -13,
+      -11,
+      -10,
+      -10,
+      -15,
+      -16,
+      -21,
+      -19,
+      -17,
+      -23,
+      -24,
+      -24,
+      -29,
+      -28,
+      -27,
+      -25,
+      -31,
+      -33
+    ],
+    "schema" : 1,
+    "seed" : 8975169356561181779,
+    "shortest" : 2,
+    "target" : [
+      -13,
+      -11,
+      -10,
+      -10,
+      -11,
+      -13,
+      -14,
+      -15,
+      -16,
+      -17,
+      -19,
+      -21,
+      -23,
+      -24,
+      -24,
+      -25,
+      -27,
+      -28,
+      -29,
+      -31,
+      -33
+    ],
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "reverse" : {
+          "_0" : 2,
+          "_1" : 6
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 9,
+          "_1" : 11
+        }
+      }
+    ],
+    "badBends" : 4
+  },
+  "number" : 32,
+  "schema" : 1,
+  "skipped" : 1,
+  "smallest" : 3
+}

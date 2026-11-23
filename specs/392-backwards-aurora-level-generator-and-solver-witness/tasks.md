@@ -66,7 +66,7 @@ logic); no GLSL in this feature.
   convergence lesson)) with `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraWitnessTests.swift`
   (round trip byte for byte; edited actions, digests, fingerprints, level, near miss and difficulty refused; newer
   schema and damaged JSON refused; the near miss behaves as recorded) by agent B; `--name host-4`
-- [ ] T-R02G1002-006 [US2] [US3] [US4] Create
+- [X] T-R02G1002-006 [US2] [US3] [US4] Create — Verified 2026-11-22: host-5 (all BackwardsAurora tests incl. BackwardsAuroraCatalogTests: 100 entries, 20 per band; pinned digest 6eb242e6…d06e; progression rule and band means; all 100 stored witnesses win on the last reversal and not one short; independent bad-bend recount and single-reversal brute force on two levels per band; full decode per band; 100 files byte for byte in 20 groups of 5) exit 0; the 100 witness files generated with BACKWARDS_AURORA_WRITE_WITNESSES=1
   `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraCatalogTests.swift` (100 entries, 20 per band;
   the catalog generated twice is identical; pinned digest; `ProgressionRule.standard` holds on the smallest count; band
   means never fall; the independent check on two levels per band (SC-R02G1002-002); all 100 witnesses replay to a win;

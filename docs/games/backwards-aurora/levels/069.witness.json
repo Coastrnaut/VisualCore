@@ -1,0 +1,194 @@
+{
+  "actions" : [
+    {
+      "reverse" : {
+        "_0" : 2,
+        "_1" : 3
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 6,
+        "_1" : 8
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 11,
+        "_1" : 13
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 16,
+        "_1" : 19
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 22,
+        "_1" : 23
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 26,
+        "_1" : 27
+      }
+    }
+  ],
+  "bound" : {
+    "badBends" : 24
+  },
+  "difficulty" : {
+    "badBends" : 24,
+    "bendLimit" : 2,
+    "breakingMargin" : 32,
+    "checkpoints" : 5,
+    "length" : 30,
+    "longestSection" : 4,
+    "reversedSamples" : 16,
+    "smallest" : 6,
+    "work" : 1670
+  },
+  "digests" : [
+    "882d47903c8f65be",
+    "201c00a652bcdaa7",
+    "1b5aeed977f0cd13",
+    "e3bf4259e48c525d",
+    "de7059c80fc7225c",
+    "b0f58939995dad3a"
+  ],
+  "fingerprints" : [
+    "acee47bb7ea9e4a40423eee45cf8a3f4be1e177c1ff7ead633f0151cf4548a58",
+    "257399e4dada7466124c22420568035de3c91767c278c626d610e79aec1ebc54",
+    "3f7cc8ba095f0c5d832070528ce62348f0ce7bc64966cbd06b1e48338183a315",
+    "4bfb61353d95045a29e8c0d85215865533cbec9fcfe1281abdeb616392f77cb2",
+    "4e71207bd9f6b4971cbff2cd4a9fa102ec8960bc383412f99c2fd12101e24a61",
+    "a78d54e8165ce973efcab9ccd3758e3f5b8a625298e097dc709b003d3e6ba4ef",
+    "4efd737f816b62d541f2fc32d677848e145079b734a8d8ed3ec3ee74379d5c6c"
+  ],
+  "level" : {
+    "bendLimit" : 2,
+    "breakingLimit" : 34,
+    "budget" : 15,
+    "checkpoints" : [
+      2,
+      6,
+      13,
+      16,
+      26
+    ],
+    "difficulty" : 4,
+    "fingerprint" : "0d119890772d3ff323bffd6be19cc0a30199e10a394d4b8b01cbbfd7133d7d8d",
+    "id" : "backwards-aurora-069",
+    "longest" : 30,
+    "opening" : [
+      -17,
+      -14,
+      -7,
+      -11,
+      -4,
+      -2,
+      5,
+      2,
+      0,
+      9,
+      13,
+      24,
+      21,
+      17,
+      27,
+      31,
+      39,
+      37,
+      36,
+      34,
+      40,
+      42,
+      47,
+      44,
+      51,
+      55,
+      62,
+      58,
+      64,
+      64
+    ],
+    "schema" : 1,
+    "seed" : 13127690053682967959,
+    "shortest" : 2,
+    "target" : [
+      -17,
+      -14,
+      -11,
+      -7,
+      -4,
+      -2,
+      0,
+      2,
+      5,
+      9,
+      13,
+      17,
+      21,
+      24,
+      27,
+      31,
+      34,
+      36,
+      37,
+      39,
+      40,
+      42,
+      44,
+      47,
+      51,
+      55,
+      58,
+      62,
+      64,
+      64
+    ],
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "reverse" : {
+          "_0" : 2,
+          "_1" : 3
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 6,
+          "_1" : 8
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 11,
+          "_1" : 13
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 16,
+          "_1" : 19
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 22,
+          "_1" : 23
+        }
+      }
+    ],
+    "badBends" : 4
+  },
+  "number" : 69,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 6
+}

@@ -1,0 +1,121 @@
+{
+  "actions" : [
+    {
+      "reverse" : {
+        "_0" : 2,
+        "_1" : 4
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 7,
+        "_1" : 8
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 11,
+        "_1" : 13
+      }
+    }
+  ],
+  "bound" : {
+    "badBends" : 12
+  },
+  "difficulty" : {
+    "badBends" : 12,
+    "bendLimit" : 1,
+    "breakingMargin" : 127,
+    "checkpoints" : 2,
+    "length" : 16,
+    "longestSection" : 3,
+    "reversedSamples" : 8,
+    "smallest" : 3,
+    "work" : 228
+  },
+  "digests" : [
+    "de006cb05dec789f",
+    "438433c7cfb72b44",
+    "8bc2705d2e420019"
+  ],
+  "fingerprints" : [
+    "dcc5eb119f657667dba485b94f8524223a5442c458d182fbae62c399e48023c8",
+    "c599518df9eacd8f924bcdcf81ba304c8dbfcd3af467a2a8d24f13ada5de10ad",
+    "0d825c339f646a4accfd0ee195b647aeb0ed42a1efa4fdd565ec8af5065a1878",
+    "a89b6fcea445674d2f5abcceb08f805b92a48d4541f5e42e1fb12dc841e3cb6b"
+  ],
+  "level" : {
+    "bendLimit" : 1,
+    "breakingLimit" : 128,
+    "budget" : 11,
+    "checkpoints" : [
+      2,
+      7
+    ],
+    "difficulty" : 1,
+    "fingerprint" : "6398b9c9d55e56103dc8030b5b05b2b53b76a04e45fd8ff6a8755ee0d694f85e",
+    "id" : "backwards-aurora-019",
+    "longest" : 16,
+    "opening" : [
+      6,
+      10,
+      22,
+      18,
+      14,
+      26,
+      29,
+      36,
+      33,
+      38,
+      40,
+      45,
+      43,
+      42,
+      48,
+      50
+    ],
+    "schema" : 1,
+    "seed" : 7923443282893324726,
+    "shortest" : 2,
+    "target" : [
+      6,
+      10,
+      14,
+      18,
+      22,
+      26,
+      29,
+      33,
+      36,
+      38,
+      40,
+      42,
+      43,
+      45,
+      48,
+      50
+    ],
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "reverse" : {
+          "_0" : 2,
+          "_1" : 4
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 7,
+          "_1" : 8
+        }
+      }
+    ],
+    "badBends" : 4
+  },
+  "number" : 19,
+  "schema" : 1,
+  "skipped" : 0,
+  "smallest" : 3
+}

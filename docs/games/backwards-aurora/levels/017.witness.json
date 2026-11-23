@@ -1,0 +1,105 @@
+{
+  "actions" : [
+    {
+      "reverse" : {
+        "_0" : 3,
+        "_1" : 6
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 9,
+        "_1" : 12
+      }
+    }
+  ],
+  "bound" : {
+    "badBends" : 8
+  },
+  "difficulty" : {
+    "badBends" : 8,
+    "bendLimit" : 1,
+    "breakingMargin" : 127,
+    "checkpoints" : 2,
+    "length" : 15,
+    "longestSection" : 4,
+    "reversedSamples" : 8,
+    "smallest" : 2,
+    "work" : 130
+  },
+  "digests" : [
+    "a2980629a25efc87",
+    "6a776546b9f8dec7"
+  ],
+  "fingerprints" : [
+    "10adb8ea50a2dcea2191e9b8ad455a4f41b64ebcc50e82cbe41fe23be58f07f5",
+    "2941dcf700045c9e0d7a3bcc54dae220a9ea82dc62c1c78a053864bdc5282b8f",
+    "de2c446ed1c22decc274bb8db53dd4558f1cd91503d49907886ccbee06a2b9c0"
+  ],
+  "level" : {
+    "bendLimit" : 1,
+    "breakingLimit" : 128,
+    "budget" : 9,
+    "checkpoints" : [
+      3,
+      10
+    ],
+    "difficulty" : 1,
+    "fingerprint" : "9bd7409062f862c4b45f1944d2e32ce846b4d39f4877e46c1d6fee82410e62e6",
+    "id" : "backwards-aurora-017",
+    "longest" : 15,
+    "opening" : [
+      -13,
+      -13,
+      -14,
+      -18,
+      -17,
+      -17,
+      -16,
+      -19,
+      -19,
+      -15,
+      -15,
+      -16,
+      -18,
+      -14,
+      -12
+    ],
+    "schema" : 1,
+    "seed" : 5611497979150808090,
+    "shortest" : 2,
+    "target" : [
+      -13,
+      -13,
+      -14,
+      -16,
+      -17,
+      -17,
+      -18,
+      -19,
+      -19,
+      -18,
+      -16,
+      -15,
+      -15,
+      -14,
+      -12
+    ],
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "reverse" : {
+          "_0" : 3,
+          "_1" : 6
+        }
+      }
+    ],
+    "badBends" : 4
+  },
+  "number" : 17,
+  "schema" : 1,
+  "skipped" : 3,
+  "smallest" : 2
+}

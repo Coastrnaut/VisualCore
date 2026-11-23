@@ -1,0 +1,157 @@
+{
+  "actions" : [
+    {
+      "reverse" : {
+        "_0" : 2,
+        "_1" : 4
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 9,
+        "_1" : 12
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 16,
+        "_1" : 17
+      }
+    },
+    {
+      "reverse" : {
+        "_0" : 20,
+        "_1" : 22
+      }
+    }
+  ],
+  "bound" : {
+    "badBends" : 16
+  },
+  "difficulty" : {
+    "badBends" : 16,
+    "bendLimit" : 1,
+    "breakingMargin" : 48,
+    "checkpoints" : 4,
+    "length" : 26,
+    "longestSection" : 4,
+    "reversedSamples" : 12,
+    "smallest" : 4,
+    "work" : 823
+  },
+  "digests" : [
+    "37e5e81cabd1e241",
+    "a9ea75fc5eebd649",
+    "32b677a98e19e196",
+    "79d8150ba1f02db7"
+  ],
+  "fingerprints" : [
+    "a56f97cebeab08d3d60b1fbc619f7bb9234fda34b786fad54596c41adb1f8e67",
+    "804a92e49b6017038c9ae4c3e75860997d93f85b01ee18d45ba2a44c6050674d",
+    "44525f80cd2a0b305b2e99e2d7e50b02cfb5110c4d91a89d5abf728e3a47c3b8",
+    "18e8d8fd2851eae947eb1cc3603e4f887a733efb390b0b97c8d387f4cfae3b57",
+    "e9095d90623db54843c4e0748fa3f79702afd1cba5ba714ca2eb091d78ed9535"
+  ],
+  "level" : {
+    "bendLimit" : 1,
+    "breakingLimit" : 49,
+    "budget" : 12,
+    "checkpoints" : [
+      4,
+      10,
+      17,
+      20
+    ],
+    "difficulty" : 3,
+    "fingerprint" : "afd8c089c0715833a9b02ce17baebb2543b5765077af1e5b5ad02f3a780de5f4",
+    "id" : "backwards-aurora-044",
+    "longest" : 26,
+    "opening" : [
+      -16,
+      -15,
+      -12,
+      -14,
+      -15,
+      -11,
+      -10,
+      -8,
+      -7,
+      -10,
+      -8,
+      -7,
+      -7,
+      -13,
+      -16,
+      -20,
+      -28,
+      -24,
+      -31,
+      -33,
+      -41,
+      -39,
+      -36,
+      -42,
+      -43,
+      -45
+    ],
+    "schema" : 1,
+    "seed" : 10282082805588402465,
+    "shortest" : 2,
+    "target" : [
+      -16,
+      -15,
+      -15,
+      -14,
+      -12,
+      -11,
+      -10,
+      -8,
+      -7,
+      -7,
+      -7,
+      -8,
+      -10,
+      -13,
+      -16,
+      -20,
+      -24,
+      -28,
+      -31,
+      -33,
+      -36,
+      -39,
+      -41,
+      -42,
+      -43,
+      -45
+    ],
+    "tutorial" : false
+  },
+  "nearMiss" : {
+    "actions" : [
+      {
+        "reverse" : {
+          "_0" : 2,
+          "_1" : 4
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 9,
+          "_1" : 12
+        }
+      },
+      {
+        "reverse" : {
+          "_0" : 16,
+          "_1" : 17
+        }
+      }
+    ],
+    "badBends" : 4
+  },
+  "number" : 44,
+  "schema" : 1,
+  "skipped" : 2,
+  "smallest" : 4
+}
