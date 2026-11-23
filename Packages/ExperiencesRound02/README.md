@@ -676,3 +676,8 @@ Feature 415 (R02-G12-05) adds teaching and progression: `HarmonicBridgesHints` (
 minimal plan at the current pegs, and the failure explanation), `HarmonicBridgesProgress` (stars, unlocks, the daily
 level, practice and the tutorial steps), the adapter's `level.select`, `mode.*` and `tutorial.dismiss` controls with
 snapshot schema 2 and its migration, and the panel's tutorial, hint, failure, band and stars text.
+
+Feature 416 (R02-G12-06) adds polish and accessibility: `HarmonicBridgesFeedbackPlan` (announcements and haptics),
+`HarmonicBridgesLights` (eased glow and won brightening with Reduce Flashing fades), `HarmonicBridgesSoundRecipe` (the
+plucked string's audition and the ambient loop), the shader's won-light uniform, and the accessible panel (labels,
+values, the adjustable string and peg, the summary element, Dynamic Type, the Sound toggle).

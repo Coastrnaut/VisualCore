@@ -157,3 +157,23 @@ rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.m
 - **Stored form.** Snapshot schema 2 `{level, mode, progress, records, tutorial}` with a migration from schema 1 (levels up
   to the saved one open, campaign mode, the tutorial at its first step); progress and mode are digested, the tutorial
   step is not.
+
+## Polish and accessibility (feature 416, R02-G12-06)
+
+- **Announcements and haptics.** `HarmonicBridgesFeedbackPlan.after(old:new:)` plans one announcement and one haptic per
+  change: an accepted tuning ("String i tuned to peg p.") or undo/redo, each with "The start reaches the goal in k of n
+  steps, a actions left." (`state`, selection); a win ("The crossing holds in every step. Level won spending a actions,
+  k of 3 stars.", `outcome`, success); a failure (the explanation of feature 415, `outcome`, warning); level and mode
+  changes (`level`); refusals in words (`rejection`, error). A test always ends the level, so it plans only its outcome.
+  The presenter routes plans through the shared `ExperienceFeedback` and keeps a feedback log.
+- **Lights and comfort settings.** `HarmonicBridgesLights` eases the glow (0.7 playing, 1 won, 0.35 failed) and the won
+  brightening of the bridges (through the shader's `u_wonLight`) over 0.15 s, 0.45 s under Reduce Flashing, a started
+  fade finishing before it turns back. Under Reduce Motion or Reduce Flashing the resting step is held, the strings
+  rest and no wave shell is drawn; neither changes the state or the digest.
+- **Sound.** Plucking a string plays its audition (fundamental 110 Hz × 2^((peg − 1) / 12), one partial per resonant mode
+  at the fundamental × n with gain 0.04 × w, 0.6 s; a muted pluck without modes), and an optional ambient loop follows
+  the actions left, the steps reached and the stage (`HarmonicBridgesSoundRecipe`); sound plays only while chosen, on
+  screen and active, and is off by default.
+- **Panel.** Every control has a label and a value in words; the chosen string and peg are adjustable; a summary element
+  reads the actions left, the steps reached, the shown step's bridges, the choice and the level; text follows Dynamic
+  Type and Increase Contrast, rows wrap, and the panel keeps a readable width on iPad.
