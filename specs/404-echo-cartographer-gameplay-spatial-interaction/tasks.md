@@ -93,7 +93,7 @@ controls, invariant scan, docs) stay with the lead. MVP: Stories 1 to 3 and 5.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G1104-013 Make `EchoCartographerPresenter.describe` say on a won, failed or result play that the play is over
+- [X] T-R02G1104-013 Make `EchoCartographerPresenter.describe` say on a won, failed or result play that the play is over — Verified 2026-11-23: sim-27-2 (36 Echo Cartographer simulator tests; the won-play wiring test now also checks that the description of a finished play says it is over with undo or next level, and a playing one does not) exit 0
   and to undo or go to the next level (`finishedMessage`), with a simulator test in
   `Packages/ExperiencesRound02/EchoCartographer/ExperienceTests/EchoCartographerGestureWiringTests.swift`, per Spec Edge
   Cases (finished play) and Clarifications Q4 (partial); `--name sim-27-2`

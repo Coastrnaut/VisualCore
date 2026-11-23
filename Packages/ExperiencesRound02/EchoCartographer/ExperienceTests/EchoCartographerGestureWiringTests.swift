@@ -476,6 +476,11 @@ enum EchoCartographerGestureScript {
         #expect(shell.presenter.mirror.message == EchoCartographerPresenter.finishedMessage)
         #expect(shell.presenter.refusalLog.isEmpty, "nothing was refused: nothing was sent")
         #expect(shell.presenter.gestures.state == .idle)
+        // The description of a finished play says it is over and what to do next (T-R02G1104-013).
+        let described: String = shell.presenter.describe(try EchoCartographerTest.core(shell))
+        #expect(described.contains(EchoCartographerPresenter.finishedMessage), "\(described)")
+        let playing: Core = try EchoCartographerTest.advanced(1)
+        #expect(!shell.presenter.describe(playing).contains(EchoCartographerPresenter.finishedMessage))
     }
 }
 #endif

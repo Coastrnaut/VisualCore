@@ -210,6 +210,9 @@ final class EchoCartographerPresenter: ExperiencePresenter {
         default:
             mirror.status = play.records.isEmpty ? "Ready" : "Playing"
         }
+        if play.stage == .won || play.stage == .failed || play.stage == .result {
+            text += " " + Self.finishedMessage + "."
+        }
         return text
     }
 
