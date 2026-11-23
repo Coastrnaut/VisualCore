@@ -61,7 +61,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 - [X] T-R02G1202-007 Docs: `docs/architecture/harmonic-bridges.md` (content pipeline), — Verified 2026-11-23: round02-host exit 0 (345 s); architecture doc content pipeline, ExperiencesRound02 README feature 412, testing doc entry (prototype the generator before writing ranges); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1202-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1202-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: rendering-27, rendering-26, experiences, host-full exit 0
   `--name host-full`
 - [ ] T-R02G1202-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1202-010 Reference regression chunk 2 (`--name reference-2`)
