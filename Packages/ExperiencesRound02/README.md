@@ -556,3 +556,9 @@ rings, kink and tear crosses, section band, reversal gauge, fixed fitted camera 
 `BackwardsAuroraShaders` (GLSL ES 3.00 shimmer and direction-coded pulses; glow), the adapter
 `BackwardsAuroraExperienceCore` with its scenario manifest, and the iOS target `BackwardsAuroraExperience` (presenter,
 scene, minimal controls), registered in the one app as a candidate until X-R02-G10.
+
+Feature 394 (R02-G10-04) adds the gestures: `BackwardsAuroraOrbit` and `camera(_:aspect:orbit:)`, the analytic
+`BackwardsAuroraPicker` (section ends, band and sample columns on the timeline plane), `BackwardsAuroraFreezePreview`
+(the kernel's reversal of the chosen section with its bends and tear, drawn as a dashed ribbon) and
+`BackwardsAuroraGestureController` (tap ends, drag ends, swipe to reverse, hold to freeze, two-finger orbit, double-tap
+reset), wired through the presenter's pointer entry, with "Reset view" in the panel.

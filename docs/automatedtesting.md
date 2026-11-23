@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G10-03: Backwards Aurora renderer, keep frame-check points clear of additive glow).
+Last updated: 2026-11-23 (R02-G10-04: Backwards Aurora gestures, new presentation sources join the kernel scan's skip list).
 
 ## 1. What is tested, and where
 
@@ -389,6 +389,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the
   enumeration guard caught (0/3 declared tests). The level-1 journey is one Turn − and two Advances, and its pinned
   values are checked against the Core by an app unit test.
+- **New presentation sources join the kernel scan's skip list** (R02-G10-04, 2026-11-23). A round-two game's invariant
+  test scans every Core file not in its `presentationSources` set for kernel purity (no Double, only kernel imports).
+  Backwards Aurora's picker and gesture controller use Doubles and pointer events, so both parallel agents found INV-01
+  and INV-10 failing in their copies; the shared test file is the lead's, so the lead added the picker, the freeze
+  preview and the controller to the set in one edit before retesting. Name every new presentation file in the task that
+  creates it.
 - **Keep frame-check points clear of additive glow** (R02-G10-03, 2026-11-22). Backwards Aurora's frame checks look
   for the lilac ghost trail at target points whose height differs from the wave's; at a gap of 8 units (0.075 world)
   the tier-0 glow shells, which reach 0.07 from the ribbon and are added over everything, tinted one ghost pixel on

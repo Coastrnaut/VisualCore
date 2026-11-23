@@ -77,3 +77,20 @@ opening wave that already wins is refused) and the fingerprint and refuses damag
 - **Experience.** Controls `wave.reverse [start, end]`, `play.undo`, `play.redo`, `level.next`; the panel's chosen
   section is presentation state; levels open from their certified candidates; snapshot schema 1 `{level, records}`.
   Registered as a candidate (`r02-g10.backwards-aurora`) until X-R02-G10.
+
+## Gestures (feature 394, R02-G10-04)
+
+- **Picking.** The touch ray through the drawn camera meets the timeline plane: an end of the chosen section (22-point
+  target) wins over the band, the band over a sample column (`BackwardsAuroraPicker`).
+- **Tap segment ends.** A tap on a sample (or on the band) moves the start when left of the section, the end when right
+  of it, and the nearer end when inside; dragging an end moves it, never past the other. The section is presentation
+  state; no tap sends a kernel action.
+- **Swipe to reverse.** A mostly sideways drag from the band sends one `wave.reverse` of the section on release while
+  playing; a refusal (a palindrome, a length outside the level's sections) is shown with its reason and logged.
+- **Timeline freeze preview.** A press held 0.5 s on the band, and every swipe while it lasts, shows the kernel's own
+  reversal as a pale dashed ribbon with the bends above the limit and the seam that would tear, and a line in words; the
+  shimmer and pulses hold still; lifting a held press sends nothing (`BackwardsAuroraFreezePreview`).
+- **Orbit.** Two fingers orbit (yaw ±35°, pitch −15° … +20°) with the distance refitted at every aspect 0.4 … 2.5; a
+  double tap or "Reset view" returns to the authored view. Orbit, section and preview are never saved and never reach
+  the kernel (`BackwardsAuroraGestureController`).
+- **Panel.** Every level can be won with the start and end steppers and Reverse alone.
