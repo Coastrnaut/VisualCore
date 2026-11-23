@@ -18,7 +18,7 @@ tests stay short (< 10 s each). No {owner} tasks. Model: feature 406's tasks.
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G1206-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesFeedbackPlan.swift`
+- [X] T-R02G1206-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesFeedbackPlan.swift` — Verified 2026-11-23: Verified 2026-11-23: host-2 exit 0 (HarmonicBridgesFeedbackPlanTests 8 through the real adapter: tunings, undo, redo, 3- and 2-star campaign wins, a practice win without stars, the daily win of 2026-11-23, every refusal code bare and prefixed, a broken test and a budget-ending tuning planning only the outcome, level and mode changes with and without the tutorial, choosing/previewing plans nothing, hint and summary texts); agent A retested by the lead (its choices of mode names, singular words and the summary's level words accepted)
   (texts and kinds of clarification Q1 word for word, the engine's `action.rule.` prefix read as the bare code, including
   the revealed hint as `state` (`hint(text:)`); haptics of Q2 — a test and a budget-ending tuning plan only the outcome;
   `after(old:new:)`, `refused(code:)`, `refusalText(code:)`, `summaryText(core:string:peg:)` of Q5) with
