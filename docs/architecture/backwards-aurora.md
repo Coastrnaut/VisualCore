@@ -57,3 +57,23 @@ opening wave that already wins is refused) and the fingerprint and refuses damag
 - **Witnesses.** `docs/games/backwards-aurora/levels/NNN.witness.json` holds each level, its reversals, a sample digest
   and play fingerprint after each, the bound, the near miss and the difficulty (`BackwardsAuroraWitness`); the catalog
   tests compare them byte for byte and pin the catalog digest.
+
+## Hero renderer and experience (feature 393, R02-G10-03)
+
+- **Scene.** The timeline stands upright as the plane z = 0: sample k at x = −1 + (k + 0.5)·2/N, y = 0.6·s / 64. The
+  deep-ocean-cyan ribbon is a strip through the kernel's exact samples (each segment in 4 straight steps; never a
+  smoothed curve), with trailing aurora layers behind it; the target is a pale lilac ghost trail; checkpoints are ticks
+  with rings at the true height, filled when matched; bends above the limit carry kink crosses and a torn seam a larger
+  cross; the chosen section is a band with dashed edges; a row of bars shows the reversals spent. A fixed camera from
+  +z fits x −1 … 1, y −0.95 … 0.75 with a 5 % margin for aspects 0.4 … 2.5 (`BackwardsAuroraSceneGeometry`).
+- **Materials.** GLSL ES 3.00 in `BackwardsAuroraShaders`: a shimmer and direction-coded pulse beads travel along the
+  ribbon with presentation time (left to right, right to left inside the chosen section), trailing layers fade, and a
+  glow program adds shells around the ribbon; Reduce Motion holds the time at 0 and Reduce Flashing caps the glow.
+- **Tiers.** `level-0`: 3 aurora layers, 2 pulses, 2 glow shells; `level-1`: 2, 1, 1; `level-2`: the ribbon alone, no
+  pulses, no glow. Samples, markers, colours and positions are the same at every tier; the presenter logs each change.
+- **Purity.** The presenter draws an immutable `BackwardsAuroraSceneSnapshot` made by the adapter
+  (`BackwardsAuroraExperienceCore`); no tier, time or failed shader changes the kernel's digest or verdict. A failed
+  program falls back to the level-2 geometry drawn unlit.
+- **Experience.** Controls `wave.reverse [start, end]`, `play.undo`, `play.redo`, `level.next`; the panel's chosen
+  section is presentation state; levels open from their certified candidates; snapshot schema 1 `{level, records}`.
+  Registered as a candidate (`r02-g10.backwards-aurora`) until X-R02-G10.

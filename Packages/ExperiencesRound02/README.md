@@ -549,3 +549,10 @@ seeded `BackwardsAuroraGenerator` (k separated reversals of a smooth target whos
 seam-count bound and iterative-deepening `BackwardsAuroraSolver`, `BackwardsAuroraDifficulty`, and
 `BackwardsAuroraWitness` files in `docs/games/backwards-aurora/levels/` checked byte for byte with a pinned catalog
 digest.
+
+Feature 393 (R02-G10-03) adds the hero renderer and the experience: `BackwardsAuroraSceneSnapshot` (palette, tiers),
+`BackwardsAuroraSceneGeometry` (the ribbon through the kernel's exact samples, trailing layers, ghost trail, checkpoint
+rings, kink and tear crosses, section band, reversal gauge, fixed fitted camera and CPU projection reference),
+`BackwardsAuroraShaders` (GLSL ES 3.00 shimmer and direction-coded pulses; glow), the adapter
+`BackwardsAuroraExperienceCore` with its scenario manifest, and the iOS target `BackwardsAuroraExperience` (presenter,
+scene, minimal controls), registered in the one app as a candidate until X-R02-G10.
