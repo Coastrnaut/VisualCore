@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for NG-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g09`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g09.nocturne-garden`
-- [ ] T-R02G0910-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Nocturne Garden definition passes; a
+- [X] T-R02G0910-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Nocturne Garden definition passes; a — Verified 2026-11-22: script-tests (run alone, incl. NocturneGardenDeviceRowsCheckTests 6: the real definition passes, a removed scenario, a missing pass field and an uncovered T-R02G0909-011 each fail by name, the release step runs the check) exit 0; agent A's tests retested by the lead
   copy with a scenario removed, a copy with NG-D1's `pass` field removed and a copy with T-R02G0909-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g09` runs the check for
   `r02-g09.nocturne-garden`); `--name script-tests` (alone)
