@@ -74,7 +74,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 - [X] T-R02G1208-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: script-tests exit 0 (run alone, before the chain's other steps)
 - [ ] T-R02G1208-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden levels.
   Not run before the lock.
-- [ ] T-R02G1208-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1208-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-23: converge round 1 appended nothing; README row, gate list and feature count updated
   README row and gate list updated
 
 ## Dependencies and parallel work
