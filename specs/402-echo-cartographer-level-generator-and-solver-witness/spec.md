@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G11-02 (migration ledger, game feature of experience R02-G11) · ID namespace FR-R02G1102-###,
 SC-R02G1102-###, T-R02G1102-###
@@ -26,6 +26,67 @@ Canonical overrides:
   milestone figure, as for the earlier round-two games.
 - **Model:** feature 392 (Backwards Aurora's content pipeline) for manifest, generator, witness files, digest and
   progression.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+392's answers where the games agree. Facts checked (read-only, 2026-11-23): R02-G11-01's `EchoCartographerChamber`
+(W, H 5 … 16, rays, breadth-first path lengths), `EchoCartographerLevel` (1 … 4 beacons, tolerance 0 … 2, energy
+1 … 60, miss cost 1 … 3, the claim rule), `EchoCartographerPlay` and `EchoCartographerRules`; R02-F24's
+`PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most 1, jump at most 3);
+`SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (`planning_index.py levels
+--experience R02-G11`: bands 1 … 5 × 20, energy budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19). The acceptance
+ranges below were measured before they were written down: a prototype of the solver over 60 candidates per band gave
+witness pulse counts mostly 2 (band 1), 2 … 3 (band 2), 3 (bands 3 and 4) and 3 … 6 (band 5), every band reaching its
+range in at least 8 % of candidates, with at most about 50 000 nodes of work.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, energy) are a table
+  in `EchoCartographerManifest` with their provenance. Candidate c of entry n draws from `SeededRandom(seed:
+  SeedDerivation.derive(plannedSeed, index: c))`, in this order: the width and the height by band (6 … 7, 7 … 9, 8 … 10,
+  9 … 12, 10 … 14, each drawn); every cell in index order a wall with chance 1 in 5 (bands 1 … 2) or 1 in 4 (bands
+  3 … 5); the entry among the open cells; the entry's region (the open cells reachable from it), which must hold at
+  least 12 cells or the candidate is skipped; the beacon count by band (1, 1 … 2, 2, 2 … 3, 3 … 4); the beacons drawn one
+  by one from the region without the entry. Tolerance by band 1, 1, 1, 0, 0; miss cost 1, 1, 2, 2, 3; energy = the
+  manifest's; ids `echo-cartographer-NNN`; tutorial on levels 1 … 3; difficulty = band. A candidate the solver does not
+  certify with a witness pulse count in its band's range (1 … 2, 2 … 3, 3 … 4, 4 … 5, 5 … 6) and at most energy − 1
+  pulses within its work bound is skipped; at most 256 candidates, then `generation(n)`. Impact: FR-R02G1102-001, 006;
+  SC-R02G1102-001, 003, 004.
+- Q: How does the solver plan the pulses, and what proves the beacons are singled out? → A: a placement is a set of
+  beacon-count distinct cells of the region other than the entry; it fits the echoes heard when, for every pulse heard,
+  the sorted path lengths from that pulse's emitter to its cells equal the reported echoes. The fitting placements are
+  counted by a depth-first enumeration over the cells that fit every pulse singly, in cell-index order, pruning a
+  partial placement whose distance counts already exceed any pulse's echoes; counts stop at 1 000 ("at least 1 000").
+  The solver is greedy: starting from the opening knowledge, at each turn it tries every cell known open and not yet
+  pulsed, in cell-index order, counts the placements that would fit after that pulse's echo, and pulses the cell with
+  the fewest (ties: lowest index), revealing its rays; it stops when exactly one placement fits (the true beacons, which
+  always fit) and gives up after 6 pulses. Work = enumeration nodes visited, counted and bounded at 400 000 per
+  candidate; over the bound the candidate is skipped. The witness is the plan's pulses followed by one claim on each
+  beacon's cell in beacon order, replayed through the kernel's play. Impact: FR-R02G1102-002; SC-R02G1102-001, 002,
+  005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `EchoCartographerDifficulty` holds the
+  witness pulse count, the width and height, the region's cells, the beacons, the tolerance, the placements fitting
+  before the last pulse (at most 1 000) and the solver work. The catalog in manifest order keeps R02-F24's standard
+  `ProgressionRule` (drop at most 1, jump at most 3) on the witness pulse count; the band ranges, each one pulse wide and
+  meeting the next band's at one value, make band means non-decreasing. Impact: FR-R02G1102-003, 005; SC-R02G1102-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/echo-cartographer/levels/NNN.witness.json`,
+  JSON schema 1 with sorted keys: number, the level's stored form, the actions, the echo digest after every pulse (16 hex
+  characters of the SHA-256 of the emitter, the rays and the echoes), the placements fitting after every pulse, the play
+  fingerprints after `begin` (and `dismissTutorial` when the level has one) and after each action, the counterexample
+  (the first two placements, in enumeration order, that fit every pulse but the last), the difficulty and the candidates
+  skipped. A test rebuilds every witness and compares bytes; it writes the files only with
+  `ECHO_CARTOGRAPHER_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. Impact: FR-R02G1102-004; SC-R02G1102-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<EchoCartographerRules>.digest(id: "echo-cartographer", identities:)` over the 100 level fingerprints
+  in manifest order, pinned in a test. Certification tests are split into groups of 5 levels so each runs under 10
+  seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New
+  refusals: `generation(Int)` (`r02-g11.generation`) and `witness(String)` (`r02-g11.witness`). The independent check
+  of SC-R02G1102-002 recomputes path lengths by fixed-point relaxation and counts fitting placements by brute force over
+  every beacon-count subset of the region on two levels per band (the two smallest regions of the band), and confirms
+  exactly one fits after the witness and at least two before its last pulse. Impact: FR-R02G1102-004, 006;
+  SC-R02G1102-002, 003, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 

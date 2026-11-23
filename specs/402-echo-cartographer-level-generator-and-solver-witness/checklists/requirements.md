@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Generation rules, the solver's proof, witness contents, difficulty metrics and refusal names are left to
+- Generation rules, the solver's proof, witness contents, difficulty metrics and refusal names are settled by
   `/speckit-clarify`.
