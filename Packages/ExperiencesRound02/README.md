@@ -711,3 +711,9 @@ append-only `AcousticConstellatorRecord`s, and `AcousticConstellatorRules` for t
 `AcousticConstellatorError` with `r02-g13.*` codes. Rules:
 [docs/architecture/acoustic-constellator.md](../../docs/architecture/acoustic-constellator.md).
 
+Feature 422 (R02-G13-02) adds the content pipeline: the 100-entry `AcousticConstellatorManifest`, band profiles and the
+constructive `AcousticConstellatorGenerator`, the minimal-plan `AcousticConstellatorSolver` (missing symbol pairs plus
+the fewest helper links and phase nudges, smaller sets counted as the proof), `AcousticConstellatorDifficulty`,
+`AcousticConstellatorWitness` and the 100 witness files in `docs/games/acoustic-constellator/levels/` with the pinned
+catalog digest.
+

@@ -64,7 +64,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1302-007 Docs: `docs/architecture/acoustic-constellator.md` (content pipeline),
+- [X] T-R02G1302-007 Docs: `docs/architecture/acoustic-constellator.md` (content pipeline), — Verified 2026-11-23: round02-host exit 0; architecture doc content pipeline, ExperiencesRound02 README feature 422, testing doc entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1302-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

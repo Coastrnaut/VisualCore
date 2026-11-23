@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G13-01: Acoustic Constellator playable rule kernel).
+Last updated: 2026-11-23 (R02-G13-02: Acoustic Constellator level generator and solver witness).
 
 ## 1. What is tested, and where
 
@@ -611,6 +611,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   byte for byte (regenerate only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`). A random generator left most candidates
   unsolvable in a Python prototype; the constructive one (a path whose strings can be bridges, k of them scrambled)
   reached each band's range in 37 … 60 of 60, so prototype the generator before writing ranges into the spec.
+- **Acoustic Constellator content pipeline** (R02-G13-02, 2026-11-23). The catalog tests regenerate the 100 levels
+  (about 6 s in a debug build) in 20 groups of 5 and compare the witness files byte for byte; regenerate them only on
+  purpose with `ACOUSTIC_CONSTELLATOR_WRITE_WITNESSES=1 swift test --package-path Packages/ExperiencesRound02 --filter
+  AcousticConstellatorCatalogTests` (the tests that read the stored files fail on that first run, before the files
+  exist; run again without the variable). The independent brute force covers every play action in bands 1 … 3 and the
+  pruned options in bands 4 and 5, where every play action at size 5 (about 650,000 listens) would not fit 10 s.
 - **Acoustic Constellator rule kernel** (R02-G13-01, 2026-11-23). `swift test --package-path
   Packages/ExperiencesRound02 --filter AcousticConstellator` (46 tests, a few seconds): the coupling table against the
   rounded sine; the exact comparison A + B√3 ≥ θ exhaustively over 1.27 million triples against rational bounds of √3;
