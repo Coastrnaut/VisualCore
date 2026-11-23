@@ -65,7 +65,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1208-007 Docs: `docs/architecture/harmonic-bridges.md` (regression net),
+- [X] T-R02G1208-007 Docs: `docs/architecture/harmonic-bridges.md` (regression net), — Verified 2026-11-23: round02-host (swift test --package-path Packages/ExperiencesRound02, 335 s) exit 0; architecture doc regression net, ExperiencesRound02 README feature 418, testing doc entry (baselines before new files); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1208-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

@@ -192,3 +192,29 @@ rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.m
 - **Replay.** `replay.start [level]` replays a verified solution action by action (`replay.step`, `replay.stop`); other
   play actions are refused in words during replay, which never changes progress or claims stars.
 - **Settings.** `settings.sound [0 … 1]` stores the sound choice in the snapshot; the presenter applies it on open.
+
+## Regression net (feature 418, R02-G12-08)
+
+- **Solver regression.** For all 100 levels, in ten groups of ten: the generated level equals its witness (part by part
+  and by fingerprint), the witness's actions replay on a fresh play to a win on the last action in exactly their count
+  (the plan's tunings, then the test) within the budget with the stored per-step bridge digests and per-action
+  fingerprints, the recounted smaller choices equal the witness's counterexample, and the solver re-finds exactly the
+  witness's tunings with its smaller-choices count and size, with work at most 400,000 (counted, never timed); eleven
+  kinds of alteration (an island's position, a string's length, starting peg or lock, a step's tone, the threshold, the
+  budget, a plan tuning, a witness action, a per-action fingerprint, the smaller-choices count) each fail naming the
+  level and the part, and a level copy the initialiser refuses is named too.
+- **Golden frames.** `HarmonicBridgesGolden` (test builds only; forbidden in the Release binary) describes 16 frames
+  (levels 1, 21, 41, 61, 81 at tiers 0 … 2 after their certified tunings and before the test, plus the hero frame) at
+  1,152 × 768: the island tops, string midpoints, the shown step's membrane check points, the step pips and the first
+  gauge bar in 1/8 pixel (an off-screen point is null), the counts of islands, strings, bridges, filled and hollow
+  marks, pips and gauge bars, the tier's detail and the 13 palette colours, hashed with SHA-256 and pinned in
+  `golden-frames.json`; a recomputed frame passes on an equal digest or within one quantum with equal counts and
+  colours, a pinned digest must match its pinned description, and the file is rewritten only with
+  `HARMONIC_BRIDGES_WRITE_GOLDEN=1`. On the simulator the same frames are rendered and checked against their
+  descriptions with the feature-413 frame checks.
+- **Memory.** Twelve open-draw-warn-close cycles keep the footprint within 16 MB of the first cycle when the class runs
+  alone (measured growth 0.55 MB) and leave the bridge scene with no GPU objects after every close and memory warning;
+  the next frame rebuilds them.
+- **Running it.** `python3 scripts/harmonic_bridges_regression.py` runs the host part and the simulator classes with
+  one summary line per part; CI runs the host part as "Harmonic Bridges regression (host)".
+

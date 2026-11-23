@@ -685,3 +685,8 @@ values, the adjustable string and peg, the summary element, Dynamic Type, the So
 Feature 417 (R02-G12-07) adds persistence and replay: result traces and `HarmonicBridgesReconciliation` (every saved
 result replayed on its certified level on restore), snapshot schema 3 with migrations, `replay.start/step/stop`, the
 saved sound choice (`settings.sound`), and the panel's replay controls and dropped-results announcement.
+
+Feature 418 (R02-G12-08) adds the regression net: the solver regression over the 100 witnesses with eleven named
+alterations, `HarmonicBridgesGolden` with the pinned `golden-frames.json` (16 code-computed frame descriptions), the
+simulator golden-frame and memory classes, `scripts/harmonic_bridges_regression.py` and the CI step "Harmonic Bridges
+regression (host)".
