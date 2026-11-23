@@ -37,3 +37,23 @@ Levels are JSON schema 1 with sorted keys (opening and target waves, checkpoints
 longest section, budget, difficulty, tutorial, seed, id) and their fingerprint; decoding re-checks every rule (an
 opening wave that already wins is refused) and the fingerprint and refuses damaged, edited and newer forms
 (`r02-g10.malformed`, `.newer-schema`).
+
+## Content pipeline (feature 392, R02-G10-02)
+
+- **Manifest.** The 100 planned levels of the archived design (`BackwardsAuroraManifest`): number, planned seed, band
+  1 … 5 (20 each) and reversal budget 8 … 19.
+- **Generator.** Candidate c of an entry draws from `SeededRandom(seed: SeedDerivation.derive(seed, index: c))`: the
+  wave length by band (14 … 16, 18 … 22, 22 … 26, 26 … 30, 30 … 32), a gently curving target (slope changing by at most
+  1 per sample), the bend limit L at the target's worst bend, k reversals by band (2 … 3 up to 6 … 7) and up to 16
+  placements of k separated sections (no shared or touching seams). A placement is kept when no section is a
+  palindrome and all four seam bends of each section, reversed alone, exceed L. The opening is the target with every
+  section reversed, so it has exactly 4k bad bends. Checkpoints sit inside band + 1 of the sections where the opening
+  differs from the target; the breaking limit is 128 in bands 1 … 2 and L + 48, L + 32, L + 16 (at most 128) above.
+  At most 256 candidates per entry (`BackwardsAuroraGenerator`).
+- **Proof.** A reversal gives new values only to its at most four seam bends, so the bad bends (|b| > L) fall by at most
+  4 per reversal and no win comes in fewer than ⌈β / 4⌉ reversals. The solver (`BackwardsAuroraSolver`) searches
+  reversible sections depth-first with iterative deepening from that bound, never past a tear, and counts its work
+  (at most 20,000 reversals evaluated). Every catalog level is certified at exactly k.
+- **Witnesses.** `docs/games/backwards-aurora/levels/NNN.witness.json` holds each level, its reversals, a sample digest
+  and play fingerprint after each, the bound, the near miss and the difficulty (`BackwardsAuroraWitness`); the catalog
+  tests compare them byte for byte and pin the catalog digest.

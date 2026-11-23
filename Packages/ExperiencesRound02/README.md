@@ -543,3 +543,9 @@ its bends, seam positions, reversals, palindrome test and distance (`BackwardsAu
 `BackwardsAuroraStage`, `BackwardsAuroraEvent`, `BackwardsAuroraFailure` and append-only `BackwardsAuroraRecord`s, and
 `BackwardsAuroraRules` for the R02-F23 puzzle contract. Refusals are `BackwardsAuroraError` with `r02-g10.*` codes.
 Rules: [docs/architecture/backwards-aurora.md](../../docs/architecture/backwards-aurora.md).
+
+Feature 392 (R02-G10-02) adds the content pipeline: the 100-entry `BackwardsAuroraManifest`, band profiles and the
+seeded `BackwardsAuroraGenerator` (k separated reversals of a smooth target whose seams all break the bend limit), the
+seam-count bound and iterative-deepening `BackwardsAuroraSolver`, `BackwardsAuroraDifficulty`, and
+`BackwardsAuroraWitness` files in `docs/games/backwards-aurora/levels/` checked byte for byte with a pinned catalog
+digest.

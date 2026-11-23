@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-22 (R02-G10-01: Backwards Aurora kernel, seam bends against a whole-wave recomputation).
+Last updated: 2026-11-22 (R02-G10-02: Backwards Aurora catalog, simulate generator filters before pinning them).
 
 ## 1. What is tested, and where
 
@@ -389,6 +389,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   files reach the test target only after `xcodegen generate`: the first run without it built and ran 0 tests, which the
   enumeration guard caught (0/3 declared tests). The level-1 journey is one Turn − and two Advances, and its pinned
   values are checked against the Core by an app unit test.
+- **Simulate a generator's filters before writing them down** (R02-G10-02, 2026-11-22). Backwards Aurora's first
+  generator (one placement of k sections per candidate) certified only 59 of the 100 levels: in bands 3 … 5 nearly every
+  candidate failed to fit its sections or broke a seam filter. A ten-line statistical simulation of the draws showed
+  which filter dominated and how often each band passed (band 5: 0.4 % per candidate); drawing section lengths within
+  what still fits, a gentler target and up to 16 placements per candidate raised band 5 to about 5 % per candidate (all
+  256 failing ≈ 2·10⁻⁶), and all 100 levels now generate in under half a second. The seam-count proof (β = 4k) was kept
+  unchanged.
 - **Seam bends against a whole-wave recomputation** (R02-G10-01, 2026-11-22). Backwards Aurora's tear rule looks only
   at the bends at a reversal's seam positions; the wave tests compare every bend before and after 1 500 seeded
   reversals (three on each of 500 waves) and prove that the others are unchanged or carried along in reverse order. The

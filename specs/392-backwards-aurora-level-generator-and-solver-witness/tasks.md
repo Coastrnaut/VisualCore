@@ -75,7 +75,7 @@ logic); no GLSL in this feature.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1002-007 Docs: `docs/architecture/backwards-aurora.md` (content pipeline),
+- [X] T-R02G1002-007 Docs: `docs/architecture/backwards-aurora.md` (content pipeline), — Verified 2026-11-22: round02-host (swift test --package-path Packages/ExperiencesRound02, 321 s) exit 0; architecture doc content pipeline section, ExperiencesRound02 README, testing doc lesson (simulate a generator's filters); validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1002-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`
