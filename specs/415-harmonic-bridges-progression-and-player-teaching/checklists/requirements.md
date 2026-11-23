@@ -32,3 +32,4 @@
 ## Notes
 
 - Hint wording, tutorial steps, star thresholds, the daily formula and the schema migration are left to `/speckit-clarify` (modelled on feature 405).
+- Validated inside the `/speckit-specify` invocation on 2026-11-23 (the draft was written just before the invocation; the template's mandatory sections, the markers and every item were re-checked there): 16/16.
