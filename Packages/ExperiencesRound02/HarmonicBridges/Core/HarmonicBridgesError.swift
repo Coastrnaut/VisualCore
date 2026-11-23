@@ -1,6 +1,7 @@
 // HarmonicBridgesError — feature 411 (R02-G12-01) T-R02G1201-002 (FR-R02G1201-006, 009, 011; clarifications Q3, Q5).
 // The refusals of Harmonic Bridges' rule kernel, each with a stable reason code `r02-g12.*` that the experience logs with
-// the level id and the action.
+// the level id and the action. Feature 412 (R02-G12-02) T-R02G1202-002 adds the content pipeline's refusals,
+// `generation` and `witness`.
 
 /// A refusal of a Harmonic Bridges level, action or event.
 public enum HarmonicBridgesError: Error, Equatable, Sendable {
@@ -19,6 +20,11 @@ public enum HarmonicBridgesError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of a manifest entry qualified within the candidate bound; the payload is the level number
+    /// (feature 412).
+    case generation(Int)
+    /// A witness file is damaged, newer, edited or no longer replays; the payload names the part (feature 412).
+    case witness(String)
 
     /// The stable reason code, `r02-g12.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +36,8 @@ public enum HarmonicBridgesError: Error, Equatable, Sendable {
         case .stale: "r02-g12.stale"
         case .newerSchema: "r02-g12.newer-schema"
         case .malformed: "r02-g12.malformed"
+        case .generation: "r02-g12.generation"
+        case .witness: "r02-g12.witness"
         }
     }
 }

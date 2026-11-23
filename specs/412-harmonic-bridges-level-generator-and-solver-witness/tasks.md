@@ -14,7 +14,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1202-002 Add `generation(Int)` ("r02-g12.generation") and `witness(String)` ("r02-g12.witness") to
+- [X] T-R02G1202-002 Add `generation(Int)` ("r02-g12.generation") and `witness(String)` ("r02-g12.witness") to — Verified 2026-11-23: host exit 0 (40 Harmonic Bridges tests, existing behaviour unchanged); generation(Int) and witness(String) refusals added; HarmonicBridgesManifest with the 100 entries of planning_index.py levels --experience R02-G12 (20 per band, budgets 8 … 19) and provenance; HarmonicBridgesDifficulty lands with the solver in T-003 because it is built from the solver's plan
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesError.swift`; create
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesManifest.swift` (the 100 entries "number 1 … 100,
   planned seed, band 1 … 5, budget 8 … 19" copied from `python3 scripts/planning_index.py levels --experience R02-G12`,
