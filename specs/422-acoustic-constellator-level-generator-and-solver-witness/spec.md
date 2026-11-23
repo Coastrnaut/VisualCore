@@ -89,7 +89,9 @@ listens of work, and no candidate won at its start.
   New refusals: `generation(Int)` (`r02-g13.generation`) and `witness(String)` (`r02-g13.witness`). The independent check
   of SC-R02G1302-002 brute-forces every multiset of one action fewer than the plan over all actions the play accepts
   (every link, every unlink of a placed link, every nudge, no pruning of opposite nudges) on the two levels with the
-  fewest stars in each band. Impact: FR-R02G1302-005, 006; SC-R02G1302-002, 006.
+  fewest stars in each of bands 1 … 3, and over the pruned options (helper links and nudges, enumerated independently of
+  the solver's order) on the two levels with the fewest stars in bands 4 and 5, where the full set (about 650,000
+  listens at size 5) would not fit the 10-second test limit. Impact: FR-R02G1302-005, 006; SC-R02G1302-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 

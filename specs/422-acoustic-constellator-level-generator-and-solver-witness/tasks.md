@@ -58,7 +58,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 - [ ] T-R02G1302-006 [US2] [US3] [US4] Create
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorCatalogTests.swift` (lead: 100 entries,
   20 per band; every level generated, won by its witness within the budget, and no set of one action fewer wins; the
-  brute force on two levels per band; pinned digest; progression rule and band means; witness files byte for byte,
+  brute force on two levels per band (all play actions in bands 1 … 3, the pruned options in bands 4 and 5); pinned digest; progression rule and band means; witness files byte for byte,
   written only with `ACOUSTIC_CONSTELLATOR_WRITE_WITNESSES=1`; groups of 5) and the 100 files
   `docs/games/acoustic-constellator/levels/001.witness.json` … `100.witness.json`; `--name host-5`
 
