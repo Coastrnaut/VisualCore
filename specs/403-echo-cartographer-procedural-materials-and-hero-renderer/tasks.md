@@ -104,7 +104,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G1103-014 Brighten the known walls' edge strips on a won level (the edge case "a won level: every beacon
+- [X] T-R02G1103-014 Brighten the known walls' edge strips on a won level (the edge case "a won level: every beacon — Verified 2026-11-23: host-5 (140 EchoCartographer tests incl. aWonLevelFlagsEveryWallEdge and aWonLevelLiftsTheWallEdges) and sim-27-2 (29 simulator tests incl. aWonLevelBrightensTheKnownWalls) exit 0, 2026-11-23; app-unit-2 exit 0 on the changed code
   stands as a pillar and the chamber's known walls brighten"), without moving any position, in
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSceneGeometry.swift` and/or
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerShaders.swift`, with a host geometry or shader test

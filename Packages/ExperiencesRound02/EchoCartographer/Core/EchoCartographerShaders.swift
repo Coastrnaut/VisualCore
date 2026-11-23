@@ -15,8 +15,9 @@
 // field (ground, wall face, pillar, ring field) d is 0. The signed-distance soft edge is
 // 1 - smoothstep(1 - ``edgeFeather``, 1, |d|) (``edgeCoverage(local:)``), used as premultiplied coverage, so outlines
 // are anti-aliased without textures. Wall edge strips (code 7) are emissive and carry the struck wall's distance in
-// cells in `a_normal.x` (the ray's `distance` to that wall; 0 for a wall the last pulse did not strike; `a_normal.y`
-// and `a_normal.z` are 0). Lighting is ambient ``ambient`` plus Lambert ``diffuse`` from `u_lightDir` on the lit
+// cells in `a_normal.x` (the ray's `distance` to that wall; 0 for a wall the last pulse did not strike), the won flag in
+// `a_normal.y` (1 on a won level, lifting the edges toward the flare colour by ``wonLift`` at every tier; feature 403
+// convergence, T-R02G1103-014) and 0 in `a_normal.z`. Lighting is ambient ``ambient`` plus Lambert ``diffuse`` from `u_lightDir` on the lit
 // materials (floor, wall face); every other material is emissive at its palette colour, so the colour cues hold under
 // any light.
 //
@@ -244,6 +245,9 @@ public enum EchoCartographerShaders {
     public static let pulseFadeSeconds: Double = 0.5
     /// The cells between a struck wall's centre and its face: the pulse reaches the face at (distance - 0.5) cells.
     public static let faceOffset: Double = 0.5
+    /// How far a won level lifts every known wall's edges toward the flare colour, at every tier and under Reduce Motion
+    /// (the spec's edge case "the chamber's known walls brighten").
+    public static let wonLift: Double = 0.5
     /// The seconds a struck wall's flare takes to fade (clarification Q1).
     public static let flareSeconds: Double = 0.5
     /// The level-0 flare trail's peak weight.
@@ -292,6 +296,7 @@ public enum EchoCartographerShaders {
     out float v_material;
     out float v_local;
     out float v_strike;
+    out float v_won;
     const vec3 EC_GROUND = \(vec3Literal(EchoCartographerPalette.ground));
     const vec3 EC_FLOOR = \(vec3Literal(EchoCartographerPalette.floor));
     const vec3 EC_ENTRY = \(vec3Literal(EchoCartographerPalette.entry));
@@ -324,6 +329,7 @@ public enum EchoCartographerShaders {
         v_material = m;
         v_local = clamp(a_uv.y, -1.0, 1.0);
         v_strike = max(a_normal.x, 0.0) * isEdge;
+        v_won = clamp(a_normal.y, 0.0, 1.0) * isEdge;
         gl_Position = u_mvp * vec4(a_position, 1.0);
     }
     """
@@ -342,6 +348,7 @@ public enum EchoCartographerShaders {
     in float v_material;
     in float v_local;
     in float v_strike;
+    in float v_won;
     uniform vec3 u_lightDir;
     uniform float u_time;
     uniform float u_cellSize;
@@ -363,6 +370,7 @@ public enum EchoCartographerShaders {
     const float EC_PULSE_FADE_SECONDS = \(fixed(pulseFadeSeconds));
     const float EC_FACE_OFFSET = \(fixed(faceOffset));
     const float EC_FLARE_SECONDS = \(fixed(flareSeconds));
+    const float EC_WON_LIFT = \(fixed(wonLift));
     const float EC_TRAIL_WEIGHT = \(fixed(trailWeight));
     const float EC_TRAIL_SECONDS = \(fixed(trailSeconds));
     float isCode(float m, float code) {
@@ -406,6 +414,7 @@ public enum EchoCartographerShaders {
         float flash = isEdge * struck * max(flare, trail) * clamp(u_tier.y, 0.0, 1.0) * motion;
         vec3 rgb = clamp(v_base, 0.0, 1.0) * light;
         rgb = mix(rgb, EC_FLARE, clamp(flash, 0.0, 1.0));
+        rgb = mix(rgb, EC_FLARE, EC_WON_LIFT * v_won);
         rgb = mix(rgb, EC_PULSE, isRing);
         rgb = clamp(rgb, 0.0, 1.0);
         float alpha = clamp(mix(soft, ring, isRing), 0.0, 1.0);

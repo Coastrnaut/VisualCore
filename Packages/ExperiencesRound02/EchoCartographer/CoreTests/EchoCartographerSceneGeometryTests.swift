@@ -631,4 +631,36 @@ import VisualCoreScenes
         #expect(Geometry.project(SIMD3(.nan, 0, 0), camera: Geometry.camera(s, aspect: 1)) == nil)
         #expect(Geometry.project(SIMD3(0, 5, 5), camera: Geometry.camera(s, aspect: 1)) == nil)
     }
+
+    /// Feature 403 convergence (T-R02G1103-014): on a won level every wall edge vertex carries the won flag 1 in the
+    /// normal slot's y, and 0 before the win; positions are unchanged.
+    @Test func aWonLevelFlagsEveryWallEdge() throws {
+        let generated: EchoCartographerGenerated = try EchoCartographerExperienceCore.generated(number: 1)
+        var play: EchoCartographerPlay = EchoCartographerPlay(level: generated.level)
+        try play.handle(.begin)
+        if play.stage == .tutorial { try play.handle(.dismissTutorial) }
+        let actions: [EchoCartographerAction] = generated.actions
+        for action in actions.dropLast() { try play.apply(action, expecting: play.fingerprint) }
+        let before: EchoCartographerSceneSnapshot = EchoCartographerSceneSnapshot(play: play, levelNumber: 1, time: 0)
+        if let last = actions.last { try play.apply(last, expecting: play.fingerprint) }
+        #expect(play.stage == .won)
+        let after: EchoCartographerSceneSnapshot = EchoCartographerSceneSnapshot(play: play, levelNumber: 1, time: 0)
+        #expect(EchoCartographerSceneGeometry.wonFlag(before) == 0)
+        #expect(EchoCartographerSceneGeometry.wonFlag(after) == 1)
+        let tier: EchoCartographerTier = EchoCartographerTier.of(0)
+        let meshBefore = try EchoCartographerSceneGeometry.chamberMesh(before, tier: tier, reduceMotion: false)
+        let meshAfter = try EchoCartographerSceneGeometry.chamberMesh(after, tier: tier, reduceMotion: false)
+        let edge: Double = Double(EchoCartographerShaders.wallEdgeMaterial)
+        var edgesBefore: Int = 0
+        var edgesAfter: Int = 0
+        for index in 0..<meshBefore.positions.count where abs(meshBefore.uvs[index].x - edge) < 0.01 {
+            edgesBefore += 1
+            #expect(meshBefore.normals[index].y == 0)
+        }
+        for index in 0..<meshAfter.positions.count where abs(meshAfter.uvs[index].x - edge) < 0.01 {
+            edgesAfter += 1
+            #expect(meshAfter.normals[index].y == 1)
+        }
+        #expect(edgesBefore > 0 && edgesAfter >= edgesBefore)
+    }
 }

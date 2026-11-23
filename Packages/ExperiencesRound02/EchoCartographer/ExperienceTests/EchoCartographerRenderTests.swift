@@ -174,5 +174,53 @@ import VisualCoreMath
         #expect(snapshot.located == core.play.level.beacons, "the located pillar stands on the beacon's cell")
         EchoCartographerTest.checkFrame(rgba, snapshot: snapshot, "level 1 won")
     }
+
+    /// Feature 403 convergence (T-R02G1103-014): the frame of the won level shows every known wall's edges brighter than
+    /// the frame one claim earlier: at the front-top edge of each known wall (its top centre moved 0.46·s towards the
+    /// viewer), the brightest pixel within 3 px is brighter after the win for at least one wall, and never darker.
+    @Test func aWonLevelBrightensTheKnownWalls() async throws {
+        let actions: [EchoCartographerAction] = try EchoCartographerTest.certifiedActions(1)
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await EchoCartographerTest.open(session, seed: 0)
+        for action in actions.dropLast() {
+            let issued = EchoCartographerTest.control(action)
+            #expect(shell.handle(control: issued.control, values: issued.values) == .accepted)
+        }
+        let before: [UInt8] = try EchoCartographerTest.still(session)
+        let snapshotBefore: EchoCartographerSceneSnapshot = try #require(shell.presenter.lastSnapshot)
+        let last = EchoCartographerTest.control(try #require(actions.last))
+        #expect(shell.handle(control: last.control, values: last.values) == .accepted)
+        let after: [UInt8] = try EchoCartographerTest.still(session)
+        let snapshotAfter: EchoCartographerSceneSnapshot = try #require(shell.presenter.lastSnapshot)
+        #expect(snapshotAfter.stage == .won)
+        let s: Double = 1.8 / Double(max(snapshotAfter.width, snapshotAfter.height))
+        var brighter: Int = 0
+        for wall in snapshotBefore.wallCells {
+            let top: SIMD3<Double> = EchoCartographerSceneGeometry.wallTop(wall, snapshotAfter)
+            let edge: SIMD3<Double> = SIMD3(top.x, top.y, top.z + 0.46 * s)
+            guard let p = EchoCartographerTest.pixel(edge, snapshotAfter) else { continue }
+            var maxBefore: Double = 0
+            var maxAfter: Double = 0
+            for dy in -3...3 {
+                for dx in -3...3 {
+                    let x: Int = Int(p.x.rounded()) + dx
+                    let y: Int = Int(p.y.rounded()) + dy
+                    if x < 0 || y < 0 || x >= EchoCartographerTest.width || y >= EchoCartographerTest.height { continue }
+                    let b: Double = EchoCartographerTest.luminance(
+                        EchoCartographerTest.colour(before, x: x, y: y, width: EchoCartographerTest.width))
+                    let a: Double = EchoCartographerTest.luminance(
+                        EchoCartographerTest.colour(after, x: x, y: y, width: EchoCartographerTest.width))
+                    maxBefore = max(maxBefore, b)
+                    maxAfter = max(maxAfter, a)
+                }
+            }
+            let label: String = "wall \(wall.x),\(wall.y): \(maxBefore) to \(maxAfter)"
+            #expect(maxAfter >= maxBefore - 0.02, "\(label)")
+            if maxAfter > maxBefore + 0.05 { brighter += 1 }
+        }
+        #expect(!snapshotBefore.wallCells.isEmpty)
+        #expect(brighter > 0, "no known wall brightened on the win")
+    }
 }
 #endif

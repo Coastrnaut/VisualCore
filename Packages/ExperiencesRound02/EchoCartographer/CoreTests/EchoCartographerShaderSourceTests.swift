@@ -296,7 +296,7 @@ import Testing
         }
         let chamberOuts: [String: String] = [
             "v_normal": "vec3", "v_base": "vec3", "v_position": "vec3", "v_material": "float", "v_local": "float",
-            "v_strike": "float",
+            "v_strike": "float", "v_won": "float",
         ]
         #expect(Self.interface("out", in: EchoCartographerShaders.chamberVertex) == chamberOuts)
         let glowOuts: [String: String] = ["v_colour": "vec3", "v_glow": "float"]
@@ -659,5 +659,17 @@ import Testing
             #expect(process.terminationStatus == 0, "\(file.name): \(output)")
         }
         #endif
+    }
+
+    /// Feature 403 convergence (T-R02G1103-014): the won flag reaches the fragment shader on wall edges only and lifts
+    /// them toward the flare colour by ``EchoCartographerShaders/wonLift`` at every tier (not gated by the tier flags or
+    /// Reduce Motion).
+    @Test func aWonLevelLiftsTheWallEdges() {
+        let vertex: String = EchoCartographerShaders.chamberVertex
+        let fragment: String = EchoCartographerShaders.chamberFragment
+        #expect(vertex.contains("v_won = clamp(a_normal.y, 0.0, 1.0) * isEdge;"))
+        #expect(fragment.contains("rgb = mix(rgb, EC_FLARE, EC_WON_LIFT * v_won);"))
+        #expect(fragment.contains("const float EC_WON_LIFT = 0.5"))
+        #expect(EchoCartographerShaders.wonLift > 0 && EchoCartographerShaders.wonLift <= 1)
     }
 }

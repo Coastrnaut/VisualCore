@@ -221,6 +221,12 @@ public enum EchoCartographerSceneGeometry {
     }
 
     /// The struck distance in cells of every wall the last pulse struck, by cell (empty without a pulse).
+    /// The won flag of the wall edge strips: 1 when the level is won (every beacon located), else 0 (feature 403
+    /// convergence, T-R02G1103-014; the spec's edge case "the chamber's known walls brighten").
+    public static func wonFlag(_ snapshot: EchoCartographerSceneSnapshot) -> Double {
+        snapshot.stage == .won || (snapshot.stage == .result && snapshot.failure == nil) ? 1 : 0
+    }
+
     public static func struckDistances(_ snapshot: EchoCartographerSceneSnapshot) -> [EchoCartographerCell: Int] {
         var result: [EchoCartographerCell: Int] = [:]
         guard let echo = snapshot.lastEcho else { return result }
@@ -353,6 +359,9 @@ public enum EchoCartographerSceneGeometry {
         }
         // Solids, back to front.
         let struck: [EchoCartographerCell: Int] = struckDistances(snapshot)
+        // Feature 403 convergence (T-R02G1103-014): on a won level every known wall's edges carry the won flag in the
+        // normal slot's y, which the shader lifts toward the flare colour at every tier (no position changes).
+        let wonFlag: Double = wonFlag(snapshot)
         for solid in solidOrder(snapshot) {
             let c: SIMD3<Double> = cellCentre(solid.cell, snapshot)
             if solid.isWall {
@@ -361,7 +370,7 @@ public enum EchoCartographerSceneGeometry {
                 try parts.box(centre: c, half: h, height: top, material: .wallFace, slot: nil)
                 let distance: Double = Double(struck[solid.cell] ?? 0)
                 try parts.edges(centre: c, half: h, height: top, halfWidth: edgeThickness * s / 2, lift: edgeLift,
-                                material: .wallEdge, slot: SIMD3(distance, 0, 0), glow: nil)
+                                material: .wallEdge, slot: SIMD3(distance, wonFlag, 0), glow: nil)
             } else {
                 try parts.box(centre: c, half: pillarWidth * s / 2, height: pillarHeight * s, material: .pillar,
                               slot: nil)
