@@ -8,7 +8,9 @@
 // each turn every cell known open and not yet pulsed is tried in cell-index order, and the one whose echo leaves the
 // fewest fitting placements is pulsed (ties: lowest index), revealing its rays; the plan ends when exactly one placement
 // fits (the true beacons, which always fit) and gives up after `maxPulses`. Work is enumeration nodes, counted and
-// bounded. The plan is a witness, not a proven minimum. Integers only; no clock, no random source.
+// bounded. The plan is a witness, not a proven minimum. Feature 405 (R02-G11-05) T-R02G1105-002 adds the continuation:
+// the same greedy rule started from a play's knowledge and current pulses, within the energy left (the hints' plan).
+// Integers only; no clock, no random source.
 import Foundation
 
 /// The echoes heard from one pulse: its emitter and the sorted path lengths of the beacons.
@@ -179,6 +181,66 @@ public enum EchoCartographerSolver {
             }
         }
         return nil
+    }
+
+    /// The further pulses that single out `level`'s beacons from a play's state (feature 405, clarification Q1): the
+    /// observations are the echoes heard from each cell of `pulsed` (the play's current pulses, undone ones excluded;
+    /// a repeated cell adds nothing new); when exactly one placement fits them the result is empty; otherwise the
+    /// certification's greedy rule continues from `knowledge` — every cell known open and not yet pulsed is tried in
+    /// cell-index order, the one whose echo leaves the fewest fitting placements is pulsed (ties: lowest index),
+    /// revealing its rays — until exactly one placement fits. Nil when more than ``maxPulses`` further pulses are
+    /// needed, when the enumeration passes `workBound` nodes, or when the further pulses would not leave at least 1 of
+    /// `energyLeft` (a play with no energy left and a beacon hidden fails at once). From the opening knowledge with no
+    /// pulses and the level's energy this is the certified plan's pulses (``plan(_:workBound:)``).
+    public static func continuation(_ level: EchoCartographerLevel, knowledge: EchoCartographerKnowledge,
+                                    pulsed: [EchoCartographerCell], energyLeft: Int,
+                                    workBound: Int = workBound) -> [EchoCartographerCell]? {
+        continuationSearch(level, knowledge: knowledge, pulsed: pulsed, energyLeft: energyLeft,
+                           workBound: workBound).pulses
+    }
+
+    /// ``continuation(_:knowledge:pulsed:energyLeft:workBound:)`` with the enumeration nodes it visited (for tests and
+    /// measurements). The opening check counts placements up to 2 only; it is counted in the work.
+    static func continuationSearch(_ level: EchoCartographerLevel, knowledge start: EchoCartographerKnowledge,
+                                   pulsed cells: [EchoCartographerCell], energyLeft: Int,
+                                   workBound: Int = workBound) -> (pulses: [EchoCartographerCell]?, work: Int) {
+        let chamber: EchoCartographerChamber = level.chamber
+        var knowledge: EchoCartographerKnowledge = start
+        var pulsed: Set<Int> = []
+        var observations: [EchoCartographerObservation] = []
+        for cell in cells where chamber.isInside(cell) && !pulsed.contains(chamber.index(cell)) {
+            pulsed.insert(chamber.index(cell))
+            let echo: EchoCartographerEcho = level.echo(from: cell)
+            observations.append(EchoCartographerObservation(emitter: cell, echoes: echo.beaconDistances))
+        }
+        var work: Int = 0
+        let now: Int = fitting(level, observations: observations, cap: 2, work: &work, limit: workBound).count
+        if work > workBound { return (nil, work) }
+        if now == 1 { return ([], work) }
+        // The further pulses must leave at least 1 energy and number at most maxPulses.
+        let allowed: Int = min(maxPulses, energyLeft - 1)
+        var pulses: [EchoCartographerCell] = []
+        while pulses.count < allowed {
+            var best: (count: Int, cell: EchoCartographerCell, echo: EchoCartographerEcho)? = nil
+            for index in 0..<chamber.cellCount where knowledge[index] == .open && !pulsed.contains(index) {
+                let cell: EchoCartographerCell = chamber.cell(index)
+                let echo: EchoCartographerEcho = level.echo(from: cell)
+                let trial: [EchoCartographerObservation] = observations
+                    + [EchoCartographerObservation(emitter: cell, echoes: echo.beaconDistances)]
+                let count: Int = fitting(level, observations: trial, cap: placementCap, work: &work,
+                                         limit: workBound).count
+                if work > workBound { return (nil, work) }
+                if best == nil || count < best!.count { best = (count, cell, echo) }
+            }
+            guard let chosen = best else { return (nil, work) }
+            knowledge.reveal(chosen.echo)
+            pulsed.insert(chamber.index(chosen.cell))
+            observations.append(EchoCartographerObservation(emitter: chosen.cell,
+                                                            echoes: chosen.echo.beaconDistances))
+            pulses.append(chosen.cell)
+            if chosen.count == 1 { return (pulses, work) }
+        }
+        return (nil, work)
     }
 
     /// The witness actions of `plan` on `level`: its pulses, then one claim on each beacon's own cell in beacon order.

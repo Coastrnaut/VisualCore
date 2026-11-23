@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 395
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1105-002 [P] [US2] [US3] Add `continuation(_:knowledge:pulsed:energyLeft:workBound:)` to
+- [X] T-R02G1105-002 [P] [US2] [US3] Add `continuation(_:knowledge:pulsed:energyLeft:workBound:)` to — Verified 2026-11-23: host-2 (164 EchoCartographer core tests incl. EchoCartographerHintsTests 8: continuation from the opening equals the certified plan on all 100 levels and following exact hints wins each spending exactly the plan's pulses; 200 seeded states: every hinted action accepted, following hints wins (5 states without a plan say so); 500 seeded failures (275 pulse, 225 missed claim) explained with their true action, cell and counts; hint texts per level; max continuation work 14,276 of 400,000) exit 0, lead retest
   `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSolver.swift` (the certification's greedy rule —
   every cell known open and not yet pulsed tried in cell-index order, the one leaving the fewest fitting placements
   pulsed, ties to the lowest index — started from the given knowledge and pulses (the echoes of the play's current
