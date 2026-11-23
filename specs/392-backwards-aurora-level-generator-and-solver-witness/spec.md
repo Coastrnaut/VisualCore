@@ -42,19 +42,21 @@ R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRu
 - Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, reversal budget)
   are a table in `BackwardsAuroraManifest` with their provenance. Candidate c of entry n draws from `SeededRandom(seed:
   SeedDerivation.derive(plannedSeed, index: c))`, in this order: the wave length N by band (14 … 16, 18 … 22, 22 … 26,
-  26 … 30, 30 … 32); the target, a gently curving wave (start height −24 … 24, slope −3 … 3, the slope changing by −2 …
-  2 per sample and kept within −6 … 6, heights kept within −64 … 64); the bend limit L = max(1, the target's worst
-  bend); the reversal count k in the band's range (2 … 3, 3 … 4, 4 … 5, 5 … 6, 6 … 7); k section lengths (2 … 4, 2 … 5,
-  2 … 6, 2 … 6, 2 … 6 by band) placed left to right with the first start at least 2, each start at least 3 after the
-  previous end and the last end at most N − 3, the spare samples spread by draws (so no two sections share a seam
-  position and every seam position is interior; a candidate whose drawn sections do not fit is skipped). A candidate is
-  kept when no section is a palindrome in the target and all 4 seam bends of every section, reversed alone, exceed L;
-  the opening wave is the target with all k sections reversed. Checkpoints: band + 1 of the k sections (drawn), one
-  position in each where the opening differs from the target. Breaking limit B: 128 in bands 1 … 2, then min(128, L +
-  48), L + 32, L + 16. Shortest section 2, longest N; budget = manifest budget; ids `backwards-aurora-NNN`; tutorial on
-  levels 1 … 3; difficulty = band. A candidate the solver does not certify with exactly k reversals within its work
-  bound is skipped; at most 256 candidates, then `generation(n)`. Impact: FR-R02G1002-001, 006; SC-R02G1002-001, 003,
-  004.
+  26 … 30, 30 … 32); the target, a gently curving wave (start height −24 … 24, slope −3 … 3, the slope changing by −1 …
+  1 per sample and kept within −4 … 4, heights kept within −64 … 64); the bend limit L = max(1, the target's worst
+  bend); the reversal count k in the band's range (2 … 3, 3 … 4, 4 … 5, 5 … 6, 6 … 7); then up to 16 placements, each
+  drawing k section lengths left to right, each within the band's range (2 … 4, 2 … 5, 2 … 6, 2 … 6, 2 … 6) and what
+  still fits (every band has N ≥ 4k + 2, so a placement always fits), and spreading the spare samples over the k + 1
+  gaps by one draw each, with the first start at least 2, each start at least 3 after the previous end and the last end
+  at most N − 3 (so no two sections share or touch a seam position and every seam position is interior). The first
+  placement in which no section is a palindrome in the target and all 4 seam bends of every section, reversed alone,
+  exceed L is kept; a candidate with none is skipped (found while implementing T-R02G1002-004: single placements failed
+  too often in bands 3 … 5). The opening wave is the target with all k sections reversed. Checkpoints: band + 1 of the k
+  sections (drawn), one position in each where the opening differs from the target. Breaking limit B: 128 in bands 1 …
+  2, then min(128, L + 48), L + 32, L + 16. Shortest section 2, longest N; budget = manifest budget; ids
+  `backwards-aurora-NNN`; tutorial on levels 1 … 3; difficulty = band. A candidate the solver does not certify with
+  exactly k reversals within its work bound is skipped; at most 256 candidates, then `generation(n)`. Impact:
+  FR-R02G1002-001, 006; SC-R02G1002-001, 003, 004.
 - Q: How does the solver decide the smallest reversal count, and what proves it? → A: the bad bends β are the interior
   positions with |b| > L. A reversal gives new values only to the bends at its at most 4 seam positions (the others
   keep their values; those inside move), so β falls by at most 4 per reversal, and a win needs β = 0: no sequence of

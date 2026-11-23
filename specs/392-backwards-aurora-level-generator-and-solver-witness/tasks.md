@@ -9,7 +9,7 @@ logic); no GLSL in this feature.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1002-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G1002-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-22: 2026-11-22: baseline-host, baseline-timing, baseline-round02 exit 0; rendering baseline is R02-G10-01's rendering runs (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G10-01's rendering runs (exit 0)
 
 ## Phase 2: Foundational
@@ -43,16 +43,17 @@ logic); no GLSL in this feature.
   (BackwardsAuroraBandProfile "band 1: 14 … 16, 2 … 3, 2 … 4, 2, none (B = 128); band 2: 18 … 22, 3 … 4, 2 … 5, 3, none;
   band 3: 22 … 26, 4 … 5, 2 … 6, 4, 48; band 4: 26 … 30, 5 … 6, 2 … 6, 5, 32; band 5: 30 … 32, 6 … 7, 2 … 6, 6, 16 (B =
   min(128, L + margin))", `candidate(_:index:)` drawing in the order of clarification Q1 from `SeededRandom(seed:
-  SeedDerivation.derive(seed, index: c))`: length, target (start −24 … 24, slope −3 … 3, change −2 … 2 kept within −6 …
-  6, heights within −64 … 64), L = max(1, worst bend), k, section lengths and their separated placement (first start ≥
-  2, each start ≥ previous end + 3, last end ≤ N − 3; nil when they do not fit), no palindrome and all 4 seam bends
-  above L, opening = all sections reversed, checkpoints (band + 1 sections, one differing position each), B;
-  BackwardsAuroraGenerated; `generate` with c = 0 … 255 keeping a candidate only when the solver certifies exactly k
-  within the budget; id `backwards-aurora-NNN`, budget = manifest budget, tutorial for 1 … 3, difficulty = band,
-  `.generation(number)` beyond 256; `catalogDigest` via `PuzzleCatalog.digest(id: "backwards-aurora", identities:)`)
-  and, after it, agent C's `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraGeneratorTests.swift`
-  (determinism; band profiles; separation and seam filters; β = 4k; budget; the solution wins; skipped recorded and
-  re-checked); `--name host-3`
+  SeedDerivation.derive(seed, index: c))`: length, target (start −24 … 24, slope −3 … 3, change −1 … 1 kept within −4 …
+  4, heights within −64 … 64), L = max(1, worst bend), k, up to 16 placements (section lengths within the band's range
+  and what still fits, spare samples spread over the k + 1 gaps; first start ≥ 2, each start ≥ previous end + 3, last
+  end ≤ N − 3), the first with no palindrome and all 4 seam bends above L kept (nil when none), opening = all sections
+  reversed, checkpoints (band + 1 sections, one differing position each), B; BackwardsAuroraGenerated; `generate` with c
+  = 0 … 255 keeping a candidate only when the solver certifies exactly k within the budget; id `backwards-aurora-NNN`,
+  budget = manifest budget, tutorial for 1 … 3, difficulty = band, `.generation(number)` beyond 256; `catalogDigest` via
+  `PuzzleCatalog.digest(id: "backwards-aurora", identities:)`) and, after it, agent C's
+  `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraGeneratorTests.swift` (determinism; band
+  profiles; separation and seam filters; β = 4k; budget; the solution wins; skipped recorded and re-checked); `--name
+  host-3`
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
