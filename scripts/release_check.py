@@ -302,11 +302,12 @@ UI_CHUNKS = {
     "r3": ["NGPlayUITests", "NGReplayUITests"],   # feature 389 R02-G09-09 (T-R02G0909-004)
     "s3": ["BAPlayUITests", "BAReplayUITests"],   # feature 399 R02-G10-09 (T-R02G1009-004)
     "t3": ["ECGPlayUITests", "ECGReplayUITests"],   # feature 409 R02-G11-09 (T-R02G1109-004)
+    "u3": ["HBPlayUITests", "HBReplayUITests"],   # feature 419 R02-G12-09 (T-R02G1209-004)
 }
 # Chunks that run on one simulator (feature 066 A08-P06): the oscilloscope draws every frame on the main thread, and
 # two parallel clones competing for the host's CPU kept XCTest's idle wait from settling (single tests took 60–89 s in
 # parallel, 23–41 s serially, with the same total time).
-SERIAL_CHUNKS = {"p2", "q2", "r2", "s2", "t2", "u2", "v2", "w2", "x2", "y2", "z2", "a3", "b3", "c3", "d3", "e3", "f3", "h3", "i3", "k3", "l3", "m3", "n3", "o3", "p3", "q3", "r3", "s3", "t3"}
+SERIAL_CHUNKS = {"p2", "q2", "r2", "s2", "t2", "u2", "v2", "w2", "x2", "y2", "z2", "a3", "b3", "c3", "d3", "e3", "f3", "h3", "i3", "k3", "l3", "m3", "n3", "o3", "p3", "q3", "r3", "s3", "t3", "u3"}
 UNIFIED_LIMIT = 590       # seconds, below the ten-minute limit of one foreground command
 RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "ScenarioLaunch", "ScenarioHostView",
                      "vcDamageStat", "vcCandidates", "vc_ci_angle_standin",

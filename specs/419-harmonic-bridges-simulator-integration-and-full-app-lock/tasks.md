@@ -37,7 +37,7 @@ change (the shaders and reference of R02-G12-03 are unchanged and re-proven by t
   name of Q1 is listed once, has the prefix `experience.r02-g12.harmonic-bridges.`, and the panel source uses each
   exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing HarmonicBridgesExperienceTests`
-- [ ] T-R02G1209-004 [US1] Create `Apps/VisualCore/Tests/UI/HarmonicBridges/HBSupport.swift`, `HBPlayUITests.swift`,
+- [X] T-R02G1209-004 [US1] Create `Apps/VisualCore/Tests/UI/HarmonicBridges/HBSupport.swift`, `HBPlayUITests.swift`, — Verified 2026-11-23: app-ui (serial chunk u3: HBPlayUITests win level 1 by stepping the peg to 12, Tune and Test, 3 stars, level 2 open, 50 s; progress survives a relaunch, 98 s with two launches; HBReplayUITests replay ends won and Stop returns to the campaign, 52 s) exit 0; xcodegen regenerated, HBPlayUITests in the project; u3 unique, test_harmonic_bridges_ui_chunk passes
   `HBReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified actions (tune string 0 to peg 12, then
   the test), the opening choice (string 0, peg 11) and the budget (9) pinned in `HB`; each tuning played by stepping the
   string and peg steppers to the tuning (reading each value, counting a press only when it moves), then Tune; finally
