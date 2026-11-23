@@ -75,3 +75,10 @@ change (the shaders and reference of R02-G11-03 are unchanged and re-proven by t
 011 stays open until device testing. Shared files (examples source, registry, controls, project.yml, docs) stay with the
 lead. MVP: Stories 1 and 2. Requirement coverage: FR-001 → 003; FR-002 → 004; FR-003 → 002, 005; FR-004 → 006;
 FR-005 → 006; FR-006 → 005; FR-007 → 004, 005, 007 … 010.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G1109-013 Move `class EchoCartographerRegressionTests` in `scripts/test_scripts.py` above the
+  `if __name__ == "__main__":` block, so the `script-tests` check (`python3 scripts/test_scripts.py`) runs its 5 tests;
+  re-run `--name script-tests-2 -- python3 scripts/test_scripts.py` alone and confirm the class runs per FR-R02G1109-007
+  (partial)
