@@ -45,6 +45,8 @@ final class HarmonicBridgesBridgeScene {
         let tier: Int
         let reduceMotion: Bool
         let fallback: Bool
+        /// The islands' painter's order for the drawn orbit (feature 414): a turn that reorders them rebuilds.
+        let islandOrder: [Int]
     }
 
     private var registry: ResourceRegistry?
@@ -125,7 +127,8 @@ final class HarmonicBridgesBridgeScene {
         GeometryKey(levelNumber: s.levelNumber, pegs: s.pegs, stage: s.stage, failure: s.failure,
                     actionsLeft: s.actionsLeft,
                     step: HarmonicBridgesSceneGeometry.drawnStep(s, reduceMotion: still), tier: tier.index,
-                    reduceMotion: still, fallback: fallbackReason != nil)
+                    reduceMotion: still, fallback: fallbackReason != nil,
+                    islandOrder: HarmonicBridgesSceneGeometry.islandOrder(s, orbit: orbit))
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
@@ -136,11 +139,12 @@ final class HarmonicBridgesBridgeScene {
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let bridges = try HarmonicBridgesSceneGeometry.bridgeMesh(snapshot, tier: tier, reduceMotion: still)
+                let bridges = try HarmonicBridgesSceneGeometry.bridgeMesh(snapshot, tier: tier, reduceMotion: still,
+                                                                          orbit: orbit)
                 bridgeRenderer = try Self.renderer(bridges, vertex: HarmonicBridgesShaders.bridgeVertex,
                                                    fragment: bridgeFragment, name: "harmonic-bridges-bridge",
                                                    registry: registry)
-                let glow = try HarmonicBridgesSceneGeometry.glowMesh(snapshot, tier: tier, reduceMotion: still)
+                let glow = try HarmonicBridgesSceneGeometry.glowMesh(snapshot, tier: tier, reduceMotion: still, orbit: orbit)
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: HarmonicBridgesShaders.glowVertex,
                                                      fragment: HarmonicBridgesShaders.glowFragment,
@@ -157,8 +161,8 @@ final class HarmonicBridgesBridgeScene {
         let minimal = HarmonicBridgesTier.of(HarmonicBridgesTier.all.count - 1)
         let up = Vec3(0, 1, 0)
         let parts: [HarmonicBridgesColouredMesh] = [
-            try HarmonicBridgesSceneGeometry.bridgePart(snapshot, tier: minimal, reduceMotion: still),
-            try HarmonicBridgesSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: still),
+            try HarmonicBridgesSceneGeometry.bridgePart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit),
+            try HarmonicBridgesSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

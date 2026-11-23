@@ -92,7 +92,7 @@ presenter, scene, controls, docs) stay with the lead. MVP: Stories 1 to 3 and 5.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G1204-013 Order the island prisms by distance from the drawn camera's eye (far first; ties as today) so the
+- [X] T-R02G1204-013 Order the island prisms by distance from the drawn camera's eye (far first; ties as today) so the — Verified 2026-11-23: Verified 2026-11-23: host-5 exit 0 (31 tests: HarmonicBridgesSceneGeometryTests incl. islandsArePaintedBackToFrontForEveryOrbit — at the orbit corners and centre every island follows every farther one, the authored orbit keeps the authored order, a turned mesh keeps the same positions; picker and gesture suites unchanged); the scene keys its geometry on the islands' order for the drawn orbit
   painter's order stays correct at every orbit: give `HarmonicBridgesSceneGeometry.islandOrder` and the bridge mesh the
   orbit's eye (the authored eye keeps today's order), rebuild the scene's geometry when the orbit changes, and test in
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesSceneGeometryTests.swift` that at the orbit's

@@ -677,4 +677,29 @@ import VisualCoreScenes
         let beyond: HarmonicBridgesCamera = Geometry.camera(s, aspect: 1, orbit: HarmonicBridgesOrbit(yaw: 9, pitch: -9))
         #expect(beyond == Geometry.camera(s, aspect: 1, orbit: HarmonicBridgesOrbit(yaw: y, pitch: lo)))
     }
+
+    /// Feature 414 convergence task T-R02G1204-013: at the orbit's corners and centre every island is drawn after
+    /// every island farther from the eye; the authored orbit keeps the authored order; a turned bridge mesh holds the
+    /// same positions as the authored one (only the islands' order changes).
+    @Test func islandsArePaintedBackToFrontForEveryOrbit() throws {
+        for s in try Self.snapshots() {
+            #expect(Geometry.islandOrder(s, orbit: .authored) == Geometry.islandOrder(s))
+            let authoredKeys: Set<String> = Self.positionKeys(try Geometry.bridgeMesh(s, tier: .of(2),
+                                                                                       reduceMotion: false),
+                                                              excluding: .waveShell)
+            for orbit in Self.orbits() where orbit != .authored {
+                let eye: SIMD3<Double> = Geometry.orbitView(orbit).eye
+                let order: [Int] = Geometry.islandOrder(s, orbit: orbit)
+                #expect(order.sorted() == Array(s.islands.indices), "a permutation of the islands")
+                var previous: Double = Double.infinity
+                for index in order {
+                    let d: Double = Self.distance(Geometry.islandCentre(index, s), eye)
+                    #expect(d <= previous + 1e-12, "island \(index) at orbit \(orbit) is not nearer than the one before")
+                    previous = d
+                }
+                let turned: Mesh = try Geometry.bridgeMesh(s, tier: .of(2), reduceMotion: false, orbit: orbit)
+                #expect(Self.positionKeys(turned, excluding: .waveShell) == authoredKeys)
+            }
+        }
+    }
 }

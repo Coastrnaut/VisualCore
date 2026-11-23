@@ -378,11 +378,26 @@ public enum HarmonicBridgesSceneGeometry {
         return Double(packed)
     }
 
-    /// The islands in painter's order: ascending Z (far first), then descending |X| (outside in), then ascending X.
-    public static func islandOrder(_ snapshot: HarmonicBridgesSceneSnapshot) -> [Int] {
+    /// The islands in painter's order for the camera at `orbit`. At the authored orbit: ascending Z (far first), then
+    /// descending |X| (outside in), then ascending X. At any other orbit (feature 414, convergence task
+    /// T-R02G1204-013): descending distance of the island's centre from the orbit's eye (far first), ties broken by the
+    /// authored order, so overlapping prisms stay painted back to front when the camera turns.
+    public static func islandOrder(_ snapshot: HarmonicBridgesSceneSnapshot,
+                                   orbit: HarmonicBridgesOrbit = .authored) -> [Int] {
         var order: [Int] = Array(snapshot.islands.indices)
         let islands: [HarmonicBridgesIsland] = snapshot.islands
+        let clamped: HarmonicBridgesOrbit = orbit.clamped()
+        let byDistance: Bool = clamped != .authored
+        var distances: [Double] = Array(repeating: 0, count: islands.count)
+        if byDistance {
+            let eye: SIMD3<Double> = orbitView(clamped).eye
+            for index in islands.indices {
+                let d: SIMD3<Double> = islandCentre(index, snapshot) - eye
+                distances[index] = (d * d).sum()
+            }
+        }
         order.sort { a, b in
+            if byDistance, distances[a] != distances[b] { return distances[a] > distances[b] }
             if islands[a].y != islands[b].y { return islands[a].y < islands[b].y }
             // |X| ∝ |2·gx − 15|, compared in whole numbers.
             let da: Int = abs(2 * islands[a].x - 15)
@@ -425,23 +440,27 @@ public enum HarmonicBridgesSceneGeometry {
 
     /// The bridges with fallback colours (unlit palette colours; won membranes and glow rings lifted) for the shared
     /// unlit renderer: the level-2 geometry — strings at rest, no wave shells. Positions equal the bridge mesh's.
+    /// The islands are in painter's order for `orbit` (``islandOrder(_:orbit:)``).
     public static func bridgePart(_ snapshot: HarmonicBridgesSceneSnapshot, tier: HarmonicBridgesTier,
-                                  reduceMotion: Bool = false) throws(MeshError) -> HarmonicBridgesColouredMesh {
+                                  reduceMotion: Bool = false,
+                                  orbit: HarmonicBridgesOrbit = .authored) throws(MeshError) -> HarmonicBridgesColouredMesh {
         _ = tier
-        return try build(snapshot, step: drawnStep(snapshot, reduceMotion: reduceMotion), motion: false, shells: 0)
+        return try build(snapshot, step: drawnStep(snapshot, reduceMotion: reduceMotion), motion: false, shells: 0,
+                         orbit: orbit)
     }
 
     /// The bridge mesh for the bridge program, in painter's order: strings at rest with their packed modes when
     /// `tier.motion` and not `reduceMotion`; `tier.waveShells` wave shells per resonating string unless `reduceMotion`.
+    /// The islands are in painter's order for `orbit` (``islandOrder(_:orbit:)``).
     public static func bridgeMesh(_ snapshot: HarmonicBridgesSceneSnapshot, tier: HarmonicBridgesTier,
-                                  reduceMotion: Bool) throws(MeshError) -> Mesh {
+                                  reduceMotion: Bool, orbit: HarmonicBridgesOrbit = .authored) throws(MeshError) -> Mesh {
         try build(snapshot, step: drawnStep(snapshot, reduceMotion: reduceMotion), motion: tier.motion && !reduceMotion,
-                  shells: reduceMotion ? 0 : min(max(tier.waveShells, 0), 2)).mesh
+                  shells: reduceMotion ? 0 : min(max(tier.waveShells, 0), 2), orbit: orbit).mesh
     }
 
     /// Builds the bridges for `step` in painter's order (see the header).
-    static func build(_ snapshot: HarmonicBridgesSceneSnapshot, step: Int, motion: Bool,
-                      shells: Int) throws(MeshError) -> HarmonicBridgesColouredMesh {
+    static func build(_ snapshot: HarmonicBridgesSceneSnapshot, step: Int, motion: Bool, shells: Int,
+                      orbit: HarmonicBridgesOrbit = .authored) throws(MeshError) -> HarmonicBridgesColouredMesh {
         var parts: Parts = Parts()
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
         let won: Double = wonFlag(snapshot)
@@ -517,8 +536,8 @@ public enum HarmonicBridgesSceneGeometry {
                 }
             }
         }
-        // Islands, back to front.
-        for index in islandOrder(snapshot) {
+        // Islands, back to front for the drawn orbit.
+        for index in islandOrder(snapshot, orbit: orbit) {
             try parts.prism(centre: islandCentre(index, snapshot), radius: islandRadius, height: islandHeight)
         }
         // Pips.
@@ -568,8 +587,10 @@ public enum HarmonicBridgesSceneGeometry {
     /// island's shell its prism grown by 0.012·k in radius and height. The glow colour in the normal slot,
     /// uv = (0.5^k, won); fallback colours the glow colour times the factor, lifted on a won level. Empty when the tier
     /// has no glow.
+    /// The island shells are in painter's order for `orbit` (``islandOrder(_:orbit:)``).
     public static func glowPart(_ snapshot: HarmonicBridgesSceneSnapshot, tier: HarmonicBridgesTier,
-                                reduceMotion: Bool = false) throws(MeshError) -> HarmonicBridgesColouredMesh {
+                                reduceMotion: Bool = false,
+                                orbit: HarmonicBridgesOrbit = .authored) throws(MeshError) -> HarmonicBridgesColouredMesh {
         var parts: Parts = Parts()
         let shells: Int = min(max(tier.glowShells, 0), 2)
         guard shells > 0 else { return parts.built() }
@@ -585,7 +606,7 @@ public enum HarmonicBridgesSceneGeometry {
                                 band: 0...(membraneWidth / 2 + membraneGlowGrowth * Double(k)), material: .membrane,
                                 segments: 1, slot: slotOf, colour: tint, code: factor, fixedLocal: won)
             }
-            for index in islandOrder(snapshot) where snapshot.isReached(index, step: step) {
+            for index in islandOrder(snapshot, orbit: orbit) where snapshot.isReached(index, step: step) {
                 try parts.prism(centre: islandCentre(index, snapshot), radius: islandRadius + islandGlowGrowth * Double(k),
                                 height: islandHeight + islandGlowGrowth * Double(k),
                                 glow: (slot: glow, factor: factor, won: won, colour: tint))
@@ -596,8 +617,8 @@ public enum HarmonicBridgesSceneGeometry {
 
     /// The glow mesh for the glow program (`glowPart` without colours).
     public static func glowMesh(_ snapshot: HarmonicBridgesSceneSnapshot, tier: HarmonicBridgesTier,
-                                reduceMotion: Bool = false) throws(MeshError) -> Mesh {
-        try glowPart(snapshot, tier: tier, reduceMotion: reduceMotion).mesh
+                                reduceMotion: Bool = false, orbit: HarmonicBridgesOrbit = .authored) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit).mesh
     }
 
     // MARK: Camera
