@@ -118,6 +118,13 @@ public enum BackwardsAuroraShaders {
     public static let unspentMaterial: Double = AuroraMaterial.unspent.code
     /// The material code of the second trailing aurora layer, faded to ``secondLayerAlpha`` (`a_uv.x` = 12).
     public static let secondTrailingLayerMaterial: Double = AuroraMaterial.secondTrailingLayer.code
+    /// The material code of the freeze preview: a pale dashed copy of the ribbon through the would-be samples, alpha
+    /// ``previewAlpha`` on its dashes (`a_uv.x` = 13; feature 394, R02-G10-04).
+    public static let previewMaterial: Double = AuroraMaterial.preview.code
+    /// The alpha of the preview ribbon's dashes.
+    public static let previewAlpha: Double = 0.6
+    /// The dashes of the preview ribbon per unit of the timeline coordinate |t|.
+    public static let previewDashes: Double = 48
 
     // MARK: Constants
 
@@ -218,6 +225,8 @@ public enum BackwardsAuroraShaders {
         case unspent = 11
         /// The second trailing aurora layer (emissive; alpha ``BackwardsAuroraShaders/secondLayerAlpha``).
         case secondTrailingLayer = 12
+        /// The freeze preview's dashed ribbon (emissive; alpha ``BackwardsAuroraShaders/previewAlpha`` on its dashes).
+        case preview = 13
 
         /// The `a_uv.x` value of the material.
         public var code: Double { Double(rawValue) }
@@ -235,6 +244,7 @@ public enum BackwardsAuroraShaders {
             case .tear: BackwardsAuroraShaders.tear
             case .spent: BackwardsAuroraShaders.spent
             case .unspent: BackwardsAuroraShaders.unspent
+            case .preview: BackwardsAuroraShaders.ribbonHighlight
             }
         }
 
@@ -252,6 +262,7 @@ public enum BackwardsAuroraShaders {
             switch self {
             case .trailingLayer: BackwardsAuroraShaders.firstLayerAlpha
             case .secondTrailingLayer: BackwardsAuroraShaders.secondLayerAlpha
+            case .preview: BackwardsAuroraShaders.previewAlpha
             default: 1
             }
         }
@@ -289,11 +300,12 @@ public enum BackwardsAuroraShaders {
     const vec3 BA_TEAR = \(vec3Literal(tear));
     const vec3 BA_SPENT = \(vec3Literal(spent));
     const vec3 BA_UNSPENT = \(vec3Literal(unspent));
+    const vec3 BA_HIGHLIGHT = \(vec3Literal(ribbonHighlight));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
     void main() {
-        float m = clamp(floor(a_uv.x + 0.5), 0.0, 12.0);
+        float m = clamp(floor(a_uv.x + 0.5), 0.0, 13.0);
         vec3 base = mix(BA_GROUND, BA_BAND, isCode(m, 1.0));
         base = mix(base, BA_RIBBON, isCode(m, 2.0));
         base = mix(base, BA_GHOST, isCode(m, 3.0));
@@ -306,6 +318,7 @@ public enum BackwardsAuroraShaders {
         base = mix(base, BA_SPENT, isCode(m, 10.0));
         base = mix(base, BA_UNSPENT, isCode(m, 11.0));
         base = mix(base, BA_RIBBON, isCode(m, 12.0));
+        base = mix(base, BA_HIGHLIGHT, isCode(m, 13.0));
         v_base = base;
         v_normal = a_normal;
         v_position = a_position;
@@ -348,6 +361,8 @@ public enum BackwardsAuroraShaders {
     const float BA_PULSE_WIDTH = \(fixed(pulseWidth));
     const float BA_FIRST_LAYER_ALPHA = \(fixed(firstLayerAlpha));
     const float BA_SECOND_LAYER_ALPHA = \(fixed(secondLayerAlpha));
+    const float BA_PREVIEW_ALPHA = \(fixed(previewAlpha));
+    const float BA_PREVIEW_DASHES = \(fixed(previewDashes));
     const float BA_WON_LIFT = \(fixed(wonLift));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
@@ -357,6 +372,7 @@ public enum BackwardsAuroraShaders {
         float isRibbon = isCode(m, 5.0);
         float isFirstLayer = isCode(m, 2.0);
         float isSecondLayer = isCode(m, 12.0);
+        float isPreview = isCode(m, 13.0);
         float isLit = isCode(m, 0.0) + isCode(m, 1.0) + isCode(m, 11.0);
         vec3 n = v_normal / max(length(v_normal), 0.0001);
         vec3 l = u_lightDir / max(length(u_lightDir), 0.0001);
@@ -387,7 +403,9 @@ public enum BackwardsAuroraShaders {
         float isAurora = clamp(isRibbon + isFirstLayer + isSecondLayer, 0.0, 1.0);
         rgb = mix(rgb, BA_HIGHLIGHT * glowLight, isAurora * clamp(u_won, 0.0, 1.0) * BA_WON_LIFT);
         rgb = clamp(rgb, 0.0, 1.0);
-        float alpha = 1.0 - isFirstLayer * (1.0 - BA_FIRST_LAYER_ALPHA) - isSecondLayer * (1.0 - BA_SECOND_LAYER_ALPHA);
+        float dash = step(0.5, fract(abs(v_t) * BA_PREVIEW_DASHES));
+        float alpha = 1.0 - isFirstLayer * (1.0 - BA_FIRST_LAYER_ALPHA) - isSecondLayer * (1.0 - BA_SECOND_LAYER_ALPHA)
+            - isPreview * (1.0 - BA_PREVIEW_ALPHA * dash);
         color = vec4(rgb * alpha, alpha);
     }
     """

@@ -336,7 +336,7 @@ import Testing
         }
         // Mesh streams: aurora uv = (material code, signed timeline t); glow colour in the normal slot, uv = (glow, 0).
         let vertex: String = BackwardsAuroraShaders.auroraVertex
-        #expect(vertex.contains("float m = clamp(floor(a_uv.x + 0.5), 0.0, 12.0);"))
+        #expect(vertex.contains("float m = clamp(floor(a_uv.x + 0.5), 0.0, 13.0);"))
         #expect(vertex.contains("v_t = clamp(a_uv.y, -1.0, 1.0);"))
         #expect(BackwardsAuroraShaders.glowVertex.contains("v_colour = clamp(a_normal, 0.0, 1.0);"))
         #expect(BackwardsAuroraShaders.glowVertex.contains("v_glow = clamp(a_uv.x, 0.0, 1.0);"))
@@ -421,7 +421,7 @@ import Testing
             #expect(Double(material.rawValue) == material.code)
             if material != .ground { #expect(material.colour != BackwardsAuroraPalette.ground) }
         }
-        #expect(codes == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+        #expect(codes == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
         let named: [Double] = [
             BackwardsAuroraShaders.groundMaterial, BackwardsAuroraShaders.bandMaterial,
             BackwardsAuroraShaders.trailingLayerMaterial, BackwardsAuroraShaders.ghostMaterial,
@@ -429,7 +429,7 @@ import Testing
             BackwardsAuroraShaders.ringMaterial, BackwardsAuroraShaders.discMaterial,
             BackwardsAuroraShaders.kinkMaterial, BackwardsAuroraShaders.tearMaterial,
             BackwardsAuroraShaders.spentMaterial, BackwardsAuroraShaders.unspentMaterial,
-            BackwardsAuroraShaders.secondTrailingLayerMaterial,
+            BackwardsAuroraShaders.secondTrailingLayerMaterial, BackwardsAuroraShaders.previewMaterial,
         ]
         #expect(named == codes)
         #expect(Set(named).count == named.count)
@@ -445,6 +445,7 @@ import Testing
         #expect(Material.tear.colour == BackwardsAuroraPalette.tear)
         #expect(Material.spent.colour == BackwardsAuroraPalette.spent)
         #expect(Material.unspent.colour == BackwardsAuroraPalette.unspent)
+        #expect(Material.preview.colour == BackwardsAuroraPalette.ribbonHighlight)
         // The vertex shader's selection chain covers every code with its palette constant, in code order.
         let vertex: String = BackwardsAuroraShaders.auroraVertex
         let selections: [String] = [
@@ -454,6 +455,7 @@ import Testing
             "base = mix(base, BA_MATCHED, isCode(m, 7.0));", "base = mix(base, BA_KINK, isCode(m, 8.0));",
             "base = mix(base, BA_TEAR, isCode(m, 9.0));", "base = mix(base, BA_SPENT, isCode(m, 10.0));",
             "base = mix(base, BA_UNSPENT, isCode(m, 11.0));", "base = mix(base, BA_RIBBON, isCode(m, 12.0));",
+            "base = mix(base, BA_HIGHLIGHT, isCode(m, 13.0));",
         ]
         for selection in selections { #expect(vertex.contains(selection), "\(selection)") }
         // Lit set and alphas agree with the fragment source.
@@ -465,8 +467,10 @@ import Testing
         #expect(fragment.contains("float isRibbon = isCode(m, 5.0);"))
         #expect(fragment.contains("float isFirstLayer = isCode(m, 2.0);"))
         #expect(fragment.contains("float isSecondLayer = isCode(m, 12.0);"))
+        #expect(fragment.contains("float isPreview = isCode(m, 13.0);"))
         for material in Material.allCases {
-            let expected: Double = material == .trailingLayer ? 0.45 : (material == .secondTrailingLayer ? 0.25 : 1)
+            var expected: Double = material == .trailingLayer ? 0.45 : (material == .secondTrailingLayer ? 0.25 : 1)
+            if material == .preview { expected = BackwardsAuroraShaders.previewAlpha }
             #expect(material.alpha == expected, "\(material)")
         }
     }

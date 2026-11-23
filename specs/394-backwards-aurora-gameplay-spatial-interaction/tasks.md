@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 2: Foundational — preview field, orbit and picking
 
-- [ ] T-R02G1004-002 Add the snapshot's `preview` samples ("would-be samples; empty when none") and
+- [X] T-R02G1004-002 Add the snapshot's `preview` samples ("would-be samples; empty when none") and — Verified 2026-11-22: host (130 BackwardsAurora tests: the snapshot's preview samples and withPreview; preview material 13 (dashed highlight, alpha 0.6) in the shaders with its source tests) exit 0, lead
   `withPreview(_:)` to `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneSnapshot.swift` and the preview material (code 13, a pale dashed
   copy of the ribbon) to `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraShaders.swift` with its source test in
   `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraShaderSourceTests.swift`; `--name host`

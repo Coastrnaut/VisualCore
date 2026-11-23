@@ -105,6 +105,9 @@ public struct BackwardsAuroraSceneSnapshot: Sendable, Equatable {
     public let levelNumber: Int
     /// The presentation time in seconds (pulses and shimmer only).
     public let time: Double
+    /// The freeze preview's would-be samples (feature 394, R02-G10-04): the kernel's reversal of the chosen section,
+    /// drawn as a pale dashed ribbon; empty when no preview shows. Presentation only.
+    public private(set) var preview: [Int] = []
 
     /// The snapshot of `play` at `time` for catalog level `levelNumber` with the chosen section [sectionStart,
     /// sectionEnd] (clamped so that 0 ≤ start < end ≤ N − 1).
@@ -134,6 +137,13 @@ public struct BackwardsAuroraSceneSnapshot: Sendable, Equatable {
 
     /// The number of samples, N.
     public var count: Int { samples.count }
+
+    /// This snapshot with `samples` as the freeze preview (empty: none); samples of another length are ignored.
+    public func withPreview(_ samples: [Int]) -> BackwardsAuroraSceneSnapshot {
+        var copy = self
+        copy.preview = samples.count == count ? samples : []
+        return copy
+    }
 
     /// The failure in words, naming the reversal and the seam as the kernel's reason does: "The aurora tore at seam 5
     /// on reversal 2." or "All 6 reversals were spent without a win."; nil when the play has not failed.
