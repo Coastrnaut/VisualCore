@@ -81,7 +81,8 @@ round-two games' daily multipliers are 37, 41, 43, 47, 53, 59, 61, 67, 71, 73 an
   numbered from 1 and steps and strings from 0: a broken test — "Action m (the test) broke the crossing in step s at
   string i: the start reached the goal in k of n steps." (or "… in step s: no string reaches across: …" without a
   string); the budget — "Action m (a tuning of string i to peg p | a test) spent the last move without a win: the start
-  reached the goal in k of n steps." — each followed by "Undo the last action or retry the level." Impact:
+  reached the goal in k of n steps." — k counted at the pegs after the failing action (the kernel's report then) — each
+  followed by "Undo the last action or retry the level." Impact:
   FR-R02G1205-003, 007; SC-R02G1205-003.
 
 ## User Scenarios & Testing *(mandatory)*

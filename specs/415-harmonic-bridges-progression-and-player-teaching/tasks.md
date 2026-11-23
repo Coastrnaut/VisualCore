@@ -27,7 +27,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 405
   plan's tunings in string order then the test, and nil unless those actions fit the actions left (and within the work
   bound); `HarmonicBridgesHints.plan`/`hint`; `HarmonicBridgesFailureExplanation` with the texts of clarification Q5 for
   a broken test (with and without a string) and for the exhausted budget (after a tuning or a test), actions numbered
-  from 1 and steps and strings from 0, followed by "Undo the last action or retry the level.") with
+  from 1 and steps and strings from 0, the steps that held counted at the pegs after the failing action, followed by "Undo the last action or retry the level.") with
   `Packages/ExperiencesRound02/HarmonicBridges/CoreTests/HarmonicBridgesHintsTests.swift` (following exact hints from the
   opening wins all 100 certified levels within their budget, in parallel groups under 10 s each; 200 seeded reachable
   states (seed 2_415): every exact hint is accepted by the kernel; 500 seeded failures explained with their true action
