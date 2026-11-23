@@ -9,7 +9,7 @@ in this feature (the chamber, its rays and echoes are the CPU reference the rend
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1101-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G1101-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0, 2026-11-23; rendering baseline is X-R02-G10's visualcore-rendering run (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is X-R02-G10's visualcore-rendering run (exit 0)
 
 ## Phase 2: Foundational
