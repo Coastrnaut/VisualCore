@@ -259,13 +259,13 @@ public enum EchoCartographerSceneGeometry {
         min(max(snapshot.energy, 0), max(snapshot.budget, 0))
     }
 
-    /// The struck distance in cells of every wall the last pulse struck, by cell (empty without a pulse).
     /// The won flag of the wall edge strips: 1 when the level is won (every beacon located), else 0 (feature 403
     /// convergence, T-R02G1103-014; the spec's edge case "the chamber's known walls brighten").
     public static func wonFlag(_ snapshot: EchoCartographerSceneSnapshot) -> Double {
         snapshot.stage == .won || (snapshot.stage == .result && snapshot.failure == nil) ? 1 : 0
     }
 
+    /// The struck distance in cells of every wall the last pulse struck, by cell (empty without a pulse).
     public static func struckDistances(_ snapshot: EchoCartographerSceneSnapshot) -> [EchoCartographerCell: Int] {
         var result: [EchoCartographerCell: Int] = [:]
         guard let echo = snapshot.lastEcho else { return result }

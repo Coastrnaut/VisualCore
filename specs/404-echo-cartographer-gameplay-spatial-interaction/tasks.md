@@ -97,6 +97,6 @@ controls, invariant scan, docs) stay with the lead. MVP: Stories 1 to 3 and 5.
   and to undo or go to the next level (`finishedMessage`), with a simulator test in
   `Packages/ExperiencesRound02/EchoCartographer/ExperienceTests/EchoCartographerGestureWiringTests.swift`, per Spec Edge
   Cases (finished play) and Clarifications Q4 (partial); `--name sim-27-2`
-- [ ] T-R02G1104-014 Restore the `///` documentation of `EchoCartographerSceneGeometry.struckDistances` (detached when
+- [X] T-R02G1104-014 Restore the `///` documentation of `EchoCartographerSceneGeometry.struckDistances` (detached when — Verified 2026-11-23: host-5 (156 EchoCartographer core tests) exit 0; struckDistances documented again, wonFlag's comment kept with it
   `wonFlag` was inserted) in `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSceneGeometry.swift`, per
   FR-R02G1104-007 (partial); `--name host-5`
