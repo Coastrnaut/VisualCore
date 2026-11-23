@@ -11,7 +11,7 @@ tests stay short (< 10 s each). No {owner} tasks. Model: feature 406's tasks.
 - [X] T-R02G1206-001 Baselines after R02-G12-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-23: Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0; rendering baseline is R02-G12-05's rendering runs (exit 0)
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G12-05's
   rendering runs (exit 0)
-- [ ] T-R02G1206-002 Edit `Packages/ExperiencesRound02/Package.swift` (`HarmonicBridgesCore` and its tests gain
+- [X] T-R02G1206-002 Edit `Packages/ExperiencesRound02/Package.swift` (`HarmonicBridgesCore` and its tests gain — Verified 2026-11-23: Verified 2026-11-23: host exit 0 (HarmonicBridgesCoreTests); HarmonicBridgesExperience and its tests gain VisualCoreAudioDSP and VisualCoreAudio (iOS) as Echo Cartographer's have; the Core already depended on VisualCoreAudioDSP since R02-G12-01
   VisualCoreAudioDSP; `HarmonicBridgesExperience` gains VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as Echo
   Cartographer's targets have); `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
   HarmonicBridgesCoreTests`
