@@ -177,6 +177,10 @@ jobs:
         # Feature 408 (R02-G11-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/echo_cartographer_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter EchoCartographerRegression
+      - name: Harmonic Bridges regression (host)
+        # Feature 418 (R02-G12-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/harmonic_bridges_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridgesRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase

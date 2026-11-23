@@ -56,7 +56,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1208-006 [P] [US4] Create `scripts/harmonic_bridges_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G1208-006 [P] [US4] Create `scripts/harmonic_bridges_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-23: regression (scripts/harmonic_bridges_regression.py: host PASS, simulator PASS with TEST_RUNNER_HARMONIC_BRIDGES_MEMORY_ISOLATED=1, footprint 28.31 -> 28.86 MB over 12 cycles, 0.55 MB growth within 16 MB) exit 0; HarmonicBridgesRegressionTests 5 script tests pass; CI step 'Harmonic Bridges regression (host)' in round02-host-tests
   (agent D: host filter `HarmonicBridgesRegression`, then the simulator classes through `xcodebuild_package.py
   --only-testing` with the isolation variable, one summary line per part with pass or fail and the first failing name,
   a non-zero exit on any failure), and add the named step "Harmonic Bridges regression (host)" to the
