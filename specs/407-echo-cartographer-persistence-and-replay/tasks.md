@@ -42,7 +42,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
   "The replay is over.", "Stop the replay first."; a replay step announced like the action it applies; a replayed win
   claims no stars) with `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and
   2 → 3, reconciliation on restore, replay rules and codes, sound setting); `--name host-2`
-- [ ] T-R02G1107-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerPersistenceTests.swift` (agent B: 500 seeded
+- [X] T-R02G1107-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerPersistenceTests.swift` (agent B: 500 seeded — Verified 2026-11-23: host-3 (223 EchoCartographer core tests incl. EchoCartographerPersistenceTests 7 (29 cases): 500 seeded states round-trip with equal digests and payloads, the sound choice flipped never changing the digest; 100 schema-1 and 100 schema-2 payloads migrate through the steps and the engine chain with progress kept, results unverified, sound off; 200 saves reconcile exactly (honest kept, edited dropped and counted, frontier as saved) and each edit alone is dropped; the same payload restores twice to equal digests; the daily level depends only on the date) exit 0, lead retest
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
   dropped and counted; FR-R02G1107-005: the same save restores to an equal digest twice and the daily level depends only
