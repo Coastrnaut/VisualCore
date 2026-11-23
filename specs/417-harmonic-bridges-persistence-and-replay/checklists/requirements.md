@@ -31,4 +31,4 @@
 
 ## Notes
 
-- What a result stores, reconciliation, migrations, replay controls and the sound setting are left to `/speckit-clarify` (modelled on feature 407).
+- What a result stores, reconciliation, migrations, replay controls and the sound setting were settled by `/speckit-clarify` (session 2026-11-23).
