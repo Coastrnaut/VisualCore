@@ -97,6 +97,28 @@ jobs:
         run: swift test --package-path Packages/VisualCore
       - name: GardenKit host tests
         run: swift test --package-path Harnesses/SecondConsumer/GardenKit
+
+  round02-host-tests:
+    # R02-G11-04 (2026-11-23): split from host-tests. The round-two package's build (about 6 minutes on a runner) and
+    # its host tests (past 17 minutes on a runner, about three times the local time) no longer fit host-tests' 30
+    # minutes beside the VisualCore tests; five ci runs in a row were cut at the limit with no failing test.
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - name: Toolchain
+        id: toolchain
+        run: |
+          swift --version
+          echo "xcode=$(xcodebuild -version | tr '\n' ' ' | tr -cs 'A-Za-z0-9.' '-')" >> "$GITHUB_OUTPUT"
+      - name: SwiftPM build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            Packages/VisualCore/.build
+            Packages/ExperiencesRound02/.build
+          key: spm-round02-${{ steps.toolchain.outputs.xcode }}-${{ hashFiles('Packages/VisualCore/**/*.swift', 'Packages/ExperiencesRound02/**/*.swift') }}
+          restore-keys: spm-round02-${{ steps.toolchain.outputs.xcode }}-
       # Feature 301 (R02-G01-01): the round-two game Cores are pure and run on the host. Since R02-G01-03 the package's
       # iOS-only Experience targets depend on VisualCoreRendering, whose ANGLE binary targets SwiftPM must find even
       # though a macOS build never links them; the link-only stand-ins (iOS simulator slices) satisfy that.

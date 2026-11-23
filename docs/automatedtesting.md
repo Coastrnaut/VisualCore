@@ -395,6 +395,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   and INV-10 failing in their copies; the shared test file is the lead's, so the lead added the picker, the freeze
   preview and the controller to the set in one edit before retesting. Name every new presentation file in the task that
   creates it.
+- **A cancelled CI run can be a job limit, not a push** (R02-G11-04, 2026-11-23). Five `ci` runs in a row ended
+  "cancelled" with no later push: `host-tests` reached its 30-minute limit while the round-two package's tests were
+  still running (build about 6 minutes, tests past 17 minutes on a runner; Swift Testing's output arrives in late chunks,
+  so the step looked silent for minutes). The round-two host tests and their regressions moved to their own job,
+  `round02-host-tests`, with 60 minutes. When a run is cancelled, read `gh run view <id> --json jobs` for the job that
+  hit its limit before assuming a push cancelled it.
 - **Overloads on enums that share case names can recurse** (R02-G11-04, 2026-11-23). Echo Cartographer's gesture
   action and kernel action both have `.claim(x, y)`; a test helper `adapterAction(_:)` overloaded on both resolved
   `adapterAction(.claim(x, y))` to the gesture overload, which called itself, and the run crashed with a stack overflow
