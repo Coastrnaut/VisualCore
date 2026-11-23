@@ -66,7 +66,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 - [X] T-R02G1302-007 Docs: `docs/architecture/acoustic-constellator.md` (content pipeline), — Verified 2026-11-23: round02-host exit 0; architecture doc content pipeline, ExperiencesRound02 README feature 422, testing doc entry; validate_docs passes
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1302-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1302-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: 2026-11-23: rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G13-02.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
 - [ ] T-R02G1302-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1302-010 Reference regression chunk 2 (`--name reference-2`)
