@@ -97,7 +97,7 @@ before 001, since their files are new or untouched by R02-G12-04 (the solver is 
 
 ## Phase 6: Convergence
 
-- [ ] T-R02G1205-012 Correct the `///` documentation of `HarmonicBridgesTutorialStep.advanced(afterTune:bridged:ended:)`
+- [X] T-R02G1205-012 Correct the `///` documentation of `HarmonicBridgesTutorialStep.advanced(afterTune:bridged:ended:)` — Verified 2026-11-23: Verified 2026-11-23: host-5 exit 0 (HarmonicBridgesProgressTests 14); the advanced(afterTune:bridged:ended:) documentation now matches the adapter (undo never ends the tutorial, a redo that restores a won or failed play ends it, nothing moves it back)
   in `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesProgress.swift`: an undo passes `afterTune: false`
   and the play's real end (an undo always lands before the end, so it never ends the tutorial), while a redo that
   restores a won or failed play ends it, as the adapter does; per FR-R02G1205-007 (contradicts); `--name host-5 -- swift

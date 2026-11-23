@@ -69,7 +69,9 @@ public enum HarmonicBridgesTutorialStep: String, Sendable, Equatable, Hashable, 
     ///     (``HarmonicBridgesReport/goalReachedInEveryStep``); it moves `bridge` to `test` (on `tune` only together
     ///     with an accepted tuning).
     ///   - ended: whether the level has ended (won or failed); then the step is `done` whatever the other flags are.
-    ///   An undo or a redo passes false for `afterTune` and `ended` and never moves the step back.
+    ///   An undo or a redo passes false for `afterTune` and the play's real end: an undo always lands before the end, so
+    ///   it never ends the tutorial, while a redo that restores a won or failed play ends it (the adapter's
+    ///   `advanceTutorial`); no call ever moves the step back.
     public func advanced(afterTune: Bool, bridged: Bool, ended: Bool) -> Self {
         if ended { return .done }
         switch self {
