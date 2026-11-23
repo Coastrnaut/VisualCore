@@ -128,12 +128,13 @@ public struct EchoCartographerFeedbackPlan: Sendable, Equatable {
             + level.cellName(cursor, knowledge: play.knowledge) + ". Level: " + level.levelDescription() + "."
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay".
     public static func modeName(_ mode: EchoCartographerMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 

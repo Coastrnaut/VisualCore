@@ -13,7 +13,7 @@ tests stay short (< 10 s each). No {owner} tasks; one {device} task; no GLSL cha
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1107-002 [P] [US2] Edit `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerProgress.swift` (Result gains "trace:
+- [X] T-R02G1107-002 [P] [US2] Edit `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerProgress.swift` (Result gains "trace: — Verified 2026-11-23: host (213 EchoCartographer core tests incl. EchoCartographerReconciliationTests 14: every certified witness as a trace verifies; edited stars, energy below the trace's, a changed step, an illegal or post-win action, an unwon or overlong trace dropped and counted; untraced kept unverified; frontier unchanged; netTrace over undo and redo; record replacement; old-JSON decoding; replay mode encoding) exit 0, lead retest; manifest regenerated for the result encoding
   [EchoCartographerAction]" (effective pulses, claims and marks) and "verified: Bool";
   `record(level:energySpent:certified:mode:trace:)` stores a verified result, replacing only when better (ties keep the
   earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace = empty, missing verified =
