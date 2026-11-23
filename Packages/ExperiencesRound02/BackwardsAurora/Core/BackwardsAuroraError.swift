@@ -1,6 +1,7 @@
 // BackwardsAuroraError — feature 391 (R02-G10-01) T-R02G1001-002 (FR-R02G1001-006, 011; clarifications Q3, Q5). The
 // refusals of Backwards Aurora's rule kernel, each with a stable reason code `r02-g10.*` that the experience logs with
-// the level id and the action.
+// the level id and the action. Feature 392 (R02-G10-02) T-R02G1002-002 adds the content pipeline's refusals:
+// `generation` and `witness`.
 
 /// A refusal of a Backwards Aurora level, action or event.
 public enum BackwardsAuroraError: Error, Equatable, Sendable {
@@ -19,6 +20,10 @@ public enum BackwardsAuroraError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of the manifest entry with this number qualified within the generator's bound (feature 392).
+    case generation(Int)
+    /// A witness file is damaged, newer, edited or no longer replays; the payload names the part (feature 392).
+    case witness(String)
 
     /// The stable reason code, `r02-g10.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +35,8 @@ public enum BackwardsAuroraError: Error, Equatable, Sendable {
         case .stale: "r02-g10.stale"
         case .newerSchema: "r02-g10.newer-schema"
         case .malformed: "r02-g10.malformed"
+        case .generation: "r02-g10.generation"
+        case .witness: "r02-g10.witness"
         }
     }
 }

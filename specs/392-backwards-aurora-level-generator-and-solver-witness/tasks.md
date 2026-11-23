@@ -14,7 +14,7 @@ logic); no GLSL in this feature.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1002-002 Add `generation(Int)` ("r02-g10.generation") and `witness(String)` ("r02-g10.witness") to
+- [X] T-R02G1002-002 Add `generation(Int)` ("r02-g10.generation") and `witness(String)` ("r02-g10.witness") to — Verified 2026-11-22: host (swift test --filter BackwardsAurora; the 41 existing tests unchanged and passing with the two new refusals, the 100-entry manifest and the difficulty; the solver and generator sources compile alongside and are tested at T-003/T-004) exit 0, lead
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraError.swift` (no other kernel change: generated
   levels stay inside R02-G10-01's ranges); create
   `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraManifest.swift` (BackwardsAuroraManifestEntry "number
