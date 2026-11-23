@@ -373,7 +373,8 @@ enum EchoCartographerGestureScript {
         #expect(sentAfter.rejected == sentBefore.rejected + 1, "one cell.claim refused")
         #expect(shell.presenter.refusalLog == [refused.result.code], "the refusal's code is logged")
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message.contains(refused.result.code))
+        // Since feature 406 the refusal is shown in words.
+        #expect(message == EchoCartographerFeedbackPlan.refusalText(code: refused.result.code))
         #expect(try EchoCartographerTest.digest(shell) == digest, "a refused claim changes nothing")
         #expect(shell.presenter.gestures.state == .idle)
 

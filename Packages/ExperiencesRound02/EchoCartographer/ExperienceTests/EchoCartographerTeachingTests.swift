@@ -305,7 +305,8 @@ enum EchoCartographerTeaching {
         let locked: ActionResult = try Teaching.send("level.select", [3], shell)
         #expect(locked == .rejected(.rule(code: EchoCartographerExperienceRule.locked)), "\(locked.code)")
         #expect(locked.code.contains("r02-g11.locked"))
-        #expect(presenter.mirror.message?.contains("r02-g11.locked") == true,
+        // Since feature 406 the refusal is shown in words.
+        #expect(presenter.mirror.message == EchoCartographerFeedbackPlan.refusalText(code: locked.code),
                 "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == locked.code)
         #expect(try EchoCartographerTest.digest(shell) == digest, "a refused pick changes nothing")

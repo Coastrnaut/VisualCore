@@ -10,6 +10,9 @@
 // change; the rings and flares move by uniforms. Reduce Flashing passes `EchoCartographerShaders.glowLimit(
 // reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls back to the level-2 geometry drawn unlit with
 // the shared `MeshRenderer` (ambient 1, per-vertex colours) and keeps the reason; nothing here can reach the kernel.
+// Feature 406 (R02-G11-06) T-R02G1106-005: the presenter's eased lights scale the glow gain (`lights.glow`) and the won
+// lift (`u_wonLight`, `lights.won`); Reduce Flashing also draws the rings and flares at rest, as Reduce Motion does. The
+// lights are uniforms, so a fade rebuilds no geometry.
 #if os(iOS)
 import EchoCartographerCore
 import Foundation
@@ -28,6 +31,11 @@ final class EchoCartographerChamberScene {
     var reducedFlash = false
     /// Whether the rings and flares are drawn at rest (Reduce Motion).
     var reduceMotion = false
+    /// The eased light levels (presentation only), set by the presenter before each frame (feature 406); nil draws the
+    /// full levels (the full glow gain and won lift).
+    var lights: EchoCartographerLights?
+    /// Whether the rings and flares are drawn at rest: under Reduce Motion or Reduce Flashing (feature 406).
+    var ringsAtRest: Bool { reduceMotion || reducedFlash }
     /// The orbit drawn (feature 404): presentation only, never part of the snapshot or the digest.
     var orbit: EchoCartographerOrbit = .authored
     /// The light direction of the chamber (from above and in front).
@@ -104,8 +112,9 @@ final class EchoCartographerChamberScene {
             try drawFallback(camera)
             return
         }
-        try drawChamber(snapshot, camera: camera, tier: tier, animate: animate && !reduceMotion)
-        let gain = EchoCartographerShaders.glowGain(for: tier)
+        try drawChamber(snapshot, camera: camera, tier: tier, animate: animate && !ringsAtRest,
+                        wonLight: Float(min(max(lights?.won ?? 1, 0), 1)))
+        let gain = EchoCartographerShaders.glowGain(for: tier) * min(max(lights?.glow ?? 1, 0), 1)
         guard tier.glowShells > 0, gain > 0 else { return }
         try drawGlow(camera, gain: gain)
     }
@@ -125,7 +134,7 @@ final class EchoCartographerChamberScene {
         if fallbackReason == nil {
             do {
                 let chamber = try EchoCartographerSceneGeometry.chamberMesh(snapshot, tier: tier,
-                                                                             reduceMotion: reduceMotion)
+                                                                             reduceMotion: ringsAtRest)
                 chamberRenderer = try Self.renderer(chamber, vertex: EchoCartographerShaders.chamberVertex,
                                                     fragment: chamberFragment, name: "echo-cartographer-chamber",
                                                     registry: registry)
@@ -181,7 +190,7 @@ final class EchoCartographerChamberScene {
     }
 
     private func drawChamber(_ snapshot: EchoCartographerSceneSnapshot, camera: EchoCartographerCamera,
-                             tier: EchoCartographerTier, animate: Bool) throws {
+                             tier: EchoCartographerTier, animate: Bool, wonLight: Float) throws {
         guard let chamberRenderer else { return }
         let mvp = camera.viewProjection
         let pulse = Self.pulseUniforms(snapshot)
@@ -198,6 +207,7 @@ final class EchoCartographerChamberScene {
             p.set(EchoCartographerShaders.echoDelaysUniform, pulse.delays)
             p.set(EchoCartographerShaders.tierUniform, SIMD3<Float>(Float(flags.x), Float(flags.y), Float(flags.z)))
             p.set(EchoCartographerShaders.reduceMotionUniform, still)
+            p.set(EchoCartographerShaders.wonLightUniform, wonLight)
         }
     }
 

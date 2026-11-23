@@ -91,6 +91,9 @@ public enum EchoCartographerShaders {
     public static let tierUniform = "u_tier"
     /// `float`: 1 under Reduce Motion (rings and flares at rest), 0 otherwise (chamber).
     public static let reduceMotionUniform = "u_reduceMotion"
+    /// `float`: the won brightening's eased light (chamber, feature 406): scales ``wonLift`` on won wall edges; 1 draws
+    /// the lift at full strength.
+    public static let wonLightUniform = "u_wonLight"
     /// `float`: the glow gain (glow); see ``glowGain(for:)`` and ``glowGain(gain:limit:)``.
     public static let glowGainUniform = "u_glowGain"
     /// `float`: the glow limit (glow): ``glowLimit(reduceFlashing:)``.
@@ -99,7 +102,7 @@ public enum EchoCartographerShaders {
     /// Every uniform the chamber program declares, each once, in order of declaration (vertex stage first).
     public static let chamberUniforms: [String] = [mvpUniform, lightDirectionUniform, timeUniform, cellSizeUniform,
                                                    emitterUniform, maxRadiusUniform, echoDelaysUniform, tierUniform,
-                                                   reduceMotionUniform]
+                                                   reduceMotionUniform, wonLightUniform]
 
     /// Every uniform the glow program declares, exactly as declared (vertex stage first).
     public static let glowUniforms: [String] = [mvpUniform, glowGainUniform, glowLimitUniform]
@@ -357,6 +360,7 @@ public enum EchoCartographerShaders {
     uniform vec4 u_echoDelays;
     uniform vec3 u_tier;
     uniform float u_reduceMotion;
+    uniform float u_wonLight;
     out vec4 color;
     const vec3 EC_PULSE = \(vec3Literal(EchoCartographerPalette.pulse));
     const vec3 EC_FLARE = \(vec3Literal(EchoCartographerPalette.flare));
@@ -414,7 +418,7 @@ public enum EchoCartographerShaders {
         float flash = isEdge * struck * max(flare, trail) * clamp(u_tier.y, 0.0, 1.0) * motion;
         vec3 rgb = clamp(v_base, 0.0, 1.0) * light;
         rgb = mix(rgb, EC_FLARE, clamp(flash, 0.0, 1.0));
-        rgb = mix(rgb, EC_FLARE, EC_WON_LIFT * v_won);
+        rgb = mix(rgb, EC_FLARE, EC_WON_LIFT * v_won * clamp(u_wonLight, 0.0, 1.0));
         rgb = mix(rgb, EC_PULSE, isRing);
         rgb = clamp(rgb, 0.0, 1.0);
         float alpha = clamp(mix(soft, ring, isRing), 0.0, 1.0);

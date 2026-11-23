@@ -199,10 +199,10 @@ import Testing
             EchoCartographerShaders.emitterUniform, EchoCartographerShaders.maxRadiusUniform,
             EchoCartographerShaders.echoDelaysUniform, EchoCartographerShaders.tierUniform,
             EchoCartographerShaders.reduceMotionUniform, EchoCartographerShaders.glowGainUniform,
-            EchoCartographerShaders.glowLimitUniform,
+            EchoCartographerShaders.glowLimitUniform, EchoCartographerShaders.wonLightUniform,
         ]
         let names: [String] = ["u_mvp", "u_lightDir", "u_time", "u_cellSize", "u_emitter", "u_maxRadius",
-                               "u_echoDelays", "u_tier", "u_reduceMotion", "u_glowGain", "u_glowLimit"]
+                               "u_echoDelays", "u_tier", "u_reduceMotion", "u_glowGain", "u_glowLimit", "u_wonLight"]
         #expect(constants == names)
         let listed: Set<String> = Set(EchoCartographerShaders.chamberUniforms + EchoCartographerShaders.glowUniforms)
         #expect(Set(constants) == listed)
@@ -210,7 +210,7 @@ import Testing
         let chamberDeclarations: [String] = [
             "uniform mat4 u_mvp;", "uniform vec3 u_lightDir;", "uniform float u_time;", "uniform float u_cellSize;",
             "uniform vec2 u_emitter;", "uniform float u_maxRadius;", "uniform vec4 u_echoDelays;",
-            "uniform vec3 u_tier;", "uniform float u_reduceMotion;",
+            "uniform vec3 u_tier;", "uniform float u_reduceMotion;", "uniform float u_wonLight;",
         ]
         for declaration in chamberDeclarations { #expect(chamber.contains(declaration), "\(declaration)") }
         let glow: String = EchoCartographerShaders.glowVertex + EchoCartographerShaders.glowFragment
@@ -234,7 +234,7 @@ import Testing
             #expect(slots <= EchoCartographerShaders.maxUniformVec4s, "\(program.name) uses \(slots) vec4 slots")
             slotsByProgram[program.name] = slots
         }
-        #expect(slotsByProgram == ["chamber": 12, "glow": 6])
+        #expect(slotsByProgram == ["chamber": 13, "glow": 6])
     }
 
     @Test func noTextureSamplerNoDiscardAndLoopsBoundedByConstants() {
@@ -663,12 +663,12 @@ import Testing
 
     /// Feature 403 convergence (T-R02G1103-014): the won flag reaches the fragment shader on wall edges only and lifts
     /// them toward the flare colour by ``EchoCartographerShaders/wonLift`` at every tier (not gated by the tier flags or
-    /// Reduce Motion).
+    /// Reduce Motion). Feature 406 (R02-G11-06): the lift is scaled by the eased won light `u_wonLight`.
     @Test func aWonLevelLiftsTheWallEdges() {
         let vertex: String = EchoCartographerShaders.chamberVertex
         let fragment: String = EchoCartographerShaders.chamberFragment
         #expect(vertex.contains("v_won = clamp(a_normal.y, 0.0, 1.0) * isEdge;"))
-        #expect(fragment.contains("rgb = mix(rgb, EC_FLARE, EC_WON_LIFT * v_won);"))
+        #expect(fragment.contains("rgb = mix(rgb, EC_FLARE, EC_WON_LIFT * v_won * clamp(u_wonLight, 0.0, 1.0));"))
         #expect(fragment.contains("const float EC_WON_LIFT = 0.5"))
         #expect(EchoCartographerShaders.wonLift > 0 && EchoCartographerShaders.wonLift <= 1)
     }

@@ -40,7 +40,7 @@ native control carries a value in words from the start).
 
 ## Phase 3: Wiring — shader, presenter, scene, sound and panel
 
-- [ ] T-R02G1106-005 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerShaders.swift` (`u_wonLight` scales the won lift;
+- [X] T-R02G1106-005 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerShaders.swift` (`u_wonLight` scales the won lift; — Verified 2026-11-23: sim-27 (47 Echo Cartographer simulator tests incl. EchoCartographerAccessibilityTests 6: every control value in words and the summary element, level 1 won through the panel's operations with every plan routed exactly once and the win outcome, refusals shown and announced in words, Reduce Motion and Reduce Flashing stills identical (rings and flares at rest), the won light fading in over 0.45 s under Reduce Flashing, the sound loop's state table) exit 0; u_wonLight in the chamber shader; refusal and won-brightening tests updated for words and the eased lift
   `wonLightUniform`) with its source test in `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerShaderSourceTests.swift`, add the new Core
   files that use Doubles to `presentationSources` in `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerInvariantTests.swift` (lights, sound
   recipe, feedback plan if it does), create `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerSound.swift` (the ambient loop over

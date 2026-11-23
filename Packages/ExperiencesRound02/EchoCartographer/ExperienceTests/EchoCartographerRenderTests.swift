@@ -191,7 +191,9 @@ import VisualCoreMath
         let snapshotBefore: EchoCartographerSceneSnapshot = try #require(shell.presenter.lastSnapshot)
         let last = EchoCartographerTest.control(try #require(actions.last))
         #expect(shell.handle(control: last.control, values: last.values) == .accepted)
-        let after: [UInt8] = try EchoCartographerTest.still(session)
+        // Since feature 406 the won brightening eases in over presentation time: the frame 10 s later shows it settled
+        // (the pulse ring and the flares have long finished by then).
+        let after: [UInt8] = try EchoCartographerTest.still(session, time: 10)
         let snapshotAfter: EchoCartographerSceneSnapshot = try #require(shell.presenter.lastSnapshot)
         #expect(snapshotAfter.stage == .won)
         let s: Double = 1.8 / Double(max(snapshotAfter.width, snapshotAfter.height))

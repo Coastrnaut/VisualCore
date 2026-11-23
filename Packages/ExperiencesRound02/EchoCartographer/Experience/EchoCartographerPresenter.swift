@@ -18,6 +18,15 @@
 // with their bands and stars and the goal; `retry` starts the level again in its mode, `undoAction` takes back the last
 // action, and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`), never by the
 // core.
+// Feature 406 (R02-G11-06) T-R02G1106-005 (FR-R02G1106-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `EchoCartographerFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log; refusals are shown and announced in
+// words (`refused(code:)`), and a revealed hint is announced as `state`; cursor moves and orbit are not announced (the
+// column and row speak their values). The scene's lights (`EchoCartographerLights`: the glow and the won brightening)
+// step toward the drawn snapshot every frame (0.15 s fades, 0.45 s under Reduce Flashing), and under Reduce Flashing
+// the rings and flares are drawn at rest. The ambient loop (`EchoCartographerSound`) is offered the recipe of the energy
+// left, the beacons located and the stage (`EchoCartographerSoundRecipe`) when a level or mode opens and when that
+// recipe changes. The mirror carries the summary element's text and the sound choice. Presentation only.
 #if os(iOS)
 import EchoCartographerCore
 import Foundation
@@ -27,6 +36,8 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
+import VisualCoreAudioDSP
 
 /// What the controls show and choose: the latest state the presenter described and the panel's cursor.
 @MainActor
@@ -66,6 +77,10 @@ final class EchoCartographerMirror {
     var certifiedPulses = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen).
     var pickedLevel = 1
+    /// The summary element's text (feature 406).
+    var summary = ""
+    /// Whether the ambient sound is on (feature 406; off by default).
+    var soundOn = false
 
     /// The goal and the level's difficulty band, with its best stars when won (feature 405).
     var goalLabel: String {
@@ -153,10 +168,23 @@ final class EchoCartographerPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The feedback route of announcements and haptics (feature 406; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 406; tests and diagnostics).
+    private(set) var feedbackLog: [EchoCartographerFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 406).
+    private(set) var lights: EchoCartographerLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient sound (feature 406).
+    let sound: EchoCartographerSound
 
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = EchoCartographerLights(reducedFlash: reduceFlashing)
+        sound = EchoCartographerSound(recipe: EchoCartographerSoundRecipe.recipe(rootStep: 0, located: 0,
+                                                                                 stage: .loading))
         scene.reducedFlash = reduceFlashing
         scene.reduceMotion = reduceMotion
     }
@@ -204,6 +232,14 @@ final class EchoCartographerPresenter: ExperiencePresenter {
         let time = pulseTime(core, now: frame.time)
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // The lights settle on the very first frame only; every later change, a level change included, fades.
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         lastPlay = core.play
         gestures.tick(at: ProcessInfo.processInfo.systemUptime)
         scene.orbit = gestures.orbit
@@ -232,7 +268,17 @@ final class EchoCartographerPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        let previous: EchoCartographerExperienceCore? = latestCore
+        if let previous {
+            route(EchoCartographerFeedbackPlan.after(old: previous, new: core))
+            let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         absorbProgress(core)
+        mirror.summary = EchoCartographerFeedbackPlan.summaryText(core: core, cursor: mirror.cursor)
         mirror.levelNumber = core.levelNumber
         mirror.energy = play.energy
         mirror.budget = level.energy
@@ -309,6 +355,7 @@ final class EchoCartographerPresenter: ExperiencePresenter {
                 mirror.row = y
                 mirror.stepColumn(0)
                 mirror.stepRow(0)
+                refreshSummary()
             case .resetView:
                 break   // the controller has already returned to the authored orbit; the next frame draws it
             }
@@ -391,9 +438,11 @@ final class EchoCartographerPresenter: ExperiencePresenter {
             clearHint()
             return
         }
+        let revealed: Bool = mirror.hintLevel != level || mirror.hintText != hint.text
         hintKey = key
         mirror.hintLevel = level
         mirror.hintText = hint.text
+        if revealed { route(EchoCartographerFeedbackPlan.hint(text: hint.text)) }   // feature 406: announced as state
     }
 
     /// Ends the tutorial of the current level.
@@ -457,13 +506,52 @@ final class EchoCartographerPresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(result.code)"
+            let plan = EchoCartographerFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(result.code)
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
             }
         }
         return result
+    }
+
+    // MARK: Feedback and sound (feature 406)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: EchoCartographerFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its energy left, its beacons located and its stage.
+    static func recipe(_ core: EchoCartographerExperienceCore) -> AmbientLoopRecipe {
+        EchoCartographerSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Turns the ambient sound on or off; turning it on plays the recipe of the current chamber.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop stops).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
+
+    /// The summary element's text for the chosen cell (the cursor is presentation state of the panel).
+    func refreshSummary() {
+        guard let core = latestCore else { return }
+        mirror.summary = EchoCartographerFeedbackPlan.summaryText(core: core, cursor: mirror.cursor)
     }
 }
 #endif

@@ -5,7 +5,10 @@
 // and logs refusals; full accessibility comes in R02-G11-06. Feature 405 (R02-G11-05) T-R02G1105-005: the tutorial
 // instruction with Dismiss, Hint (each press reveals the next level), the failure explanation with Undo and Retry, the
 // goal with the level's band and best stars, Campaign / Daily / Practice and a picker of the open levels; all as
-// wrapping text in the panel, never over the chamber.
+// wrapping text in the panel, never over the chamber. Feature 406 (R02-G11-06) T-R02G1106-005 (FR-R02G1106-001, 005,
+// 006; clarification Q5): the summary element ("Chamber"), adjustable column and row steppers whose values name the
+// cell and what is known of it, a value in words on every control, refusals in words, the Sound toggle (off by
+// default), rows that become columns at accessibility text sizes, wrapping text and a 520-point readable width.
 #if os(iOS)
 import EchoCartographerCore
 import SwiftUI
@@ -22,6 +25,13 @@ struct EchoCartographerControls: View {
     let resetView: () -> Void
     /// Sends a control with its values through the presenter (which shows and logs a refusal).
     let sender: (String, [Double]) -> Void
+    /// The text size: rows become columns at accessibility sizes (feature 406).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the ambient loop plays only while it is.
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 406).
+    static let readableWidth: CGFloat = 520
 
     var body: some View {
         ScrollView(.vertical) {
@@ -32,9 +42,30 @@ struct EchoCartographerControls: View {
                 cellRow
                 playRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 406).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 406; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Ambient sound")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
 
     /// The level, energy and stage lines.
@@ -42,10 +73,14 @@ struct EchoCartographerControls: View {
         Text("Level \(mirror.levelNumber) · energy \(mirror.energy) of \(mirror.budget)")
             .font(.headline)
         Text(mirror.status).font(.subheadline)
-        Text(mirror.measureLabel).font(.footnote)
-        Text(mirror.targetLabel).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Chamber")
+            .accessibilityValue(mirror.summary)
+        Text(mirror.measureLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -53,21 +88,21 @@ struct EchoCartographerControls: View {
     @ViewBuilder private var cursorRow: some View {
         VStack(alignment: .leading, spacing: 6) {
             Stepper(mirror.columnLabel,
-                    onIncrement: { mirror.stepColumn(1) },
-                    onDecrement: { mirror.stepColumn(-1) })
+                    onIncrement: { mirror.stepColumn(1); presenter.refreshSummary() },
+                    onDecrement: { mirror.stepColumn(-1); presenter.refreshSummary() })
                 .accessibilityLabel("Column of the chosen cell")
-                .accessibilityValue(mirror.columnLabel)
+                .accessibilityValue(mirror.cursorLabel)
             Stepper(mirror.rowLabel,
-                    onIncrement: { mirror.stepRow(1) },
-                    onDecrement: { mirror.stepRow(-1) })
+                    onIncrement: { mirror.stepRow(1); presenter.refreshSummary() },
+                    onDecrement: { mirror.stepRow(-1); presenter.refreshSummary() })
                 .accessibilityLabel("Row of the chosen cell")
-                .accessibilityValue(mirror.rowLabel)
+                .accessibilityValue(mirror.cursorLabel)
         }
     }
 
     /// Pulse, claim and mark at the cursor.
     @ViewBuilder private var cellRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Pulse") { send("cell.pulse", cursorValues) }
                 .accessibilityLabel("Send a pulse from the chosen cell")
                 .accessibilityValue(mirror.cursorLabel)
@@ -82,15 +117,19 @@ struct EchoCartographerControls: View {
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last action")
+                .accessibilityValue(Self.values(mirror).energy)
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the action")
+                .accessibilityValue(Self.values(mirror).energy)
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue(Self.values(mirror).nextLevel)
             Button("Reset view") { resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue(Self.viewValue(presenter.gestures.orbit == .authored))
         }
     }
 
@@ -101,9 +140,10 @@ struct EchoCartographerControls: View {
                 Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityValue(instruction)
             }
         }
-        HStack(spacing: 12) {
+        row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
@@ -115,11 +155,13 @@ struct EchoCartographerControls: View {
         if let failure = mirror.failureText {
             VStack(alignment: .leading, spacing: 4) {
                 Text(failure).font(.callout).fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 12) {
+                row {
                     Button("Undo") { presenter.undoAction(port: port) }
                         .accessibilityLabel("Undo the last action")
+                        .accessibilityValue(Self.values(mirror).energy)
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
+                        .accessibilityValue(Self.values(mirror).retry)
                 }
             }
         }
@@ -127,18 +169,18 @@ struct EchoCartographerControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 405).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
-                .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
-                .accessibilityValue(Self.modeName(mirror.mode) == "daily" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with more energy")
-                .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "")
+                .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "practice"))
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -146,6 +188,7 @@ struct EchoCartographerControls: View {
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
+                .accessibilityValue(Self.values(mirror).playLevel)
         }
     }
 
@@ -164,6 +207,34 @@ struct EchoCartographerControls: View {
         case .daily: "daily"
         }
     }
+
+    /// The accessibility values in words of the controls that act on the play (feature 406, after feature 386's
+    /// convergence lesson): every native control carries a value.
+    struct Values: Equatable {
+        /// Undo and redo: the energy left of the level's energy.
+        let energy: String
+        /// Next level: the next open level, or that none is open.
+        let nextLevel: String
+        /// Retry: the level and the mode.
+        let retry: String
+        /// Play level: the picked level.
+        let playLevel: String
+    }
+
+    /// The button values of `mirror` (see ``Values``).
+    static func values(_ mirror: EchoCartographerMirror) -> Values {
+        let next: String = mirror.levelNumber < mirror.frontier ? "level \(mirror.levelNumber + 1)"
+            : "no further level open"
+        return Values(energy: "\(mirror.energy) of \(mirror.budget) energy left", nextLevel: next,
+                      retry: "level \(mirror.levelNumber), " + modeName(mirror.mode),
+                      playLevel: "level \(mirror.pickedLevel)")
+    }
+
+    /// The Reset view value: "authored view" or "orbited view".
+    static func viewValue(_ authored: Bool) -> String { authored ? "authored view" : "orbited view" }
+
+    /// A mode button's value: "selected" or "not selected".
+    static func selectedValue(_ selected: Bool) -> String { selected ? "selected" : "not selected" }
 
     /// The cursor as the values of a `cell.*` control.
     private var cursorValues: [Double] { [Double(mirror.column), Double(mirror.row)] }

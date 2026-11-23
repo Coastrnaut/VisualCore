@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "EchoCartographerExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing EchoCartographerExperienceTests",
+  "elapsed_seconds": 8.154,
+  "exit_code": 0,
+  "finished": "2026-11-23T12:55:33+00:00",
+  "gate": "R02-G11-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G11-06.sim-27.log",
+  "log_sha256": "50350257662fef3aaebe69d72d64f5a7fccec13de4086e3130df4eb08ca2e3ee",
+  "name": "sim-27",
+  "started": "2026-11-23T12:55:25+00:00",
+  "timed_out": false
+}
