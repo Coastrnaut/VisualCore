@@ -57,7 +57,8 @@ round-two games' daily multipliers are 37, 41, 43, 47, 53, 59, 61, 67, 71, 73 an
   harmonics matches a tone of the step it swings and its samples fill" — it advances once a tuning has been accepted;
   (2) "A string whose five samples all fill becomes a cyan bridge: bridge a path from the start to the violet goal in
   every step — a hint shows which string" — until the current pegs join the start to the goal in every step or the
-  level ends; (3) "Tap the goal or a step pip to test the crossing; if a step breaks, undo it" — until the level ends.
+  level ends (a tuning that already does both moves straight on to the third step; an undo that unbridges a step does
+  not move it back); (3) "Tap the goal or a step pip to test the crossing; if a step breaks, undo it" — until the level ends.
   `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G1205-001; SC-R02G1205-001.
 - Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted tuning and test
   record, undone ones included: 3 when at most the certified witness's action count (its tunings plus the test), 2 when
