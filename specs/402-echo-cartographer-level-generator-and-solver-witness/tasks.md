@@ -22,7 +22,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 3: Story 1 — every shipped level can be solved by reasoning (P1) 🎯
 
-- [ ] T-R02G1102-003 [US1] Implement `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSolver.swift`
+- [X] T-R02G1102-003 [US1] Implement `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSolver.swift` — Verified 2026-11-23: host-2 (incl. EchoCartographerSolverTests 10: region, hand counts and enumeration order, work limit, fitting equals an independent fixed-point brute force on 200 seeded levels, plans certified on seeded levels with pulses from known-open cells, unique placement equal to the beacons, counterexample, work and pulse bounds, wins) exit 0, 2026-11-23; agent A's tests retested by the lead
   (lead: region, fitting placements by pruned enumeration capped at 1 000, the greedy plan up to 6 pulses from the
   opening knowledge, work counted and bounded at 400 000, witness actions and replay check) with
   `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerSolverTests.swift` (agent A: hand levels with
