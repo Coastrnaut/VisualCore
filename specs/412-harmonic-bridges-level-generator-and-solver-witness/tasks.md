@@ -22,7 +22,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G1202-003 [US1] Implement `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSolver.swift`
+- [X] T-R02G1202-003 [US1] Implement `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesSolver.swift` — Verified 2026-11-23: host-2 exit 0 (HarmonicBridgesSolverTests 14: hand levels with known minima incl. already won, locked and beyond six tunings; work bound; patterns and options (maximal, not contained, lowest peg, none for locked) against an independent definition on 40 fixtures; independent brute force with every peg 1 … 12 and no pattern pruning over 120 fixtures and band 1–3 generator candidates: no smaller choice wins, the plan wins, smallerChoices and work recounted); solver and difficulty, with the generator the solver tests draw candidates from; agent A's tests retested by the lead
   (lead: bridge patterns per string and peg over the window's steps; options = maximal patterns among the other pegs not
   contained in the current pattern, each realised by its lowest peg; plans of k = 1 … 6 retuned strings, subsets of the
   useful strings in lexicographic index order, the product of their options in order, the first winning choice; smaller
