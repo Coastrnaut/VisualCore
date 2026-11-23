@@ -22,7 +22,7 @@ alone). A local script runs every part with one summary; CI gains a named host s
 ## Technical Context
 
 **Language/Version**: Swift 6. **Primary dependencies**: BackwardsAuroraCore (solver, generator, witness, play, scene
-geometry, palette); CryptoKit's SHA-256 for digests (as `BackwardsAuroraGolden`); VisualCoreRendering's
+geometry, palette); CryptoKit's SHA-256 for digests (as `NocturneGardenGolden`); VisualCoreRendering's
 `ProcessMemory.footprint()` in the experience tests. No new package.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02 --filter BackwardsAuroraRegression`; simulator
 `xcodebuild_package.py --only-testing` for the golden-frame and memory classes; script tests (alone).
