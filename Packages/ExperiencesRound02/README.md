@@ -671,3 +671,8 @@ Feature 414 (R02-G12-04) adds the gestures: `HarmonicBridgesOrbit` and the orbit
 `HarmonicBridgesGestureController` (tap a string to choose and audition it, drag up or down to tune its peg, tap the goal
 or a pip to test, double tap to reset, two-finger orbit), wired through the presenter's pointer entry with a "Reset
 view" button.
+
+Feature 415 (R02-G12-05) adds teaching and progression: `HarmonicBridgesHints` (three hint levels from the solver's
+minimal plan at the current pegs, and the failure explanation), `HarmonicBridgesProgress` (stars, unlocks, the daily
+level, practice and the tutorial steps), the adapter's `level.select`, `mode.*` and `tutorial.dismiss` controls with
+snapshot schema 2 and its migration, and the panel's tutorial, hint, failure, band and stars text.

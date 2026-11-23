@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G12-04: Harmonic Bridges gestures).
+Last updated: 2026-11-23 (R02-G12-05: Harmonic Bridges teaching and progression).
 
 ## 1. What is tested, and where
 
@@ -545,6 +545,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   (`host-1`, `host-2`), and every attestation's `elapsed_seconds` is read after a check: anything above about 450 s is
   split before the next gate. The one failed attempt of that gate (sim26) came from an outside
   `simctl shutdown all && simctl erase all`, not from the code.
+- **Harmonic Bridges teaching and progression** (R02-G12-05, 2026-11-23). Host: exact hints from every opening win all
+  100 levels in the witness's action count, 200 seeded states' hints are accepted and win, 500 seeded failures are
+  explained with independently computed numbers, and the progress, daily (× 83, 2026–2036) and schema 1 → 2 rules
+  (`swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridges`); simulator:
+  `HarmonicBridgesTeachingTests`. Once `level.next` needs an open level, scenario and identity tests that called it on
+  a fresh level must win first; the digest then includes progress, so expected digests move with it.
 - **Harmonic Bridges gestures** (R02-G12-04, 2026-11-23). Host: the picker against an independent projection (500
   seeded points × 3 sizes × 3 orbits), 500 seeded gesture scripts applied through the adapter, and all 100 levels won
   through the panel model (`swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridges`);

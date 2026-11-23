@@ -133,3 +133,27 @@ rule and the fingerprint and refuses damaged, edited and newer forms (`r02-g12.m
   gestures send no kernel action and the panel says the play is over; refusals are shown in words and logged with their
   reason code.
 - **Panel.** Every certified level can be won with the string and peg steppers, Tune and Test alone.
+
+## Teaching and progression (feature 415, R02-G12-05)
+
+- **Hints.** From the current state: the solver's minimal plan at the current pegs (`HarmonicBridgesSolver.plan(_:pegs:)`,
+  locks kept); the test when the pegs already join the start to the goal in every step, else the plan's first tuning
+  (lowest string index), provided the plan's tunings plus the test fit the actions left (and the work bound). Level 1
+  names the kind ("Tune a string so that more steps are bridged" / "Every step is bridged: test the crossing"), level 2
+  the string, level 3 the peg. A won play has no hint; a failed one suggests undo or retry; a state with no plan in the
+  moves left says so. From every opening, following exact hints wins in the certified witness's action count.
+- **Failure explanation.** A broken test: "Action m (the test) broke the crossing in step s at string i: the start
+  reached the goal in k of n steps." (or no string reaches across); the budget: "Action m (a tuning of string i to peg p)
+  spent the last move without a win: …"; actions are numbered from 1, steps and strings from 0, and k is counted at the
+  pegs after the failing action (`HarmonicBridgesFailureExplanation`).
+- **Tutorial.** Levels 1 … 3: tune → bridge → test → done, advanced by an accepted tuning (straight on to the test step
+  when that tuning already bridges every step), the pegs bridging every step, or the level's end; never moved back;
+  `tutorial.dismiss` ends it (`HarmonicBridgesTutorialStep`).
+- **Progress and modes.** Stars by actions spent (every accepted tuning and test record, undone ones included): 3 at the
+  witness's action count, 2 within + 2, else 1; the best result per level; level 1 open and a campaign win opening the
+  next; `level.select` and `level.next` only to open levels (`r02-g12.locked`); the daily level (days from 2026-01-01 ×
+  83) mod 100 + 1 from `mode.daily [y, m, d]` (`r02-g12.date` for an impossible date), recording but opening nothing;
+  practice replays the level with budget 60 and records nothing (`HarmonicBridgesProgress`, `HarmonicBridgesMode`).
+- **Stored form.** Snapshot schema 2 `{level, mode, progress, records, tutorial}` with a migration from schema 1 (levels up
+  to the saved one open, campaign mode, the tutorial at its first step); progress and mode are digested, the tutorial
+  step is not.
