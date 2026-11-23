@@ -51,8 +51,8 @@ to reverse, timeline freeze preview".
 - Q: What is a bend, which bends does a reversal change, and how are the limits applied? → A: the bend at an interior
   position k (1 … N − 2) is b(k) = s(k − 1) − 2·s(k) + s(k + 1), an exact integer. Reversing the section [i, j] (0 ≤ i <
   j ≤ N − 1) reverses the order of its samples; the bends strictly inside the section are carried along (b(i + 1) … b(j
-  − 1) reversed), so only the bends at its new seams — positions i − 1, i, j and j + 1 where they exist — can change. The
-  bend limit L (1 … 64) and the breaking limit B (L … 128) apply to |b|: the wave is smooth when every |b(k)| ≤ L; a
+  − 1) reversed), so only the bends at its new seams — positions i − 1, i, j and j + 1 where they exist — can change.
+  The bend limit L (1 … 64) and the breaking limit B (L … 128) apply to |b|: the wave is smooth when every |b(k)| ≤ L; a
   reversal tears the aurora when any of its seam bends has |b| > B. Impact: FR-R02G1001-003, 005, 014; SC-R02G1001-003,
   004.
 - Q: Which actions exist, what does each cost, and when is one refused? → A: `reverse(start, end)` with start < end;
