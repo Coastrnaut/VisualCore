@@ -12,6 +12,8 @@
 // Feature 407 (R02-G11-07) T-R02G1107-005 (clarifications Q2, Q4, Q5): "Replay best solution" for a level with a
 // verified stored solution, and during replay its position ("Replay: action k of n") with Step and Stop, each with a
 // label and a value; the Sound toggle saves the choice through `settings.sound`.
+// Feature 409 (R02-G11-09) T-R02G1109-003 (FR-R02G1109-001; clarification Q1): every control also carries the stable
+// identifier `experience.r02-g11.echo-cartographer.<name>` (`port.identifier`), the names listed in ``identifierNames``.
 #if os(iOS)
 import EchoCartographerCore
 import SwiftUI
@@ -32,6 +34,14 @@ struct EchoCartographerControls: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the ambient loop plays only while it is.
     @Environment(\.scenePhase) private var scenePhase
+
+    /// Every control's identifier name (clarification Q1 of feature 409), each once; the identifier is
+    /// `experience.r02-g11.echo-cartographer.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "pulse", "claim", "mark", "undo", "redo", "next-level", "reset-view", "hint", "dismiss-tutorial", "failure-undo",
+        "retry", "campaign", "daily", "practice", "play-level", "replay", "replay-step", "replay-stop", "column-picker",
+        "row-picker", "level-picker", "sound", "summary",
+    ]
 
     /// The widest the panel's content grows, padding included (clarification Q5 of feature 406).
     static let readableWidth: CGFloat = 520
@@ -69,6 +79,7 @@ struct EchoCartographerControls: View {
     @ViewBuilder private var soundToggle: some View {
         Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Ambient sound")
+            .accessibilityIdentifier(port.identifier("sound"))
             .accessibilityValue(mirror.soundOn ? "on" : "off")
     }
 
@@ -80,6 +91,7 @@ struct EchoCartographerControls: View {
             .fixedSize(horizontal: false, vertical: true)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Chamber")
+            .accessibilityIdentifier(port.identifier("summary"))
             .accessibilityValue(mirror.summary)
         Text(mirror.measureLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
@@ -95,11 +107,13 @@ struct EchoCartographerControls: View {
                     onIncrement: { mirror.stepColumn(1); presenter.refreshSummary() },
                     onDecrement: { mirror.stepColumn(-1); presenter.refreshSummary() })
                 .accessibilityLabel("Column of the chosen cell")
+                .accessibilityIdentifier(port.identifier("column-picker"))
                 .accessibilityValue(mirror.cursorLabel)
             Stepper(mirror.rowLabel,
                     onIncrement: { mirror.stepRow(1); presenter.refreshSummary() },
                     onDecrement: { mirror.stepRow(-1); presenter.refreshSummary() })
                 .accessibilityLabel("Row of the chosen cell")
+                .accessibilityIdentifier(port.identifier("row-picker"))
                 .accessibilityValue(mirror.cursorLabel)
         }
     }
@@ -109,12 +123,15 @@ struct EchoCartographerControls: View {
         row {
             Button("Pulse") { send("cell.pulse", cursorValues) }
                 .accessibilityLabel("Send a pulse from the chosen cell")
+                .accessibilityIdentifier(port.identifier("pulse"))
                 .accessibilityValue(mirror.cursorLabel)
             Button("Claim") { send("cell.claim", cursorValues) }
                 .accessibilityLabel("Claim a beacon at the chosen cell")
+                .accessibilityIdentifier(port.identifier("claim"))
                 .accessibilityValue(mirror.cursorLabel)
             Button("Mark") { send("cell.mark", cursorValues) }
                 .accessibilityLabel("Toggle a marker on the chosen cell")
+                .accessibilityIdentifier(port.identifier("mark"))
                 .accessibilityValue(mirror.cursorLabel)
         }
     }
@@ -124,15 +141,19 @@ struct EchoCartographerControls: View {
         row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last action")
+                .accessibilityIdentifier(port.identifier("undo"))
                 .accessibilityValue(Self.values(mirror).energy)
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the action")
+                .accessibilityIdentifier(port.identifier("redo"))
                 .accessibilityValue(Self.values(mirror).energy)
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityIdentifier(port.identifier("next-level"))
                 .accessibilityValue(Self.values(mirror).nextLevel)
             Button("Reset view") { resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityIdentifier(port.identifier("reset-view"))
                 .accessibilityValue(Self.viewValue(presenter.gestures.orbit == .authored))
         }
     }
@@ -144,12 +165,14 @@ struct EchoCartographerControls: View {
                 Text(instruction).font(.callout).fixedSize(horizontal: false, vertical: true)
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
                     .accessibilityValue(instruction)
             }
         }
         row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
+                .accessibilityIdentifier(port.identifier("hint"))
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
             Text(mirror.goalLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         }
@@ -162,9 +185,11 @@ struct EchoCartographerControls: View {
                 row {
                     Button("Undo") { presenter.undoAction(port: port) }
                         .accessibilityLabel("Undo the last action")
+                        .accessibilityIdentifier(port.identifier("failure-undo"))
                         .accessibilityValue(Self.values(mirror).energy)
                     Button("Retry") { presenter.retry(port: port) }
                         .accessibilityLabel("Start the level again")
+                        .accessibilityIdentifier(port.identifier("retry"))
                         .accessibilityValue(Self.values(mirror).retry)
                 }
             }
@@ -176,12 +201,15 @@ struct EchoCartographerControls: View {
         row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
+                .accessibilityIdentifier(port.identifier("campaign"))
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "campaign"))
             Button("Daily") { presenter.playDaily(port: port) }
                 .accessibilityLabel("Play today's daily level")
+                .accessibilityIdentifier(port.identifier("daily"))
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "daily"))
             Button("Practice") { send("mode.practice") }
                 .accessibilityLabel("Practise this level with more energy")
+                .accessibilityIdentifier(port.identifier("practice"))
                 .accessibilityValue(Self.selectedValue(Self.modeName(mirror.mode) == "practice"))
         }
         row {
@@ -189,9 +217,11 @@ struct EchoCartographerControls: View {
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
                 .accessibilityLabel("Level to play")
+                .accessibilityIdentifier(port.identifier("level-picker"))
                 .accessibilityValue(levelLabel(mirror.pickedLevel))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
+                .accessibilityIdentifier(port.identifier("play-level"))
                 .accessibilityValue(Self.values(mirror).playLevel)
         }
     }
@@ -211,14 +241,17 @@ struct EchoCartographerControls: View {
             row {
                 Button("Step") { presenter.stepReplay(port: port) }
                     .accessibilityLabel("Play the next action of the replay")
+                    .accessibilityIdentifier(port.identifier("replay-step"))
                     .accessibilityValue("Action \(mirror.replayPosition) of \(mirror.replayLength)")
                 Button("Stop") { presenter.stopReplay(port: port) }
                     .accessibilityLabel("Stop the replay")
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
                     .accessibilityValue("\(mirror.replayLength) actions")
             }
         } else if mirror.replayAvailable {
             Button("Replay best solution") { presenter.startReplay(port: port) }
                 .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityIdentifier(port.identifier("replay"))
                 .accessibilityValue("Level \(mirror.levelNumber)")
         }
     }

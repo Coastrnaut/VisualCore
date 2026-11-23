@@ -25,7 +25,7 @@ change (the shaders and reference of R02-G11-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1109-003 [US1] Edit `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerControls.swift`:
+- [X] T-R02G1109-003 [US1] Edit `Packages/ExperiencesRound02/EchoCartographer/Experience/EchoCartographerControls.swift`: — Verified 2026-11-23: sim-27 exit 0 (61 simulator tests incl. EchoCartographerIdentifierTests: the 23 identifier names of Q1 listed once each, well formed, built through the port with the experience prefix and unique; every panel control carries experience.r02-g11.echo-cartographer.<name>; agent E's tests retested by the lead)
   identifiers `experience.r02-g11.echo-cartographer.<name>` through `port.identifier` (spec Clarifications Q1 names:
   pulse, claim, mark, undo, redo, next-level, reset-view, hint, dismiss-tutorial, failure-undo, retry, campaign,
   daily, practice, play-level, replay, replay-step, replay-stop, column-picker, row-picker, level-picker, sound, summary; unique; `identifierNames` lists them) with
