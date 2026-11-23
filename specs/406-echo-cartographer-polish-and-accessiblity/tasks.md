@@ -12,7 +12,7 @@ native control carries a value in words from the start).
 - [X] T-R02G1106-001 Baselines after R02-G11-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on the committed tree; rendering baseline is R02-G11-05's rendering runs (exit 0)
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G11-05's
   rendering runs (exit 0)
-- [ ] T-R02G1106-002 Edit `Packages/ExperiencesRound02/Package.swift` (`EchoCartographerCore` and its tests gain
+- [X] T-R02G1106-002 Edit `Packages/ExperiencesRound02/Package.swift` (`EchoCartographerCore` and its tests gain — Verified 2026-11-23: host (EchoCartographer core tests with the new VisualCoreAudioDSP dependency) exit 0
   VisualCoreAudioDSP; `EchoCartographerExperience` gains VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as
   Backwards Aurora's targets have); `--name host -- swift test --package-path Packages/ExperiencesRound02 --filter
   EchoCartographerCoreTests`

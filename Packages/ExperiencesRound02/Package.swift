@@ -360,7 +360,9 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               // Feature 406 (R02-G11-06): the ambient recipe (pure, host-testable).
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
                 path: "EchoCartographer/Core"),
         .testTarget(name: "EchoCartographerCoreTests",
                     dependencies: ["EchoCartographerCore",
@@ -369,7 +371,8 @@ let package = Package(
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreDiagnostics", package: visualCore),
-                                   .product(name: "VisualCorePersistence", package: visualCore)],
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "EchoCartographer/CoreTests"),
         // Feature 403 (R02-G11-03): Echo Cartographer's experience (presenter, scene, controls) and its simulator tests.
         .target(name: "EchoCartographerExperience",
@@ -379,7 +382,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 406 (R02-G11-06): the ambient loop.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "EchoCartographer/Experience"),
         .testTarget(name: "EchoCartographerExperienceTests",
                     dependencies: ["EchoCartographerExperience", "EchoCartographerCore",
