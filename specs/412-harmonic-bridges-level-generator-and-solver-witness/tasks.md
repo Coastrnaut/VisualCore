@@ -9,7 +9,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1202-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test
+- [X] T-R02G1202-001 Baselines: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02 -- swift test — Verified 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on the committed tree; rendering baseline is R02-G12-01's rendering runs (exit 0)
   --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G12-01's rendering runs (exit 0)
 
 ## Phase 2: Foundational
