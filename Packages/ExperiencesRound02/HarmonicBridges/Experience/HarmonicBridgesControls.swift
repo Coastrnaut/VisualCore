@@ -21,6 +21,8 @@
 // n", identifier `replay-position`) with Step (identifier `replay-step`, value "Action k of n") and Stop (identifier
 // `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
 // `settings.sound`; the mode's name includes "replay".
+// Feature 419 (R02-G12-09) T-R02G1209-003 (FR-R02G1209-001; clarification Q1): the identifiers the panel gives through
+// `port.identifier` (`experience.r02-g12.harmonic-bridges.<name>`) are listed in ``identifierNames``, each once.
 #if os(iOS)
 import HarmonicBridgesCore
 import SwiftUI
@@ -38,6 +40,15 @@ struct HarmonicBridgesControls: View {
     let resetView: () -> Void
     /// Sends a control with its values through the presenter (which shows and logs a refusal).
     let sender: (String, [Double]) -> Void
+    /// Every identifier name the panel gives (clarification Q1 of feature 419), each once; the identifier is
+    /// `experience.r02-g12.harmonic-bridges.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "string", "peg", "tune", "test", "undo", "redo", "next-level", "reset-view", "dismiss-tutorial", "hint",
+        "failure-undo", "retry", "campaign", "daily", "practice", "level-picker", "play-level", "replay", "replay-step",
+        "replay-stop", "sound", "summary", "status", "actions", "message", "failure", "instruction", "hint-text", "goal",
+        "replay-position",
+    ]
+
     /// The text size: rows become columns at accessibility sizes (feature 416).
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 416).
