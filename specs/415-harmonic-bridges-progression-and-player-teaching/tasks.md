@@ -35,7 +35,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 405
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1205-003 [P] [US1] [US4] Create
+- [X] T-R02G1205-003 [P] [US1] [US4] Create — Verified 2026-11-23: Verified 2026-11-23: host-3 exit 0 (HarmonicBridgesProgressTests 14: tutorial tune → bridge → test → done on levels 2 and 3 and tune → test straight on level 1 by the real witnesses, never moved back by undo; stars 3/2 by actions spent incl. undone ones; frontier over a 100-level script; practice records nothing, daily opens nothing; every date 2026–2036 in 1…100 by × 83; leap years, wrapped negative days, impossible dates; Codable round trips); agent C retested by the lead
   `Packages/ExperiencesRound02/HarmonicBridges/Core/HarmonicBridgesProgress.swift` (`HarmonicBridgesTutorialStep`
   tune → bridge → test → done with the texts of clarification Q2, advanced by an accepted tuning (tune → bridge, and on
   to test at once when that tuning already bridges every step), the pegs bridging every step (bridge → test) or the
