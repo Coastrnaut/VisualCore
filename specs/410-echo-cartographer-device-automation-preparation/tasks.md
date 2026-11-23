@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for EC-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g11`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g11.echo-cartographer`
-- [ ] T-R02G1110-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Echo Cartographer definition passes; a
+- [X] T-R02G1110-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Echo Cartographer definition passes; a — Verified 2026-11-23: script-tests exit 0, 682 tests incl. EchoCartographerDeviceRowsCheckTests 8 (the real definition passes with 8 rows and 12 scenarios; a scenario removed from the manifest, an unknown scenario, EC-D1 without pass, T-R02G1109-011 or T-R02G1104-011 uncovered each fail by name; release step device-rows-r02-g11 runs the check), placed above the __main__ block; agent A's tests retested by the lead
   copy with a scenario removed, a copy with EC-D1's `pass` field removed and a copy with T-R02G1109-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g11` runs the check for
   `r02-g11.echo-cartographer`); `--name script-tests` (alone)
