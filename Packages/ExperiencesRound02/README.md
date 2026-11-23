@@ -609,3 +609,8 @@ only what the player knows), `EchoCartographerSceneGeometry` (chamber meshes, ca
 `EchoCartographerShaders` (chamber and glow programs with signed-distance shading and the pulse, echo rings and wall
 flares), the adapter `EchoCartographerExperienceCore`, the scenario manifest, and the iOS target
 `EchoCartographerExperience` (presenter, chamber scene, control panel), registered as a candidate.
+
+Feature 404 (R02-G11-04) adds the gestures: `EchoCartographerOrbit` and the orbiting camera, the analytic
+`EchoCartographerPicker` (floor-plane ray, 22-point marker targets) and the host-tested
+`EchoCartographerGestureController` (tap to pulse or move the cursor, drag to place or move markers, hold to claim,
+double tap to reset, two-finger orbit), wired through the presenter's pointer entry with a "Reset view" button.

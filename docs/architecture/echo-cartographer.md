@@ -97,3 +97,21 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g11.malformed`, `.
 - **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest a32a593b…dca9) and linked into the app
   as a candidate (`ExperienceRegistry.candidates`) until X-R02-G11; the scenario manifest holds the standard scenarios,
   `full-playthrough`, `hero`, 80 acceptance scenarios and three fixtures.
+
+## Gestures (feature 404, R02-G11-04)
+
+- **Picking.** At touch-down the touch ray through the drawn camera meets the floor plane y = 0: a marker whose ring
+  centre projects within 22 points wins (the nearest, ties to the lower cell index), then the cell whose square holds
+  the hit point inside the chamber; anything else is empty space (`EchoCartographerPicker`).
+- **Tap to emit a pulse.** A tap (under 10 points, lifted before 0.5 s by event timestamps) on a cell known open sends
+  one `cell.pulse` while playing; a tap on any other chamber cell moves the panel's cursor there and sends nothing.
+- **Drag markers to triangulate.** A drag (16 points or more) from a cell without a marker places one where the finger
+  lifts (`cell.mark`); a drag from a marker moves it (`cell.mark` on the old cell, then on the new one); releasing on
+  its own cell, on a marked cell or outside the chamber sends nothing. The kernel refuses a ninth marker.
+- **Hold to claim.** A press held still for 0.5 s and then lifted sends one `cell.claim` of the held cell; moving 10
+  points after the hold armed cancels it. The cursor follows every placed, moved or claimed cell.
+- **Orbit.** Two fingers orbit (yaw ±35°, pitch −15° … +20°) with the field of view refitted at every aspect 0.4 … 2.5;
+  a double tap on empty space or "Reset view" returns to the authored view. Orbit and cursor are never saved and never
+  reach the kernel (`EchoCartographerGestureController`); outside the playing stage gestures send no kernel action and
+  a finished play says so; refusals are shown with their reason code and logged.
+- **Panel.** Every certified level can be won with the column and row steppers, Pulse and Claim alone.

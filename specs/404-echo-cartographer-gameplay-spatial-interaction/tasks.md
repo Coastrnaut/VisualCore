@@ -75,7 +75,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1104-006 Docs: `docs/architecture/echo-cartographer.md` (gestures), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G1104-006 Docs: `docs/architecture/echo-cartographer.md` (gestures), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-23: round02-host (swift test --package-path Packages/ExperiencesRound02) exit 0; architecture doc gestures section, ExperiencesRound02 README, testing doc lesson (overloads on enums sharing case names recurse; a marker press starts as a cell press); validate_docs passes
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1104-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`
