@@ -1,11 +1,11 @@
 // ECGSupport — feature 409 (R02-G11-09) T-R02G1109-004 (FR-R02G1109-002; SC-R02G1109-001; clarifications Q1, Q2):
 // helpers of the interface tests of Echo Cartographer (R02-G11) inside the one app, modelled on `BASupport` (feature
-// 399). The namespace is `ECG` (`EC` belongs to Effects Composer). Echo Cartographer is a candidate, so every launch
-// carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh
-// start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens the experience directly
-// with `-openExperience r02-g11.echo-cartographer`; a relaunch (`ECG.reopen`) backgrounds the app first (its save
-// point), terminates it and starts again without the reset, so the stored progress (solved levels, stars, the frontier,
-// the verified winning trace) survives.
+// 399). The namespace is `ECG` (`EC` belongs to Effects Composer). Echo Cartographer was a candidate until X-R02-G11
+// (2026-11-23); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become
+// available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the
+// welcome and opens the experience directly with `-openExperience r02-g11.echo-cartographer`; a relaunch
+// (`ECG.reopen`) backgrounds the app first (its save point), terminates it and starts again without the reset, so the
+// stored progress (solved levels, stars, the frontier, the verified winning trace) survives.
 //
 // The canvas (`session.canvas`) is labelled with the presenter's description (`EchoCartographerPresenter.describe`):
 // "Echo Cartographer level n. ", the progress "k of b beacon(s) located, e energy left" (with the last pulse's report),

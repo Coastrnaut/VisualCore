@@ -281,7 +281,8 @@ import Testing
                          "r02-g07.amethyst-escape",
                          "r02-g08.faceted-forge",
                          "r02-g09.nocturne-garden",
-                         "r02-g10.backwards-aurora"])
+                         "r02-g10.backwards-aurora",
+                         "r02-g11.echo-cartographer"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")

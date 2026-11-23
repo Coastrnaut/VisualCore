@@ -1309,7 +1309,7 @@
         "catalog_sha256": "a32a593b898acf77bd86c25509a68e0b5f8a1227f356d2d3b91c8cfff5c8dca9",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g12.harmonic-bridges",

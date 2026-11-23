@@ -1505,7 +1505,7 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "NocturneGardenCore", "NocturneGardenExperience",
                                     # Feature 393 (R02-G10-03): Backwards Aurora, integrated at X-R02-G10.
                                     "BackwardsAuroraCore", "BackwardsAuroraExperience",
-                                    # Feature 403 (R02-G11-03): Echo Cartographer, a registered candidate until X-R02-G11.
+                                    # Feature 403 (R02-G11-03): Echo Cartographer, integrated at X-R02-G11.
                                     "EchoCartographerCore", "EchoCartographerExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):

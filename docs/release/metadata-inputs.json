@@ -293,9 +293,17 @@
       "name": "Backwards Aurora",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G11",
+      "id": "r02-g11.echo-cartographer",
+      "name": "Echo Cartographer",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "4b39f23fcb49bccec217b2204866a6a9399f4f6d0879900edf90c3665c6f1df1",
+  "ledger_sha256": "f34fd3a5329de2109a67eae1020925c66cb2581d7f4dc680f9736b92bd6773e4",
   "privacy_answers": "unproven",
   "schema": 1
 }

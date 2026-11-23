@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g11.echo-cartographer",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g11.echo-cartographer --runtime 27",
+  "elapsed_seconds": 317.606,
+  "exit_code": 0,
+  "finished": "2026-11-23T16:18:29+00:00",
+  "gate": "X-R02-G11",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G11.followthrough-verify27.log",
+  "log_sha256": "16dab83e2c56fc5f2b864bdcf7dee684b47bade761aa0f116afdff842cd4dda4",
+  "name": "followthrough-verify27",
+  "started": "2026-11-23T16:13:12+00:00",
+  "timed_out": false
+}
