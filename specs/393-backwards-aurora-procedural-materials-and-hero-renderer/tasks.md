@@ -35,7 +35,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   constants equal to the CPU's) with `Packages/ExperiencesRound02/BackwardsAurora/CoreTests/BackwardsAuroraShaderSourceTests.swift`
   (version line, declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants
   match); agent A; `--name host-2`
-- [ ] T-R02G1003-004 [P] [US1] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneGeometry.swift`
+- [X] T-R02G1003-004 [P] [US1] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraSceneGeometry.swift` — Verified 2026-11-22: host-3 (108 tests incl. BackwardsAuroraSceneGeometryTests 7: finite bounded streams for catalog levels 1, 50, 100 and zigzag levels of 12 and 32 samples at ±64 (every bend a kink, a tear, sections at each end, budgets 1 and 40, NaN time); every sample point, ring and gauge bar inside the view with margin at 7 aspects; identical marker positions at every tier; ribbon through the exact samples; counter-clockwise winding; fallback parts coloured) exit 0, lead retest; dashed band edges in the mesh
   (clarification Q1: sample k at x = −1 + (k + 0.5)·2/N, y = 0.6·s / 64, z = 0; ribbon 0.06 high through the sample
   points, each segment in 4 straight steps; trailing layer i at z = −0.06·i, y + 0.04·i; ghost polyline 0.024 high at z
   = −0.05; checkpoint ticks y −0.7 … 0.7 at z = −0.02 with rings (radius 0.045, line 0.012) at the target height at z =
