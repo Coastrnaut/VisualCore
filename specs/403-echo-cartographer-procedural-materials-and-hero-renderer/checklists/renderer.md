@@ -28,8 +28,9 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-23; failu
   [Consistency, Spec §FR-R02G1103-004; Clarifications Q2]
 - [x] CHK006 Is it stated that unknown walls and unlocated beacons are never drawn, so the picture can never solve the
   puzzle? [Clarity, Spec §US2; research R2]
-- [x] CHK007 Is the drawing order and depth use stated (opaque floor, blocks and pillars depth-tested; rings, rays and
-  glow additive and last)? [Consistency, Spec §Clarifications Q1]
+- [x] CHK007 Is the drawing order and depth use stated (depth testing off; flat layers first, then blocks and pillars
+  back to front with culling, then the gauge; glow additive and last)? [Consistency, Spec §Clarifications Q1] —
+  corrected during implementation 2026-11-23: depth testing was first planned on.
 
 ## Empty and error states
 

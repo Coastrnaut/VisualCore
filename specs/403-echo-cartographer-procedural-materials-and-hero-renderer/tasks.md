@@ -35,7 +35,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   the CPU's) with `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerShaderSourceTests.swift`
   (version line, declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants
   match); agent A; `--name host-2`
-- [ ] T-R02G1103-004 [P] [US1] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSceneGeometry.swift`
+- [X] T-R02G1103-004 [P] [US1] Create `Packages/ExperiencesRound02/EchoCartographer/Core/EchoCartographerSceneGeometry.swift` — Verified 2026-11-23: host-3 (incl. EchoCartographerSceneGeometryTests 17: finite and bounded meshes on extreme chambers, every reference point inside the 5 % margin at 7 aspects, same positions at every tier, nothing on unknown cells, only located pillars, gauge counts, material codes, struck distances, painter's order and outward winding) exit 0, 2026-11-23; depth testing off (spec Q1 and CHK007 corrected), rows sorted outside-in for the centred camera; agent B's geometry retested by the lead
   (clarification Q1: s = 1.8 / max(W, H), cell centre X = (x + 0.5 − W / 2)·s, Z = (y + 0.5 − H / 2)·s; ground at y =
   −0.01 over the chamber plus 0.1; floor tiles 0.9·s on known-open cells; entry diamond 0.5·s at y = 0.005; marker rings
   radius 0.32·s line 0.06·s at y = 0.01; rays 0.05·s wide at y = 0.015 to the struck wall's face or the edge; pulse and

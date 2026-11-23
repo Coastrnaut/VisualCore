@@ -59,7 +59,10 @@ primitives plus instanced wireframe edge strips".
   wide and 0.8·s high; and the energy gauge, a row of `energy` bars in front of the chamber at z = 1.0, y = 0, spread evenly from x = −0.9
   to 0.9 (each 1.8 / budget wide with a gap of a fifth of that, 0.06 deep), lit for the energy left (corrected at the
   checklist, 2026-11-23: the gauge's extent was added). Walls struck by the last pulse flare (brighter edges) when the pulse ring reaches their distance, fading
-  over 0.5 s. Depth testing is on for floor, blocks and pillars; rings, rays and glow are additive and drawn last.
+  over 0.5 s. Depth testing is off (the shared mesh renderer's path, which may have no depth buffer): the flat
+  layers are drawn first, then the blocks and pillars back to front (by row from the far side, then by column) with
+  back faces culled, then the gauge; the glow is additive and drawn last (corrected during implementation, 2026-11-23:
+  depth testing was first planned on).
   Unknown cells draw nothing but the ground; unlocated beacons are never drawn. The camera is a fixed authored
   perspective from above and in front (eye (0, 2.4, 1.9) looking at (0, 0, 0.05)) fitted to the box x −1 … 1, z −1 … 1.1,
   y 0 … 0.8 with a 5 % margin for aspect 0.4 … 2.5, so it never moves while a level is played. Nothing drawn is
