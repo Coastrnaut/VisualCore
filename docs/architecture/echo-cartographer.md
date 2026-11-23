@@ -168,3 +168,24 @@ fingerprint and refuses damaged, edited and newer forms (`r02-g11.malformed`, `.
 - **Replay.** `replay.start [level]` replays the best stored solution action by action (`replay.step`, `replay.stop`);
   other play actions are refused with "Stop the replay first."; a replayed win records nothing.
 - **Settings.** `settings.sound [0 … 1]` saves the sound choice in the snapshot; the presenter applies it on opening.
+
+## Regression net (feature 408, R02-G11-08)
+
+- **Solver regression.** For all 100 levels, in ten groups of ten: the generated level equals its witness, the witness's
+  actions replay to a win in exactly their count (pulses plus beacons) within the energy with the stored per-pulse echo
+  digests and per-action fingerprints, and the solver re-finds exactly the witness's pulses with its placements, its
+  placements before the last pulse and its counterexample, with work at most 400,000 (the largest is 14,282, level 99);
+  ten kinds of alteration (a beacon cell, a chamber wall, the energy, the tolerance, the miss cost, a plan pulse, a
+  witness action, an echo digest, a fingerprint, the placements count) each fail naming the level and the part. Work is
+  counted, never timed.
+- **Golden frames.** `EchoCartographerGolden` (test builds only; forbidden in the Release binary) describes 16 frames
+  (levels 1, 21, 41, 61, 81 at tiers 0 … 2 after their first certified pulses and one marker, plus the hero frame) at
+  1,152 × 768: the known floor tile centres, wall tops, marker rings, located pillars, the entry and the first gauge bar
+  in 1/8 pixel, the counts and the palette, hashed with SHA-256 and pinned in `golden-frames.json`; a recomputed frame
+  passes on an equal digest or within one quantum with equal counts and colours, and the file is rewritten only with
+  `ECHO_CARTOGRAPHER_WRITE_GOLDEN=1`. On the simulator the same frames are rendered and checked against their
+  descriptions with the feature-403 frame checks.
+- **Memory.** Twelve open-draw-warn-close cycles keep the footprint within 16 MB of the first cycle when the class runs
+  alone (measured growth 0.86 MB) and leave the chamber scene with no GPU objects after every close and memory warning.
+- **Running it.** `python3 scripts/echo_cartographer_regression.py` runs the host part and the simulator classes with one
+  summary line per part; CI runs the host part as "Echo Cartographer regression (host)".

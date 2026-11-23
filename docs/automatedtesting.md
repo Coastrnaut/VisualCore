@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G11-03: Echo Cartographer renderer; depth-off painter order).
+Last updated: 2026-11-23 (R02-G11-08: Echo Cartographer regression net; cached host builds).
 
 ## 1. What is tested, and where
 
@@ -438,6 +438,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `BACKWARDS_AURORA_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
   BackwardsAuroraRegressionGoldenTests`. Agents that write files while an evidence chain runs write them to a scratch
   folder for the lead to copy in, so the chain tests the tree it started with.
+- **Echo Cartographer regression net** (R02-G11-08, 2026-11-23). `python3 scripts/echo_cartographer_regression.py` runs
+  the solver regression and golden digests on the host, then the golden-frame and memory classes on sim-27.2 with
+  `TEST_RUNNER_ECHO_CARTOGRAPHER_MEMORY_ISOLATED=1` (measured growth 0.86 MB over 12 cycles); regenerate the pinned
+  frames only on purpose with `ECHO_CARTOGRAPHER_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02
+  --filter EchoCartographerRegressionGoldenTests`. A host suite's build is cached after the first filtered run, so a
+  check of a few seconds still ran its tests: read "Test run with N tests" in the log, not the time.
 - **No `+` inside an `#expect` comment** (R02-G10-08, 2026-11-23). A message built as `"…" + "…"` in the second
   argument of `#expect` does not compile (the macro wants a `Comment`, and the concatenation is inferred as `String`);
   build the text in a `let` first and pass `"\(note)"`. The simulator build caught it on the first run (sim-27 exit 65).

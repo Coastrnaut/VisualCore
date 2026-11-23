@@ -630,3 +630,7 @@ Feature 407 (R02-G11-07) adds persistence and replay: results carry their winnin
 (`EchoCartographerReconciliation` replays them on restore and drops what does not verify), snapshot schema 3 with
 migrations from 1 and 2, the replay mode (`replay.start`, `replay.step`, `replay.stop`) and the saved sound choice
 (`settings.sound`), with the panel's replay controls.
+
+Feature 408 (R02-G11-08) adds the regression net: the solver regression over the 100 witnesses, `EchoCartographerGolden`
+with the pinned `golden-frames.json` (16 code-computed frame descriptions), the simulator golden-frame and memory
+classes, `scripts/echo_cartographer_regression.py` and the CI step "Echo Cartographer regression (host)".
