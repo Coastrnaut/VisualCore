@@ -28,7 +28,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1003-003 [P] [US1] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraShaders.swift`
+- [X] T-R02G1003-003 [P] [US1] Create `Packages/ExperiencesRound02/BackwardsAurora/Core/BackwardsAuroraShaders.swift` — Verified 2026-11-22: host-2 (101 tests incl. BackwardsAuroraShaderSourceTests 10: version and precision; every uniform the scene sets declared and used; 8 and 6 vec4 slots (≤ 16); no samplers; constant-bounded loops; palette constants within 1/255 of BackwardsAuroraPalette; distinct material codes 0–12; pulse direction and per-tier counts on the CPU reference; glow gain per tier and the Reduce Flashing cap) exit 0, lead retest; band dashes come from the mesh (agent B)
   (aurora and glow sources, GLSL ES 3.00; cyan ribbon with a shimmer and direction-coded pulse beads driven by `u_time`
   (left to right outside the chosen section, right to left inside it, at most 2 per section); trailing layers fading;
   lilac ghost; rings, discs, kink and tear crosses, band with dashed edges; uniform names; glow gain cap; palette
