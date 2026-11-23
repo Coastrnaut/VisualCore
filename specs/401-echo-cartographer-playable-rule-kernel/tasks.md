@@ -31,7 +31,7 @@ in this feature (the chamber, its rays and echoes are the CPU reference the rend
 
 ## Phase 3: Story 1 — map the chamber and find the beacons (P1) 🎯
 
-- [ ] T-R02G1101-003 [P] [US1] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerChamberTests.swift`
+- [X] T-R02G1101-003 [P] [US1] Create `Packages/ExperiencesRound02/EchoCartographer/CoreTests/EchoCartographerChamberTests.swift` — Verified 2026-11-23: host-2 (incl. EchoCartographerChamberTests 7: rays vs explicit coordinate stepping and path lengths vs fixed-point relaxation on 500 seeded chambers incl. wall emitters and unreachable beacons; sorted echoes and delays; hand cases) exit 0, 2026-11-23; agent A's tests retested by the lead
   (agent A: on 500 seeded chambers and emitters, every ray equals explicit coordinate stepping (open cells, struck wall or
   border, distance); every path length equals repeated relaxation to a fixed point (no queue); unreachable cells and
   walls have none; echoes are the sorted beacon path lengths; delays are 24 × distance; hand cases: a wall next to the

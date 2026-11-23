@@ -5,7 +5,9 @@
 // beacons on distinct open cells of the entry's connected region (side steps), other than the entry. Its known winning
 // actions are one pulse from the entry followed by one claim on each beacon's own cell, in beacon order: each claim is
 // at distance 0 of its beacon, so it locates exactly that beacon whatever the tolerance, and the last claim wins. The
-// energy is 1 + 0 … 3 (the pulse costs 1; hits are free), so the known actions never run out of energy.
+// energy is 1 + 0 … 3 (the pulse costs 1; hits are free). With energy 2 or more the known actions win on the last claim;
+// with energy 1 the opening pulse spends the last energy with beacons hidden and fails the level (an undo then returns
+// to playing and the claims alone win). Both kinds occur among the 500 fixtures and the tests rely on both.
 import Foundation
 import VisualCoreSimulation
 @testable import EchoCartographerCore
@@ -78,7 +80,7 @@ enum EchoCartographerFixtures {
     ///     row 3: . # # # . # .
     ///     row 4: . . . . . . .
     ///
-    /// entry (0, 0); beacons (2, 2) and (6, 0); tolerance 1; energy 6; a miss costs 2.
+    /// entry (0, 0); beacons (6, 0) and (2, 2) in cell-index order; tolerance 1; energy 6; a miss costs 2.
     static func handLevel(tolerance: Int = 1, energy: Int = 6, missCost: Int = 2) -> EchoCartographerLevel {
         let rows: [String] = ["...#...", ".#.#.#.", ".#...#.", ".###.#.", "......."]
         var walls: Set<Int> = []
