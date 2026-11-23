@@ -124,14 +124,15 @@ that grows and stays readable, and controls that stay usable.
 **Why this priority**: photosensitivity and motion sensitivity are safety concerns; expanding light rings and flaring
 walls are bright, moving subjects.
 
-**Independent Test**: with Reduce Flashing, no drawn element changes brightness more than three times a second and the
-glow stays capped; with Reduce Motion, the rings and flares are at rest; the panel lays out at the largest accessibility
+**Independent Test**: with Reduce Flashing, no faded element changes brightness more than three times a second, no ring
+or flare is drawn and the glow stays capped; with Reduce Motion, the rings and flares are at rest; the panel lays out at the largest accessibility
 text size without clipping the controls.
 
 **Acceptance Scenarios**:
 
-1. **Given** Reduce Flashing, **When** a pulse is sent, the level is won or it fails, **Then** every brightness change is
-   a fade of at least 0.4 s, not a flash.
+1. **Given** Reduce Flashing, **When** a pulse is sent, the level is won or it fails, **Then** no ring or flare is drawn
+   and every change of the chamber's glow and the won brightening is a fade of at least 0.4 s, not a flash (what the
+   player's action reveals — rays, walls, tiles, markers — appears with the action).
 2. **Given** Reduce Motion, **When** two frames of the same state are drawn at different times, **Then** they are
    identical.
 
