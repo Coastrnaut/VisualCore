@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G10-05 (migration ledger, game feature of experience R02-G10) · ID namespace FR-R02G1005-###,
 SC-R02G1005-###, T-R02G1005-###
@@ -26,6 +26,56 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G10-01 … 04.
 - **Model:** feature 385 (Nocturne Garden's progression and teaching) for hints, tutorial, failure text, progress, daily
   and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+385's answers where the games agree. Facts checked in code (read-only, 2026-11-23): `BackwardsAuroraSolver` certifies a
+level by an iterative-deepening search over reversible sections (20,000 reversals evaluated at most) from the opening
+wave, pruned by the seam-count bound ⌈β / 4⌉; a play fails on a tear (`tear(reversal, seam)`) or when the reversals
+spent reach the budget (`budget`); undo works in playing, paused and failed, a won play is final; levels 1 … 3 carry the
+tutorial flag; manifest budgets are 8 … 19 and the level's range 1 … 40; the adapter prepares level (seed mod 100) + 1
+and snapshots `{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily
+multipliers are 37, 41, 43, 47, 53, 59, 61, 67 and 71.
+
+- Q: How is a hint computed and what does each level reveal? → A: the plan comes from the current state. A won play has
+  no hint; a failed play's hint is "Undo the last reversal or retry the level." While playing: the solver's bounded
+  search (a new entry point) from the current wave, looking for the fewest further reversals that win within the
+  reversals left, by the same iterative deepening and seam-count pruning as the certification. Its first reversal is the
+  plan: level 1 names its length ("Reverse a section of 4 samples"), level 2 adds where it starts ("… starting at sample
+  3"), level 3 names both ends ("Reverse samples 3 to 6"). When no plan is found within the bound: "No way to fold the
+  aurora back was found in the reversals left: undo the last reversal or retry the level." Hints never change the state,
+  are unlimited, do not affect stars and reset to level 1 after any change of the play. "A state that can still win"
+  means one whose plan exists. Impact: FR-R02G1005-002; SC-R02G1005-002.
+- Q: What does the tutorial show, and when does it advance? → A: on levels 1 … 3, three instructions in order: (1) "Tap
+  two samples to mark the ends of a section (or use the panel) — a hint shows which" — it advances once a reversal has
+  been accepted; (2) "Swipe along the section to reverse it, or hold it first to preview; keep every bend within the
+  limit and never tear the aurora" — until a second reversal is accepted or the level ends; (3) "Bring every checkpoint
+  to its true height before the reversals run out" — until the level ends. `tutorial.dismiss` ends it for that level;
+  undo never moves it back. Impact: FR-R02G1005-001; SC-R02G1005-001.
+- Q: What are the progress and star rules? → A: stars measure the reversals made, undone ones included (the play's
+  reversal records): 3 when at most the certified smallest reversal count, 2 when at most that + 2, else 1; per level
+  the best (fewest) reversals made of a won campaign play and its stars, a better result replacing a worse one; level 1
+  open; a campaign win opens the next; `level.select [n]` opens any open level and refuses others (`r02-g10.locked`);
+  `level.next` moves to the next open level (refused when none, `r02-g10.locked`); the five bands of 20 are the
+  certified difficulty bands. Impact: FR-R02G1005-004; SC-R02G1005-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 73) mod 100 + 1, negative day counts wrapped into 0 … 99 (73 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g10.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the budget raised to the kernel's
+  maximum (40); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G1005-005;
+  SC-R02G1005-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 385: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the snapshot payload becomes schema 2
+  (`{level, records, progress, mode, tutorial}`) with a migration from schema 1 (level 1 open plus the restored level,
+  campaign mode, tutorial at its first step on tutorial levels). Failures are explained from the failing reversal: tear
+  "Reversal m (samples i to j) tore the aurora at seam s: a bend of b against the breaking limit B."; budget "The
+  reversals ran out: b of b spent with k of n checkpoints matched and a worst bend of w against the limit L.", each
+  followed by "Undo the last reversal or retry the level." Impact: FR-R02G1005-003, 007; SC-R02G1005-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
