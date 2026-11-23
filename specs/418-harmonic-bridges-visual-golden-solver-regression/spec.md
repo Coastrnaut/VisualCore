@@ -163,7 +163,8 @@ simulator parts and reports one summary.
   differing part.
 - **FR-R02G1208-003**: A golden set of frames (levels, tiers, frame times, including the hero frame) MUST have a
   code-computed description (projected island tops, string midpoints, the membrane check points of the shown step's
-  bridges, the filled and hollow mark counts, the step pips, the gauge's lit and total bars, palette colours) pinned in the repository with its digest;
+  bridges, the step pips, the gauge's first bar, the counts of islands, strings, bridges, filled and hollow marks, pips
+  and lit and total gauge bars, palette colours) pinned in the repository with its digest;
   a recomputed description matches when its digest is equal or every position lies within one 1/8-pixel quantum and
   every count and colour is equal.
 - **FR-R02G1208-004**: Rendered frames of the golden set on the simulator MUST match their descriptions within the
