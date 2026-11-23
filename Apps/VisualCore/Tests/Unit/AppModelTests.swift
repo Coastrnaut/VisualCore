@@ -10,6 +10,7 @@ import ColorfallCanyonsCore
 import EchoCartographerCore
 import FacetedForgeCore
 import Foundation
+import HarmonicBridgesCore
 import HueCompassCore
 import LissajousLabyrinthCore
 import NocturneGardenCore
@@ -2556,6 +2557,161 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(freshEntry, pinnedStartingCell, "a fresh play's cursor cell")
         XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
         XCTAssertEqual(EchoCartographerExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Harmonic Bridges in the app (feature 419, R02-G12-09; T-R02G1209-005, FR-R02G1209-003,
+    // FR-R02G1209-006; SC-R02G1209-002)
+
+    /// Harmonic Bridges' registration: a candidate until X-R02-G12.
+    private func harmonicBridgesRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(HarmonicBridgesExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id }, "Harmonic Bridges is a candidate")
+    }
+
+    /// FR-R02G1209-003, clarification Q3: the snapshot is schema 3 and the stored schema-1 and schema-2 examples
+    /// restore to their digests through the migrations (the app's migration check).
+    func testTheHarmonicBridgesRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try harmonicBridgesRegistration()
+        XCTAssertEqual(HarmonicBridgesExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(HarmonicBridgesExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(HarmonicBridgesExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1209-006, clarification Q5: without `-vcCandidates` Harmonic Bridges is a candidate only: in
+    /// `candidates`, outside `all`, listed in the bundled catalog as not available, without a tile and not opened.
+    func testHarmonicBridgesIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(HarmonicBridgesExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g12.harmonic-bridges")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1209-003, SC-R02G1209-002: with `-vcCandidates` Harmonic Bridges is shown, opens through the registry
+    /// and engine with seed 0 (level 1), and level 1 is won by its certified actions
+    /// (`HarmonicBridgesExperienceCore.certifiedActions(1)`) sent as `string.tune [string, peg]` and `crossing.test`
+    /// with three stars (the opening play is already past the kernel's tutorial stage, so no `tutorial.dismiss` is
+    /// needed); the win opens level 2 and `level.next` plays it.
+    func testHarmonicBridgesOpensAsACandidateAndLevelOneIsWonByItsCertifiedActions() async throws {
+        let registration = try harmonicBridgesRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["string.tune", "crossing.test", "play.undo", "play.redo", "level.next", "tutorial.dismiss",
+                        "replay.start"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(HarmonicBridgesExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<HarmonicBridgesExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, HarmonicBridgesStage.playing, "the opening play accepts actions")
+        let actions: [HarmonicBridgesAction] = HarmonicBridgesExperienceCore.certifiedActions(1)
+        XCTAssertFalse(actions.isEmpty)
+        for action in actions {
+            switch action {
+            case .tune(let string, let peg):
+                let values: [Double] = [Double(string), Double(peg)]
+                XCTAssertEqual(engine.handle(control: "string.tune", values: values), .accepted, "tune \(values)")
+            case .test:
+                XCTAssertEqual(engine.handle(control: "crossing.test"), .accepted, "test")
+            }
+        }
+        XCTAssertEqual(engine.outcome?.code, HarmonicBridgesExperienceCore.wonCode)
+        XCTAssertEqual(HarmonicBridgesExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, HarmonicBridgesStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified actions earn three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `HB` (their own literals in
+    /// Tests/UI/HarmonicBridges/HBSupport.swift, which this target cannot import); the same literals equal the Core's
+    /// certified level 1: one tuning, string 0 to peg 12, then the test; the panel opens a new level with string 0
+    /// chosen at its current peg (`HarmonicBridgesMirror.follow(_:)`), peg 11 on level 1; the budget is 9; every pinned
+    /// string and peg is reachable by the string and peg steppers. Seed 0 opens level 1.
+    func testHarmonicBridgesLevelOnePinsInHBEqualTheCore() throws {
+        // An action is a kind ("tune" or "test") with, for a tune, [string, peg] (empty for the test).
+        let pinnedKinds: [String] = ["tune", "test"]
+        let pinnedTunings: [[Int]] = [[0, 12]]
+        // [string, peg]
+        let pinnedOpeningChoice: [Int] = [0, 11]
+        let pinnedBudget: Int = 9
+
+        let certifiedActions: [HarmonicBridgesAction] = HarmonicBridgesExperienceCore.certifiedActions(1)
+        var coreKinds: [String] = []
+        var coreTunings: [[Int]] = []
+        for action in certifiedActions {
+            switch action {
+            case .tune(let string, let peg):
+                coreKinds.append("tune")
+                coreTunings.append([string, peg])
+            case .test:
+                coreKinds.append("test")
+            }
+        }
+        XCTAssertEqual(coreKinds, pinnedKinds, "level 1 certified action kinds")
+        XCTAssertEqual(coreTunings, pinnedTunings, "level 1 certified tunings")
+        XCTAssertEqual(HarmonicBridgesExperienceCore.certifiedTunings(1).count, pinnedTunings.count, "one tuning")
+
+        let certified = try HarmonicBridgesExperienceCore.generated(number: 1)
+        let level: HarmonicBridgesLevel = certified.level
+        XCTAssertEqual(certified.actions, certifiedActions, "the certified witness is the generated level's")
+        XCTAssertEqual(level.budget, pinnedBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, certifiedActions.count, "the witness fits the budget")
+        for tuning in pinnedTunings {
+            XCTAssertEqual(tuning.count, 2, "a tuning is a string and a peg \(tuning)")
+            XCTAssertTrue((0...(level.strings.count - 1)).contains(tuning[0]), "string on the string stepper \(tuning)")
+            XCTAssertTrue(HarmonicBridgesExperienceCore.pegRange.contains(tuning[1]), "peg on the peg stepper \(tuning)")
+        }
+
+        // The panel's opening choice as HarmonicBridgesMirror sets it on a new level (follow(_:)): string 0 at its
+        // current peg.
+        let startingChoice: [Int] = [0, level.startingPegs[0]]
+        XCTAssertEqual(startingChoice, pinnedOpeningChoice, "level 1's starting peg of string 0")
+        let opening = try HarmonicBridgesExperienceCore.opening(number: 1)
+        let openingChoice: [Int] = [0, opening.play.pegs[0]]
+        XCTAssertEqual(openingChoice, pinnedOpeningChoice, "the opening choice")
+        XCTAssertEqual(opening.play.actionsLeft, pinnedBudget, "the opening's actions left")
+        let fresh = try HarmonicBridgesExperienceCore.freshPlay(of: level)
+        let freshChoice: [Int] = [0, fresh.pegs[0]]
+        XCTAssertEqual(freshChoice, pinnedOpeningChoice, "a fresh play's choice")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(HarmonicBridgesExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
