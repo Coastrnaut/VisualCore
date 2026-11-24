@@ -40,7 +40,7 @@ prefix.
 
 ## Phase 3: Stories 1 to 4 — link drags, nudge taps, listening, inspection (P1) 🎯
 
-- [ ] T-R02G1304-003 [US1] [US2] [US3] [US4] Create
+- [X] T-R02G1304-003 [US1] [US2] [US3] [US4] Create — Verified 2026-11-23: 2026-11-23: agent C gesture controller (written on a stub, retested by the lead against B's real picker): 7 tests incl. 500 seeded scripts in 13 kinds on levels 1/50/100 at opening, placed, paused, won and failed, 3 sizes, 3 orbits, every kernel action applied through the adapter; host-3 exit 0 (.autonomy/migration/checks/R02-G13-04.host-3.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorGestureController.swift`
   (FR-R02G1304-001 … 004, 006; SC-R02G1304-001 … 003; `AcousticConstellatorGestureAction` choose(star), choosePair(a, b),
   preview(from, target, point), link(a, b), unlink(a, b), nudge(star), listen, resetView; states idle, starPress,

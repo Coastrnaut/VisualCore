@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AcousticConstellatorGestureController"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AcousticConstellatorGestureController",
+  "elapsed_seconds": 4.352,
+  "exit_code": 0,
+  "finished": "2026-11-24T01:04:55+00:00",
+  "gate": "R02-G13-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-04.host-3.log",
+  "log_sha256": "3383e6f5fdc9c5e4d642f8e9add71211a62f7ca22c04089ce5a0d009c62b4639",
+  "name": "host-3",
+  "started": "2026-11-24T01:04:51+00:00",
+  "timed_out": false
+}
