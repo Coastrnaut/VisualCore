@@ -790,3 +790,10 @@ Feature 434 (R02-G14-04) adds the touch controls: `MoonlitMechanismOrbit` and th
 `MoonlitMechanismPicker` (lamp, ladder, key-frame cards, front-most gear) and `MoonlitMechanismGestureController`
 (rotary gear drags that turn the train tooth for tooth, lamp drags, gear taps and double taps, card taps, lamp taps,
 two-finger orbit), wired into the presenter with "Reset view".
+
+Feature 435 (R02-G14-05) adds teaching and progression: the solver entry `plan(_:phases:height:)`,
+`MoonlitMechanismHints` (three hint levels from the minimal plan of the current state) and
+`MoonlitMechanismFailureExplanation`, `MoonlitMechanismProgress` with the tutorial steps, stars, the daily level (× 97)
+and the practice mode; the adapter's `level.select`, `mode.daily`, `mode.practice`, `mode.campaign` and
+`tutorial.dismiss` with snapshot schema 2 and a migration from 1; the presenter's tutorial, hint, explanation, goal and
+mode controls.

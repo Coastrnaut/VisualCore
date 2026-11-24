@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G14-04: Moonlit Mechanism touch controls).
+Last updated: 2026-11-24 (R02-G14-05: Moonlit Mechanism teaching and progression).
 
 ## 1. What is tested, and where
 
@@ -669,6 +669,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   AcousticConstellatorCatalogTests` (the tests that read the stored files fail on that first run, before the files
   exist; run again without the variable). The independent brute force covers every play action in bands 1 … 3 and the
   pruned options in bands 4 and 5, where every play action at size 5 (about 650,000 listens) would not fit 10 s.
+- **Moonlit Mechanism teaching and progression** (R02-G14-05, 2026-11-24). Host: `MoonlitMechanismHintsTests` (exact
+  hints win all 100 levels in ten groups, 200 seeded states, 500 seeded failures explained), `MoonlitMechanismProgressTests`
+  (tutorial steps on the witnesses of levels 1 … 3, stars, frontier, every daily date 2026 … 2036),
+  `MoonlitMechanismProgressionCoreTests` (the adapter's new controls, modes, schema 2 and migration); simulator:
+  `MoonlitMechanismTeachingTests` (8 tests, the panel's tutorial, hints, explanation, goal and modes). Two lessons. The
+  checklist step checked the tutorial against the witness files and found levels 2 and 3 solved without a turn, so the
+  first step now advances on any change, not only a turn; check teaching rules against the certified witnesses before
+  writing them down. And when the `level.next` rule changes, the integration acceptance rows must first win their
+  level so the next one is open (the manifest is then regenerated with `UPDATE_SCENARIO_MANIFEST=1`).
 - **Moonlit Mechanism touch controls** (R02-G14-04, 2026-11-24). Host: `MoonlitMechanismPickerTests` (500 seeded
   points per level, size and orbit against an independent pick written in the test), `MoonlitMechanismGestureControllerTests`
   (500 seeded scripts against an independent arbitration, every action applied through the adapter, angle wrap, the

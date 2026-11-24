@@ -87,7 +87,7 @@ final copy).
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G1405-006 Docs: `docs/architecture/moonlit-mechanism.md` (teaching and progression),
+- [X] T-R02G1405-006 Docs: `docs/architecture/moonlit-mechanism.md` (teaching and progression), — Verified 2026-11-24: 2026-11-24: architecture teaching section, ExperiencesRound02 README, testing doc (two lessons); round02-host exit 0 in 368 s (.autonomy/migration/checks/R02-G14-05.round02-host.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1405-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

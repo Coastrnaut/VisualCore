@@ -141,3 +141,32 @@ the level certification of R02-G14-02.
 - **Panel.** Every move remains on the panel ("Reset view" added); all 100 certified levels are won through panel
   actions alone (`MoonlitMechanismPanelWinTests`). Refusals are shown in words and their codes kept, with or without the
   engine's `action.rule.` prefix.
+
+## Teaching and progression (feature 435, R02-G14-05)
+
+- **Hints.** `MoonlitMechanismSolver.plan(_:phases:height:)` runs the certifying plan-vector search from the play's
+  current phases and lamp height (`plan(_:)` is that entry at the level's start, so certification is unchanged). The
+  hint plan is its witness actions (turns, re-seats in gear order, lamp steps, then the run) when they fit the actions
+  left; its first action is the hint, revealed in three levels: the kind ("Turn the handle", "Re-seat a gear", "Move
+  the lamp", "The shadows are ready: run the machine"), then the way or the gear, then the exact action. A failed play's
+  hint is "Undo the last action or retry the level."; no plan within the actions left (or the work bound) says so.
+  Following exact hints from every level's opening wins in the witness's action count. The presenter searches off the
+  main actor, once per play, and any change of the play hides the hint.
+- **Failure explanation.** `MoonlitMechanismFailureExplanation` names the failing action (numbered from 1) and its cause:
+  the jammed gear and its parent, the key frame and the forbidden cell, the key frame and its missing or stray count
+  (against the level's allowance), or the action that spent the last of the budget — then "Undo the last action or
+  retry the level."
+- **Tutorial.** Levels 1 … 3 show three steps (`MoonlitMechanismTutorialStep` change → align → run → done): a change
+  (turn, re-seat or lamp step — levels 2 and 3 are solved without a turn), then until the run report of the current
+  set-up wins, then until the level ends. Undo never moves it back; `tutorial.dismiss` ends it; it is snapshotted but
+  not digested.
+- **Progress and modes.** `MoonlitMechanismProgress`: level 1 open, a campaign win opens the next; stars by actions spent
+  (every turn, re-seat, lamp step and run record, undone ones included): 3 at the witness's count, 2 within + 2, else
+  1; the best result kept per level; five bands of 20. `level.select` opens any open level (`r02-g14.locked`
+  otherwise); `level.next` needs the next level open (no wrap). The daily level is (days from 2026-01-01 × 97) mod 100
+  + 1 from `mode.daily [year, month, day]` (the presenter reads the local date; `r02-g14.date` for an impossible one);
+  daily wins record stars and open nothing. `mode.practice` replays the level with the budget raised to 40 and records
+  nothing. No level is ever gated by payment.
+- **Schema 2.** The digest ("r02-g14.moonlit-mechanism.v2") adds the progress and the mode; the snapshot payload is
+  `{level, mode, progress, records, tutorial}` with a migration from schema 1 (level 1 and the restored level open,
+  campaign mode, the tutorial at its first step). The shown key frame stays presentation.
