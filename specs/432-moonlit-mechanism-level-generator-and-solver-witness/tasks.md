@@ -24,7 +24,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G1402-003 [US1] Implement `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSolver.swift`
+- [X] T-R02G1402-003 [US1] Implement `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSolver.swift` — Verified 2026-11-24: 2026-11-24: lead solver (plan vectors by L1 norm, range and alignment pruning, runs as work bound 400,000, witness order); agent A 11 tests incl. an independent breadth-first search on 40 fixtures and two catalog levels per band, smaller-vector counts, bounds; host-2 exit 0 (.autonomy/migration/checks/R02-G14-02.host-2.json)
   (lead: plan vectors (t, h, r₁ … rₙ₋₁) by L1 norm c = 0, 1, 2, …, each coordinate from −left to +left in the order t,
   h, r₁, …, the last coordinate +left before −left; a vector leaving the lamp range skipped; a vector leaving a mesh
   misaligned skipped without a run; every other vector judged by the kernel's run; the first winning vector is the
