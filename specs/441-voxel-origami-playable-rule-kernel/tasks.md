@@ -67,7 +67,7 @@ will consume).
   "every hinge with a descendant off its axis, then −1, +1") with
   `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiRulesTests.swift` (agreement with the play on 200
   walks); `--name host-4`
-- [ ] T-R02G1501-006 [P] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiInvariantTests.swift`
+- [X] T-R02G1501-006 [P] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiInvariantTests.swift` — Verified 2026-11-24: 2026-11-24: agent D invariant tests, 9 boundaries each with a seeded neighbouring check (seed 2_446), updated to the revised sweep rule; lead retest host-5 exit 0 (.autonomy/migration/checks/R02-G15-01.host-5.json)
   (agent D: `testVoxelOrigamiTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each with
   a seeded neighbouring-input check, seed 2_446); `--name host-5`
