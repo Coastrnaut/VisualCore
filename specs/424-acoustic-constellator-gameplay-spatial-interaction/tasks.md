@@ -29,7 +29,9 @@ prefix.
   `segmentDistance`; in this order a coherence bar or hold pip whose centre lies within 22 points (nearest, ties to the
   coherence bars and then the lower index), a star centre within 22 points (nearest, ties to the lower index), a link
   whose projected spline (16 segments) lies within 22 points (nearest, ties to the lower link index), else empty; the
-  moves gauge and guides are empty; `starAt(_:size:snapshot:orbit:excluding:)` for drag targets; empty for unusable
+  moves gauge and guides are empty; `starAt(_:size:snapshot:orbit:excluding:)` for drag targets; `fingerPoint(_:size:camera:height:)`, the world point under
+  the finger on the plane y = height (the dragged star's height), nil when the ray misses it — the filament ends there,
+  or at the target star's centre when there is one; empty for unusable
   input) with `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorPickerTests.swift` (an
   independent pick written in the test on 500 seeded points over certified levels, 3 sizes and 3 orbits; the 22-point
   target at 21 and 23 points; gauges beat stars beat links; ties; unusable input) and orbit framing, star order under
@@ -69,7 +71,7 @@ prefix.
 - [ ] T-R02G1304-005 [US5] Wire `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorPresenter.swift`
   (FR-R02G1304-001 … 004, 006 … 008; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn
   snapshot; link, unlink, nudge and listen sent through the port; choose, choosePair and preview changing the mirror's
-  star and partner; a chosen link described (its stars, its gap at the shown tick, fixed or placed); a fixed pair's drag
+  star and partner (`choose(star)` moves the partner to the next star, modulo the star count, when it equals the star); a chosen link described (its stars, its gap at the shown tick, fixed or placed); a fixed pair's drag
   described as fixed; on a won or failed play `describe` says "The play is over: undo or go to the next level"; a
   refused action shown in the mirror message and logged with its code, reading codes with or without the engine's
   `action.rule.` prefix; `resetView()`),

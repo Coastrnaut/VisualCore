@@ -17,6 +17,8 @@ public enum AcousticConstellatorPicker {
     public static func segmentDistance(_ point: SIMD2<Double>, _ a: SIMD2<Double>, _ b: SIMD2<Double>) -> Double
     public static func starAt(_ point: SIMD2<Double>, size: SIMD2<Double>, snapshot: AcousticConstellatorSceneSnapshot,
                               orbit: AcousticConstellatorOrbit, excluding: Int?) -> Int?   // nearest within 22 points
+    public static func fingerPoint(_ point: SIMD2<Double>, size: SIMD2<Double>, camera: AcousticConstellatorCamera,
+                                   height: Double) -> SIMD3<Double>?   // on the plane y = height; nil when the ray misses
     public static func pick(_ point: SIMD2<Double>, size: SIMD2<Double>, snapshot: AcousticConstellatorSceneSnapshot,
                             orbit: AcousticConstellatorOrbit) -> AcousticConstellatorPick }
 public enum AcousticConstellatorGestureAction: Sendable, Equatable { case choose(star: Int), choosePair(Int, Int),
