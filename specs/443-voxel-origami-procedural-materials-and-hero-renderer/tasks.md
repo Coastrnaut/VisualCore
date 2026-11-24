@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1503-001 Baselines on the committed tree after R02-G15-02 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1503-001 Baselines on the committed tree after R02-G15-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing, baseline-round02 exit 0 on the committed tree after R02-G15-02's record
   baseline-timing`, `--name baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering
   baseline is R02-G15-02's rendering runs (exit 0)
 - [ ] T-R02G1503-002 Edit `Packages/ExperiencesRound02/Package.swift` (`VoxelOrigamiCore` gains VisualCoreScenes,
