@@ -434,7 +434,9 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               // Feature 436 (R02-G14-06): the ambient sound recipe.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
                 path: "MoonlitMechanism/Core"),
         .testTarget(name: "MoonlitMechanismCoreTests",
                     dependencies: ["MoonlitMechanismCore",
@@ -443,7 +445,8 @@ let package = Package(
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreDiagnostics", package: visualCore),
-                                   .product(name: "VisualCorePersistence", package: visualCore)],
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "MoonlitMechanism/CoreTests"),
         // Feature 433 (R02-G14-03): Moonlit Mechanism's experience (presenter, scene, controls).
         .target(name: "MoonlitMechanismExperience",
@@ -453,7 +456,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 436 (R02-G14-06): the ambient loop and the audition.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "MoonlitMechanism/Experience"),
         // Feature 433 (R02-G14-03): the simulator tests of Moonlit Mechanism's experience.
         .testTarget(name: "MoonlitMechanismExperienceTests",
@@ -464,7 +470,9 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore),
+                                   .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "MoonlitMechanism/ExperienceTests"),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (presenter, scene, controls).
         .target(name: "AcousticConstellatorExperience",
