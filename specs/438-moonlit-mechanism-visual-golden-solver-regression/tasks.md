@@ -25,7 +25,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1408-003 [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G1408-003 [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-24: 2026-11-24: golden source (16 frames, pip = alignLit), golden-frames.json written with MOONLIT_MECHANISM_WRITE_GOLDEN=1 (sha256 accecae0…), MoonlitMechanismGolden in RELEASE_FORBIDDEN; host-2 exit 0 (.autonomy/migration/checks/R02-G14-08.host-2.json)
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after the witness's turns, re-seats and lamp steps and
   before its run, key frame 0 shown, plus the hero frame of `scenario-manifest.json` at tier 0; at 1,152 × 768 with the
   authored camera: every cast-cell centre, every gear centre and rim check point, every key-frame card centre (index
