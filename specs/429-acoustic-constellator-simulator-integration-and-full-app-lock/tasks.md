@@ -37,7 +37,7 @@ change (the shaders and reference of R02-G13-03 are unchanged and re-proven by t
   name of Q1 is listed once, has the prefix `experience.r02-g13.acoustic-constellator.`, and the panel source uses each
   exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing AcousticConstellatorExperienceTests`
-- [ ] T-R02G1309-004 [US1] Create `Apps/VisualCore/Tests/UI/AcousticConstellator/ACNSupport.swift`, `ACNPlayUITests.swift`,
+- [X] T-R02G1309-004 [US1] Create `Apps/VisualCore/Tests/UI/AcousticConstellator/ACNSupport.swift`, `ACNPlayUITests.swift`, — Verified 2026-11-24: 2026-11-24: agent C ACNSupport/ACNPlayUITests/ACNReplayUITests, agent D chunk v3 serial with its script test; xcodegen; app-ui exit 0, 3 of 3 (win 66 s, relaunch 100 s incl. two launches, replay 53 s) (.autonomy/migration/checks/R02-G13-09.app-ui.json)
   `ACNReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified actions (link stars 0 and 1, then a
   listen), the opening choice (star 0, partner 1) and the budget (9) pinned in `ACN`; each link played by stepping the
   star and partner steppers to its stars only when they differ (reading each value, counting a press only when it moves),

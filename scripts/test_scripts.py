@@ -1231,6 +1231,20 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(argv[start:start + 2],
                          ["VisualCoreUITests/HBPlayUITests", "VisualCoreUITests/HBReplayUITests"])
 
+    def test_acoustic_constellator_ui_chunk(self):
+        """Feature 429 R02-G13-09 (T-R02G1309-004): the serial chunk `v3` runs the Acoustic Constellator
+        interface journeys; its key appears once in the `UI_CHUNKS` literal."""
+        self.assertEqual(relcheck.UI_CHUNKS["v3"], ["ACNPlayUITests", "ACNReplayUITests"])
+        self.assertIn("v3", relcheck.SERIAL_CHUNKS)
+        source = Path(relcheck.__file__).read_text(encoding="utf-8")
+        self.assertEqual(source.count('"v3": ['), 1)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-v3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2],
+                         ["VisualCoreUITests/ACNPlayUITests", "VisualCoreUITests/ACNReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""
