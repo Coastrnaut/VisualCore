@@ -24,7 +24,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G1502-003 [US1] Implement `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiSolver.swift` (lead: a
+- [X] T-R02G1502-003 [US1] Implement `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiSolver.swift` (lead: a — Verified 2026-11-24: 2026-11-24: solver (breadth-first, swept filter, minimality counts, work bound 300 000, at most 6 turns); agent A 13 tests (hand minima incl. a sweep-blocked shortcut, independent BFS order and counts, depth-first enumeration on the two fewest-cube levels per band); lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G15-02.host-2.json)
   breadth-first search over quarter-turn states from the start; states expanded in the order reached, moves in hinge
   order ascending, step −1 then +1; only hinges that would swing a cube; a move reaches a state only when the kernel's
   collision and exact sweep rule clear it; states merged by their quarter turns; the first reached state whose pose
