@@ -62,7 +62,7 @@ will consume).
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1501-005 [P] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiRules.swift` (agent C:
+- [X] T-R02G1501-005 [P] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiRules.swift` (agent C: — Verified 2026-11-24: 2026-11-24: agent C PuzzleRules conformance, 5 tests (agreement with the play on 200 walks); lead retest host-4 exit 0 (.autonomy/migration/checks/R02-G15-01.host-4.json)
   `PuzzleRules`: State = position (turns, actions spent, outcome), Move = VoxelOrigamiAction; legal moves while playing
   "every hinge with a descendant off its axis, then −1, +1") with
   `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiRulesTests.swift` (agreement with the play on 200
