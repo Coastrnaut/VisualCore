@@ -61,7 +61,7 @@ offscreen host resizes before every still (R02-G14-03), so orbit changes the cam
 
 ## Phase 4: Story 6 — every move without gestures (P1)
 
-- [ ] T-R02G1404-004 [P] [US6] Create
+- [X] T-R02G1404-004 [P] [US6] Create — Verified 2026-11-24: 2026-11-24: agent D, all 100 certified levels won through panel actions only in ten groups (witness action counts), panel undo/redo restore digests; lead retest host-4 exit 0 (.autonomy/migration/checks/R02-G14-04.host-4.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismPanelWinTests.swift`: all 100 certified levels
   won through panel actions only (FR-R02G1404-007; SC-R02G1404-005; turn − and +, the gear stepper and re-seat − and +,
   lamp − and +, and run, as the witnesses play them), split so each test is under 10 s, plus panel Undo then Redo
