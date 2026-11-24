@@ -49,7 +49,7 @@ will consume).
 
 ## Phase 4: Stories 2 and 3 — failures, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G1401-004 [P] [US1] [US2] [US3] Create
+- [X] T-R02G1401-004 [P] [US1] [US2] [US3] Create — Verified 2026-11-24: 2026-11-24: agent B play (stages, validation order, run decision, budget, records, undo/redo from failed, replay) with 9 tests (200 fixtures, named failures, budget either side, 500 traces); lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G14-01.host-3.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismPlay.swift` (agent B: stages "loading, tutorial,
   playing, paused, won, failed, result"; phases at the level's starting phases, the lamp at its starting height; `turn`,
   `reseat`, `lamp` and `run` validated in the order stage, previous fingerprint, action (unknown gear, re-seating the
