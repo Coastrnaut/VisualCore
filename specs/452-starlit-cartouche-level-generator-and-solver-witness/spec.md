@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G16-02 (migration ledger, game feature of experience R02-G16) · ID namespace FR-R02G1602-###,
 SC-R02G1602-###, T-R02G1602-###
@@ -22,11 +22,77 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price and "no IAP"; the Round 2 lock and per-round device campaign.
   **Device-only items:** none (pure logic). **Owner-only items:** none.
 - **Content count:** the canonical catalog is the 100-level manifest of the archived design (`python3
-  scripts/planning_index.py levels --experience R02-G16`: 20 levels in each of bands 1 … 5, each with its planned seed
-  and moves budget 8 … 19). The prompt's "content count 80" (the catalog's "80 solver-certified stages") is a milestone
+  scripts/planning_index.py levels --experience R02-G16`: 20 levels in each of bands 1 … 5, each with its planned
+  seed and moves budget 8 … 19). The prompt's "content count 80" (the catalog's "80 solver-certified stages") is a milestone
   figure, as for the earlier round-two games.
 - **Model:** feature 442 (Voxel Origami's content pipeline) for manifest, generator, witness files, digest and
   progression.
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+442's answers where the games agree. Facts checked (read-only, 2026-11-24): R02-G16-01's `StarlitCartoucheLevel` (4 …
+12 stars on orbits of 1 … 4 positions, range 1 … 12, corridors, hazards, windows closing by beat 64, deadline 1 … 64,
+budget 1 … 16), `StarlitCartoucheChart` (leg refusals, failures in order, route report), `StarlitCartouchePlay` and
+`StarlitCartoucheRules`; R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at
+most 1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries
+(bands 1 … 5 × 20, moves budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19 by band, control emphases `avoid hazard`,
+`time launch`, `commit glyph`, `place route waypoint`, `adjust arc`, 20 each); the kernel's budget bound 1 … 16 is
+below the manifest's 19. The ranges below were measured before they were written down: a prototype of this generator
+and the time-expanded breadth-first solver on the real kernel (release build, 120 candidates per band) generated 117,
+119, 114, 116 and 116 valid candidates (bands 1 … 5), of which 110, 105, 98, 102 and 105 had a minimal plan inside the
+band's range, with at most 33 832 legs tried per candidate and under 0.07 s per band of 120 candidates.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, budget, control
+  emphasis) are a table in `StarlitCartoucheManifest` with their provenance. Candidate c of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: c))`, in this order: the star count (band + 4 …
+  band + 5); for each star a glyph point (redrawn until distinct) and an orbit of 1 … 3 positions with coordinates
+  −5 … 5; the range (6 … 8); the start star; a route of band + 1 … band + 2 legs, each choosing up to 8 times a next star
+  other than the current one and the first flyable wait counted from a drawn offset 0 … 3 (waits 0 … 8, modulo 9),
+  adding the corridor (travel 1 … 3) when new (no flyable next star in 8 draws skips the candidate); band + 1 drawn
+  decoy corridors (new pairs only, at most 24 corridors); hazards (band + 2 for `avoid hazard`, else 0 … band; each on a
+  drawn corridor with a drawn interval of from 0 … last arrival + 2 and length 0 … 3, dropped when it would meet a leg of
+  the route on that corridor; at most 8); the deadline (the last arrival plus 0 … max(0, 5 − band), at most 64); and
+  the windows (every visited star for `time launch`, else each with a 1 in 3 draw: open = earliest arrival − 0 … 2 (0 for
+  the start), close = latest arrival or departure + 0 … 2; the others [0, 64]). Symbol = the corridors the route flew;
+  beacon = its last star; budget = the manifest's; ids `starlit-cartouche-NNN`; tutorial on levels 1 … 3; difficulty =
+  band. A candidate the level rules refuse, or that the solver does not certify with a minimal plan in its band's range
+  (2 … 3, 3 … 4, 4 … 5, 5 … 6, 6 … 7 legs) within its work bound, is skipped; at most 256 candidates, then
+  `generation(n)`. The kernel's budget bound widens to 1 … 24 (FR-R02G1602-007). Impact: FR-R02G1602-001, 007;
+  SC-R02G1602-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing shorter wins? → A: a breadth-first search over
+  route states (the ship's star, the beat and the set of symbol strokes drawn) from the start — the catalog's
+  time-expanded graph search, time being part of every state: at each depth the states are expanded in the order they
+  were reached, each state's legs in the order corridors by index (those touching the ship's star), then waits 0 … 8; a
+  leg reaches a state only when it is flyable and the chart finds no failure (a stray stroke always fails); states are
+  merged by star, beat and strokes. The first leg that wins ends the search; the plan is its path. Work = legs tried
+  (every corridor and wait considered), counted and bounded at 300 000; over the bound, or past the band's upper plan
+  length, the candidate is skipped. The minimality proof is that every state reachable in fewer legs was reached and none
+  won (the counts of states at each smaller depth are stored). The witness is the plan's legs, replayed through the
+  kernel's play. Impact: FR-R02G1602-002; SC-R02G1602-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `StarlitCartoucheDifficulty` holds the
+  witness leg count, the stars, the corridors, the hazards, the symbol strokes, the states searched at smaller depths and
+  the solver work. The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at
+  most 3) on the witness leg count; the band ranges, each two values wide and meeting the next band's at one value, make
+  band means non-decreasing. Impact: FR-R02G1602-003, 005; SC-R02G1602-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/starlit-cartouche/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the actions, the state digest after every action (16 hex
+  characters of the SHA-256 of the ship's star, the beat and the drawn strokes), the play fingerprints after `begin`
+  (and `dismissTutorial` when the level has one) and after each action, the counterexample (the depth one below the plan
+  and the number of states reached at that depth, none winning), the difficulty and the candidates skipped. A test
+  rebuilds every witness and compares bytes; it writes the files only with `STARLIT_CARTOUCHE_WRITE_WITNESSES=1`.
+  Decoding refuses newer schemas, damaged files and witnesses that no longer replay. Impact: FR-R02G1602-004;
+  SC-R02G1602-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<StarlitCartoucheRules>.digest(id: "starlit-cartouche", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split into groups of 10 levels so each runs under 10
+  seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New
+  refusals: `generation(Int)` (`r02-g16.generation`) and `witness(String)` (`r02-g16.witness`). The independent check of
+  SC-R02G1602-002 is a depth-first enumeration of every leg sequence the play accepts (no state merging), shorter than
+  the plan, on the two levels with the fewest stars in each band: none wins. Impact: FR-R02G1602-005, 006;
+  SC-R02G1602-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
