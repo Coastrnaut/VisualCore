@@ -67,7 +67,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   `--name host-full`
 - [ ] T-R02G1402-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1402-010 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02G1402-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1402-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-24: 2026-11-24: script-tests exit 0, run alone (.autonomy/migration/checks/R02-G14-02.script-tests.json)
 - [ ] T-R02G1402-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
 
@@ -78,3 +78,9 @@ Agents work in isolated copies against contracts/api.md; shared files (error, ma
 catalog tests, witness files, docs) stay with the lead. Agents and the lead may draft in isolated copies before 001
 (new files only). MVP: Story 1. Requirement coverage: FR-001 → 004, 006; FR-002 → 003, 006; FR-003 → 002, 004; FR-004 →
 005, 006; FR-005 → 006; FR-006 → 002, 007 … 011.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G1402-013 Align `specs/432-moonlit-mechanism-level-generator-and-solver-witness/contracts/api.md` with the
+  witness's public names (`MoonlitMechanismCounterexample` with `norm` and `vectors`, `canonicalText(phases:height:)`,
+  `vectors(dimensions:norm:)`, the closed-form count of vectors of one norm) per plan: contract (unrequested)
