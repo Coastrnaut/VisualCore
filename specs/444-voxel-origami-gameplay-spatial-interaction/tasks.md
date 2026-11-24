@@ -40,7 +40,7 @@ resize alone.
 
 ## Phase 3: Stories 1 and 2 — drags and taps (P1) 🎯
 
-- [ ] T-R02G1504-003 [US1] [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiGestureController.swift`
+- [X] T-R02G1504-003 [US1] [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiGestureController.swift` — Verified 2026-11-24: 2026-11-24: agent C gesture controller (taps choose, double taps turn +1 or explain, drags predict and send one turn, root/idle/finished drags explain once, second finger cancels and orbits, third re-bases); 5 tests incl. 500 seeded scripts at 4 play states, 3 sizes, 3 orbits against the test's own reference; lead retest host-3 (whole VoxelOrigami suite) exit 0
   (FR-R02G1504-001, 002, 004, 005; SC-R02G1504-001 … 003; `VoxelOrigamiGestureAction` chooseHinge(h), pendingTurn(hinge,
   step), clearPending, turn(hinge, step), resetView, explain(reason); states idle, cubePress, cubeDrag, emptyPress,
   orbiting, cancelled; a tap (< 10 points, lifted before 0.5 s) on a non-root cube: `chooseHinge` in any stage, and a
