@@ -19,10 +19,11 @@
 //   2. an accepted action: the play gained exactly one record →
 //      a new end (the stage became won or failed; Q2: a listen always ends the level and a link, unlink or nudge that
 //      spends the last action without a win ends it too, so each plans only the outcome):
-//        won: `outcome`, "The symbol rings together. Level won spending a actions, k of 3 stars." (practice: "… Level
-//             won spending a actions."), haptic `success`; a is `AcousticConstellatorProgress.actionsSpent(_:)` (undone
-//             actions included) and k is `AcousticConstellatorProgress.stars(actionsSpent:certified:)` of this win
-//             against the certified witness's action count;
+//        won: `outcome`, "The symbol rings together. Level won spending a actions, k of 3 stars." (practice and
+//             replay: "… Level won spending a actions."), haptic `success`; a is
+//             `AcousticConstellatorProgress.actionsSpent(_:)` (undone actions included) and k is
+//             `AcousticConstellatorProgress.stars(actionsSpent:certified:)` of this win against the certified witness's
+//             action count;
 //        failed: `outcome`, the failure explanation of feature 425 (`AcousticConstellatorFailureExplanation`), haptic
 //             `warning`;
 //      otherwise by the records' last kind: an undo or redo "Undone." or "Redone."; else the change of the cores — a
@@ -35,6 +36,14 @@
 // Choosing a star or partner, a drag preview and orbit are presentation only and plan nothing (the core does not
 // change; the adjustable star and partner speak their own values). A revealed hint is `hint(text:)`: `state` with the
 // hint's words and no haptic. Integers only, except the snapshot's coherence bars that the summary reads.
+//
+// Feature 427 (R02-G13-07) T-R02G1307-003 (clarification Q4): the replay codes' words ("There is no saved solution to
+// replay for this level." `r02-g13.no-replay`, "The replay is over." `r02-g13.replay-end`, "Stop the replay first."
+// `r02-g13.replay`). A replay step adds exactly one record to the play, so case 2 announces it like the action it
+// applies (the link, unlink or nudge with the progress, or the outcome); a replayed win claims no stars (the replay
+// mode awards none: "… Level won spending a actions."); `replay.start` and `replay.stop` open a fresh play in another
+// mode, so case 1 announces "Level n, band b, replay." or "…, campaign." (the tutorial is done in replay). The
+// dropped-results sentence of Q2 is the presenter's, not a plan.
 import Foundation
 import VisualCoreSimulation
 
@@ -97,9 +106,11 @@ public struct AcousticConstellatorFeedbackPlan: Sendable, Equatable {
     /// The words of a refusal with reason code `code`, also shown by the panel (clarification Q1, word for word). The
     /// engine's ``rulePrefix`` is read as the bare code: "That level is not open yet." (`r02-g13.locked`), "That date
     /// cannot be used." (`r02-g13.date`), "That change is not allowed for these stars." (`r02-g13.action`), "The level
-    /// has ended." (`r02-g13.stage`), "That value must be a whole number." (`r02-g13.not-whole`); any other code
-    /// (`r02-g13.stale`, `r02-g13.level`, `r02-g13.malformed`, the engine's own codes such as `action.out-of-range`)
-    /// "That action was refused.".
+    /// has ended." (`r02-g13.stage`), "That value must be a whole number." (`r02-g13.not-whole`); feature 427's replay
+    /// codes: "There is no saved solution to replay for this level." (`r02-g13.no-replay`), "The replay is over."
+    /// (`r02-g13.replay-end`), "Stop the replay first." (`r02-g13.replay`); any other code (`r02-g13.stale`,
+    /// `r02-g13.level`, `r02-g13.malformed`, the engine's own codes such as `action.out-of-range`) "That action was
+    /// refused.".
     public static func refusalText(code: String) -> String {
         let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
         switch bare {
@@ -108,6 +119,9 @@ public struct AcousticConstellatorFeedbackPlan: Sendable, Equatable {
         case AcousticConstellatorError.action("").reasonCode: return "That change is not allowed for these stars."
         case AcousticConstellatorError.stage.reasonCode: return "The level has ended."
         case AcousticConstellatorExperienceRule.notWhole: return "That value must be a whole number."
+        case AcousticConstellatorExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case AcousticConstellatorExperienceRule.replayEnd: return "The replay is over."
+        case AcousticConstellatorExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }
@@ -221,7 +235,7 @@ public struct AcousticConstellatorFeedbackPlan: Sendable, Equatable {
     }
 
     /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars in campaign and daily;
-    /// never in practice), haptic `success`; or the failure explanation, haptic `warning`.
+    /// never in practice or replay), haptic `success`; or the failure explanation, haptic `warning`.
     static func outcomePlan(_ core: AcousticConstellatorExperienceCore) -> AcousticConstellatorFeedbackPlan {
         let play: AcousticConstellatorPlay = core.play
         if play.stage == .won {

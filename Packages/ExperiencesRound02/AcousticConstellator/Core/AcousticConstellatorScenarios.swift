@@ -59,7 +59,9 @@
 // the integration rows (71 … 80) therefore first win their level's certified witness (a campaign win opens the next
 // level) before `level.next` (row 80, on level 100, as described above); rejection also refuses the progression
 // controls' wrong value counts (`level.select`, `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`);
-// the manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`).
+// the manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`). Feature 427 (R02-G13-07) T-R02G1307-003: digests are
+// schema 3's ("…v3"), wins store their traces, and rejection also refuses the replay and sound controls' wrong value
+// counts (`replay.start`, `replay.step`, `replay.stop`, `settings.sound`); the manifest was regenerated.
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -291,6 +293,10 @@ extension AcousticConstellatorExperienceCore {
             refusedEntry("mode.practice", [1], wrongCountCode),
             refusedEntry("mode.campaign", [1], wrongCountCode),
             refusedEntry("tutorial.dismiss", [1], wrongCountCode),
+            refusedEntry("replay.start", [], wrongCountCode),
+            refusedEntry("replay.step", [1], wrongCountCode),
+            refusedEntry("replay.stop", [1], wrongCountCode),
+            refusedEntry("settings.sound", [], wrongCountCode),
         ]
         return entries
     }

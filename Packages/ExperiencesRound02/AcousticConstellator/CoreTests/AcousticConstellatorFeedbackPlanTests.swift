@@ -16,6 +16,9 @@
 // nudge of star 0 never cohere (hold 6 within 24). The daily level of 2026-11-23 is level 15 (band 1), witness link
 // 0–1, 2–3 and listen. The expected texts are written out here, not built with the plan's helpers. Explicit types,
 // plain loops, short runs.
+// Feature 427 (R02-G13-07) T-R02G1307-003: the replay codes' words (`r02-g13.no-replay`, `r02-g13.replay-end`,
+// `r02-g13.replay`) in the table and provoked through the core; replaying level 41's stored trace announces the replay
+// opening, each step like the action it applies and the replayed win without stars; stopping announces campaign.
 import Foundation
 import Testing
 @testable import AcousticConstellatorCore
@@ -182,12 +185,15 @@ import VisualCoreSimulation
                 == Self.rejection("That value must be a whole number."))
         // `stage` is provoked in the win test; the other codes cannot arise through the core.
         let codes: [String] = ["r02-g13.locked", "r02-g13.date", "r02-g13.action", "r02-g13.stage", "r02-g13.not-whole",
+                               "r02-g13.no-replay", "r02-g13.replay-end", "r02-g13.replay",
                                "r02-g13.stale", "r02-g13.level", "r02-g13.malformed", "r02-g13.newer-schema",
                                "action.out-of-range", ""]
         let refusedText: String = "That action was refused."
         let texts: [String] = ["That level is not open yet.", "That date cannot be used.",
                                "That change is not allowed for these stars.", "The level has ended.",
-                               "That value must be a whole number.", refusedText, refusedText, refusedText,
+                               "That value must be a whole number.",
+                               "There is no saved solution to replay for this level.", "The replay is over.",
+                               "Stop the replay first.", refusedText, refusedText, refusedText,
                                refusedText, refusedText, refusedText]
         #expect(codes.count == texts.count)
         for index in codes.indices {
@@ -342,5 +348,34 @@ import VisualCoreSimulation
         var low: Core = try await Core.prepare(seed: 0)
         for index in 0..<8 { _ = Self.nudge(&low, 0, index % 2 == 0 ? 1 : -1) }
         #expect(Plan.summaryText(core: low, star: 0, partner: 1).hasPrefix("1 action left. 1 symbol pair missing. "))
+    }
+
+    /// Feature 427: the replay is worded like play — its opening as a level change, each step like the action it
+    /// applies, the replayed win without stars — and its refusals have their own words.
+    @Test func aReplayIsAnnouncedLikePlayAndItsWinClaimsNoStars() async throws {
+        var core: Core = try await Core.prepare(seed: 40)
+        #expect(Self.refused(&core, "replay.start", [41], code: "r02-g13.no-replay")
+                == Self.rejection("There is no saved solution to replay for this level."))
+        #expect(Self.refused(&core, "replay.step", [], code: "r02-g13.no-replay")
+                == Self.rejection("There is no saved solution to replay for this level."))
+        let witness: [AcousticConstellatorAction] = try Core.generated(number: 41).actions
+        for action in witness { _ = Self.act(&core, action) }
+        #expect(core.play.stage == .won)
+        #expect(Self.accepted(&core, "replay.start", [41]) == Self.level("Level 41, band 3, replay."))
+        #expect(Self.refused(&core, "link.add", [1, 4], code: "r02-g13.replay")
+                == Self.rejection("Stop the replay first."))
+        #expect(Self.accepted(&core, "replay.step")
+                == Self.state("Linked star 1 to star 4, gap 6. 2 symbol pairs missing, 12 actions left."))
+        #expect(Self.accepted(&core, "replay.step")
+                == Self.state("Linked star 2 to star 3, gap 1. 1 symbol pair missing, 11 actions left."))
+        #expect(Self.accepted(&core, "replay.step")
+                == Self.state("Linked star 3 to star 4, gap 2. The symbol is linked, 10 actions left."))
+        #expect(Self.accepted(&core, "replay.step")
+                == Self.won("The symbol rings together. Level won spending 4 actions."))
+        #expect(Self.refused(&core, "replay.step", [], code: "r02-g13.replay-end")
+                == Self.rejection("The replay is over."))
+        // The sound setting changes no announced state.
+        #expect(Self.accepted(&core, "settings.sound", [1]) == Plan.none)
+        #expect(Self.accepted(&core, "replay.stop") == Self.level("Level 41, band 3, campaign."))
     }
 }

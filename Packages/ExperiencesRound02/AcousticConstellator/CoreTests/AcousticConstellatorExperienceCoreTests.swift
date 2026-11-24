@@ -20,6 +20,12 @@
 // tutorial's steps (link, complete, listen, done); the schema-2 round trip in every mode, its refused payloads and the
 // migration of a schema-1 payload; a newer schema refused. Fixture seed 2_423. Levels are certified once per process,
 // so the run stays short. Explicit types, plain loops.
+// Feature 427 (R02-G13-07) T-R02G1307-003: schema 3 and digest v3; sixteen controls; a win stores its verified trace
+// (the effective actions, an undone nudge left out); restore reconciles (a tampered result dropped and counted, the
+// frontier as saved); replay starts only for a verified traced result, steps through the trace to a win without
+// changing progress and refuses other play actions with their codes; a replay saved mid-way restores while a changed,
+// reordered or undo-carrying replay is refused `damaged`; the sound setting is snapshotted and never digested;
+// migrations 1 → 3 and 2 → 3.
 import Foundation
 import Testing
 @testable import AcousticConstellatorCore
@@ -99,21 +105,23 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g13.acoustic-constellator" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g13.acoustic-constellator.v2")
+        #expect(Core.experienceID == "r02-g13.acoustic-constellator" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g13.acoustic-constellator.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["link.add", "link.remove", "star.nudge", "constellation.listen", "play.undo",
                              "play.redo", "level.next", "level.select", "mode.daily", "mode.practice",
-                             "mode.campaign", "tutorial.dismiss"]
-        #expect(Core.actionIDs == ids)
+                             "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step", "replay.stop",
+                             "settings.sound"]
+        #expect(Core.actionIDs == ids && Core.controls.count == 16)
         #expect(Core.controls[0].ranges == [0...7, 0...7] && Core.controls[1].ranges == [0...7, 0...7])
         #expect(Core.controls[2].ranges == [0...7, -1...1])
-        let plainIndices: [Int] = [3, 4, 5, 6, 9, 10, 11]
+        let plainIndices: [Int] = [3, 4, 5, 6, 9, 10, 11, 13, 14]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.controls[7].ranges == [1...100])
         #expect(Core.controls[8].ranges == [1...9999, 1...12, 1...31])
+        #expect(Core.controls[12].ranges == [1...100] && Core.controls[15].ranges == [0...1])
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == AcousticConstellatorTier.all.count)
-        #expect(Core.migrations.currentVersion == 2 && Core.practiceBudget == 40)
+        #expect(Core.migrations.currentVersion == 3 && Core.practiceBudget == 40)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == AcousticConstellatorTier.all.map(\.name))
@@ -128,6 +136,9 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(AcousticConstellatorExperienceRule.notWhole == "r02-g13.not-whole")
         #expect(AcousticConstellatorExperienceRule.locked == "r02-g13.locked")
         #expect(AcousticConstellatorExperienceRule.date == "r02-g13.date")
+        #expect(AcousticConstellatorExperienceRule.noReplay == "r02-g13.no-replay")
+        #expect(AcousticConstellatorExperienceRule.replayEnd == "r02-g13.replay-end")
+        #expect(AcousticConstellatorExperienceRule.replay == "r02-g13.replay")
         #expect(Core.wonCode == "won" && Core.failedCode == "failed")
         #expect(Core.openingStar == 0 && Core.openingPartner == 1)
     }
@@ -450,13 +461,18 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(core.apply(Self.act("play.undo")) == .accepted)
         for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
         #expect(core.play.stage == .won && AcousticConstellatorProgress.actionsSpent(core.play) == certified + 1)
-        #expect(core.progress.solved[1] == AcousticConstellatorProgress.Result(actionsSpent: certified + 1, stars: 2))
+        // Feature 427: the result carries the winning trace (the undone nudge left out) and is verified.
+        #expect(core.progress.solved[1] == AcousticConstellatorProgress.Result(actionsSpent: certified + 1, stars: 2,
+                                                                                trace: generated.actions,
+                                                                                verified: true))
         #expect(core.progress.frontier == 2 && core.progress.isOpen(2) && !core.progress.isOpen(3))
         // A better result replaces it: the witness alone, 3 stars.
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.mode == .campaign)
         for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
-        #expect(core.progress.solved[1] == AcousticConstellatorProgress.Result(actionsSpent: certified, stars: 3))
+        #expect(core.progress.solved[1] == AcousticConstellatorProgress.Result(actionsSpent: certified, stars: 3,
+                                                                                trace: generated.actions,
+                                                                                verified: true))
         // A worse result keeps the best one: four nudges back and forth more than the witness (1 star) change nothing.
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         let detours: [ExperienceAction] = [Self.act("star.nudge", [2, 1]), Self.act("star.nudge", [2, -1]),
@@ -464,7 +480,9 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         for step in detours { #expect(core.apply(step) == .accepted) }
         for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
         #expect(core.play.stage == .won && AcousticConstellatorProgress.actionsSpent(core.play) == certified + 4)
-        #expect(core.progress.solved[1] == AcousticConstellatorProgress.Result(actionsSpent: certified, stars: 3))
+        #expect(core.progress.solved[1] == AcousticConstellatorProgress.Result(actionsSpent: certified, stars: 3,
+                                                                                trace: generated.actions,
+                                                                                verified: true))
         #expect(core.progress.frontier == 2)
         // The frontier: level 2 can be chosen, level 3 cannot.
         #expect(core.apply(Self.act("level.select", [3])) == .rejected(.rule(code: "r02-g13.locked")))
@@ -505,7 +523,8 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         for step in dailyGenerated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
         #expect(core.play.stage == .won && core.progress.frontier == 1 && !core.progress.isOpen(daily))
         let result: AcousticConstellatorProgress.Result = try #require(core.progress.solved[daily])
-        #expect(result == AcousticConstellatorProgress.Result(actionsSpent: dailyGenerated.actions.count, stars: 3))
+        #expect(result == AcousticConstellatorProgress.Result(actionsSpent: dailyGenerated.actions.count, stars: 3,
+                                                              trace: dailyGenerated.actions, verified: true))
         // Campaign from a level that is not open goes to the frontier.
         #expect(core.apply(Self.act("mode.campaign")) == .accepted)
         #expect(core.mode == .campaign && core.levelNumber == 1)
@@ -587,7 +606,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(restored == saved && restored.tutorial == .complete)
     }
 
-    @Test func theSchemaTwoPayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
+    @Test func theSchemaThreePayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
         // Campaign with progress: level 1 won, level 2 reached with level.next.
         var campaign: Core = try await Core.prepare(seed: 0)
         for step in try Core.generated(number: 1).actions { #expect(campaign.apply(Self.act(step)) == .accepted) }
@@ -616,9 +635,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         }
         #expect(practice.play.level.budget == 40)
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
+        // Feature 427: the win's result carries its trace (level 1's witness: a link and the listen), verified.
+        let traceText: String = String(decoding: try Core.payloadEncoder().encode(Core.generated(number: 1).actions),
+                                       as: UTF8.self)
         let progressText: String = "\"progress\":{\"frontier\":2,"
-            + "\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3,\"trace\":[],\"verified\":false}]}"
+            + "\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3,\"trace\":" + traceText
+            + ",\"verified\":true}]}"
         #expect(campaignText.contains(progressText))
+        #expect(campaignText.contains(",\"sound\":false,\"tutorial\":\"link\"}"))
         let dailyText: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
         #expect(dailyText.hasPrefix("{\"level\":15,\"mode\":{\"level\":15,\"mode\":\"daily\"},"))
         // Damaged: a daily mode naming another level, an unknown mode, an invalid frontier, invalid stars, an unknown
@@ -656,7 +680,8 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let records: Data = try Core.payloadEncoder().encode(core.play.records)
         let recordsObject: Any = try JSONSerialization.jsonObject(with: records)
         let schemaOne: [String: Any] = ["level": 3, "records": recordsObject]
-        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        // Feature 427: the chain runs 1 → 2 → 3.
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(schemaOne))
         let chained: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
         let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
         let chainedData: Data = try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])
@@ -669,7 +694,8 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         // The tutorial step is not digested, so the migrated state digests as the saved one.
         #expect(try Self.digest(restored) == Self.digest(core))
         // A level without the tutorial migrates with it done: the fresh opening of level 7.
-        let seven: [String: Any] = try Core.migratedToSchemaTwo(["level": 7, "records": [Any]()])
+        let seven: [String: Any] = try Core.migratedToSchemaThree(
+            try Core.migratedToSchemaTwo(["level": 7, "records": [Any]()]))
         let sevenData: Data = try JSONSerialization.data(withJSONObject: seven, options: [.sortedKeys])
         let sevenCore: Core = try Core.restore(payload: sevenData, seed: 6)
         #expect(sevenCore == (try Core.opening(number: 7)) && sevenCore.tutorial == .done)
@@ -677,7 +703,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(throws: AcousticConstellatorRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "3"]) }
         #expect(throws: AcousticConstellatorRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
         // A newer schema is refused by the chain.
-        #expect(throws: MigrationError.newerVersion(3)) { try Core.migrations.migrate(schemaOne, from: 3) }
+        #expect(throws: MigrationError.newerVersion(4)) { try Core.migrations.migrate(schemaOne, from: 4) }
     }
 
     @Test func snapshotRestoreRoundTripAndRefusals() async throws {
@@ -713,7 +739,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let opening: Core = try await Core.prepare(seed: 7)
         let openingPayload: Data = try opening.snapshotPayload()
         let openingText: String = "{\"level\":8,\"mode\":{\"mode\":\"campaign\"},"
-            + "\"progress\":{\"frontier\":8,\"solved\":[]},\"records\":[],\"tutorial\":\"done\"}"
+            + "\"progress\":{\"frontier\":8,\"solved\":[]},\"records\":[],\"sound\":false,\"tutorial\":\"done\"}"
         #expect(String(data: openingPayload, encoding: .utf8) == openingText)
         #expect(try Core.restore(payload: openingPayload, seed: 7) == opening)
 
@@ -726,7 +752,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(throws: AcousticConstellatorRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":\"21\",\"records\":[]}".utf8), seed: 20)
         }
-        // A schema-1 payload is no schema-2 payload: the engine migrates it before the core sees it.
+        // A schema-1 payload is no schema-3 payload: the engine migrates it before the core sees it.
         #expect(throws: AcousticConstellatorRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":21,\"records\":[]}".utf8), seed: 20)
         }
@@ -772,14 +798,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(engine.handle(control: "link.add", values: [0, 2]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -839,5 +865,220 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         }
         core.shedCaches()
         #expect(try Self.digest(core) == digest && core == before)
+    }
+
+    /// Feature 427: a win stores its verified trace; replay plays it back step by step to a win without recording,
+    /// refuses every other play action with `r02-g13.replay` and stops into campaign.
+    @Test func aWinStoresItsTraceAndReplayReplaysIt() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let generated: AcousticConstellatorGenerated = try Core.generated(number: 1)
+        // Without a stored trace there is nothing to replay; replay controls outside replay are refused.
+        let noReplay: ActionResult = .rejected(.rule(code: AcousticConstellatorExperienceRule.noReplay))
+        #expect(core.apply(Self.act("replay.start", [1])) == noReplay)
+        #expect(core.apply(Self.act("replay.step")) == noReplay)
+        #expect(core.apply(Self.act("replay.stop")) == noReplay)
+        // A nudge undone and an honest win: the trace holds only the effective actions.
+        #expect(core.apply(Self.act("star.nudge", [2, 1])) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        let result: AcousticConstellatorProgress.Result = try #require(core.progress.solved[1])
+        #expect(result.verified && result.trace == generated.actions && result.trace == core.winningTrace)
+        #expect(result.actionsSpent == generated.actions.count + 1)
+        let progress: AcousticConstellatorProgress = core.progress
+        // Level 2 has no result: refused.
+        #expect(core.apply(Self.act("replay.start", [2])) == noReplay)
+        // Replay: a fresh play of the certified level with the tutorial done, stepped through the trace to a win;
+        // other play actions refused with the state unchanged; progress unchanged.
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.mode == .replay(level: 1) && core.play.records.isEmpty && core.tutorial == .done)
+        #expect(core.play.level == (try Core.level(number: 1)))
+        let refused: ActionResult = .rejected(.rule(code: AcousticConstellatorExperienceRule.replay))
+        let blocked: [ExperienceAction] = [Self.act("link.add", [0, 1]), Self.act("link.remove", [0, 1]),
+                                           Self.act("star.nudge", [0, 1]), Self.act("constellation.listen"),
+                                           Self.act("play.undo"), Self.act("play.redo"), Self.act("level.next"),
+                                           Self.act("level.select", [1]), Self.act("mode.daily", [2026, 11, 23]),
+                                           Self.act("mode.practice"), Self.act("mode.campaign")]
+        let inReplay: Core = core
+        for action in blocked {
+            #expect(core.apply(action) == refused, "\(action.control)")
+            #expect(core == inReplay)
+        }
+        #expect(core.apply(Self.act("tutorial.dismiss")) == .accepted && core.tutorial == .done)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        for index in 0..<result.trace.count {
+            #expect(core.apply(Self.act("replay.step")) == .accepted, "step \(index)")
+        }
+        #expect(core.play.stage == .won && core.progress == progress && core.outcome?.code == Core.wonCode)
+        let replayEnd: ActionResult = .rejected(.rule(code: AcousticConstellatorExperienceRule.replayEnd))
+        #expect(core.apply(Self.act("replay.step")) == replayEnd)
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && core.play.records.isEmpty)
+        #expect(core.apply(Self.act("replay.stop")) == noReplay)
+        #expect(core.progress == progress)
+    }
+
+    /// Feature 427: a replay ends with its trace, a replay saved mid-way restores and continues, a replayed daily
+    /// level stops at the frontier, and a replay whose result does not survive restore returns to campaign.
+    @Test func aReplayStopsAtTheFrontierAndEndsWithTheTrace() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let generated: AcousticConstellatorGenerated = try Core.generated(number: 1)
+        for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        // A trace of 1 link and the listen: one step, then the listen ends the play; a further step is the end.
+        #expect(generated.actions.count == 2)
+        #expect(core.apply(Self.act("replay.step")) == .accepted && core.play.stage == .playing)
+        #expect(core.apply(Self.act("replay.step")) == .accepted && core.play.stage == .won)
+        let replayEnd: ActionResult = .rejected(.rule(code: AcousticConstellatorExperienceRule.replayEnd))
+        #expect(core.apply(Self.act("replay.step")) == replayEnd)
+        // A replay saved mid-way restores into replay and continues.
+        #expect(core.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(core.apply(Self.act("replay.step")) == .accepted)
+        let payload: Data = try core.snapshotPayload()
+        var restored: Core = try Core.restore(payload: payload, seed: 0)
+        #expect(restored == core && restored.mode == .replay(level: 1) && restored.reconciliationDropped == 0)
+        #expect(restored.apply(Self.act("replay.step")) == .accepted && restored.play.stage == .won)
+        // A replayed daily level not open in the campaign stops at the frontier.
+        var daily: Core = try await Core.prepare(seed: 0)
+        #expect(daily.apply(Self.act("mode.daily", [2026, 11, 23])) == .accepted && daily.levelNumber == 15)
+        for step in try Core.generated(number: 15).actions { #expect(daily.apply(Self.act(step)) == .accepted) }
+        #expect(daily.progress.solved[15]?.verified == true && !daily.progress.isOpen(15))
+        #expect(daily.apply(Self.act("replay.start", [15])) == .accepted && daily.mode == .replay(level: 15))
+        #expect(daily.apply(Self.act("replay.stop")) == .accepted)
+        #expect(daily.mode == .campaign && daily.levelNumber == daily.progress.frontier)
+        // A replay whose result does not survive restore returns to campaign at the frontier.
+        #expect(daily.apply(Self.act("replay.start", [15])) == .accepted)
+        let text: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
+        let edited: String = text.replacingOccurrences(of: "\"stars\":3", with: "\"stars\":2")
+        #expect(edited != text)
+        let dropped: Core = try Core.restore(payload: Data(edited.utf8), seed: 0)
+        #expect(dropped.reconciliationDropped == 1 && dropped.mode == .campaign)
+        #expect(dropped.levelNumber == dropped.progress.frontier && dropped.progress.solved[15] == nil)
+    }
+
+    /// Feature 427: a saved replay's records must be the first actions of its verified trace; a changed link, a
+    /// reordered pair of links and an added undo make the payload damaged, while the honest mid-way replay restores.
+    @Test func aReplayWhoseRecordsLeaveTheTraceIsDamaged() async throws {
+        // Level 41 (seed 40): its witness links 1–4, 2–3 and 3–4 and listens.
+        var core: Core = try await Core.prepare(seed: 40)
+        let generated: AcousticConstellatorGenerated = try Core.generated(number: 41)
+        let links: [AcousticConstellatorAction] = [.link(1, 4), .link(2, 3), .link(3, 4), .listen]
+        #expect(generated.actions == links)
+        for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.apply(Self.act("replay.start", [41])) == .accepted)
+        #expect(core.apply(Self.act("replay.step")) == .accepted)
+        #expect(core.apply(Self.act("replay.step")) == .accepted)
+        let honest: Data = try core.snapshotPayload()
+        #expect((try? Core.restore(payload: honest, seed: 40)) == core, "the honest mid-way replay restores")
+        let object: [String: Any] = try #require(try JSONSerialization.jsonObject(with: honest) as? [String: Any])
+        // The records of campaign plays of level 41 that are not the trace's prefix: a changed second link, the two
+        // links reordered, and the prefix with an undo and a redo.
+        let fresh: Core = try await Core.prepare(seed: 40)
+        var changed: Core = fresh
+        #expect(changed.apply(Self.act("link.add", [1, 4])) == .accepted)
+        #expect(changed.apply(Self.act("link.add", [3, 4])) == .accepted)
+        var reordered: Core = fresh
+        #expect(reordered.apply(Self.act("link.add", [2, 3])) == .accepted)
+        #expect(reordered.apply(Self.act("link.add", [1, 4])) == .accepted)
+        var undone: Core = fresh
+        #expect(undone.apply(Self.act("link.add", [1, 4])) == .accepted)
+        #expect(undone.apply(Self.act("link.add", [2, 3])) == .accepted)
+        #expect(undone.apply(Self.act("play.undo")) == .accepted)
+        #expect(undone.apply(Self.act("play.redo")) == .accepted)
+        #expect(AcousticConstellatorReconciliation.netTrace(undone.play.records) == Array(links.prefix(2)))
+        for source in [changed, reordered, undone] {
+            let other: [String: Any] = try #require(
+                try JSONSerialization.jsonObject(with: try source.snapshotPayload()) as? [String: Any])
+            var edited: [String: Any] = object
+            edited["records"] = other["records"]
+            let data: Data = try JSONSerialization.data(withJSONObject: edited, options: [.sortedKeys])
+            #expect(throws: AcousticConstellatorRestoreRefusal.damaged) {
+                _ = try Core.restore(payload: data, seed: 40)
+            }
+        }
+    }
+
+    /// Feature 427: restore reconciles the progress (a tampered result dropped and counted, the frontier as saved)
+    /// and the sound choice is snapshotted but never digested.
+    @Test func restoreReconcilesAndKeepsTheSoundChoiceOutOfTheDigest() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(!core.soundOn)
+        for step in try Core.generated(number: 1).actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        #expect(core.apply(Self.act("settings.sound", [0.5])) == .rejected(.rule(code: "r02-g13.not-whole")))
+        let digest: StateDigest = try Self.digest(core)
+        var silent: Core = core
+        #expect(silent.apply(Self.act("settings.sound", [0])) == .accepted && !silent.soundOn)
+        #expect(try Self.digest(silent) == digest && silent != core)
+        let payload: Data = try core.snapshotPayload()
+        #expect(String(decoding: payload, as: UTF8.self).contains(",\"sound\":true,"))
+        let restored: Core = try Core.restore(payload: payload, seed: 0)
+        #expect(restored == core && restored.soundOn && restored.reconciliationDropped == 0)
+        #expect(try Self.digest(restored) == digest)
+        var reset: Core = restored
+        reset.reset()
+        #expect(!reset.soundOn)
+        // A tampered result (its stars lowered by one) is dropped and counted; the frontier stays as saved.
+        let text: String = String(decoding: payload, as: UTF8.self)
+        #expect(try #require(core.progress.solved[1]).stars == 3)
+        let edited: String = text.replacingOccurrences(of: "\"stars\":3", with: "\"stars\":2")
+        #expect(edited != text)
+        let tampered: Core = try Core.restore(payload: Data(edited.utf8), seed: 0)
+        #expect(tampered.reconciliationDropped == 1 && tampered.progress.solved[1] == nil)
+        #expect(tampered.progress.frontier == core.progress.frontier)
+        // The dropped count is never digested: the same state with nothing dropped digests alike.
+        let honest: Core = try Core.restore(payload: try tampered.snapshotPayload(), seed: 0)
+        #expect(honest.reconciliationDropped == 0 && honest == tampered)
+        #expect(try Self.digest(honest) == Self.digest(tampered))
+    }
+
+    /// Feature 427: schema-2 payloads migrate to schema 3 (results unverified with an empty trace, sound off) and
+    /// schema-1 payloads through both steps; a replay mode naming another level is damaged.
+    @Test func schemaOneAndTwoPayloadsMigrateToThree() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        for step in try Core.generated(number: 1).actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        let payload: Data = try core.snapshotPayload()
+        var object: [String: Any] = try #require(try JSONSerialization.jsonObject(with: payload) as? [String: Any])
+        // A schema-2 object: no sound key and results without trace or verified.
+        object.removeValue(forKey: "sound")
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        var solved: [Any] = []
+        for entry in try #require(progress["solved"] as? [Any]) {
+            guard var result = entry as? [String: Any] else { continue }
+            result.removeValue(forKey: "trace")
+            result.removeValue(forKey: "verified")
+            solved.append(result)
+        }
+        progress["solved"] = solved
+        object["progress"] = progress
+        let three: [String: Any] = try Core.migratedToSchemaThree(object)
+        let chained: [String: Any] = try Core.migrations.migrate(object, from: 2)
+        let data: Data = try JSONSerialization.data(withJSONObject: three, options: [.sortedKeys])
+        #expect(data == (try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])))
+        let restored: Core = try Core.restore(payload: data, seed: 0)
+        let kept: AcousticConstellatorProgress.Result = try #require(restored.progress.solved[1])
+        #expect(!kept.verified && kept.trace.isEmpty && !restored.soundOn && restored.reconciliationDropped == 0)
+        #expect(kept.actionsSpent == 2 && kept.stars == 3)
+        #expect(restored.progress.frontier == core.progress.frontier)
+        // An unverified result cannot be replayed.
+        var unverified: Core = restored
+        let noReplay: ActionResult = .rejected(.rule(code: AcousticConstellatorExperienceRule.noReplay))
+        #expect(unverified.apply(Self.act("replay.start", [1])) == noReplay)
+        // Schema 1 → 2 → 3.
+        let one: [String: Any] = ["level": 1, "records": [Any]()]
+        let viaTwo: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(one))
+        #expect(viaTwo["sound"] as? Bool == false)
+        let oneData: Data = try JSONSerialization.data(withJSONObject: viaTwo, options: [.sortedKeys])
+        let fromOne: Core = try Core.restore(payload: oneData, seed: 0)
+        #expect(fromOne.levelNumber == 1 && fromOne.progress.solved.isEmpty && !fromOne.soundOn)
+        #expect(fromOne == (try Core.opening(number: 1)))
+        #expect(throws: AcousticConstellatorRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+        // A replay mode naming another level is damaged.
+        let replayText: String = String(decoding: payload, as: UTF8.self)
+            .replacingOccurrences(of: "\"mode\":{\"mode\":\"campaign\"}",
+                                  with: "\"mode\":{\"level\":3,\"mode\":\"replay\"}")
+        #expect(replayText != String(decoding: payload, as: UTF8.self))
+        #expect(throws: AcousticConstellatorRestoreRefusal.damaged) {
+            try Core.restore(payload: Data(replayText.utf8), seed: 0)
+        }
     }
 }

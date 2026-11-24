@@ -31,7 +31,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G1307-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorExperienceCore.swift` (schema 3, migration 2 → 3
+- [X] T-R02G1307-003 [US1] [US2] [US3] Edit `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorExperienceCore.swift` (schema 3, migration 2 → 3 — Verified 2026-11-24: 2026-11-24: agent F drafted, lead landed: schema 3 (sound, traces), migrations 1 → 2 → 3, digest v3, traced wins, reconciliation on restore, replay.start/step/stop with codes no-replay, replay-end, replay, restored-replay validation (refused damaged off the trace), settings.sound, feedback words, regenerated manifest; registry comment schema 3; host-2 exit 0 (.autonomy/migration/checks/R02-G13-07.host-2.json)
   "results with an empty trace and verified false, sound off", digest v3; a campaign or daily win records the winning
   effective-action trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start
   [1…100]" (`r02-g13.no-replay` without a verified traced result), "replay.step" (`r02-g13.replay-end` after the last

@@ -64,6 +64,28 @@
 // schema-1 payloads migrate (no won levels, level 1 open plus the levels up to the restored level, campaign mode, the
 // tutorial at its first step — `link` on the tutorial levels, else `done`).
 //
+// Feature 427 (R02-G13-07) T-R02G1307-003 (FR-R02G1307-001 … 007; clarifications Q1–Q5; research R2–R7): a campaign or
+// daily win records its winning trace (`AcousticConstellatorReconciliation.netTrace` of the play's records: the
+// effective links, unlinks, nudges and the listen, an undone action left out unless redone) as a verified result;
+// restore reconciles every result (`AcousticConstellatorReconciliation.reconcile`, the frontier as saved) and exposes
+// `reconciliationDropped` (not digested, not in `==`); the replay mode `replay(level)` plays a verified trace action by
+// action:
+//   replay.start [1…100]  a fresh play of that level in mode `replay(level)` (campaign budget) with the tutorial done
+//                         (`r02-g13.no-replay` without a verified result with a trace);
+//   replay.step           the next action of the trace (`r02-g13.replay-end` after the last or once the play ended;
+//                         `r02-g13.no-replay` outside replay);
+//   replay.stop           campaign at that level, the frontier when it is not open (`r02-g13.no-replay` outside
+//                         replay);
+//   settings.sound [0…1]  the sound choice (FR-R02G1307-007): 1 on, 0 off; whole; allowed in every mode.
+// In replay every other action except `tutorial.dismiss` and `settings.sound` is refused with `r02-g13.replay` (the
+// panel's chosen star and partner and the camera are presentation only and send no action), and nothing is recorded.
+// A restored replay whose records are not exactly the first actions of its level's verified trace (links, unlinks,
+// nudges and the listen only, in order, no undo or redo) is refused as `damaged`; a restored replay whose result did
+// not survive reconciliation returns to campaign at that level (the frontier when it is not open). Digest
+// "r02-g13.acoustic-constellator.v3" (the same parts as v2, the progress now with traces; never the sound choice or the
+// dropped count); snapshot schema 3 `{"level", "mode", "progress", "records", "sound", "tutorial"}` (results carry
+// `trace` and `verified`), migrating 1 → 2 → 3 (2 → 3: every result an empty trace and `verified` false, sound off).
+//
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `AcousticConstellatorTier.of(t)`: level-0 = star pulse, 2 wave shells, 2 glow shells;
 // level-1 = pulse, 1 glow shell; level-2 = none. Outcome: `won` or `failed` while the play is in that stage, else nil.
@@ -82,6 +104,12 @@ public enum AcousticConstellatorExperienceRule {
     public static let locked = "r02-g13.locked"
     /// An impossible calendar date (feature 425).
     public static let date = "r02-g13.date"
+    /// No verified result with a trace to replay, or a replay control outside replay (feature 427).
+    public static let noReplay = "r02-g13.no-replay"
+    /// The replay has no further action: the trace is over or the play ended (feature 427).
+    public static let replayEnd = "r02-g13.replay-end"
+    /// An action that is not allowed during replay (feature 427).
+    public static let replay = "r02-g13.replay"
 }
 
 /// Why a saved Acoustic Constellator state was refused on restore (feature 423). A refused restore changes nothing.
@@ -95,18 +123,21 @@ public enum AcousticConstellatorRestoreRefusal: Error, Equatable, Sendable {
     case kernel(AcousticConstellatorError)
 }
 
-/// The state of Acoustic Constellator as an experience (see the file header). Snapshot schema 2.
+/// The state of Acoustic Constellator as an experience (see the file header). Snapshot schema 3.
 public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g13.acoustic-constellator"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g13.acoustic-constellator.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g13.acoustic-constellator.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["link.add", "link.remove", "star.nudge", "constellation.listen", "play.undo",
                                    "play.redo", "level.next", "level.select", "mode.daily", "mode.practice",
-                                   "mode.campaign", "tutorial.dismiss"]
+                                   "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step",
+                                   "replay.stop", "settings.sound"]
+    /// The declared range of `settings.sound`: 0 off, 1 on (feature 427).
+    public static let soundRange: ClosedRange<Int> = 0...1
     /// The budget of a practice play: the kernel's maximum (`AcousticConstellatorMode.practiceBudget`, 40).
     public static let practiceBudget: Int = AcousticConstellatorMode.practiceBudget
     /// The level numbers of the catalog.
@@ -135,6 +166,12 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
     public private(set) var mode: AcousticConstellatorMode
     /// The tutorial step (feature 425): in the snapshot, not in the digest.
     public private(set) var tutorial: AcousticConstellatorTutorialStep
+    /// How many saved results the last restore dropped because they did not verify (feature 427); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
+    /// The player's sound choice (feature 427, FR-R02G1307-007), set by `settings.sound`: in the snapshot (key
+    /// `"sound"`) and `==`, never in the digest; off at an opening, after a reset and in a migrated save.
+    public private(set) var soundOn = false
     /// The certified witness's action count of the current level (its links and nudges plus the listen), against which
     /// a win's stars are counted. Derived from the level number.
     public private(set) var certifiedActions: Int
@@ -329,18 +366,45 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the quality tier or
-    /// the opening level).
+    /// Equal states: the level number, the play, the progress, the mode, the tutorial step and the sound choice (not
+    /// the quality tier, the dropped count or the opening level).
     public static func == (lhs: AcousticConstellatorExperienceCore, rhs: AcousticConstellatorExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial && lhs.soundOn == rhs.soundOn
     }
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object (feature 427): every won result gains an empty `trace` and `verified`
+    /// false, and the sound choice is off.
+    ///
+    /// - Throws: ``AcousticConstellatorRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw AcousticConstellatorRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated: [String: Any] = object
+        migrated["progress"] = progress
+        migrated["sound"] = false
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 425): no won levels with level 1 open
@@ -383,6 +447,10 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
+        ExperienceControl(id: "settings.sound", ranges: [declared(soundRange)]),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -390,8 +458,9 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The twelve controls with their declared ranges (see the file header); `constellation.listen`, `play.undo`,
-    /// `play.redo`, `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
+    /// The sixteen controls with their declared ranges (see the file header); `constellation.listen`, `play.undo`,
+    /// `play.redo`, `level.next`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`, `replay.step` and `replay.stop`
+    /// take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing`; no clock is read.
@@ -423,6 +492,9 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
                 return .rejected(.rule(code: AcousticConstellatorExperienceRule.notWhole))
             }
             values.append(whole)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: AcousticConstellatorExperienceRule.replay))
         }
         do throws(AcousticConstellatorError) {
             switch action.control {
@@ -466,6 +538,29 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
                 try open(number: levelNumber, mode: .practice)
             case "mode.campaign":
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "replay.start":
+                guard let result = progress.solved[values[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: AcousticConstellatorExperienceRule.noReplay))
+                }
+                try open(number: values[0], mode: .replay(level: values[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: AcousticConstellatorExperienceRule.noReplay))
+                }
+                // Replay never undoes, so each trace action made exactly one record.
+                let index: Int = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: AcousticConstellatorExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: AcousticConstellatorExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
+            case "settings.sound":
+                soundOn = values[0] == 1
             default:   // tutorial.dismiss
                 tutorial = tutorial.dismissed()
             }
@@ -507,13 +602,24 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
 
     /// After an accepted action that won the play: records the actions spent
     /// (`AcousticConstellatorProgress.actionsSpent(_:)`) against the certified witness's action count in the current
-    /// mode (campaign opens the next level; daily records the best result and stars and opens nothing; practice records
-    /// nothing). A won play is final, so a win is recorded once.
+    /// mode with the winning trace (``winningTrace``) as a verified result (campaign opens the next level; daily
+    /// records the best result and stars and opens nothing; practice and replay record nothing). A won play is final,
+    /// so a win is recorded once.
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
+        if case .replay = mode { return }
         progress.record(level: levelNumber, actionsSpent: AcousticConstellatorProgress.actionsSpent(play),
-                        certified: certifiedActions, mode: mode)
+                        certified: certifiedActions, mode: mode, trace: winningTrace)
     }
+
+    /// The controls accepted during replay (feature 427); the panel's chosen star and partner and the camera are
+    /// presentation only and send no action.
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "settings.sound"]
+
+    /// The winning trace of the current play (feature 427): its effective actions in order
+    /// (``AcousticConstellatorReconciliation/netTrace(_:)``), never an undo or a redo.
+    var winningTrace: [AcousticConstellatorAction] { AcousticConstellatorReconciliation.netTrace(play.records) }
 
     /// Back to the opening state the seed chose (progress included, campaign mode); the quality tier, which is not
     /// state, is kept.
@@ -524,6 +630,7 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
         mode = .campaign
         tutorial = opening.tutorial
         certifiedActions = opening.certifiedActions
+        soundOn = false
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -535,8 +642,9 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g13.acoustic-constellator.v2", then the level number, the play's fingerprint (level, links, phases,
-    /// actions spent, stage, failure), the progress and the mode (their sorted JSON); never the tutorial step.
+    /// "r02-g13.acoustic-constellator.v3", then the level number, the play's fingerprint (level, links, phases,
+    /// actions spent, stage, failure), the progress (with its traces) and the mode (their sorted JSON); never the
+    /// tutorial step, the sound choice or the dropped count.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
@@ -549,7 +657,8 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload and `sound` (absent
+    /// means off) is written by every schema-3 payload and by the 2 → 3 migration.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
@@ -559,23 +668,29 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
         var progress: AcousticConstellatorProgress
         /// The play's records.
         var records: [AcousticConstellatorRecord]
+        /// The sound choice; nil (off) in a payload written before schema 3.
+        var sound: Bool?
         /// The tutorial step; nil in a migrated schema-1 payload.
         var tutorial: AcousticConstellatorTutorialStep?
     }
 
-    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "sound", "tutorial"}` with sorted keys and unescaped
+    /// slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
-                                                 records: play.records, tutorial: tutorial))
+                                                 records: play.records, sound: soundOn, tutorial: tutorial))
     }
 
-    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
-    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent); a reset returns to
-    /// the opening state `seed` chooses.
+    /// The core of `payload` (schema 3): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the reconciled progress (``AcousticConstellatorReconciliation/reconcile(_:)``, the frontier
+    /// as saved, the number dropped in ``reconciliationDropped``), the saved mode, tutorial step (the first step when
+    /// absent) and sound choice (off when absent); a saved replay whose result did not survive the check returns to
+    /// campaign at that level (the frontier when it is not open). A reset returns to the opening state `seed` chooses.
     ///
     /// - Throws: ``AcousticConstellatorRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or
-    ///   tutorial step, or a daily mode naming another level among them), a level number outside 1 … 100 or a level
-    ///   or trace the kernel refuses.
+    ///   tutorial step, a daily or replay mode naming another level, or a replay whose records are not exactly the
+    ///   first actions of its level's verified trace among them), a level number outside 1 … 100 or a level or trace
+    ///   the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> AcousticConstellatorExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw AcousticConstellatorRestoreRefusal.damaged
@@ -586,6 +701,23 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw AcousticConstellatorRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw AcousticConstellatorRestoreRefusal.damaged
+        }
+        // Feature 427: a saved replay's records are exactly the first actions of its level's saved trace — links,
+        // unlinks, nudges and the listen only, in order, no undo or redo — or the payload is damaged.
+        if case .replay(let replayed) = decoded.mode, let saved = decoded.progress.solved[replayed], saved.verified {
+            var applied: [AcousticConstellatorAction] = []
+            for record in decoded.records {
+                guard record.kind != .undo, record.kind != .redo, let action = record.action else {
+                    throw AcousticConstellatorRestoreRefusal.damaged
+                }
+                applied.append(action)
+            }
+            guard applied.count <= saved.trace.count, Array(saved.trace.prefix(applied.count)) == applied else {
+                throw AcousticConstellatorRestoreRefusal.damaged
+            }
+        }
         do throws(AcousticConstellatorError) {
             let certified: AcousticConstellatorGenerated = try generated(number: decoded.level)
             let play: AcousticConstellatorPlay = try AcousticConstellatorPlay.replay(
@@ -593,12 +725,19 @@ public struct AcousticConstellatorExperienceCore: ExperienceCore, Equatable {
             let tutorial: AcousticConstellatorTutorialStep = decoded.tutorial
                 ?? AcousticConstellatorTutorialStep.initial(level: decoded.level)
             let openingCore: AcousticConstellatorExperienceCore = try opening(number: levelNumber(forSeed: seed))
-            return AcousticConstellatorExperienceCore(levelNumber: decoded.level, play: play,
-                                                      progress: decoded.progress, mode: decoded.mode,
-                                                      tutorial: tutorial,
-                                                      certifiedActions: certified.actions.count,
-                                                      openingNumber: openingCore.openingNumber,
-                                                      opening: openingCore.opening)
+            // Feature 427: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = AcousticConstellatorReconciliation.reconcile(decoded.progress)
+            var core: AcousticConstellatorExperienceCore = AcousticConstellatorExperienceCore(
+                levelNumber: decoded.level, play: play, progress: reconciled.progress, mode: decoded.mode,
+                tutorial: tutorial, certifiedActions: certified.actions.count,
+                openingNumber: openingCore.openingNumber, opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            core.soundOn = decoded.sound ?? false
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw AcousticConstellatorRestoreRefusal.kernel(error)
         }
