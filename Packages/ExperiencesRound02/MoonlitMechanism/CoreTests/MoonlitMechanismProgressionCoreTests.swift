@@ -115,13 +115,19 @@ import VisualCoreSimulation
         #expect(core.apply(Self.act("play.undo")) == .accepted)
         for step in actions { #expect(core.apply(Self.act(step)) == .accepted) }
         #expect(core.play.stage == .won && MoonlitMechanismProgress.actionsSpent(core.play) == certified + 1)
-        #expect(core.progress.solved[1] == MoonlitMechanismProgress.Result(actionsSpent: certified + 1, stars: 2))
+        // Since feature 437 a campaign win stores a verified result with its winning trace (the undone turn left out).
+        #expect(MoonlitMechanismReconciliation.netTrace(core.play.records) == actions)
+        #expect(core.progress.solved[1] == MoonlitMechanismProgress.Result(actionsSpent: certified + 1, stars: 2,
+                                                                          trace: actions, verified: true))
         #expect(core.progress.frontier == 2 && core.progress.isOpen(2) && !core.progress.isOpen(3))
         // A better result replaces it: the witness alone, 3 stars.
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.mode == .campaign)
         for step in actions { #expect(core.apply(Self.act(step)) == .accepted) }
-        #expect(core.progress.solved[1] == MoonlitMechanismProgress.Result(actionsSpent: certified, stars: 3))
+        // Since feature 437 the result carries the witness trace, verified.
+        let best: MoonlitMechanismProgress.Result = MoonlitMechanismProgress.Result(actionsSpent: certified, stars: 3,
+                                                                                    trace: actions, verified: true)
+        #expect(core.progress.solved[1] == best)
         // A worse result keeps the best one: four turns back and forth more than the witness (1 star; 7 of the
         // budget's 9 actions) change nothing.
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
@@ -131,7 +137,7 @@ import VisualCoreSimulation
         for step in detours { #expect(core.apply(step) == .accepted) }
         for step in actions { #expect(core.apply(Self.act(step)) == .accepted) }
         #expect(core.play.stage == .won && MoonlitMechanismProgress.actionsSpent(core.play) == certified + 4)
-        #expect(core.progress.solved[1] == MoonlitMechanismProgress.Result(actionsSpent: certified, stars: 3))
+        #expect(core.progress.solved[1] == best)   // since feature 437 compared with its trace
         #expect(core.progress.frontier == 2)
         // The frontier: level 2 can be chosen, level 3 cannot.
         #expect(core.apply(Self.act("level.select", [3])) == .rejected(.rule(code: "r02-g14.locked")))
@@ -177,7 +183,9 @@ import VisualCoreSimulation
         for step in dailyActions { #expect(core.apply(Self.act(step)) == .accepted) }
         #expect(core.play.stage == .won && core.progress.frontier == 1 && !core.progress.isOpen(daily))
         let result: MoonlitMechanismProgress.Result = try #require(core.progress.solved[daily])
-        #expect(result == MoonlitMechanismProgress.Result(actionsSpent: dailyActions.count, stars: 3))
+        // Since feature 437 a daily win stores a verified result with its winning trace.
+        #expect(result == MoonlitMechanismProgress.Result(actionsSpent: dailyActions.count, stars: 3,
+                                                          trace: dailyActions, verified: true))
         // Campaign from a level that is not open goes to the frontier.
         #expect(core.apply(Self.act("mode.campaign")) == .accepted)
         #expect(core.mode == .campaign && core.levelNumber == 1)
@@ -302,9 +310,11 @@ import VisualCoreSimulation
         #expect(practice.play.level.budget == 40)
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
         let certified: Int = try Self.witness(1).count
+        // Since feature 437 the stored result carries the winning trace (the witness) and is verified.
+        let traceText: String = String(decoding: try Core.payloadEncoder().encode(try Self.witness(1)), as: UTF8.self)
         let progressText: String = "\"progress\":{\"frontier\":2,"
             + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3,"
-            + "\"trace\":[],\"verified\":false}]}"
+            + "\"trace\":" + traceText + ",\"verified\":true}]}"
         #expect(campaignText.contains(progressText))
         #expect(campaignText.hasPrefix("{\"level\":2,\"mode\":{\"mode\":\"campaign\"},"))
         let dailyText: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
@@ -345,7 +355,9 @@ import VisualCoreSimulation
         let records: Data = try Core.payloadEncoder().encode(core.play.records)
         let recordsObject: Any = try JSONSerialization.jsonObject(with: records)
         let schemaOne: [String: Any] = ["level": 3, "records": recordsObject]
-        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        // Since feature 437 the chain runs 1 → 2 → 3, so the expectation is both steps applied in order.
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(schemaOne))
+        #expect(migrated["sound"] as? Bool == false)
         let chained: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
         let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
         let chainedData: Data = try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])
@@ -366,7 +378,8 @@ import VisualCoreSimulation
         #expect(throws: MoonlitMechanismRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "3"]) }
         #expect(throws: MoonlitMechanismRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
         // A newer schema is refused by the chain.
-        #expect(Core.schemaVersion == 2)
-        #expect(throws: MigrationError.newerVersion(3)) { try Core.migrations.migrate(schemaOne, from: 3) }
+        // Since feature 437 the current schema is 3, so the newer one is 4.
+        #expect(Core.schemaVersion == 3)
+        #expect(throws: MigrationError.newerVersion(4)) { try Core.migrations.migrate(schemaOne, from: 4) }
     }
 }

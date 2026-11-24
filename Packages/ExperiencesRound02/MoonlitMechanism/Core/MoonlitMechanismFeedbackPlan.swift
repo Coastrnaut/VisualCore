@@ -115,6 +115,10 @@ public struct MoonlitMechanismFeedbackPlan: Sendable, Equatable {
         case MoonlitMechanismError.stage.reasonCode: return "The level has ended."
         case MoonlitMechanismExperienceRule.notWhole: return "That value must be a whole number."
         case MoonlitMechanismExperienceRule.frame: return "This level has no such key frame."
+        // Feature 437: the replay refusals.
+        case MoonlitMechanismExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case MoonlitMechanismExperienceRule.replayEnd: return "The replay is over."
+        case MoonlitMechanismExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }

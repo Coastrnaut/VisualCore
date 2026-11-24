@@ -72,6 +72,27 @@
 // migrate (no won levels, level 1 open plus the levels up to the restored level, campaign mode, the tutorial at its
 // first step — `change` on the tutorial levels, else `done`).
 //
+// Feature 437 (R02-G14-07) T-R02G1407-003 (FR-R02G1407-001 … 007; clarifications Q1–Q5): a campaign or daily win
+// records its winning trace (`MoonlitMechanismReconciliation.netTrace` of the play's records: the effective turns,
+// re-seats, lamp steps and the run, an undone action left out unless redone) as a verified result; restore reconciles
+// every result (`MoonlitMechanismReconciliation.reconcile`, the frontier as saved) and exposes `reconciliationDropped`
+// (not digested, not in `==`); the replay mode `replay(level)` plays a verified trace action by action:
+//   replay.start [1…100]  a fresh play of that level in mode `replay(level)` (campaign budget) with the tutorial done
+//                         (`r02-g14.no-replay` without a verified result with a trace);
+//   replay.step           the next action of the trace (`r02-g14.replay-end` after the last or once the play ended;
+//                         `r02-g14.no-replay` outside replay);
+//   replay.stop           campaign at that level, the frontier when it is not open (`r02-g14.no-replay` outside
+//                         replay);
+//   settings.sound [0…1]  the sound choice (FR-R02G1407-007): 1 on, 0 off; whole; allowed in every mode.
+// In replay every other action except `tutorial.dismiss`, `frame.show` (presentation) and `settings.sound` is refused
+// with `r02-g14.replay` (the panel's chosen gear and the camera are presentation only and send no action), and nothing
+// is recorded. A restored replay whose records are not exactly the first actions of its level's verified trace (turns,
+// re-seats, lamp steps and the run only, in order, no undo or redo) is refused as `damaged`; a restored replay whose
+// result did not survive reconciliation returns to campaign at that level (the frontier when it is not open). Digest
+// "r02-g14.moonlit-mechanism.v3" (the same parts as v2, the progress now with traces; never the sound choice or the
+// dropped count); snapshot schema 3 `{"level", "mode", "progress", "records", "sound", "tutorial"}` (results carry
+// `trace` and `verified`), migrating 1 → 2 → 3 (2 → 3: every result an empty trace and `verified` false, sound off).
+//
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `MoonlitMechanismTier.of(t)`: level-0 = 6 rim segments per tooth, soft shadow edges,
 // 2 glow shells; level-1 = 4, soft edges, 1 glow shell; level-2 = 2, hard edges, no glow. Outcome: `won` or `failed`
@@ -92,6 +113,12 @@ public enum MoonlitMechanismExperienceRule {
     public static let locked = "r02-g14.locked"
     /// An impossible calendar date (feature 435).
     public static let date = "r02-g14.date"
+    /// No verified result with a trace to replay, or a replay control outside replay (feature 437).
+    public static let noReplay = "r02-g14.no-replay"
+    /// The replay has no further action: the trace is over or the play ended (feature 437).
+    public static let replayEnd = "r02-g14.replay-end"
+    /// An action that is not allowed during replay (feature 437).
+    public static let replay = "r02-g14.replay"
 }
 
 /// Why a saved Moonlit Mechanism state was refused on restore (feature 433). A refused restore changes nothing.
@@ -105,18 +132,21 @@ public enum MoonlitMechanismRestoreRefusal: Error, Equatable, Sendable {
     case kernel(MoonlitMechanismError)
 }
 
-/// The state of Moonlit Mechanism as an experience (see the file header). Snapshot schema 2.
+/// The state of Moonlit Mechanism as an experience (see the file header). Snapshot schema 3.
 public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g14.moonlit-mechanism"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g14.moonlit-mechanism.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g14.moonlit-mechanism.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["handle.turn", "gear.reseat", "lamp.step", "machine.run", "play.undo", "play.redo",
                                    "level.next", "frame.show", "level.select", "mode.daily", "mode.practice",
-                                   "mode.campaign", "tutorial.dismiss"]
+                                   "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step", "replay.stop",
+                                   "settings.sound"]
+    /// The declared range of `settings.sound`: 0 off, 1 on (feature 437).
+    public static let soundRange: ClosedRange<Int> = 0...1
     /// The budget of a practice play: the kernel's maximum (`MoonlitMechanismMode.practiceBudget`, 40).
     public static let practiceBudget: Int = MoonlitMechanismMode.practiceBudget
     /// The level numbers of the catalog.
@@ -171,6 +201,12 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
+    /// How many saved results the last restore dropped because they did not verify (feature 437); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
+    /// The player's sound choice (feature 437, FR-R02G1407-007), set by `settings.sound`: in the snapshot (key
+    /// `"sound"`) and `==`, never in the digest; off at an opening, after a reset and in a migrated save.
+    public private(set) var soundOn = false
 
     /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial` and key frame 0 shown, whose
     /// reset returns to `opening` of `openingNumber`.
@@ -332,18 +368,45 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown key frame,
-    /// the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode, the tutorial step and the sound choice (not the
+    /// shown key frame, the quality tier, the dropped count or the opening level).
     public static func == (lhs: MoonlitMechanismExperienceCore, rhs: MoonlitMechanismExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial && lhs.soundOn == rhs.soundOn
     }
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object (feature 437): every won result gains an empty `trace` and `verified`
+    /// false, and the sound choice is off.
+    ///
+    /// - Throws: ``MoonlitMechanismRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw MoonlitMechanismRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated: [String: Any] = object
+        migrated["progress"] = progress
+        migrated["sound"] = false
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 435): no won levels with level 1 open
@@ -386,6 +449,10 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
+        ExperienceControl(id: "settings.sound", ranges: [declared(soundRange)]),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -393,8 +460,9 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The thirteen controls with their declared ranges (see the file header); `machine.run`, `play.undo`, `play.redo`,
-    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
+    /// The seventeen controls with their declared ranges (see the file header); `machine.run`, `play.undo`,
+    /// `play.redo`, `level.next`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`, `replay.step` and `replay.stop`
+    /// take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with key frame 0 shown; no clock is read.
@@ -426,6 +494,9 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
                 return .rejected(.rule(code: MoonlitMechanismExperienceRule.notWhole))
             }
             values.append(whole)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: MoonlitMechanismExperienceRule.replay))
         }
         do throws(MoonlitMechanismError) {
             switch action.control {
@@ -475,6 +546,29 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
                 try open(number: levelNumber, mode: .practice)
             case "mode.campaign":
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "replay.start":
+                guard let result = progress.solved[values[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: MoonlitMechanismExperienceRule.noReplay))
+                }
+                try open(number: values[0], mode: .replay(level: values[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: MoonlitMechanismExperienceRule.noReplay))
+                }
+                // Replay never undoes, so each trace action made exactly one record.
+                let index: Int = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: MoonlitMechanismExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: MoonlitMechanismExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
+            case "settings.sound":
+                soundOn = values[0] == 1
             default:   // tutorial.dismiss
                 tutorial = tutorial.dismissed()
             }
@@ -522,9 +616,19 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
     /// nothing). A won play is final, so a win is recorded once.
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
+        if case .replay = mode { return }
         progress.record(level: levelNumber, actionsSpent: MoonlitMechanismProgress.actionsSpent(play),
-                        certified: certifiedActions, mode: mode)
+                        certified: certifiedActions, mode: mode, trace: winningTrace)
     }
+
+    /// The controls accepted during replay (feature 437); the panel's chosen gear and the camera are presentation only
+    /// and send no action.
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "frame.show", "settings.sound"]
+
+    /// The winning trace of the current play (feature 437): its effective actions in order
+    /// (``MoonlitMechanismReconciliation/netTrace(_:)``), never an undo or a redo.
+    var winningTrace: [MoonlitMechanismAction] { MoonlitMechanismReconciliation.netTrace(play.records) }
 
     /// Back to the opening state the seed chose (progress included, campaign mode, key frame 0 shown); the quality
     /// tier, which is not state, is kept.
@@ -536,6 +640,7 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         tutorial = opening.tutorial
         certifiedActions = opening.certifiedActions
         shownFrame = Self.openingFrame
+        soundOn = false
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -547,9 +652,9 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g14.moonlit-mechanism.v2", then the level number, the play's fingerprint (level, phases, lamp height,
-    /// actions spent, stage, failure), the progress and the mode (their sorted JSON); never the tutorial step or the
-    /// shown key frame.
+    /// "r02-g14.moonlit-mechanism.v3", then the level number, the play's fingerprint (level, phases, lamp height,
+    /// actions spent, stage, failure), the progress (with its traces) and the mode (their sorted JSON); never the
+    /// tutorial step, the shown key frame, the sound choice or the dropped count.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
@@ -573,14 +678,17 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         var progress: MoonlitMechanismProgress
         /// The play's records.
         var records: [MoonlitMechanismRecord]
+        /// The sound choice; nil (off) in a payload written before schema 3.
+        var sound: Bool?
         /// The tutorial step; nil in a migrated schema-1 payload.
         var tutorial: MoonlitMechanismTutorialStep?
     }
 
-    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "sound", "tutorial"}` with sorted keys and unescaped
+    /// slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
-                                                 records: play.records, tutorial: tutorial))
+                                                 records: play.records, sound: soundOn, tutorial: tutorial))
     }
 
     /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
@@ -600,6 +708,23 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw MoonlitMechanismRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw MoonlitMechanismRestoreRefusal.damaged
+        }
+        // Feature 437: a saved replay's records are exactly the first actions of its level's saved trace — turns,
+        // re-seats, lamp steps and the run only, in order, no undo or redo — or the payload is damaged.
+        if case .replay(let replayed) = decoded.mode, let saved = decoded.progress.solved[replayed], saved.verified {
+            var applied: [MoonlitMechanismAction] = []
+            for record in decoded.records {
+                guard record.kind != .undo, record.kind != .redo, let action = record.action else {
+                    throw MoonlitMechanismRestoreRefusal.damaged
+                }
+                applied.append(action)
+            }
+            guard applied.count <= saved.trace.count, Array(saved.trace.prefix(applied.count)) == applied else {
+                throw MoonlitMechanismRestoreRefusal.damaged
+            }
+        }
         do throws(MoonlitMechanismError) {
             let certified: MoonlitMechanismGenerated = try generated(number: decoded.level)
             let play: MoonlitMechanismPlay = try MoonlitMechanismPlay.replay(
@@ -607,11 +732,19 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
             let tutorial: MoonlitMechanismTutorialStep = decoded.tutorial
                 ?? MoonlitMechanismTutorialStep.initial(level: decoded.level)
             let openingCore: MoonlitMechanismExperienceCore = try opening(number: levelNumber(forSeed: seed))
-            return MoonlitMechanismExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                                  mode: decoded.mode, tutorial: tutorial,
-                                                  certifiedActions: MoonlitMechanismSolver.actions(certified.plan).count,
-                                                  openingNumber: openingCore.openingNumber,
-                                                  opening: openingCore.opening)
+            // Feature 437: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = MoonlitMechanismReconciliation.reconcile(decoded.progress)
+            var core: MoonlitMechanismExperienceCore = MoonlitMechanismExperienceCore(
+                levelNumber: decoded.level, play: play, progress: reconciled.progress, mode: decoded.mode,
+                tutorial: tutorial, certifiedActions: MoonlitMechanismSolver.actions(certified.plan).count,
+                openingNumber: openingCore.openingNumber, opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            core.soundOn = decoded.sound ?? false
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw MoonlitMechanismRestoreRefusal.kernel(error)
         }

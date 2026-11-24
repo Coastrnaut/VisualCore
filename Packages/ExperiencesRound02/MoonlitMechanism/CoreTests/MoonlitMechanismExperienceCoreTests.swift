@@ -111,22 +111,28 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g14.moonlit-mechanism" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g14.moonlit-mechanism.v2")
+        // Since feature 437 the snapshot schema is 3 and the digest domain v3.
+        #expect(Core.experienceID == "r02-g14.moonlit-mechanism" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g14.moonlit-mechanism.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["handle.turn", "gear.reseat", "lamp.step", "machine.run", "play.undo", "play.redo",
                              "level.next", "frame.show", "level.select", "mode.daily", "mode.practice",
-                             "mode.campaign", "tutorial.dismiss"]
+                             "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step", "replay.stop",
+                             "settings.sound"]
+        // Since feature 437 four controls follow: replay.start [1…100], replay.step, replay.stop, settings.sound [0…1].
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [-1...1] && Core.controls[2].ranges == [-1...1])
         #expect(Core.controls[1].ranges == [0...4, -1...1])
         #expect(Core.controls[7].ranges == [0...5])
         #expect(Core.controls[8].ranges == [1...100])
         #expect(Core.controls[9].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [3, 4, 5, 6, 10, 11, 12]
+        #expect(Core.controls[13].ranges == [1...100])
+        #expect(Core.controls[16].ranges == [0...1])
+        let plainIndices: [Int] = [3, 4, 5, 6, 10, 11, 12, 14, 15]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == MoonlitMechanismTier.all.count)
-        #expect(Core.migrations.currentVersion == 2)
+        // Since feature 437 the migration chain ends at schema 3.
+        #expect(Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == MoonlitMechanismTier.all.map(\.name))
@@ -513,7 +519,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let openingPayload: Data = try opening.snapshotPayload()
         #expect(String(data: openingPayload, encoding: .utf8)
             == "{\"level\":8,\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":8,\"solved\":[]},"
-            + "\"records\":[],\"tutorial\":\"done\"}")
+            + "\"records\":[],\"sound\":false,\"tutorial\":\"done\"}")   // since feature 437 with "sound"
         #expect(try Core.restore(payload: openingPayload, seed: 7) == opening)
 
         #expect(throws: MoonlitMechanismRestoreRefusal.damaged) {
@@ -566,14 +572,15 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(engine.handle(control: "handle.turn", values: [1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        // Since feature 437 the current schema is 3, so the newer one is 4.
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
