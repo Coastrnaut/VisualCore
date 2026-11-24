@@ -54,3 +54,25 @@ before the failing turn and refunds its action (recorded); a won level is final.
 Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decode (`r02-g15.level`,
 `r02-g15.newer-schema`, `r02-g15.malformed`). `VoxelOrigamiRules` expresses the rules as an R02-F23 `PuzzleRules`
 (moves: every hinge that would swing a cube, ascending, then −1, +1) for the level certification of R02-G15-02.
+
+## Levels, the solver and witness files (feature 442, R02-G15-02)
+
+- **Manifest.** The 100 planned levels of the archived design (`VoxelOrigamiManifest`): number, seed, band 1 … 5 (20
+  each), moves budget 8 … 19 and control emphasis; the emphasis chooses the orientations (`rotate assembly` → `any`,
+  `lock shape` → `fixed`, the others → `upright`).
+- **Generator.** Candidate c of an entry draws from `SeedDerivation.derive(seed, index: c)`: the cube count by band
+  (5 … 6, 6 … 7, 7 … 8, 8 … 9, 9 … 10), a hinge tree with a collision-free rest pose (redrawn up to 50 times), a
+  collision-free solution pose, the target (the solution's cells under a drawn allowed rotation and a drawn shift), and a
+  scramble of clear turns by band (2 … 4, 4 … 6, 6 … 9, 8 … 12, 10 … 14) that gives the start. The first candidate whose
+  minimal plan lies in its band's range (1 … 2, 2 … 3, 3 … 4, 4 … 5, 5 … 6 turns) is kept; at most 256, then
+  `generation(n)`. The ranges were measured by a prototype on the real kernel first; the catalog needs at most 58
+  candidates per entry and 4 640 turns tried.
+- **Solver.** A breadth-first search over quarter-turn states (the exact case of the catalog's A-star): states expanded
+  in the order reached, moves in hinge order, −1 then +1, each move filtered by the kernel's collision and exact sweep
+  rule, states merged by their quarter turns; the first matching state is the plan, and every state reached at a
+  smaller depth (counted) is the proof that nothing shorter matches. Work is bounded at 300 000 turns tried.
+- **Witness files.** `docs/games/voxel-origami/levels/NNN.witness.json` (schema 1): the level, the turns, a state digest
+  after every turn, the play fingerprints, the counterexample (the depth below the plan and its states, none matching),
+  the difficulty and the candidates skipped; decoding re-checks everything by replay. The catalog digest over the 100
+  level fingerprints is pinned, R02-F24's progression rule holds on the witness turn count, and a depth-first
+  enumeration on the two levels with the fewest cubes per band confirms the minima.

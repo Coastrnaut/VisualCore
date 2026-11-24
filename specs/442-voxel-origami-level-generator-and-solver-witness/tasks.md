@@ -61,7 +61,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1502-007 Docs: `docs/architecture/voxel-origami.md` (content pipeline),
+- [X] T-R02G1502-007 Docs: `docs/architecture/voxel-origami.md` (content pipeline), — Verified 2026-11-24: 2026-11-24: architecture content-pipeline section, ExperiencesRound02 README, testing doc (groups of 10, first write run); round02-host exit 0, 383 s (.autonomy/migration/checks/R02-G15-02.round02-host.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1502-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

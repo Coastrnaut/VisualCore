@@ -738,6 +738,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   search through the play (states merged by phases and lamp height), which is cheap here because every action adds to
   one vector. Regenerate the witness files only with `MOONLIT_MECHANISM_WRITE_WITNESSES=1` and re-pin the catalog digest
   after review.
+- **Voxel Origami content pipeline** (R02-G15-02, 2026-11-24). `swift test --package-path Packages/ExperiencesRound02
+  --filter VoxelOrigami`: the solver against an independent breadth-first search (order and state counts) and a
+  depth-first enumeration on the two fewest-cube levels per band; the generator against an independent re-draw of 60
+  candidates; the 100 witness files byte for byte (regenerate only with `VOXEL_ORIGAMI_WRITE_WITNESSES=1`). The
+  byte-for-byte check runs in 10 groups of 10 levels: 20 band-5 levels, generated and re-solved by the witness check,
+  took about 13 s in a debug build, over the 10 s per test rule. A first write run fails the tests that read the files
+  at process start (they do not exist yet); rerun without the switch.
 - **Voxel Origami rule kernel** (R02-G15-01, 2026-11-24). `swift test --package-path Packages/ExperiencesRound02
   --filter VoxelOrigami` (43 tests, under 10 s): poses against an independent subtree recomputation, collisions against
   a set intersection, the sweep against a 1 000-step sampling of each quarter arc, canonical forms and covered counts

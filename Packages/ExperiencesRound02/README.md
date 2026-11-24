@@ -831,3 +831,7 @@ with names in words), the play state `VoxelOrigamiPlay` with `VoxelOrigamiStage`
 `VoxelOrigamiFailure` and append-only `VoxelOrigamiRecord`s, and `VoxelOrigamiRules` for the R02-F23 puzzle contract.
 Refusals are `VoxelOrigamiError` with `r02-g15.*` codes. Rules:
 [docs/architecture/voxel-origami.md](../../docs/architecture/voxel-origami.md).
+
+Feature 442 (R02-G15-02) adds the content pipeline: the 100-entry `VoxelOrigamiManifest`, band profiles and the
+constructive `VoxelOrigamiGenerator`, the breadth-first `VoxelOrigamiSolver` with its minimality counts,
+`VoxelOrigamiDifficulty`, `VoxelOrigamiWitness` files in `docs/games/voxel-origami/levels/` and the pinned catalog digest.
