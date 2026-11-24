@@ -36,7 +36,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   colours 8-bit sRGB; JSON with sorted keys; SHA-256"; manifest; compare with the one-quantum fallback and the
   pinned-digest self-check), generate `Packages/ExperiencesRound02/VoxelOrigami/golden-frames.json` (schema 1) with
   `VOXEL_ORIGAMI_WRITE_GOLDEN=1`, and add `VoxelOrigamiGolden` to `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G1508-004 [P] [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G1508-004 [P] [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-24: 2026-11-24 host-2 exit 0, 11 tests (.autonomy/migration/checks/R02-G15-08.host-2.json)
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a moved
   position beyond a quantum, a changed colour or count, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
