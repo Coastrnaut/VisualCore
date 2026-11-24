@@ -11,7 +11,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G1503-001 Baselines on the committed tree after R02-G15-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing, baseline-round02 exit 0 on the committed tree after R02-G15-02's record
   baseline-timing`, `--name baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering
   baseline is R02-G15-02's rendering runs (exit 0)
-- [ ] T-R02G1503-002 Edit `Packages/ExperiencesRound02/Package.swift` (`VoxelOrigamiCore` gains VisualCoreScenes,
+- [X] T-R02G1503-002 Edit `Packages/ExperiencesRound02/Package.swift` (`VoxelOrigamiCore` gains VisualCoreScenes, — Verified 2026-11-24: 2026-11-24: Package.swift deps added, VoxelOrigamiSceneSnapshot.swift (palette, tiers, snapshot); the invariant scans read only the explicit kernelFiles list, so presentation sources are already skipped; host exit 0
   VisualCoreExperience, VisualCoreDiagnostics and VisualCorePersistence; `VoxelOrigamiExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); make the renderer-purity and
   time scans of `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiInvariantTests.swift` skip the

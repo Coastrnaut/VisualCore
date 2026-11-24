@@ -718,12 +718,21 @@ let package = Package(
         // Feature 441 (R02-G15-01): Voxel Origami's pure rule kernel.
         .target(name: "VoxelOrigamiCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 443 (R02-G15-03): the adapter, snapshot and scene geometry.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "VoxelOrigami/Core"),
         .testTarget(name: "VoxelOrigamiCoreTests",
                     dependencies: ["VoxelOrigamiCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore)],
                     path: "VoxelOrigami/CoreTests"),
     ]
 )
