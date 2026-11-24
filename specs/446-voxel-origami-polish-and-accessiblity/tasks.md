@@ -28,7 +28,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
   undos, redos, refusals of every code (bare and prefixed), wins in campaign and practice, failures by collision, sweep
   and budget, and level and mode changes compare texts, kinds and haptics exactly; choosing a hinge plans nothing);
   agent A; `--name host-2`
-- [ ] T-R02G1506-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiLights.swift`
+- [X] T-R02G1506-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiLights.swift` — Verified 2026-11-24: 2026-11-24: agent B VoxelOrigamiLights (0.15/0.45 s, frame clock, no mid-fade reversal under Reduce Flashing) and VoxelOrigamiSoundRecipe (hinge tones, chord or 3 Hz beat, ambient by actions share and cubes-in-place quarters, whole-cycle loops); 20 tests incl. adversarial flicker within 3 crossings/s and ≥ 0.4 s fades; lead retest host-3 exit 0
   ("glow 0.7 playing / 1 won / 0.35 failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce
   Flashing, no reversal mid-fade under Reduce Flashing, stepped by the frame clock's elapsed time;
   `maxHalfRangeCrossingsPerSecond`) and `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiSoundRecipe.swift`

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "VoxelOrigamiLights|VoxelOrigamiSoundRecipe"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'VoxelOrigamiLights|VoxelOrigamiSoundRecipe'",
+  "elapsed_seconds": 6.569,
+  "exit_code": 0,
+  "finished": "2026-11-24T19:05:19+00:00",
+  "gate": "R02-G15-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-06.host-3.log",
+  "log_sha256": "7aa11f6acb10f9438fb231c7359fc99b76913ee5ad069945d5a3f12f3dd91049",
+  "name": "host-3",
+  "started": "2026-11-24T19:05:12+00:00",
+  "timed_out": false
+}
