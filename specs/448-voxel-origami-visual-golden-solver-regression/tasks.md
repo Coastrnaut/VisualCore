@@ -8,7 +8,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1508-001 Baselines after R02-G15-07 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1508-001 Baselines after R02-G15-07 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24 baseline-host, baseline-timing, baseline-round02-1/2/3 exit 0 (.autonomy/migration/checks/R02-G15-08.baseline-*.json)
   baseline-round02-1 … 3` (the three round-two filters of feature 446: `--filter VoxelOrigami`, `--filter
   'MoonlitMechanism|AcousticConstellator|HarmonicBridges'`, `--skip` of both)
 
