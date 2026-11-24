@@ -52,7 +52,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   each action; play fingerprints after begin (and dismissTutorial) and each action; counterexample (the norm one below
   and the count of its vectors tried); difficulty; skipped; decode refuses newer, damaged and non-replaying files) with
   `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G1402-006 [US2] [US3] [US4] Create
+- [X] T-R02G1402-006 [US2] [US3] [US4] Create — Verified 2026-11-24: 2026-11-24: catalog tests (manifest, pinned digest 7de63603…, progression and band means 1.9/2.5/3.5/4.5/5.3, every witness wins, breadth-first search through the play on two levels per band finds the first win at exactly the plan, re-verified decodes, 100 witness files byte for byte in 5 groups) and docs/games/moonlit-mechanism/levels/001…100.witness.json; host-5 exit 0 (.autonomy/migration/checks/R02-G14-02.host-5.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the budget, and no shorter sequence wins; the breadth-first
   search on the two levels with the fewest gears in each band; pinned digest; progression rule and band means; witness

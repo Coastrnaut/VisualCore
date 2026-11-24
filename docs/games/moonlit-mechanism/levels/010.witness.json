@@ -1,0 +1,450 @@
+{
+  "actions" : [
+    {
+      "turn" : {
+        "_0" : 1
+      }
+    },
+    {
+      "reseat" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "norm" : 1,
+    "vectors" : 6
+  },
+  "difficulty" : {
+    "actions" : 2,
+    "forbiddenCells" : 3,
+    "gears" : 2,
+    "keyFrames" : 2,
+    "lampHeights" : 3,
+    "meshes" : 1,
+    "requiredKeyFrames" : 2,
+    "smallerVectors" : 7,
+    "targetCells" : 35,
+    "teeth" : 24,
+    "work" : 4
+  },
+  "digests" : [
+    "fba7d8c409736b7c",
+    "320bba14f601758d",
+    "320bba14f601758d"
+  ],
+  "fingerprints" : [
+    "ef6ed91be1e4c2fab6d39ddb3e49d864b945ac6859bfef9a0d0237bbb2fe01a9",
+    "5a2a7212eac59b0c1943563c5dccca02ab50279e7e62e7c922d61113a94db323",
+    "c98ea87884286a1507041f275de69cbea71b03f65611ac98f37294d29674030a",
+    "f7f72daf8a1b93177b6e2fc5348ce1e8d5974b32d3a83f01aa65a7f9f3454d7d"
+  ],
+  "level" : {
+    "allowance" : 0,
+    "budget" : 10,
+    "difficulty" : 1,
+    "fingerprint" : "c261a42e79b322d480728272af25bdfa3059969e2c5fa0aa2cf5fe2aba5a8c51",
+    "forbidden" : [
+      9,
+      61,
+      101
+    ],
+    "gears" : [
+      {
+        "alignment" : 0,
+        "blades" : [
+          true,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false
+        ],
+        "centre" : [
+          3,
+          3
+        ],
+        "depth" : 1,
+        "phase" : 0,
+        "slots" : [
+          [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          [
+            [
+              -1,
+              1
+            ],
+            [
+              -2,
+              2
+            ]
+          ],
+          [
+            [
+              -1,
+              0
+            ],
+            [
+              -2,
+              0
+            ]
+          ],
+          [
+            [
+              -1,
+              0
+            ],
+            [
+              -2,
+              0
+            ]
+          ],
+          [
+            [
+              -1,
+              -1
+            ],
+            [
+              -2,
+              -2
+            ],
+            [
+              -3,
+              -3
+            ]
+          ],
+          [
+            [
+              0,
+              -1
+            ],
+            [
+              0,
+              -2
+            ],
+            [
+              0,
+              -3
+            ]
+          ],
+          [
+            [
+              0,
+              -1
+            ],
+            [
+              0,
+              -2
+            ],
+            [
+              0,
+              -3
+            ]
+          ],
+          [
+            [
+              1,
+              -1
+            ],
+            [
+              2,
+              -2
+            ]
+          ]
+        ],
+        "teeth" : 12
+      },
+      {
+        "alignment" : 7,
+        "blades" : [
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "centre" : [
+          8,
+          4
+        ],
+        "depth" : 3,
+        "parent" : 0,
+        "phase" : 6,
+        "slots" : [
+          [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          [
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ]
+          ],
+          [
+            [
+              -1,
+              1
+            ],
+            [
+              -2,
+              2
+            ],
+            [
+              -3,
+              3
+            ]
+          ],
+          [
+            [
+              -1,
+              0
+            ],
+            [
+              -2,
+              0
+            ],
+            [
+              -3,
+              0
+            ]
+          ],
+          [
+            [
+              -1,
+              0
+            ],
+            [
+              -2,
+              0
+            ]
+          ],
+          [
+            [
+              -1,
+              -1
+            ],
+            [
+              -2,
+              -2
+            ]
+          ],
+          [
+            [
+              0,
+              -1
+            ],
+            [
+              0,
+              -2
+            ],
+            [
+              0,
+              -3
+            ]
+          ],
+          [
+            [
+              0,
+              -1
+            ],
+            [
+              0,
+              -2
+            ]
+          ],
+          [
+            [
+              1,
+              -1
+            ],
+            [
+              2,
+              -2
+            ]
+          ]
+        ],
+        "teeth" : 12
+      }
+    ],
+    "id" : "moonlit-mechanism-010",
+    "keyFrames" : [
+      {
+        "required" : true,
+        "target" : [
+          0,
+          3,
+          13,
+          15,
+          17,
+          26,
+          27,
+          28,
+          37,
+          38,
+          40,
+          41,
+          53,
+          54,
+          55,
+          57,
+          58,
+          59
+        ],
+        "turns" : 0
+      },
+      {
+        "required" : true,
+        "target" : [
+          0,
+          3,
+          13,
+          15,
+          17,
+          26,
+          27,
+          28,
+          34,
+          40,
+          41,
+          42,
+          45,
+          51,
+          63,
+          68,
+          80
+        ],
+        "turns" : 2
+      }
+    ],
+    "lampHeights" : 3,
+    "rows" : 9,
+    "schema" : 1,
+    "seed" : 15818896439791822448,
+    "startingHeight" : 0,
+    "tutorial" : false,
+    "width" : 12
+  },
+  "number" : 10,
+  "schema" : 1,
+  "skipped" : 2
+}
