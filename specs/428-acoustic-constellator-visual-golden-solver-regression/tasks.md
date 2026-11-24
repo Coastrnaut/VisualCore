@@ -42,7 +42,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1308-005 [US2] [US3] Create `Packages/ExperiencesRound02/AcousticConstellator/ExperienceTests/AcousticConstellatorRegressionGoldenFrameTests.swift` and
+- [X] T-R02G1308-005 [US2] [US3] Create `Packages/ExperiencesRound02/AcousticConstellator/ExperienceTests/AcousticConstellatorRegressionGoldenFrameTests.swift` and — Verified 2026-11-24: 2026-11-24: agent C 16 frames rendered and checked against their descriptions with the feature-423 tolerances, memory tests; lead fixed one #expect comment; sim-27 exit 0, 67 simulator tests (.autonomy/migration/checks/R02-G13-08.sim-27.json)
   `Packages/ExperiencesRound02/AcousticConstellator/ExperienceTests/AcousticConstellatorRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked
   against their descriptions with the feature-423 tolerances (star centres 0.15 from the sky in luminance with red, green
   and blue within 0.1, teal link check points 0.08 from the sky with green above red by 0.05, the first moves bar 0.1
