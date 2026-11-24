@@ -31,5 +31,5 @@
 
 ## Notes
 
-- All items pass on the first validation; the golden set, alteration kinds, memory bound and CI wiring are left to
-  `/speckit-clarify`, as in feature 418.
+- The golden set, alteration kinds, memory bound and CI wiring were settled by `/speckit-clarify` (session
+  2026-11-24).

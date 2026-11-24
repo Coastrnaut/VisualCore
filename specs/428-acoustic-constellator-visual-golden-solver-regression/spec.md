@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G13-08 (migration ledger, game feature of experience R02-G13) · ID namespace FR-R02G1308-###,
 SC-R02G1308-###, T-R02G1308-###
@@ -22,6 +22,65 @@ Canonical overrides:
   "content count 85" milestone figure. **Device-only items:** frame time and memory on D1/D2/D3 after
   ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 418 (Harmonic Bridges' visual golden and solver regression).
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+418's answers where the games agree. Facts checked in code (read-only audit, 2026-11-24): `AcousticConstellatorSolver.plan`
+certifies a level by the smallest action set that wins (the missing symbol pairs plus 0 … 6 − missing extras of helper
+links and ±1 nudges, at most 400,000 listens, `workBound`), returning the links, the nudges, `smallerSets` (every set of
+a smaller size listened to, none winning) and `work`; the 100 witness files in `docs/games/acoustic-constellator/levels/`
+hold the number, the level, the actions (the plan's links in pair order, its nudges, then one listen), the per-action
+fingerprints and digests, the counterexample (`reason` missing or tried, `sets` = `smallerSets`, `size`), the difficulty
+and the skipped candidate count, and are byte-checked by `AcousticConstellatorCatalogTests` with the catalog digest
+pinned there; the simulator frame checks of feature 423 compare rendered frames with the CPU reference (star centres
+0.15 from the sky in luminance with red, green and blue within 0.1, teal link check points 0.08 from the sky with green
+above red by 0.05, the first moves bar 0.1 from the sky, the sky within 0.05, each point at least 6 px from other
+elements) at 1,152 × 768; `AcousticConstellatorConstellationScene.release()` frees every renderer, the next draw rebuilds
+them and `liveObjectCount` counts them; the CI job `round02-host-tests` has a named regression step per earlier
+round-two game (Harmonic Bridges' the latest); `scripts/xcodebuild_package.py` runs simulator tests with
+`--only-testing`.
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win in exactly its action count, within the budget, with exactly its per-action fingerprints and digests;
+  and `plan` returns exactly the witness's links and nudges with exactly its `smallerSets` (the counterexample's `sets`)
+  and size; `work` is at most `workBound` (counted, never timed). The run is split into tests of 10 levels so each stays
+  short. Impact: FR-R02G1308-001; SC-R02G1308-001.
+- Q: Which alterations must the regression detect and how is each named? → A: thirteen kinds, each applied to a copy
+  and each producing a failure message naming the level and the part: a star's position, a star's rate, a star's
+  starting phase, a fixed link, a symbol pair, the coupling, the threshold, the hold, the budget; a plan link or nudge; a
+  witness action, a per-action fingerprint; the smaller-sets count. Impact: FR-R02G1308-002; SC-R02G1308-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after the witness's links and nudges and before its listen, so
+  links, gauges and a partly spent moves gauge show, at presentation time 0 (tick 0 shown) and the authored camera, plus
+  the hero frame of the scenario manifest's hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the
+  projected pixel positions of every star centre, every link check point, the first coherence bar, the first hold pip
+  and the first moves bar, rounded to 1/8 pixel, the counts of stars, links, teal links at tick 0, guides, lit coherence
+  bars, lit hold pips and lit and total moves bars, and the expected colours as 8-bit sRGB (sky, star, hand, silver,
+  teal, guide, coherence lit and unlit, threshold mark, hold lit and unlit, moves lit and unlit); serialized as JSON with
+  sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
+  `Packages/ExperiencesRound02/AcousticConstellator/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every count and colour
+  must be equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal
+  the digest of its pinned description. The file is rewritten only when `ACOUSTIC_CONSTELLATOR_WRITE_GOLDEN=1` is set.
+  The simulator test renders the 16 frames and checks them against the same descriptions with the feature-423
+  tolerances. Impact: FR-R02G1308-003, 004; SC-R02G1308-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_ACOUSTIC_CONSTELLATOR_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU
+  objects of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a
+  named reason. Impact: FR-R02G1308-005; SC-R02G1308-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's `round02-host-tests` job keeps running all
+  round-two host tests and adds a named step "Acoustic Constellator regression (host)" that runs the Acoustic
+  Constellator regression filter alone. The local command `python3 scripts/acoustic_constellator_regression.py` runs the
+  host regression filter and then the simulator regression test classes through `xcodebuild_package.py
+  --only-testing`, and prints one summary line per part with pass or fail and the first failing name; its exit code is
+  non-zero on any failure. Nothing is timed against the wall clock. Impact: FR-R02G1308-006, 007; SC-R02G1308-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
