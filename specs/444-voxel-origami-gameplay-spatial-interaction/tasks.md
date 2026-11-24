@@ -89,7 +89,7 @@ resize alone.
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1504-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1504-009 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02G1504-010 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1504-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-24: 2026-11-24: script-tests exit 0, run alone before the chain
 - [ ] T-R02G1504-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G1504-007)
 - [ ] T-R02G1504-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
