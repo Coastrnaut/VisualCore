@@ -57,7 +57,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 415
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1305-004 Edit `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorExperienceCore.swift`
+- [X] T-R02G1305-004 Edit `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorExperienceCore.swift` — Verified 2026-11-23: 2026-11-23: agent F drafted, lead landed and retested: 12 controls (level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss added; codes r02-g13.locked, r02-g13.date), practice budget 40, progress and mode in the digest (domain v2), schema 2 with migration from 1, level.next to the next open level (row 80 now shows the refusal on level 100), regenerated manifest; host-4 exit 0 (.autonomy/migration/checks/R02-G13-05.host-4.json)
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g13.locked`, `r02-g13.date`; practice budget 40 on a copy of the level, no stars, no
   unlocks; a daily win records the level's best result and stars and opens nothing; progress and mode in the digest,

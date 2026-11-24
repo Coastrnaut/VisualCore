@@ -47,11 +47,19 @@
 //           undo, an honest retry back to the digest before the listen;
 //  61 … 70  persistence and replay — the first certified link, undo, redo, then the rest of the witness (won; the
 //           saved trace replays to the same state);
-//  71 … 80  integration — `level.next` (the next certified level, a fresh play), its first certified link, an undo
-//           (the next level's opening digest) and a second undo refused `r02-g13.action`.
+//  71 … 80  integration — the certified witness (won, the next level opened), `level.next` (the next certified level,
+//           a fresh play), its first certified link, an undo (the next level's fresh play) and a second undo refused
+//           `r02-g13.action`; row 80's level is 100, whose `level.next` is refused `r02-g13.locked` after the win (no
+//           wrap), so that row then chooses level 1 with `level.select [1]` before the link.
 // The expected digests and outcomes are derived by playing the entries on a core exactly as the engine plays them; the
 // tests replay every scenario through `ExperienceEngine` and check each family's kernel state. No clock, no random
 // source.
+// Feature 425 (R02-G13-05) T-R02G1305-004: the digests are now schema 2's ("…v2": level, play, progress and mode), and
+// `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`;
+// the integration rows (71 … 80) therefore first win their level's certified witness (a campaign win opens the next
+// level) before `level.next` (row 80, on level 100, as described above); rejection also refuses the progression
+// controls' wrong value counts (`level.select`, `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`);
+// the manifest was regenerated (`UPDATE_SCENARIO_MANIFEST=1`).
 #if DEBUG || VISUALCORE_AUTOMATION
 import Foundation
 import VisualCoreExperience
@@ -98,7 +106,7 @@ extension AcousticConstellatorExperienceCore {
         case accessibility
         /// Rows 61 … 70: a link undone and redone, then the rest of the witness.
         case persistence
-        /// Rows 71 … 80: the next level, its first link, an undo and a refused undo.
+        /// Rows 71 … 80: the witness won, the next level, its first link, an undo and a refused undo.
         case integration
     }
 
@@ -278,6 +286,11 @@ extension AcousticConstellatorExperienceCore {
             refusedEntry("play.undo", [1], wrongCountCode),
             refusedEntry("play.redo", [1], wrongCountCode),
             refusedEntry("level.next", [1], wrongCountCode),
+            refusedEntry("level.select", [], wrongCountCode),
+            refusedEntry("mode.daily", [2026, 1], wrongCountCode),
+            refusedEntry("mode.practice", [1], wrongCountCode),
+            refusedEntry("mode.campaign", [1], wrongCountCode),
+            refusedEntry("tutorial.dismiss", [1], wrongCountCode),
         ]
         return entries
     }
@@ -314,8 +327,19 @@ extension AcousticConstellatorExperienceCore {
     /// The seed that opens level `number`: `number − 1` (``levelNumber(forSeed:)`` gives `seed % 100 + 1`).
     public static func seed(forLevel number: Int) -> UInt64 { UInt64(max(number - 1, 0)) }
 
-    /// The level after `number` as `level.next` opens it (100 wraps to 1).
+    /// The level an integration row on level `number` reaches after its campaign win: `number + 1` with `level.next`;
+    /// for level 100, whose `level.next` is refused `r02-g13.locked` (no wrap), level 1 with `level.select [1]`.
     public static func nextLevel(after number: Int) -> Int { number % levelNumbers.upperBound + 1 }
+
+    /// The code of the adapter's locked refusal (no next open level, a level not yet open; never a payment gate).
+    static let lockedCode = "action.rule." + AcousticConstellatorExperienceRule.locked
+
+    /// The entries that move an integration row on level `number` from its won play to ``nextLevel(after:)``:
+    /// `level.next`; for level 100 a `level.next` refused ``lockedCode`` and then `level.select [1]` (feature 425).
+    static func integrationMoveEntries(_ number: Int) -> [ScenarioStep] {
+        guard number == levelNumbers.upperBound else { return [acceptedEntry("level.next")] }
+        return [refusedEntry("level.next", [], lockedCode, steps: 1), acceptedEntry("level.select", [1])]
+    }
 
     /// The failure of a listen after the certified moves of manifest number `number` without move `omitted`; nil when
     /// the level cannot be generated, the kernel refuses a move or the listen wins.
@@ -457,8 +481,9 @@ extension AcousticConstellatorExperienceCore {
                 + actions.dropFirst().map { actionEntry($0) }
         case .integration:
             guard let next = certifiedMoves(nextLevel(after: number)).first else { return [] }
-            return [acceptedEntry("level.next"), actionEntry(next), acceptedEntry("play.undo"),
-                    refusedEntry("play.undo", [], kernelActionCode, steps: 1)]
+            return actions.map { actionEntry($0) } + integrationMoveEntries(number)
+                + [actionEntry(next), acceptedEntry("play.undo"),
+                   refusedEntry("play.undo", [], kernelActionCode, steps: 1)]
         }
     }
 
