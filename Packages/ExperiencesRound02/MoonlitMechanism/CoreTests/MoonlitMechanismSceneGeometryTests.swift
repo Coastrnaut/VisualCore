@@ -581,4 +581,128 @@ private let catalogLevels: Result<[MoonlitMechanismLevel], any Error> = Result {
             #expect(side > 0, "every triangle winds counter-clockwise from +z")
         }
     }
+
+    // MARK: Orbit (feature 434, R02-G14-04, T-R02G1404-002)
+
+    /// Six orbits: the authored one, the four clamp corners and the centre of the allowed range.
+    static func orbits() -> [MoonlitMechanismOrbit] {
+        let y: Double = MoonlitMechanismOrbit.yawLimit
+        let lo: Double = MoonlitMechanismOrbit.pitchRange.lowerBound
+        let hi: Double = MoonlitMechanismOrbit.pitchRange.upperBound
+        return [MoonlitMechanismOrbit.authored, MoonlitMechanismOrbit(yaw: y, pitch: hi),
+                MoonlitMechanismOrbit(yaw: -y, pitch: hi), MoonlitMechanismOrbit(yaw: y, pitch: lo),
+                MoonlitMechanismOrbit(yaw: -y, pitch: lo), MoonlitMechanismOrbit(yaw: 0, pitch: (lo + hi) / 2)]
+    }
+
+    @Test func everyOrbitKeepsTheBoxInsideTheMargin() throws {
+        let snap: Snapshot = try Self.snapshot(try Self.small())
+        for orbit in Self.orbits() {
+            for aspect in [0.4, 1, 2.5] {
+                let camera: MoonlitMechanismCamera = Geometry.camera(snap, aspect: aspect, orbit: orbit)
+                var lowest: Double = 1
+                for index in 0..<8 {
+                    guard let p = Geometry.project(Geometry.corner(index), camera: camera) else {
+                        Issue.record("box corner \(index) behind the eye at \(orbit), aspect \(aspect)")
+                        continue
+                    }
+                    lowest = min(lowest, p.x, p.y, 1 - p.x, 1 - p.y)
+                }
+                #expect(lowest >= 0.05, "every corner keeps 5 % at \(orbit), aspect \(aspect)")
+                #expect(abs(lowest - Geometry.fitMargin) < 1e-6, "the fit is tight at \(orbit), aspect \(aspect)")
+                #expect(camera.eye.z > Geometry.boxHigh.z, "the eye stays in front of every plane")
+            }
+        }
+    }
+
+    @Test func catalogElementsInsideTheViewAtEveryOrbitBound() throws {
+        // The lamp, the ladder's ends, cards, pips, bars and gear extremes of three catalog levels.
+        let levels: [MoonlitMechanismLevel] = try Self.catalog()
+        var outside: Int = 0
+        for level in [levels[0], levels[49], levels[99]] {
+            let snap: Snapshot = try Self.snapshot(level)
+            var points: [SIMD3<Double>] = [Geometry.lampCentre(snap)]
+            let top: Double = Geometry.lampBaseY + Geometry.lampStep * Double(snap.lampHeights - 1)
+            points.append(SIMD3(Geometry.ladderX, Geometry.lampBaseY, Geometry.lampZ))
+            points.append(SIMD3(Geometry.ladderX, top, Geometry.lampZ))
+            let reach: Double = Geometry.rimRadius(snap) + Geometry.toothHeight * Geometry.cellSize(snap)
+            for index in snap.gears.indices {
+                let c: SIMD3<Double> = Geometry.gearCentre(index, snap)
+                points.append(c + SIMD3(reach, 0, 0))
+                points.append(c - SIMD3(reach, 0, 0))
+                points.append(c + SIMD3(0, reach, 0))
+                points.append(c - SIMD3(0, reach, 0))
+            }
+            for index in snap.keyFrames.indices { points.append(Geometry.card(index, snap)) }
+            for index in 0..<Geometry.pipCount(snap) { points.append(Geometry.alignmentPip(index, snap)) }
+            for index in 0..<snap.budget { points.append(Geometry.movesBar(index, snap)) }
+            for orbit in Self.orbits() {
+                for aspect in [0.4, 1, 2.5] {
+                    let camera: MoonlitMechanismCamera = Geometry.camera(snap, aspect: aspect, orbit: orbit)
+                    for point in points {
+                        guard let p = Geometry.project(point, camera: camera) else {
+                            outside += 1
+                            continue
+                        }
+                        if p.x < 0.05 || p.x > 0.95 || p.y < 0.05 || p.y > 0.95 { outside += 1 }
+                    }
+                }
+            }
+        }
+        #expect(outside == 0, "every reference point inside the view with a 5 % margin at every orbit")
+    }
+
+    @Test func orbitIsClampedAndAuthoredIsBitIdentical() throws {
+        let y: Double = MoonlitMechanismOrbit.yawLimit
+        let range: ClosedRange<Double> = MoonlitMechanismOrbit.pitchRange
+        #expect(abs(y - 25 * Double.pi / 180) < 1e-15)
+        #expect(abs(range.lowerBound + 10 * Double.pi / 180) < 1e-15)
+        #expect(abs(range.upperBound - 15 * Double.pi / 180) < 1e-15)
+        #expect(MoonlitMechanismOrbit(yaw: 2, pitch: 2).clamped()
+                == MoonlitMechanismOrbit(yaw: y, pitch: range.upperBound))
+        #expect(MoonlitMechanismOrbit(yaw: -2, pitch: -2).clamped()
+                == MoonlitMechanismOrbit(yaw: -y, pitch: range.lowerBound))
+        #expect(MoonlitMechanismOrbit(yaw: .nan, pitch: .infinity).clamped() == MoonlitMechanismOrbit.authored)
+        #expect(MoonlitMechanismOrbit(yaw: 0.1, pitch: -0.1).clamped() == MoonlitMechanismOrbit(yaw: 0.1, pitch: -0.1))
+        let snap: Snapshot = try Self.snapshot(try Self.small())
+        for aspect in Self.aspects {
+            let fixed: MoonlitMechanismCamera = Geometry.camera(snap, aspect: aspect)
+            let authored: MoonlitMechanismCamera = Geometry.camera(snap, aspect: aspect, orbit: .authored)
+            #expect(fixed == authored, "the fixed camera is the authored orbit bit for bit")
+            #expect(fixed.eye == Geometry.eye && fixed.target == Geometry.lookAt)
+            // Beyond the bounds the camera is the clamped orbit's.
+            let wild: MoonlitMechanismCamera = Geometry.camera(snap, aspect: aspect,
+                                                               orbit: MoonlitMechanismOrbit(yaw: 9, pitch: -9))
+            let edge: MoonlitMechanismCamera = Geometry.camera(snap, aspect: aspect,
+                                                               orbit: MoonlitMechanismOrbit(yaw: y,
+                                                                                            pitch: range.lowerBound))
+            #expect(wild == edge)
+        }
+    }
+
+    @Test func positivePitchRaisesTheEyeAndPositiveYawMovesItTowardsPlusX() throws {
+        let snap: Snapshot = try Self.snapshot(try Self.small())
+        let base: MoonlitMechanismCamera = Geometry.camera(snap, aspect: 1)
+        let up: MoonlitMechanismCamera = Geometry.camera(snap, aspect: 1,
+                                                         orbit: MoonlitMechanismOrbit(yaw: 0, pitch: 0.2))
+        let down: MoonlitMechanismCamera = Geometry.camera(snap, aspect: 1,
+                                                           orbit: MoonlitMechanismOrbit(yaw: 0, pitch: -0.15))
+        let side: MoonlitMechanismCamera = Geometry.camera(snap, aspect: 1,
+                                                           orbit: MoonlitMechanismOrbit(yaw: 0.3, pitch: 0))
+        #expect(up.eye.y > base.eye.y && up.eye.z < base.eye.z && up.eye.x == 0 && up.target == Geometry.lookAt)
+        // The authored offset (0, 0.1, 2.7) already points slightly up, so lowering it also shortens its z a little.
+        #expect(down.eye.y < base.eye.y && down.eye.x == 0 && down.target == Geometry.lookAt)
+        #expect(side.eye.x > 0 && side.eye.y == base.eye.y && side.target.y == base.target.y)
+        // Yaw turns the eye and the look-at point about the vertical axis through the box centre (0, ·, −0.1).
+        let centre: SIMD3<Double> = (Geometry.boxLow + Geometry.boxHigh) / 2
+        #expect(abs(centre.x) < 1e-15 && abs(centre.z + 0.1) < 1e-12)
+        let pairs: [(SIMD3<Double>, SIMD3<Double>)] = [(base.eye, side.eye), (base.target, side.target)]
+        for p in pairs {
+            let a: SIMD2<Double> = SIMD2(p.0.x - centre.x, p.0.z - centre.z)
+            let b: SIMD2<Double> = SIMD2(p.1.x - centre.x, p.1.z - centre.z)
+            #expect(abs((a * a).sum() - (b * b).sum()) < 1e-12)
+        }
+        let offset: SIMD3<Double> = up.eye - up.target
+        let authored: SIMD3<Double> = Geometry.eye - Geometry.lookAt
+        #expect(abs((offset * offset).sum() - (authored * authored).sum()) < 1e-12)
+    }
 }

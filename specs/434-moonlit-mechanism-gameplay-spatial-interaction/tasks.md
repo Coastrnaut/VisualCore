@@ -16,7 +16,7 @@ offscreen host resizes before every still (R02-G14-03), so orbit changes the cam
 
 ## Phase 2: Foundational — orbit, camera and picking
 
-- [ ] T-R02G1404-002 [P] Add `MoonlitMechanismOrbit` ("yaw ±25°, pitch −10° … +15°, authored (0, 0)", `clamped()`) and
+- [X] T-R02G1404-002 [P] Add `MoonlitMechanismOrbit` ("yaw ±25°, pitch −10° … +15°, authored (0, 0)", `clamped()`) and — Verified 2026-11-24: 2026-11-24: agent B orbit (yaw ±25°, pitch −10…+15°), camera(_:aspect:orbit:) refit with authored bit-identical, MoonlitMechanismPicker (lamp, ladder, cards, front-most gear); 500 seeded points × 3 levels × 3 sizes × 3 orbits vs an independent pick, 0 mismatches; lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G14-04.host-2.json)
   `camera(_:aspect:orbit:)` (yaw about the y axis through the box centre, pitch about the authored view; field of view
   refit so the authored box x −0.95 … 0.95, y −0.45 … 1.5, z −0.6 … 0.4 stays inside the view with a 5 % margin at aspects
   0.4 … 2.5; `camera(_:aspect:)` equals the authored orbit, bit-identical) to

@@ -63,15 +63,60 @@
 // position named above is the same at every tier. Reduce Motion draws the gears at the set-up phases of the shown key
 // frame (``MoonlitMechanismSceneSnapshot/phases``) without a turning preview; this geometry never previews a turn, so
 // both draw the same phases. Doubles are used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 434 (R02-G14-04) T-R02G1404-002 (FR-R02G1404-005, 006; SC-R02G1404-004; clarifications Q1, Q5) adds the
+// player's orbit (`MoonlitMechanismOrbit`: yaw ±25° about the vertical axis through the authored box centre
+// (0, 0.525, −0.1), positive moving the eye towards +x; pitch −10° … +15° about the authored view's right axis (+x),
+// positive raising the eye so the clockwork is seen more from above; authored (0, 0)) and `camera(_:aspect:orbit:)`:
+// the eye's offset from the look-at point is pitched, then the eye and the look-at point are yawed together about that
+// axis, and the field of view is refitted exactly as for the fixed camera so the authored box x −0.95 … 0.95,
+// y −0.45 … 1.5, z −0.6 … 0.4 keeps ``fitMargin`` (above the required 5 %) per side at every orbit and aspect
+// 0.4 … 2.5. At the authored orbit the eye and the look-at point are the authored ones, so `camera(_:aspect:)` (which
+// calls it) is unchanged bit for bit. The eye stays in front of every plane (z > 0.4) at every orbit, so the painter's
+// order and the winding seen from +z hold unchanged. The orbit is presentation only: never saved, never read by the
+// rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
-/// The camera of one frame: eye, target, lens and the matrices built from them.
+/// The player's view of the clockwork: a yaw about the vertical axis through the authored box centre and a pitch about
+/// the authored view's right axis, both in radians (feature 434, R02-G14-04). Presentation only: never saved, never
+/// read by the rules.
+public struct MoonlitMechanismOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians about the view's right axis: positive raises the eye (the clockwork seen more from above),
+    /// negative lowers it; allowed ``pitchRange`` (−10° … +15°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 0, the fixed camera of R02-G14-03.
+    public static let authored = MoonlitMechanismOrbit(yaw: 0, pitch: 0)
+    /// The largest yaw either way, 25° in radians.
+    public static let yawLimit: Double = 25.0 * Double.pi / 180
+    /// The allowed pitches, −10° … +15° in radians.
+    public static let pitchRange: ClosedRange<Double> = (-10.0 * Double.pi / 180)...(15.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −25° … 25° and pitch to −10° … 15°; a non-finite angle becomes 0.
+    public func clamped() -> MoonlitMechanismOrbit {
+        let y: Double = yaw.isFinite ? yaw : 0
+        let p: Double = pitch.isFinite ? pitch : 0
+        return MoonlitMechanismOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                     pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+}
+
+/// The camera of one frame: eye, target, lens and the matrices built from them (the authored camera at the authored
+/// orbit).
 public struct MoonlitMechanismCamera: Sendable, Equatable {
-    /// The eye position in world units, (0, 0.65, 2.4).
+    /// The eye position in world units, (0, 0.65, 2.4) at the authored orbit.
     public let eye: SIMD3<Double>
-    /// The point looked at, (0, 0.55, −0.3).
+    /// The point looked at, (0, 0.55, −0.3) at the authored orbit.
     public let target: SIMD3<Double>
     /// The vertical field of view in radians (fitted to the authored box at `aspect`).
     public let fovY: Double
@@ -783,10 +828,51 @@ public enum MoonlitMechanismSceneGeometry {
     /// view is the smallest that holds every corner of the box x −0.95 … 0.95, y −0.45 … 1.5, z −0.6 … 0.4 inside the
     /// view with ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it — every
     /// cell, gear, the lamp, card, pip and bar of a catalog level — keeps a margin of at least 5 % for aspect
-    /// 0.4 … 2.5). The snapshot is accepted for parity.
+    /// 0.4 … 2.5). The snapshot is accepted for parity. Equals ``camera(_:aspect:orbit:)`` at
+    /// ``MoonlitMechanismOrbit/authored`` bit for bit.
     public static func camera(_ snapshot: MoonlitMechanismSceneSnapshot, aspect: Double) -> MoonlitMechanismCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The vertical axis the orbit yaws about passes through the authored box centre (0, 0.525, −0.1).
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `p` yawed by `yaw` radians about the vertical axis through ``orbitPivot`` (from +z towards +x).
+    static func yawed(_ p: SIMD3<Double>, _ yaw: Double) -> SIMD3<Double> {
+        let c: Double = cos(yaw)
+        let s: Double = sin(yaw)
+        let d: SIMD3<Double> = p - orbitPivot
+        return SIMD3(orbitPivot.x + d.x * c + d.z * s, p.y, orbitPivot.z - d.x * s + d.z * c)
+    }
+
+    /// The eye and the look-at point of `orbit` (clamped): the authored eye's offset from the look-at point,
+    /// e = (0, 0.1, 2.7), pitched about the x axis (positive p raises it: (0, e.y·cos p + e.z·sin p,
+    /// −e.y·sin p + e.z·cos p)) and added to the look-at point; then both points yawed about the vertical axis through
+    /// ``orbitPivot``. Exactly ``eye`` and ``lookAt`` at the authored orbit.
+    static func orbitView(_ orbit: MoonlitMechanismOrbit) -> (eye: SIMD3<Double>, target: SIMD3<Double>) {
+        let o: MoonlitMechanismOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return (eye: eye, target: lookAt) }
+        let e: SIMD3<Double> = eye - lookAt
+        let cp: Double = cos(o.pitch)
+        let sp: Double = sin(o.pitch)
+        let pitched: SIMD3<Double> = lookAt + SIMD3(e.x, e.y * cp + e.z * sp, -e.y * sp + e.z * cp)
+        return (eye: yawed(pitched, o.yaw), target: yawed(lookAt, o.yaw))
+    }
+
+    /// The camera for `orbit` (clamped, see ``MoonlitMechanismOrbit/clamped()``) and `aspect` (feature 434,
+    /// T-R02G1404-002): from the orbit's eye looking at its look-at point (``orbitView(_:)``) with +y up (never
+    /// parallel: the view stays within 25° of level); the vertical field of view is the smallest that holds every
+    /// corner of the box x −0.95 … 0.95, y −0.45 … 1.5, z −0.6 … 0.4 inside the view with ``fitMargin`` per side, so
+    /// everything inside the box — every cell, gear, the lamp, ladder, card, pip and bar of a catalog level — keeps a
+    /// margin of at least 5 % at every orbit and aspect 0.4 … 2.5. Presentation only; independent of the snapshot, the
+    /// tier and the time.
+    public static func camera(_ snapshot: MoonlitMechanismSceneSnapshot, aspect: Double,
+                              orbit: MoonlitMechanismOrbit) -> MoonlitMechanismCamera {
         _ = snapshot
         let a: Double = usableAspect(aspect)
+        let view0: (eye: SIMD3<Double>, target: SIMD3<Double>) = orbitView(orbit)
+        let eye: SIMD3<Double> = view0.eye
+        let lookAt: SIMD3<Double> = view0.target
         let forward: SIMD3<Double> = unit(lookAt - eye)
         let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
         let up: SIMD3<Double> = cross(right, forward)
