@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/acoustic_constellator_regression.py"
+  ],
+  "command": "python3 scripts/acoustic_constellator_regression.py",
+  "elapsed_seconds": 18.2,
+  "exit_code": 0,
+  "finished": "2026-11-24T06:38:54+00:00",
+  "gate": "R02-G13-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-09.regression.log",
+  "log_sha256": "b6506780bf2fbe72214eb5a6a68e3feeec47cc1e3b883f14b0feca9fd441afba",
+  "name": "regression",
+  "started": "2026-11-24T06:38:35+00:00",
+  "timed_out": false
+}
