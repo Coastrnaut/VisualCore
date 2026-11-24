@@ -705,4 +705,32 @@ private let catalogLevels: Result<[MoonlitMechanismLevel], any Error> = Result {
         let authored: SIMD3<Double> = Geometry.eye - Geometry.lookAt
         #expect(abs((offset * offset).sum() - (authored * authored).sum()) < 1e-12)
     }
+
+    // MARK: Fallback won level (feature 436, R02-G14-06)
+
+    /// The fallback paper's lift scales monotonically with the won level, never moves a vertex, and defaults to the
+    /// snapshot's won state.
+    @Test func theFallbackWonLevelScalesTheLiftOnly() throws {
+        let core: MoonlitMechanismExperienceCore = try MoonlitMechanismExperienceCore.opening(number: 1)
+        let snapshot: MoonlitMechanismSceneSnapshot = core.snapshot(time: 0)
+        let tier: MoonlitMechanismTier = MoonlitMechanismTier.of(2)
+        let plain: MoonlitMechanismColouredMesh = try MoonlitMechanismSceneGeometry.clockworkPart(snapshot, tier: tier)
+        let zero: MoonlitMechanismColouredMesh = try MoonlitMechanismSceneGeometry.clockworkPart(snapshot, tier: tier,
+                                                                                                wonLevel: 0)
+        #expect(plain.mesh.positions == zero.mesh.positions && plain.colours == zero.colours)
+        var previous: Double = -1
+        let levels: [Double] = [0, 0.25, 0.5, 0.75, 1]
+        for level in levels {
+            let part: MoonlitMechanismColouredMesh = try MoonlitMechanismSceneGeometry.clockworkPart(
+                snapshot, tier: tier, wonLevel: level)
+            #expect(part.mesh.positions == plain.mesh.positions, "positions never change")
+            let paper: SIMD3<Double> = MoonlitMechanismSceneGeometry.paperColour(won: level)
+            let brightness: Double = paper.x + paper.y + paper.z
+            #expect(brightness > previous)
+            previous = brightness
+        }
+        let nan: MoonlitMechanismColouredMesh = try MoonlitMechanismSceneGeometry.clockworkPart(snapshot, tier: tier,
+                                                                                               wonLevel: .nan)
+        #expect(nan.colours == zero.colours)
+    }
 }

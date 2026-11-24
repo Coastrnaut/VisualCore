@@ -18,6 +18,20 @@
 // the last action, and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`),
 // never by the core. A refused `level.next` before a win (`r02-g14.locked`) and an impossible date (`r02-g14.date`)
 // read in words.
+// Feature 436 (R02-G14-06) T-R02G1406-005 (FR-R02G1406-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `MoonlitMechanismFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log (`feedbackLog`); a gear drag's turns
+// are routed once, from the core before the first turn to the core after the last; refusals are shown and announced in
+// words (`refused(code:)`; the panel shows exactly the plan's text), and a revealed hint is announced as `state`.
+// Choosing a gear, showing a key frame, the pending drag texts and orbit are not announced (the gear and key frame
+// speak their values). The scene's lights (`MoonlitMechanismLights`: the glow and the won brightening of the wall) step
+// toward the drawn snapshot every frame by the frame clock's elapsed time (0.15 s fades, 0.45 s under Reduce Flashing;
+// the first frame settles them), so fades finish under Reduce Motion too, where the presentation time is held at 0. The
+// ambient loop (`MoonlitMechanismSound`) is offered the recipe of the actions left, the covered quarters and the stage
+// when the first state is described, when a level or mode opens and when that recipe changes; choosing a gear plays its
+// audition (`MoonlitMechanismAudition.of(_:gear:)`) when the sound is on, on screen and active. The mirror carries the
+// summary element's text (`MoonlitMechanismFeedbackPlan.summaryText(core:gear:)`) and the sound choice (off by default).
+// Presentation only.
 #if os(iOS)
 import Foundation
 import MoonlitMechanismCore
@@ -27,6 +41,7 @@ import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreAudioDSP
 
 /// What the controls show and choose: the latest state the presenter described, the shown key frame and the panel's
 /// chosen gear.
@@ -77,6 +92,11 @@ final class MoonlitMechanismMirror {
     var certifiedActions = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen) (feature 435).
     var pickedLevel = 1
+    /// The summary element's text (feature 436): `MoonlitMechanismFeedbackPlan.summaryText(core:gear:)` of the latest
+    /// core and the chosen gear.
+    var summary = ""
+    /// Whether the sound is on (feature 436; off by default; presentation only).
+    var soundOn = false
 
     /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 435).
     var goalLabel: String {
@@ -151,19 +171,11 @@ final class MoonlitMechanismMirror {
         code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
     }
 
-    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``. Since feature 436 it
+    /// forwards to `MoonlitMechanismFeedbackPlan.refusalText(code:)` (clarification Q1's sentences, e.g. "That change is
+    /// not allowed for this machine.").
     static func refusalText(code: String) -> String {
-        switch bareCode(code) {
-        case "r02-g14.stage": "the play is over: undo or go to the next level"
-        case "r02-g14.action": "that change is not allowed for this machine"
-        case "r02-g14.stale": "the play changed before the action arrived"
-        case "r02-g14.level": "the next level could not be made"
-        case MoonlitMechanismExperienceRule.notWhole: "a step, a gear and a key frame must be whole numbers"
-        case MoonlitMechanismExperienceRule.frame: "this level has no such key frame"
-        case MoonlitMechanismExperienceRule.locked: "that level is not open yet: win the level before it first"
-        case MoonlitMechanismExperienceRule.date: "that date is not a calendar date"
-        default: "that action is not available now"
-        }
+        MoonlitMechanismFeedbackPlan.refusalText(code: code)
     }
 }
 
@@ -228,10 +240,26 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
     private var playKey: PlayKey?
     private var playStart: Double = 0
 
+    /// The feedback route of announcements and haptics (feature 436; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 436; tests and diagnostics).
+    private(set) var feedbackLog: [MoonlitMechanismFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 436).
+    private(set) var lights: MoonlitMechanismLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the chosen gear's audition (feature 436).
+    let sound: MoonlitMechanismSound
+    /// While a gear drag's turns are sent, feedback waits so the drag is announced once (feature 436).
+    private var holdingFeedback = false
+
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = MoonlitMechanismLights(reducedFlash: reduceFlashing)
+        sound = MoonlitMechanismSound(recipe: MoonlitMechanismSoundRecipe.recipe(rootStep: 0, quarters: 0,
+                                                                                 stage: .loading))
         scene.reducedFlash = reduceFlashing
         scene.reduceMotion = reduceMotion
     }
@@ -290,6 +318,15 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
         let time = presentationTime(core, now: frame.time)
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // The lights settle on the very first frame only; every later change, a level change included, fades, stepped
+        // by the frame clock (not the presentation time, which Reduce Motion holds at 0).
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
@@ -318,7 +355,16 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
-        absorbProgress(core)
+        if let previous = latestCore {
+            if !holdingFeedback { route(MoonlitMechanismFeedbackPlan.after(old: previous, new: core)) }
+            let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
+        if !holdingFeedback { absorbProgress(core) } else { absorbProgressKeepingCore(core) }
+        mirror.summary = MoonlitMechanismFeedbackPlan.summaryText(core: core, gear: mirror.gear)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -364,6 +410,60 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
                                          sender: { [weak self] control, values in
                                              self?.send(control, values, port: port)
                                          }))
+    }
+
+    // MARK: Feedback and sound (feature 436, R02-G14-06)
+
+    /// The latest core described while a gear drag's feedback waits (feature 436).
+    private var heldCore: MoonlitMechanismExperienceCore?
+
+    /// Keeps `core` for the drag's single plan while feedback waits; the mirror still follows its progress.
+    private func absorbProgressKeepingCore(_ core: MoonlitMechanismExperienceCore) {
+        heldCore = core
+    }
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: MoonlitMechanismFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its actions left, the covered quarters of its required target cells and its stage.
+    static func recipe(_ core: MoonlitMechanismExperienceCore) -> AmbientLoopRecipe {
+        MoonlitMechanismSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Chooses `gear` in the panel (clamped) and, when the sound is on, plays its audition (presentation only).
+    func chooseGear(_ gear: Int) {
+        mirror.gear = mirror.clampedGear(gear)
+        if mirror.soundOn, let core = latestCore {
+            sound.audition(MoonlitMechanismAudition.of(core.play, gear: mirror.gear))
+        }
+        refreshSummary()
+    }
+
+    /// Turns the sound on or off; turning it on plays the recipe of the current play.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
+
+    /// The summary element's text for the chosen gear (the choice is presentation state of the panel).
+    func refreshSummary() {
+        guard let core = latestCore else { return }
+        mirror.summary = MoonlitMechanismFeedbackPlan.summaryText(core: core, gear: mirror.gear)
     }
 
     // MARK: Teaching and progression (feature 435, R02-G14-05)
@@ -441,9 +541,11 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
             clearHint()
             return
         }
+        let revealed: Bool = mirror.hintLevel != level || mirror.hintText != hint.text
         hintKey = key
         mirror.hintLevel = level
         mirror.hintText = hint.text
+        if revealed { route(MoonlitMechanismFeedbackPlan.hint(text: hint.text)) }   // feature 436: announced as state
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -539,15 +641,27 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
             switch action {
             case let .chooseGear(gear):
                 chose = true
-                mirror.gear = mirror.clampedGear(gear)
+                chooseGear(gear)
             case let .pendingTurn(_, teeth):
                 mirror.pending = teeth == 0 ? nil : Self.pendingTurnText(teeth: teeth)
             case let .turn(step, count):
                 sentKernel = true
                 mirror.pending = nil
+                // Feature 436: the drag's turns are announced and felt once, from the core before the first turn to
+                // the core after the last.
+                let before: MoonlitMechanismExperienceCore? = latestCore
+                holdingFeedback = count > 1
                 for _ in 0..<max(count, 0) {
                     // The count is capped at the actions left; a refusal (the play ended) stops the rest.
                     if !send("handle.turn", [Double(step)], port: port).isAccepted { break }
+                }
+                if holdingFeedback {
+                    holdingFeedback = false
+                    if let before, let after = heldCore {
+                        route(MoonlitMechanismFeedbackPlan.after(old: before, new: after))
+                        absorbProgress(after)
+                    }
+                    heldCore = nil
                 }
             case let .pendingLamp(steps):
                 mirror.pending = steps == 0 ? nil : Self.pendingLampText(steps: steps)
@@ -603,7 +717,9 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(MoonlitMechanismMirror.refusalText(code: result.code))."
+            let plan = MoonlitMechanismFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(MoonlitMechanismMirror.bareCode(result.code))
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)

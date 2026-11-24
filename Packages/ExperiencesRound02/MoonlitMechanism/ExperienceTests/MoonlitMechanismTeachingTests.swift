@@ -14,7 +14,7 @@
 // campaign is `level.select` of the level and starts it fresh; spending the whole budget with turns fails `budget` and
 // is explained too. Goal: `mirror.goalLabel` names the certified action count and band 1 of 5; after the certified win
 // it adds the best stars (`MoonlitMechanismProgress.stars(actionsSpent:certified:)`). Progression: `level.next` before
-// a win is refused with `r02-g14.locked`, shown as "That change was refused: " + `refusalText(code:)` + "."; after the
+// a win is refused with `r02-g14.locked`, shown as `refusalText(code:)` (since feature 436 the feedback plan's words); after the
 // win it opens level 2; the picker plays an open level and refuses a locked one. Modes: Daily of 2026-11-23 opens
 // `MoonlitMechanismProgress.dailyLevel(year: 2026, month: 11, day: 23)` and Retry keeps that date; an impossible date
 // reads the date refusal; Practice raises the budget to 40; Campaign returns to the frontier. Synthetic data, no
@@ -43,7 +43,7 @@ enum MoonlitMechanismTeaching {
 
     /// What the panel shows for a refusal with reason `code`, from the mirror's own words.
     static func refusalMessage(_ code: String) -> String {
-        "That change was refused: " + MoonlitMechanismMirror.refusalText(code: code) + "."
+        MoonlitMechanismMirror.refusalText(code: code)   // since feature 436 the feedback plan's words exactly
     }
 
     /// Opens level `seed % 100 + 1` at a small view (one frame drawn) and describes the opening so the presenter holds

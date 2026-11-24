@@ -47,7 +47,7 @@ presentation time Reduce Motion holds at 0) taken into the first pass.
 
 ## Phase 3: Wiring — geometry fallback, presenter, scene, sound and panel
 
-- [ ] T-R02G1406-005 [US1] [US2] [US3] Give `MoonlitMechanismSceneGeometry.clockworkPart` and `glowPart`
+- [X] T-R02G1406-005 [US1] [US2] [US3] Give `MoonlitMechanismSceneGeometry.clockworkPart` and `glowPart` — Verified 2026-11-24: 2026-11-24: fallback won level in clockworkPart (host-4 exit 0, .autonomy/migration/checks/R02-G14-06.host-4.json); MoonlitMechanismSound; presenter feedback route and log (a gear drag held and routed once), lights stepped by the frame clock, gear audition, refusal words from the plan; scene glow gain x glow level, u_won = won level, fallback rebuilt per tenth; panel labels and values on all 28 controls, adjustable gear and key frame, summary, Sound toggle, accessibility-size rows, 520-pt width; render test draws the won frame after the fade, wiring and teaching refusal expectations follow the plan's words; agent C's 10 accessibility tests (one compile fix by the lead); 51 simulator tests; sim-27 exit 0 (.autonomy/migration/checks/R02-G14-06.sim-27.json)
   (`Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSceneGeometry.swift`) a won level 0 … 1 that scales
   the paper's fallback lift (default: the snapshot's won state, so existing callers are unchanged), tested in
   `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismSceneGeometryTests.swift` (the lift scales

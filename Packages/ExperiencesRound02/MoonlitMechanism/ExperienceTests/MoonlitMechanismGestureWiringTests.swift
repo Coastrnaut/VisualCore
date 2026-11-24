@@ -641,8 +641,9 @@ enum MoonlitMechanismGestureScript {
         #expect(code == MoonlitMechanismMirror.bareCode(refusal.code))
         #expect(code == "r02-g14.action", "the bare code, without the engine's prefix: \(code)")
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message == "That change was refused: " + MoonlitMechanismMirror.refusalText(code: code) + ".")
-        #expect(message == "That change was refused: that change is not allowed for this machine.", "\(message)")
+        // Since feature 436 the panel shows the feedback plan's refusal words exactly.
+        #expect(message == MoonlitMechanismMirror.refusalText(code: code))
+        #expect(message == "That change is not allowed for this machine.", "\(message)")
         #expect(shell.presenter.gestures.state == .idle)
     }
 

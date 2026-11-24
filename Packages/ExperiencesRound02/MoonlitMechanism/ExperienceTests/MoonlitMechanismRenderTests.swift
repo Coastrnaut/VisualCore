@@ -114,7 +114,8 @@ import VisualCoreMath
         _ = shell.presenter.describe(core)
         #expect(shell.presenter.mirror.status == "Won")
         #expect(shell.presenter.mirror.failureText == nil)
-        let won2: [UInt8] = try MoonlitMechanismTest.still(session)
+        // Since feature 436 the won brightening eases in by the frame clock: the frame 10 s later shows it settled.
+        let won2: [UInt8] = try MoonlitMechanismTest.still(session, time: 10)
         let snapshot: MoonlitMechanismSceneSnapshot = try #require(shell.presenter.lastSnapshot)
         #expect(snapshot.stage == .won)
         #expect(MoonlitMechanismSceneGeometry.wonFlag(snapshot) == 1)
@@ -125,7 +126,7 @@ import VisualCoreMath
         #expect(drops >= 5_000, "the won paper is lifted toward the glow colour: \(drops) pixels")
         // Level-0: the wall's glow shells lift the night just outside the paper.
         MoonlitMechanismTest.pin(session, shell, tier: 0)
-        let won0: [UInt8] = try MoonlitMechanismTest.still(session)
+        let won0: [UInt8] = try MoonlitMechanismTest.still(session, time: 10)
         MoonlitMechanismTest.checkFrame(won0, snapshot: snapshot, require: false, "level 41 won, level-0")
         let samples: [SIMD2<Double>] = MoonlitMechanismTest.wallGlowSamples(snapshot)
         #expect(!samples.isEmpty, "a point outside the paper clear of the gears and the lamp")

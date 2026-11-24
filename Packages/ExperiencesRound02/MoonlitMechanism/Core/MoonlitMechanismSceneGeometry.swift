@@ -558,12 +558,15 @@ public enum MoonlitMechanismSceneGeometry {
     }
 
     /// The clockwork with fallback colours (unlit palette colours, ``colour(_:)``; the paper lifted on a won level)
-    /// for the shared unlit renderer: the same mesh as ``clockworkMesh(_:tier:reduceMotion:)``.
+    /// for the shared unlit renderer: the same mesh as ``clockworkMesh(_:tier:reduceMotion:)``. `wonLevel` (0 … 1,
+    /// feature 436) scales the paper's lift so the fallback can fade the won look; nil uses the snapshot's won state
+    /// (``wonFlag(_:)``), so existing callers are unchanged. Positions never depend on it.
     public static func clockworkPart(_ snapshot: MoonlitMechanismSceneSnapshot, tier: MoonlitMechanismTier,
-                                     reduceMotion: Bool = false) throws(MeshError) -> MoonlitMechanismColouredMesh {
+                                     reduceMotion: Bool = false,
+                                     wonLevel: Double? = nil) throws(MeshError) -> MoonlitMechanismColouredMesh {
         var parts: Parts = Parts()
         let s: Double = cellSize(snapshot)
-        let won: Double = wonFlag(snapshot)
+        let won: Double = wonLevel.map { $0.isFinite ? min(max($0, 0), 1) : 0 } ?? wonFlag(snapshot)
         let phases: [Int] = drawnPhases(snapshot, reduceMotion: reduceMotion)
         // 1. Backdrop.
         try parts.quad([SIMD3(backdropX.lowerBound, backdropY.lowerBound, backdropZ),
