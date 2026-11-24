@@ -214,3 +214,28 @@ the level certification of R02-G14-02.
   "Replay best solution" with Step and Stop and the position.
 - **Sound setting.** `settings.sound [0 … 1]` stores the sound choice in the snapshot (never the digest); the presenter
   applies the restored choice when the experience opens.
+
+## Regression net (feature 438, R02-G14-08)
+
+- **Solver regression.** For every one of the 100 certified levels the host tests check that the generated level equals
+  its witness's level, that the witness replays on a fresh play to a win on its last action and not before, in exactly
+  its action count within the budget, with its per-action fingerprints and digests, and that the solver re-plans
+  exactly the witness's turns, lamp steps and re-seats with the same `smallerVectors` (the sum of the vector counts over
+  norms 0 … the counterexample's norm, plan size − 1) and size, its work counted within the bound (never timed).
+  Thirteen kinds of alteration (a gear's tooth count, centre, depth or starting phase, a slot table offset, the lamp's
+  starting height, a key frame's target cell, a forbidden cell, the budget, a plan component, a witness action, a
+  per-action fingerprint, the smaller-vectors count) are each detected and named with the level and the part
+  (`MoonlitMechanismRegressionSolverTests`).
+- **Golden frames.** `MoonlitMechanismGolden` (test builds only; excluded from Release) computes the code-only
+  description of 16 frames — levels 1, 21, 41, 61 and 81 at the three tiers after the witness's turns, re-seats and
+  lamp steps and before its run, key frame 0 shown, plus the hero frame — at 1,152 × 768: projected cast-cell centres,
+  gear centres and rim check points, key-frame card centres, the first alignment pip, the lamp and the first moves bar
+  to 1/8 pixel (null when a point does not project inside the frame), the element counts and the palette (`pip` is the
+  lit alignment pip), hashed with SHA-256 and pinned in `golden-frames.json`. A changed description fails until the
+  file is rewritten on purpose with `MOONLIT_MECHANISM_WRITE_GOLDEN=1`; the simulator renders the 16 frames and checks
+  them against the descriptions with the feature-433 tolerances.
+- **Memory.** Twelve open-draw-warn-close cycles stay within 16 MB of the first (asserted when the class runs alone;
+  28.4 MB to 29.0 MB on the iOS 27.2 simulator on 2026-11-24), and the clockwork scene holds no GPU objects after each
+  close and memory warning.
+- **CI and local command.** The `round02-host-tests` job runs the host part as "Moonlit Mechanism regression (host)";
+  `python3 scripts/moonlit_mechanism_regression.py` runs the host and simulator parts with one summary.

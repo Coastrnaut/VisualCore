@@ -618,6 +618,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   byte for byte (regenerate only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`). A random generator left most candidates
   unsolvable in a Python prototype; the constructive one (a path whose strings can be bridges, k of them scrambled)
   reached each band's range in 37 … 60 of 60, so prototype the generator before writing ranges into the spec.
+- **Moonlit Mechanism regression net** (R02-G14-08, 2026-11-24). `python3 scripts/moonlit_mechanism_regression.py`
+  runs the host filter `MoonlitMechanismRegression` (solver regression, golden descriptions) and the simulator classes
+  `MoonlitMechanismRegressionGoldenFrameTests` and `MoonlitMechanismRegressionMemoryTests` with the memory isolation
+  variable, printing one summary; CI runs the host part as its own named step. Regenerate the golden file only on
+  purpose: `MOONLIT_MECHANISM_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
+  MoonlitMechanismRegressionGolden`. The witness's `smallerVectors` is the sum of the vector counts over norms 0 … the
+  counterexample's norm, while the counterexample's `vectors` is the count at that norm alone; the spec first said they
+  were equal, and the solver test (written against the witness data) found it. Check such definitions against one
+  witness file before writing them into a spec.
 - **Acoustic Constellator regression net** (R02-G13-08, 2026-11-24). `python3 scripts/acoustic_constellator_regression.py`
   runs the host filter `AcousticConstellatorRegression` (solver regression, golden descriptions) and the simulator
   classes `AcousticConstellatorRegressionGoldenFrameTests` and `AcousticConstellatorRegressionMemoryTests` with the

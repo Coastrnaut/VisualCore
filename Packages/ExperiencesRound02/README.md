@@ -808,3 +808,7 @@ Feature 437 (R02-G14-07) adds persistence and replay: results with their winning
 (replaying each saved trace on restore, dropping and counting edited results), snapshot schema 3 with a 2 → 3 migration,
 the replay mode (`replay.start`, `replay.step`, `replay.stop`) and the saved sound setting (`settings.sound`), with the
 panel's replay controls and the dropped-results announcement.
+
+Feature 438 (R02-G14-08) adds the regression net: the solver regression over all 100 levels with thirteen named
+alterations, the code-only golden frames (`MoonlitMechanismGolden`, `golden-frames.json`), the simulator frame and
+memory checks, the CI step and `scripts/moonlit_mechanism_regression.py`.
