@@ -52,7 +52,8 @@ tree".
   space by w(c) = (c − m) · s, where m is the centre of the bounding box of the occupied cells together with the target
   cells at the best allowed alignment (the covered count's rotation and translation), and s = 1.5 / (e + 1) with e the
   box's largest extent in cells; y is up. Drawn back to front by distance from the eye (depth testing is off, the shared
-  mesh renderer's path; the painter's order is the camera-distance order of the elements' centres): the night backdrop
+  mesh renderer's path; the painter's order is the camera-distance order of the elements' centres, farthest first,
+  ties broken by kind — target outline, cubes, hinge marks, gauges — then by index): the night backdrop
   (a large quad behind everything); the target outline, one wireframe cube of side 0.96 s per target cell at its best
   alignment, edges of the tier's thickness in turquoise; the cubes, each a chamfered cube of side 0.9 s at w(cell),
   turned by its orientation, frosted ivory with faceted shading, an inner glyph on its faces (solid turquoise when the
