@@ -405,6 +405,7 @@ enum AcousticConstellatorA11y {
         #expect(AcousticConstellatorControls.hintValue(2) == "level 2 of 3")
         #expect(AcousticConstellatorControls.modeName(.campaign) == "campaign")
         #expect(AcousticConstellatorControls.modeName(.practice) == "practice")
+        #expect(AcousticConstellatorControls.modeName(.replay(level: 3)) == "replay")
         #expect(AcousticConstellatorControls.readableWidth == 520)
 
         // The buttons' values follow the mirror.

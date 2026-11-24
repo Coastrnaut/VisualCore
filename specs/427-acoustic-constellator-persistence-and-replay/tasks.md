@@ -53,7 +53,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1307-005 [US3] Edit `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorPresenter.swift` and
+- [X] T-R02G1307-005 [US3] Edit `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorPresenter.swift` and — Verified 2026-11-24: 2026-11-24: agent G replay panel (Replay, Step, Stop with labels, values and position), the Sound toggle saving settings.sound and the restored choice applied on open, the dropped results announced once; identity tests schema 3 and 16 controls; agent C's 6 replay tests; sim-27 exit 0, 61 simulator tests (.autonomy/migration/checks/R02-G13-07.sim-27.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the Sound toggle sends `settings.sound` and the presenter applies the restored `soundOn`
   when the experience opens; the dropped results announced once: "n saved results could not be checked and were

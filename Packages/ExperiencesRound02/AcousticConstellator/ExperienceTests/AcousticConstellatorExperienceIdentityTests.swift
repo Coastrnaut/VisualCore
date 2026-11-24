@@ -1,14 +1,16 @@
 // AcousticConstellatorExperienceIdentityTests — feature 423 (R02-G13-03) T-R02G1303-006 (FR-R02G1303-003, 004, 005,
 // 007, 008, 009; clarifications Q2, Q3, Q4, Q5). The experience's id is the catalog id, the factory (with and without
 // storage) builds a shell around the presenter (with the accessibility settings passed through), the controls are the
-// declared actions in order with their arities and ranges (twelve since feature 425), the registration facts hold (100
-// certified levels, schema 2 since feature 425, the tiers level-0 … level-2, the palette's five hex strings), the
+// declared actions in order with their arities and ranges (sixteen since feature 427), the registration facts hold (100
+// certified levels, schema 3 since feature 427, the tiers level-0 … level-2, the palette's five hex strings), the
 // quality profile's levels equal the Core's `qualityTiers` and the presenter's, the palette is clarification Q3's
 // colours, the frame probes are none before a frame and the two dark sky corners after one (declared, as the round-two
 // X gates require), the description names the level and the progress, and the mirror follows the description with the panel's choice opening on star 0 and
 // partner 1, clamped to the level's stars, and returning to star 0 and partner 1 on a new level (since feature 425
 // (R02-G13-05) T-R02G1305-005 the next level opens only after a win: `level.next` before it is refused
 // `r02-g13.locked`). iOS only, as the target.
+// Feature 427 (R02-G13-07) T-R02G1307-005: schema 3; the declared actions (sixteen) add `replay.start`, `replay.step`,
+// `replay.stop` and `settings.sound`.
 #if os(iOS)
 import Foundation
 import AcousticConstellatorCore
@@ -26,12 +28,12 @@ import VisualCoreExperienceHost
         #expect(AcousticConstellatorTest.id.rawValue == AcousticConstellatorExperienceCore.experienceID)
     }
 
-    /// The registration's content facts: 100 certified levels, schema 2 (since feature 425), three tiers, five palette
+    /// The registration's content facts: 100 certified levels, schema 3 (since feature 427), three tiers, five palette
     /// hex strings.
     @Test func theRegistrationFactsHold() {
         #expect(AcousticConstellatorExperienceCore.levelNumbers == 1...100)
         #expect(AcousticConstellatorExperienceCore.certifiedCandidates.count == 100)
-        #expect(AcousticConstellatorExperienceCore.schemaVersion == 2)   // schema 2 since feature 425
+        #expect(AcousticConstellatorExperienceCore.schemaVersion == 3)   // schema 3 since feature 427
         #expect(AcousticConstellatorExperienceCore.levelNumber(forSeed: 0) == 1)
         #expect(AcousticConstellatorExperienceCore.levelNumber(forSeed: 199) == 100)
         #expect(AcousticConstellatorPalette.hex == ["#05060F", "#F4F1E8", "#3FD6C6", "#8A5A9C", "#B8C0D0"])
@@ -87,7 +89,8 @@ import VisualCoreExperienceHost
     /// The controls are the declared actions in order: the seven of feature 423 (`link.add` and `link.remove` [star
     /// 0 … 7, star 0 … 7], `star.nudge` [star 0 … 7, step −1 … 1], then four without values), then (feature 425)
     /// `level.select` [1 … 100], `mode.daily` [year 1 … 9999, month 1 … 12, day 1 … 31], `mode.practice`,
-    /// `mode.campaign` and `tutorial.dismiss`.
+    /// `mode.campaign` and `tutorial.dismiss`, then (feature 427) `replay.start` [1 … 100], `replay.step`, `replay.stop`
+    /// and `settings.sound` [0 … 1].
     @Test func theControlsAreTheDeclaredActions() {
         var ids: [String] = []
         var arities: [Int] = []
@@ -97,9 +100,9 @@ import VisualCoreExperienceHost
         }
         #expect(ids == ["link.add", "link.remove", "star.nudge", "constellation.listen", "play.undo", "play.redo",
                         "level.next", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                        "tutorial.dismiss"])
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"])
         #expect(ids == AcousticConstellatorExperienceCore.actionIDs)
-        #expect(arities == [2, 2, 2, 0, 0, 0, 0, 1, 3, 0, 0, 0])
+        #expect(arities == [2, 2, 2, 0, 0, 0, 0, 1, 3, 0, 0, 0, 1, 0, 0, 1])
         let controls: [ExperienceControl] = AcousticConstellatorExperienceCore.controls
         for index in 0..<2 where controls[index].ranges.count == 2 {
             #expect(controls[index].ranges[0] == 0.0...7.0, "\(controls[index].id) first star")
@@ -115,6 +118,10 @@ import VisualCoreExperienceHost
         #expect(select.ranges == [1.0...100.0], "level range \(select.ranges)")
         let daily: ExperienceControl = controls[8]
         #expect(daily.ranges == [1.0...9999.0, 1.0...12.0, 1.0...31.0], "date ranges \(daily.ranges)")
+        let replay: ExperienceControl = controls[12]
+        #expect(replay.ranges == [1.0...100.0], "replay level range \(replay.ranges)")
+        let sound: ExperienceControl = controls[15]
+        #expect(sound.ranges == [0.0...1.0], "sound range \(sound.ranges)")
     }
 
     /// The quality profile names level-0 … level-2 and equals the presenter's (the X follow-through declares the same
