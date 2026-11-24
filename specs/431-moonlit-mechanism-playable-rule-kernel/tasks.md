@@ -16,7 +16,7 @@ will consume).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1401-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `MoonlitMechanismCore`,
+- [X] T-R02G1401-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `MoonlitMechanismCore`, — Verified 2026-11-24: 2026-11-24: package targets, error (r02-g14.*), mechanics (directions, turned, alignment and error, cast, run order, action), level (ranges, stored form, names), fixtures (scrambled solutions) and 7 level tests incl. 200 fixtures; host exit 0 (.autonomy/migration/checks/R02-G14-01.host.json)
   `MoonlitMechanismCoreTests`, product); create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismError.swift`
   (codes "r02-g14.level, .action, .stage, .stale, .newer-schema, .malformed"),
   `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismMechanics.swift` (directions "+1 when its distance

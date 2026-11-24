@@ -43,6 +43,8 @@ let package = Package(
         .library(name: "HarmonicBridgesCore", targets: ["HarmonicBridgesCore"]),
         // Feature 421 (R02-G13-01): Acoustic Constellator's rule kernel, a candidate until X-R02-G13.
         .library(name: "AcousticConstellatorCore", targets: ["AcousticConstellatorCore"]),
+        // Feature 431 (R02-G14-01): Moonlit Mechanism's rule kernel, a candidate until X-R02-G14.
+        .library(name: "MoonlitMechanismCore", targets: ["MoonlitMechanismCore"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
         .library(name: "AcousticConstellatorExperience", targets: ["AcousticConstellatorExperience"]),
         // Feature 413 (R02-G12-03): Harmonic Bridges' experience (iOS only; a registered candidate until X-R02-G12).
@@ -422,6 +424,16 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "AcousticConstellator/CoreTests"),
+        // Feature 431 (R02-G14-01): Moonlit Mechanism's pure rule kernel.
+        .target(name: "MoonlitMechanismCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "MoonlitMechanism/Core"),
+        .testTarget(name: "MoonlitMechanismCoreTests",
+                    dependencies: ["MoonlitMechanismCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "MoonlitMechanism/CoreTests"),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (presenter, scene, controls).
         .target(name: "AcousticConstellatorExperience",
                 dependencies: ["AcousticConstellatorCore",
