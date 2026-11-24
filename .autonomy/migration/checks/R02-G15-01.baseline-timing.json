@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "env",
+    "VC_TIMING_ASSERTS=1",
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "aMeshAtTheBudgetBuildsAndValidates|analysisTimingLevelZeroMeanBelowBudget|wholeRunForTheSampleTakesLessThanTenSeconds|aPreparationOverItsLimitTimesOut|aCancelledPreparationEndsWithinOneSecond"
+  ],
+  "command": "env VC_TIMING_ASSERTS=1 swift test --package-path Packages/VisualCore --filter 'aMeshAtTheBudgetBuildsAndValidates|analysisTimingLevelZeroMeanBelowBudget|wholeRunForTheSampleTakesLessThanTenSeconds|aPreparationOverItsLimitTimesOut|aCancelledPreparationEndsWithinOneSecond'",
+  "elapsed_seconds": 4.396,
+  "exit_code": 0,
+  "finished": "2026-11-24T15:13:21+00:00",
+  "gate": "R02-G15-01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-01.baseline-timing.log",
+  "log_sha256": "42e4b1ce38408cc40502db5e670b779a940a352d4feb62422d83377b37e1eae2",
+  "name": "baseline-timing",
+  "started": "2026-11-24T15:13:17+00:00",
+  "timed_out": false
+}

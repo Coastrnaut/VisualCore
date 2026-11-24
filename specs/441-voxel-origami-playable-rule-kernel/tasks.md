@@ -10,7 +10,7 @@ will consume).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1501-001 Baselines after X-R02-G14 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1501-001 Baselines after X-R02-G14 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing, baseline-round02 exit 0 (.autonomy/migration/checks/R02-G15-01.baseline-*.json); rendering baseline = X-R02-G14 visualcore-rendering
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is X-R02-G14's
   visualcore-rendering run (exit 0)
 
