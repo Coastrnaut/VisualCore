@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AcousticConstellatorPersistence"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AcousticConstellatorPersistence",
+  "elapsed_seconds": 7.408,
+  "exit_code": 0,
+  "finished": "2026-11-24T05:18:10+00:00",
+  "gate": "R02-G13-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-07.host-3.log",
+  "log_sha256": "554df08f6b5aaa0e80110b53c2772682848f42886fc11b3a4e642be1d4040846",
+  "name": "host-3",
+  "started": "2026-11-24T05:18:02+00:00",
+  "timed_out": false
+}

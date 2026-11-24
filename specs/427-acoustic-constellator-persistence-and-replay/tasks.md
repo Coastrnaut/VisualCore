@@ -45,7 +45,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
   claims no stars) with `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorExperienceCoreTests.swift` updates (schema 3, migrations 1 → 3 and
   2 → 3, reconciliation on restore, replay rules and codes, a replay saved mid-way restores while a changed, reordered
   or undo-carrying replay is refused `damaged`, sound setting); `--name host-2`
-- [ ] T-R02G1307-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorPersistenceTests.swift` (agent B: 500 seeded
+- [X] T-R02G1307-004 [P] [US1] [US2] Create `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorPersistenceTests.swift` (agent B: 500 seeded — Verified 2026-11-24: 2026-11-24: agent B persistence tests (500 round trips with the sound choice outside the digest, schema 1 and 2 migrations of 100 states, 200 saves reconciled exactly, each edit dropped alone, restore twice equal, daily by date only, schema 3), written against the contract and passing unchanged on the landed adapter, each test under 1 s; host-3 exit 0 (.autonomy/migration/checks/R02-G13-07.host-3.json)
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
   dropped and counted; FR-R02G1307-005: the same save restores to an equal digest twice and the daily level depends only
