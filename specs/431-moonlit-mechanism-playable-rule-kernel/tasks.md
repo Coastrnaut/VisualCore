@@ -38,7 +38,7 @@ will consume).
 
 ## Phase 3: Story 1 — turn the clockwork until its shadows spell the symbols (P1) 🎯
 
-- [ ] T-R02G1401-003 [P] [US1] Create
+- [X] T-R02G1401-003 [P] [US1] Create — Verified 2026-11-24: 2026-11-24: agent A 11 mechanics tests (independent walk, brute-force alignment, separate rasterisation, Q4 transcription on 500 set-ups; turn keeps alignment; hand cases); lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G14-01.host-2.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismMechanicsTests.swift` (agent A: on 500 seeded
   levels, phases and lamp heights, every turned phase equals an independent walk of the train from the driver one turn
   at a time, every alignment error equals a brute force over the cyclic distances, every cast equals a separate
