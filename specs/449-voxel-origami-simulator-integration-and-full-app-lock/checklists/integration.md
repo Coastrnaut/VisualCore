@@ -13,8 +13,8 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-24, follo
 
 - [x] CHK001 Is every panel control the tests use named with its exact identifier and the shared prefix, and is the full
   list required to be pinned and unique? [Completeness, Spec §Clarifications Q1; FR-R02G1509-001]
-- [x] CHK002 Is the end-to-end journey stated step by step (open, dismiss tutorial, choose hinge 4, Turn − twice, win, stars,
-  next level open, relaunch, replay, stop)? [Completeness, Spec §US1; Clarifications Q2]
+- [x] CHK002 Is the end-to-end journey stated step by step (open, dismiss tutorial, choose hinge 4, Turn − twice, win,
+  stars, next level open, relaunch, replay, stop)? [Completeness, Spec §US1; Clarifications Q2]
 - [x] CHK003 Is what the tests read named (canvas description phrases "The chain matches the target shape.",
   "Stars: 3 of 3.", the `actions` text, the hinge control's value)? [Clarity, Spec §Clarifications Q1, Q2]
 - [x] CHK004 Is the save point before a relaunch addressed (background before terminate)? [Edge Case, Spec §Edge Cases]
