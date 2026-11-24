@@ -39,7 +39,8 @@ phase began/moved/ended/cancelled, location in view points with the origin top-l
 thresholds (tap below 10 points and 0.5 s, drag from 16 points, double tap within 0.35 s and 22 points, orbit 90° per
 view width and 60° per view height). Moonlit Mechanism's adapter declares `handle.turn` [±1], `gear.reseat` [gear, ±1],
 `lamp.step` [±1], `machine.run`, `play.undo`, `play.redo`, `level.next` and `frame.show` [key frame]; the kernel refuses
-a re-seat of gear 0 (the driver, code `action.driver`) and a lamp step out of range (`action.lamp`); one handle turn
+a re-seat of gear 0 (the driver) and a lamp step out of range, both with reason code `r02-g14.action` (the adapter
+reports it as `.rule(code:)`); one handle turn
 moves every gear by one of its own teeth, gear i in the sense `MoonlitMechanismTrain.direction` gives (clockwise on
 screen for +1); spending the last action of the budget without a win fails the level. The camera
 (`MoonlitMechanismSceneGeometry`) looks from eye (0, 0.65, 2.4) towards (0, 0.55, −0.3) at the box x −0.95 … 0.95,
@@ -65,7 +66,7 @@ rung by rung.
 - Q: How does the lamp respond? → A: a vertical drag that starts on the lamp or the ladder counts one rung per 24 points
   of finger travel (upward positive, rounded to the nearest rung, a fixed screen distance because a projected rung is
   too small), shows the pending steps, and on release while playing sends that many `lamp.step` actions; steps past the
-  ends are sent and refused with `action.lamp`, so the lamp stops at its end. A tap on the lamp (not the ladder) while
+  ends are sent and refused with `r02-g14.action`, so the lamp stops at its end. A tap on the lamp (not the ladder) while
   playing sends `machine.run`; a tap on the ladder changes nothing. A lamp drag on any stage other than playing
   previews nothing and sends nothing. A cancelled gear or lamp drag (second finger, cancelled touch) clears its pending
   text and sends nothing. Impact: FR-R02G1404-002, 004; SC-R02G1404-001.

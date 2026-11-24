@@ -72,7 +72,8 @@ offscreen host resizes before every still (R02-G14-03), so orbit changes the cam
 - [ ] T-R02G1404-005 [US5] Wire `Packages/ExperiencesRound02/MoonlitMechanism/Experience/MoonlitMechanismPresenter.swift`
   (FR-R02G1404-001 … 004, 006 … 008; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn
   snapshot; turn × count, lamp step × count, re-seat, run and frame.show sent through the port; chooseGear changing the
-  mirror's gear; the pending turn and lamp steps in the description ("Turn n teeth (n actions)", "Lamp n steps"); the
+  mirror's gear; the pending turn and lamp steps in the description and the panel ("Turn n teeth (n actions)", "Lamp n
+  steps"); the
   driver's double tap described as "The driver cannot be re-seated"; on a won or failed play `describe` says "The play
   is over: undo or go to the next level"; a refused action shown in the mirror message and logged with its code,
   reading codes with or without the engine's `action.rule.` prefix; `resetView()`),
