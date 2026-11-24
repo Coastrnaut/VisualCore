@@ -29,7 +29,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1503-003 [P] [US1] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiShaders.swift` (voxel
+- [X] T-R02G1503-003 [P] [US1] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiShaders.swift` (voxel — Verified 2026-11-24: 2026-11-24: VoxelOrigamiShaders.swift (voxel and glow GLSL ES 3.00, material codes 0…13, palette constants, glow gain and limit) and 12 shader-source tests; lead reran host-2 exit 0
   and glow sources, GLSL ES 3.00; signed-distance shading of cube edges, bevels, inner glyphs, dots, hinge bars and
   stripes, target wireframe edges and gauges from per-vertex local coordinates; frosted faceted shading of the cubes
   from the face normal; the glow program shades lit cubes and the target outline; a won level flares the target; uniform
