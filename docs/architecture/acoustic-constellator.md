@@ -84,3 +84,38 @@ and refuses damaged, edited and newer forms (`r02-g13.malformed`, `.newer-schema
 - **Catalog.** `PuzzleCatalog<AcousticConstellatorRules>.digest(id: "acoustic-constellator", …)` over the 100
   fingerprints is pinned; the standard progression rule holds on the witness action count; an independent brute force
   (every play action in bands 1 … 3, the pruned options in bands 4 and 5) re-checks minimality on two levels per band.
+
+## Hero renderer and experience (feature 423, R02-G13-03)
+
+- **Scene.** The sky is a plane at y = −0.01. Star (gx, gy, gz) of the 12³ grid is at X = (gx − 5.5)·0.14,
+  Z = (gy − 5.5)·0.11, Y = 0.15 + (gz − 5.5)·0.02, an ellipsoid 0.045 × 0.035 × 0.045 (12 × 8 segments) with a phase
+  hand 0.006 wide and 0.07 long at angle phase·30°, 0.04 above it. Each link is a spline strip 0.01 wide rising 0.03 at
+  its middle (16 segments): silver while the gap at the shown tick is above 1, teal at most 1; a link the kernel's report
+  has snapped by the shown tick is drawn as two halves with the middle 30 % missing. Every unlinked symbol pair is a
+  dashed plum guide (8 dashes). In front lie the coherence gauge (12 bars at z = 0.85, ⌊12·(A + B√3)/n²⌋ lit, a mark
+  over bar ⌈12θ/n²⌉), the hold pips (z = 1.0, lit for the current coherent run) and the moves gauge (z = 1.15, one bar
+  per action of the budget, lit for the actions left) (`AcousticConstellatorSceneGeometry`).
+- **Ticks and pulse.** The shown tick plays the kernel's listen report of the current state, one tick per 0.25 s, holds
+  the last tick 1 s and loops (`AcousticConstellatorSceneSnapshot.shownTick`, 0 at time 0). Stars pulse in the vertex
+  shader, scale 1 + 0.15·cos(2π·phase/12) from the per-star phases of the shown tick (two vec4 uniforms, `u_phasesLow`
+  and `u_phasesHigh`, since the shared `ShaderProgram` has no vec4-array setter); the pulse is presentation only and
+  never replaces the kernel's phases (`AcousticConstellatorShaders`).
+- **Order and shading.** Depth testing is off: the constellation mesh is in painter's order (sky, gauges, guides, links,
+  hands, stars back to front); the glow mesh (wave shells, then glow shells) is drawn last, additively. Material codes in
+  uv.x select colour and signed-distance edge shading from the per-vertex local coordinate in uv.y. A won level draws the
+  symbol links in the won colour and lifts their glow without moving anything; a failure outlines the missing pair's
+  guide or the snapped link in #FF6B4A.
+- **Tiers.** level-0: pulse, two wave shells per star on a coherent shown tick, two glow shells; level-1: pulse and one
+  glow shell; level-2: none. The constellation mesh is identical at every tier; only the glow mesh and the pulse uniform
+  change, and the presenter logs tier changes.
+- **Camera.** A fixed authored view from eye (0, 2.0, 1.7) towards (0, 0, 0.2), fitted to the box x −0.9 … 0.9,
+  z −0.7 … 1.25, y 0 … 0.3 with a margin for aspects 0.4 … 2.5.
+- **Adapter.** `AcousticConstellatorExperienceCore` opens certified level (seed mod 100) + 1 directly from its table of
+  each witness's skipped candidate (the whole generator only if that fails) and accepts `link.add` [a, b], `link.remove`
+  [a, b], `star.nudge` [s, ±1], `constellation.listen`, `play.undo`, `play.redo` and `level.next`; its digest
+  ("r02-g13.acoustic-constellator.v1") is the level number and the play fingerprint; snapshot schema 1.
+- **Fallback and settings.** A shader failure draws the level-2 geometry unlit and keeps the reason; Reduce Motion draws
+  tick 0 without pulse or wave shells; Reduce Flashing caps the glow.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest 4c50d04a…07a12) and linked into the app
+  as a candidate (`ExperienceRegistry.candidates`) until X-R02-G13; the scenario manifest holds the standard scenarios,
+  `full-playthrough`, `hero`, 80 acceptance scenarios and the fixtures.

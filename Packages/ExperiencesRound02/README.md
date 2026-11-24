@@ -717,3 +717,10 @@ the fewest helper links and phase nudges, smaller sets counted as the proof), `A
 `AcousticConstellatorWitness` and the 100 witness files in `docs/games/acoustic-constellator/levels/` with the pinned
 catalog digest.
 
+Feature 423 (R02-G13-03) adds the hero renderer and the experience: `AcousticConstellatorSceneSnapshot` (palette, tiers,
+the shown tick and the kernel's listen report), `AcousticConstellatorSceneGeometry` (star ellipsoids and phase hands,
+spline links, dashed guides, broken links, the coherence, hold and moves gauges; camera; CPU reference),
+`AcousticConstellatorShaders` (constellation and glow programs with signed-distance shading, the star pulse and the
+wave shells), the adapter `AcousticConstellatorExperienceCore`, the scenario manifest, and the iOS target
+`AcousticConstellatorExperience` (presenter, constellation scene, control panel), registered as a candidate.
+
