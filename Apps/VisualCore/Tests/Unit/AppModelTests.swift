@@ -2,6 +2,7 @@
 // bundled catalog and the registry agree; the app model shows the empty launcher for the real catalog and six
 // tiles in three sections for the fixture; a premium tile gives the notice and no session; the quality override
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
+import AcousticConstellatorCore
 import AmethystEscapeCore
 import AuroraLoomCore
 import BackwardsAuroraCore
@@ -2714,6 +2715,174 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(freshChoice, pinnedOpeningChoice, "a fresh play's choice")
         XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
         XCTAssertEqual(HarmonicBridgesExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Acoustic Constellator in the app (feature 429, R02-G13-09; T-R02G1309-005, FR-R02G1309-003, 006; SC-R02G1309-002)
+
+    /// Acoustic Constellator's registration: a candidate until X-R02-G13.
+    private func acousticConstellatorRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(AcousticConstellatorExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Acoustic Constellator is a candidate")
+    }
+
+    /// FR-R02G1309-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheAcousticConstellatorRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try acousticConstellatorRegistration()
+        XCTAssertEqual(AcousticConstellatorExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(AcousticConstellatorExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(AcousticConstellatorExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1309-006: without `-vcCandidates` Acoustic Constellator is a candidate only: in `candidates`, outside
+    /// `all`, listed in the bundled catalog as not available, without a tile and not opened.
+    func testAcousticConstellatorIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(AcousticConstellatorExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g13.acoustic-constellator")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1309-003, SC-R02G1309-002: with `-vcCandidates` Acoustic Constellator is shown, opens through the
+    /// registry and engine with seed 0 (level 1), and level 1 is won by its certified actions
+    /// (`AcousticConstellatorExperienceCore.certifiedActions(1)`) sent as `link.add [a, b]`, `star.nudge [star, step]`
+    /// and `constellation.listen` with three stars (the opening play is already past the kernel's tutorial stage; the
+    /// tutorial step is presentation and blocks no action, so no `tutorial.dismiss` is needed); the win opens level 2
+    /// and `level.next` plays it.
+    func testAcousticConstellatorOpensAsACandidateAndLevelOneIsWonByItsCertifiedActions() async throws {
+        let registration = try acousticConstellatorRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["link.add", "link.remove", "star.nudge", "constellation.listen", "play.undo", "play.redo",
+                        "level.next", "tutorial.dismiss", "replay.start"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(AcousticConstellatorExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<AcousticConstellatorExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, AcousticConstellatorStage.playing, "the opening play accepts actions")
+        let actions: [AcousticConstellatorAction] = AcousticConstellatorExperienceCore.certifiedActions(1)
+        XCTAssertFalse(actions.isEmpty)
+        for action in actions {
+            switch action {
+            case .link(let a, let b):
+                let values: [Double] = [Double(a), Double(b)]
+                XCTAssertEqual(engine.handle(control: "link.add", values: values), .accepted, "link \(values)")
+            case .unlink(let a, let b):
+                let values: [Double] = [Double(a), Double(b)]
+                XCTAssertEqual(engine.handle(control: "link.remove", values: values), .accepted, "unlink \(values)")
+            case .nudge(let star, let step):
+                let values: [Double] = [Double(star), Double(step)]
+                XCTAssertEqual(engine.handle(control: "star.nudge", values: values), .accepted, "nudge \(values)")
+            case .listen:
+                XCTAssertEqual(engine.handle(control: "constellation.listen"), .accepted, "listen")
+            }
+        }
+        XCTAssertEqual(engine.outcome?.code, AcousticConstellatorExperienceCore.wonCode)
+        XCTAssertEqual(AcousticConstellatorExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, AcousticConstellatorStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified actions earn three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `ACN` (their own literals in
+    /// Tests/UI/AcousticConstellator/ACNSupport.swift, which this target cannot import); the same literals equal the
+    /// Core's certified level 1: one link, star 0 to star 1, then the listen; the panel opens a level with star 0 and
+    /// partner 1 chosen (`openingStar`, `openingPartner`); the budget is 9; every pinned star is on the level. Seed 0
+    /// opens level 1.
+    func testAcousticConstellatorLevelOnePinsInACNEqualTheCore() throws {
+        // An action is a kind ("link" or "listen") with, for a link, [a, b] (none for the listen).
+        let pinnedKinds: [String] = ["link", "listen"]
+        let pinnedLinks: [[Int]] = [[0, 1]]
+        // [star, partner]
+        let pinnedOpeningChoice: [Int] = [0, 1]
+        let pinnedBudget: Int = 9
+
+        let certifiedActions: [AcousticConstellatorAction] = AcousticConstellatorExperienceCore.certifiedActions(1)
+        XCTAssertEqual(certifiedActions, [.link(0, 1), .listen], "level 1's certified actions")
+        var coreKinds: [String] = []
+        var coreLinks: [[Int]] = []
+        for action in certifiedActions {
+            switch action {
+            case .link(let a, let b):
+                coreKinds.append("link")
+                coreLinks.append([a, b])
+            case .unlink:
+                coreKinds.append("unlink")
+            case .nudge:
+                coreKinds.append("nudge")
+            case .listen:
+                coreKinds.append("listen")
+            }
+        }
+        XCTAssertEqual(coreKinds, pinnedKinds, "level 1 certified action kinds")
+        XCTAssertEqual(coreLinks, pinnedLinks, "level 1 certified links")
+
+        let certified = try AcousticConstellatorExperienceCore.generated(number: 1)
+        let level: AcousticConstellatorLevel = certified.level
+        XCTAssertEqual(certified.actions, certifiedActions, "the certified witness is the generated level's")
+        XCTAssertEqual(level.budget, pinnedBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, certifiedActions.count, "the witness fits the budget")
+        XCTAssertGreaterThanOrEqual(level.stars.count, 2, "the opening choice names two stars of the level")
+        for link in pinnedLinks {
+            XCTAssertEqual(link.count, 2, "a link is two stars \(link)")
+            for star in link {
+                XCTAssertTrue((0..<level.stars.count).contains(star), "star on the level \(link)")
+                XCTAssertTrue(AcousticConstellatorExperienceCore.starRange.contains(star), "star in range \(link)")
+            }
+        }
+
+        // The panel's opening choice as the presenter's mirror sets it on a new level: star 0 and partner 1.
+        let coreChoice: [Int] = [AcousticConstellatorExperienceCore.openingStar,
+                                 AcousticConstellatorExperienceCore.openingPartner]
+        XCTAssertEqual(coreChoice, pinnedOpeningChoice, "the opening choice")
+        for star in pinnedOpeningChoice {
+            XCTAssertTrue((0..<level.stars.count).contains(star), "opening choice on the level \(star)")
+        }
+        let opening = try AcousticConstellatorExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, pinnedBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, AcousticConstellatorStage.playing, "the opening accepts actions")
+        XCTAssertEqual(AcousticConstellatorExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }

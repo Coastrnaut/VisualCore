@@ -49,7 +49,7 @@ change (the shaders and reference of R02-G13-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G1309-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore
+- [X] T-R02G1309-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore — Verified 2026-11-24: 2026-11-24: agent B 4 app unit tests (stored examples restore, candidate not available without -vcCandidates, opens and level 1 won by its certified actions, ACN pins equal the Core); app-unit exit 0 (.autonomy/migration/checks/R02-G13-09.app-unit.json)
   through the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win;
   without `-vcCandidates` it is not available and not openable; `ACN`'s pinned level 1 certified actions, opening choice
   and budget equal the Core's); `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27
