@@ -67,7 +67,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1506-006 Docs: `docs/architecture/voxel-origami.md` (polish and accessibility),
+- [X] T-R02G1506-006 Docs: `docs/architecture/voxel-origami.md` (polish and accessibility), — Verified 2026-11-24: 2026-11-24: architecture polish section, ExperiencesRound02 README, testing doc; round02-host in three chunks exit 0 (74 s, 57 s, 324 s)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 -- … --filter
   VoxelOrigami`, `--name round02-host-2 -- … --filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges'`,
   `--name round02-host-3 -- … --skip 'VoxelOrigami|MoonlitMechanism|AcousticConstellator|HarmonicBridges'`

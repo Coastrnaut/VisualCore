@@ -164,3 +164,25 @@ Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decod
   the restored level, campaign mode and the tutorial's first step. The digest ("…v2") covers the level, the play, the
   progress and the mode, never the tutorial step or the chosen hinge.
 
+## Polish and accessibility (feature 446, R02-G15-06)
+
+- **Feedback.** `VoxelOrigamiFeedbackPlan` turns the old and new adapter core into one announcement and one haptic:
+  a turn, undo or redo as `state` ("Turned hinge h forward a quarter turn. c of n cubes in place, a actions left.") with
+  a selection haptic; a win ("The chain matches the target. Level won spending a actions, k of 3 stars.") and a failure
+  (the failure explanation) as `outcome` with success or warning, a turn that ends the level planning only its outcome;
+  level and mode changes as `level`; refusals as `rejection` in sentences ("That hinge cannot turn: nothing would
+  move.") with an error haptic, the engine's `action.rule.` prefix read as the bare code. The presenter routes plans
+  through the shared feedback route and keeps a feedback log; choosing a hinge, pending drags and orbit are silent.
+- **Lights.** `VoxelOrigamiLights` eases the glow (0.7 playing, 1 won, 0.35 failed) and the won look (0 or 1) by the frame
+  clock: 0.15 s, 0.45 s under Reduce Flashing, a started fade finishing before it turns back. The scene draws the glow
+  gain times the glow level and `u_won` as the won level; the fallback's cube lift follows the won level in tenths. The
+  solid itself never moves between actions (no time input), so Reduce Motion changes nothing else.
+- **Sound.** Off by default (a panel toggle, presentation only). Choosing a hinge plays its audition: 220 Hz × 2^((h − 1)
+  / 12) with its fifth when it can turn, with a partial 3 Hz above (an audible beat) when it swings nothing, 0.6 s. The
+  ambient loop's root follows the actions left in quarters and adds a partial per quarter of the cubes in place, an
+  octave when won and halved gains when failed (`VoxelOrigamiSoundRecipe`, `VoxelOrigamiSound`); it plays only while the
+  sound is on, the controls are on screen and the scene is active, and is rebuilt only when its recipe changes.
+- **Panel.** A label and a value in words on every control, an adjustable chosen hinge, a summary element ("a actions
+  left. <progress>. Chosen: <hinge>. Level: <level>."), rows that become columns at accessibility text sizes and a
+  520-point readable width on iPad.
+

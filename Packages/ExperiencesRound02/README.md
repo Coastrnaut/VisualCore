@@ -853,3 +853,8 @@ Feature 445 (R02-G15-05) adds teaching and progression: `VoxelOrigamiSolver.plan
 hint levels from the current state) and `VoxelOrigamiFailureExplanation`, `VoxelOrigamiProgress` with stars, unlocks
 and the daily level, `VoxelOrigamiMode` and `VoxelOrigamiTutorialStep`; the adapter's level, mode and tutorial controls
 and snapshot schema 2 with a migration from 1; the panel's tutorial, hints, failure text, goal and modes.
+
+Feature 446 (R02-G15-06) adds polish and accessibility: `VoxelOrigamiFeedbackPlan` (announcements and haptics),
+`VoxelOrigamiLights` (eased glow and won look), `VoxelOrigamiSoundRecipe` (the hinge audition and the ambient recipe) and
+the experience's `VoxelOrigamiSound`, with labels and values on every control, an adjustable hinge, a summary element
+and a Sound toggle.
