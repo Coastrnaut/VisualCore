@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g15.voxel-origami",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g15.voxel-origami --runtime 26",
+  "elapsed_seconds": 336.923,
+  "exit_code": 0,
+  "finished": "2026-11-24T22:41:36+00:00",
+  "gate": "X-R02-G15",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G15.sim26.log",
+  "log_sha256": "d8a252ef9a58857becdcf76fbe25c7301982614f6b430f9d6b355e5133264a32",
+  "name": "sim26",
+  "started": "2026-11-24T22:35:59+00:00",
+  "timed_out": false
+}
