@@ -309,9 +309,17 @@
       "name": "Harmonic Bridges",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G13",
+      "id": "r02-g13.acoustic-constellator",
+      "name": "Acoustic Constellator",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "a431a83f28709f00bbda4251dc46f60d307fe1c221c2c6af2da537d34f056ccd",
+  "ledger_sha256": "d3a0733926f22f28aca2e2324ee3b014f905dfc9ef3c63673374ae853f98a859",
   "privacy_answers": "unproven",
   "schema": 1
 }

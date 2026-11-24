@@ -1,11 +1,12 @@
 // ACNSupport — feature 429 (R02-G13-09) T-R02G1309-004 (FR-R02G1309-002; SC-R02G1309-001; clarifications Q1, Q2):
 // helpers of the interface tests of Acoustic Constellator (R02-G13) inside the one app, modelled on `HBSupport`
 // (feature 419). The namespace is `ACN` (the prefix `AC` is Ambient Clock's; no other UI test uses `ACN`). Acoustic
-// Constellator is a candidate until X-R02-G13; every launch carries `-vcCandidates` (DebugLaunch: the candidates'
-// catalog entries become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is
-// solved), skips the welcome and opens the experience directly with `-openExperience r02-g13.acoustic-constellator`; a
-// relaunch (`ACN.reopen`) backgrounds the app first (its save point), terminates it and starts again without the reset,
-// so the stored progress (solved levels, stars, the frontier, the verified winning trace) survives.
+// Constellator was a candidate until X-R02-G13 (2026-11-24); every launch still carries `-vcCandidates` (DebugLaunch:
+// the candidates' catalog entries become available and are registered). A fresh start erases the data
+// (`-vcResetData`, so no level is solved), skips the welcome and opens the experience directly with `-openExperience
+// r02-g13.acoustic-constellator`; a relaunch (`ACN.reopen`) backgrounds the app first (its save point), terminates it
+// and starts again without the reset, so the stored progress (solved levels, stars, the frontier, the verified winning
+// trace) survives.
 //
 // The canvas (`session.canvas`) is labelled with the presenter's description
 // (`AcousticConstellatorPresenter.describe`): "Acoustic Constellator level n. ", the progress ("tick t of w: …;

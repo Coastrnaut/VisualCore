@@ -50,7 +50,7 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // A01–A25 and R02-G01 … G12 are integrated (X-A01 to X-A25 and X-R02-G01 … G12 pass): registered and
+        // A01–A25 and R02-G01 … G13 are integrated (X-A01 to X-A25 and X-R02-G01 … G13 pass): registered and
         // available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
         XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
@@ -75,7 +75,8 @@ final class AppModelTests: XCTestCase {
                                                      "r02-g09.nocturne-garden",
                                                      "r02-g10.backwards-aurora",
                                                      "r02-g11.echo-cartographer",
-                                                     "r02-g12.harmonic-bridges"])
+                                                     "r02-g12.harmonic-bridges",
+                                                     "r02-g13.acoustic-constellator"])
         XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
@@ -101,7 +102,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
         // Any catalog experience before its X gate works as a candidate; R02-G14 is one (unavailable, not in `all`, not yet
-        // registered; R02-G01 … R02-G12 were real candidates until their X gates, and R02-G13 is a registered one).
+        // registered; R02-G01 … R02-G13 were real candidates until their X gates).
         // The synthetic debug registration stands in for one.
         let id = try XCTUnwrap(ExperienceID(rawValue: "r02-g14.moonlit-mechanism"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
@@ -501,7 +502,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 37, "A01–A25 and R02-G01 … G12 are integrated")
+        XCTAssertEqual(ExperienceRegistry.all.count, 38, "A01–A25 and R02-G01 … G13 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.
@@ -1254,7 +1255,8 @@ final class AppModelTests: XCTestCase {
                                     NocturneGardenExperienceCore.experienceID,
                                     BackwardsAuroraExperienceCore.experienceID,
                                     EchoCartographerExperienceCore.experienceID,
-                                    HarmonicBridgesExperienceCore.experienceID]
+                                    HarmonicBridgesExperienceCore.experienceID,
+                                    AcousticConstellatorExperienceCore.experienceID]
         for other in ExperienceRegistry.all where !puzzles.contains(other.id.rawValue) {
             XCTAssertNil(other.openingSeed, "\(other.id.rawValue) keeps its stable seed")
         }
@@ -2719,11 +2721,11 @@ final class AppModelTests: XCTestCase {
 
     // MARK: Acoustic Constellator in the app (feature 429, R02-G13-09; T-R02G1309-005, FR-R02G1309-003, 006; SC-R02G1309-002)
 
-    /// Acoustic Constellator's registration: a candidate until X-R02-G13.
+    /// Acoustic Constellator's registration (a candidate until X-R02-G13, integrated since 2026-11-24).
     private func acousticConstellatorRegistration() throws -> ExperienceRegistration {
         let id = try ExperienceID(AcousticConstellatorExperienceCore.experienceID)
-        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
-                             "Acoustic Constellator is a candidate")
+        return try XCTUnwrap(ExperienceRegistry.all.first { $0.id == id },
+                             "Acoustic Constellator is integrated")
     }
 
     /// FR-R02G1309-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
@@ -2740,25 +2742,25 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(problems, [], "\(registration.id)")
     }
 
-    /// FR-R02G1309-006: without `-vcCandidates` Acoustic Constellator is a candidate only: in `candidates`, outside
-    /// `all`, listed in the bundled catalog as not available, without a tile and not opened.
-    func testAcousticConstellatorIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+    /// X-R02-G13 (2026-11-24): Acoustic Constellator is integrated: in `all`, not a candidate, available in the
+    /// bundled catalog, shown and opened without `-vcCandidates` (FR-R02G1309-006 held until then).
+    func testAcousticConstellatorIsIntegratedAndAvailableWithoutTheCandidatesArgument() async throws {
         let id = try ExperienceID(AcousticConstellatorExperienceCore.experienceID)
         XCTAssertEqual(id.rawValue, "r02-g13.acoustic-constellator")
-        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
-        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertTrue(ExperienceRegistry.all.map(\.id).contains(id))
+        XCTAssertEqual(try acousticConstellatorRegistration().openingSeed, 0)
         let categories = try CategoryList(data: bundled("categories"))
         let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
-        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
-        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available")
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
                                                               categories: try bundled("categories"),
                                                               registry: ExperienceRegistry.all))
-        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "a tile")
         let opened = await model.open(id)
-        XCTAssertFalse(opened)
-        XCTAssertNil(model.session.experience)
+        XCTAssertTrue(opened)
+        XCTAssertNotNil(model.session.experience)
     }
 
     /// FR-R02G1309-003, SC-R02G1309-002: with `-vcCandidates` Acoustic Constellator is shown, opens through the

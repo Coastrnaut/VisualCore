@@ -1387,7 +1387,7 @@
         "catalog_sha256": "4c50d04a181e11f815af9239b483914e0d7e1e339986a431f0c7c721edf07a12",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g14.moonlit-mechanism",

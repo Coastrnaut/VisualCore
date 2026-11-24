@@ -69,7 +69,8 @@ import Testing
                          "r02-g09.nocturne-garden",
                          "r02-g10.backwards-aurora",
                          "r02-g11.echo-cartographer",
-                         "r02-g12.harmonic-bridges"].compactMap(ExperienceID.init(rawValue:))
+                         "r02-g12.harmonic-bridges",
+                         "r02-g13.acoustic-constellator"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }
