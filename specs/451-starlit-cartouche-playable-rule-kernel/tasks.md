@@ -16,7 +16,7 @@ consume).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1601-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `StarlitCartoucheCore`,
+- [X] T-R02G1601-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `StarlitCartoucheCore`, — Verified 2026-11-24: 2026-11-24 host exit 0, 4 level tests incl. 200 fixtures winning through the chart (.autonomy/migration/checks/R02-G16-01.host.json); window rule revised (close ≤ 64) so the deadline failure is reachable
   `StarlitCartoucheCoreTests`, product); create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheError.swift`
   (codes "r02-g16.level, .action, .stage, .stale, .newer-schema, .malformed"),
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheChart.swift` (vectors with squared distance; glyph

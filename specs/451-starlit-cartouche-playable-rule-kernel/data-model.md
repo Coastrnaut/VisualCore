@@ -4,7 +4,7 @@
 |---|---|---|
 | `StarlitCartoucheVector` | x, y, z (Int) | lattice positions, each coordinate −8 … 8 |
 | `StarlitCartoucheGlyphPoint` | x, y (Int) | 0 … 4 each; distinct per star |
-| `StarlitCartoucheStar` | orbit (1 … 4 vectors), glyph point, window open, close | 0 ≤ open ≤ close ≤ deadline |
+| `StarlitCartoucheStar` | orbit (1 … 4 vectors), glyph point, window open, close | 0 ≤ open ≤ close ≤ 64 (independent of the deadline) |
 | `StarlitCartoucheCorridor` | a < b (star indices), travel 1 … 3 | undirected; at most 24; no duplicates |
 | `StarlitCartoucheHazard` | corridor index, from ≤ to (beats) | at most 8 |
 | `StarlitCartoucheLevel` | id, seed, difficulty 1 … 5, stars (4 … 12), range 1 … 12, corridors, hazards, start, beacon, deadline 1 … 64, symbol (1 … 12 corridor indices, distinct), budget 1 … 16, tutorial, fingerprint | start's window contains 0; schema 1; sorted-key JSON |

@@ -49,6 +49,8 @@ let package = Package(
         .library(name: "MoonlitMechanismExperience", targets: ["MoonlitMechanismExperience"]),
         // Feature 441 (R02-G15-01): Voxel Origami's rule kernel, a candidate until X-R02-G15.
         .library(name: "VoxelOrigamiCore", targets: ["VoxelOrigamiCore"]),
+        // Feature 451 (R02-G16-01): Starlit Cartouche's rule kernel, a candidate until X-R02-G16.
+        .library(name: "StarlitCartoucheCore", targets: ["StarlitCartoucheCore"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -717,6 +719,16 @@ let package = Package(
                                    .product(name: "VisualCoreAudioDSP", package: visualCore),
                                    .product(name: "VisualCoreSimulation", package: visualCore)],
                     path: "ColorfallCanyons/ExperienceTests"),
+        // Feature 451 (R02-G16-01): Starlit Cartouche's pure rule kernel.
+        .target(name: "StarlitCartoucheCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "StarlitCartouche/Core"),
+        .testTarget(name: "StarlitCartoucheCoreTests",
+                    dependencies: ["StarlitCartoucheCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "StarlitCartouche/CoreTests"),
         // Feature 441 (R02-G15-01): Voxel Origami's pure rule kernel.
         .target(name: "VoxelOrigamiCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),

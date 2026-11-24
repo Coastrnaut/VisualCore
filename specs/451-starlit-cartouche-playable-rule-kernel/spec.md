@@ -59,12 +59,15 @@ comparison of small integers, so no rounding can differ between devices.
   (`r02-g16.action`): an unknown star, j equal to i, no corridor between i and j, a wait outside 0 … 8, and stars out of
   range at t₀ (naming both positions' squared distance and r²). Impact: FR-R02G1601-002, 006.
 - Q: When does a leg fail, and in which order are the checks made? → A: each star has a window [open, close] (beats,
-  0 ≤ open ≤ close ≤ deadline; the start star's window contains 0); each hazard tube names a corridor and a closed beat
+  0 ≤ open ≤ close ≤ 64, independent of the deadline; the start star's window contains 0); each hazard tube names a corridor and a closed beat
   interval [from, to]. In this order the leg fails the level: `window` when t₀ > close of i (the ship lingered past its
   star's window), `hazard` when a hazard on the leg's corridor has an interval meeting [t₀, t₁] (closed intervals;
   naming the lowest such hazard), `window` when t₁ is outside j's window (naming j and the window), `deadline` when
   t₁ exceeds the level's deadline (1 … 64), and `stroke` when the leg's corridor is not one of the symbol's strokes
-  (naming the stray stroke). A failed leg leaves the ship, beat and strokes as they were. Impact: FR-R02G1601-003;
+  (naming the stray stroke). A failed leg leaves the ship, beat and strokes as they were. (Revised during
+  implementation: windows first had to close by the deadline, which made the deadline failure unreachable, as the chart
+  tests showed; a window now closes by beat 64, so a leg can arrive inside its star's window and still past the
+  deadline.) Impact: FR-R02G1601-003;
   SC-R02G1601-004.
 - Q: When is the level won, and what is the truth metric? → A: the symbol is a set of 1 … 12 strokes, each a corridor
   (an unordered pair of stars; its glyph segment joins the two stars' glyph points). The drawn set is the set of
