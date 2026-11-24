@@ -82,3 +82,39 @@ the level certification of R02-G14-02.
 - **Catalog.** `PuzzleCatalog<MoonlitMechanismRules>.digest(id: "moonlit-mechanism", …)` over the 100 fingerprints is
   pinned; the standard progression rule holds on the witness action count; an independent breadth-first search through
   the play re-checks minimality on the two levels with the fewest gears in each band.
+
+## Hero renderer and experience (feature 433, R02-G14-03)
+
+- **Scene.** The paper wall is the plane z = −0.6; its cell size is s = min(1.8 / W, 1.2 / H) and cell (c, r) is
+  centred at x = (c − (W − 1)/2)·s, y = 0.65 − (r − (H − 1)/2)·s. In painter's order (depth testing off): the night
+  backdrop, the paper, the ink feathers (soft-edge tiers), the shown key frame's cast cells as ink squares of side
+  0.92 s (the kernel's cast, never recomputed), the target borders, the missing cells dotted, the stray cells hatched,
+  the forbidden cells crossed, the gauges (one key-frame card per key frame with its covered share lit and a gold border
+  when required, one alignment pip per mesh, the moves bars), the gears back to front by depth (a translucent gold body,
+  a toothed rim of radius 3.4 s with T teeth, the tooth-zero notch and the blade spokes at the drawn phases), the lamp's
+  height ladder and the lamp at y = 1.30 + 0.03·height. Gears stay on their centre cells; the lamp moves only their
+  shadows, as the kernel casts them (`MoonlitMechanismSceneGeometry`).
+- **Shading.** Two GLSL ES 3.00 programs (`MoonlitMechanismShaders`): the clockwork program selects one of 22 material
+  codes from uv.x and shades signed-distance edges from the local coordinate in uv.y; every material is emissive at its
+  palette colour (night #070A14, paper #E8DFC8, ink #1A1822, gold #C9A24A, rim #E2C277, blade #B08A3C, lamp #8FB4E8).
+  A won level brightens the paper through `u_won` without moving anything; a failure outlines the jammed teeth, the
+  forbidden cell or the failing card in the broken colour. The glow program draws the shells additively and last; its
+  gain is clamped by `u_glowLimit`.
+- **Tiers.** level-0: 6 outline segments per tooth, soft edges, two glow shells; level-1: 4, soft edges, one shell;
+  level-2: 2, hard edges, none. Positions of cells, gears and gauges are the same at every tier; the presenter logs tier
+  changes with their reason.
+- **Camera.** A fixed authored view from eye (0, 0.65, 2.4) towards (0, 0.55, −0.3), fitted to the box
+  x −0.95 … 0.95, y −0.45 … 1.5, z −0.6 … 0.4 with a 6 % margin per side for aspects 0.4 … 2.5.
+- **Adapter.** `MoonlitMechanismExperienceCore` opens certified level (seed mod 100) + 1 from its table of each witness's
+  skipped candidate and accepts `handle.turn` [±1], `gear.reseat` [gear, ±1], `lamp.step` [±1], `machine.run`,
+  `play.undo`, `play.redo`, `level.next` and `frame.show` [key frame] (presentation only: it changes the shown key frame,
+  never the play); its digest ("r02-g14.moonlit-mechanism.v1") is the level number, the shown key frame and the play
+  fingerprint; snapshot schema 1. The renderer reads only an immutable `MoonlitMechanismSceneSnapshot`, so nothing drawn
+  can change the game (renderer purity).
+- **Fallback and settings.** A shader failure draws the level-2 geometry unlit with the shared mesh renderer and keeps
+  the reason; Reduce Motion draws the gears at the set-up phases of the shown key frame without a turning preview;
+  Reduce Flashing caps the glow. Neither program has a time input, so meshes are rebuilt only when what they read
+  changes. The presenter declares two frame probes (the top-left and bottom-right night corners) for the X gates.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest 7de63603…9744) and linked into the app
+  as a candidate (`ExperienceRegistry.candidates`) until X-R02-G14; the scenario manifest holds the standard scenarios,
+  `full-playthrough`, `hero`, 80 acceptance scenarios and the fixtures.

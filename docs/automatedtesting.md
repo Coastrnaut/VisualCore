@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G14-02: Moonlit Mechanism content pipeline).
+Last updated: 2026-11-24 (R02-G14-03: Moonlit Mechanism renderer).
 
 ## 1. What is tested, and where
 
@@ -669,6 +669,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   AcousticConstellatorCatalogTests` (the tests that read the stored files fail on that first run, before the files
   exist; run again without the variable). The independent brute force covers every play action in bands 1 … 3 and the
   pruned options in bands 4 and 5, where every play action at size 5 (about 650,000 listens) would not fit 10 s.
+- **Moonlit Mechanism renderer** (R02-G14-03, 2026-11-24). Host: the shader-source, geometry, adapter, purity and
+  scenario tests (`swift test --package-path Packages/ExperiencesRound02 --filter MoonlitMechanism`); simulator:
+  `MoonlitMechanismExperienceTests` (23 tests, about 4 s: frames against the CPU reference at three tiers on five
+  levels, tier positions, probes, fallback, resize and zero size, memory warning, Reduce Motion and Reduce Flashing, a
+  jam, a forbidden shadow and a failing key frame outlined, a won wall). Three lessons. A Core test target is also built
+  for iOS by the package scheme, so a test that uses `Process` needs `#if os(macOS)`. The offscreen host calls
+  `resize` before every still, so a scene that drops its meshes on every resize rebuilds each frame; drop them only
+  when the aspect changes. And sample points chosen "6 px from any other element" found none on levels where gears sit
+  over the shadows: take the clearance only against what is drawn over the point, and require a sample summed over
+  levels rather than on each one.
 - **Moonlit Mechanism content pipeline** (R02-G14-02, 2026-11-24). `swift test --package-path
   Packages/ExperiencesRound02 --filter MoonlitMechanism` (88 tests, about 11 s): all 100 levels generate in about a
   second on a debug build, so the catalog tests run in 5 groups of 20. Minimality is re-checked by a breadth-first

@@ -777,3 +777,11 @@ Feature 432 (R02-G14-02) adds the content pipeline: the 100-entry `MoonlitMechan
 constructive `MoonlitMechanismGenerator`, the minimal-plan `MoonlitMechanismSolver` (plan vectors by L1 norm, pruned by
 the lamp range and the mesh alignments, smaller vectors counted as the proof), `MoonlitMechanismDifficulty`,
 `MoonlitMechanismWitness` and the 100 witness files in `docs/games/moonlit-mechanism/levels/`.
+
+Feature 433 (R02-G14-03) adds the hero renderer and the experience: `MoonlitMechanismSceneSnapshot` (palette, tiers,
+the shown key frame, the kernel's cast and run report), `MoonlitMechanismSceneGeometry` (night backdrop, paper wall, ink
+shadows, target, missing, stray and forbidden marks, key-frame cards, alignment pips, moves bars, toothed gears with
+blades, the lamp and its ladder; camera; CPU reference), `MoonlitMechanismShaders` (clockwork and glow programs with
+signed-distance shading), the adapter `MoonlitMechanismExperienceCore`, `MoonlitMechanismScenarios` with the scenario
+manifest, and the iOS target `MoonlitMechanismExperience` (presenter, clockwork scene, control panel), registered as a
+candidate.
