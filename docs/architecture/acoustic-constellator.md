@@ -210,3 +210,23 @@ and refuses damaged, edited and newer forms (`r02-g13.malformed`, `.newer-schema
 - **Settings.** The sound choice is stored in the snapshot (never the digest), changed by `settings.sound [0 … 1]` and
   applied when the experience opens. The state reads no clock or random source: the seed, the certified catalog, the
   date given to `mode.daily` and the recorded actions decide everything.
+
+## Regression net (feature 428, R02-G13-08)
+
+- **Solver regression.** For every one of the 100 certified levels the host tests check that the generated level equals
+  its witness's level, that the witness replays on a fresh play to a win in exactly its action count within the budget
+  with its per-action fingerprints and digests, and that the solver re-plans exactly the witness's links and nudges with
+  the same smaller sets and size, its work counted within the bound (never timed). Thirteen kinds of alteration (a
+  star's position, rate or starting phase, a fixed link, a symbol pair, the coupling, the threshold, the hold, the
+  budget, a plan link or nudge, a witness action, a per-action fingerprint, the smaller-sets count) are each detected
+  and named with the level and the part (`AcousticConstellatorRegressionSolverTests`).
+- **Golden frames.** `AcousticConstellatorGolden` (test builds only; excluded from Release) computes the code-only
+  description of 16 frames — levels 1, 21, 41, 61 and 81 at the three tiers after the witness's links and nudges, plus
+  the hero frame — at 1,152 × 768: projected star centres, link check points and the first coherence bar, hold pip and
+  moves bar to 1/8 pixel, the element counts and the palette, hashed with SHA-256 and pinned in `golden-frames.json`.
+  A changed description fails until the file is rewritten on purpose with `ACOUSTIC_CONSTELLATOR_WRITE_GOLDEN=1`; the
+  simulator renders the 16 frames and checks them against the descriptions with the feature-423 tolerances.
+- **Memory.** Twelve open-draw-warn-close cycles stay within 16 MB of the first (asserted when the class runs alone),
+  and the scene holds no GPU objects after each close and memory warning.
+- **CI and local command.** The `round02-host-tests` job runs the host part as "Acoustic Constellator regression
+  (host)"; `python3 scripts/acoustic_constellator_regression.py` runs the host and simulator parts with one summary.

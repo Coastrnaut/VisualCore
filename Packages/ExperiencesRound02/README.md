@@ -748,3 +748,7 @@ Feature 427 (R02-G13-07) adds persistence and replay: results carry their winnin
 (`AcousticConstellatorReconciliation`), snapshot schema 3 with migrations from 1 and 2, a replay mode
 (`replay.start`, `replay.step`, `replay.stop`) and the saved sound choice (`settings.sound`).
 
+Feature 428 (R02-G13-08) adds the regression net: the solver regression over all 100 levels with thirteen named
+alterations, the code-only golden frames (`AcousticConstellatorGolden`, `golden-frames.json`), the simulator frame and
+memory checks, the CI step and `scripts/acoustic_constellator_regression.py`.
+

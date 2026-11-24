@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G13-07: Acoustic Constellator persistence and replay).
+Last updated: 2026-11-24 (R02-G13-08: Acoustic Constellator regression net).
 
 ## 1. What is tested, and where
 
@@ -611,6 +611,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   byte for byte (regenerate only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`). A random generator left most candidates
   unsolvable in a Python prototype; the constructive one (a path whose strings can be bridges, k of them scrambled)
   reached each band's range in 37 … 60 of 60, so prototype the generator before writing ranges into the spec.
+- **Acoustic Constellator regression net** (R02-G13-08, 2026-11-24). `python3 scripts/acoustic_constellator_regression.py`
+  runs the host filter `AcousticConstellatorRegression` (solver regression, golden descriptions) and the simulator
+  classes `AcousticConstellatorRegressionGoldenFrameTests` and `AcousticConstellatorRegressionMemoryTests` with the
+  memory isolation variable, printing one summary; CI runs the host part as its own named step. Regenerate the golden
+  file only on purpose: `ACOUSTIC_CONSTELLATOR_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02
+  --filter AcousticConstellatorRegressionGolden`. The solver test compares the plan's total `smallerSets` with the
+  witness's difficulty and the counterexample's `sets` with the recount at the last smaller size — the two are not the
+  same number.
 - **Acoustic Constellator persistence and replay** (R02-G13-07, 2026-11-24). Host: reconciliation of all 100 witness
   traces and of tampered results, 500 round trips, schema 1 and 2 migrations, 200 reconciled saves, replay rules and
   the restored-replay check (`swift test --package-path Packages/ExperiencesRound02 --filter
