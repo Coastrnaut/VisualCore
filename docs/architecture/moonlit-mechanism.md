@@ -193,3 +193,24 @@ the level certification of R02-G14-02.
 - **Panel.** Every control has a label and a value in words; the chosen gear and the shown key frame are adjustable; a
   summary element reads the actions left, the progress, the lamp, the shown key frame, the chosen gear and the level;
   rows become columns at accessibility text sizes and the panel keeps a 520-point readable width.
+
+## Persistence and replay (feature 437, R02-G14-07)
+
+- **Traces.** A campaign or daily win stores its result with the winning trace: the play's effective turns, re-seats,
+  lamp steps and the run in order (`MoonlitMechanismReconciliation.netTrace`: an undone action is left out unless
+  redone), marked verified. Actions spent still count undone actions, so they are at least what the trace spends; a
+  better result replaces a worse one, a tie keeps the earlier trace; practice and replay record nothing.
+- **Reconciliation.** On restore every traced result is replayed on a fresh play of its certified level and kept only
+  if it wins, spends at most its recorded actions and its stars match the stars rule; otherwise it is dropped and
+  counted (`reconciliationDropped`, never digested), and the presenter announces the count once. Untraced results from
+  schema 1 or 2 are kept, unverified. The frontier is restored as saved.
+- **Schema 3.** The digest ("r02-g14.moonlit-mechanism.v3") keeps v2's parts with the traces in the progress; the
+  payload is `{level, mode, progress, records, sound, tutorial}`, migrating 1 → 2 → 3 (2 → 3: empty traces, unverified,
+  sound off). A saved replay restores only when its records are exactly the first actions of its level's verified
+  trace; otherwise the payload is damaged.
+- **Replay.** `replay.start [level]` replays a verified trace from a fresh play (tutorial done), `replay.step` plays the
+  next action, `replay.stop` returns to the campaign; every other play control is refused (`r02-g14.replay`) except
+  dismissing the tutorial, showing a key frame and the sound setting. A replayed win claims no stars. The panel offers
+  "Replay best solution" with Step and Stop and the position.
+- **Sound setting.** `settings.sound [0 … 1]` stores the sound choice in the snapshot (never the digest); the presenter
+  applies the restored choice when the experience opens.

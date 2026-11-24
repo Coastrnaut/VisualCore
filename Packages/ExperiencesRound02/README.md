@@ -803,3 +803,8 @@ the old and new core), `MoonlitMechanismLights` (glow and won fades eased by the
 (a gear's audition from its mesh and an ambient loop from the run report) and the experience's `MoonlitMechanismSound`,
 the fallback's won level, and a panel with labels, values, an adjustable gear and key frame, a summary element and a
 Sound toggle.
+
+Feature 437 (R02-G14-07) adds persistence and replay: results with their winning traces, `MoonlitMechanismReconciliation`
+(replaying each saved trace on restore, dropping and counting edited results), snapshot schema 3 with a 2 → 3 migration,
+the replay mode (`replay.start`, `replay.step`, `replay.stop`) and the saved sound setting (`settings.sound`), with the
+panel's replay controls and the dropped-results announcement.
