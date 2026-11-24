@@ -15,7 +15,7 @@ change (the shaders and reference of R02-G15-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1509-002 Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiSchemaExamples.swift`
+- [X] T-R02G1509-002 Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiSchemaExamples.swift` — Verified 2026-11-24: 2026-11-24 host exit 0, 7 tests (.autonomy/migration/checks/R02-G15-09.host.json); registry stores both examples (app build in T-004/T-005)
   (contracts/api.md; data-model: schema 1 "`{level: 1, records}` of a seeded play of level 1 with its first certified
   turn applied (playing, not won), seed 7"; schema 2 "campaign mode, the tutorial done, progress (frontier 2, level 1
   solved with actions spent one above the certified count and its stars), records []", "the result is kept, unverified,
