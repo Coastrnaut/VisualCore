@@ -28,7 +28,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1303-003 [P] [US1] Create
+- [X] T-R02G1303-003 [P] [US1] Create — Verified 2026-11-23: 2026-11-23: agent A shaders and 15 source tests, lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G13-03.host-2.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorShaders.swift` (constellation and glow
   sources, GLSL ES 3.00; signed-distance shading of stars, hands, filaments, guides and gauges from per-vertex local
   coordinates; the presentation pulse 1 + 0.15 · cos(2π · phase / 12) driven by uniforms, none at level-2 and under
