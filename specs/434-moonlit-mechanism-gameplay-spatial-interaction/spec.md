@@ -66,7 +66,9 @@ rung by rung.
   of finger travel (upward positive, rounded to the nearest rung, a fixed screen distance because a projected rung is
   too small), shows the pending steps, and on release while playing sends that many `lamp.step` actions; steps past the
   ends are sent and refused with `action.lamp`, so the lamp stops at its end. A tap on the lamp (not the ladder) while
-  playing sends `machine.run`. Impact: FR-R02G1404-002, 004; SC-R02G1404-001.
+  playing sends `machine.run`; a tap on the ladder changes nothing. A lamp drag on any stage other than playing
+  previews nothing and sends nothing. A cancelled gear or lamp drag (second finger, cancelled touch) clears its pending
+  text and sends nothing. Impact: FR-R02G1404-002, 004; SC-R02G1404-001.
 - Q: What do taps and double taps do? → A: a tap on a gear chooses it as the panel's gear (any stage, no action). A
   second tap on the same gear within 0.35 s and 22 points while playing sends `gear.reseat [gear, +1]`, except on the
   driver (gear 0), which sends nothing and the description says the driver cannot be re-seated. A tap on a key-frame
