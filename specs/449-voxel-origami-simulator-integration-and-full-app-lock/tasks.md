@@ -38,7 +38,7 @@ change (the shaders and reference of R02-G15-03 are unchanged and re-proven by t
   name of Q1 is listed once, has the prefix `experience.r02-g15.voxel-origami.`, and the panel source uses each
   exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing VoxelOrigamiExperienceTests`
-- [ ] T-R02G1509-004 [US1] Create `Apps/VisualCore/Tests/UI/VoxelOrigami/VOSupport.swift`, `VOPlayUITests.swift`,
+- [X] T-R02G1509-004 [US1] Create `Apps/VisualCore/Tests/UI/VoxelOrigami/VOSupport.swift`, `VOPlayUITests.swift`, — Verified 2026-11-24: 2026-11-24 app-ui exit 0: VOPlayUITests (2) and VOReplayUITests (1) passed in chunk x3 (59 s, 112 s with relaunch, 59 s; .autonomy/migration/checks/R02-G15-09.app-ui.json); xcodegen regenerated; chunk test 16/16
   `VOReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified turns (hinge 4 by −1, twice) and the
   budget (9) pinned in `VO`; hinge 4 chosen with Hinge + or Hinge − by the hinge control's value, Turn − tapped, each press
   counted only when the actions-left count of the `actions` text moves; read "The chain matches the target shape." and
