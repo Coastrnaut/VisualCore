@@ -62,7 +62,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   gear rotation follows phase and direction; gauges at 0, half and the budget; a won level brighter and in place; the
   glow mesh empty at level-2 and its shell counts per tier; only segments, feathers and glow differ between tiers);
   agent B; `--name host-3`
-- [ ] T-R02G1403-005 [P] [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismExperienceCore.swift`
+- [X] T-R02G1403-005 [P] [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismExperienceCore.swift` — Verified 2026-11-24: 2026-11-24: agent C adapter (8 controls incl. frame.show outside the digest, certified-candidate table from the witnesses, digest, schema 1, quality profile of 3) with 14 adapter tests and 2 purity tests (200 seeded snapshots); lead retest host-4 exit 0 (.autonomy/migration/checks/R02-G14-03.host-4.json)
   (controls "handle.turn [±1], gear.reseat [g, ±1], lamp.step [±1], machine.run, play.undo, play.redo, level.next,
   frame.show [k]"; digest "level number and play fingerprint", never the shown key frame; schema 1 `{level, records}`;
   quality profile of three levels (the Core's `qualityTiers` equals the presenter's levels); each level certified
