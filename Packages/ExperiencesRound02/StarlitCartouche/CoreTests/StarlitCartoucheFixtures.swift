@@ -15,7 +15,8 @@ import VisualCoreSimulation
 struct StarlitCartoucheFixture: Sendable {
     /// The level.
     let level: StarlitCartoucheLevel
-    /// The known legs, each `.leg(star, wait)`; the last one wins.
+    /// The known legs, each `.leg(star, wait)`; flown in order they win, at the latest on the last one (a route that
+    /// revisits its stars can complete the symbol at the beacon earlier).
     let actions: [StarlitCartoucheAction]
 
     /// The fixture seed of the feature.

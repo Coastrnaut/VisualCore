@@ -61,7 +61,7 @@ consume).
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1601-005 [P] [US4] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheRules.swift`
+- [X] T-R02G1601-005 [P] [US4] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheRules.swift` — Verified 2026-11-24: 2026-11-24 host-4 exit 0, 5 rules tests incl. 200 walks agreeing with the play (.autonomy/migration/checks/R02-G16-01.host-4.json)
   (agent C: `PuzzleRules`: State = position (star, beat, drawn, actions spent, outcome), Move = StarlitCartoucheAction;
   legal moves while playing "every corridor from the star, waits 0 … 8, flyable ones only") with
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheRulesTests.swift` (agreement with the play on
