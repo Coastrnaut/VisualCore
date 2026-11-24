@@ -10,7 +10,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1506-001 Baselines after R02-G15-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1506-001 Baselines after R02-G15-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing exit 0; baseline-round02 in three chunks exit 0 (57 s VoxelOrigami, 48 s Moonlit/Acoustic/Harmonic, 339 s the rest)
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02` (split into `baseline-round02-1 … 3` by the
   three filters of T-006 if it nears 450 s); the rendering baseline is R02-G15-05's rendering runs (exit 0)
 - [ ] T-R02G1506-002 Edit `Packages/ExperiencesRound02/Package.swift` (`VoxelOrigamiCore` and its tests gain
