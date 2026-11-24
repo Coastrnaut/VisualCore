@@ -119,3 +119,26 @@ and refuses damaged, edited and newer forms (`r02-g13.malformed`, `.newer-schema
 - **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest 4c50d04a…07a12) and linked into the app
   as a candidate (`ExperienceRegistry.candidates`) until X-R02-G13; the scenario manifest holds the standard scenarios,
   `full-playthrough`, `hero`, 80 acceptance scenarios and the fixtures.
+
+## Gestures (feature 424, R02-G13-04)
+
+- **Picking.** At touch-down every target is projected through the drawn camera (orbit included) into view points:
+  first a coherence bar or hold pip whose centre lies within 22 points (nearest; ties to the coherence bars, then the
+  lower index), then a star centre within 22 points (nearest, ties to the lower index), then a link whose projected
+  spline (16 segments) lies within 22 points (nearest, ties to the lower index); the moves gauge and the guides are
+  empty space (`AcousticConstellatorPicker`).
+- **Taps and drags.** A tap moves less than 10 points and lifts within 0.5 s; a drag moves at least 16 points. A tap on a
+  star while playing nudges it one step forward (`star.nudge [s, 1]`) and chooses it; a tap on a link chooses its two
+  stars and describes it (no action); a tap on a gauge listens; two taps on empty space within 0.35 s and 22 points
+  reset the view. A drag from a star draws a teal filament to the finger (`filamentMesh`, ending on the dragged star's
+  height plane or at the target star) and, released on another star, links an unlinked pair or unlinks a pair the player
+  linked; fixed pairs send nothing (`AcousticConstellatorGestureController`).
+- **Orbit.** Two fingers orbit within yaw ±35° and pitch −15° … +20°; the field of view refits so the authored box stays
+  inside the view with a 5 % margin at aspects 0.4 … 2.5, and the stars are painted back to front from the drawn eye.
+  Orbit is presentation only, outside the snapshot and the digest; "Reset view" or a double tap returns to the authored
+  view.
+- **Finished plays and refusals.** On a won or failed play gestures send no kernel action (a star tap only chooses the
+  star) and the description says the play is over; refused actions are shown in words and their codes kept in the
+  presenter's refusal log, read with or without the engine's `action.rule.` prefix.
+- **Panel.** Every action stays on the panel, now with "Reset view"; all 100 certified levels are won through the panel
+  alone in a host test.

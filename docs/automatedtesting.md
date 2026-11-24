@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G13-03: Acoustic Constellator renderer).
+Last updated: 2026-11-23 (R02-G13-04: Acoustic Constellator touch controls).
 
 ## 1. What is tested, and where
 
@@ -611,6 +611,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   byte for byte (regenerate only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`). A random generator left most candidates
   unsolvable in a Python prototype; the constructive one (a path whose strings can be bridges, k of them scrambled)
   reached each band's range in 37 … 60 of 60, so prototype the generator before writing ranges into the spec.
+- **Acoustic Constellator touch controls** (R02-G13-04, 2026-11-23). Host: the picker (500 seeded points at 3 sizes
+  and 3 orbits against an independent pick), the orbit framing and star order, the gesture controller (500 seeded
+  scripts applied through the adapter) and the panel win over all 100 levels (`swift test --package-path
+  Packages/ExperiencesRound02 --filter 'AcousticConstellatorPicker|AcousticConstellatorGestureController|AcousticConstellatorPanelWin'`);
+  simulator: `AcousticConstellatorGestureWiringTests` through the presenter's pointer entry. The gesture agent wrote
+  against a stub of the picker contract while the picker agent wrote the real one; because its tests computed their
+  expectations from public geometry only, they passed unchanged when the lead swapped in the real picker. Fix the
+  contract first and keep each agent's tests independent of the other's internals.
 - **Acoustic Constellator renderer** (R02-G13-03, 2026-11-23). Host: the shader-source, geometry, adapter, purity and
   scenario tests (`swift test --package-path Packages/ExperiencesRound02 --filter AcousticConstellator`); simulator:
   `AcousticConstellatorExperienceTests` (frames against the CPU reference at three tiers on five levels, fallback,

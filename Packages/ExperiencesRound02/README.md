@@ -724,3 +724,10 @@ spline links, dashed guides, broken links, the coherence, hold and moves gauges;
 wave shells), the adapter `AcousticConstellatorExperienceCore`, the scenario manifest, and the iOS target
 `AcousticConstellatorExperience` (presenter, constellation scene, control panel), registered as a candidate.
 
+Feature 424 (R02-G13-04) adds the touch controls: `AcousticConstellatorOrbit` and an orbiting camera,
+`AcousticConstellatorPicker` (coherence bars and hold pips, stars and link splines projected through the drawn camera,
+each with a 22-point target), `AcousticConstellatorGestureController` (tap a star to nudge it, drag from star to star to
+link or unlink, tap a link to inspect it, tap a gauge to listen, two-finger orbit, double tap to reset), the drag
+filament, the presenter's pointer entry and "Reset view"; all 100 levels are won through the panel alone in a host
+test.
+
