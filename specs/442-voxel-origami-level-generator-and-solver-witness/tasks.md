@@ -15,7 +15,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1502-002 Add `generation(Int)` ("r02-g15.generation") and `witness(String)` ("r02-g15.witness") to
+- [X] T-R02G1502-002 Add `generation(Int)` ("r02-g15.generation") and `witness(String)` ("r02-g15.witness") to — Verified 2026-11-24: 2026-11-24: generation and witness refusals, 100-entry manifest with emphases and orientations, difficulty (the solver lands with it, the difficulty being built from its plan); host exit 0, existing Voxel Origami suites unchanged (.autonomy/migration/checks/R02-G15-02.host.json)
   `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiError.swift`; create
   `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiManifest.swift` (the 100 entries "number 1 … 100, planned
   seed, band 1 … 5, budget 8 … 19, emphasis" copied from `python3 scripts/planning_index.py levels --experience
