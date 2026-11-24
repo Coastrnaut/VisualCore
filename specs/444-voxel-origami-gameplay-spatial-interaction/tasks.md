@@ -65,7 +65,7 @@ resize alone.
 
 ## Phase 5: Story 3 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G1504-005 [US3] Wire `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiPresenter.swift`
+- [X] T-R02G1504-005 [US3] Wire `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiPresenter.swift` — Verified 2026-11-24: 2026-11-24: presenter pointer entry (hinge.choose, hinge.turn, pending text, explain messages, refusal log with or without action.rule.), scene drawn and meshes rebuilt for the orbit, panel Reset view and pending line; agent E 8 wiring tests; 30 simulator tests; sim-27 exit 0
   (FR-R02G1504-001 … 007; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot;
   turn sent through `hinge.turn`, chooseHinge through `hinge.choose`; the pending turn in the description and the panel
   ("Turn hinge h forward" or "back"); explain texts "The root cube has no hinge", "Nothing would move: hinge h swings no

@@ -10,6 +10,9 @@
 // mode. If a program fails, the scene falls back to the level-2 geometry drawn unlit with the shared `MeshRenderer`
 // (ambient 1, the geometry's fallback colours) and keeps the reason; nothing here can reach the kernel. A zero-sized
 // drawable is cleared and nothing else is drawn.
+// Since feature 444 (R02-G15-04) the camera follows the gesture controller's orbit (`orbit`, presentation only); the
+// meshes face the drawn eye (billboards, paint order, culling winding), so an orbit change rebuilds them, a resize
+// alone does not.
 #if os(iOS)
 import Foundation
 import VisualCoreMath
@@ -32,6 +35,9 @@ final class VoxelOrigamiVoxelScene {
     private(set) var voxelBuilds = 0
     /// How many times the glow mesh was built (tests).
     private(set) var glowBuilds = 0
+    /// The orbit the camera is drawn at (feature 444, presentation only; the gesture controller's). The meshes are
+    /// built for the drawn eye, so a new orbit rebuilds them.
+    var orbit = VoxelOrigamiOrbit.authored
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the mode.
     private struct GeometryKey: Equatable {
@@ -46,6 +52,7 @@ final class VoxelOrigamiVoxelScene {
         let tier: Int
         let reduceMotion: Bool
         let fallback: Bool
+        let orbit: VoxelOrigamiOrbit
     }
 
     private var registry: ResourceRegistry?
@@ -102,8 +109,10 @@ final class VoxelOrigamiVoxelScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let still: Bool = reduceMotion || !animate
-        let camera = VoxelOrigamiSceneGeometry.camera(snapshot, aspect: aspect)
-        if key(snapshot, tier: tier, still: still) != geometryKey { try rebuild(snapshot, tier: tier, still: still) }
+        let camera = VoxelOrigamiSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
+        if key(snapshot, tier: tier, still: still) != geometryKey {
+            try rebuild(snapshot, tier: tier, still: still, camera: camera)
+        }
         geometryKey = key(snapshot, tier: tier, still: still)
         if fallbackReason != nil {
             try drawFallback(camera)
@@ -121,23 +130,25 @@ final class VoxelOrigamiVoxelScene {
     private func key(_ s: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier, still: Bool) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, cells: s.cells, turns: s.turns, chosenHinge: s.chosenHinge,
                     report: s.report, stage: s.stage, failure: s.failure, actionsLeft: s.actionsLeft,
-                    tier: tier.index, reduceMotion: still, fallback: fallbackReason != nil)
+                    tier: tier.index, reduceMotion: still, fallback: fallbackReason != nil, orbit: orbit)
     }
 
-    /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
-    private func rebuild(_ snapshot: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier, still: Bool) throws {
+    /// Rebuilds the GPU objects for `snapshot` at `tier` seen from `camera`: the two programs, or the unlit fallback.
+    private func rebuild(_ snapshot: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier, still: Bool,
+                         camera: VoxelOrigamiCamera) throws {
         guard let registry else { return }
         let keepFallback = fallbackReason
         release()
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let voxels = try VoxelOrigamiSceneGeometry.voxelMesh(snapshot, tier: tier, reduceMotion: still)
+                let voxels = try VoxelOrigamiSceneGeometry.voxelMesh(snapshot, tier: tier, reduceMotion: still,
+                                                                     camera: camera)
                 voxelRenderer = try Self.renderer(voxels, vertex: VoxelOrigamiShaders.voxelVertex,
                                                   fragment: voxelFragment, name: "voxel-origami-voxels",
                                                   registry: registry)
                 voxelBuilds += 1
-                let glow = try VoxelOrigamiSceneGeometry.glowMesh(snapshot, tier: tier)
+                let glow = try VoxelOrigamiSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera)
                 glowBuilds += 1
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: VoxelOrigamiShaders.glowVertex,
@@ -155,8 +166,8 @@ final class VoxelOrigamiVoxelScene {
         let minimal = VoxelOrigamiTier.of(VoxelOrigamiTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [VoxelOrigamiColouredMesh] = [
-            try VoxelOrigamiSceneGeometry.voxelPart(snapshot, tier: minimal, reduceMotion: still),
-            try VoxelOrigamiSceneGeometry.glowPart(snapshot, tier: minimal),
+            try VoxelOrigamiSceneGeometry.voxelPart(snapshot, tier: minimal, reduceMotion: still, camera: camera),
+            try VoxelOrigamiSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

@@ -3,8 +3,9 @@
 // adapter, a level opens with its first turnable hinge chosen, clamped to the level's hinges), turning it (turn − and
 // +, `hinge.turn [h, ±1]`), undo, redo and next level (kernel actions through the action port), each with an
 // accessibility label, value and identifier; the header shows the actions left of the budget, the status (stage, or the
-// failure in words), the progress description, the failure in words and a refused action in words. Touching cubes on
-// the canvas, orbiting and full accessibility come in later features of R02-G15.
+// failure in words), the progress description, the failure in words and a refused action in words. Since feature 444
+// (R02-G15-04) the panel shows the pending turn of a canvas drag and has "Reset view"; full accessibility comes in a
+// later feature of R02-G15.
 #if os(iOS)
 import SwiftUI
 import VisualCoreExperienceHost
@@ -16,6 +17,11 @@ struct VoxelOrigamiControls: View {
     let port: ExperienceActionPort
     /// What the panel shows.
     let mirror: VoxelOrigamiMirror
+    /// Returns the camera to the authored view (feature 444; presentation only).
+    var resetView: () -> Void = {}
+    /// Sends a control and shows a refusal in words (the presenter's `send`, feature 444); nil sends through the port
+    /// directly.
+    var sender: ((String, [Double]) -> Void)? = nil
 
     /// The panel.
     var body: some View {
@@ -47,6 +53,10 @@ struct VoxelOrigamiControls: View {
         if let message = mirror.message {
             Text(message).font(.footnote)
                 .accessibilityIdentifier(port.identifier("message"))
+        }
+        if let pending = mirror.pending {
+            Text(pending).font(.footnote)
+                .accessibilityIdentifier(port.identifier("pending"))
         }
     }
 
@@ -95,10 +105,18 @@ struct VoxelOrigamiControls: View {
                 .accessibilityLabel("Go to the next level")
                 .accessibilityIdentifier(port.identifier("next-level"))
         }
+        Button("Reset view") { resetView() }
+            .accessibilityLabel("Return the camera to the authored view")
+            .accessibilityValue("presentation only")
+            .accessibilityIdentifier(port.identifier("reset-view"))
     }
 
     /// Sends `control` and shows a refusal in words.
     private func send(_ control: String, _ values: [Double] = []) {
+        if let sender {
+            sender(control, values)
+            return
+        }
         let result = port.send(control, values)
         mirror.message = result.isAccepted
             ? nil : "That change was refused: \(VoxelOrigamiMirror.refusalText(code: result.code))."

@@ -8,6 +8,10 @@
 // first turnable hinge chosen. A refused action is shown in words. A memory warning releases the GPU objects; the next
 // frame rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the kernel (renderer purity).
 // Its probes (two backdrop corners) let the verification runner check a frame.
+// Since feature 444 (R02-G15-04) canvas touches go through `VoxelOrigamiGestureController`: a tap chooses a hinge
+// (`hinge.choose`), a double tap or a drag turns one (`hinge.turn`), the pending turn of a drag is shown in words, a
+// drag that cannot turn explains why, two fingers orbit the camera (presentation only), and refused actions are shown
+// and logged with their codes, read with or without the engine's `action.rule.` prefix.
 #if os(iOS)
 import Foundation
 import SwiftUI
@@ -15,6 +19,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 import VoxelOrigamiCore
 
 /// What the controls show: the latest state the presenter described and the chosen hinge.
@@ -39,8 +44,10 @@ final class VoxelOrigamiMirror {
     var hinge = 1
     /// The play followed (a copy; never sent anywhere).
     var play: VoxelOrigamiPlay?
-    /// The text of the last refused change, if any.
+    /// The text of the last refused change, or why a gesture sent nothing, if any.
     var message: String?
+    /// The pending turn of a canvas drag in words (feature 444), nil when no drag is pending.
+    var pending: String?
 
     /// The number of cubes of the followed level (2 while no play is followed, so hinge 1 exists).
     var cubeCount: Int { max(play?.level.cubes.count ?? 2, 2) }
@@ -74,9 +81,17 @@ final class VoxelOrigamiMirror {
         }
     }
 
-    /// A refused action's reason code in words.
+    /// The engine's prefix on a kernel refusal's code (`action.rule.` before the kernel's `r02-g15.*` code).
+    static let rulePrefix = "action.rule."
+
+    /// `code` without the engine's ``rulePrefix`` (feature 444: codes are read with or without it).
+    static func bareCode(_ code: String) -> String {
+        code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+    }
+
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
     static func refusalText(code: String) -> String {
-        switch code {
+        switch bareCode(code) {
         case "r02-g15.stage": "the play is over: undo or go to the next level"
         case "r02-g15.action": "that hinge cannot turn: nothing would move"
         case "r02-g15.stale": "the play changed before the action arrived"
@@ -114,6 +129,12 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
     private(set) var tierLog: [VoxelOrigamiTierChange] = []
     /// The last snapshot drawn (tests and the description).
     private(set) var lastSnapshot: VoxelOrigamiSceneSnapshot?
+    /// The gesture controller (feature 444): cube taps, double taps and drags, orbit.
+    private(set) var gestures = VoxelOrigamiGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability, feature 444).
+    private(set) var refusalLog: [String] = []
+    /// How many refusal codes ``refusalLog`` keeps.
+    static let refusalLogLimit = 64
 
     /// What restarts the presentation clock.
     private struct PlayKey: Equatable {
@@ -224,6 +245,7 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
         mirror.measureLabel = measure
         var text = "Voxel Origami level \(core.levelNumber). "
         text += measure + ". "
+        if let pending = mirror.pending { text += pending + ". " }
         switch play.stage {
         case .won, .result where play.failure == nil:
             text += "The chain matches the target shape."
@@ -238,12 +260,94 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
             mirror.status = play.records.isEmpty ? "Ready" : "Playing"
             mirror.failureText = nil
         }
+        if play.stage == .won || play.stage == .failed || play.stage == .result {
+            text += " " + Self.finishedMessage + "."
+        }
         return text
     }
 
-    /// The control panel.
+    /// The control panel: "Reset view" returns to the authored orbit; every button sends through ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(VoxelOrigamiControls(port: port, mirror: mirror))
+        AnyView(VoxelOrigamiControls(port: port, mirror: mirror,
+                                     resetView: { [weak self] in self?.resetView() },
+                                     sender: { [weak self] control, values in
+                                         self?.send(control, values, port: port)
+                                     }))
+    }
+
+    // MARK: Touch controls (feature 444, R02-G15-04)
+
+    /// What a finished play says when a one-finger gesture sent nothing.
+    static let finishedMessage = VoxelOrigamiGestureController.finishedReason
+
+    /// The pending turn of a cube drag in words: "Turn hinge h forward" or "Turn hinge h back".
+    static func pendingTurnText(hinge: Int, step: Int) -> String {
+        "Turn hinge \(hinge) \(step > 0 ? "forward" : "back")"
+    }
+
+    /// The canvas gestures send hinge turns and hinge choices; the pending text and the orbit are presentation state.
+    var gestureActions: Set<String> { ["hinge.turn", "hinge.choose"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(VoxelOrigamiExperienceCore.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
+    /// order: a turn goes through `hinge.turn` (one quarter turn, its own undo step), a choice through `hinge.choose`
+    /// (presentation only), the pending turn to the mirror, and an explanation to the mirror's message.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot else { return }
+        let actions: [VoxelOrigamiGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
+        for action in actions {
+            switch action {
+            case let .chooseHinge(hinge):
+                send("hinge.choose", [Double(hinge)], port: port)
+            case let .pendingTurn(hinge, step):
+                mirror.pending = Self.pendingTurnText(hinge: hinge, step: step)
+            case .clearPending:
+                mirror.pending = nil
+            case let .turn(hinge, step):
+                mirror.pending = nil
+                send("hinge.turn", [Double(hinge), Double(step)], port: port)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            case let .explain(reason):
+                mirror.message = reason
+            }
+        }
+        if event.phase == .ended || event.phase == .cancelled || gestures.state == .orbiting
+            || gestures.state == .cancelled {
+            mirror.pending = nil
+        }
+        scene.orbit = gestures.orbit
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the pending text disappears.
+    func cancelPointers() {
+        gestures.cancel()
+        mirror.pending = nil
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its code (read with or without
+    /// the engine's `action.rule.` prefix) in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(VoxelOrigamiMirror.refusalText(code: result.code))."
+            refusalLog.append(VoxelOrigamiMirror.bareCode(result.code))
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        return result
     }
 }
 #endif
