@@ -1,0 +1,115 @@
+{
+  "actions" : [
+    {
+      "turn" : {
+        "_0" : 2,
+        "_1" : 1
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 0,
+    "states" : 1
+  },
+  "difficulty" : {
+    "cubes" : 5,
+    "orientations" : "upright",
+    "statesSearched" : 1,
+    "turnableHinges" : 1,
+    "turns" : 1,
+    "work" : 2
+  },
+  "digests" : [
+    "e2d3a4badf1e3097"
+  ],
+  "fingerprints" : [
+    "61760240090d363ab55e0d0379ca01ac6112b28118b9963f0f385f9e57b8b019",
+    "f04aaa408bae5acdcd3df138d8217993e54a1daad98beedc3223306135497167"
+  ],
+  "level" : {
+    "budget" : 10,
+    "cubes" : [
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : 0
+        },
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 0,
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 1,
+          "z" : 0
+        },
+        "parent" : 0,
+        "startTurn" : 2
+      },
+      {
+        "direction" : {
+          "x" : 1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 2,
+        "startTurn" : 1
+      },
+      {
+        "direction" : {
+          "x" : -1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 0,
+        "startTurn" : 1
+      }
+    ],
+    "difficulty" : 1,
+    "fingerprint" : "d433de96d83bcda2c1d13a0564ee1dda684f90952a71c0e3aa8579ac79fe61d3",
+    "id" : "voxel-origami-006",
+    "orientations" : "upright",
+    "schema" : 1,
+    "seed" : 12497773791342444674,
+    "target" : [
+      {
+        "x" : -3,
+        "y" : -3,
+        "z" : -3
+      },
+      {
+        "x" : -3,
+        "y" : -2,
+        "z" : -3
+      },
+      {
+        "x" : -3,
+        "y" : -1,
+        "z" : -4
+      },
+      {
+        "x" : -3,
+        "y" : -1,
+        "z" : -3
+      },
+      {
+        "x" : -2,
+        "y" : -2,
+        "z" : -3
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 6,
+  "schema" : 1,
+  "skipped" : 0
+}

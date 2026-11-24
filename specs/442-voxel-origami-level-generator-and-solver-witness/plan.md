@@ -23,7 +23,7 @@ API: [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstar
 `VoxelOrigamiCore`. **Numbers**: at most 10 cubes in the catalog; turns tried bounded at 300 000 per candidate (the
 prototype needed at most 3 670); states are arrays of quarter turns; plain `Int` arithmetic. **Seeds**: manifest seeds
 through `SeedDerivation`; test fixtures seed 2_442. **Testing**: `swift test --package-path Packages/ExperiencesRound02
---filter VoxelOrigami`; catalog certification in groups of 20 levels, each under 10 s on a debug host build (measured
+--filter VoxelOrigami`; catalog certification in groups of 10 levels, each under 10 s on a debug host build (measured
 locally, not asserted on CI); generated levels cached per process. **Constraints**: additive; reason codes `r02-g15.*`;
 no clock in any rule.
 

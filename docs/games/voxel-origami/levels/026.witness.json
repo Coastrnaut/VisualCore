@@ -1,0 +1,151 @@
+{
+  "actions" : [
+    {
+      "turn" : {
+        "_0" : 1,
+        "_1" : -1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 5,
+        "_1" : 1
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "states" : 4
+  },
+  "difficulty" : {
+    "cubes" : 7,
+    "orientations" : "upright",
+    "statesSearched" : 5,
+    "turnableHinges" : 2,
+    "turns" : 2,
+    "work" : 8
+  },
+  "digests" : [
+    "91e20b3594eb055d",
+    "8ab5b4500d908421"
+  ],
+  "fingerprints" : [
+    "f28935e848131d776930d370ec2e3ee650118a52bcc148a8b97c4ceed7f2b170",
+    "d9ab5b193a4222b583c0892e1eabc967c2a9d8c7e0a7f266fb163cbf67af43e1",
+    "ab7fb5edbf89692af4e33578d2f1e3033daf1e66ee141d7ef5cd11e3c6c4ca1d"
+  ],
+  "level" : {
+    "budget" : 12,
+    "cubes" : [
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : 0
+        },
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 0,
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 1,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 1,
+          "z" : 0
+        },
+        "parent" : 1,
+        "startTurn" : 1
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 2,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : 1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 1,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : 1
+        },
+        "parent" : 5,
+        "startTurn" : 0
+      }
+    ],
+    "difficulty" : 2,
+    "fingerprint" : "c0bdc5c7ef605f5bad4b65d6f4c655f2ba00a61cf80cdf6df7f81360da05ada7",
+    "id" : "voxel-origami-026",
+    "orientations" : "upright",
+    "schema" : 1,
+    "seed" : 15509781146252243854,
+    "target" : [
+      {
+        "x" : -1,
+        "y" : -2,
+        "z" : 1
+      },
+      {
+        "x" : -1,
+        "y" : -1,
+        "z" : 1
+      },
+      {
+        "x" : 0,
+        "y" : -2,
+        "z" : -1
+      },
+      {
+        "x" : 0,
+        "y" : -2,
+        "z" : 0
+      },
+      {
+        "x" : 0,
+        "y" : -2,
+        "z" : 1
+      },
+      {
+        "x" : 0,
+        "y" : -2,
+        "z" : 2
+      },
+      {
+        "x" : 1,
+        "y" : -2,
+        "z" : 1
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 26,
+  "schema" : 1,
+  "skipped" : 0
+}

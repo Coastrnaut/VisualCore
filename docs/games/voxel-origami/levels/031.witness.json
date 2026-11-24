@@ -1,0 +1,137 @@
+{
+  "actions" : [
+    {
+      "turn" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "states" : 2
+  },
+  "difficulty" : {
+    "cubes" : 6,
+    "orientations" : "upright",
+    "statesSearched" : 3,
+    "turnableHinges" : 2,
+    "turns" : 2,
+    "work" : 7
+  },
+  "digests" : [
+    "49e9bfcab591cb87",
+    "26557b305538b4f3"
+  ],
+  "fingerprints" : [
+    "11fffedacc9368eb94baa03693162bebc3963e8e39ac22a278177f5d3ae14217",
+    "a5dc90a39f77bf5a064d936d5e22c600361753b493fd7aa4387aa35aebec5be8",
+    "8b69b400a971d8eaa0d94f8f4d89d886dcfc0f2009b79b55ad89d57670bb23fa"
+  ],
+  "level" : {
+    "budget" : 13,
+    "cubes" : [
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : 0
+        },
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 0,
+        "startTurn" : 1
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : -1
+        },
+        "parent" : 1,
+        "startTurn" : 1
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 2,
+        "startTurn" : 1
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 1,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : 1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 2,
+        "startTurn" : 0
+      }
+    ],
+    "difficulty" : 2,
+    "fingerprint" : "fa2793df05f69db49e9e7c83fc2d17e3450f2ccba4a4fc809c9c6345e3507247",
+    "id" : "voxel-origami-031",
+    "orientations" : "upright",
+    "schema" : 1,
+    "seed" : 12573751573166872111,
+    "target" : [
+      {
+        "x" : -2,
+        "y" : 4,
+        "z" : -1
+      },
+      {
+        "x" : -1,
+        "y" : 3,
+        "z" : -1
+      },
+      {
+        "x" : -1,
+        "y" : 3,
+        "z" : 0
+      },
+      {
+        "x" : -1,
+        "y" : 4,
+        "z" : -2
+      },
+      {
+        "x" : -1,
+        "y" : 4,
+        "z" : -1
+      },
+      {
+        "x" : 0,
+        "y" : 3,
+        "z" : -1
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 31,
+  "schema" : 1,
+  "skipped" : 0
+}

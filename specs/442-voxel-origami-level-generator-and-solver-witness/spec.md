@@ -81,8 +81,8 @@ solver on the real kernel (release build, 120 candidates per band) gave a minima
   damaged files and witnesses that no longer replay. Impact: FR-R02G1502-004; SC-R02G1502-003, 005.
 - Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
   `PuzzleCatalog<VoxelOrigamiRules>.digest(id: "voxel-origami", identities:)` over the 100 level fingerprints in
-  manifest order, pinned in a test. Certification tests are split into groups of 20 levels so each runs under 10
-  seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New
+  manifest order, pinned in a test. Certification tests are split into groups of 10 levels so each runs under 10
+  seconds on a debug host build (measured locally, not asserted on CI; 20 band-5 levels took about 13 s); generated levels are cached per process. New
   refusals: `generation(Int)` (`r02-g15.generation`) and `witness(String)` (`r02-g15.witness`). The independent check of
   SC-R02G1502-002 is a depth-first enumeration of every turn sequence the play accepts (no state merging), shorter than
   the plan, on the two levels with the fewest cubes in each band: none reaches a matching pose. Impact:

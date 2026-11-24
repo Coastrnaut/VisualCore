@@ -1,0 +1,211 @@
+{
+  "actions" : [
+    {
+      "turn" : {
+        "_0" : 3,
+        "_1" : -1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 3,
+        "_1" : -1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 6,
+        "_1" : 1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 6,
+        "_1" : 1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 7,
+        "_1" : 1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 7,
+        "_1" : 1
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 5,
+    "states" : 47
+  },
+  "difficulty" : {
+    "cubes" : 9,
+    "orientations" : "any",
+    "statesSearched" : 139,
+    "turnableHinges" : 4,
+    "turns" : 6,
+    "work" : 744
+  },
+  "digests" : [
+    "f90c965b662d0069",
+    "e7baa24282d344c7",
+    "6603acdde901af99",
+    "03746ae8083bf3ba",
+    "bf51a93a041aa63d",
+    "82e566c0662368e7"
+  ],
+  "fingerprints" : [
+    "6e9b9c5cc161fcb20d8f5f037caa33b84e46212e78325d336fba2e83da9d9317",
+    "b3d3745f17859c2828d9b59866d47357a6b83671a30d5ee81109cb178144dc24",
+    "b443d5f3b0c92b89bba7e8c6a8a68bdf78fb753d4fe94709ab792afebeb944b1",
+    "cd033dd94d9c02c39b23d1a55710008327760ea00d112bd655cdd760c89a36ce",
+    "7ebbc63a861f58c09a6f49d5d5173c48aa308a55098b8b34ad49b684be5032ee",
+    "2a5a98c8d9b0c7b920fc35b2a0763b252b16959ec07eefa4ddd9f3b05ab50ba0",
+    "72be209aa2cce729611256aaf0114c21912c831ca45614f1a1b0cbb8472beddd"
+  ],
+  "level" : {
+    "budget" : 18,
+    "cubes" : [
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : 0
+        },
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 0,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : -1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 1,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : 1
+        },
+        "parent" : 1,
+        "startTurn" : 1
+      },
+      {
+        "direction" : {
+          "x" : 1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 3,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 1,
+          "z" : 0
+        },
+        "parent" : 3,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : -1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 3,
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 6,
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : 1
+        },
+        "parent" : 7,
+        "startTurn" : 1
+      }
+    ],
+    "difficulty" : 5,
+    "fingerprint" : "14cc35726afe1fde44625aa6bdbd40853963c6fbd5eff52ab13d498656edf432",
+    "id" : "voxel-origami-090",
+    "orientations" : "any",
+    "schema" : 1,
+    "seed" : 12461651313954338474,
+    "target" : [
+      {
+        "x" : 1,
+        "y" : 3,
+        "z" : 2
+      },
+      {
+        "x" : 2,
+        "y" : 2,
+        "z" : 3
+      },
+      {
+        "x" : 2,
+        "y" : 3,
+        "z" : 2
+      },
+      {
+        "x" : 2,
+        "y" : 3,
+        "z" : 3
+      },
+      {
+        "x" : 2,
+        "y" : 4,
+        "z" : 2
+      },
+      {
+        "x" : 3,
+        "y" : 3,
+        "z" : 2
+      },
+      {
+        "x" : 3,
+        "y" : 3,
+        "z" : 3
+      },
+      {
+        "x" : 3,
+        "y" : 4,
+        "z" : 1
+      },
+      {
+        "x" : 3,
+        "y" : 4,
+        "z" : 2
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 90,
+  "schema" : 1,
+  "skipped" : 7
+}

@@ -56,7 +56,7 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-24, follo
 ## Simulator proof
 
 - [x] CHK014 Are host-test sizes stated (all 100 levels, the independent depth-first enumeration on two levels per
-  band, groups of 20 under 10 s measured locally)? [Measurability, Spec §SC-R02G1502-001 … 006; Clarifications Q5]
+  band, groups of 10 under 10 s measured locally)? [Measurability, Spec §SC-R02G1502-001 … 006; Clarifications Q5]
 
 ## Future D1/D2/D3 evidence
 

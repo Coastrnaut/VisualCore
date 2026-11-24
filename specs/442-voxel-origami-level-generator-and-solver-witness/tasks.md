@@ -4,7 +4,7 @@
 [contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate R02-G15-02 (migration ledger). Evidence:
 `python3 scripts/migration_ledger.py run-check --gate R02-G15-02 --name <check> -- <command>` (never a scratchpad path;
 recorded only after every agent has reported). Commit after every task with its check record (no trailers). Test seed
-2_442; tests stay short (< 10 s each; catalog certification in groups of 20 levels, measured locally, never asserted on
+2_442; tests stay short (< 10 s each; catalog certification in groups of 10 levels, measured locally, never asserted on
 CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 1: Setup
@@ -53,10 +53,10 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   fingerprints after begin (and dismissTutorial) and each action; counterexample (the depth one below and the count of
   states reached at it); difficulty; skipped; decode refuses newer, damaged and non-replaying files) with
   `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G1502-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiCatalogTests.swift`
+- [X] T-R02G1502-006 [US2] [US3] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiCatalogTests.swift` — Verified 2026-11-24: 2026-11-24: catalog tests (manifest, pinned digest b02e58ec…, progression and band means, every witness wins, depth-first enumeration on the two fewest-cube levels per band, full decode per band, witness files byte for byte in 10 groups of 10 after 20 band-5 levels measured 13 s) and the 100 witness files; host-5 and host-5-2 exit 0 (.autonomy/migration/checks/R02-G15-02.host-5*.json)
   (lead: 100 entries, 20 per band; every level generated, won by its witness within the budget, and no shorter sequence
   matches; the depth-first enumeration on the two levels with the fewest cubes in each band; pinned digest; progression
-  rule and band means; witness files byte for byte, written only with `VOXEL_ORIGAMI_WRITE_WITNESSES=1`; groups of 20)
+  rule and band means; witness files byte for byte, written only with `VOXEL_ORIGAMI_WRITE_WITNESSES=1`; groups of 10)
   and the 100 files `docs/games/voxel-origami/levels/001.witness.json` … `100.witness.json`; `--name host-5`
 
 ## Phase 6: Regression, documentation and close

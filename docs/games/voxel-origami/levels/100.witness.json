@@ -1,0 +1,225 @@
+{
+  "actions" : [
+    {
+      "turn" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 2,
+        "_1" : -1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 3,
+        "_1" : 1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 3,
+        "_1" : 1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 4,
+        "_1" : 1
+      }
+    },
+    {
+      "turn" : {
+        "_0" : 5,
+        "_1" : 1
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 5,
+    "states" : 165
+  },
+  "difficulty" : {
+    "cubes" : 10,
+    "orientations" : "any",
+    "statesSearched" : 492,
+    "turnableHinges" : 5,
+    "turns" : 6,
+    "work" : 4640
+  },
+  "digests" : [
+    "7e1b5b216af429a8",
+    "790f9545de3717a5",
+    "58983ab9344132b7",
+    "7c272a4f542ee48e",
+    "18a2df383c87b0ac",
+    "6829a3498d5c4381"
+  ],
+  "fingerprints" : [
+    "0b20f3b5446f0100360574fa371565e34ac4c52866f88126ff498a5c03564cda",
+    "88336031c8ffbe0266d7f3f7cf14ef8107b41185603ff545e0eb48ff40c46408",
+    "e19c43e638201dcc7fe47480b177f27376fb86bd21342435d8ac5659888132f7",
+    "0bd0d891129667e3b74572f1d6de4d2122a1123b6fe375334ba85dc5cac17f14",
+    "fa47661f590e6ed969352deec3c492c3f725b3333740fa1b07eed111c3cb8308",
+    "337209dc5d0b3d7572a3d2983e98546cef5df7572e07379a00020071bdcec92b",
+    "b79492fdcc9be497c6b52106db4e171df48ec1b0cfcb8b528c011ef8ebd59fdf"
+  ],
+  "level" : {
+    "budget" : 16,
+    "cubes" : [
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : 0
+        },
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : -1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 0,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : -1
+        },
+        "parent" : 1,
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : -1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 2,
+        "startTurn" : 2
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 3,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : 0,
+          "z" : -1
+        },
+        "parent" : 4,
+        "startTurn" : 2
+      },
+      {
+        "direction" : {
+          "x" : 1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 5,
+        "startTurn" : 3
+      },
+      {
+        "direction" : {
+          "x" : -1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 4,
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 0,
+          "y" : -1,
+          "z" : 0
+        },
+        "parent" : 2,
+        "startTurn" : 0
+      },
+      {
+        "direction" : {
+          "x" : 1,
+          "y" : 0,
+          "z" : 0
+        },
+        "parent" : 6,
+        "startTurn" : 0
+      }
+    ],
+    "difficulty" : 5,
+    "fingerprint" : "2a6ae89b57875981e08704068df0d1982664857e922a001bbda8a80e499c5207",
+    "id" : "voxel-origami-100",
+    "orientations" : "any",
+    "schema" : 1,
+    "seed" : 6045459960164035272,
+    "target" : [
+      {
+        "x" : -3,
+        "y" : 3,
+        "z" : 1
+      },
+      {
+        "x" : -3,
+        "y" : 3,
+        "z" : 2
+      },
+      {
+        "x" : -2,
+        "y" : 2,
+        "z" : 0
+      },
+      {
+        "x" : -2,
+        "y" : 2,
+        "z" : 1
+      },
+      {
+        "x" : -2,
+        "y" : 2,
+        "z" : 2
+      },
+      {
+        "x" : -2,
+        "y" : 3,
+        "z" : 1
+      },
+      {
+        "x" : -2,
+        "y" : 3,
+        "z" : 2
+      },
+      {
+        "x" : -1,
+        "y" : 2,
+        "z" : 1
+      },
+      {
+        "x" : -1,
+        "y" : 3,
+        "z" : 1
+      },
+      {
+        "x" : -1,
+        "y" : 4,
+        "z" : 1
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 100,
+  "schema" : 1,
+  "skipped" : 3
+}
