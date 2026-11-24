@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G14-09 (migration ledger, game feature of experience R02-G14) · ID namespace FR-R02G1409-###,
 SC-R02G1409-###, T-R02G1409-###
@@ -24,6 +24,62 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 429 (Acoustic Constellator's simulator integration and full app lock).
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+429's answers where the games agree. Facts checked in code (read-only, 2026-11-24): feature 429 (Acoustic
+Constellator) is the model (`Apps/VisualCore/Tests/UI/AcousticConstellator`, namespace `ACN`, serial chunk `v3`;
+`AcousticConstellatorControls.identifierNames`; `AcousticConstellatorSchemaExamples.swift`); Moonlit Mechanism's panel
+(`MoonlitMechanismControls`) already gives every control a label, a value and an identifier through
+`port.identifier(name)` (features 434–437: `gear`, `gear-minus`, `gear-plus`, `gear-detail`, `turn-minus`, `turn-plus`,
+`reseat-minus`, `reseat-plus`, `lamp`, `lamp-minus`, `lamp-plus`, `frame`, `frame-minus`, `frame-plus`, `run`, `undo`,
+`redo`, `next-level`, `reset-view`, `dismiss-tutorial`, `hint`, `failure-undo`, `retry`, `campaign`, `daily`,
+`practice`, `level-picker`, `play-level`, `replay`, `replay-step`, `replay-stop`, `sound`, and the text elements
+`summary`, `status`, `actions`, `pending`, `progress`, `message`, `failure`, `explanation`, `instruction`, `hint-text`,
+`goal`, `replay-position` — 44 names, each used once), but no list of those names is pinned; the registration in
+`Apps/VisualCore/App/ExperienceRegistry.swift` stores no examples yet and says they are registered at R02-G14-09 (the
+snapshot is schema 3 since feature 437; migration 1 → 2 adds progress, the mode and the tutorial to `{level, records}`;
+2 → 3 adds the sound choice and traces); the canvas description of a won level says "The shadows match every required
+key frame." followed by " Stars: k of 3."; level 1's certified witness is one handle turn (+1), one lamp step (−1) and
+the run, so no gear chooser has to move (Turn + sends `handle.turn [1]`, Lamp − sends `lamp.step [-1]`, Run sends
+`machine.run`); the `actions` text reads "Level n · a of b actions left"; the tutorial shows on levels 1 … 3; the UI
+chunk keys in `release_check.py` end at `v3` (no `w3`); no UI test class uses the prefix `MM`.
+
+- Q: How do the interface tests find controls and what do they read? → A: through the identifiers the panel already
+  carries (`experience.r02-g14.moonlit-mechanism.<name>`); this feature pins the full list as
+  `MoonlitMechanismControls.identifierNames` (the 44 names above) with a host-visible test that every name is unique and
+  used once in the panel. The tests read the canvas description for the level, the win and the stars, the `actions`
+  text to confirm each press took effect, and the replay step's value for the replay position. Impact: FR-R02G1409-001,
+  002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `MM` in
+  `Apps/VisualCore/Tests/UI/MoonlitMechanism/MMSupport.swift`; `MMPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g14.moonlit-mechanism`: dismiss the tutorial, play level 1's certified
+  solution by tapping Turn + and Lamp − (counting a press only when the actions-left count moves), then Run; read "The
+  shadows match every required key frame." and "Stars: 3 of 3.", the level picker shows level 2 open; relaunch without
+  reset after sending the app to the background: the stars and level 2 are kept) and `MMReplayUITests` (after the win,
+  Replay best solution, Step until the replay ends won, Stop back to the campaign). They run as a new serial chunk `w3`
+  of `release_check.py` (its key checked unique); each test stays under 90 s apart from the simulator's
+  automation-session setup of each app launch (about 30 s per launch, and a relaunch test launches twice). Level 1's
+  certified actions are pinned in `MM` and checked against the Core by an app unit test. Impact: FR-R02G1409-002, 007;
+  SC-R02G1409-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `MoonlitMechanismExperienceCore.schemaOneExample()` (the schema-1 saved state `{level: 1, records}` of a seeded play of
+  level 1 with its first certified action applied, so it is still playing and not won) and `schemaTwoExample()` (schema
+  2 with progress, the campaign mode, the tutorial done and level 1 solved with its stars at one action above the
+  certified count, no trace), both `MigrationExample`s built in the Core (`MoonlitMechanismSchemaExamples.swift`,
+  modelled on `AcousticConstellatorSchemaExamples`), registered with `examples:`; the app's migration check restores
+  both into schema 3 with progress kept (a schema-2 result without a trace keeps its stars unverified, as feature 437
+  reconciles). The registration's comment is updated. Impact: FR-R02G1409-003; SC-R02G1409-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `MoonlitMechanismGolden` is forbidden by feature 438, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G1409-004;
+  SC-R02G1409-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g14.moonlit-mechanism` as not available and the launcher cannot open it; the registry's candidates list contains
+  it and `all` does not. Impact: FR-R02G1409-006; SC-R02G1409-002.
 
 ## User Scenarios & Testing *(mandatory)*
 

@@ -32,5 +32,5 @@
 ## Notes
 
 - The app paths in the canonical overrides name where the one app lives (ADR-0009), not an implementation choice.
-- Identifiers, interface tests and their chunk, schema examples, release exclusion and candidate visibility are left
-  to `/speckit-clarify` (following feature 429's answers).
+- Identifiers, interface tests and their chunk, schema examples, release exclusion and candidate visibility are
+  settled by `/speckit-clarify` (following feature 429's answers).
