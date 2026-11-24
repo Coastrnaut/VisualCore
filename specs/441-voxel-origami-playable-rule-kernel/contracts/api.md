@@ -17,7 +17,7 @@ public struct VoxelOrigamiPose: Sendable, Equatable { public let cells: [VoxelOr
     public let orientations: [VoxelOrigamiRotation] }
 public enum VoxelOrigamiLattice {
     public static func pose(_ cubes: [VoxelOrigamiCube], turns: [Int]) -> VoxelOrigamiPose
-    public static func swinging(_ cubes: [VoxelOrigamiCube], hinge: Int) -> [Int]                 // descendants
+    public static func swinging(_ cubes: [VoxelOrigamiCube], pose: VoxelOrigamiPose, hinge: Int) -> [Int]  // descendants off the axis
     public static func check(_ cubes: [VoxelOrigamiCube], turns: [Int], hinge: Int, step: Int) -> VoxelOrigamiFailure?
         // collision first, then sweep; nil when the turn is clear
     public static func inBand(still: VoxelOrigamiVector, start: VoxelOrigamiVector, end: VoxelOrigamiVector,
