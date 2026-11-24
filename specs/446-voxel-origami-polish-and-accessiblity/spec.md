@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G15-06 (migration ledger, game feature of experience R02-G15) · ID namespace FR-R02G1506-###,
 SC-R02G1506-###, T-R02G1506-###
@@ -24,6 +24,73 @@ Canonical overrides:
 - **Shared features used:** R02-F26 (input and accessibility contract, shared feedback route), the shared ambient loop
   player, and the kernel, content, adapter, renderer, gestures and teaching of R02-G15-01 … 05.
 - **Model:** feature 436 (Moonlit Mechanism's polish and accessibility).
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+436's answers where the games agree. Facts checked in code (read-only, 2026-11-24): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` are those feature 436 used; Voxel Origami's programs
+have no time input and the geometry never previews a turn, so the solid is already still between actions; the won look
+is `u_won` (0 … 1) in the voxel program — it lifts the cube faces toward white by `wonLift` and flares the target toward
+its glow colour — and the target's glow shells scale with it, and the fallback lifts the cubes' colours by its
+`wonLevel`, so today the won look switches at once; the glow gain uniform scales the cube and target shells; the refusal
+codes are `r02-g15.action`, `stage`, `stale`, `level`, `not-whole`, `hinge`, `locked` and `date` (reported by the engine
+as `action.rule.<code>`); the level words hinges "hinge h, turned d degrees" and progress "c of n cubes in place; the
+shape matches the target (or does not match yet); a actions left".
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted action (`state`), the change then the
+  progress: a turn "Turned hinge h forward a quarter turn." (or "back"); undo and redo "Undone." / "Redone."; each
+  followed by " c of n cubes in place, a actions left."; a win (`outcome`): "The chain matches the target. Level won
+  spending a actions, k of 3 stars." (without the stars in practice); a failure (`outcome`): the failure explanation of
+  feature 445; a level or mode change (`level`): "Level n, band b, <mode>." with the tutorial instruction when shown; a
+  refusal (`rejection`) in words: `r02-g15.locked` "That level is not open yet.", `r02-g15.date` "That date cannot be
+  used.", `r02-g15.action` "That hinge cannot turn: nothing would move.", `r02-g15.stage` "The level has ended.",
+  `r02-g15.not-whole` "That value must be a whole number.", `r02-g15.hinge` "This chain has no such hinge.", any other
+  code "That action was refused." (the engine's `action.rule.` prefix read as the bare code). A revealed hint is
+  announced (`state`) with its text. Choosing a hinge, pending drag texts and orbit are not announced. Texts are a pure
+  function of the old and new core (and the refusal code), so tests compare them exactly; the panel shows the same
+  refusal text. Impact: FR-R02G1506-002; SC-R02G1506-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted turn, undo or redo; `success` for
+  a win; `warning` for a failure; `error` for a refusal; choosing a hinge, the pending texts, orbit and level changes
+  play none. A turn that ends the level (a win, a collision, a sweep or the last of the budget) plays only its outcome.
+  The shared planners' intervals apply. Impact: FR-R02G1506-003; SC-R02G1506-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: as feature 436: the presenter keeps light levels for
+  the glow (0.7 while playing, 1 once won, 0.35 once failed) and the won look (1 once won, else 0), each easing toward its
+  target by the frame clock's elapsed time between drawn frames (not the presentation time, which Reduce Motion holds at
+  0, so fades finish under Reduce Motion too; 0.15 s normally, 0.45 s under Reduce Flashing, linear; under Reduce Flashing
+  a fade that has started finishes before it may turn back); the scene draws the eased levels (the glow gain times the
+  glow level, `u_won` the won level, and in the fallback the cubes' lift times the won level, rebuilt when the level moves
+  by a tenth or more); the state and digest never see them. Cubes, hinge marks and gauges change only with the player's
+  actions and are not faded. The measure: sampling the drawn levels every 1/60 s through a scripted win and adversarial
+  flicker (a turn undone and redone every frame, retry, level changes), no element crosses half its range more than 3
+  times per second, and every complete one-way fade of more than half the range takes at least 0.4 s under Reduce
+  Flashing. Under Reduce Motion the solid is still between actions and the fades still run. Impact: FR-R02G1506-004;
+  SC-R02G1506-003.
+- Q: Where does the sound choice live, and what are the audition and ambient recipes? → A: a Sound toggle in the panel,
+  off by default, held by the presenter (presentation only; saving it is R02-G15-07). Hinge h's tone is
+  220 Hz × 2^((h − 1) / 12) (one semitone per hinge, at most eleven). The audition of a chosen hinge is a pure function of
+  its index and whether it can turn: a turnable hinge sounds its tone and its fifth (× 3/2) at gain 0.04 each, a clean
+  chord; a hinge that swings nothing sounds its tone with a second partial detuned upward by 3 Hz, so it beats audibly; 0.6
+  s with a linear decay to silence; played once per choice, a new one replacing the last. The ambient recipe is a pure
+  function of the cubes in place, the actions left as a share of the budget and the stage: a root at 110 Hz times (1, 9/8,
+  5/4, 4/3) for more than three quarters of the actions left, more than half, more than a quarter, or less; one partial
+  per quarter of the cubes in place (the covered count over the cube count, floor of four times it, up to four), at the
+  root times (5/4, 3/2, 2, 5/2)[k − 1], each with the base gain; the root alone when fewer than a quarter are in place; an
+  added octave when won and halved gains when failed; the loop's length is the longest the shared player accepts at
+  which every partial has a whole number of cycles (tested). The presenter rebuilds the loop only when the level opens,
+  an action, undo or redo changes the quarters, the root step or the stage, or the toggle turns on, never per frame.
+  Sound plays exactly while the choice is on, the controls are on screen and the scene is active. Impact:
+  FR-R02G1506-006; SC-R02G1506-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the chosen hinge
+  is an accessibility-adjustable element with its label and value in words (the hinge as the level words it, with its
+  turn and whether it can turn and which cube it swings); a summary element reads "a actions left. <the progress in
+  words>. Chosen: <the hinge in words>. Level: <the level in words>."; on iPad the panel keeps a readable width (at most
+  520 points). Impact: FR-R02G1506-001, 005; SC-R02G1506-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -152,8 +219,6 @@ ambient recipes are pure functions of the state they are made from; sound plays 
   (announcements and haptic kinds with their trigger) for tests and diagnostics, alongside the tier log and the refusal
   log.
 - Copyright and originality: the design is the project's own archived design; the code and texts are original.
-- The exact announcement texts, haptic rules, fade times, sound recipes and panel layout follow feature 436's pattern
-  and are settled by `/speckit-clarify`.
 
 ## Traceability
 
