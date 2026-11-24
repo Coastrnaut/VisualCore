@@ -58,7 +58,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1408-006 [P] [US4] Create `scripts/moonlit_mechanism_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G1408-006 [P] [US4] Create `scripts/moonlit_mechanism_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-24: 2026-11-24: agent D regression script, 5 script tests, CI step 'Moonlit Mechanism regression (host)'; lead retest regression exit 0 (host and simulator PASS, memory 28.4 to 29.0 MB over 12 isolated cycles) (.autonomy/migration/checks/R02-G14-08.regression.json)
   (agent D: host filter `MoonlitMechanismRegression`, then the simulator classes through `xcodebuild_package.py
   --only-testing` with the isolation variable, one summary line per part with pass or fail and the first failing name,
   a non-zero exit on any failure), and add the named step "Moonlit Mechanism regression (host)" to the

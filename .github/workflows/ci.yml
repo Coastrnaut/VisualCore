@@ -185,6 +185,10 @@ jobs:
         # Feature 428 (R02-G13-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/acoustic_constellator_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter AcousticConstellatorRegression
+      - name: Moonlit Mechanism regression (host)
+        # Feature 438 (R02-G14-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/moonlit_mechanism_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter MoonlitMechanismRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase
