@@ -33,5 +33,5 @@
 
 - The device names and the ledger's device rows in the canonical overrides are fixed project facts (Auto-Creator.md
   section 21), not implementation choices.
-- The row list, the definition's location and form, the check and the plan's location are left to `/speckit-clarify`
+- The row list, the definition's location and form, the check and the plan's location are settled by `/speckit-clarify`
   (following feature 430's answers).
