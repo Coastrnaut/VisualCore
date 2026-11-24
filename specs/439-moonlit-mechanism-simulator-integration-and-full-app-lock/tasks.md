@@ -59,7 +59,7 @@ change (the shaders and reference of R02-G14-03 are unchanged and re-proven by t
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G1409-006 [US3] Release build and symbols (`MoonlitMechanismGolden`, `acceptanceScenarios` already
+- [X] T-R02G1409-006 [US3] Release build and symbols (`MoonlitMechanismGolden`, `acceptanceScenarios` already — Verified 2026-11-24: 2026-11-24: release exit 0 (app-release-build, app-release-symbols; MoonlitMechanismGolden and acceptanceScenarios absent); regression exit 0 (host and simulator PASS, 100 of 100 levels) (.autonomy/migration/checks/R02-G14-09.{release,regression}.json)
   forbidden): `--name release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`;
   `--name regression -- python3 scripts/moonlit_mechanism_regression.py` (100 of 100 levels, SC-R02G1409-004)
 

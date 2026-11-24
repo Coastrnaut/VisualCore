@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/moonlit_mechanism_regression.py"
+  ],
+  "command": "python3 scripts/moonlit_mechanism_regression.py",
+  "elapsed_seconds": 16.872,
+  "exit_code": 0,
+  "finished": "2026-11-24T13:36:16+00:00",
+  "gate": "R02-G14-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G14-09.regression.log",
+  "log_sha256": "2abfa85b9d335ced37e97c15f2f466d6a6f143b724e5f9805540d045cf0dcd7c",
+  "name": "regression",
+  "started": "2026-11-24T13:35:59+00:00",
+  "timed_out": false
+}
