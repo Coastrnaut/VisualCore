@@ -43,6 +43,8 @@ let package = Package(
         .library(name: "HarmonicBridgesCore", targets: ["HarmonicBridgesCore"]),
         // Feature 421 (R02-G13-01): Acoustic Constellator's rule kernel, a candidate until X-R02-G13.
         .library(name: "AcousticConstellatorCore", targets: ["AcousticConstellatorCore"]),
+        // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
+        .library(name: "AcousticConstellatorExperience", targets: ["AcousticConstellatorExperience"]),
         // Feature 413 (R02-G12-03): Harmonic Bridges' experience (iOS only; a registered candidate until X-R02-G12).
         .library(name: "HarmonicBridgesExperience", targets: ["HarmonicBridgesExperience"]),
         // Feature 403 (R02-G11-03): Echo Cartographer's experience (iOS only; a registered candidate until X-R02-G11).
@@ -420,6 +422,27 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "AcousticConstellator/CoreTests"),
+        // Feature 423 (R02-G13-03): Acoustic Constellator's experience (presenter, scene, controls).
+        .target(name: "AcousticConstellatorExperience",
+                dependencies: ["AcousticConstellatorCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "AcousticConstellator/Experience"),
+        // Feature 423 (R02-G13-03): the simulator tests of Acoustic Constellator's experience.
+        .testTarget(name: "AcousticConstellatorExperienceTests",
+                    dependencies: ["AcousticConstellatorExperience", "AcousticConstellatorCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "AcousticConstellator/ExperienceTests"),
         // Feature 413 (R02-G12-03): Harmonic Bridges' experience (presenter, scene, controls).
         .target(name: "HarmonicBridgesExperience",
                 dependencies: ["HarmonicBridgesCore",

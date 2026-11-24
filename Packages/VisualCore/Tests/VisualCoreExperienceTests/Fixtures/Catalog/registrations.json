@@ -942,6 +942,34 @@
       "manifest": "Packages/ExperiencesRound02/HarmonicBridges/scenario-manifest.json",
       "permissions": [],
       "summary": "Tune copper strings between floating islands until the tones of every step make them swing into cyan bridges, then cross from the start to the goal in every step before the moves run out. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g13.acoustic-constellator": {
+      "capabilities": [
+        "Link stars into the shown symbol",
+        "Nudge phases until they pulse as one",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#05060F",
+        "#F4F1E8",
+        "#3FD6C6",
+        "#8A5A9C",
+        "#B8C0D0"
+      ],
+      "content": {
+        "catalog_sha256": "4c50d04a181e11f815af9239b483914e0d7e1e339986a431f0c7c721edf07a12",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/AcousticConstellator/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Link musical stars with silver filaments and nudge their phases until the linked constellation matches the symbol and its stars pulse together in teal for the whole hold, before the moves run out. 100 certified levels. Drawn in code; offline."
     }
   }
 }

@@ -1354,7 +1354,7 @@
       "id": "r02-g13.acoustic-constellator",
       "code": "R02-G13",
       "title": "Acoustic Constellator",
-      "summary": "Connect drifting musical nodes so their shared harmonics form celestial diagrams",
+      "summary": "Link musical stars with silver filaments and nudge their phases until the linked constellation matches the symbol and its stars pulse together in teal for the whole hold, before the moves run out. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1363,11 +1363,30 @@
         "acoustic-geometry"
       ],
       "order": 38,
-      "palette": [],
+      "palette": [
+        "#05060F",
+        "#F4F1E8",
+        "#3FD6C6",
+        "#8A5A9C",
+        "#B8C0D0"
+      ],
       "tile_seed": 863229864,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Link stars into the shown symbol",
+        "Nudge phases until they pulse as one",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "4c50d04a181e11f815af9239b483914e0d7e1e339986a431f0c7c721edf07a12",
+        "levels": 100
+      },
       "available": false
     },
     {

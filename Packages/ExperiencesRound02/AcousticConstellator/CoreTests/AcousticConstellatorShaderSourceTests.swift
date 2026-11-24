@@ -206,20 +206,22 @@ import Testing
             }
         }
         #expect(Shaders.uniformNames.count == 2)
-        let constants: [String] = [Shaders.mvpUniform, Shaders.phasesUniform, Shaders.pulseUniform,
+        let constants: [String] = [Shaders.mvpUniform, Shaders.phasesLowUniform, Shaders.phasesHighUniform, Shaders.pulseUniform,
                                    Shaders.glowGainUniform, Shaders.glowLimitUniform]
-        #expect(constants == ["u_mvp", "u_phases", "u_pulse", "u_glowGain", "u_glowLimit"])
+        #expect(constants == ["u_mvp", "u_phasesLow", "u_phasesHigh", "u_pulse", "u_glowGain", "u_glowLimit"])
         #expect(Set(constants) == Set(Shaders.constellationUniforms + Shaders.glowUniforms))
-        #expect(Shaders.constellationUniforms == ["u_mvp", "u_phases", "u_pulse"])
+        #expect(Shaders.constellationUniforms == ["u_mvp", "u_phasesLow", "u_phasesHigh", "u_pulse"])
+        #expect(Shaders.phaseRowUniforms == ["u_phasesLow", "u_phasesHigh"])
         #expect(Shaders.glowUniforms == ["u_mvp", "u_glowGain", "u_glowLimit"])
         let vertex: String = Shaders.constellationVertex
-        let declarations: [String] = ["uniform mat4 u_mvp;", "uniform vec4 u_phases[2];", "uniform float u_pulse;"]
+        let declarations: [String] = ["uniform mat4 u_mvp;", "uniform vec4 u_phasesLow;", "uniform vec4 u_phasesHigh;", "uniform float u_pulse;"]
         for declaration in declarations { #expect(vertex.contains(declaration), "\(declaration)") }
         #expect(Self.declared("uniform", in: Shaders.constellationFragment).isEmpty)
         // The glow has no time or pulse input: it never pulses.
         let glow: String = Shaders.glowVertex + Shaders.glowFragment
         #expect(Self.wordCount("u_pulse", in: glow) == 0)
-        #expect(Self.wordCount("u_phases", in: glow) == 0)
+        #expect(Self.wordCount("u_phasesLow", in: glow) == 0)
+        #expect(Self.wordCount("u_phasesHigh", in: glow) == 0)
         for source in Self.sources() { #expect(Self.wordCount("u_time", in: source) == 0) }
     }
 
@@ -266,10 +268,11 @@ import Testing
             // No loop at all in this feature's sources.
             #expect(Self.wordCount("for", in: source) == 0)
         }
-        // The pulse reads u_phases with constant indices only (no dynamic indexing).
+        // The pulse reads the two phase vectors whole (no array, no dynamic indexing).
         let vertex: String = Shaders.constellationVertex
-        #expect(vertex.contains("vec4 row = mix(u_phases[0], u_phases[1], upper);"))
-        #expect(Self.wordCount("u_phases", in: vertex) == 3)
+        #expect(vertex.contains("vec4 row = mix(u_phasesLow, u_phasesHigh, upper);"))
+        #expect(Self.wordCount("u_phasesLow", in: vertex) == 2)
+        #expect(Self.wordCount("u_phasesHigh", in: vertex) == 2)
     }
 
     @Test func bracesBalancedAndInterfacesMatch() {

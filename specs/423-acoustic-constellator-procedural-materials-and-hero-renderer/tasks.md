@@ -75,7 +75,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G1303-006 [US3] [US4] Create
+- [X] T-R02G1303-006 [US3] [US4] Create — Verified 2026-11-23: 2026-11-23: agents E (experience), S (scenarios, 94 scenarios), D (30 simulator tests) landed; lead split u_phases into two vec4 uniforms (the shared setters have no vec4 array), made the status plain, registered the candidate; sim-27, packages, catalog-search, host-5 exit 0 (.autonomy/migration/checks/R02-G13-03.{sim-27,packages,catalog-search,host-5}.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorExperience.swift`, `…Presenter.swift`,
   `…ConstellationScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce
   Flashing; the presenter declares `probes(_:)` — two sky corners, as the round-two X gates require — and its quality

@@ -1521,8 +1521,11 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "BackwardsAuroraCore", "BackwardsAuroraExperience",
                                     # Feature 403 (R02-G11-03): Echo Cartographer, integrated at X-R02-G11.
                                     "EchoCartographerCore", "EchoCartographerExperience",
-                                    # Feature 413 (R02-G12-03): Harmonic Bridges, a registered candidate until X-R02-G12.
-                                    "HarmonicBridgesCore", "HarmonicBridgesExperience"])
+                                    # Feature 413 (R02-G12-03): Harmonic Bridges, integrated at X-R02-G12.
+                                    "HarmonicBridgesCore", "HarmonicBridgesExperience",
+                                    # Feature 423 (R02-G13-03): Acoustic Constellator, a registered candidate until
+                                    # X-R02-G13.
+                                    "AcousticConstellatorCore", "AcousticConstellatorExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

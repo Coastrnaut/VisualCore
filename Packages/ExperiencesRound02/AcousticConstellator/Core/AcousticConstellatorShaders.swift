@@ -23,8 +23,9 @@
 // cues hold under any light. A won level draws every symbol link with the won-link code: teal lifted toward the glow
 // colour by ``wonLift`` (``wonLinkColour``), at every tier, in place.
 //
-// The star pulse, driven by uniforms: `u_phases` (vec4[2]) holds the phase 0 … 11 of stars 0 … 7 at the shown tick
-// (lane i % 4 of row i / 4; ``phaseUniform(_:)``) and `u_pulse` is 1 when stars pulse, 0 at level-2 and under Reduce
+// The star pulse, driven by uniforms: `u_phasesLow` and `u_phasesHigh` (two vec4, not an array, so the shared
+// `ShaderProgram` setters suffice) hold the phase 0 … 11 of stars 0 … 7 at the shown tick (lane i % 4 of row i / 4;
+// ``phaseUniform(_:)``) and `u_pulse` is 1 when stars pulse, 0 at level-2 and under Reduce
 // Motion (``pulse(for:reduceMotion:)``). A star vertex moves to centre + offset · (1 + ``pulseAmplitude`` · pulse ·
 // cos(2π · phase / 12)) (``pulseScale(phase:pulse:)``): 1 ± 0.15; 0 leaves the geometry unchanged. The phase is read
 // with constant indices only (no dynamic indexing).
@@ -43,7 +44,7 @@
 // Attributes follow VisualCoreRendering's `ShaderMeshRenderer`: `a_position` (location 0), `a_normal` (location 1) from
 // `Mesh.interleavedPositionNormal()` and `a_uv` (location 2) from `Mesh.uvs`. Every source starts with
 // `#version 300 es` and states one float precision. Plain uniforms in the default block (at most 16 vec4 slots per
-// program; the constellation program uses 7: u_mvp 4, u_phases 2, u_pulse 1; the glow program 6: u_mvp 4, u_glowGain
+// program; the constellation program uses 7: u_mvp 4, u_phasesLow 1, u_phasesHigh 1, u_pulse 1; the glow program 6: u_mvp 4, u_glowGain
 // and u_glowLimit 1 each), no texture samplers, no image assets, no `discard` and no loops. Output is premultiplied
 // alpha. Palette constants are written with six fixed decimals from `AcousticConstellatorPalette`, so the shader
 // colours equal the CPU's within 1e-6.
@@ -183,9 +184,14 @@ public enum AcousticConstellatorShaders {
 
     /// `mat4`: projection x view x model (both programs).
     public static let mvpUniform = "u_mvp"
-    /// `vec4[2]`: the phase 0 … 11 of stars 0 … 7 at the shown tick, star i in lane i % 4 of row i / 4, unused lanes 0
-    /// (constellation, vertex stage); see ``phaseUniform(_:)``.
-    public static let phasesUniform = "u_phases"
+    /// `vec4`: the phase 0 … 11 of stars 0 … 3 at the shown tick, star i in lane i, unused lanes 0 (constellation,
+    /// vertex stage); row 0 of ``phaseUniform(_:)``.
+    public static let phasesLowUniform = "u_phasesLow"
+    /// `vec4`: the phase 0 … 11 of stars 4 … 7 at the shown tick, star i in lane i − 4, unused lanes 0
+    /// (constellation, vertex stage); row 1 of ``phaseUniform(_:)``.
+    public static let phasesHighUniform = "u_phasesHigh"
+    /// The phase uniforms by row of ``phaseUniform(_:)``: ``phasesLowUniform``, ``phasesHighUniform``.
+    public static let phaseRowUniforms: [String] = [phasesLowUniform, phasesHighUniform]
     /// `float`: 1 when stars pulse, 0 at level-2 and under Reduce Motion (constellation, vertex stage); see
     /// ``pulse(for:reduceMotion:)``.
     public static let pulseUniform = "u_pulse"
@@ -195,7 +201,7 @@ public enum AcousticConstellatorShaders {
     public static let glowLimitUniform = "u_glowLimit"
 
     /// Every uniform the constellation program declares, each once, in order of declaration (vertex stage first).
-    public static let constellationUniforms: [String] = [mvpUniform, phasesUniform, pulseUniform]
+    public static let constellationUniforms: [String] = [mvpUniform, phasesLowUniform, phasesHighUniform, pulseUniform]
 
     /// Every uniform the glow program declares, each once, in order of declaration (vertex stage first).
     public static let glowUniforms: [String] = [mvpUniform, glowGainUniform, glowLimitUniform]
@@ -228,9 +234,9 @@ public enum AcousticConstellatorShaders {
         (name: "AC_GLOW", colour: AcousticConstellatorPalette.glow),
     ]
 
-    /// The most stars a level has (`AcousticConstellatorLevel.starCounts.upperBound`), the lanes of `u_phases`.
+    /// The most stars a level has (`AcousticConstellatorLevel.starCounts.upperBound`), the lanes of the phase uniforms.
     public static let maxStars: Int = 8
-    /// The vec4 rows of `u_phases` (``maxStars`` / 4).
+    /// The vec4 phase uniforms (``maxStars`` / 4): ``phaseRowUniforms``.
     public static let phaseRows: Int = 2
     /// The phase steps on the clock (`AcousticConstellatorClock.steps`).
     public static let clockSteps: Int = 12
@@ -293,7 +299,7 @@ public enum AcousticConstellatorShaders {
     /// `v` as a GLSL `vec3(...)` literal with six fixed decimals.
     static func vec3Literal(_ v: SIMD3<Double>) -> String { "vec3(\(fixed(v.x)), \(fixed(v.y)), \(fixed(v.z)))" }
 
-    /// The constellation vertex shader. Uniforms: `u_mvp`, `u_phases`, `u_pulse`. Selects the material colour from
+    /// The constellation vertex shader. Uniforms: `u_mvp`, `u_phasesLow`, `u_phasesHigh`, `u_pulse`. Selects the material colour from
     /// `a_uv.x` (the won link mixed from teal and glow); moves star vertices by the pulse of their star's phase
     /// (``pulseScale(phase:pulse:)``; nothing moves when `u_pulse` is 0); passes the normal (a star's true ellipsoid
     /// normal), the material code and the local coordinate (0 on stars).
@@ -304,7 +310,8 @@ public enum AcousticConstellatorShaders {
     layout(location = 1) in vec3 a_normal;
     layout(location = 2) in vec2 a_uv;
     uniform mat4 u_mvp;
-    uniform vec4 u_phases[2];
+    uniform vec4 u_phasesLow;
+    uniform vec4 u_phasesHigh;
     uniform float u_pulse;
     out vec3 v_normal;
     out vec3 v_base;
@@ -353,7 +360,7 @@ public enum AcousticConstellatorShaders {
         float isStar = isCode(m, 5.0);
         float index = clamp(floor(a_uv.y + 0.5), 0.0, AC_MAX_STAR);
         float upper = step(3.5, index);
-        vec4 row = mix(u_phases[0], u_phases[1], upper);
+        vec4 row = mix(u_phasesLow, u_phasesHigh, upper);
         float lane = index - 4.0 * upper;
         vec4 pick = vec4(1.0) - step(vec4(0.5), abs(vec4(lane) - vec4(0.0, 1.0, 2.0, 3.0)));
         float phase = clamp(dot(row, pick), 0.0, AC_STEPS - 1.0);
@@ -469,7 +476,7 @@ public enum AcousticConstellatorShaders {
         tier.pulse && !reduceMotion ? 1 : 0
     }
 
-    /// The value the presenter passes as `u_phases`: ``phaseRows`` vec4 rows with the phase of star i (reduced to
+    /// The values the presenter passes as ``phaseRowUniforms`` (row r to uniform r): ``phaseRows`` vec4 rows with the phase of star i (reduced to
     /// 0 … 11) in lane i % 4 of row i / 4; stars past ``maxStars`` are ignored and unused lanes are 0.
     public static func phaseUniform(_ phases: [Int]) -> [SIMD4<Double>] {
         var lanes: [Double] = Array(repeating: 0, count: maxStars)
