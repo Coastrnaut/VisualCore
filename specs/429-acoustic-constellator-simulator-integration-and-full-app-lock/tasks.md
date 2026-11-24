@@ -9,7 +9,7 @@ change (the shaders and reference of R02-G13-03 are unchanged and re-proven by t
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1309-001 Baselines after R02-G13-08 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1309-001 Baselines after R02-G13-08 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing, baseline-round02 exit 0 on c5316386f (.autonomy/migration/checks/R02-G13-09.baseline-*.json); rendering baseline = R02-G13-08 rendering-27/26
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G13-08's
   rendering runs (exit 0)
 
