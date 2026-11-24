@@ -58,7 +58,7 @@ resize alone.
 
 ## Phase 4: Story 4 — every move without gestures (P1)
 
-- [ ] T-R02G1504-004 [P] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiPanelWinTests.swift`:
+- [X] T-R02G1504-004 [P] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiPanelWinTests.swift`: — Verified 2026-11-24: 2026-11-24: agent D, all 100 certified levels won through panel actions only (hinge −/+ then turn −/+) in ten groups, panel undo/redo restore digests on levels 41, 61, 81 (level 1 wins in two turns, and a won play refuses undo); lead retest host-4 exit 0
   all 100 certified levels won through panel actions only (FR-R02G1504-006; SC-R02G1504-005; hinge − and + through
   `hinge.choose` to each witness turn's hinge, then turn − or +), split so each test is under 10 s, plus panel Undo then
   Redo restoring the digests; agent D; `--name host-4`

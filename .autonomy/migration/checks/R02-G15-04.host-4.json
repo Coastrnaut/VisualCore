@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "VoxelOrigamiPanelWin"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter VoxelOrigamiPanelWin",
+  "elapsed_seconds": 8.377,
+  "exit_code": 0,
+  "finished": "2026-11-24T17:26:10+00:00",
+  "gate": "R02-G15-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-04.host-4.log",
+  "log_sha256": "6acbbae4ff76035afc27c90c8c6b8051a3b7c5b09029aee789964eb2668a05c6",
+  "name": "host-4",
+  "started": "2026-11-24T17:26:02+00:00",
+  "timed_out": false
+}
