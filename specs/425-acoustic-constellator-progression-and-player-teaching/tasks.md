@@ -9,7 +9,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 415
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1305-001 Baselines on the committed tree after R02-G13-04 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1305-001 Baselines on the committed tree after R02-G13-04 is recorded: `--name baseline-host`, `--name — Verified 2026-11-23: 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on ed3b90026 (.autonomy/migration/checks/R02-G13-05.baseline-*.json); rendering baseline = R02-G13-04 rendering-27/26
   baseline-timing`, `--name baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering
   baseline is R02-G13-04's rendering runs (exit 0)
 
