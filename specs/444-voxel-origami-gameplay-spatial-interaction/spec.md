@@ -151,7 +151,8 @@ redo, next level, "Reset view"), including winning every certified level.
 - **A finished play (won or failed):** gestures send no kernel action (a tap only chooses the hinge) and the description
   says the play is over (undo or next level); orbit still works.
 - **A second finger during a gesture:** cancels it (nothing sent) and starts an orbit.
-- **A cancelled touch:** changes nothing.
+- **A cancelled touch:** changes nothing; a pending turn shown by a cancelled drag (cancelled touch or second finger) is
+  cleared and nothing is sent.
 - **Very small or very wide views:** picking and orbit work at every supported aspect.
 
 ## Requirements *(mandatory)*
