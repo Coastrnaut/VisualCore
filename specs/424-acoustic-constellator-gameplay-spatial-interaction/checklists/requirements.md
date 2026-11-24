@@ -31,5 +31,4 @@
 
 ## Notes
 
-- All items pass on the first validation; the exact distances, times, pick order and orbit bounds are left to
-  `/speckit-clarify`, as in feature 414.
+- Gesture distances, times, pick order and orbit bounds were settled by `/speckit-clarify` (session 2026-11-23).

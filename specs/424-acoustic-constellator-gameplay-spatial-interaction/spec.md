@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G13-04 (migration ledger, game feature of experience R02-G13) · ID namespace FR-R02G1304-###,
 SC-R02G1304-###, T-R02G1304-###
@@ -28,6 +28,61 @@ Canonical overrides:
   renderer of R02-G13-01 … 03.
 - **Model:** feature 414 (Harmonic Bridges' gameplay spatial interaction) for the gesture controller, picker, orbit and
   panel.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+414's answers where the games agree. Facts checked in code (read-only, 2026-11-23): Harmonic Bridges' feature 414 solved
+the same problem with a host-tested gesture controller in its Core taking `PointerEvent`s (id, phase
+began/moved/ended/cancelled, location in view points with the origin top-left, timestamp) with the view size, the drawn
+snapshot and orbit, an analytic picker and a clamped orbit; tap below 10 points and 0.5 s, drag from 16 points, double
+tap within 0.35 s and 22 points, orbit 90° per view width and 60° per view height. Acoustic Constellator's camera
+(`AcousticConstellatorSceneGeometry`) looks from eye (0, 2.0, 1.7) towards (0, 0, 0.2) at the box x −0.9 … 0.9,
+z −0.7 … 1.25, y 0 … 0.3; star (gx, gy, gz) is at X = (gx − 5.5)·0.14, Z = (gy − 5.5)·0.11, Y = 0.15 + (gz − 5.5)·0.02;
+links are spline strips between star centres rising 0.03 at the middle; the coherence gauge is 12 bars at z = 0.85
+across x −0.6 … 0.6, the hold pips at z = 1.0 across x −0.4 … 0.4, the moves gauge at z = 1.15; the adapter accepts
+`link.add` [a, b], `link.remove` [a, b], `star.nudge` [s, ±1], `constellation.listen`, `play.undo`, `play.redo` and
+`level.next`; the panel's chosen star and partner are presentation state.
+
+- Q: How is a touch picked? → A: at touch-down, every target is projected through the drawn camera (orbit included)
+  into view points. In this order: a gauge target (a coherence bar or a hold pip whose centre is within 22 points of the
+  touch; the nearest first, ties to the coherence bars and then the lower index), then a star (its centre within 22
+  points; the nearest first, ties to the lower star index), then a link (the shortest distance from the touch to its
+  projected spline, 16 segments, within 22 points; the nearest first, ties to the lower link index); anything else, the
+  moves gauge and guides included, is empty space. A tap is a touch that moves less than 10 points and lifts within
+  0.5 s; a drag moves at least 16 points; 10 … 16 points is neither, and a press lifted at 0.5 s or later without moving
+  is neither. Impact: FR-R02G1304-002, 003, 004, 005; SC-R02G1304-001.
+- Q: What do taps do? → A: a tap on a star while playing sends `star.nudge [s, 1]` and chooses star s (the partner moves
+  to the next star, modulo the star count, when it equals s). A tap on a link chooses its stars as star and partner
+  (presentation state, in any stage) and the description names the link, its gap at the shown tick and whether it is
+  fixed; no action is sent. A tap on a gauge target sends `constellation.listen` while playing. A tap on empty space
+  changes nothing, and two such taps within 0.35 s and 22 points reset the view. Impact: FR-R02G1304-002, 003, 004, 006;
+  SC-R02G1304-001.
+- Q: How does dragging a link work? → A: a drag that starts on a star previews a filament from that star's projected
+  centre to the finger; the target is the other star whose projected centre is nearest the finger within 22 points
+  (ties to the lower index), or none. On release while playing: no target sends nothing; an unlinked pair sends
+  `link.add [a, b]` (a < b); a pair the player linked sends `link.remove [a, b]`; a pair joined by a fixed link sends
+  nothing and the description says the link is fixed. The chosen star and partner follow the start and target stars.
+  A link the kernel refuses (degree or link limit) is sent and refused with its reason code. A drag from a star on any
+  stage other than playing previews nothing and sends nothing; a drag that starts on a link, a gauge or empty space sends
+  nothing. Impact: FR-R02G1304-001; SC-R02G1304-001.
+- Q: How do two fingers behave, and what happens on a finished play? → A: as feature 414: a second finger cancels any
+  one-finger gesture (nothing sent) and orbits: yaw ±35° about the y axis (90° per view width), pitch −15° … +20° (60°
+  per view height) about the authored view; a third finger re-bases the midpoint; a double tap on empty space or "Reset
+  view" returns to the authored view. The camera refits its field of view so the authored box stays inside the view with
+  a 5 % margin at every orbit and aspect 0.4 … 2.5. Orbit is presentation only: not saved, so the snapshot schema stays
+  1. Gestures send kernel actions only while playing; on a won or failed play a star tap only chooses the star, link
+  drags and gauge taps send nothing, and the description says the play is over (undo or next level); link inspection
+  and orbit still work. Impact: FR-R02G1304-006, 008; SC-R02G1304-002, 004.
+- Q: How is everything tested? → A: the Core gesture controller (`AcousticConstellatorGestureController`) with a picker
+  (`AcousticConstellatorPicker`) takes pointer events with the view size, the drawn snapshot, the orbit and the chosen
+  star and partner and returns the gesture actions (choose, choosePair, preview, link, unlink, nudge, listen, resetView)
+  and the orbit; host tests feed 500 seeded taps and drags on certified levels at several sizes and orbits and compare
+  with an independent pick computed in the test; simulator tests send the same touches through the experience's pointer
+  entry; a host test wins all 100 certified levels through panel actions alone (star and partner steppers, link, nudge,
+  listen). Impact: FR-R02G1304-007, 008; SC-R02G1304-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -99,19 +154,19 @@ unlink, nudge − and +, listen, undo, redo, next level, "Reset view"), includin
 
 ### Edge Cases
 
-- **A touch that never moves far enough:** a tap; two taps on empty space close together reset the view; a long press
-  without movement does nothing.
-- **A touch that moves a little but not enough to drag:** neither a tap nor a drag; nothing changes.
+- **A touch that never moves far enough:** a tap (below 10 points, lifted within 0.5 s); two taps on empty space within
+  0.35 s and 22 points reset the view; a press lifted at 0.5 s or later without moving does nothing.
+- **A touch that moves 10 … 16 points:** neither a tap nor a drag; nothing changes.
 - **A drag that ends on its own star, on empty space, or on a pair joined by a fixed link:** sends nothing.
 - **A drag that would exceed a star's degree limit or the link limit:** sent and refused by the kernel with its reason,
   shown to the player.
-- **A finished play (won or failed):** gestures send no kernel action and the description says the play is over (undo
-  or next level); inspecting links and orbit still work.
+- **A finished play (won or failed):** gestures send no kernel action (a star tap only chooses the star) and the
+  description says the play is over (undo or next level); inspecting links and orbit still work.
 - **A stage other than playing:** gestures send no kernel action.
 - **A second finger during a gesture:** cancels it (nothing sent) and starts an orbit.
 - **A cancelled touch:** changes nothing.
-- **Overlapping targets near a touch:** a fixed order decides (gauges, then stars, then links), each with a touch target
-  of fixed size.
+- **Overlapping targets near a touch:** gauge targets first, then the nearest star (ties to the lower index), then the
+  nearest link (ties to the lower index), each within 22 points.
 
 ## Requirements *(mandatory)*
 
@@ -127,7 +182,7 @@ unlink, nudge − and +, listen, undo, redo, next level, "Reset view"), includin
 - **FR-R02G1304-004**: A tap on a link MUST choose its two stars as the panel's star and partner and describe the link;
   it MUST send no kernel action.
 - **FR-R02G1304-005**: Picking MUST be analytic and deterministic: the gauges, the star centres and the link curves
-  projected through the drawn camera (orbit included), each with a touch target of fixed size, in that order.
+  projected through the drawn camera (orbit included), each with a 22-point touch target, in that order.
 - **FR-R02G1304-006**: Two-finger orbit MUST stay within stated bounds, keep the scene inside the view with a 5 % margin
   at every aspect 0.4 … 2.5 and never enter the digest, the snapshot or the kernel; a double tap on empty space or
   "Reset view" returns to the authored view.
