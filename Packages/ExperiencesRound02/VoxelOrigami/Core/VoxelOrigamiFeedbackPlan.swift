@@ -105,6 +105,10 @@ public struct VoxelOrigamiFeedbackPlan: Sendable, Equatable {
         switch bare {
         case VoxelOrigamiExperienceRule.locked: return "That level is not open yet."
         case VoxelOrigamiExperienceRule.date: return "That date cannot be used."
+        // Feature 447: the replay refusals.
+        case VoxelOrigamiExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case VoxelOrigamiExperienceRule.replayEnd: return "The replay is over."
+        case VoxelOrigamiExperienceRule.replay: return "Stop the replay first."
         case VoxelOrigamiError.action("").reasonCode: return "That hinge cannot turn: nothing would move."
         case VoxelOrigamiError.stage.reasonCode: return "The level has ended."
         case VoxelOrigamiExperienceRule.notWhole: return "That value must be a whole number."

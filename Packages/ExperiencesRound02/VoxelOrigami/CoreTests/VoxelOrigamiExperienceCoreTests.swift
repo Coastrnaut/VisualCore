@@ -108,20 +108,26 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g15.voxel-origami" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g15.voxel-origami.v2")
+        // Since feature 447 the snapshot schema is 3 and the digest domain v3.
+        #expect(Core.experienceID == "r02-g15.voxel-origami" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g15.voxel-origami.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["hinge.turn", "play.undo", "play.redo", "level.next", "hinge.choose", "level.select",
-                             "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                             "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "replay.start",
+                             "replay.step", "replay.stop", "settings.sound"]
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [0...11, -1...1])
         #expect(Core.controls[4].ranges == [0...11])
         #expect(Core.controls[5].ranges == [1...100])
         #expect(Core.controls[6].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [1, 2, 3, 7, 8, 9]
+        // Since feature 447 four controls follow: replay.start [1…100], replay.step, replay.stop, settings.sound [0…1].
+        #expect(Core.controls[10].ranges == [1...100])
+        #expect(Core.controls[13].ranges == [0...1])
+        let plainIndices: [Int] = [1, 2, 3, 7, 8, 9, 11, 12]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == VoxelOrigamiTier.all.count)
-        #expect(Core.migrations.currentVersion == 2)
+        // Since feature 447 the migration chain ends at schema 3.
+        #expect(Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == VoxelOrigamiTier.all.map(\.name))
@@ -497,14 +503,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "hinge.turn", values: [4, -1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))   // since feature 447 the current schema is 3
         }
         #expect(refused)
         #expect(try engine.digest() == before)

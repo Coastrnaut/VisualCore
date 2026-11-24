@@ -68,6 +68,27 @@
 // step or the chosen hinge). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}` with sorted
 // keys; schema-1 payloads migrate (no won levels, level 1 open plus the levels up to the restored level, campaign mode,
 // the tutorial at its first step — `turn` on the tutorial levels, else `done`).
+//
+// Feature 447 (R02-G15-07) T-R02G1507-003 (FR-R02G1507-001 … 007; clarifications Q1–Q5): a campaign or daily win
+// records its winning trace (`VoxelOrigamiReconciliation.netTrace` of the play's records: the effective turns, an undone
+// turn left out unless redone) as a verified result; restore reconciles every result
+// (`VoxelOrigamiReconciliation.reconcile`, the frontier as saved) and exposes `reconciliationDropped` (not digested,
+// not in `==`); the replay mode `replay(level)` plays a verified trace turn by turn:
+//   replay.start [1…100]  a fresh play of that level in mode `replay(level)` (campaign budget) with the tutorial done
+//                         (`r02-g15.no-replay` without a verified result with a trace); during a replay it restarts it;
+//   replay.step           the next turn of the trace (`r02-g15.replay-end` after the last or once the play ended;
+//                         `r02-g15.no-replay` outside replay);
+//   replay.stop           campaign at that level, the frontier when it is not open (`r02-g15.no-replay` outside
+//                         replay);
+//   settings.sound [0…1]  the sound choice (FR-R02G1507-007): 1 on, 0 off; whole; allowed in every mode.
+// In replay every other action except `tutorial.dismiss`, `hinge.choose` (presentation) and `settings.sound` is refused
+// with `r02-g15.replay` (the camera is presentation only and sends no action), and nothing is recorded. A restored
+// replay whose records are not exactly the first turns of its level's verified trace (turns only, in order, no undo or
+// redo) is refused as `damaged`; a restored replay whose result did not survive reconciliation, or was never verified,
+// returns to campaign at that level (the frontier when it is not open). Digest "r02-g15.voxel-origami.v3" (the same
+// parts as v2, the progress now with traces; never the sound choice or the dropped count); snapshot schema 3 `{"level", "mode", "progress",
+// "records", "sound", "tutorial"}` (results carry `trace` and `verified`), migrating 1 → 2 → 3 (2 → 3: every result an
+// empty trace and `verified` false, sound off).
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -84,6 +105,12 @@ public enum VoxelOrigamiExperienceRule {
     public static let locked = "r02-g15.locked"
     /// An impossible calendar date (feature 445).
     public static let date = "r02-g15.date"
+    /// No verified result with a trace to replay, or a replay control outside replay (feature 447).
+    public static let noReplay = "r02-g15.no-replay"
+    /// The replay has no further turn: the trace is over or the play ended (feature 447).
+    public static let replayEnd = "r02-g15.replay-end"
+    /// An action that is not allowed during replay (feature 447).
+    public static let replay = "r02-g15.replay"
 }
 
 /// Why a saved Voxel Origami state was refused on restore (feature 443). A refused restore changes nothing.
@@ -97,17 +124,20 @@ public enum VoxelOrigamiRestoreRefusal: Error, Equatable, Sendable {
     case kernel(VoxelOrigamiError)
 }
 
-/// The state of Voxel Origami as an experience (see the file header). Snapshot schema 2.
+/// The state of Voxel Origami as an experience (see the file header). Snapshot schema 3.
 public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g15.voxel-origami"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g15.voxel-origami.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g15.voxel-origami.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["hinge.turn", "play.undo", "play.redo", "level.next", "hinge.choose",
-                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                                   "replay.start", "replay.step", "replay.stop", "settings.sound"]
+    /// The declared range of `settings.sound`: 0 off, 1 on (feature 447).
+    public static let soundRange: ClosedRange<Int> = 0...1
     /// The budget of a practice play: the kernel's maximum (`VoxelOrigamiMode.practiceBudget`, 40).
     public static let practiceBudget: Int = VoxelOrigamiMode.practiceBudget
     /// The level numbers of the catalog.
@@ -135,6 +165,12 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
     /// The certified witness's turn count of the current level, against which a win's stars are counted. Derived from
     /// the level number.
     public private(set) var certifiedTurns: Int
+    /// How many saved results the last restore dropped because they did not verify (feature 447); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
+    /// The player's sound choice (feature 447, FR-R02G1507-007), set by `settings.sound`: in the snapshot (key
+    /// `"sound"`) and `==`, never in the digest; off at an opening, after a reset and in a migrated save.
+    public private(set) var soundOn = false
     /// The chosen hinge, 1 … cubes − 1; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var chosenHinge: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
@@ -317,18 +353,45 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the chosen hinge,
-    /// the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode, the tutorial step and the sound choice (not
+    /// the chosen hinge, the quality tier, the opening level or the dropped count).
     public static func == (lhs: VoxelOrigamiExperienceCore, rhs: VoxelOrigamiExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial && lhs.soundOn == rhs.soundOn
     }
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object (feature 447): every won result gains an empty `trace` and `verified`
+    /// false, and the sound choice is off.
+    ///
+    /// - Throws: ``VoxelOrigamiRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw VoxelOrigamiRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated: [String: Any] = object
+        migrated["progress"] = progress
+        migrated["sound"] = false
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 445): no won levels with level 1 open
@@ -368,6 +431,10 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
+        ExperienceControl(id: "settings.sound", ranges: [declared(soundRange)]),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -375,8 +442,8 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The ten controls with their declared ranges (see the file header); `play.undo`, `play.redo`, `level.next`,
-    /// `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
+    /// The fourteen controls with their declared ranges (see the file header); `play.undo`, `play.redo`, `level.next`,
+    /// `mode.practice`, `mode.campaign`, `tutorial.dismiss`, `replay.step` and `replay.stop` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with its first turnable hinge chosen; no clock
@@ -402,6 +469,9 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
         if let refusal = ExperienceInput.validate(control: action.control, values: action.values,
                                                   controls: Self.declaredControls) {
             return .rejected(refusal)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: VoxelOrigamiExperienceRule.replay))
         }
         var values: [Int] = []
         for value in action.values {
@@ -449,6 +519,29 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
                 try open(number: levelNumber, mode: .practice)
             case "mode.campaign":
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "replay.start":
+                guard let result = progress.solved[values[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: VoxelOrigamiExperienceRule.noReplay))
+                }
+                try open(number: values[0], mode: .replay(level: values[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: VoxelOrigamiExperienceRule.noReplay))
+                }
+                // Replay never undoes, so each trace turn made exactly one record.
+                let index: Int = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: VoxelOrigamiExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: VoxelOrigamiExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
+            case "settings.sound":
+                soundOn = values[0] == 1
             default:   // tutorial.dismiss
                 tutorial = tutorial.dismissed()
             }
@@ -494,9 +587,18 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
     /// recorded once.
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
+        if case .replay = mode { return }
         _ = progress.record(level: levelNumber, actionsSpent: VoxelOrigamiProgress.actionsSpent(play),
-                            certified: certifiedTurns, mode: mode)
+                            certified: certifiedTurns, mode: mode, trace: winningTrace)
     }
+
+    /// The controls accepted during replay (feature 447); the camera is presentation only and sends no action.
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "hinge.choose", "settings.sound"]
+
+    /// The winning trace of the current play (feature 447): its effective turns in order
+    /// (``VoxelOrigamiReconciliation/netTrace(_:)``), never an undo or a redo.
+    var winningTrace: [VoxelOrigamiAction] { VoxelOrigamiReconciliation.netTrace(play.records) }
 
     /// Back to the opening state the seed chose (progress included, campaign mode, its first turnable hinge chosen);
     /// the quality tier, which is not state, is kept.
@@ -508,6 +610,7 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
         tutorial = opening.tutorial
         certifiedTurns = opening.certifiedTurns
         chosenHinge = Self.openingHinge(of: opening.play)
+        soundOn = false
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -519,8 +622,9 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g15.voxel-origami.v2", then the level number, the play's fingerprint (level, turns, actions spent, stage,
-    /// failure), the progress and the mode (their sorted JSON); never the tutorial step or the chosen hinge.
+    /// "r02-g15.voxel-origami.v3", then the level number, the play's fingerprint (level, turns, actions spent, stage,
+    /// failure), the progress (with its traces) and the mode (their sorted JSON); never the tutorial step, the chosen
+    /// hinge, the sound choice or the dropped count.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
@@ -534,7 +638,7 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
@@ -546,15 +650,18 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
         var records: [VoxelOrigamiRecord]
         /// The tutorial step; nil in a migrated schema-1 payload.
         var tutorial: VoxelOrigamiTutorialStep?
+        /// The sound choice; nil (off) in a payload written before schema 3.
+        var sound: Bool?
     }
 
-    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "sound", "tutorial"}` with sorted keys and unescaped
+    /// slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
-                                                 records: play.records, tutorial: tutorial))
+                                                 records: play.records, tutorial: tutorial, sound: soundOn))
     }
 
-    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// The core of `payload` (schema 3): the records replayed on a fresh play of the saved level (the practice copy in
     /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), its first turnable
     /// hinge chosen; a reset returns to the opening state `seed` chooses.
     ///
@@ -568,6 +675,23 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw VoxelOrigamiRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw VoxelOrigamiRestoreRefusal.damaged
+        }
+        // Feature 447: a saved replay's records are exactly the first turns of its level's saved trace — turns only, in
+        // order, no undo or redo — or the payload is damaged.
+        if case .replay(let replayed) = decoded.mode, let saved = decoded.progress.solved[replayed], saved.verified {
+            var applied: [VoxelOrigamiAction] = []
+            for record in decoded.records {
+                guard record.kind != .undo, record.kind != .redo, let action = record.action else {
+                    throw VoxelOrigamiRestoreRefusal.damaged
+                }
+                applied.append(action)
+            }
+            guard applied.count <= saved.trace.count, Array(saved.trace.prefix(applied.count)) == applied else {
+                throw VoxelOrigamiRestoreRefusal.damaged
+            }
+        }
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw VoxelOrigamiRestoreRefusal.damaged
         }
@@ -578,10 +702,19 @@ public struct VoxelOrigamiExperienceCore: ExperienceCore, Equatable {
             let tutorial: VoxelOrigamiTutorialStep = decoded.tutorial
                 ?? VoxelOrigamiTutorialStep.initial(level: decoded.level)
             let openingCore: VoxelOrigamiExperienceCore = try opening(number: levelNumber(forSeed: seed))
-            return VoxelOrigamiExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                              mode: decoded.mode, tutorial: tutorial,
-                                              certifiedTurns: certified.plan.size,
-                                              openingNumber: openingCore.openingNumber, opening: openingCore.opening)
+            // Feature 447: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = VoxelOrigamiReconciliation.reconcile(decoded.progress)
+            var core: VoxelOrigamiExperienceCore = VoxelOrigamiExperienceCore(
+                levelNumber: decoded.level, play: play, progress: reconciled.progress, mode: decoded.mode,
+                tutorial: tutorial, certifiedTurns: certified.plan.size,
+                openingNumber: openingCore.openingNumber, opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            core.soundOn = decoded.sound ?? false
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw VoxelOrigamiRestoreRefusal.kernel(error)
         }

@@ -114,7 +114,10 @@ import VisualCoreSimulation
         #expect(core.play.stage == .won && VoxelOrigamiProgress.actionsSpent(core.play) == certified + 1)
         let twoStars: Int = VoxelOrigamiProgress.stars(actionsSpent: certified + 1, certified: certified)
         #expect(twoStars == 2)
-        #expect(core.progress.solved[1] == VoxelOrigamiProgress.Result(actionsSpent: certified + 1, stars: twoStars))
+        // Since feature 447 a campaign win stores a verified result with its winning trace (the undone turn left out).
+        #expect(VoxelOrigamiReconciliation.netTrace(core.play.records) == actions)
+        #expect(core.progress.solved[1] == VoxelOrigamiProgress.Result(actionsSpent: certified + 1, stars: twoStars,
+                                                                      trace: actions, verified: true))
         #expect(core.progress.frontier == 2 && core.progress.isOpen(2) && !core.progress.isOpen(3))
         // level.next goes to the newly opened level 2, fresh, with its tutorial.
         var next: Core = core
@@ -126,7 +129,9 @@ import VisualCoreSimulation
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.mode == .campaign)
         for step in actions { #expect(core.apply(Self.act(step)) == .accepted) }
-        let best: VoxelOrigamiProgress.Result = VoxelOrigamiProgress.Result(actionsSpent: certified, stars: 3)
+        // Since feature 447 the result carries the witness trace, verified.
+        let best: VoxelOrigamiProgress.Result = VoxelOrigamiProgress.Result(actionsSpent: certified, stars: 3,
+                                                                            trace: actions, verified: true)
         #expect(core.progress.solved[1] == best)
         // A worse result keeps the best one: four undone turns more than the plan (1 star) change nothing.
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
@@ -181,7 +186,9 @@ import VisualCoreSimulation
         for step in dailyActions { #expect(core.apply(Self.act(step)) == .accepted) }
         #expect(core.play.stage == .won && core.progress.frontier == 1 && !core.progress.isOpen(daily))
         let result: VoxelOrigamiProgress.Result = try #require(core.progress.solved[daily])
-        #expect(result == VoxelOrigamiProgress.Result(actionsSpent: dailyActions.count, stars: 3))
+        // Since feature 447 a daily win stores a verified result with its winning trace.
+        #expect(result == VoxelOrigamiProgress.Result(actionsSpent: dailyActions.count, stars: 3,
+                                                      trace: dailyActions, verified: true))
         // Campaign from a level that is not open goes to the frontier.
         #expect(core.apply(Self.act("mode.campaign")) == .accepted)
         #expect(core.mode == .campaign && core.levelNumber == 1)
@@ -325,9 +332,11 @@ import VisualCoreSimulation
         #expect(restoredPractice.play.level.budget == 40 && restoredPractice.mode == .practice)
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
         let certified: Int = try Self.plan(1).count
+        // Since feature 447 the stored result carries the winning trace (the witness) and is verified.
+        let traceText: String = String(decoding: try Core.payloadEncoder().encode(try Self.plan(1)), as: UTF8.self)
         let progressText: String = "\"progress\":{\"frontier\":2,"
             + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3,"
-            + "\"trace\":[],\"verified\":false}]}"
+            + "\"trace\":" + traceText + ",\"verified\":true}]}"
         #expect(campaignText.contains(progressText))
         #expect(campaignText.hasPrefix("{\"level\":2,\"mode\":{\"mode\":\"campaign\"},"))
         #expect(campaignText.hasSuffix(",\"tutorial\":\"turn\"}"))
@@ -369,7 +378,9 @@ import VisualCoreSimulation
         let records: Data = try Core.payloadEncoder().encode(core.play.records)
         let recordsObject: Any = try JSONSerialization.jsonObject(with: records)
         let schemaOne: [String: Any] = ["level": 3, "records": recordsObject]
-        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        // Since feature 447 the chain runs 1 → 2 → 3, so the expectation is both steps applied in order.
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(schemaOne))
+        #expect(migrated["sound"] as? Bool == false)
         let chained: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
         let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
         let chainedData: Data = try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])
@@ -390,8 +401,9 @@ import VisualCoreSimulation
         #expect(throws: VoxelOrigamiRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "3"]) }
         #expect(throws: VoxelOrigamiRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
         // A newer schema is refused by the chain.
-        #expect(Core.schemaVersion == 2)
-        #expect(throws: MigrationError.newerVersion(3)) { try Core.migrations.migrate(schemaOne, from: 3) }
+        // Since feature 447 the current schema is 3, so the newer one is 4.
+        #expect(Core.schemaVersion == 3)
+        #expect(throws: MigrationError.newerVersion(4)) { try Core.migrations.migrate(schemaOne, from: 4) }
     }
 
     @Test func theEngineMigratesASchemaOneEnvelopeAndRefusesANewerOne() async throws {
@@ -417,15 +429,15 @@ import VisualCoreSimulation
         #expect(migrated.progress.frontier == 3 && migrated.progress.solved.isEmpty)
         #expect(migrated.tutorial == .turn && played.tutorial == .compare)
         #expect(try engine.digest() == saved.digest)
-        // An envelope of schema 3 is refused and changes nothing.
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        // An envelope of schema 4 (since feature 447 the current schema is 3) is refused and changes nothing.
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(engine.core == migrated)
