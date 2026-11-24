@@ -47,12 +47,12 @@ consume).
 
 ## Phase 4: Stories 2 and 3 — failures, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G1601-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartouchePlay.swift`
+- [X] T-R02G1601-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartouchePlay.swift` — Verified 2026-11-24: 2026-11-24 host-3 exit 0, 15 play tests incl. 500 seeded traces replayed (.autonomy/migration/checks/R02-G16-01.host-3.json); budget payload is the action count
   (agent B: stages "loading, tutorial, playing, paused, won, failed, result"; the ship at the start star at beat 0; `leg`
   validated in the order stage, previous fingerprint, action (the chart's refusals); each spends 1 action; a window,
   hazard, deadline or stroke failure fails the level on that leg with the ship, beat and strokes unchanged; after an
   accepted leg a win (drawn equals the symbol and the ship at the beacon), otherwise a spent budget fails
-  `budget(action index)`; the route report after every action; records with previous and next fingerprints; full undo
+  `budget(actions spent)`; the route report after every action; records with previous and next fingerprints; full undo
   and redo (from failed back to playing before the failing leg, its action refunded, recorded; won is final); replay)
   with `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartouchePlayTests.swift` (known legs win on the
   exact leg; each failure named; budget failure on the exact action with one action either side; a leg on the last
