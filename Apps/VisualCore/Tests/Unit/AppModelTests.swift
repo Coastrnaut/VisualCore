@@ -14,6 +14,7 @@ import Foundation
 import HarmonicBridgesCore
 import HueCompassCore
 import LissajousLabyrinthCore
+import MoonlitMechanismCore
 import NocturneGardenCore
 import SwiftUI
 import VisualCoreDiagnostics
@@ -2885,6 +2886,172 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
         XCTAssertEqual(opening.play.stage, AcousticConstellatorStage.playing, "the opening accepts actions")
         XCTAssertEqual(AcousticConstellatorExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Moonlit Mechanism in the app (feature 439, R02-G14-09; T-R02G1409-005, FR-R02G1409-003, 006; SC-R02G1409-002)
+
+    /// Moonlit Mechanism's registration: a candidate until X-R02-G14.
+    private func moonlitMechanismRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(MoonlitMechanismExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Moonlit Mechanism is a candidate")
+    }
+
+    /// FR-R02G1409-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheMoonlitMechanismRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try moonlitMechanismRegistration()
+        XCTAssertEqual(MoonlitMechanismExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(MoonlitMechanismExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(MoonlitMechanismExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1409-006: without `-vcCandidates` Moonlit Mechanism is a candidate only: in `candidates`, outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testMoonlitMechanismIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(MoonlitMechanismExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g14.moonlit-mechanism")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1409-003, SC-R02G1409-002: with `-vcCandidates` Moonlit Mechanism is shown, opens through the registry and
+    /// engine with seed 0 (level 1), and level 1 is won by its certified actions
+    /// (`MoonlitMechanismExperienceCore.certifiedActions(1)`) sent as `handle.turn [step]`, `gear.reseat [gear, step]`,
+    /// `lamp.step [step]` and `machine.run` with three stars (the opening play is already past the kernel's tutorial
+    /// stage; the tutorial step is presentation and blocks no action, so no `tutorial.dismiss` is needed); the win opens
+    /// level 2 and `level.next` plays it.
+    func testMoonlitMechanismOpensAsACandidateAndLevelOneIsWonByItsCertifiedActions() async throws {
+        let registration = try moonlitMechanismRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["handle.turn", "gear.reseat", "lamp.step", "machine.run", "play.undo", "play.redo",
+                        "level.next", "frame.show", "tutorial.dismiss", "replay.start"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(MoonlitMechanismExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<MoonlitMechanismExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, MoonlitMechanismStage.playing, "the opening play accepts actions")
+        let actions: [MoonlitMechanismAction] = MoonlitMechanismExperienceCore.certifiedActions(1)
+        XCTAssertFalse(actions.isEmpty)
+        for action in actions {
+            switch action {
+            case .turn(let step):
+                let values: [Double] = [Double(step)]
+                XCTAssertEqual(engine.handle(control: "handle.turn", values: values), .accepted, "turn \(values)")
+            case .reseat(let gear, let step):
+                let values: [Double] = [Double(gear), Double(step)]
+                XCTAssertEqual(engine.handle(control: "gear.reseat", values: values), .accepted, "reseat \(values)")
+            case .lamp(let step):
+                let values: [Double] = [Double(step)]
+                XCTAssertEqual(engine.handle(control: "lamp.step", values: values), .accepted, "lamp \(values)")
+            case .run:
+                XCTAssertEqual(engine.handle(control: "machine.run"), .accepted, "run")
+            }
+        }
+        XCTAssertEqual(engine.outcome?.code, MoonlitMechanismExperienceCore.wonCode)
+        XCTAssertEqual(MoonlitMechanismExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, MoonlitMechanismStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified actions earn three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `MM` (their own literals in
+    /// Tests/UI/MoonlitMechanism/MMSupport.swift, which this target cannot import); the same literals equal the Core's
+    /// certified level 1: one handle turn (+1), one lamp step (−1), then the run (a kind with its step; 0 for the run);
+    /// the budget is 9; no gear chooser has to move; the lamp step stays on the level's heights. Seed 0 opens level 1.
+    func testMoonlitMechanismLevelOnePinsInMMEqualTheCore() throws {
+        // The same literals as `MM.levelOneActions` and `MM.levelOneBudget` in MMSupport.swift.
+        let levelOneActions: [(kind: String, value: Int)] = [("turn", 1), ("lamp", -1), ("run", 0)]
+        let levelOneBudget = 9
+
+        let certifiedActions: [MoonlitMechanismAction] = MoonlitMechanismExperienceCore.certifiedActions(1)
+        XCTAssertEqual(certifiedActions, [.turn(1), .lamp(-1), .run], "level 1's certified actions")
+        var coreKinds: [String] = []
+        var coreValues: [Int] = []
+        for action in certifiedActions {
+            switch action {
+            case .turn(let step):
+                coreKinds.append("turn")
+                coreValues.append(step)
+            case .reseat(_, let step):
+                coreKinds.append("reseat")
+                coreValues.append(step)
+            case .lamp(let step):
+                coreKinds.append("lamp")
+                coreValues.append(step)
+            case .run:
+                coreKinds.append("run")
+                coreValues.append(0)
+            }
+        }
+        let pinnedKinds: [String] = levelOneActions.map { $0.kind }
+        let pinnedValues: [Int] = levelOneActions.map { $0.value }
+        XCTAssertEqual(coreKinds, pinnedKinds, "level 1 certified action kinds")
+        XCTAssertEqual(coreValues, pinnedValues, "level 1 certified action steps")
+        XCTAssertFalse(coreKinds.contains("reseat"), "no gear chooser has to move on level 1")
+
+        let certified = try MoonlitMechanismExperienceCore.generated(number: 1)
+        let level: MoonlitMechanismLevel = certified.level
+        XCTAssertEqual(certified.actions, certifiedActions, "the certified witness is the generated level's")
+        XCTAssertEqual(level.budget, levelOneBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, certifiedActions.count, "the witness fits the budget")
+        var height: Int = level.startingHeight
+        for action in levelOneActions where action.kind == "lamp" {
+            XCTAssertTrue(MoonlitMechanismExperienceCore.stepRange.contains(action.value), "a lamp step \(action)")
+            height += action.value
+            XCTAssertTrue((0..<level.lampHeights).contains(height), "the lamp stays on the level's heights \(height)")
+        }
+        for action in levelOneActions where action.kind == "turn" {
+            XCTAssertTrue(MoonlitMechanismExperienceCore.stepRange.contains(action.value), "a turn step \(action)")
+            XCTAssertNotEqual(action.value, 0, "a turn of 0 is refused")
+        }
+
+        let opening = try MoonlitMechanismExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, levelOneBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, MoonlitMechanismStage.playing, "the opening accepts actions")
+        XCTAssertEqual(opening.certifiedActions, certifiedActions.count, "stars are counted against the witness")
+        XCTAssertEqual(MoonlitMechanismExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
