@@ -73,7 +73,7 @@ final copy).
   (`UPDATE_SCENARIO_MANIFEST=1`); update `MoonlitMechanismPanelWinTests`, the gesture wiring tests and other suites
   whose `level.next` expectation changes; lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02
   --filter MoonlitMechanismCoreTests`
-- [ ] T-R02G1405-005 Edit `Packages/ExperiencesRound02/MoonlitMechanism/Experience/MoonlitMechanismPresenter.swift` (the
+- [X] T-R02G1405-005 Edit `Packages/ExperiencesRound02/MoonlitMechanism/Experience/MoonlitMechanismPresenter.swift` (the — Verified 2026-11-24: 2026-11-24: presenter tutorial, hints (three levels, search off the main actor, stale search owns nothing), failure explanation, goal with band and stars, retry/undo/daily; panel Hint, Dismiss, Undo/Retry, Campaign/Daily/Practice, level picker; agent D 8 teaching tests on its final copy; 41 simulator tests; sim-27 exit 0 (.autonomy/migration/checks/R02-G14-05.sim-27.json)
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it,
   the search off the main actor and a stale search never owning the hint state — and the failure explanation as panel
   text, with the level's difficulty band (of the five bands of 20), its goal and its best stars (FR-R02G1405-004); the
