@@ -44,7 +44,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1408-005 [US2] [US3] Create `Packages/ExperiencesRound02/MoonlitMechanism/ExperienceTests/MoonlitMechanismRegressionGoldenFrameTests.swift` and
+- [X] T-R02G1408-005 [US2] [US3] Create `Packages/ExperiencesRound02/MoonlitMechanism/ExperienceTests/MoonlitMechanismRegressionGoldenFrameTests.swift` and — Verified 2026-11-24: 2026-11-24: agent C golden-frame and memory simulator tests; lead retest sim-27 exit 0, 64 tests (.autonomy/migration/checks/R02-G14-08.sim-27.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/ExperienceTests/MoonlitMechanismRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked
   against their descriptions with the feature-433 tolerances (a cast cell's centre 0.25 darker than the paper in
   luminance, a gear rim point with red above blue by 0.08, the first moves bar 0.1 from the paper, the backdrop within
