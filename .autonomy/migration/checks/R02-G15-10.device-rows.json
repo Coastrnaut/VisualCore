@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g15.voxel-origami"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g15.voxel-origami",
+  "elapsed_seconds": 0.039,
+  "exit_code": 0,
+  "finished": "2026-11-24T21:46:45+00:00",
+  "gate": "R02-G15-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-10.device-rows.log",
+  "log_sha256": "966a2eb5b1c9dc19ca03a7913bddef200edc4c601f879b986da00caf95743703",
+  "name": "device-rows",
+  "started": "2026-11-24T21:46:45+00:00",
+  "timed_out": false
+}
