@@ -114,3 +114,29 @@ Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decod
 - **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest b02e58ec…f611) and linked into the app as
   a candidate (`ExperienceRegistry.candidates`) until X-R02-G15; the scenario manifest holds 9 standard scenarios,
   `full-playthrough`, `hero`, 80 acceptance scenarios (R2-G15-QA-001 … 080) and 3 fixtures.
+
+## Gestures and camera (feature 444, R02-G15-04)
+
+- **Picking.** At touch-down every cube's eight corners (side 0.9 s, turned by its orientation) are projected through the
+  drawn camera; a touch inside their convex outline, or within 8 points of it, hits the cube, and the front-most hit
+  (the one the paint order draws last) wins (`VoxelOrigamiPicker`). Target wireframes, hinge marks, gauges and the
+  backdrop are empty space; cube 0, the root, has no hinge.
+- **Drag to turn.** Hinge h twists the subtree of cube h about the line from its parent, so cube h itself never moves.
+  A drag on cube h follows its tracked cube: of the cubes hinge h swings, the one farthest from the hinge line (lowest
+  index on ties; the centroid of a subtree symmetric about the line would not move). Its projected motion for a `+1` and
+  a `−1` quarter turn gives two screen directions; the step whose direction has the larger projection of the finger's
+  travel is pending from 24 points and sent on release as one `hinge.turn` — one quarter turn per drag
+  (`VoxelOrigamiTurnPrediction`).
+- **Taps.** A tap on a non-root cube chooses its hinge (`hinge.choose`, presentation only); a second tap on the same
+  cube within 0.35 s and 22 points while playing turns it `+1`, or explains that nothing would move; two taps on empty
+  space reset the view. Drags from the root, from an idle hinge or on a finished play explain why once and send nothing
+  (`VoxelOrigamiGestureController`, thresholds as Moonlit Mechanism's: tap below 10 points and 0.5 s, drag from 16).
+- **Orbit.** Two fingers orbit: yaw ±60° about the vertical axis through the box centre (90° per view width) and pitch
+  −20° … +35° (60° per view height); a third finger re-bases the midpoint; "Reset view" or an empty double tap returns
+  to the authored view. The camera refits so the box stays inside the view at every orbit and aspect, the eye outside
+  the box; the meshes face the drawn eye, so an orbit change rebuilds them (a resize alone does not). Orbit, the chosen
+  hinge and the pending turn are not saved (schema 1).
+- **Panel.** Every move stays available without gestures (hinge − and +, turn − and +, undo, redo, next level, "Reset
+  view"); all 100 certified levels are won through the panel alone in the host tests. Refused actions are shown in words
+  and logged with their codes.
+

@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G15-03: Voxel Origami renderer).
+Last updated: 2026-11-24 (R02-G15-04: Voxel Origami gestures).
 
 ## 1. What is tested, and where
 
@@ -738,6 +738,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   search through the play (states merged by phases and lamp height), which is cheap here because every action adds to
   one vector. Regenerate the witness files only with `MOONLIT_MECHANISM_WRITE_WITNESSES=1` and re-pin the catalog digest
   after review.
+- **Voxel Origami gestures** (R02-G15-04, 2026-11-24). Host: picker and turn prediction against an independent
+  reference on 500 seeded points, 500 seeded gesture scripts at four play states, three sizes and three orbits, orbit
+  framing and culling for an orbited camera, all 100 levels won through the panel (`swift test --package-path
+  Packages/ExperiencesRound02 --filter VoxelOrigami`); simulator: 8 wiring tests through the presenter's pointer entry
+  (30 Voxel simulator tests, about 5 s). One lesson: a drag must follow a cube that moves. The first rule followed the
+  centroid of the cubes a hinge swings, which stays on the hinge line when the subtree is symmetric about it (two
+  children on opposite sides), so the drag would predict nothing; the controller follows the swinging cube farthest
+  from the line instead, and a host test builds that symmetric chain.
 - **Voxel Origami renderer** (R02-G15-03, 2026-11-24). Host: the shader-source, geometry (including the winding a
   back-face-culled painter's pass needs), adapter, purity and scenario tests (`swift test --package-path
   Packages/ExperiencesRound02 --filter VoxelOrigami`); simulator: `VoxelOrigamiExperienceTests` (22 tests, about 5 s:

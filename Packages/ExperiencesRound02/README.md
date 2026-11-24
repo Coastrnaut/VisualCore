@@ -843,3 +843,8 @@ inner glyphs and dots, hinge marks, failure outlines, covered pips and moves bar
 `VoxelOrigamiShaders` (voxel and glow programs with signed-distance shading), the adapter
 `VoxelOrigamiExperienceCore`, `VoxelOrigamiScenarios` with the scenario manifest, and the iOS target
 `VoxelOrigamiExperience` (presenter, voxel scene, control panel), registered as a candidate.
+
+Feature 444 (R02-G15-04) adds the gestures: `VoxelOrigamiOrbit` and `camera(_:aspect:orbit:)` with meshes built for the
+drawn eye, `VoxelOrigamiPicker` (projected cube outlines, the front-most first, and the turn prediction of a hinge's
+tracked cube), `VoxelOrigamiGestureController` (taps choose, double taps and drags turn, two fingers orbit), the
+presenter's pointer entry, the pending text and "Reset view".
