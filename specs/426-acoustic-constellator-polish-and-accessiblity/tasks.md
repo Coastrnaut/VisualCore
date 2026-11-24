@@ -19,7 +19,7 @@ faded in the unlit fallback too) taken into the first pass.
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G1306-003 [P] [US1] [US3] Create
+- [X] T-R02G1306-003 [P] [US1] [US3] Create — Verified 2026-11-23: 2026-11-23: agent A feedback plan (texts of Q1 word for word, haptics of Q2, refusal words with the prefix read, summary of Q5); 10 tests on real cores; lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G13-06.host-2.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorFeedbackPlan.swift` (texts and kinds of
   clarification Q1 word for word, the engine's `action.rule.` prefix read as the bare code, including the revealed hint
   as `state` (`hint(text:)`); haptics of Q2 — a listen and a budget-ending action plan only the outcome;
