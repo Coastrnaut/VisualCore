@@ -176,7 +176,7 @@ it as available, and the experience package, registry, catalog and content check
   as the kernel's reason does.
 - **A won level:** every required key frame's card is lit and the wall glows; the frame checks use the same positions.
 - **Memory warning:** caches are released and rebuilt on the next frame.
-- **Reduce Motion:** gears are drawn at their set-up phases without the turning preview; Reduce Flashing caps the glow
+- **Reduce Motion:** gears are drawn at the set-up phases of the shown key frame without the turning preview; Reduce Flashing caps the glow
   to the shared limit.
 
 ## Requirements *(mandatory)*
