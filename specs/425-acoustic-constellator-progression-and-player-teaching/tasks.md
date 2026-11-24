@@ -93,7 +93,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 415
   `--name host-full`, `--name app-unit`
 - [X] T-R02G1305-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-23: 2026-11-23: reference-1 exit 0 (.autonomy/migration/checks/R02-G13-05.reference-1.json)
 - [X] T-R02G1305-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-23: 2026-11-23: reference-2 exit 0 (.autonomy/migration/checks/R02-G13-05.reference-2.json)
-- [ ] T-R02G1305-010 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1305-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-23: 2026-11-23: script-tests exit 0 (.autonomy/migration/checks/R02-G13-05.script-tests.json)
 - [ ] T-R02G1305-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
 
