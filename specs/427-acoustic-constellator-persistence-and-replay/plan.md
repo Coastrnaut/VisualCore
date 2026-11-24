@@ -27,7 +27,8 @@ package, target, GLSL or VisualCore API; no Objective-C++.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02`; simulator package tests on sim-27.2; app unit
 tests; regression; script tests alone.
 **Performance**: reconciliation replays at most 100 traces, each bounded (R6), on restore only.
-**Constraints**: no clock or random source in the state; the sound choice is snapshotted, never digested.
+**Constraints**: no clock or random source in the state; the sound choice is snapshotted, never digested; a restored
+replay must be exactly the first actions of its level's verified trace, or the payload is refused as `damaged`.
 
 No NEEDS CLARIFICATION remains.
 
