@@ -37,7 +37,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G1502-004 [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiGenerator.swift` (lead: band
+- [X] T-R02G1502-004 [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiGenerator.swift` (lead: band — Verified 2026-11-24: 2026-11-24: generator (band profiles, drawing order of Q1, 256-candidate bound, catalog digest); all 100 entries certify (most candidates 58, most work 4 640); agent C 14 tests incl. an independent re-draw agreeing on 60 pairs; lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G15-02.host-3.json)
   profiles "band 1: 5 … 6, 2 … 4, 1 … 2; band 2: 6 … 7, 4 … 6, 2 … 3; band 3: 7 … 8, 6 … 9, 3 … 4; band 4: 8 … 9,
   8 … 12, 4 … 5; band 5: 9 … 10, 10 … 14, 5 … 6" (cubes, scramble, plan range); candidates from
   `SeedDerivation.derive(plannedSeed, index: c)` in the drawing order of clarification Q1 (tree redrawn up to 50 times,
