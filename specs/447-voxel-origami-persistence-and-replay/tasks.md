@@ -66,7 +66,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G1507-006 Docs: `docs/architecture/voxel-origami.md` (persistence and replay),
+- [X] T-R02G1507-006 Docs: `docs/architecture/voxel-origami.md` (persistence and replay), — Verified 2026-11-24: 2026-11-24 round02-host-1/2/3 exit 0 (55 s, 44 s, 337 s; .autonomy/migration/checks/R02-G15-07.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3` (the three filters of feature 446)
 - [ ] T-R02G1507-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

@@ -858,3 +858,8 @@ Feature 446 (R02-G15-06) adds polish and accessibility: `VoxelOrigamiFeedbackPla
 `VoxelOrigamiLights` (eased glow and won look), `VoxelOrigamiSoundRecipe` (the hinge audition and the ambient recipe) and
 the experience's `VoxelOrigamiSound`, with labels and values on every control, an adjustable hinge, a summary element
 and a Sound toggle.
+
+Feature 447 (R02-G15-07) adds persistence and replay: winning traces stored with each campaign or daily result
+(`VoxelOrigamiReconciliation` checks them on restore and drops edited ones), snapshot schema 3 with migrations from 1
+and 2, the saved sound choice (`settings.sound`) and `replay.start`, `replay.step` and `replay.stop` with the panel's
+"Replay best solution", Step and Stop.

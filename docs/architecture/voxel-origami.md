@@ -186,3 +186,25 @@ Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decod
   left. <progress>. Chosen: <hinge>. Level: <level>."), rows that become columns at accessibility text sizes and a
   520-point readable width on iPad.
 
+## Persistence and replay (feature 447, R02-G15-07)
+
+- **Traces.** A campaign or daily win stores its result with the winning trace: the play's effective hinge turns in
+  order (`VoxelOrigamiReconciliation.netTrace`: an undone turn is left out unless redone; at most 64 turns), marked
+  verified. Actions spent still count undone turns, so they are at least the trace's turns; a better result replaces a
+  worse one, a tie keeps the earlier trace; practice and replay record nothing.
+- **Reconciliation.** On restore every traced result is replayed on a fresh play of its certified level and kept only
+  if it wins, spends at most its recorded actions and its stars match the stars rule; otherwise it is dropped and
+  counted (`reconciliationDropped`, never digested), and the presenter announces the count once ("1 saved result could
+  not be checked and was removed."). Untraced results from schema 1 or 2 are kept, unverified. The frontier is restored
+  as saved.
+- **Schema 3.** The digest ("r02-g15.voxel-origami.v3") keeps v2's parts with the traces in the progress; the payload
+  gains `sound`, migrating 1 → 2 → 3 (2 → 3: empty traces, unverified, sound off). A saved replay restores only when its
+  records are exactly the first turns of its level's verified trace (no undo or redo); otherwise the payload is damaged.
+- **Replay.** `replay.start [level]` replays a verified trace from a fresh play (tutorial done, the campaign budget),
+  `replay.step` plays the next turn (`r02-g15.replay-end` after the last), `replay.stop` returns to the campaign at that
+  level (the frontier when it is not open); every other play control is refused (`r02-g15.replay`, "Stop the replay
+  first.") except dismissing the tutorial, choosing a hinge and the sound setting. A replayed win claims no stars. The
+  panel offers "Replay best solution" with Step and Stop and the position ("Replay: turn k of n").
+- **Sound setting.** `settings.sound [0 … 1]` stores the sound choice in the snapshot (never the digest); the panel's
+  Sound toggle sends it and the presenter applies the restored choice when the experience opens.
+
