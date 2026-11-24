@@ -28,7 +28,7 @@ change (the shaders and reference of R02-G14-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1409-003 [US1] Edit `Packages/ExperiencesRound02/MoonlitMechanism/Experience/MoonlitMechanismControls.swift`:
+- [X] T-R02G1409-003 [US1] Edit `Packages/ExperiencesRound02/MoonlitMechanism/Experience/MoonlitMechanismControls.swift`: — Verified 2026-11-24: 2026-11-24: identifierNames (44 names) in the panel; agent E 4 identifier tests; lead retest sim-27 exit 0, 68 tests (.autonomy/migration/checks/R02-G14-09.sim-27.json)
   `identifierNames` lists the 44 identifiers the panel already gives through `port.identifier` (spec Clarifications
   Q1: gear, gear-minus, gear-plus, gear-detail, turn-minus, turn-plus, reseat-minus, reseat-plus, lamp, lamp-minus,
   lamp-plus, frame, frame-minus, frame-plus, run, undo, redo, next-level, reset-view, dismiss-tutorial, hint,

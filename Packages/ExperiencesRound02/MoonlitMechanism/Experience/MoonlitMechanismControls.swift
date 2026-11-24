@@ -22,6 +22,8 @@
 // n", identifier `replay-position`) with Step (identifier `replay-step`, value "Action k of n") and Stop (identifier
 // `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
 // `settings.sound`; the mode's name includes "replay".
+// Feature 439 (R02-G14-09) T-R02G1409-003 (clarification Q1): the identifiers the panel gives through `port.identifier`
+// (`experience.r02-g14.moonlit-mechanism.<name>`) are listed in ``identifierNames``, each once.
 #if os(iOS)
 import MoonlitMechanismCore
 import SwiftUI
@@ -40,6 +42,16 @@ struct MoonlitMechanismControls: View {
     /// Sends a control and shows a refusal in words (the presenter's `send`, feature 434); nil sends through the port
     /// directly.
     var sender: ((String, [Double]) -> Void)? = nil
+    /// Every identifier name the panel gives (clarification Q1 of feature 439), each once; the identifier is
+    /// `experience.r02-g14.moonlit-mechanism.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "gear", "gear-minus", "gear-plus", "gear-detail", "turn-minus", "turn-plus", "reseat-minus", "reseat-plus",
+        "lamp", "lamp-minus", "lamp-plus", "frame", "frame-minus", "frame-plus", "run", "undo", "redo", "next-level",
+        "reset-view", "dismiss-tutorial", "hint", "failure-undo", "retry", "campaign", "daily", "practice",
+        "level-picker", "play-level", "replay", "replay-step", "replay-stop", "sound", "summary", "status", "actions",
+        "pending", "progress", "message", "failure", "explanation", "instruction", "hint-text", "goal",
+        "replay-position",
+    ]
     /// The text size: rows become columns at accessibility sizes (feature 436).
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 436).
