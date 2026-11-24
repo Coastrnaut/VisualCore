@@ -32,6 +32,16 @@
 // when a level or mode opens and when that recipe changes; choosing a hinge plays its audition
 // (`VoxelOrigamiAudition.of(_:hinge:)`) when the sound is on, on screen and active. The mirror carries the summary
 // element's text (`VoxelOrigamiFeedbackPlan.summaryText(core:hinge:)`) and the sound choice (off by default).
+// Feature 447 (R02-G15-07) T-R02G1507-005 (FR-R02G1507-003, 004; clarifications Q2, Q4, Q5): the mirror carries whether
+// a verified replay exists for the level (`replayAvailable`: a verified result with a trace, outside replay), whether a
+// replay runs and its position (`replaying`, `replayPosition` = the turns played, `replayLength` = the trace's turns);
+// `startReplay`, `stepReplay` and `stopReplay` send `replay.start [level]`, `replay.step` and `replay.stop` (a refusal,
+// `r02-g15.no-replay`, `r02-g15.replay-end` or `r02-g15.replay`, is shown and announced in the plan's words); Retry
+// during replay starts the replay again; the Sound toggle saves the choice through `settings.sound [0/1]`
+// (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied when the experience opens (the first
+// described state) and whenever it changes; the results a restore dropped (`core.reconciliationDropped`) are announced
+// once per presenter as `state` ("n saved results could not be checked and were removed.", "1 saved result could not
+// be checked and was removed.").
 // Presentation only.
 #if os(iOS)
 import Foundation
@@ -91,8 +101,16 @@ final class VoxelOrigamiMirror {
     /// The summary element's text (feature 446): `VoxelOrigamiFeedbackPlan.summaryText(core:hinge:)` of the latest
     /// core and the chosen hinge.
     var summary = ""
-    /// Whether the sound is on (feature 446; off by default; presentation only).
+    /// Whether the sound is on (feature 446; off by default; since feature 447 the core's saved choice, `soundOn`).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 447).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 447).
+    var replaying = false
+    /// The turns of the running replay played so far (0 when no replay runs; feature 447).
+    var replayPosition = 0
+    /// The turns of the running replay's trace (0 when no replay runs; feature 447).
+    var replayLength = 0
 
     /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 445).
     var goalLabel: String {
@@ -336,6 +354,18 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
             // The first described state offers its recipe, so the sound never holds a placeholder.
             sound.offer(Self.recipe(core))
         }
+        // Feature 447: the saved sound choice is applied when it first appears (the experience opens) or changes.
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(VoxelOrigamiFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                           haptic: nil))
+        }
+        absorbReplay(core)
         absorbProgress(core)
         mirror.summary = VoxelOrigamiFeedbackPlan.summaryText(core: core, hinge: core.chosenHinge)
         var text = "Voxel Origami level \(core.levelNumber). "
@@ -621,6 +651,67 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
         mirror.soundOn = on
+    }
+
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 447); the described change turns the loop on or off
+    /// (`describe` applies `core.soundOn`).
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    // MARK: Replay (feature 447, R02-G15-07)
+
+    /// Starts the replay of the current level's verified stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Plays the next turn of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 447).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 447).
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 447).
+    static func isReplay(_ mode: VoxelOrigamiMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
+    /// Takes the replay state of `core` into the mirror: Replay is offered for a level with a verified result that has
+    /// a trace (outside replay); during replay the position is the turns played of the trace's turns.
+    private func absorbReplay(_ core: VoxelOrigamiExperienceCore) {
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
     }
 
     /// The controls view appeared (the loop may play).

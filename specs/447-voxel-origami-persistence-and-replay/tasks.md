@@ -54,7 +54,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1507-005 [US3] Edit `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiPresenter.swift` and
+- [X] T-R02G1507-005 [US3] Edit `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiPresenter.swift` and — Verified 2026-11-24: 2026-11-24 sim-27 exit 0 (.autonomy/migration/checks/R02-G15-07.sim-27.json); VoxelOrigamiReplayTests 7 passed
   `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiControls.swift` (Replay for a verified solved level, Step and Stop with labels and
   values, the replay position; the Sound toggle sends `settings.sound` and the presenter applies the restored `soundOn`
   when the experience opens; the dropped results announced once: "n saved results could not be checked and were

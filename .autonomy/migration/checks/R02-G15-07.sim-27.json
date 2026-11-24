@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "VoxelOrigamiExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing VoxelOrigamiExperienceTests",
+  "elapsed_seconds": 12.609,
+  "exit_code": 0,
+  "finished": "2026-11-24T20:00:58+00:00",
+  "gate": "R02-G15-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-07.sim-27.log",
+  "log_sha256": "5c95234444d00cd56dca013e801bd67acdbaf3e869148c1d3e143653051d4027",
+  "name": "sim-27",
+  "started": "2026-11-24T20:00:46+00:00",
+  "timed_out": false
+}

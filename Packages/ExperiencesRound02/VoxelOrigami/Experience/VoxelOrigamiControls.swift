@@ -16,6 +16,11 @@
 // Dismiss the instruction, Campaign / Daily / Practice "selected" or "not selected", Hint the level shown, Sound "on" or
 // "off"), refusals in the feedback plan's words, the Sound toggle (off by default, identifier `sound`), rows that become
 // columns at accessibility text sizes, wrapping text and a 520-point readable width (iPad).
+// Feature 447 (R02-G15-07) T-R02G1507-005 (clarifications Q2, Q4, Q5): "Replay best solution" (identifier `replay`,
+// value the level) for a level with a verified stored solution, and during replay its position ("Replay: turn k of n",
+// identifier `replay-position`) with Step (identifier `replay-step`, value "Turn k of n") and Stop (identifier
+// `replay-stop`, value the trace's turns), each with a label; the Sound toggle saves the choice through
+// `settings.sound`; the mode's name includes "replay".
 #if os(iOS)
 import SwiftUI
 import VisualCoreExperienceHost
@@ -52,6 +57,7 @@ struct VoxelOrigamiControls: View {
                 turnRow
                 playRow
                 progressRows
+                replaySection
                 soundToggle
             }
             .padding()
@@ -71,9 +77,9 @@ struct VoxelOrigamiControls: View {
         }
     }
 
-    /// The Sound toggle (feature 446; off by default; presentation only).
+    /// The Sound toggle (feature 446; off by default; saved through `settings.sound` since feature 447).
     @ViewBuilder private var soundToggle: some View {
-        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.saveSound(on: $0, port: port) }))
             .accessibilityLabel("Sound of the solid")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
             .accessibilityIdentifier(port.identifier("sound"))
@@ -243,6 +249,45 @@ struct VoxelOrigamiControls: View {
         }
     }
 
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 447).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text(Self.replayPositionText(mirror)).font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("replay-position"))
+            row {
+                Button("Step") { presenter.stepReplay(port: port) }
+                    .accessibilityLabel("Play the next turn of the replay")
+                    .accessibilityValue(Self.replayStepValue(mirror))
+                    .accessibilityIdentifier(port.identifier("replay-step"))
+                Button("Stop") { presenter.stopReplay(port: port) }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue(Self.replayStopValue(mirror))
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { presenter.startReplay(port: port) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
+        }
+    }
+
+    /// The replay position line: "Replay: turn k of n" (feature 447).
+    static func replayPositionText(_ mirror: VoxelOrigamiMirror) -> String {
+        "Replay: turn \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// Step's value: "Turn k of n", the turns played of the trace (feature 447).
+    static func replayStepValue(_ mirror: VoxelOrigamiMirror) -> String {
+        "Turn \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// Stop's value: the trace's turns (feature 447).
+    static func replayStopValue(_ mirror: VoxelOrigamiMirror) -> String {
+        mirror.replayLength == 1 ? "1 turn" : "\(mirror.replayLength) turns"
+    }
+
     /// "Level n, band b" with its stars when won.
     private func levelLabel(_ level: Int) -> String {
         let band: Int = VoxelOrigamiProgress.band(of: level)
@@ -250,7 +295,7 @@ struct VoxelOrigamiControls: View {
         return "Level \(level), band \(band)"
     }
 
-    /// The mode's name: campaign, daily or practice.
+    /// The mode's name: campaign, daily, practice or replay.
     static func modeName(_ mode: VoxelOrigamiMode) -> String {
         switch mode {
         case .campaign: "campaign"
