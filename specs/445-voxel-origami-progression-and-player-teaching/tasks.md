@@ -88,7 +88,7 @@ final copy; round02-host split by test bundle, since it reached 401 s at R02-G15
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1505-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1505-009 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02G1505-010 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1505-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-24: 2026-11-24: script-tests exit 0, run alone before the chain
 - [ ] T-R02G1505-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
 
