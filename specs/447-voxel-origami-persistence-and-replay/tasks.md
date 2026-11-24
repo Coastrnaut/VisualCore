@@ -9,7 +9,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1507-001 Baselines after R02-G15-06 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1507-001 Baselines after R02-G15-06 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing and baseline-round02-1…3 exit 0 after R02-G15-06's record
   baseline-round02-1 … 3` (the three round-two filters of feature 446)
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
