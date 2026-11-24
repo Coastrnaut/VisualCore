@@ -738,3 +738,9 @@ daily level × 89, practice with budget 40), the adapter's `level.select`, `mode
 and `tutorial.dismiss` with snapshot schema 2 and a migration from 1, and the panel's tutorial, hint, failure, goal,
 stars and modes.
 
+Feature 426 (R02-G13-06) adds polish and accessibility: `AcousticConstellatorFeedbackPlan` (announcements and haptics
+from the old and new core), `AcousticConstellatorLights` (glow and won brightening faded, slower under Reduce
+Flashing), `AcousticConstellatorSoundRecipe` (the two-tone audition of an inspected link and the ambient loop), the
+shaders' `u_wonLight`, the experience's `AcousticConstellatorSound`, adjustable star and partner, a summary element and a
+Sound toggle.
+

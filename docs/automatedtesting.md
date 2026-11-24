@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G13-05: Acoustic Constellator teaching and progression).
+Last updated: 2026-11-23 (R02-G13-06: Acoustic Constellator polish and accessibility).
 
 ## 1. What is tested, and where
 
@@ -611,6 +611,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   byte for byte (regenerate only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`). A random generator left most candidates
   unsolvable in a Python prototype; the constructive one (a path whose strings can be bridges, k of them scrambled)
   reached each band's range in 37 … 60 of 60, so prototype the generator before writing ranges into the spec.
+- **Acoustic Constellator polish and accessibility** (R02-G13-06, 2026-11-23). Host: feedback plans word for word on
+  real cores, the lights' fade rules over seven flicker patterns, the recipes' purity and loop lengths, the won-light
+  uniform and the fallback won level (`swift test --package-path Packages/ExperiencesRound02 --filter
+  AcousticConstellatorCoreTests`); simulator: `AcousticConstellatorAccessibilityTests`. The wiring was split across two
+  agents working at once — one on the Core (shader uniform, fallback colours), one on the experience — with the shared
+  names fixed in both briefs; the scene compiled against the Core on the first build.
 - **Acoustic Constellator teaching and progression** (R02-G13-05, 2026-11-23). Host: exact hints win all 100 levels
   at the witness's action count, 200 seeded states and 500 seeded failures, the catalog's byte-for-byte witness
   regeneration after the solver gained `plan(_:links:phases:)`, progress, stars, 4,018 daily dates and the schema 1 → 2

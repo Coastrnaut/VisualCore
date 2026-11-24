@@ -168,3 +168,24 @@ and refuses damaged, edited and newer forms (`r02-g13.malformed`, `.newer-schema
 - **Panel.** The presenter shows the tutorial, the hint revealed so far (searched off the main actor), the failure
   explanation, the goal with the level's band and best stars, and Hint, Dismiss tutorial, Retry, the level picker,
   Practice, Daily and Campaign.
+
+## Polish and accessibility (feature 426, R02-G13-06)
+
+- **Feedback.** `AcousticConstellatorFeedbackPlan` turns the old and new core into one announcement and one haptic: a
+  link, unlink, nudge, undo or redo is announced (`state`, selection haptic) with what changed, the symbol pairs still
+  missing and the actions left; a win (`outcome`, success) with the actions spent and the stars; a failure (`outcome`,
+  warning) with the failure explanation; a level or mode change (`level`) with the band, the mode and the tutorial
+  instruction; a refusal (`rejection`, error) in words. A listen always ends the level, so it plays only its outcome.
+  The presenter routes the plans through the shared feedback route and keeps a feedback log.
+- **Comfort.** `AcousticConstellatorLights` eases the glow (0.7 playing, 1 won, 0.35 failed) and the won brightening of
+  the links (0 → 1) over 0.15 s, or 0.45 s under Reduce Flashing, where a started fade finishes before it may turn back;
+  the scene scales the glow gain by the glow level and the won look by `u_wonLight`, also in the unlit fallback, so
+  winning never flashes. Under Reduce Motion or Reduce Flashing the scene draws tick 0, no pulse and no wave shells,
+  since the tick preview would swap teal and silver links four times a second.
+- **Sound.** Inspecting a link plays its audition: the two stars' tones, 220 Hz × 2^(rate / 12), the second detuned by
+  1.5 Hz per step of their phase gap, so a wide gap beats and a locked pair sounds clean (0.6 s). An optional ambient loop
+  rises with the lit quarters of the coherence gauge and falls with the actions left, with an octave when won and halved
+  gains when failed. Sound is off by default and plays only while wanted, on screen and active.
+- **Panel.** Every control carries a label and a value in words; the chosen star and partner are adjustable; a summary
+  element reads the actions left, the missing pairs, the coherence and run, the chosen pair and the level; the panel
+  follows Dynamic Type and Increase Contrast and keeps a readable width on iPad.
