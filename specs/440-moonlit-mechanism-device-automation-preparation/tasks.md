@@ -19,7 +19,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for MM-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g14`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g14.moonlit-mechanism`
-- [ ] T-R02G1410-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Moonlit Mechanism definition passes; a
+- [X] T-R02G1410-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Moonlit Mechanism definition passes; a — Verified 2026-11-24: 2026-11-24: agent A MoonlitMechanismDeviceRowsCheckTests (8 tests: real definition passes, removals fail by name, release step); lead retest script-tests exit 0 alone (.autonomy/migration/checks/R02-G14-10.script-tests.json)
   copy with a scenario removed, a copy with MM-D1's `pass` field removed and a copy with T-R02G1409-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g14` runs the check for
   `r02-g14.moonlit-mechanism`); `--name script-tests` (alone)
