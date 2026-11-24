@@ -66,7 +66,7 @@ consume).
   legal moves while playing "every corridor from the star, waits 0 … 8, flyable ones only") with
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheRulesTests.swift` (agreement with the play on
   200 walks); `--name host-4`
-- [ ] T-R02G1601-006 [P] Create `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheInvariantTests.swift`
+- [X] T-R02G1601-006 [P] Create `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheInvariantTests.swift` — Verified 2026-11-24: 2026-11-24 host-5 exit 0, 9 invariant tests each with a seeded neighbouring check, seed 2_456 (.autonomy/migration/checks/R02-G16-01.host-5.json)
   (agent D: `testStarlitCartoucheTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
   with a seeded neighbouring-input check, seed 2_456); `--name host-5`
