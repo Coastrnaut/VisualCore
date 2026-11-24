@@ -13,4 +13,4 @@
 | `VoxelOrigamiFailure` | collision(hinge, moving, still, cell), sweep(hinge, moving, still, cell), budget(spent) | named codes `collision`, `sweep`, `budget` |
 | `VoxelOrigamiPlay` | stage, turns (quarter turn per hinge), actions spent, pose, report, failure, records, undo/redo stacks | records carry previous and next fingerprints |
 | `VoxelOrigamiRecord` | schema, level seed, index, kind (turn, undo, redo), action, previous and next fingerprints | appended for every accepted action |
-| `VoxelOrigamiRules.Position` | turns, actions spent, outcome (playing, won, failed) | moves: every non-leaf hinge, then −1, +1 |
+| `VoxelOrigamiRules.Position` | turns, actions spent, outcome (playing, won, failed) | moves: every hinge with a descendant off its axis, then −1, +1 |

@@ -26,5 +26,5 @@
   quarter turns, actions spent, stage, failure) and records with previous and next fingerprints, as feature 431.
 - **R7 Undo from failed.** Decision: undo from failed returns to playing before the failing turn and refunds its action
   (recorded); a won level refuses undo.
-- **R8 Leaf hinges refused.** Decision: a hinge whose cube has no descendant is refused (`r02-g15.action`). Rationale:
-  turning it would change no cell, so it would spend an action for nothing and inflate the solver's state space.
+- **R8 Idle hinges refused.** Decision: a hinge with no descendant off its axis (a leaf included) is refused
+  (`r02-g15.action`). Rationale: turning it would change no cell, so it would spend an action for nothing and inflate the solver's state space.

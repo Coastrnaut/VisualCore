@@ -56,8 +56,9 @@ disconnect the tree.
   x(i) = x(p) + O(p) · d(i) and has the orientation O(i) = O(p) · R(d(i), q(i)), where R(a, k) is k quarter turns
   counter-clockwise (right-hand rule) about the axis a and O is one of the 24 rotation matrices of the cube (integer
   entries). So hinge i twists everything beyond cube i about the line from p(i) through i: cube i stays, its
-  descendants swing. `turn(i, δ)` with δ = +1 or −1 sets q(i) to (q(i) + δ) mod 4. A hinge whose cube has no
-  descendant is refused (`r02-g15.action`: nothing would swing), as are an unknown hinge and a step other than ±1. The
+  descendants swing. `turn(i, δ)` with δ = +1 or −1 sets q(i) to (q(i) + δ) mod 4. A hinge with nothing that
+  would move (no descendant off its axis, a leaf included) is refused (`r02-g15.action`: nothing would swing), as are
+  an unknown hinge and a step other than ±1. The
   hierarchy is fixed, so "disconnected hierarchy" can never arise from a turn; the kernel re-checks after every turn
   that every hinge's two cubes are face to face and refuses a stored state or level that breaks it (`r02-g15.level`).
   Impact: FR-R02G1501-002, 006; SC-R02G1501-003.
@@ -137,8 +138,8 @@ refused.
 
 ### Edge Cases
 
-- **An unknown hinge, a turn other than one quarter turn either way, a hinge with nothing beyond it:** refused without
-  cost.
+- **An unknown hinge, a turn other than one quarter turn either way, a hinge with nothing that would move (a leaf, or
+  every cube beyond it on its axis):** refused without cost.
 - **A turn whose swinging cubes end exactly beside, but not inside, another cube's cell:** allowed.
 - **A turn that would make two cubes share a cell, or sweep a cube through an occupied cell:** fails the level, naming
   the moving cube, the cube in the way and the cell; undo returns to playing.
