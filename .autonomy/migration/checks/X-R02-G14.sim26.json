@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g14.moonlit-mechanism",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g14.moonlit-mechanism --runtime 26",
+  "elapsed_seconds": 303.296,
+  "exit_code": 0,
+  "finished": "2026-11-24T14:47:47+00:00",
+  "gate": "X-R02-G14",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G14.sim26.log",
+  "log_sha256": "ed336c687fd5a02166a7748f9cd55a437357043e6fa506623c1431ac2dc06f9e",
+  "name": "sim26",
+  "started": "2026-11-24T14:42:44+00:00",
+  "timed_out": false
+}
