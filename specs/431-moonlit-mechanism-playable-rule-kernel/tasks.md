@@ -69,7 +69,7 @@ will consume).
   legal moves while playing "turn −1, +1; every re-seat (gear, then −1, +1); lamp −1, +1 when in range; then the run")
   with `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismRulesTests.swift` (agreement with the
   play on 200 walks); `--name host-4`
-- [ ] T-R02G1401-006 [P] Create
+- [X] T-R02G1401-006 [P] Create — Verified 2026-11-24: 2026-11-24: agent D 9 invariant boundaries (time, input budget, goal, repeatability, undo, failure honesty, stability, save, renderer purity), each with a seeded neighbouring check (2_436), run against the real play and rules; host-5 exit 0 (.autonomy/migration/checks/R02-G14-01.host-5.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismInvariantTests.swift` (agent D:
   `testMoonlitMechanismTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each with
