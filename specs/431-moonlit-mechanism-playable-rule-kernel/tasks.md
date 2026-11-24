@@ -64,7 +64,7 @@ will consume).
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1401-005 [P] [US4] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismRules.swift`
+- [X] T-R02G1401-005 [P] [US4] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismRules.swift` — Verified 2026-11-24: 2026-11-24: agent C PuzzleRules (move order, budget, run) with 5 tests incl. 200 walks agreeing with the real play; lead retest host-4 exit 0 (.autonomy/migration/checks/R02-G14-01.host-4.json)
   (agent C: `PuzzleRules`: State = position (phases, height, actions spent, outcome), Move = MoonlitMechanismAction;
   legal moves while playing "turn −1, +1; every re-seat (gear, then −1, +1); lamp −1, +1 when in range; then the run")
   with `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismRulesTests.swift` (agreement with the
