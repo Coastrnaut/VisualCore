@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G14-07: Moonlit Mechanism persistence and replay).
+Last updated: 2026-11-24 (R02-G15-03: Voxel Origami renderer).
 
 ## 1. What is tested, and where
 
@@ -738,6 +738,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   search through the play (states merged by phases and lamp height), which is cheap here because every action adds to
   one vector. Regenerate the witness files only with `MOONLIT_MECHANISM_WRITE_WITNESSES=1` and re-pin the catalog digest
   after review.
+- **Voxel Origami renderer** (R02-G15-03, 2026-11-24). Host: the shader-source, geometry (including the winding a
+  back-face-culled painter's pass needs), adapter, purity and scenario tests (`swift test --package-path
+  Packages/ExperiencesRound02 --filter VoxelOrigami`); simulator: `VoxelOrigamiExperienceTests` (22 tests, about 5 s:
+  frames against the CPU reference at three tiers on five levels, the chosen hinge hot pink, probes, fallback, resize
+  and zero size, memory warning, Reduce Motion and Reduce Flashing, a collision or sweep outlined, a won level lit). Two
+  lessons. A mark placed on the face between two cubes sits in the 0.1 s seam and is hidden by the nearer cube in a
+  painter's pass: the first simulator run measured no hinge; lifting the mark along the view ray towards the eye keeps
+  its screen point and paints it after both cubes. And a "won" look made only of glow vanishes at the tier without glow:
+  the shader lifts the cube faces on `u_won` as the fallback does.
 - **Voxel Origami content pipeline** (R02-G15-02, 2026-11-24). `swift test --package-path Packages/ExperiencesRound02
   --filter VoxelOrigami`: the solver against an independent breadth-first search (order and state counts) and a
   depth-first enumeration on the two fewest-cube levels per band; the generator against an independent re-draw of 60

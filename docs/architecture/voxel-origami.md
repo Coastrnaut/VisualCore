@@ -76,3 +76,41 @@ Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decod
   the difficulty and the candidates skipped; decoding re-checks everything by replay. The catalog digest over the 100
   level fingerprints is pinned, R02-F24's progression rule holds on the witness turn count, and a depth-first
   enumeration on the two levels with the fewest cubes per band confirms the minima.
+
+## Hero renderer and experience (feature 443, R02-G15-03)
+
+- **Scene.** Cell c is drawn at w(c) = (c − m)·s, with m the centre of the bounding box of the occupied cells and the
+  target cells at the best allowed alignment (the rotation and translation of the kernel's covered count) and
+  s = 1.5 / (e + 1) for the box's largest extent e. Painter's order by distance from the eye, farthest first, ties by
+  kind (target outline, cube, hinge, pip, bar) then index, with depth testing off and back faces culled: the night
+  backdrop, one wireframe cube of side 0.96 s per target cell, chamfered cubes of side 0.9 s at the kernel's cells turned
+  by their orientations (an inner glyph on each face, solid on a target cell and hollow elsewhere, and (index mod 6) + 1
+  dots on the cube's +z face), hinge marks 0.6 s × 0.12 s along the parent-to-cube axis (the chosen hinge striped hot
+  pink), covered pips at y −1.05 and moves bars at y −1.2 (`VoxelOrigamiSceneGeometry`). A hinge mark sits on the face
+  between its two cubes, lifted 0.55 s along the view ray towards the eye: it projects to the same point and is painted
+  after both cubes, which would otherwise hide it.
+- **Shading.** Two GLSL ES 3.00 programs (`VoxelOrigamiShaders`): the voxel program selects one of 14 material codes from
+  uv.x and shades signed-distance edges from the local coordinate in uv.y; cube faces and bevels are frosted ivory
+  (#EDE8DC toward #B9B2A3) lit from the face normal, every other material is emissive at its palette colour (night
+  #0B0D16, turquoise #2EE6D6, hot pink #FF3C8C). A won level flares the target and lifts the cubes toward white through
+  `u_won` without moving anything; a failure outlines the moving cube and the cube in its way in #FF6B4A and crosses the
+  cell. The glow program draws the shells around lit cubes and target cells additively and last; its gain is clamped by
+  `u_glowLimit`.
+- **Tiers.** level-0: two bevel steps, edges 0.06 s, two glow shells; level-1: one step, 0.05 s, one shell; level-2: no
+  bevel, 0.04 s, none. Positions are the same at every tier; the presenter logs tier changes with their reason.
+- **Camera.** A fixed authored three-quarter view from eye (1.4, 1.1, 2.6) towards (0, −0.1, 0), fitted to the box
+  x −0.95 … 0.95, y −1.25 … 0.95, z −0.95 … 0.95 with a 6 % margin per side (at least the specified 5 %) for aspects
+  0.4 … 2.5.
+- **Adapter.** `VoxelOrigamiExperienceCore` opens certified level (seed mod 100) + 1 from its table of each witness's
+  skipped candidate and accepts `hinge.turn` [hinge, ±1], `play.undo`, `play.redo`, `level.next` and `hinge.choose`
+  [hinge] (presentation only: a level opens with its first turnable hinge chosen); its digest
+  ("r02-g15.voxel-origami.v1") is the level number and the play fingerprint, never the chosen hinge; snapshot schema 1
+  `{level, records}`. The renderer reads only an immutable `VoxelOrigamiSceneSnapshot`, so nothing drawn can change the
+  game (renderer purity).
+- **Fallback and settings.** A shader failure draws the level-2 geometry unlit with the shared mesh renderer and keeps
+  the reason; Reduce Motion draws the chain still at presentation time 0; Reduce Flashing caps the glow. Neither program
+  has a time input, so meshes are rebuilt only when what they read changes. The presenter declares two frame probes (the
+  top-left and bottom-right night corners) for the X gates.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest b02e58ec…f611) and linked into the app as
+  a candidate (`ExperienceRegistry.candidates`) until X-R02-G15; the scenario manifest holds 9 standard scenarios,
+  `full-playthrough`, `hero`, 80 acceptance scenarios (R2-G15-QA-001 … 080) and 3 fixtures.

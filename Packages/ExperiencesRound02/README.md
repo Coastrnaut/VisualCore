@@ -835,3 +835,11 @@ Refusals are `VoxelOrigamiError` with `r02-g15.*` codes. Rules:
 Feature 442 (R02-G15-02) adds the content pipeline: the 100-entry `VoxelOrigamiManifest`, band profiles and the
 constructive `VoxelOrigamiGenerator`, the breadth-first `VoxelOrigamiSolver` with its minimality counts,
 `VoxelOrigamiDifficulty`, `VoxelOrigamiWitness` files in `docs/games/voxel-origami/levels/` and the pinned catalog digest.
+
+Feature 443 (R02-G15-03) adds the hero renderer and the experience: `VoxelOrigamiSceneSnapshot` (palette, tiers, the
+pose's cells and orientations, the turnable and chosen hinges, the target at the best alignment, the kernel's shape
+report), `VoxelOrigamiSceneGeometry` (night backdrop, turquoise target wireframes, chamfered frosted-ivory cubes with
+inner glyphs and dots, hinge marks, failure outlines, covered pips and moves bars; camera; paint order; CPU reference),
+`VoxelOrigamiShaders` (voxel and glow programs with signed-distance shading), the adapter
+`VoxelOrigamiExperienceCore`, `VoxelOrigamiScenarios` with the scenario manifest, and the iOS target
+`VoxelOrigamiExperience` (presenter, voxel scene, control panel), registered as a candidate.
