@@ -37,7 +37,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G1402-004 [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismGenerator.swift`
+- [X] T-R02G1402-004 [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismGenerator.swift` — Verified 2026-11-24: 2026-11-24: lead generator (band profiles, drawing order of Q1, filters, 256-candidate bound, digest); agent C 13 tests incl. an independent re-draw of 20 entries x 12 candidates, per-band generation and difficulty recount, the generation refusal; host-3 exit 0 (.autonomy/migration/checks/R02-G14-02.host-3.json)
   (lead: band profiles "band 1: 2 … 3, 2 … 3, 2, 2 … 3, 1 … 2; band 2: 3, 3, 2 … 3, 3 … 4, 2 … 3; band 3: 3 … 4, 3 … 4,
   3, 4 … 6, 3 … 4; band 4: 4, 4, 3 … 4, 5 … 7, 4 … 5; band 5: 4 … 5, 4 … 5, 4 … 5, 7 … 9, 5 … 6" (gears, lamp heights,
   key frames, scramble, plan range); candidates from `SeedDerivation.derive(plannedSeed, index: c)` in the drawing order
