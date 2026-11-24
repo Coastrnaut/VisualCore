@@ -9,7 +9,7 @@ change (the shaders and reference of R02-G15-03 are unchanged and re-proven by t
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1509-001 Baselines after R02-G15-08 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1509-001 Baselines after R02-G15-08 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24 baseline-host, baseline-timing, baseline-round02-1/2/3 exit 0 (.autonomy/migration/checks/R02-G15-09.baseline-*.json); rendering baseline is R02-G15-08's rendering runs
   baseline-round02-1 … 3` (the three round-two filters of feature 446); the rendering baseline is R02-G15-08's
   rendering runs (exit 0)
 
