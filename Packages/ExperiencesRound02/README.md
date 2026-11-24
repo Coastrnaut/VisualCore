@@ -848,3 +848,8 @@ Feature 444 (R02-G15-04) adds the gestures: `VoxelOrigamiOrbit` and `camera(_:as
 drawn eye, `VoxelOrigamiPicker` (projected cube outlines, the front-most first, and the turn prediction of a hinge's
 tracked cube), `VoxelOrigamiGestureController` (taps choose, double taps and drags turn, two fingers orbit), the
 presenter's pointer entry, the pending text and "Reset view".
+
+Feature 445 (R02-G15-05) adds teaching and progression: `VoxelOrigamiSolver.plan(_:turns:)`, `VoxelOrigamiHints` (three
+hint levels from the current state) and `VoxelOrigamiFailureExplanation`, `VoxelOrigamiProgress` with stars, unlocks
+and the daily level, `VoxelOrigamiMode` and `VoxelOrigamiTutorialStep`; the adapter's level, mode and tutorial controls
+and snapshot schema 2 with a migration from 1; the panel's tutorial, hints, failure text, goal and modes.

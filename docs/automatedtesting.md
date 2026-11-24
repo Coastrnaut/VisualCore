@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G15-04: Voxel Origami gestures).
+Last updated: 2026-11-24 (R02-G15-05: Voxel Origami teaching and progression).
 
 ## 1. What is tested, and where
 
@@ -738,6 +738,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   search through the play (states merged by phases and lamp height), which is cheap here because every action adds to
   one vector. Regenerate the witness files only with `MOONLIT_MECHANISM_WRITE_WITNESSES=1` and re-pin the catalog digest
   after review.
+- **Voxel Origami teaching and progression** (R02-G15-05, 2026-11-24). Host: exact hints win all 100 levels (one
+  test case per level: a 6-turn band-5 search costs about 1.3 s in a debug build, so ten levels per case went over the
+  10 s rule), 200 seeded states' hints accepted, 500 seeded failures explained, progress, stars, daily (every date
+  2026 … 2036) and practice rules, the adapter's new controls and the schema 1 → 2 migration; simulator: the teaching
+  tests through the panel. round02-host now runs in two chunks (`--filter VoxelOrigami` and `--skip VoxelOrigami`):
+  the whole package reached 401 s at R02-G15-04 and the hint tests add about 45 s. Measured here: 57 s and 450 s, so
+  from R02-G15-06 the second chunk is split again (`--filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges'`
+  and `--skip 'VoxelOrigami|MoonlitMechanism|AcousticConstellator|HarmonicBridges'`).
 - **Voxel Origami gestures** (R02-G15-04, 2026-11-24). Host: picker and turn prediction against an independent
   reference on 500 seeded points, 500 seeded gesture scripts at four play states, three sizes and three orbits, orbit
   framing and culling for an orbited camera, all 100 levels won through the panel (`swift test --package-path

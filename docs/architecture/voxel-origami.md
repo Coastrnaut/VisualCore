@@ -140,3 +140,27 @@ Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decod
   view"); all 100 certified levels are won through the panel alone in the host tests. Refused actions are shown in words
   and logged with their codes.
 
+## Teaching and progression (feature 445, R02-G15-05)
+
+- **Hints.** A hint comes from the solver's minimal plan from the current quarter turns (`VoxelOrigamiSolver.plan(_:turns:)`,
+  the same breadth-first search the certification ran, which `plan(_:)` calls with the start turns). Its first turn is
+  the hint when the whole plan fits the actions left; following exact hints from any certified level's opening wins,
+  since a breadth-first plan is a shortest path and each followed turn shortens it by one. Level 1 names the cube that
+  will swing (the hinge's tracked cube), level 2 the hinge, level 3 the hinge and the way. A won play has no hint, a
+  failed one suggests undo or retry, and a state with no plan in the actions left says so (`VoxelOrigamiHints`). The
+  presenter searches off the main actor, once per play, and any change of the play hides the hint.
+- **Failure text.** `VoxelOrigamiFailureExplanation` names the failing action (numbered from 1), the hinge and way,
+  and for a collision or a sweep the moving cube, the cube in its way and the cell; for a spent budget the last turn;
+  each followed by "Undo the last action or retry the level."
+- **Tutorial.** Levels 1 … 3 show three steps in turn — choose and turn a hinge, orbit and compare with the target,
+  recover from a failed turn — each advancing on an accepted turn or the level's end, never moved back by undo, and
+  dismissible (`VoxelOrigamiTutorialStep`).
+- **Progress and modes.** Stars count every turn record, undone ones included: 3 at the certified turn count, 2 within
+  two more, else 1. Level 1 is open and a campaign win opens the next (`level.next` and `level.select` only reach open
+  levels, `r02-g15.locked` otherwise; no level is ever gated by payment). The daily level is (days since 2026-01-01 × 31)
+  mod 100 + 1 from a date the presenter reads (`mode.daily`, `r02-g15.date` for an impossible date); daily wins record
+  but open nothing; practice raises the budget to 40 and records nothing (`VoxelOrigamiProgress`, `VoxelOrigamiMode`).
+- **Snapshot schema 2.** `{level, mode, progress, records, tutorial}`; a schema-1 payload migrates to level 1 open plus
+  the restored level, campaign mode and the tutorial's first step. The digest ("…v2") covers the level, the play, the
+  progress and the mode, never the tutorial step or the chosen hinge.
+
