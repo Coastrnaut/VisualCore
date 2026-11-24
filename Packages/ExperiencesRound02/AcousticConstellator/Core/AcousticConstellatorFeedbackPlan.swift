@@ -155,12 +155,13 @@ public struct AcousticConstellatorFeedbackPlan: Sendable, Equatable {
             + "; a hold of \(level.hold) ticks within \(level.window); a budget of \(level.budget) actions"
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay".
     public static func modeName(_ mode: AcousticConstellatorMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 

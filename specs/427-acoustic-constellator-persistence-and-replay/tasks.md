@@ -14,7 +14,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1307-002 [P] [US2] Edit `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorProgress.swift` (Result gains "trace:
+- [X] T-R02G1307-002 [P] [US2] Edit `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorProgress.swift` (Result gains "trace: — Verified 2026-11-24: 2026-11-24: agent A results with trace and verified, record(trace:), drop, replay mode, netTrace and reconcile (15 tests: all 100 witnesses verify, tampered results dropped and counted, traces up to 64); FeedbackPlan modeName gained replay; manifest digests regenerated for the new progress encoding; host exit 0 over the whole Core suite (.autonomy/migration/checks/R02-G13-07.host.json)
   [AcousticConstellatorAction]" (effective links, unlinks and nudges and the listen) and "verified: Bool";
   `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing only when better (ties keep the
   earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace = empty, missing verified =
