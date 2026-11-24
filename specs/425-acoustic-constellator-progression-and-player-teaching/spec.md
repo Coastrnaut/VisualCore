@@ -44,8 +44,9 @@ levels 1 … 3 carry the tutorial flag; budgets are 1 … 40; the adapter prepar
 
 - Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
   failed play's hint is "Undo the last action or retry the level." While playing: the solver's plan is computed for the
-  level as it stands — the current links in place (the player's links as placed ones), every star at its current
-  starting phase. Its first action is the hint (a missing pair's link first, then helper links, then nudges, then the
+  level as it stands — the current links in place, every star at its current starting phase — through a solver entry
+  that starts from given links and phases (`plan(_:links:phases:)`, the certifying `plan(_:)` being that entry at the
+  level's fixed links and starting phases), not through a new level, whose six-fixed-link limit a play can exceed. Its first action is the hint (a missing pair's link first, then helper links, then nudges, then the
   listen); the whole plan (its links and nudges plus the listen) must fit the actions left, or else, as when the work
   bound is exceeded or no plan exists (for example a placed link that blocks a star's degree): "No way to win was found
   in the moves left: undo the last action or retry the level." Level 1 names the kind ("Link two stars of the symbol",
