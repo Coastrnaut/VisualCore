@@ -57,7 +57,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   the kernel's cells; the target at the covered count's alignment; gauges at 0, half and the budget; a won level
   brighter and in place; the glow mesh empty at level-2 and its shell counts per tier; only bevels, edge widths and glow
   differ between tiers; the paint order sorted with the tie rule); agent B; `--name host-3`
-- [ ] T-R02G1503-005 [P] [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiExperienceCore.swift`
+- [X] T-R02G1503-005 [P] [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiExperienceCore.swift` — Verified 2026-11-24: 2026-11-24: VoxelOrigamiExperienceCore.swift (5 controls, digest level+fingerprint, schema 1, three-level profile, certified candidate table) with 14 adapter tests and 2 purity tests (200 seeded snapshots); lead reran host-4 exit 0 and the stored-witness table test passed against the real docs
   (controls "hinge.turn [h, ±1], play.undo, play.redo, level.next, hinge.choose [h]"; digest "level number and play
   fingerprint", never the chosen hinge; schema 1 `{level, records}`; quality profile of three levels (the Core's
   `qualityTiers` equals the presenter's levels); each level certified directly from a table of its witness's `skipped`
