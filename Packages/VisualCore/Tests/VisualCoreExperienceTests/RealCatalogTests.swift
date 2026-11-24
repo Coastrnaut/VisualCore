@@ -169,7 +169,9 @@ enum CatalogFixture {
                                // Feature 413 (R02-G12-03); integrated at X-R02-G12.
                                "r02-g12.harmonic-bridges",
                                // Feature 423 (R02-G13-03); integrated at X-R02-G13.
-                               "r02-g13.acoustic-constellator"],
+                               "r02-g13.acoustic-constellator",
+                               // Feature 433 (R02-G14-03); a registered candidate until X-R02-G14.
+                               "r02-g14.moonlit-mechanism"],
                 "the registrations of Catalog/registrations.json")
     }
 

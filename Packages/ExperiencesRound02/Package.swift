@@ -45,6 +45,8 @@ let package = Package(
         .library(name: "AcousticConstellatorCore", targets: ["AcousticConstellatorCore"]),
         // Feature 431 (R02-G14-01): Moonlit Mechanism's rule kernel, a candidate until X-R02-G14.
         .library(name: "MoonlitMechanismCore", targets: ["MoonlitMechanismCore"]),
+        // Feature 433 (R02-G14-03): Moonlit Mechanism's experience (iOS only; a registered candidate until X-R02-G14).
+        .library(name: "MoonlitMechanismExperience", targets: ["MoonlitMechanismExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
         .library(name: "AcousticConstellatorExperience", targets: ["AcousticConstellatorExperience"]),
         // Feature 413 (R02-G12-03): Harmonic Bridges' experience (iOS only; a registered candidate until X-R02-G12).
@@ -443,6 +445,27 @@ let package = Package(
                                    .product(name: "VisualCoreDiagnostics", package: visualCore),
                                    .product(name: "VisualCorePersistence", package: visualCore)],
                     path: "MoonlitMechanism/CoreTests"),
+        // Feature 433 (R02-G14-03): Moonlit Mechanism's experience (presenter, scene, controls).
+        .target(name: "MoonlitMechanismExperience",
+                dependencies: ["MoonlitMechanismCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "MoonlitMechanism/Experience"),
+        // Feature 433 (R02-G14-03): the simulator tests of Moonlit Mechanism's experience.
+        .testTarget(name: "MoonlitMechanismExperienceTests",
+                    dependencies: ["MoonlitMechanismExperience", "MoonlitMechanismCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "MoonlitMechanism/ExperienceTests"),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (presenter, scene, controls).
         .target(name: "AcousticConstellatorExperience",
                 dependencies: ["AcousticConstellatorCore",

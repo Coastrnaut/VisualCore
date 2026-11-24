@@ -524,7 +524,9 @@ import Testing
         #expect(Shaders.glowFragment.contains(line))
     }
 
+    /// A real front-end compile with `glslangValidator` when it is installed (macOS only; skipped otherwise).
     @Test func glslangValidatorAcceptsEverySourceWhenInstalled() throws {
+        #if os(macOS)
         let candidates: [String] = ["/opt/homebrew/bin/glslangValidator", "/usr/local/bin/glslangValidator"]
         var tool: String? = nil
         for path in candidates where FileManager.default.isExecutableFile(atPath: path) { tool = path }
@@ -552,5 +554,6 @@ import Testing
             let output: String = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
             #expect(process.terminationStatus == 0, "\(file.name): \(output)")
         }
+        #endif
     }
 }

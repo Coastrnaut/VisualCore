@@ -79,7 +79,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G1403-006 [US3] [US4] Create
+- [X] T-R02G1403-006 [US3] [US4] Create — Verified 2026-11-24: 2026-11-24: experience (presenter, clockwork scene, controls; resize keeps meshes unless the aspect changes), scenarios + manifest, candidate registration; agent D's 4 test files + identity tests, 23 simulator tests; sim-27 exit 0 (.autonomy/migration/checks/R02-G14-03.sim-27.json), packages exit 0, catalog-search-2 exit 0 (first attempt failed: RealCatalogTests registered list lacked the candidate, fixed)
   `Packages/ExperiencesRound02/MoonlitMechanism/Experience/MoonlitMechanismExperience.swift`, `…Presenter.swift`,
   `…ClockworkScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing;
   the presenter declares `probes(_:)` — two backdrop corners, as the round-two X gates require — and its quality levels

@@ -970,6 +970,34 @@
       "manifest": "Packages/ExperiencesRound02/AcousticConstellator/scenario-manifest.json",
       "permissions": [],
       "summary": "Link musical stars with silver filaments and nudge their phases until the linked constellation matches the symbol and its stars pulse together in teal for the whole hold, before the moves run out. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g14.moonlit-mechanism": {
+      "capabilities": [
+        "Turn gears until shadows spell symbols",
+        "Raise the lamp to slide each shadow",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#070A14",
+        "#E8DFC8",
+        "#1A1822",
+        "#C9A24A",
+        "#8FB4E8"
+      ],
+      "content": {
+        "catalog_sha256": "7de6360319ce24f0874ac9d14907ab2ade7f0da0c365815070da258d183c9744",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/MoonlitMechanism/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Turn a train of translucent gears, re-seat a gear by a tooth and raise the lunar lamp until the ink shadows on the paper wall cover every key frame's symbol without touching a forbidden mark, with every mesh aligned and the moves to spare."
     }
   }
 }
