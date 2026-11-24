@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g13.acoustic-constellator",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g13.acoustic-constellator --runtime 27",
+  "elapsed_seconds": 333.495,
+  "exit_code": 0,
+  "finished": "2026-11-24T07:39:21+00:00",
+  "gate": "X-R02-G13",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G13.sim27.log",
+  "log_sha256": "b69505a0a24b42b46610f82a8c3d1527d19b81c8638a92f8ac083c1be04ecb5a",
+  "name": "sim27",
+  "started": "2026-11-24T07:33:47+00:00",
+  "timed_out": false
+}
