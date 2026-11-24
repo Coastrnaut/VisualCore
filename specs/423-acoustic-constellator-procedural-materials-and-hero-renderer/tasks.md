@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1303-001 Baselines on the committed tree after R02-G13-02 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1303-001 Baselines on the committed tree after R02-G13-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-23: 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on 1379d921c (.autonomy/migration/checks/R02-G13-03.baseline-*.json); rendering baseline = R02-G13-02 rendering-27/26
   baseline-timing`, `--name baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering
   baseline is R02-G13-02's rendering runs (exit 0)
 - [ ] T-R02G1303-002 Edit `Packages/ExperiencesRound02/Package.swift` (`AcousticConstellatorExperience` and its tests
