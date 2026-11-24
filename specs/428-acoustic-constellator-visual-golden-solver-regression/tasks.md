@@ -13,7 +13,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1308-002 [P] [US1] Create `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G1308-002 [P] [US1] Create `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-24: 2026-11-24: agent A solver regression (100 levels in ten groups: level identity, witness replay with per-action fingerprints and digests, exact re-plan with smaller sets and size, work within the bound; thirteen named alterations on levels 1, 41, 81), each test under 2.4 s; host exit 0 (.autonomy/migration/checks/R02-G13-08.host.json)
   level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's actions replay
   on a fresh play to a win in exactly its action count within the budget, with its per-action fingerprints and digests;
   plan returns exactly the witness's links and nudges with its smallerSets (the counterexample's sets) and size, with
