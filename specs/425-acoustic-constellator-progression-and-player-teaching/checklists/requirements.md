@@ -31,5 +31,5 @@
 
 ## Notes
 
-- All items pass on the first validation; hint levels, stars, daily rule, practice budget and migration are left to
-  `/speckit-clarify`, as in feature 415.
+- Hint levels, tutorial steps, stars, the daily rule, practice and the migration were settled by `/speckit-clarify`
+  (session 2026-11-23).

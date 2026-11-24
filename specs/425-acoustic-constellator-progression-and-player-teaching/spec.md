@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G13-05 (migration ledger, game feature of experience R02-G13) · ID namespace FR-R02G1305-###,
 SC-R02G1305-###, T-R02G1305-###
@@ -26,6 +26,67 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G13-01 … 04.
 - **Model:** feature 415 (Harmonic Bridges' progression and teaching) for hints, tutorial, failure text, progress,
   daily and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+415's answers where the games agree. Facts checked in code (read-only, 2026-11-23): `AcousticConstellatorSolver.plan`
+certifies a level by the smallest action set that wins — the missing symbol pairs, then extra multisets of helper links
+and ±1 nudges for 0 … `maxActions` (6) − the missing count extras — bounded at 400,000 listens; its witness actions are
+the plan's links in pair order, then its nudges, then one listen; every link, unlink, nudge and listen spends 1 action;
+a listen fails `missing(pair)`, `disconnected(tick, link)` or `incoherent(longestRun)`, and the last action spent
+without a win fails `budget(action)` (its 0-based index); undo works in playing and failed plays, a won play is final;
+levels 1 … 3 carry the tutorial flag; budgets are 1 … 40; the adapter prepares level (seed mod 100) + 1 and snapshots
+`{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily multipliers are 37,
+41, 43, 47, 53, 59, 61, 67, 71, 73, 79 and 83.
+
+- Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
+  failed play's hint is "Undo the last action or retry the level." While playing: the solver's plan is computed for the
+  level as it stands — the current links in place (the player's links as placed ones), every star at its current
+  starting phase. Its first action is the hint (a missing pair's link first, then helper links, then nudges, then the
+  listen); the whole plan (its links and nudges plus the listen) must fit the actions left, or else, as when the work
+  bound is exceeded or no plan exists (for example a placed link that blocks a star's degree): "No way to win was found
+  in the moves left: undo the last action or retry the level." Level 1 names the kind ("Link two stars of the symbol",
+  "Link a helper pair so the phases pull together", "Nudge a star's phase" or "The symbol is ready: listen"), level 2
+  names the stars ("Work on star 2 and star 5" / "Work on star 3" / "Listen: tap the coherence gauge"), level 3 the
+  exact action ("Link star 2 to star 5" / "Nudge star 3 by +1" / the same listen text). Hints never change the state,
+  are unlimited, do not affect stars and reset to level 1 after any change of the play. Impact: FR-R02G1305-002;
+  SC-R02G1305-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
+  instructions in order: (1) "Drag from one star to another (or use the panel's star, partner and Link) to link a pair
+  the dashed plum guides show" — it advances once a link has been accepted; (2) "Link every guided pair; linked stars
+  pull each other's phases, and a link stretched too far snaps — tap a star to nudge its phase, and a hint shows which"
+  — until no symbol pair is missing or the level ends (a link that completes the symbol moves straight on to the third
+  step; an undo does not move it back); (3) "Tap the coherence gauge (or Listen) to hear whether the stars hold
+  together for the hold; if they fall apart, undo" — until the level ends. `tutorial.dismiss` ends it for that level;
+  undo never moves it back. Impact: FR-R02G1305-001; SC-R02G1305-001.
+- Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted link, unlink, nudge and
+  listen record, undone ones included: 3 when at most the certified witness's action count (its links and nudges plus
+  the listen), 2 when at most that + 2, else 1; per level the best (least) actions spent of a won campaign play and its
+  stars, a better result replacing a worse one; level 1 open; a campaign win opens the next; `level.select [n]` opens any
+  open level and refuses others (`r02-g13.locked`); `level.next` moves to the next open level (refused when none,
+  `r02-g13.locked`); the five bands of 20 are the certified difficulty bands. Impact: FR-R02G1305-004;
+  SC-R02G1305-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 89) mod 100 + 1, negative day counts wrapped into 0 … 99 (89 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g13.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the budget raised to the kernel's
+  maximum (40); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G1305-005;
+  SC-R02G1305-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 415: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the snapshot payload becomes schema 2
+  (`{level, mode, progress, records, tutorial}`) with a migration from schema 1 (level 1 open plus the restored level,
+  campaign mode, tutorial at its first step on tutorial levels). A failure is explained from the failing action, actions
+  numbered from 1 and ticks and stars from 0: a missing pair — "Action m (the listen) found the symbol's pair star a –
+  star b unlinked."; a disconnection — "Action m (the listen): on tick t the link from star a to star b snapped and the
+  symbol came apart."; incoherence — "Action m (the listen): the stars held together for at most r of the h ticks
+  needed within w."; the budget — "Action m (a link of star a and star b | an unlink of star a and star b | a nudge of
+  star s by ±1 | the listen) spent the last move without a win." — each followed by "Undo the last action or retry the
+  level." Impact: FR-R02G1305-003, 007; SC-R02G1305-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -81,7 +142,7 @@ budget without affecting progress.
 - **A hint after the level is won or failed:** a won level has no hint; a failed one suggests undo or retry.
 - **A hint when no win was found in the moves left:** it says so and never suggests a useless action.
 - **A hint search that would run long:** bounded by the solver's work limit; it never stalls the frame.
-- **A locked level or an impossible date:** refused with a named reason.
+- **A locked level or an impossible date:** refused with a named reason (`r02-g13.locked`, `r02-g13.date`).
 - **Practice and daily results:** never open levels; practice never awards stars.
 - **A daily level still locked in the campaign:** playable as the daily level without opening it.
 - **Tutorial in practice or daily mode:** shown on the tutorial levels in every mode, with the same steps.
