@@ -816,3 +816,7 @@ memory checks, the CI step and `scripts/moonlit_mechanism_regression.py`.
 Feature 439 (R02-G14-09) adds the in-app integration: the pinned identifier list of the panel, the schema-1 and
 schema-2 examples (`MoonlitMechanismSchemaExamples`) stored by the app registration, app unit tests, and the interface
 tests `MMPlayUITests` and `MMReplayUITests` (serial chunk `w3`).
+
+Feature 440 (R02-G14-10) prepares Moonlit Mechanism's device campaign without touching a device:
+`docs/apps/moonlit-mechanism/device-rows.json` (rows MM-D1 … MM-D8, all pending), the written plan
+`docs/apps/moonlit-mechanism/device-campaign.md`, and the release step `device-rows-r02-g14`.

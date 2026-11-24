@@ -765,6 +765,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   23 s because each attempt hashes a fingerprint, so 8 walks are exhaustive and 192 sample 24 cells per step. Write
   fixtures' comments from the drawn ranges: energy 1 + 0 … 3 lets the known pulse end the level, which all four agents
   found; the tests now rely on both kinds of fixture.
+- **Moonlit Mechanism device rows** (R02-G14-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
+  r02-g14.moonlit-mechanism` (release step `device-rows-r02-g14`, tests `MoonlitMechanismDeviceRowsCheckTests`) checks
+  the definition (rows MM-D1 … MM-D8, 12 device scenarios) against the scenario manifest, the ledger's
+  DEV1/2/3-R02-G14 rows and the open {device} tasks of features 431 … 439; nothing contacts a device. The row prefix
+  follows the interface namespace (`MM`). When a definition is ported from another game, read each row's procedure
+  against the new game's gestures: a re-seat is a double tap, not a drag (caught by the written plan's review).
 - **Acoustic Constellator device rows** (R02-G13-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g13.acoustic-constellator` (release step `device-rows-r02-g13`, tests `AcousticConstellatorDeviceRowsCheckTests`)
   checks the definition (rows ACN-D1 … ACN-D8, 12 device scenarios) against the scenario manifest, the ledger's
