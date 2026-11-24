@@ -10,7 +10,7 @@ prefix.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1304-001 Baselines on the committed tree: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1304-001 Baselines on the committed tree: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-23: 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on 8a35986f3 (.autonomy/migration/checks/R02-G13-04.baseline-*.json); rendering baseline = R02-G13-03 rendering-27/26
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G13-03's
   rendering runs (exit 0)
 
