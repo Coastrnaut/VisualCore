@@ -40,7 +40,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 415
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1305-003 [P] [US1] [US4] Create
+- [X] T-R02G1305-003 [P] [US1] [US4] Create — Verified 2026-11-23: 2026-11-23: agent C tutorial steps, progress, stars, daily (x 89), modes; 15 tests incl. levels 1-3 through the kernel, 4,018 dates, Codable shapes; lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G13-05.host-3.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorProgress.swift`
   (`AcousticConstellatorTutorialStep` link → complete → listen → done with the texts of clarification Q2, advanced by an
   accepted link (link → complete, and on to listen at once when that link leaves no symbol pair missing), no symbol pair
