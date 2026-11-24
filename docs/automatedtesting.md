@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G15-07: Voxel Origami persistence and replay).
+Last updated: 2026-11-24 (R02-G15-08: Voxel Origami regression net).
 
 ## 1. What is tested, and where
 
@@ -738,6 +738,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   search through the play (states merged by phases and lamp height), which is cheap here because every action adds to
   one vector. Regenerate the witness files only with `MOONLIT_MECHANISM_WRITE_WITNESSES=1` and re-pin the catalog digest
   after review.
+- **Voxel Origami regression net** (R02-G15-08, 2026-11-24). `python3 scripts/voxel_origami_regression.py` runs the
+  host filter `VoxelOrigamiRegression` (solver regression in 20 groups of 5 levels, golden descriptions) and the
+  simulator classes `VoxelOrigamiRegressionGoldenFrameTests` and `VoxelOrigamiRegressionMemoryTests` with the memory
+  isolation variable, printing one summary; CI runs the host part as its own named step. Regenerate the golden file only
+  on purpose: `VOXEL_ORIGAMI_WRITE_GOLDEN=1 swift test --package-path Packages/ExperiencesRound02 --filter
+  VoxelOrigamiRegressionGolden`. One
+  lesson: the first description recorded the chosen hinge only as a palette colour, so the hero frame (level 1 with
+  hinge 4 chosen) and level 1's tier-0 frame had the same description apart from the name; the golden test agent
+  noticed it, and the description now carries `chosenHinge`. A golden description should hold every input of the frame,
+  not only what the geometry reads.
 - **Voxel Origami persistence and replay** (R02-G15-07, 2026-11-24). Host: `VoxelOrigamiReplayCoreTests` (11 tests:
   traces without undone turns, migrations 1 → 3 and 2 → 3, reconciliation on restore, replay rules and codes, a mid-way
   replay restored, altered replays damaged, the sound setting never digested), `VoxelOrigamiPersistenceTests` (500 round

@@ -863,3 +863,7 @@ Feature 447 (R02-G15-07) adds persistence and replay: winning traces stored with
 (`VoxelOrigamiReconciliation` checks them on restore and drops edited ones), snapshot schema 3 with migrations from 1
 and 2, the saved sound choice (`settings.sound`) and `replay.start`, `replay.step` and `replay.stop` with the panel's
 "Replay best solution", Step and Stop.
+
+Feature 448 (R02-G15-08) adds the regression net: the solver regression over all 100 levels with eleven named
+alterations, `VoxelOrigamiGolden` (16 code-computed frame descriptions pinned in `golden-frames.json`, test builds only),
+simulator golden-frame and memory tests, `scripts/voxel_origami_regression.py` and a named CI step.

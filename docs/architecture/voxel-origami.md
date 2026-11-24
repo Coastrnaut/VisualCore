@@ -208,3 +208,28 @@ Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decod
 - **Sound setting.** `settings.sound [0 … 1]` stores the sound choice in the snapshot (never the digest); the panel's
   Sound toggle sends it and the presenter applies the restored choice when the experience opens.
 
+## Regression net (feature 448, R02-G15-08)
+
+- **Solver regression.** For every one of the 100 certified levels the host tests check that the generated level equals
+  its witness's level, that the witness replays on a fresh play to a win on its last turn and not before, within the
+  budget, with its per-action fingerprints and digests, and that the breadth-first search re-plans exactly the
+  witness's turns with the same count of states one turn short (`statesByDepth[size − 1]`, the counterexample's
+  `states`), its work counted within the bound (never timed). The checks run in 20 groups of 5 levels (a six-turn
+  band-5 search costs over a second in a debug build). Eleven kinds of alteration (a cube's parent, direction or start
+  turn, a target cell, the allowed orientations, the budget, a plan turn, a witness action, a per-action fingerprint, a
+  per-action digest, the counterexample's state count) are each detected and named with the level and the part
+  (`VoxelOrigamiRegressionSolverTests`).
+- **Golden frames.** `VoxelOrigamiGolden` (test builds only; excluded from Release) computes the code-only description
+  of 16 frames — levels 1, 21, 41, 61 and 81 at the three tiers after all of the witness's turns but the last with hinge
+  1 chosen, plus the hero frame — at 1,152 × 768: the chosen hinge, projected cube centres, hinge mark centres (lifted
+  towards the eye as drawn), target cell centres, the first covered pip and the first moves bar to 1/8 pixel (null when
+  a point does not project inside the frame), the element counts and the palette, hashed with SHA-256 and pinned in
+  `golden-frames.json`. A changed description fails until the file is rewritten on purpose with
+  `VOXEL_ORIGAMI_WRITE_GOLDEN=1`; the simulator renders the 16 frames and checks them against the descriptions with the
+  feature-443 tolerances.
+- **Memory.** Twelve open-draw-warn-close cycles stay within 16 MB of the first (asserted when the class runs alone;
+  28.75 MB to 29.19 MB on the iOS 27.2 simulator on 2026-11-24), and the voxel scene holds no GPU objects after each
+  close and memory warning.
+- **CI and local command.** The `round02-host-tests` job runs the host part as "Voxel Origami regression (host)";
+  `python3 scripts/voxel_origami_regression.py` runs the host and simulator parts with one summary.
+

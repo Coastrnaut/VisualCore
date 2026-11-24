@@ -66,7 +66,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1508-007 Docs: `docs/architecture/voxel-origami.md` (regression net),
+- [X] T-R02G1508-007 Docs: `docs/architecture/voxel-origami.md` (regression net), — Verified 2026-11-24: 2026-11-24 round02-host-1/2/3 exit 0 (56 s, 45 s, 347 s; .autonomy/migration/checks/R02-G15-08.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3` (the three filters)
 - [ ] T-R02G1508-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`
