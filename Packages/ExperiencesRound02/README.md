@@ -756,3 +756,7 @@ memory checks, the CI step and `scripts/acoustic_constellator_regression.py`.
 Feature 429 (R02-G13-09) adds the in-app integration: the pinned identifier list of the panel, the schema-1 and
 schema-2 examples (`AcousticConstellatorSchemaExamples`) stored by the app registration, app unit tests, and the
 interface tests `ACNPlayUITests` and `ACNReplayUITests` (serial chunk `v3`).
+
+Feature 430 (R02-G13-10) prepares Acoustic Constellator's device campaign without touching a device:
+`docs/apps/acoustic-constellator/device-rows.json` (rows ACN-D1 … ACN-D8, all pending), the written plan
+`docs/apps/acoustic-constellator/device-campaign.md`, and the release step `device-rows-r02-g13`.

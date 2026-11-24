@@ -33,7 +33,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1310-005 Docs: `docs/architecture/acoustic-constellator.md` (device preparation),
+- [X] T-R02G1310-005 Docs: `docs/architecture/acoustic-constellator.md` (device preparation), — Verified 2026-11-24: 2026-11-24: architecture device-preparation section, ExperiencesRound02 README feature 430, testing doc; round02-host exit 0 (.autonomy/migration/checks/R02-G13-10.round02-host.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1310-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full` (nothing in the app changes)
