@@ -34,4 +34,4 @@
 - The target and package paths in the canonical overrides name where the one app keeps experiences (ADR-0009), not an
   implementation choice.
 - The adapter actions, the snapshot fields, the palette values, the tolerances, the gauges and the scenario manifest
-  are left to `/speckit-clarify` (following feature 433's answers).
+  are settled by `/speckit-clarify` (following feature 433's answers).

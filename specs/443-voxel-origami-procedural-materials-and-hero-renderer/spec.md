@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G15-03 (migration ledger, game feature of experience R02-G15) · ID namespace FR-R02G1503-###,
 SC-R02G1503-###, T-R02G1503-###
@@ -28,6 +28,81 @@ Canonical overrides:
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G15-01 and -02.
 - **Model:** feature 433 (Moonlit Mechanism's hero renderer and experience).
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+433's answers where the games agree. Facts checked in code (read-only, 2026-11-24): Moonlit Mechanism's experience
+(R02-G14-03 … 10) is the pattern in this package — a Core adapter with a table of certified candidates, an immutable
+scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target (`…Experience.swift`,
+presenter, scene, controls), a scenario manifest with 80 acceptance scenarios, a registration with content facts in
+`Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Voxel Origami kernel provides the level (4 … 12
+cubes with parents, rest directions and start turns; the target; the orientations; the budget), the pose (cells and
+orientations), the shape report (occupancy, canonical hash, covered count, match), the covered alignment (rotation and
+translation), the play (turn, undo, redo, stages, failures collision, sweep and budget) and the certified catalog of
+R02-G15-02 (5 … 10 cubes); `AppModelTests` uses `r02-g15.voxel-origami` as its synthetic unregistered candidate and the
+next round-two game is `r02-g16.starlit-cartouche`; the archived matrix has 80 acceptance rows R2-G15-QA-001 … 080; the
+catalog's design gives the palette "frosted ivory, laser turquoise and hot pink edge", the hero "chains of luminous cubes
+collapsing into radiant sculptural forms" and the geometry "instanced cubes with chamfered normals and hinge transform
+tree".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the kernel's cells map to world
+  space by w(c) = (c − m) · s, where m is the centre of the bounding box of the occupied cells together with the target
+  cells at the best allowed alignment (the covered count's rotation and translation), and s = 1.5 / (e + 1) with e the
+  box's largest extent in cells; y is up. Drawn back to front by distance from the eye (depth testing is off, the shared
+  mesh renderer's path; the painter's order is the camera-distance order of the elements' centres): the night backdrop
+  (a large quad behind everything); the target outline, one wireframe cube of side 0.96 s per target cell at its best
+  alignment, edges of the tier's thickness in turquoise; the cubes, each a chamfered cube of side 0.9 s at w(cell),
+  turned by its orientation, frosted ivory with faceted shading, an inner glyph on its faces (solid turquoise when the
+  cube's cell is a target cell, hollow grey otherwise) and (cube index mod 6) + 1 dots on its +z face; the hinge marks,
+  one bar per hinge on the face between its parent and its cube (length 0.6 s along the hinge axis, width 0.12 s), grey,
+  the chosen hinge striped hot pink; the gauges in screen-facing world space below the scene: the covered pips, one per
+  cube at y = −1.05 from x = −0.8 to 0.8, lit for the covered count; the moves bars, `budget` bars at y = −1.2 from
+  x = −0.9 to 0.9 (each 1.8 / budget wide with a gap of a fifth, 0.04 tall), lit for the actions left; the glow is
+  additive and drawn last. The chosen hinge is presentation state of the adapter (`hinge.choose [h]`, never in the
+  digest), the first hinge that can turn at opening. The camera is a fixed authored perspective (eye (1.4, 1.1, 2.6)
+  looking at (0, −0.1, 0)) fitted to the box x −0.95 … 0.95, y −1.25 … 0.95, z −0.95 … 0.95 with a 5 % margin for
+  aspect 0.4 … 2.5. Nothing drawn is consulted by the rules; the drawn cubes sit in the kernel's cells. Impact:
+  FR-R02G1503-001, 002, 003, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): a chamfer of 0.12 of the cube's side in 2 bevel
+  steps, target edges 0.06 s thick and 2 glow shells around lit cubes and the target outline; `level-1`: 1 bevel step,
+  edges 0.05 s, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): plain cubes without a bevel, edges 0.04 s, no
+  glow. Cubes, glyphs, dots, hinge marks, the target outline, gauges, colours and positions are the same at every tier.
+  Levels are ordered richest first; the presenter logs each tier change with its reason. Impact: FR-R02G1503-004;
+  SC-R02G1503-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects through the same
+  camera every cube's centre and every hinge mark's centre, the first covered pip and the first moves bar, orders them
+  by camera distance as the painter does, and gives the palette. Simulator tests render offscreen at 1,152 × 768 at time
+  0 and check, at points at least 6 pixels from every element drawn after them, that a cube's centre is brighter than
+  the night backdrop by at least 0.25 in luminance; that the chosen hinge's centre has red above blue by at least 0.08
+  (hot pink); that the first moves bar differs from the backdrop by at least 0.1; and that the backdrop matches the night
+  colour within 0.05 away from geometry. Palette: night #0B0D16, ivory #EDE8DC, ivory shade #B9B2A3, target turquoise
+  #2EE6D6, target glow #8FF5EC, hinge #7F7A70, hinge chosen #FF3C8C, glyph solid #2EE6D6, glyph hollow #4A4E5C, dots
+  #3A3D48, covered lit #FF3C8C, covered unlit #2A2D3A, moves lit #2EE6D6, moves unlit #2A2D3A, broken outline #FF6B4A,
+  glow #FFF4E0. Impact: FR-R02G1503-006; SC-R02G1503-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `VoxelOrigamiSceneSnapshot` (the cubes' cells and orientations, the parents and rest directions, the hinges' quarter
+  turns and which can turn, the chosen hinge, the target cells at the best alignment, the shape report, stage, failure,
+  actions left, budget, level number and presentation time) made by the adapter; it never holds the kernel. If a program
+  fails to compile or link, the scene draws the level-2 geometry unlit with the shared unlit mesh renderer, keeps
+  `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion draws the cubes at their cells
+  without a turning preview; Reduce Flashing caps the glow gain. A failure outlines the moving cube and the cube in its
+  way in the broken colour and marks the cell they meet in, and the failure text names them, as the kernel's reason
+  does. Impact: FR-R02G1503-003, 007; SC-R02G1503-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g15.voxel-origami` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the scenario
+  manifest `Packages/ExperiencesRound02/VoxelOrigami/scenario-manifest.json`, no permissions, a summary of at most 300
+  characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's experience registry
+  link `VoxelOrigamiExperience` as a candidate (`available: false` until X-R02-G15), opening at seed 0 (level 1);
+  `AppModelTests` switches its synthetic unregistered candidate to the next round-two game
+  (`r02-g16.starlit-cartouche`). The adapter (`VoxelOrigamiExperienceCore`) prepares certified level (seed mod 100) + 1
+  from its table of certified candidates (the whole generator only if that candidate no longer certifies) and accepts
+  `hinge.turn [h, ±1]`, `play.undo`, `play.redo`, `level.next` and `hinge.choose [h]` (whole numbers only); the kernel
+  refuses everything out of range or out of stage, and `hinge.choose` refuses a hinge the level does not have; its
+  digest is the level number and the play's fingerprint (never the record history or the chosen hinge, so undo restores
+  the earlier digest); snapshot schema 1 `{level, records}`. Impact: FR-R02G1503-005, 008, 009; SC-R02G1503-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -81,7 +156,7 @@ it as available, and the experience package, registry, catalog and content check
 - **Zero-size or very small views, rotation and resize:** a zero-size view draws nothing and reports no error; for every
   aspect ratio from 0.4 to 2.5 the camera fits every cube, the target outline and the gauges with a margin of at least
   5 % on each side.
-- **Colour-blind players:** each cube carries its number pattern of dots on its faces, the chosen hinge a striped bar,
+- **Colour-blind players:** each cube carries (index mod 6) + 1 dots on one face, the chosen hinge a striped bar,
   cubes in a target cell a solid inner glyph and cubes outside it a hollow one, the target an outline; moves and the
   covered count are rows of shapes; every cube, hinge and measure can be named in words by the kernel, so no
   information is carried by hue only.
