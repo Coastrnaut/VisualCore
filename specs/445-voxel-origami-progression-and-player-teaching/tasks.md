@@ -52,7 +52,7 @@ final copy; round02-host split by test bundle, since it reached 401 s at R02-G15
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1505-004 Edit `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiExperienceCore.swift` (controls
+- [X] T-R02G1505-004 Edit `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiExperienceCore.swift` (controls — Verified 2026-11-24: 2026-11-24: adapter controls level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss; codes r02-g15.locked/date; progress, mode and tutorial; digest v2; snapshot schema 2 with migration from 1; scenarios (integration rows win first, level-100 rule, new refusals) and manifest regenerated; adapter tests updated; agent F 9 progression tests; identity test and registry comment; lead host-4 (VoxelOrigamiCoreTests) exit 0
   `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`; codes
   `r02-g15.locked`, `r02-g15.date`; practice budget 40 on a copy of the level, no stars, no unlocks; a daily win records
   the level's best result and stars and opens nothing; progress and mode in the digest, the tutorial step snapshotted

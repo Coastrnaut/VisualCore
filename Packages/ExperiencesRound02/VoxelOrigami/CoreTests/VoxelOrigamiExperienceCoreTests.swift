@@ -108,17 +108,20 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g15.voxel-origami" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g15.voxel-origami.v1")
+        #expect(Core.experienceID == "r02-g15.voxel-origami" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g15.voxel-origami.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
-        let ids: [String] = ["hinge.turn", "play.undo", "play.redo", "level.next", "hinge.choose"]
+        let ids: [String] = ["hinge.turn", "play.undo", "play.redo", "level.next", "hinge.choose", "level.select",
+                             "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [0...11, -1...1])
         #expect(Core.controls[4].ranges == [0...11])
-        let plainIndices: [Int] = [1, 2, 3]
+        #expect(Core.controls[5].ranges == [1...100])
+        #expect(Core.controls[6].ranges == [1...9999, 1...12, 1...31])
+        let plainIndices: [Int] = [1, 2, 3, 7, 8, 9]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == VoxelOrigamiTier.all.count)
-        #expect(Core.migrations.currentVersion == 1)
+        #expect(Core.migrations.currentVersion == 2)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == VoxelOrigamiTier.all.map(\.name))
@@ -286,7 +289,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(probe.apply(Self.act("hinge.turn", [4, -1])) == .accepted && probe.play.actionsSpent == 1)
         #expect(probe.apply(Self.act("play.undo")) == .accepted && probe.play.actionsSpent == 0)
         #expect(probe.apply(Self.act("play.redo")) == .accepted && probe.play.actionsSpent == 1)
-        #expect(probe.apply(Self.act("level.next")) == .accepted && probe.levelNumber == 2)
+        // Feature 445: `level.next` needs the next level open; level 2 is not open until level 1 is won.
+        #expect(probe.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g15.locked")))
+        #expect(probe.apply(Self.act("mode.practice")) == .accepted && probe.levelNumber == 1)
         #expect(probe.play.records.isEmpty && probe.chosenHinge == Core.openingHinge(of: probe.play))
     }
 
@@ -338,8 +343,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(reset.chosenHinge == Core.openingHinge(of: reset.play) && reset.play.records.isEmpty)
         let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
         #expect(restored == core && restored.chosenHinge == Core.openingHinge(of: restored.play))
+        // A new opening (here practice; since feature 445 `level.next` needs the next level open).
         var next: Core = core
-        #expect(next.apply(Self.act("level.next")) == .accepted)
+        #expect(next.apply(Self.act("mode.practice")) == .accepted)
         #expect(next.chosenHinge == Core.openingHinge(of: next.play))
     }
 
@@ -397,11 +403,19 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(spender.play.stage == .playing && spender.play.actionsLeft == 1)
     }
 
-    @Test func levelNextWrapsAndResetReturns() async throws {
+    @Test func levelNextNeedsAnOpenLevelAndResetReturns() async throws {
         var core: Core = try await Core.prepare(seed: 99)
         #expect(core.levelNumber == 100)
         #expect(core.apply(Self.act("hinge.turn", [Double(core.chosenHinge), 1])) == .accepted)
-        #expect(core.apply(Self.act("level.next")) == .accepted)
+        // Feature 445: no wrap; after winning level 100, `level.next` is refused and level 1 is chosen with
+        // `level.select`.
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g15.locked")))
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        let hundred: VoxelOrigamiGenerated = try Core.generated(number: 100)
+        for step in hundred.plan.turns { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.solved[100] != nil)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g15.locked")))
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.play.stage == .playing)
         #expect(core.play.level == (try Core.level(number: 1)))
         #expect(core.chosenHinge == Core.openingHinge(of: core.play))
@@ -425,7 +439,7 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let savedDigest: StateDigest = try Self.digest(core)
         let payload: Data = try core.snapshotPayload()
         let text: String = String(decoding: payload, as: UTF8.self)
-        #expect(text.hasPrefix("{\"level\":21,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":21,\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":21,"))
         let restored: Core = try Core.restore(payload: payload, seed: 20)
         let restoredDigest: StateDigest = try Self.digest(restored)
         #expect(restored == core && restoredDigest == savedDigest)
@@ -447,11 +461,12 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(throws: VoxelOrigamiRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":\"21\",\"records\":[]}".utf8), seed: 20)
         }
+        let rest: String = ",\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":1,\"solved\":[]},\"records\":[]}"
         #expect(throws: VoxelOrigamiRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":0" + rest).utf8), seed: 20)
         }
         #expect(throws: VoxelOrigamiRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":101" + rest).utf8), seed: 20)
         }
         // A trace of level 21 restored as level 22 (another seed).
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "{\"level\":21,", with: "{\"level\":22,").utf8)
@@ -482,14 +497,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "hinge.turn", values: [4, -1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)

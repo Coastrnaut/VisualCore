@@ -287,12 +287,31 @@ private func digest(of core: VoxelOrigamiExperienceCore) throws -> String {
                 let restoredDigest: String = try digest(of: restored)
                 #expect(restored == core && restoredDigest == played.final, "\(name)")
             case .integration:
+                // Feature 445: `level.next` needs the next level open, so the row first wins its level's plan; on
+                // level 100 `level.next` is refused `r02-g15.locked` (no wrap) and level 1 is chosen instead.
                 let next: Int = Core.nextLevel(after: level)
                 #expect(core.levelNumber == next && core.play.stage == .playing, "\(name)")
-                let nextOpening: String = try #require(Core.expectedDigest(for: scenarioID, seed: UInt64(next - 1),
-                                                                           entries: []))
-                #expect(played.final == nextOpening, "\(name)")
-                #expect(played.results == ["accepted", "accepted", "accepted", Core.kernelActionCode], "\(name)")
+                #expect(Self.kinds(core).count == 2 && Self.kinds(core)[1] == .undo, "\(name)")
+                #expect(core.play.actionsSpent == 0, "\(name)")
+                #expect(core.mode == .campaign && core.progress.solved[level] != nil, "\(name)")
+                let actions: [VoxelOrigamiAction] = Core.certifiedActions(level)
+                var won: [ScenarioStep] = []
+                for action in actions { won.append(Core.actionEntry(action)) }
+                won += Core.integrationMoveEntries(level)
+                let nextFresh: String = try #require(Core.expectedDigest(for: scenarioID, seed: spec.seed,
+                                                                         entries: won))
+                #expect(played.final == nextFresh, "\(name)")
+                var results: [String] = []
+                for _ in actions { results.append("accepted") }
+                if level == Core.levelNumbers.upperBound {
+                    #expect(core.progress.frontier == Core.levelNumbers.upperBound, "\(name)")
+                    results += [Core.lockedCode, "accepted"]
+                } else {
+                    #expect(core.progress.frontier == next, "\(name)")
+                    results.append("accepted")
+                }
+                results += ["accepted", "accepted", Core.kernelActionCode]
+                #expect(played.results == results, "\(name)")
             }
         }
         #expect(runFailures == ["budget", "collision", "sweep"], "\(runFailures)")

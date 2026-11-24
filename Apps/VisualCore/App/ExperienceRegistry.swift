@@ -136,8 +136,8 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [voxelOrigami].compactMap { $0 }
 
-    /// R02-G15 Voxel Origami (feature 443, R02-G15-03): a candidate until X-R02-G15. Snapshot schema 1, so no earlier
-    /// example is stored yet.
+    /// R02-G15 Voxel Origami (feature 443, R02-G15-03): a candidate until X-R02-G15. Snapshot schema 2 since feature
+    /// 445; its schema-1 example is registered at R02-G15-09, before the X gate's follow-through needs it.
     fileprivate static var voxelOrigami: ExperienceRegistration? {
         guard let id = VoxelOrigamiExperience.id else { return nil }
         var registration = ExperienceRegistration(id: id, core: VoxelOrigamiExperienceCore.self) { launch in

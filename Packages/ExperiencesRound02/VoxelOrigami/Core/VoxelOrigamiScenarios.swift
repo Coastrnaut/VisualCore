@@ -50,8 +50,16 @@
 //           else the budget path); then an undo, an honest retry back to the digest before the failing turn;
 //  61 … 70  persistence and replay — the probe turn, undo, redo, undo, then the certified plan (won; the saved trace
 //           replays to the same state);
-//  71 … 80  integration — `level.next` (the next certified level, a fresh play), its probe turn, an undo (the next
-//           level's opening digest) and a second undo refused `r02-g15.action`.
+//  71 … 80  integration — the certified plan (won, the next level opened), `level.next` (the next certified level, a
+//           fresh play), its probe turn, an undo (the next level's fresh play) and a second undo refused
+//           `r02-g15.action`; on level 100 (no row reaches it today) `level.next` is refused `r02-g15.locked` after the
+//           win (no wrap) and the row chooses level 1 with `level.select [1]` instead.
+// Feature 445 (R02-G15-05) T-R02G1505-004: the digests are now schema 2's ("…v2": level, play, progress and mode), and
+// `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`; the
+// integration rows (71 … 80) therefore first win their level's certified plan (a campaign win opens the next level)
+// before `level.next`; rejection also refuses the progression controls' wrong value counts (`level.select`,
+// `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`); the manifest was regenerated
+// (`UPDATE_SCENARIO_MANIFEST=1`).
 // The expected digests and outcomes are derived by playing the entries on a core exactly as the engine plays them; the
 // tests replay every scenario through `ExperienceEngine` and check each family's kernel state. No clock, no random
 // source.
@@ -336,6 +344,11 @@ extension VoxelOrigamiExperienceCore {
             refusedEntry("level.next", [1], wrongCountCode),
             refusedEntry("hinge.choose", [], wrongCountCode),
             refusedEntry("hinge.choose", [1, 1], wrongCountCode),
+            refusedEntry("level.select", [], wrongCountCode),
+            refusedEntry("mode.daily", [2026, 1], wrongCountCode),
+            refusedEntry("mode.practice", [1], wrongCountCode),
+            refusedEntry("mode.campaign", [1], wrongCountCode),
+            refusedEntry("tutorial.dismiss", [1], wrongCountCode),
         ]
         return entries
     }
@@ -372,8 +385,19 @@ extension VoxelOrigamiExperienceCore {
     /// The seed that opens level `number`: `number − 1` (``levelNumber(forSeed:)`` gives `seed % 100 + 1`).
     public static func seed(forLevel number: Int) -> UInt64 { UInt64(max(number - 1, 0)) }
 
-    /// The level after `number` as `level.next` opens it (100 wraps to 1).
+    /// The level an integration row on level `number` reaches after its campaign win: `number + 1` with `level.next`;
+    /// for level 100, whose `level.next` is refused `r02-g15.locked` (no wrap), level 1 with `level.select [1]`.
     public static func nextLevel(after number: Int) -> Int { number % levelNumbers.upperBound + 1 }
+
+    /// The code of the adapter's locked refusal (no next open level, a level not yet open; never a payment gate).
+    static let lockedCode = "action.rule." + VoxelOrigamiExperienceRule.locked
+
+    /// The entries that move an integration row on level `number` from its won play to ``nextLevel(after:)``:
+    /// `level.next`; for level 100 a `level.next` refused ``lockedCode`` and then `level.select [1]` (feature 445).
+    static func integrationMoveEntries(_ number: Int) -> [ScenarioStep] {
+        guard number == levelNumbers.upperBound else { return [acceptedEntry("level.next")] }
+        return [refusedEntry("level.next", [], lockedCode, steps: 1), acceptedEntry("level.select", [1])]
+    }
 
     /// The perturbed last turn of manifest number `number`: after the certified plan without its last turn, the
     /// inverse of that turn, else the first legal turn there other than it, that does not win; nil when there is none.
@@ -521,8 +545,9 @@ extension VoxelOrigamiExperienceCore {
                     acceptedEntry("play.undo")] + actions.map { actionEntry($0) }
         case .integration:
             guard let next = probeMove(nextLevel(after: number)) else { return [] }
-            return [acceptedEntry("level.next"), actionEntry(next), acceptedEntry("play.undo"),
-                    refusedEntry("play.undo", [], kernelActionCode, steps: 1)]
+            return actions.map { actionEntry($0) } + integrationMoveEntries(number)
+                + [actionEntry(next), acceptedEntry("play.undo"),
+                   refusedEntry("play.undo", [], kernelActionCode, steps: 1)]
         }
     }
 
