@@ -29,7 +29,7 @@ presentation time Reduce Motion holds at 0) taken into the first pass.
   of turns, re-seats, lamp steps, undos, redos, refusals of every code (bare and prefixed), wins in campaign and practice,
   failures by each run outcome and by the budget, and level and mode changes compare texts, kinds and haptics exactly;
   choosing a gear and showing a key frame plan nothing); agent A; `--name host-2`
-- [ ] T-R02G1406-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismLights.swift`
+- [X] T-R02G1406-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismLights.swift` — Verified 2026-11-24: 2026-11-24: agent B lights (fades 0.15/0.45 s by the frame clock, crossing measure) and sound recipes (gear audition detuned by mesh error, ambient by covered quarters); 17 tests incl. seven flicker patterns; lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G14-06.host-3.json)
   ("glow 0.7 playing / 1 won / 0.35 failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce
   Flashing, no reversal mid-fade under Reduce Flashing, stepped by the frame clock's elapsed time;
   `maxHalfRangeCrossingsPerSecond`) and `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSoundRecipe.swift`
