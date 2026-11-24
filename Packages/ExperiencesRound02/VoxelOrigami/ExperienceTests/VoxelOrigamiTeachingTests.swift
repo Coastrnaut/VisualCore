@@ -400,7 +400,7 @@ enum VoxelOrigamiTeaching {
         let early: ActionResult = try Teaching.send("level.next", [], shell)
         #expect(early == .rejected(.rule(code: VoxelOrigamiExperienceRule.locked)), "\(early.code)")
         let lockedWords: String = Teaching.refusalWords(VoxelOrigamiExperienceRule.locked)
-        #expect(lockedWords == "that level is not open yet: win the level before it first")
+        #expect(lockedWords == "That level is not open yet.")   // feature 446's refusal sentence
         let message: String = presenter.mirror.message ?? ""
         #expect(message.contains(lockedWords), "\(message)")
         #expect(presenter.refusalLog.last == VoxelOrigamiExperienceRule.locked)
@@ -449,7 +449,7 @@ enum VoxelOrigamiTeaching {
         _ = try Teaching.describe(shell)
         #expect(impossible == .rejected(.rule(code: VoxelOrigamiExperienceRule.date)), "\(impossible.code)")
         let dateWords: String = Teaching.refusalWords(VoxelOrigamiExperienceRule.date)
-        #expect(dateWords == "that date is not a calendar date")
+        #expect(dateWords == "That date cannot be used.")   // feature 446's refusal sentence
         let dateMessage: String = presenter.mirror.message ?? ""
         #expect(dateMessage.contains(dateWords), "\(dateMessage)")
         #expect(presenter.refusalLog.last == VoxelOrigamiExperienceRule.date)

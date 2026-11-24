@@ -548,8 +548,9 @@ enum VoxelOrigamiGestureScript {
         #expect(shell.presenter.refusalLog.count == 1)
         #expect(code == "r02-g15.action", "the bare code, without the engine's prefix: \(code)")
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message.hasPrefix("That change was refused"), "\(message)")
-        #expect(message == "That change was refused: \(VoxelOrigamiMirror.refusalText(code: code)).")
+        // Since feature 446 the panel shows the feedback plan's refusal sentence.
+        #expect(message == "That hinge cannot turn: nothing would move.", "\(message)")
+        #expect(message == VoxelOrigamiMirror.refusalText(code: code))
     }
 
     /// 8. A drag cancelled by suspension clears the pending text and sends nothing.

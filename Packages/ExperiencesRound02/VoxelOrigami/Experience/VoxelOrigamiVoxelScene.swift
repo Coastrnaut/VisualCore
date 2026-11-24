@@ -38,6 +38,10 @@ final class VoxelOrigamiVoxelScene {
     /// The orbit the camera is drawn at (feature 444, presentation only; the gesture controller's). The meshes are
     /// built for the drawn eye, so a new orbit rebuilds them.
     var orbit = VoxelOrigamiOrbit.authored
+    /// The eased light levels the presenter steps every frame (feature 446): the glow gain is multiplied by
+    /// `lights.glow`, `u_won` is `lights.won`, and the fallback's cube lift is scaled by `lights.won` (rebuilt when it
+    /// moves by a tenth or more). Nil draws the snapshot's levels at once (the renderer tests' default).
+    var lights: VoxelOrigamiLights?
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the mode.
     private struct GeometryKey: Equatable {
@@ -53,6 +57,8 @@ final class VoxelOrigamiVoxelScene {
         let reduceMotion: Bool
         let fallback: Bool
         let orbit: VoxelOrigamiOrbit
+        /// The won level in tenths, in the fallback only (feature 446): the fallback's colours depend on it.
+        let wonTenths: Int
     }
 
     private var registry: ResourceRegistry?
@@ -118,19 +124,26 @@ final class VoxelOrigamiVoxelScene {
             try drawFallback(camera)
             return
         }
-        let won = Float(VoxelOrigamiSceneGeometry.wonFlag(snapshot))
+        let won = Float(wonLevel(snapshot))
         try drawVoxels(camera, won: won)
-        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
-        let gain = VoxelOrigamiShaders.glowGain(for: tier)
+        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty; feature 446 eases it by
+        // the glow level.
+        let gain = VoxelOrigamiShaders.glowGain(for: tier) * (lights?.glow ?? 1)
         guard gain > 0 else { return }
         try drawGlow(camera, gain: gain, won: won)
+    }
+
+    /// The won level drawn (feature 446): the eased `lights.won`, or the snapshot's won flag without lights.
+    private func wonLevel(_ snapshot: VoxelOrigamiSceneSnapshot) -> Double {
+        lights?.won ?? VoxelOrigamiSceneGeometry.wonFlag(snapshot)
     }
 
     /// The geometry key of `snapshot` at `tier` in the current mode.
     private func key(_ s: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier, still: Bool) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, cells: s.cells, turns: s.turns, chosenHinge: s.chosenHinge,
                     report: s.report, stage: s.stage, failure: s.failure, actionsLeft: s.actionsLeft,
-                    tier: tier.index, reduceMotion: still, fallback: fallbackReason != nil, orbit: orbit)
+                    tier: tier.index, reduceMotion: still, fallback: fallbackReason != nil, orbit: orbit,
+                    wonTenths: fallbackReason != nil ? Int((wonLevel(s) * 10).rounded(.down)) : 0)
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier` seen from `camera`: the two programs, or the unlit fallback.
@@ -166,7 +179,8 @@ final class VoxelOrigamiVoxelScene {
         let minimal = VoxelOrigamiTier.of(VoxelOrigamiTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [VoxelOrigamiColouredMesh] = [
-            try VoxelOrigamiSceneGeometry.voxelPart(snapshot, tier: minimal, reduceMotion: still, camera: camera),
+            try VoxelOrigamiSceneGeometry.voxelPart(snapshot, tier: minimal, reduceMotion: still,
+                                                    wonLevel: wonLevel(snapshot), camera: camera),
             try VoxelOrigamiSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {

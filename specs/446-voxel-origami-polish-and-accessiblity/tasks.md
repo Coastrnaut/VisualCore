@@ -46,7 +46,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
 
 ## Phase 3: Wiring — presenter, scene, sound and panel
 
-- [ ] T-R02G1506-005 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiSound.swift`
+- [X] T-R02G1506-005 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiSound.swift` — Verified 2026-11-24: 2026-11-24: VoxelOrigamiSound (loop and audition, A21 rule), presenter feedback route with log, lights stepped by the frame clock, hinge audition on choice, refusal sentences; scene glow gain × glow level, u_won and fallback won level in tenths; panel labels and values, adjustable hinge, summary element, Sound toggle, Dynamic Type rows, 520-pt width; refusal-word assertions in the wiring and teaching tests updated; agent C 10 accessibility tests; 46 simulator tests; sim-27 exit 0
   (the ambient loop over `AmbientLoopPlayer` and the audition, playing exactly while wanted, on screen and active); edit
   `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiPresenter.swift` (feedback through
   `ExperienceFeedback` with a feedback log; lights stepped per frame by the frame clock; choosing a hinge plays its

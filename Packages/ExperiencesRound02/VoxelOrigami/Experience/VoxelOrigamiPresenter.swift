@@ -20,6 +20,19 @@
 // the last turn, and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`), never
 // by the core. A refused `level.next` before a win (`r02-g15.locked`) and an impossible date (`r02-g15.date`) read in
 // words.
+// Feature 446 (R02-G15-06) T-R02G1506-005 (FR-R02G1506-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `VoxelOrigamiFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log (`feedbackLog`); refusals are shown
+// and announced in words (`refused(code:)`; the panel shows exactly the plan's text), and a revealed hint is announced
+// as `state`. Choosing a hinge, the pending drag text and orbit are not announced (the hinge speaks its value). The
+// scene's lights (`VoxelOrigamiLights`: the glow and the won look) step toward the drawn snapshot every frame by the
+// frame clock's elapsed time (0.15 s fades, 0.45 s under Reduce Flashing; the first frame settles them), so fades finish
+// under Reduce Motion too, where the presentation time is held at 0. The ambient loop (`VoxelOrigamiSound`) is offered
+// the recipe of the actions left, the quarters of the cubes in place and the stage when the first state is described,
+// when a level or mode opens and when that recipe changes; choosing a hinge plays its audition
+// (`VoxelOrigamiAudition.of(_:hinge:)`) when the sound is on, on screen and active. The mirror carries the summary
+// element's text (`VoxelOrigamiFeedbackPlan.summaryText(core:hinge:)`) and the sound choice (off by default).
+// Presentation only.
 #if os(iOS)
 import Foundation
 import SwiftUI
@@ -27,6 +40,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreAudioDSP
 import VisualCoreScenes
 import VoxelOrigamiCore
 
@@ -74,6 +88,11 @@ final class VoxelOrigamiMirror {
     var certifiedTurns = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen) (feature 445).
     var pickedLevel = 1
+    /// The summary element's text (feature 446): `VoxelOrigamiFeedbackPlan.summaryText(core:hinge:)` of the latest
+    /// core and the chosen hinge.
+    var summary = ""
+    /// Whether the sound is on (feature 446; off by default; presentation only).
+    var soundOn = false
 
     /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 445).
     var goalLabel: String {
@@ -124,19 +143,11 @@ final class VoxelOrigamiMirror {
         code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
     }
 
-    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``. Since feature 446 it
+    /// forwards to `VoxelOrigamiFeedbackPlan.refusalText(code:)` (clarification Q1's sentences, e.g. "That hinge cannot
+    /// turn: nothing would move.").
     static func refusalText(code: String) -> String {
-        switch bareCode(code) {
-        case "r02-g15.stage": "the play is over: undo or go to the next level"
-        case "r02-g15.action": "that hinge cannot turn: nothing would move"
-        case "r02-g15.stale": "the play changed before the action arrived"
-        case "r02-g15.level": "the next level could not be made"
-        case VoxelOrigamiExperienceRule.notWhole: "a hinge and a step must be whole numbers"
-        case VoxelOrigamiExperienceRule.hinge: "this chain has no such hinge"
-        case VoxelOrigamiExperienceRule.locked: "that level is not open yet: win the level before it first"
-        case VoxelOrigamiExperienceRule.date: "that date is not a calendar date"
-        default: "that action is not available now"
-        }
+        VoxelOrigamiFeedbackPlan.refusalText(code: code)
     }
 }
 
@@ -172,6 +183,16 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// How many refusal codes ``refusalLog`` keeps.
     static let refusalLogLimit = 64
+    /// The feedback route of announcements and haptics (feature 446; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 446; tests and diagnostics).
+    private(set) var feedbackLog: [VoxelOrigamiFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 446).
+    private(set) var lights: VoxelOrigamiLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the chosen hinge's audition (feature 446).
+    let sound: VoxelOrigamiSound
     /// The latest core described (feature 445): hints and retry read it.
     private(set) var latestCore: VoxelOrigamiExperienceCore?
     /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 445).
@@ -203,6 +224,8 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = VoxelOrigamiLights(reducedFlash: reduceFlashing)
+        sound = VoxelOrigamiSound(recipe: VoxelOrigamiSoundRecipe.recipe(rootStep: 0, quarters: 0, stage: .loading))
         scene.reducedFlash = reduceFlashing
         scene.reduceMotion = reduceMotion
     }
@@ -257,6 +280,15 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
         let time = presentationTime(core, now: frame.time)
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // The lights settle on the very first frame only; every later change, a level change included, fades, stepped
+        // by the frame clock (not the presentation time, which Reduce Motion holds at 0).
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
@@ -292,7 +324,20 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
             + "the turquoise target shape (\(level.orientations.rawValue) orientation)"
         let measure: String = level.progressDescription(report: play.report, actionsLeft: play.actionsLeft)
         mirror.measureLabel = measure
+        if let previous = latestCore {
+            route(VoxelOrigamiFeedbackPlan.after(old: previous, new: core))
+            let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+            // Choosing a hinge (presentation state of the adapter) plays its audition when the sound is on.
+            if !opened, previous.chosenHinge != core.chosenHinge, mirror.soundOn {
+                sound.audition(VoxelOrigamiAudition.of(core.play, hinge: core.chosenHinge))
+            }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         absorbProgress(core)
+        mirror.summary = VoxelOrigamiFeedbackPlan.summaryText(core: core, hinge: core.chosenHinge)
         var text = "Voxel Origami level \(core.levelNumber). "
         text += measure + ". "
         if let pending = mirror.pending { text += pending + ". " }
@@ -397,7 +442,9 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(VoxelOrigamiMirror.refusalText(code: result.code))."
+            let plan = VoxelOrigamiFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(VoxelOrigamiMirror.bareCode(result.code))
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
@@ -498,9 +545,11 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
             clearHint()
             return
         }
+        let revealed: Bool = mirror.hintLevel != level || mirror.hintText != hint.text
         hintKey = key
         mirror.hintLevel = level
         mirror.hintText = hint.text
+        if revealed { route(VoxelOrigamiFeedbackPlan.hint(text: hint.text)) }   // feature 446: announced as state
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -550,5 +599,36 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
     static func dateValues(_ date: DateComponents) -> [Double] {
         [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
+
+    // MARK: Feedback and sound (feature 446, R02-G15-06)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: VoxelOrigamiFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its actions left, the quarters of its cubes in place and its stage.
+    static func recipe(_ core: VoxelOrigamiExperienceCore) -> AmbientLoopRecipe {
+        VoxelOrigamiSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Turns the sound on or off; turning it on plays the recipe of the current play.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 }
 #endif
