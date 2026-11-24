@@ -14,7 +14,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1507-002 [P] [US2] Edit `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiProgress.swift` (Result gains "trace:
+- [X] T-R02G1507-002 [P] [US2] Edit `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiProgress.swift` (Result gains "trace: — Verified 2026-11-24: 2026-11-24: agent A Result trace + verified (old payloads decode unverified), traced record replacing only when better, drop, replay mode; VoxelOrigamiReconciliation (netTrace, verifies, reconcile; 64-turn bound); 13 reconciliation tests; progress encodings in two test files and the manifest's final digests updated; the mode's new case added to the panel's mode name and the presenter's retry (replay.start); lead host-1 (whole VoxelOrigami suite) exit 0, experience builds
   [VoxelOrigamiAction]" (effective turns, each `.turn(hinge, step)`) and "verified: Bool";
   `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing only when better (ties keep the
   earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace = empty, missing verified =

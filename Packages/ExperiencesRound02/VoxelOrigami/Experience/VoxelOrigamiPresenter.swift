@@ -571,6 +571,7 @@ final class VoxelOrigamiPresenter: ExperiencePresenter {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])   // feature 447: the replay from the start
         }
     }
 

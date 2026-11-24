@@ -149,12 +149,13 @@ public struct VoxelOrigamiFeedbackPlan: Sendable, Equatable {
         }
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay".
     public static func modeName(_ mode: VoxelOrigamiMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 
