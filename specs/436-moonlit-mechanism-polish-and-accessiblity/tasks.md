@@ -20,7 +20,7 @@ presentation time Reduce Motion holds at 0) taken into the first pass.
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G1406-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismFeedbackPlan.swift`
+- [X] T-R02G1406-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismFeedbackPlan.swift` — Verified 2026-11-24: 2026-11-24: agent A feedback plan (texts of Q1 word for word, haptics of Q2, a gear drag planned once, refusal words with the prefix read, summary of Q5); 11 tests on real cores; lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G14-06.host-2.json)
   (texts and kinds of clarification Q1 word for word, the engine's `action.rule.` prefix read as the bare code, a
   revealed hint as `state` (`hint(text:)`); haptics of Q2 — a run and a budget-ending action plan only the outcome; a
   gear drag's turns planned once from the core before the first turn to the core after the last ("Turned the handle
