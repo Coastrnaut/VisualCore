@@ -111,7 +111,7 @@ pass.
   `--name host-full`, `--name app-unit`
 - [X] T-R02G1403-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-24: 2026-11-24: reference-1 exit 0 (.autonomy/migration/checks/R02-G14-03.reference-1.json)
 - [X] T-R02G1403-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-24: 2026-11-24: reference-2 exit 0 (.autonomy/migration/checks/R02-G14-03.reference-2.json)
-- [ ] T-R02G1403-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1403-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-24: 2026-11-24: script-tests exit 0 (.autonomy/migration/checks/R02-G14-03.script-tests.json)
 - [ ] T-R02G1403-012 {device} After ImplementationLock-100: frame time per tier on D1/D2/D3 (SC-R02G1403-006)
 - [ ] T-R02G1403-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
