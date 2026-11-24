@@ -81,7 +81,7 @@ presentation time Reduce Motion holds at 0) taken into the first pass.
 - [X] T-R02G1406-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-24: 2026-11-24: reference-2 exit 0 (.autonomy/migration/checks/R02-G14-06.reference-2.json)
 - [X] T-R02G1406-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-24: 2026-11-24: script-tests exit 0 (.autonomy/migration/checks/R02-G14-06.script-tests.json)
 - [ ] T-R02G1406-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G1406-006)
-- [ ] T-R02G1406-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1406-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-24: 2026-11-24: converge round 1 appended nothing (the mesh-error range wording of Q4 noted; the code follows the kernel's cyclic distance, documented in the architecture); README row, gate list and feature count (136) updated
   README row and gate list updated
 
 ## Dependencies and parallel work
