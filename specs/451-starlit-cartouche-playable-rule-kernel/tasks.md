@@ -10,7 +10,7 @@ consume).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1601-001 Baselines after X-R02-G15 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1601-001 Baselines after X-R02-G15 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24 baseline-host, baseline-timing, baseline-round02-1/2/3 exit 0 (.autonomy/migration/checks/R02-G16-01.baseline-*.json); rendering baseline X-R02-G15 visualcore-rendering
   baseline-round02-1 … 3` (the three round-two filters of feature 446); the rendering baseline is X-R02-G15's
   visualcore-rendering run (exit 0)
 
@@ -28,7 +28,7 @@ consume).
   hazard interval and a flown leg on its corridor, or nil"; the route report with drawn, missing, stray, mismatch and
   matched), `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheLevel.swift` ("4 … 12 stars", orbits "1 …
   4 positions, coordinates −8 … 8", glyph points "0 … 4, distinct", "range 1 … 12", "at most 24 corridors, no self or
-  duplicate corridor", windows "0 ≤ open ≤ close ≤ deadline", the start's window "contains 0", "at most 8 hazards" with
+  duplicate corridor", windows "0 ≤ open ≤ close ≤ 64", the start's window "contains 0", "at most 8 hazards" with
   "from ≤ to", start and beacon stars, "deadline 1 … 64", symbol "1 … 12 distinct corridor indices", "budget 1 … 16",
   "difficulty 1 … 5", tutorial, seed, id; stars, corridors and progress named in words (FR-R02G1601-013); JSON schema 1
   with sorted keys and fingerprint; decode re-checks) and
