@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AcousticConstellatorPanelWin"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter AcousticConstellatorPanelWin",
+  "elapsed_seconds": 7.672,
+  "exit_code": 0,
+  "finished": "2026-11-24T01:00:41+00:00",
+  "gate": "R02-G13-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-04.host-4.log",
+  "log_sha256": "953f529399b1444d960881055a6e10b4cccdf7a9bc42f8d87f618b673da9a54a",
+  "name": "host-4",
+  "started": "2026-11-24T01:00:33+00:00",
+  "timed_out": false
+}

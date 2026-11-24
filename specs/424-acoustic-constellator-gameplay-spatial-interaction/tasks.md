@@ -60,7 +60,7 @@ prefix.
 
 ## Phase 4: Story 6 — every move without gestures (P1)
 
-- [ ] T-R02G1304-004 [P] [US6] Create
+- [X] T-R02G1304-004 [P] [US6] Create — Verified 2026-11-23: 2026-11-23: agent D AcousticConstellatorPanelWinTests (all 100 certified levels won through the star and partner steppers, Link, Nudge and Listen in 10 groups, each in exactly its witness's action count; panel Undo then Redo restore the digests), lead retest host-4 exit 0 (.autonomy/migration/checks/R02-G13-04.host-4.json)
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorPanelWinTests.swift`: all 100
   certified levels won through panel actions only (FR-R02G1304-007; SC-R02G1304-005; the star and partner steppers, then
   Link, the star stepper and Nudge, and Listen, as the witnesses play them), split so each test is under 10 s, plus
