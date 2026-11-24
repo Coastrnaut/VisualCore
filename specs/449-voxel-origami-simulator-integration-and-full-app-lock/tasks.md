@@ -28,7 +28,7 @@ change (the shaders and reference of R02-G15-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1509-003 [US1] Edit `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiControls.swift`:
+- [X] T-R02G1509-003 [US1] Edit `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiControls.swift`: — Verified 2026-11-24: 2026-11-24 sim-27 exit 0, 63 Voxel simulator tests incl. identifier tests (.autonomy/migration/checks/R02-G15-09.sim-27.json)
   `identifierNames` lists the 35 identifiers the panel already gives through `port.identifier` (spec Clarifications
   Q1: hinge, hinge-minus, hinge-plus, hinge-detail, turn-minus, turn-plus, undo, redo, next-level, reset-view,
   dismiss-tutorial, hint, failure-undo, retry, campaign, daily, practice, level-picker, play-level, replay,
