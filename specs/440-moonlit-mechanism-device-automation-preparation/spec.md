@@ -92,7 +92,8 @@ number.
 ### Key Entities
 
 - **Device scenario set**: the manifest scenarios the campaign runs on each device.
-- **Device row**: id (MM-D1, MM-D2, …; the row list is settled by clarification), title, devices, procedure, measurements, pass condition, covered tasks, status.
+- **Device row**: id (MM-D1, MM-D2, …; the row list is settled by clarification), title, devices, procedure,
+  measurements, pass condition, covered tasks, status.
 - **Coverage**: the mapping from each deferred {device} task to its rows.
 
 ## Success Criteria *(mandatory)*
