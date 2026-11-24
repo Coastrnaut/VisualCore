@@ -1,8 +1,8 @@
 # API contract: R02-G15-07 (VoxelOrigamiCore additions)
 
 ```swift
-extension VoxelOrigamiProgress.Result { public let trace: [VoxelOrigamiAction]   // .turn(hinge, step) each
-   ; public let verified: Bool }
+extension VoxelOrigamiProgress.Result { public let trace: [VoxelOrigamiAction]; public let verified: Bool }
+    // each trace entry is `.turn(hinge, step)` as the kernel applied it
 extension VoxelOrigamiProgress {
     public mutating func record(level: Int, actionsSpent: Int, certified: Int, mode: VoxelOrigamiMode = .campaign,
                                 trace: [VoxelOrigamiAction]) -> Bool             // verified result
