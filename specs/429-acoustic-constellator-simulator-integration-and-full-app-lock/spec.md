@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G13-09 (migration ledger, game feature of experience R02-G13) · ID namespace FR-R02G1309-###,
 SC-R02G1309-###, T-R02G1309-###
@@ -26,6 +26,59 @@ Canonical overrides:
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 419 (Harmonic Bridges's simulator integration and full app lock).
 
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+419's answers where the games agree. Facts checked in code (read-only, 2026-11-24): feature 419 (Harmonic Bridges) is
+the model (`Apps/VisualCore/Tests/UI/HarmonicBridges`, namespace `HB`, serial chunk `u3`;
+`HarmonicBridgesControls.identifierNames`; `HarmonicBridgesSchemaExamples.swift`); Acoustic Constellator's panel
+(`AcousticConstellatorControls`) already gives every control a label, a value and an identifier through
+`port.identifier(name)` (features 423–427: `star`, `partner`, `link`, `unlink`, `nudge-minus`, `nudge-plus`, `listen`,
+`undo`, `redo`, `next-level`, `reset-view`, `dismiss-tutorial`, `hint`, `failure-undo`, `retry`, `campaign`, `daily`,
+`practice`, `level-picker`, `play-level`, `replay`, `replay-step`, `replay-stop`, `sound`, and the text elements
+`summary`, `choice`, `status`, `actions`, `progress`, `message`, `failure`, `instruction`, `hint-text`, `goal`,
+`replay-position` — 35 names, each used once), but no list of those names is pinned; the registration in
+`Apps/VisualCore/App/ExperienceRegistry.swift` stores no examples yet and says they are registered at R02-G13-09 (the
+snapshot is schema 3 since feature 427; migration 1 → 2 adds progress, the mode and the tutorial to `{level, records}`;
+2 → 3 adds the sound choice and traces); the canvas description of a won level says "The symbol rings together."
+followed by " Stars: k of 3."; a level opens with star 0 and partner 1 chosen, and level 1's certified witness is one
+link (stars 0 and 1) then a listen, so no chooser has to move; the tutorial shows on levels 1 … 3; the UI chunk keys in
+`release_check.py` end at `u3` (no `v3`); the prefix `AC` is Ambient Clock's, and no UI test class uses `ACN`.
+
+- Q: How do the interface tests find controls and what do they read? → A: through the identifiers the panel already
+  carries (`experience.r02-g13.acoustic-constellator.<name>`); this feature pins the full list as
+  `AcousticConstellatorControls.identifierNames` (the 35 names above) with a host-visible test that every name is unique
+  and used once in the panel. The tests read the canvas description for the level, the win and the stars, and the replay
+  step's value for the replay position. Impact: FR-R02G1309-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `ACN` in
+  `Apps/VisualCore/Tests/UI/AcousticConstellator/ACNSupport.swift`; `ACNPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g13.acoustic-constellator`: dismiss the tutorial, play level 1's
+  certified solution by checking the star and partner values are its pair (stepping a chooser only if its value differs,
+  counting a press only when the value moves), tapping Link, then Listen; read "The symbol rings together." and "Stars: 3
+  of 3.", the level picker shows level 2 open; relaunch without reset after sending the app to the background: the stars
+  and level 2 are kept) and `ACNReplayUITests` (after the win, Replay best solution, Step until the replay ends won, Stop
+  back to the campaign). They run as a new serial chunk `v3` of `release_check.py` (its key checked unique); each test
+  stays under 90 s apart from the simulator's automation-session setup of each app launch (about 30 s per launch, and a
+  relaunch test launches twice). Level 1's certified actions are pinned in `ACN` and checked against the Core by an app
+  unit test. Impact: FR-R02G1309-002, 007; SC-R02G1309-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `AcousticConstellatorExperienceCore.schemaOneExample()` (the schema-1 saved state `{level: 1, records}` of a seeded
+  play of level 1 with its one certified link applied, so it is still playing and not won) and `schemaTwoExample()`
+  (schema 2 with progress, the campaign mode, the tutorial and level 1 solved with its stars, no trace), both
+  `MigrationExample`s built in the Core (`AcousticConstellatorSchemaExamples.swift`, modelled on
+  `HarmonicBridgesSchemaExamples`), registered with `examples:`; the app's migration check restores both into schema 3
+  with progress kept (a schema-2 result without a trace keeps its stars unverified, as feature 427 reconciles). The
+  registration's comment is updated. Impact: FR-R02G1309-003; SC-R02G1309-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `AcousticConstellatorGolden` is forbidden by feature 428, and the scenarios exist only
+  under `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G1309-004;
+  SC-R02G1309-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g13.acoustic-constellator` as not available and the launcher cannot open it; the registry's candidates list
+  contains it and `all` does not. Impact: FR-R02G1309-006; SC-R02G1309-002.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - The game works inside the real app (Priority: P1) 🎯
@@ -43,7 +96,7 @@ visible, labelled controls and read the experience's spoken texts.
 
 1. **Given** a fresh app on the simulator, **When** the tester opens Acoustic Constellator and plays level 1's
    certified solution (its links, then a listen) with the panel's star and partner choosers and the Link and Listen
-   buttons, **Then** the level is won, the stars are shown and the next level opens.
+   buttons, **Then** the canvas says "The symbol rings together." and "Stars: 3 of 3.", and level 2 is open in the level picker.
 2. **Given** a won level, **When** the app is relaunched, **Then** the same progress, stars and open levels are shown.
 3. **Given** a solved level, **When** the tester taps Replay and steps through it, **Then** the replay ends won and Stop
    returns to the campaign.
