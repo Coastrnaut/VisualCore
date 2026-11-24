@@ -744,3 +744,7 @@ Flashing), `AcousticConstellatorSoundRecipe` (the two-tone audition of an inspec
 shaders' `u_wonLight`, the experience's `AcousticConstellatorSound`, adjustable star and partner, a summary element and a
 Sound toggle.
 
+Feature 427 (R02-G13-07) adds persistence and replay: results carry their winning trace and are reconciled on restore
+(`AcousticConstellatorReconciliation`), snapshot schema 3 with migrations from 1 and 2, a replay mode
+(`replay.start`, `replay.step`, `replay.stop`) and the saved sound choice (`settings.sound`).
+

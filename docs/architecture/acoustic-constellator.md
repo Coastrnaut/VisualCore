@@ -189,3 +189,24 @@ and refuses damaged, edited and newer forms (`r02-g13.malformed`, `.newer-schema
 - **Panel.** Every control carries a label and a value in words; the chosen star and partner are adjustable; a summary
   element reads the actions left, the missing pairs, the coherence and run, the chosen pair and the level; the panel
   follows Dynamic Type and Increase Contrast and keeps a readable width on iPad.
+
+## Persistence and replay (feature 427, R02-G13-07)
+
+- **Traced results.** Each campaign or daily win stores, with its least actions spent and stars, the winning trace —
+  the effective links, unlinks, nudges and the listen of the play that earned it, undone actions left out
+  (`AcousticConstellatorReconciliation.netTrace`) — and `verified`. A better result replaces a worse one; ties keep the
+  earlier trace; practice and replay record nothing.
+- **Reconciliation.** On restore every traced result is replayed on a fresh copy of its certified level and kept only if
+  the play wins, spends no more actions than recorded and its stars match the stars rule; a trace over 64 actions or
+  with a refused action never verifies. Dropped results are counted (`reconciliationDropped`, never digested) and
+  announced once; untraced results from older saves are kept unverified; the frontier is restored as saved.
+- **Schema 3.** The snapshot is `{level, mode, progress, records, sound, tutorial}` with migrations 1 → 2 → 3 (results
+  gain an empty trace and `verified: false`, the sound choice starts off); the shared store writes it atomically,
+  quarantines unreadable files and refuses newer schemas.
+- **Replay.** `replay.start [n]` replays a verified solution of level n action by action with `replay.step`
+  (`replay.stop` returns to the campaign); every other play action is refused with `r02-g13.replay` (the tutorial
+  dismissal, the sound setting, the panel's choice and the camera stay allowed); a replayed win claims nothing, and a
+  restored replay must be exactly the first actions of its trace or the payload is refused as damaged.
+- **Settings.** The sound choice is stored in the snapshot (never the digest), changed by `settings.sound [0 … 1]` and
+  applied when the experience opens. The state reads no clock or random source: the seed, the certified catalog, the
+  date given to `mode.daily` and the recorded actions decide everything.
