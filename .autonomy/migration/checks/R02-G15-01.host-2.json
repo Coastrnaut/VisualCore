@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "VoxelOrigamiLatticeTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter VoxelOrigamiLatticeTests",
+  "elapsed_seconds": 8.813,
+  "exit_code": 0,
+  "finished": "2026-11-24T15:20:25+00:00",
+  "gate": "R02-G15-01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-01.host-2.log",
+  "log_sha256": "b55d23e9434cf6790fa5e7389a29d11535efdb58961d68d1cfda616ec176b73b",
+  "name": "host-2",
+  "started": "2026-11-24T15:20:16+00:00",
+  "timed_out": false
+}

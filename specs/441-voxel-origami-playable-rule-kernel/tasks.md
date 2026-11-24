@@ -37,7 +37,7 @@ will consume).
 
 ## Phase 3: Story 1 — fold a chain of hinged cubes into the target solid (P1) 🎯
 
-- [ ] T-R02G1501-003 [P] [US1] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiLatticeTests.swift`
+- [X] T-R02G1501-003 [P] [US1] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiLatticeTests.swift` — Verified 2026-11-24: 2026-11-24: agent A lattice tests, 8 tests (independent poses, collision by set intersection, sweep equal to 1000-step arc sampling on every unambiguous pair after the rule revision, brute-force canonical forms and covered counts, hand cases); lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G15-01.host-2.json)
   (agent A: on 500 seeded levels and turn sequences, every pose equals an independent recomputation that rotates each
   subtree's cell list directly about its hinge line one quarter turn at a time from the rest pose; collision equals a set
   intersection; the sweep decision equals a fine sampling of the quarter arc (1 000 steps, unit-cube overlap with the
