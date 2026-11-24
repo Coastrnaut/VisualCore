@@ -37,7 +37,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorShaderSourceTests.swift` (version line,
   declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match); agent A;
   `--name host-2`
-- [ ] T-R02G1303-004 [P] [US1] Create
+- [X] T-R02G1303-004 [P] [US1] Create — Verified 2026-11-23: 2026-11-23: agent B geometry and 12 tests (won-link fallback colour unified with the shaders by the lead), lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G13-03.host-3.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSceneGeometry.swift` (clarification Q1: star
   (gx, gy, gz) at X = (gx − 5.5) · 0.14, Z = (gy − 5.5) · 0.11, Y = 0.15 + (gz − 5.5) · 0.02; sky at y = −0.01 over x
   −1.1 … 1.1, z −0.9 … 1.3; dashed guides (8 dashes, 0.006 wide) for unlinked symbol pairs; links as spline strips
