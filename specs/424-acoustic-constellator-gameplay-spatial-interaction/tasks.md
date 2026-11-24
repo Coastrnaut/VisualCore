@@ -16,7 +16,7 @@ prefix.
 
 ## Phase 2: Foundational — orbit, camera, picking and the drag filament
 
-- [ ] T-R02G1304-002 [P] Add `AcousticConstellatorOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)", `clamped()`)
+- [X] T-R02G1304-002 [P] Add `AcousticConstellatorOrbit` ("yaw ±35°, pitch −15° … +20°, authored (0, 0)", `clamped()`) — Verified 2026-11-23: 2026-11-23: agent B orbit, camera(_:aspect:orbit:) (authored bit-identical), star order by the drawn eye, filament, picker (gauges, stars, 16-segment link splines, 22 points; fingerPoint, starAt); 8 picker tests incl. 500 seeded points x 3 sizes x 3 orbits against an independent pick, 6 orbit geometry tests; lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G13-04.host-2.json)
   and `camera(_:aspect:orbit:)` (yaw about the y axis through the box centre, pitch about the authored view; field of
   view refit so the authored box x −0.9 … 0.9, z −0.7 … 1.25, y 0 … 0.3 stays inside the view with a 5 % margin at aspects
   0.4 … 2.5; `camera(_:aspect:)` equals the authored orbit, bit-identical), star painter's order by distance from the

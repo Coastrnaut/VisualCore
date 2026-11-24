@@ -51,15 +51,62 @@
 // lifted 0.001 · k).
 // Tiers change only the glow mesh: the constellation mesh is identical at every tier (the pulse is a shader uniform).
 // Doubles are used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 424 (R02-G13-04) T-R02G1304-002 (FR-R02G1304-005; SC-R02G1304-004; clarifications Q1, Q4) adds the player's
+// orbit (`AcousticConstellatorOrbit`: yaw ±35° about the vertical axis through the authored box centre
+// (0, 0.15, 0.275), pitch −15° … +20° about the authored view's right axis, positive raising the eye so the
+// constellation is seen more from above; authored (0, 0)) and `camera(_:aspect:orbit:)`: the eye's offset from the
+// look-at point is pitched, then the eye and the look-at point are yawed together about that axis, and the field of view
+// is refitted exactly as for the fixed camera so the authored box x −0.9 … 0.9, z −0.7 … 1.25, y 0 … 0.3 keeps
+// ``fitMargin`` (above the required 5 %) per side at every orbit and aspect 0.4 … 2.5. At the authored orbit the eye and
+// the look-at point are the authored ones, so `camera(_:aspect:)` (which calls it) is unchanged bit for bit. Under any
+// other orbit the stars are painted in descending distance of their centres from the orbit's eye (far first, ties by
+// the authored order) and the strips are wound to face the orbit's eye; the authored orbit keeps today's order and
+// winding. `filamentMesh(from:to:_:)` is the drag preview: a straight strip 0.01 wide in
+// ``AcousticConstellatorMaterial/tealLink`` from a star's centre to a world point. The orbit is presentation only:
+// never saved, never read by the rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
-/// The fixed authored camera of one frame: eye, target, lens and the matrices built from them.
+/// The player's view of the constellation: a yaw about the vertical axis through the authored box centre and a pitch
+/// about the authored view's right axis, both in radians (feature 424, R02-G13-04). Presentation only: never saved,
+/// never read by the rules.
+public struct AcousticConstellatorOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians about the view's right axis: positive raises the eye (the constellation seen more from
+    /// above), negative lowers it; allowed ``pitchRange`` (−15° … +20°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 0, the fixed camera of R02-G13-03.
+    public static let authored = AcousticConstellatorOrbit(yaw: 0, pitch: 0)
+    /// The largest yaw either way, 35° in radians.
+    public static let yawLimit: Double = 35.0 * Double.pi / 180
+    /// The allowed pitches, −15° … +20° in radians.
+    public static let pitchRange: ClosedRange<Double> = (-15.0 * Double.pi / 180)...(20.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −35° … 35° and pitch to −15° … 20°; a non-finite angle becomes 0.
+    public func clamped() -> AcousticConstellatorOrbit {
+        let y: Double = yaw.isFinite ? yaw : 0
+        let p: Double = pitch.isFinite ? pitch : 0
+        return AcousticConstellatorOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                         pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+}
+
+/// The camera of one frame: eye, target, lens and the matrices built from them (the authored camera at the authored
+/// orbit).
 public struct AcousticConstellatorCamera: Sendable, Equatable {
-    /// The eye position in world units, (0, 2.0, 1.7).
+    /// The eye position in world units, (0, 2.0, 1.7) at the authored orbit.
     public let eye: SIMD3<Double>
-    /// The point looked at, (0, 0, 0.2).
+    /// The point looked at, (0, 0, 0.2) at the authored orbit.
     public let target: SIMD3<Double>
     /// The vertical field of view in radians (fitted to the authored box at `aspect`).
     public let fovY: Double
@@ -343,10 +390,25 @@ public enum AcousticConstellatorSceneGeometry {
         return SIMD3(sin(angle), 0, -cos(angle))
     }
 
-    /// The stars in painter's order: ascending Z (far side first), then ascending X, then ascending Y, then index.
-    public static func starOrder(_ snapshot: AcousticConstellatorSceneSnapshot) -> [Int] {
+    /// The stars in painter's order for the camera at `orbit` (clamped). At the authored orbit: ascending Z (far side
+    /// first), then ascending X, then ascending Y, then index. At any other orbit (feature 424, T-R02G1304-002):
+    /// descending distance of the star's centre from the orbit's eye (far first), ties broken by the authored order, so
+    /// overlapping stars stay painted back to front when the camera turns.
+    public static func starOrder(_ snapshot: AcousticConstellatorSceneSnapshot,
+                                 orbit: AcousticConstellatorOrbit = .authored) -> [Int] {
         let stars: [AcousticConstellatorStar] = snapshot.stars
+        let clamped: AcousticConstellatorOrbit = orbit.clamped()
+        let byDistance: Bool = clamped != .authored
+        var distances: [Double] = Array(repeating: 0, count: stars.count)
+        if byDistance {
+            let eye: SIMD3<Double> = orbitView(clamped).eye
+            for index in stars.indices {
+                let d: SIMD3<Double> = starCentre(index, snapshot) - eye
+                distances[index] = dot(d, d)
+            }
+        }
         return Array(stars.indices).sorted { a, b in
+            if byDistance, distances[a] != distances[b] { return distances[a] > distances[b] }
             if stars[a].y != stars[b].y { return stars[a].y < stars[b].y }
             if stars[a].x != stars[b].x { return stars[a].x < stars[b].x }
             if stars[a].z != stars[b].z { return stars[a].z < stars[b].z }
@@ -384,25 +446,49 @@ public enum AcousticConstellatorSceneGeometry {
     // MARK: Meshes
 
     /// The constellation mesh for the constellation program, in painter's order (see the header), at the drawn tick
-    /// (tick 0 under `reduceMotion`). Identical at every tier: the tier's pulse is applied by a shader uniform.
+    /// (tick 0 under `reduceMotion`). Identical at every tier: the tier's pulse is applied by a shader uniform. The stars
+    /// are in painter's order for `orbit` (``starOrder(_:orbit:)``) and the strips face its eye; positions are the same
+    /// at every orbit.
     public static func constellationMesh(_ snapshot: AcousticConstellatorSceneSnapshot, tier: AcousticConstellatorTier,
-                                         reduceMotion: Bool) throws(MeshError) -> Mesh {
-        try constellationPart(snapshot, tier: tier, reduceMotion: reduceMotion).mesh
+                                         reduceMotion: Bool,
+                                         orbit: AcousticConstellatorOrbit = .authored) throws(MeshError) -> Mesh {
+        try constellationPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit).mesh
     }
 
     /// The constellation with fallback colours (unlit palette colours) for the shared unlit renderer: the same mesh as
-    /// ``constellationMesh(_:tier:reduceMotion:)`` (which draws the level-2 look when shaded unlit).
+    /// ``constellationMesh(_:tier:reduceMotion:orbit:)`` (which draws the level-2 look when shaded unlit), the stars in
+    /// painter's order for `orbit`.
     public static func constellationPart(_ snapshot: AcousticConstellatorSceneSnapshot, tier: AcousticConstellatorTier,
-                                         reduceMotion: Bool = false) throws(MeshError)
+                                         reduceMotion: Bool = false,
+                                         orbit: AcousticConstellatorOrbit = .authored) throws(MeshError)
         -> AcousticConstellatorColouredMesh {
         _ = tier
-        return try build(snapshot, tick: drawnTick(snapshot, reduceMotion: reduceMotion))
+        return try build(snapshot, tick: drawnTick(snapshot, reduceMotion: reduceMotion), orbit: orbit)
     }
 
-    /// Builds the constellation at `tick` in painter's order.
-    static func build(_ snapshot: AcousticConstellatorSceneSnapshot,
-                      tick: Int) throws(MeshError) -> AcousticConstellatorColouredMesh {
+    /// The drag preview (feature 424, T-R02G1304-002): a straight strip 0.01 wide (one segment, d = −1 and +1 on its
+    /// long sides) in ``AcousticConstellatorMaterial/tealLink`` from the centre of star `star` to the world `point`,
+    /// normal slot (u, star, 0), wound to face the authored eye (the strip lies nearly flat and every orbit's eye is
+    /// above it). Empty when `star` is not a star of `snapshot`, `point` is not finite or the two coincide.
+    public static func filamentMesh(from star: Int, to point: SIMD3<Double>,
+                                    _ snapshot: AcousticConstellatorSceneSnapshot) throws(MeshError) -> Mesh {
         var parts: Parts = Parts()
+        guard star >= 0, star < snapshot.stars.count, point.x.isFinite, point.y.isFinite, point.z.isFinite else {
+            return parts.built().mesh
+        }
+        let a: SIMD3<Double> = starCentre(star, snapshot)
+        let d: SIMD3<Double> = point - a
+        guard dot(d, d) > 0 else { return parts.built().mesh }
+        try parts.strip(a, point, rise: 0, from: 0, to: 1, segments: 1, band: 0...(linkWidth / 2), material: .tealLink,
+                        item: Double(star))
+        return parts.built().mesh
+    }
+
+    /// Builds the constellation at `tick` in painter's order for `orbit`.
+    static func build(_ snapshot: AcousticConstellatorSceneSnapshot, tick: Int,
+                      orbit: AcousticConstellatorOrbit = .authored) throws(MeshError) -> AcousticConstellatorColouredMesh {
+        var parts: Parts = Parts()
+        parts.eye = orbitView(orbit).eye
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
         // Sky.
         let x0: Double = skyX.lowerBound
@@ -485,8 +571,8 @@ public enum AcousticConstellatorSceneGeometry {
                                           SIMD3(1, Double(index), 0), SIMD3(0, Double(index), 0)]
             try parts.quad([c - n, e - n, e + n, c + n], front: up, slots: slots, material: .hand, local: [-1, -1, 1, 1])
         }
-        // Stars, back to front.
-        for index in starOrder(snapshot) {
+        // Stars, back to front for the drawn orbit.
+        for index in starOrder(snapshot, orbit: orbit) {
             try parts.ellipsoid(centre: starCentre(index, snapshot), radii: starRadii, code: Material.star.code,
                                 local: Double(index), slot: nil, colour: colour(.star))
         }
@@ -496,10 +582,14 @@ public enum AcousticConstellatorSceneGeometry {
     /// The glow with fallback colours (the base colour times the intensity) for the shared unlit renderer: the wave
     /// shells (`tier.waveShells` per star on a coherent drawn tick, none under `reduceMotion`) and the glow shells
     /// (`tier.glowShells`, outermost first) around every star and every unsnapped teal link (on a won level every
-    /// symbol link, its glow lifted). Empty at level-2.
+    /// symbol link, its glow lifted). Empty at level-2. The star shells are in painter's order for `orbit`
+    /// (``starOrder(_:orbit:)``) and the link glow strips face its eye.
     public static func glowPart(_ snapshot: AcousticConstellatorSceneSnapshot, tier: AcousticConstellatorTier,
-                                reduceMotion: Bool = false) throws(MeshError) -> AcousticConstellatorColouredMesh {
+                                reduceMotion: Bool = false,
+                                orbit: AcousticConstellatorOrbit = .authored) throws(MeshError)
+        -> AcousticConstellatorColouredMesh {
         var parts: Parts = Parts()
+        parts.eye = orbitView(orbit).eye
         let tick: Int = drawnTick(snapshot, reduceMotion: reduceMotion)
         let won: Double = wonFlag(snapshot)
         // Wave shells.
@@ -538,7 +628,7 @@ public enum AcousticConstellatorSceneGeometry {
                 try parts.glowStrip(ends.a + lift, ends.b + lift, halfWidth: linkWidth / 2 + linkGlowGrowth * Double(k),
                                     slot: base, code: kind.code(factor: factor), colour: base * factor)
             }
-            for index in starOrder(snapshot) {
+            for index in starOrder(snapshot, orbit: orbit) {
                 let grow: Double = starGlowGrowth * Double(k)
                 try parts.ellipsoid(centre: starCentre(index, snapshot), radii: starRadii + SIMD3(grow, grow, grow),
                                     code: AcousticConstellatorGlowKind.glow.code(factor: factor), local: 0, slot: glow,
@@ -548,10 +638,12 @@ public enum AcousticConstellatorSceneGeometry {
         return parts.built()
     }
 
-    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2.
+    /// The glow mesh for the glow program (`glowPart` without colours, in painter's order for `orbit`); empty at
+    /// level-2.
     public static func glowMesh(_ snapshot: AcousticConstellatorSceneSnapshot, tier: AcousticConstellatorTier,
-                                reduceMotion: Bool = false) throws(MeshError) -> Mesh {
-        try glowPart(snapshot, tier: tier, reduceMotion: reduceMotion).mesh
+                                reduceMotion: Bool = false,
+                                orbit: AcousticConstellatorOrbit = .authored) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, reduceMotion: reduceMotion, orbit: orbit).mesh
     }
 
     // MARK: Camera
@@ -585,11 +677,50 @@ public enum AcousticConstellatorSceneGeometry {
     /// The fixed camera for `aspect`: from (0, 2.0, 1.7) looking at (0, 0, 0.2) with +y up; the vertical field of view
     /// is the smallest that holds every corner of the box x −0.9 … 0.9, y 0 … 0.3, z −0.7 … 1.25 inside the view with
     /// ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it — every star, link,
-    /// gauge bar and pip — keeps a margin of at least 5 % for aspect 0.4 … 2.5). The snapshot is accepted for parity;
-    /// the camera never moves while a level is played.
+    /// gauge bar and pip — keeps a margin of at least 5 % for aspect 0.4 … 2.5). The snapshot is accepted for parity.
+    /// Equals ``camera(_:aspect:orbit:)`` at ``AcousticConstellatorOrbit/authored`` bit for bit.
     public static func camera(_ snapshot: AcousticConstellatorSceneSnapshot, aspect: Double) -> AcousticConstellatorCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The vertical axis the orbit yaws about passes through the authored box centre (0, 0.15, 0.275).
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `p` yawed by `yaw` radians about the vertical axis through ``orbitPivot`` (from +z towards +x).
+    static func yawed(_ p: SIMD3<Double>, _ yaw: Double) -> SIMD3<Double> {
+        let c: Double = cos(yaw)
+        let s: Double = sin(yaw)
+        let d: SIMD3<Double> = p - orbitPivot
+        return SIMD3(orbitPivot.x + d.x * c + d.z * s, p.y, orbitPivot.z - d.x * s + d.z * c)
+    }
+
+    /// The eye and the look-at point of `orbit` (clamped): the authored eye's offset from the look-at point,
+    /// e = (0, 2.0, 1.5), pitched about the x axis (positive p raises it: (0, e.y·cos p + e.z·sin p,
+    /// −e.y·sin p + e.z·cos p)) and added to the look-at point; then both points yawed about the vertical axis through
+    /// ``orbitPivot``. Exactly ``eye`` and ``lookAt`` at the authored orbit.
+    static func orbitView(_ orbit: AcousticConstellatorOrbit) -> (eye: SIMD3<Double>, target: SIMD3<Double>) {
+        let o: AcousticConstellatorOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return (eye: eye, target: lookAt) }
+        let e: SIMD3<Double> = eye - lookAt
+        let cp: Double = cos(o.pitch)
+        let sp: Double = sin(o.pitch)
+        let pitched: SIMD3<Double> = lookAt + SIMD3(e.x, e.y * cp + e.z * sp, -e.y * sp + e.z * cp)
+        return (eye: yawed(pitched, o.yaw), target: yawed(lookAt, o.yaw))
+    }
+
+    /// The camera for `orbit` (clamped, see ``AcousticConstellatorOrbit/clamped()``) and `aspect` (feature 424,
+    /// T-R02G1304-002): from the orbit's eye looking at its look-at point (``orbitView(_:)``) with +y up (never
+    /// parallel: the eye stays well above the sky); the vertical field of view is the smallest that holds every corner
+    /// of the box x −0.9 … 0.9, y 0 … 0.3, z −0.7 … 1.25 inside the view with ``fitMargin`` per side, so everything
+    /// inside the box — every star, link, gauge bar and pip — keeps a margin of at least 5 % at every orbit and aspect
+    /// 0.4 … 2.5. Presentation only; independent of the snapshot, the tier and the time.
+    public static func camera(_ snapshot: AcousticConstellatorSceneSnapshot, aspect: Double,
+                              orbit: AcousticConstellatorOrbit) -> AcousticConstellatorCamera {
         _ = snapshot
         let a: Double = usableAspect(aspect)
+        let view0 = orbitView(orbit)
+        let eye: SIMD3<Double> = view0.eye
+        let lookAt: SIMD3<Double> = view0.target
         let forward: SIMD3<Double> = unit(lookAt - eye)
         let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
         let up: SIMD3<Double> = cross(right, forward)
@@ -630,6 +761,8 @@ public enum AcousticConstellatorSceneGeometry {
         var builder: MeshBuilder = MeshBuilder()
         /// One colour per welded vertex.
         var colours: [Vec4] = []
+        /// The eye the strips are wound to face (the authored eye unless an orbit's is set; feature 424).
+        var eye: SIMD3<Double> = AcousticConstellatorSceneGeometry.eye
 
         /// Adds (or welds) a vertex at `p` with normal slot `slot` and uv (`code`, `local`); its fallback colour is
         /// `colour`.
@@ -741,7 +874,7 @@ public enum AcousticConstellatorSceneGeometry {
                                                     p0 + side * lane.far]
                     let slots: [SIMD3<Double>] = [SIMD3(u0, item, 0), SIMD3(u1, item, 0), SIMD3(u1, item, 0),
                                                   SIMD3(u0, item, 0)]
-                    let front: SIMD3<Double> = AcousticConstellatorSceneGeometry.eye - (p0 + p1) * 0.5
+                    let front: SIMD3<Double> = eye - (p0 + p1) * 0.5
                     try quad(corners, front: front, slots: slots, material: material,
                              local: [lane.dNear, lane.dNear, lane.dFar, lane.dFar])
                 }
@@ -759,7 +892,7 @@ public enum AcousticConstellatorSceneGeometry {
                 let u1: Double = Double(i + 1) / Double(count)
                 let p0: SIMD3<Double> = AcousticConstellatorSceneGeometry.splinePoint(a, b, u: u0)
                 let p1: SIMD3<Double> = AcousticConstellatorSceneGeometry.splinePoint(a, b, u: u1)
-                let front: SIMD3<Double> = AcousticConstellatorSceneGeometry.eye - (p0 + p1) * 0.5
+                let front: SIMD3<Double> = eye - (p0 + p1) * 0.5
                 try quad([p0 - side, p1 - side, p1 + side, p0 + side], front: front, slots: [slot, slot, slot, slot],
                          material: .wonLink, local: [0, 0, 0, 0], code: code,
                          colour: colour)

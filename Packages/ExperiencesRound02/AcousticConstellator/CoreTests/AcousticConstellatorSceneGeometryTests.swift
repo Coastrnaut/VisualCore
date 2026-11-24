@@ -9,6 +9,13 @@
 // are brighter and nothing moves; the glow mesh is empty at level-2 and has 2 wave shells and 2 glow shells at level-0
 // and 1 glow shell at level-1; failures outline the missing guide or the snapped link; painter's order holds. Plain
 // loops; well under 10 s each.
+//
+// Feature 424 (R02-G13-04) T-R02G1304-002 (FR-R02G1304-005; SC-R02G1304-004; clarifications Q1, Q4): at the authored
+// orbit, the four clamp corners and the centre of the range, at seven aspects 0.4 … 2.5, every star centre, link check
+// point, gauge bar, threshold mark and hold pip projects inside the view with a 5 % margin and the fit is tight; pitch
+// raises, yaw turns about the box centre; the orbit is clamped; the authored orbit is the fixed camera bit for bit; the
+// stars are painted back to front for every orbit (the authored orbit keeps the authored order) and nothing moves; the
+// drag filament is finite, teal, 0.01 wide and in place between the star's centre and the world point.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -543,5 +550,224 @@ import VisualCoreScenes
                 #expect(Geometry.starCentre(order[i - 1], s).z <= Geometry.starCentre(order[i], s).z)
             }
         }
+    }
+
+    // MARK: Orbit (feature 424, R02-G13-04, T-R02G1304-002)
+
+    /// Six orbits: the authored one, the four clamp corners and the centre of the allowed range.
+    static func orbits() -> [AcousticConstellatorOrbit] {
+        let y: Double = AcousticConstellatorOrbit.yawLimit
+        let lo: Double = AcousticConstellatorOrbit.pitchRange.lowerBound
+        let hi: Double = AcousticConstellatorOrbit.pitchRange.upperBound
+        return [AcousticConstellatorOrbit.authored, AcousticConstellatorOrbit(yaw: y, pitch: hi),
+                AcousticConstellatorOrbit(yaw: -y, pitch: hi), AcousticConstellatorOrbit(yaw: y, pitch: lo),
+                AcousticConstellatorOrbit(yaw: -y, pitch: lo), AcousticConstellatorOrbit(yaw: 0, pitch: (lo + hi) / 2)]
+    }
+
+    /// NDC (x, y) of `p` through `camera`, or nil behind the eye.
+    static func ndc(_ p: SIMD3<Double>, _ camera: AcousticConstellatorCamera) -> SIMD2<Double>? {
+        let clip: Vec4 = camera.viewProjection * Vec4(Vec3(p.x, p.y, p.z), 1)
+        guard clip.w > 0 else { return nil }
+        return SIMD2(clip.x / clip.w, clip.y / clip.w)
+    }
+
+    /// The distance between `a` and `b`.
+    static func distance(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> Double {
+        let d: SIMD3<Double> = a - b
+        return (d * d).sum().squareRoot()
+    }
+
+    @Test func everyOrbitKeepsTheSceneInsideTheMarginAtSevenAspects() throws {
+        let snapshots: [Snapshot] = [try Self.threeIdle(), try Self.sixteenCalm(listen: false, time: 0),
+                                     try Self.sixteenSnapped(listen: true, time: 0.3)]
+        let bound: Double = 1 - 2 * Geometry.fitMargin
+        for s in snapshots {
+            var points: [SIMD3<Double>] = []
+            for index in s.stars.indices { points.append(Geometry.starCentre(index, s)) }
+            for index in s.links.indices {
+                points.append(Geometry.linkCheckPoint(index, s))
+                points.append(Geometry.linkPoint(index, u: 0.5, s))
+            }
+            for index in 0..<Geometry.coherenceCount { points.append(Geometry.coherenceBar(index, s)) }
+            points.append(Geometry.thresholdMark(s))
+            for index in 0..<s.hold { points.append(Geometry.holdPip(index, s)) }
+            for index in 0..<s.budget { points.append(Geometry.movesBar(index, s)) }
+            for orbit in Self.orbits() {
+                for aspect in Self.aspects {
+                    let camera: AcousticConstellatorCamera = Geometry.camera(s, aspect: aspect, orbit: orbit)
+                    var outside: Int = 0
+                    for p in points {
+                        guard let v = Geometry.project(p, camera: camera) else { outside += 1; continue }
+                        if v.x < 0.05 || v.x > 0.95 || v.y < 0.05 || v.y > 0.95 { outside += 1 }
+                    }
+                    #expect(outside == 0, "points outside the 5 % margin: \(outside) at \(orbit), aspect \(aspect)")
+                    // The field of view is the smallest that holds the box: some corner touches the margin.
+                    var largest: Double = 0
+                    for index in 0..<8 {
+                        guard let v = Self.ndc(Geometry.corner(index), camera) else {
+                            Issue.record("corner \(index) behind the eye at \(orbit), aspect \(aspect)")
+                            continue
+                        }
+                        largest = max(largest, abs(v.x), abs(v.y))
+                    }
+                    #expect(abs(largest - bound) < 1e-9, "fit not tight: \(largest) at \(orbit), aspect \(aspect)")
+                }
+            }
+        }
+    }
+
+    @Test func positivePitchRaisesTheEyeAndPositiveYawMovesItTowardsPlusX() throws {
+        let s: Snapshot = try Self.threeIdle()
+        let base: AcousticConstellatorCamera = Geometry.camera(s, aspect: 1)
+        let up: AcousticConstellatorCamera = Geometry.camera(s, aspect: 1,
+                                                             orbit: AcousticConstellatorOrbit(yaw: 0, pitch: 0.2))
+        let down: AcousticConstellatorCamera = Geometry.camera(s, aspect: 1,
+                                                               orbit: AcousticConstellatorOrbit(yaw: 0, pitch: -0.2))
+        let side: AcousticConstellatorCamera = Geometry.camera(s, aspect: 1,
+                                                               orbit: AcousticConstellatorOrbit(yaw: 0.3, pitch: 0))
+        #expect(up.eye.y > base.eye.y && up.eye.z < base.eye.z && up.eye.x == 0 && up.target == Geometry.lookAt)
+        #expect(down.eye.y < base.eye.y && down.eye.z > base.eye.z)
+        #expect(side.eye.x > 0 && side.eye.y == base.eye.y)
+        // Yaw turns the eye and the look-at point about the vertical axis through the box centre (0, ·, 0.275).
+        let centre: SIMD3<Double> = (Geometry.boxLow + Geometry.boxHigh) / 2
+        #expect(abs(centre.x) < 1e-15 && abs(centre.z - 0.275) < 1e-12)
+        for p in [(base.eye, side.eye), (base.target, side.target)] {
+            let a: SIMD2<Double> = SIMD2(p.0.x - centre.x, p.0.z - centre.z)
+            let b: SIMD2<Double> = SIMD2(p.1.x - centre.x, p.1.z - centre.z)
+            #expect(abs((a * a).sum() - (b * b).sum()) < 1e-12)
+        }
+        let offset: SIMD3<Double> = up.eye - up.target
+        let authored: SIMD3<Double> = Geometry.eye - Geometry.lookAt
+        #expect(abs((offset * offset).sum() - (authored * authored).sum()) < 1e-12)
+    }
+
+    @Test func theAuthoredOrbitIsTheFixedCameraBitForBit() throws {
+        let s: Snapshot = try Self.threeIdle()
+        var aspects: [Double] = Self.aspects
+        aspects.append(contentsOf: [0.05, 20, 0, -1, .nan, .infinity])
+        for aspect in aspects {
+            let fixed: AcousticConstellatorCamera = Geometry.camera(s, aspect: aspect)
+            let orbit: AcousticConstellatorCamera = Geometry.camera(s, aspect: aspect, orbit: .authored)
+            #expect(fixed == orbit)
+            #expect(fixed.fovY.bitPattern == orbit.fovY.bitPattern && fixed.near.bitPattern == orbit.near.bitPattern
+                    && fixed.far.bitPattern == orbit.far.bitPattern)
+            #expect(fixed.eye == SIMD3(0, 2.0, 1.7) && fixed.target == SIMD3(0, 0, 0.2))
+            let odd: AcousticConstellatorCamera = Geometry.camera(s, aspect: aspect,
+                                                                  orbit: AcousticConstellatorOrbit(yaw: .nan,
+                                                                                                   pitch: .infinity))
+            #expect(odd == fixed)
+        }
+        // The meshes drawn at the authored orbit are the meshes of R02-G13-03.
+        for s in [try Self.sixteenCalm(listen: true, time: 0.85), try Self.threeMissing()] {
+            let tier: AcousticConstellatorTier = AcousticConstellatorTier.of(0)
+            #expect(try Geometry.constellationMesh(s, tier: tier, reduceMotion: false, orbit: .authored)
+                    == Geometry.constellationMesh(s, tier: tier, reduceMotion: false))
+            #expect(try Geometry.glowMesh(s, tier: tier, orbit: .authored) == Geometry.glowMesh(s, tier: tier))
+        }
+    }
+
+    @Test func clampedBoundsTheOrbit() throws {
+        let y: Double = AcousticConstellatorOrbit.yawLimit
+        let lo: Double = AcousticConstellatorOrbit.pitchRange.lowerBound
+        let hi: Double = AcousticConstellatorOrbit.pitchRange.upperBound
+        #expect(abs(y - 35.0 * Double.pi / 180) < 1e-15)
+        #expect(abs(lo + 15.0 * Double.pi / 180) < 1e-15 && abs(hi - 20.0 * Double.pi / 180) < 1e-15)
+        #expect(AcousticConstellatorOrbit.authored == AcousticConstellatorOrbit(yaw: 0, pitch: 0))
+        #expect(AcousticConstellatorOrbit(yaw: 5, pitch: 5).clamped() == AcousticConstellatorOrbit(yaw: y, pitch: hi))
+        #expect(AcousticConstellatorOrbit(yaw: -5, pitch: -5).clamped() == AcousticConstellatorOrbit(yaw: -y, pitch: lo))
+        #expect(AcousticConstellatorOrbit(yaw: 0.2, pitch: -0.1).clamped()
+                == AcousticConstellatorOrbit(yaw: 0.2, pitch: -0.1))
+        #expect(AcousticConstellatorOrbit(yaw: .nan, pitch: .infinity).clamped() == AcousticConstellatorOrbit.authored)
+        #expect(AcousticConstellatorOrbit(yaw: -.infinity, pitch: .nan).clamped() == AcousticConstellatorOrbit.authored)
+        let s: Snapshot = try Self.threeIdle()
+        let beyond: AcousticConstellatorCamera = Geometry.camera(s, aspect: 1,
+                                                                 orbit: AcousticConstellatorOrbit(yaw: 9, pitch: -9))
+        #expect(beyond == Geometry.camera(s, aspect: 1, orbit: AcousticConstellatorOrbit(yaw: y, pitch: lo)))
+    }
+
+    @Test func starsArePaintedBackToFrontForEveryOrbit() throws {
+        let tier: AcousticConstellatorTier = AcousticConstellatorTier.of(0)
+        for s in try Self.snapshots() {
+            #expect(Geometry.starOrder(s, orbit: .authored) == Geometry.starOrder(s))
+            let authored: Mesh = try Geometry.constellationMesh(s, tier: tier, reduceMotion: false)
+            let authoredKeys: Set<String> = Self.keys(authored)
+            for orbit in Self.orbits() where orbit != .authored {
+                let eye: SIMD3<Double> = Geometry.orbitView(orbit).eye
+                let order: [Int] = Geometry.starOrder(s, orbit: orbit)
+                #expect(order.sorted() == Array(s.stars.indices), "a permutation of the stars")
+                var previous: Double = Double.infinity
+                for index in order {
+                    let d: Double = Self.distance(Geometry.starCentre(index, s), eye)
+                    #expect(d <= previous + 1e-12, "star \(index) at orbit \(orbit) is not nearer than the one before")
+                    previous = d
+                }
+                // The turned mesh draws its stars in that order and holds the same positions.
+                let turned: Mesh = try Geometry.constellationMesh(s, tier: tier, reduceMotion: false, orbit: orbit)
+                #expect(Self.keys(turned) == authoredKeys)
+                #expect(turned.positions.count == authored.positions.count)
+                var drawn: [Int] = []
+                var t: Int = 0
+                while t < turned.indices.count {
+                    let k: Int = Int(turned.indices[t])
+                    if Self.code(turned, k) == Material.star.rawValue {
+                        let star: Int = Int(turned.uvs[k].y.rounded())
+                        if drawn.last != star { drawn.append(star) }
+                    }
+                    t += 3
+                }
+                #expect(drawn == order, "stars drawn in painter's order at \(orbit)")
+                let glow: Mesh = try Geometry.glowMesh(s, tier: tier, orbit: orbit)
+                #expect(Self.keys(glow) == Self.keys(try Geometry.glowMesh(s, tier: tier)))
+            }
+        }
+    }
+
+    @Test func theFilamentIsFiniteTealAndInPlace() throws {
+        let s: Snapshot = try Self.sixteenCalm(listen: false, time: 0)
+        let half: Double = Geometry.linkWidth / 2
+        for star in s.stars.indices {
+            let a: SIMD3<Double> = Geometry.starCentre(star, s)
+            let targets: [SIMD3<Double>] = [Geometry.starCentre((star + 3) % s.stars.count, s),
+                                            SIMD3(0.4, a.y, -0.3), SIMD3(-0.85, a.y, 1.2), a + SIMD3(0.001, 0, 0)]
+            for b in targets {
+                let m: Mesh = try Geometry.filamentMesh(from: star, to: b, s)
+                #expect(m.positions.count == 4 && m.indices.count == 6, "one strip segment")
+                let chord: SIMD3<Double> = b - a
+                let lengthSquared: Double = (chord * chord).sum()
+                for (k, v) in m.positions.enumerated() {
+                    #expect(Self.finite(v))
+                    #expect(Self.code(m, k) == Material.tealLink.rawValue)
+                    #expect(abs(abs(m.uvs[k].y) - 1) < 1e-12, "d is −1 or +1 on the long sides")
+                    #expect(m.normals[k].y == Double(star), "the normal slot carries the star")
+                    // In place: on the chord (u in 0 … 1) at the half width sideways.
+                    let p: SIMD3<Double> = SIMD3(v.x, v.y, v.z)
+                    let u: Double = ((p - a) * chord).sum() / lengthSquared
+                    #expect(u > -1e-9 && u < 1 + 1e-9)
+                    let off: Double = Self.distance(p, a + chord * min(max(u, 0), 1))
+                    #expect(abs(off - half) < 1e-9, "\(off)")
+                }
+                // Wound to face the eye (from above).
+                var t: Int = 0
+                while t < m.indices.count {
+                    let p0: Vec3 = m.positions[Int(m.indices[t])]
+                    let p1: Vec3 = m.positions[Int(m.indices[t + 1])]
+                    let p2: Vec3 = m.positions[Int(m.indices[t + 2])]
+                    let e1: SIMD3<Double> = SIMD3(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z)
+                    let e2: SIMD3<Double> = SIMD3(p2.x - p0.x, p2.y - p0.y, p2.z - p0.z)
+                    let n: SIMD3<Double> = SIMD3(e1.y * e2.z - e1.z * e2.y, e1.z * e2.x - e1.x * e2.z,
+                                                 e1.x * e2.y - e1.y * e2.x)
+                    let toEye: SIMD3<Double> = Geometry.eye - SIMD3(p0.x, p0.y, p0.z)
+                    #expect((n * toEye).sum() > 0)
+                    t += 3
+                }
+            }
+        }
+        // Unusable input: no strip.
+        let a: SIMD3<Double> = Geometry.starCentre(0, s)
+        #expect(try Geometry.filamentMesh(from: -1, to: a, s).positions.isEmpty)
+        #expect(try Geometry.filamentMesh(from: s.stars.count, to: SIMD3(0, 0.15, 0), s).positions.isEmpty)
+        #expect(try Geometry.filamentMesh(from: 0, to: SIMD3(.nan, 0, 0), s).positions.isEmpty)
+        #expect(try Geometry.filamentMesh(from: 0, to: SIMD3(0, .infinity, 0), s).positions.isEmpty)
+        #expect(try Geometry.filamentMesh(from: 0, to: a, s).positions.isEmpty)
     }
 }
