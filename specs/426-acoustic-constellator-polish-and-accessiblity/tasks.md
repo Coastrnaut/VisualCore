@@ -82,7 +82,7 @@ faded in the unlit fallback too) taken into the first pass.
 
 - [X] T-R02G1306-006 Docs: `docs/architecture/acoustic-constellator.md` (polish and accessibility), — Verified 2026-11-23: 2026-11-23: architecture polish and accessibility section, ExperiencesRound02 README, testing doc (two-agent wiring with fixed shared names); round02-host exit 0 (.autonomy/migration/checks/R02-G13-06.round02-host.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1306-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1306-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: 2026-11-23: rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G13-06.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1306-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1306-009 Reference regression chunk 2 (`--name reference-2`)
