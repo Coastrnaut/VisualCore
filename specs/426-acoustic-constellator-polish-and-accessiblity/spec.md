@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G13-06 (migration ledger, game feature of experience R02-G13) · ID namespace FR-R02G1306-###,
 SC-R02G1306-###, T-R02G1306-###
@@ -24,6 +24,75 @@ Canonical overrides:
 - **Shared features used:** R02-F26 (input and accessibility contract, shared feedback route), the shared ambient loop
   player, and the kernel, content, adapter, renderer, gestures and teaching of R02-G13-01 … 05.
 - **Model:** feature 416 (Harmonic Bridges' polish and accessibility).
+
+## Clarifications
+
+### Session 2026-11-23
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+416's answers where the games agree. Facts checked in code (read-only, 2026-11-23): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` are those feature 416 used; Acoustic Constellator's
+stars pulse by a uniform and level-0 adds two wave shells per star on a coherent shown tick, the shown tick advances
+every 0.25 s and holds the last tick 1 s, and the won look reaches the symbol links through the `wonLink` material and
+the `.wonGlow` glow strips, which switch at once when the level is won; a listen always ends the level (won or failed);
+the adapter's refusal codes are `r02-g13.action`, `stage`, `stale`, `level`, `malformed`, `locked`, `date` and
+`not-whole` (reported by the engine as `action.rule.<code>`), which the panel words through
+`AcousticConstellatorMirror.refusalText`; the level words stars "star i, rate r, phase p", links "link star a to star b,
+gap g" and progress "tick t of w: order …, threshold θ, coherent, run r of h, k links snapped; …; a actions left".
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted action (`state`), the change then the
+  progress: a link "Linked star a to star b, gap g."; an unlink "Unlinked star a and star b."; a nudge "Star s nudged to
+  phase p."; undo and redo "Undone." / "Redone."; each followed by " k symbol pairs missing, a actions left." (" The
+  symbol is linked, a actions left." when none is missing); a win (`outcome`): "The symbol rings together. Level won
+  spending a actions, k of 3 stars." (without the stars in practice); a failure (`outcome`): the failure explanation of
+  feature 425; a level or mode change (`level`): "Level n, band b, <mode>." with the tutorial instruction when shown; a
+  refusal (`rejection`) in words: `r02-g13.locked` "That level is not open yet.", `r02-g13.date` "That date cannot be
+  used.", `r02-g13.action` "That change is not allowed for these stars.", `r02-g13.stage` "The level has ended.",
+  `r02-g13.not-whole` "That value must be a whole number.", any other code "That action was refused." (the engine's
+  `action.rule.` prefix read as the bare code). A revealed hint is announced (`state`) with its text. Choosing a star or
+  partner, a drag preview and orbit are not announced. Texts are a pure function of the old and new core (and the
+  refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact: FR-R02G1306-002;
+  SC-R02G1306-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted link, unlink, nudge, undo or redo;
+  `success` for a win; `warning` for a failure; `error` for a refusal; choosing, the drag preview, orbit and level
+  changes play none. A listen always ends the level, so it plays only its outcome; an action that spends the last move
+  without a win plays only the warning. The shared planners' intervals apply. Impact: FR-R02G1306-003; SC-R02G1306-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: the presenter keeps light levels for the glow (0.7
+  while playing, 1 once won, 0.35 once failed) and the won brightening (1 once won, else 0), each easing toward its
+  target in presentation time (0.15 s normally, 0.45 s under Reduce Flashing, linear; under Reduce Flashing a fade that
+  has started finishes before it may turn back); the scene draws the eased levels (the glow gain times the glow level,
+  and the won look scaled by its level through a uniform, so the `wonLink` material and the `.wonGlow` strips no longer
+  switch the brightness at once); the state and digest never see them. The tick preview changes which links are teal
+  and which hands point where every 0.25 s, so under Reduce Flashing the shown tick is held (tick 0) exactly as under
+  Reduce Motion, the stars do not pulse and no wave shell is drawn; links, hands and gauges change only with the
+  player's actions and are not faded. The measure: sampling the drawn levels every 1/60 s through a scripted win and
+  adversarial flicker (a link undone and redone every frame, retry, level changes), no element crosses half its range
+  more than 3 times per second, and every complete one-way fade of more than half the range takes at least 0.4 s under
+  Reduce Flashing; with Reduce Flashing no wave shell is drawn in any frame. Impact: FR-R02G1306-004; SC-R02G1306-003.
+- Q: Where does the sound choice live, and what are the audition and ambient recipes? → A: a Sound toggle in the panel,
+  off by default, held by the presenter (presentation only; saving it is R02-G13-07). A star's tone is
+  220 Hz × 2^(rate / 12) (its natural rate 0 … 11 as semitones). The audition of an inspected link is a pure function
+  of its two stars' rates and their phase gap g (0 … 6) at the shown tick: the two tones at gain 0.04 each, the second
+  detuned upward by g × 1.5 Hz so that a wide gap beats audibly and a gap of 0 is a clean chord; 0.6 s with a linear
+  decay to silence; played once per inspection, a new one replacing the last. The ambient recipe is a pure function of
+  the stars' rates, the coherence bars lit (0 … 12) at the last tick of the current listen report, the hold run, the
+  actions left as a share of the budget and the stage: a root at 110 Hz times (1, 9/8, 5/4, 4/3) for more than three
+  quarters of the actions left, more than half, more than a quarter, or less; one partial per lit quarter of the
+  coherence gauge (up to four), at the root times (5/4, 3/2, 2, 5/2)[k − 1], each with the base gain; the root alone when
+  no quarter is lit; an added octave when won and halved gains when failed; the loop's length is the longest the shared
+  player accepts at which every partial has a whole number of cycles (tested). The presenter rebuilds the loop only when
+  the level opens, an action, undo or redo changes the lit quarters, the root step or the stage, or the toggle turns on,
+  never per frame. Sound plays exactly while the choice is on, the controls are on screen and the scene is active.
+  Impact: FR-R02G1306-006; SC-R02G1306-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the chosen star
+  and partner are accessibility-adjustable elements with their labels and values in words (the star as the level words
+  it, with its rate and phase; the partner likewise and whether the pair is linked); a summary element reads "a actions
+  left. k symbol pairs missing. Tick t: coherence c of 12, run r of h. Chosen: <the star in words> and <the partner in
+  words>. Level: <the level in words>."; on iPad the panel keeps a readable width (at most 520 points). Impact:
+  FR-R02G1306-001, 005; SC-R02G1306-001.
 
 ## User Scenarios & Testing *(mandatory)*
 

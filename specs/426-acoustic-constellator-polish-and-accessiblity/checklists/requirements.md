@@ -31,5 +31,5 @@
 
 ## Notes
 
-- All items pass on the first validation; the announcement texts, light easing, audition and ambient recipes are left
-  to `/speckit-clarify`, as in feature 416.
+- Announcement texts, haptics, light easing, the audition and ambient recipes and the panel layout were settled by
+  `/speckit-clarify` (session 2026-11-23).
