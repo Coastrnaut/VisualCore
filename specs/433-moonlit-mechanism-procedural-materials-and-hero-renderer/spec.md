@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G14-03 (migration ledger, game feature of experience R02-G14) · ID namespace FR-R02G1403-###,
 SC-R02G1403-###, T-R02G1403-###
@@ -30,6 +30,88 @@ Canonical overrides:
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G14-01 and -02.
 - **Model:** feature 423 (Acoustic Constellator's hero renderer and experience).
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+423's answers where the games agree. Facts checked in code (read-only, 2026-11-24): Acoustic Constellator's experience
+(R02-G13-03 … 10) is the pattern in this package — a Core adapter with a table of certified candidates, an immutable
+scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+(`…Experience.swift`, presenter, scene, controls), a scenario manifest with 80 acceptance scenarios, a registration
+with content facts in `Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Moonlit Mechanism kernel
+provides the level (gears with teeth, phases, blades, depths, centres, parents, alignments and slot tables; the wall
+W × H; lamp heights; key frames; forbidden cells; allowance; budget), the run report (alignment errors, per-key-frame
+phases, cast cells, covered, missing, stray and forbidden counts, outcome), the play (turn, re-seat, lamp, run, undo,
+redo, stages, failures jammed, forbidden, missing, stray and budget) and the certified catalog of R02-G14-02 (walls
+12 … 16 × 9 … 12, gear centres in columns 3 … W − 4 and rows 2 … H − 5, rays of at most 3 cells, lamp shifts of at most
+4 · 3 rows); `AppModelTests` uses `r02-g14.moonlit-mechanism` as its synthetic unregistered candidate and the next
+round-two game is `r02-g15.voxel-origami`; the archived matrix has 80 acceptance rows R2-G14-QA-001 … 080; the catalog's
+design gives the palette "aged gold, lunar blue and ink", the hero "translucent clockwork casting moving ink shadows onto
+an illuminated paper wall" and the geometry "involute-inspired approximated gear outlines extruded procedurally".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the wall is a vertical plane at
+  z = −0.6 facing the camera; its cell size is s = min(1.8 / W, 1.2 / H); cell (c, r) is centred at x = (c − (W − 1)/2)
+  · s, y = 0.65 − (r − (H − 1)/2) · s. Drawn in this order: the night backdrop (a plane at z = −0.62 covering x
+  −1.2 … 1.2, y −0.5 … 1.7); the paper wall (the W × H rectangle); the shown key frame's cast cells as ink squares of
+  side 0.92 s; its target cells' outline (each target cell's border, 0.08 s wide, in the target colour) and, when the
+  run report names it, missing target cells dotted and stray cells hatched; forbidden cells as crossed marks; then the
+  gears back to front (the deepest first): gear i stands at z = −0.6 + 0.12 · depth with its centre at its centre
+  cell's position shifted down by height · depth cells (so it sits in front of its own shadow), its rim an extruded
+  toothed outline of radius 3.4 s with T teeth of height 0.35 s (each tooth a trapezoid, its segments by tier) rotated
+  by phase · 360° / T (clockwise for direction +1, anticlockwise for −1), a tooth-zero notch and its solid blades as
+  translucent spokes along their slot rays; the lamp, a disc of radius 0.06 at x = 0, y = 1.32 + 0.06 · height, z =
+  0.35, with a height ladder of `lampHeights` rungs beside it; the key-frame cards, one per key frame at y = −0.18,
+  spread from x = −0.6 to 0.6, each lit in proportion to its covered fraction, a required card with a gold border and the
+  shown card raised; the alignment pips, one per mesh at y = −0.30 from x = −0.3 to 0.3, lit when aligned; the moves
+  bars, `budget` bars at y = −0.40 spread from x = −0.9 to 0.9 (each 1.8 / budget wide with a gap of a fifth, 0.04
+  tall), lit for the actions left. The shown key frame is presentation state of the adapter (`frame.show [k]`, never in
+  the digest), key frame 0 at opening; the gears are drawn at the shown key frame's phases. Depth testing is off (the
+  shared mesh renderer's path), so the order above is the painter's order; the glow is additive and drawn last. The
+  camera is a fixed authored perspective (eye (0, 0.65, 2.4) looking at (0, 0.55, −0.3)) fitted to the box x
+  −0.95 … 0.95, y −0.45 … 1.5, z −0.6 … 0.4 with a 5 % margin for aspect 0.4 … 2.5. Nothing drawn is consulted by the
+  rules; the drawn shadow cells are the kernel's cast cells. Impact: FR-R02G1403-001, 002, 003, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): 6 outline segments per tooth, a soft shadow edge
+  (each ink square with a feather quad 0.15 s wide fading to the paper) and 2 glow shells around the lamp and the lit
+  cards; `level-1`: 4 segments per tooth, the soft edge, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): 2
+  segments per tooth, no soft edge, no glow. Gears, blades, shadow cells, targets, marks, gauges, colours and positions
+  are the same at every tier. Levels are ordered richest first; the presenter logs each tier change with its reason.
+  Impact: FR-R02G1403-004; SC-R02G1403-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects the centre of
+  every cast cell of the shown key frame, every gear's rim check point (the outline at the angle of its tooth-zero notch
+  plus half a tooth, 0.2 s inside the rim, clear of the spokes), the first key-frame card, the first alignment pip and
+  the first moves bar through the same camera and gives the palette. Simulator tests render offscreen at 1,152 × 768 at
+  time 0 and check, at points at least 6 pixels from any other element, that a cast cell's centre is darker than the
+  paper by at least 0.25 in luminance; that a gear's rim point has red above blue by at least 0.08 (gold); that the first
+  moves bar differs from the paper by at least 0.1; and that the backdrop matches the night colour within 0.05 away from
+  geometry. Palette: night #070A14, paper #E8DFC8, ink #1A1822, gear gold #C9A24A (alpha 0.6), gear rim #E2C277, blade
+  #B08A3C (alpha 0.5), lamp #8FB4E8, lamp glow #B7CFF2, target outline #4A6FA8, forbidden mark #B03A3A, stray hatch
+  #7A3A5A, broken outline #FF6B4A, card lit #C9A24A, card unlit #2A2A38, alignment lit #8FB4E8, alignment unlit
+  #2A2A38, moves lit #E2C277, moves unlit #2A2A38, glow #F2E2B0. Impact: FR-R02G1403-006; SC-R02G1403-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `MoonlitMechanismSceneSnapshot` (the gears with their phases at the shown key frame, blades, depths, centres and slot
+  tables, the lamp height and count, the wall size, the shown key frame with its cast, target and forbidden cells, the
+  run report, stage, failure, actions left, budget, level number and presentation time) made by the adapter; it never
+  holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the shared
+  unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion draws
+  the gears at the set-up phases of the shown key frame without the turning preview; Reduce Flashing caps the glow gain.
+  A failure outlines the jammed pair's meshing teeth, the forbidden cell or the failing key frame's card in the broken
+  colour, and the failure text names them, as the kernel's reason does. Impact: FR-R02G1403-003, 007; SC-R02G1403-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g14.moonlit-mechanism` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/MoonlitMechanism/scenario-manifest.json`, no permissions, a summary of
+  at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's
+  experience registry link `MoonlitMechanismExperience` as a candidate (`available: false` until X-R02-G14), opening at
+  seed 0 (level 1); `AppModelTests` switches its synthetic unregistered candidate to the next round-two game
+  (`r02-g15.voxel-origami`). The adapter (`MoonlitMechanismExperienceCore`) prepares certified level (seed mod 100) + 1
+  from its table of certified candidates (the whole generator only if that candidate no longer certifies) and accepts
+  `handle.turn [±1]`, `gear.reseat [g, ±1]`, `lamp.step [±1]`, `machine.run`, `play.undo`, `play.redo`, `level.next` and
+  `frame.show [k]` (whole numbers only); the kernel refuses everything out of range or out of stage, and `frame.show`
+  refuses a key frame the level does not have; its digest is the level number and the play's fingerprint (never the
+  record history or the shown key frame, so undo restores the earlier digest); snapshot schema 1 `{level, records}`.
+  The panel's chosen gear is presentation state of the controls: a level opens with gear 1 chosen. Impact:
+  FR-R02G1403-005, 008, 009; SC-R02G1403-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
