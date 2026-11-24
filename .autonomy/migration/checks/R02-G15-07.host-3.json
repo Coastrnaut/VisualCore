@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "VoxelOrigamiPersistence"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter VoxelOrigamiPersistence",
+  "elapsed_seconds": 9.38,
+  "exit_code": 0,
+  "finished": "2026-11-24T19:58:32+00:00",
+  "gate": "R02-G15-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-07.host-3.log",
+  "log_sha256": "ae9135a0af157860d1f0da720f2b8d4e617b64242dceab92c2d2e5c72049e372",
+  "name": "host-3",
+  "started": "2026-11-24T19:58:23+00:00",
+  "timed_out": false
+}
