@@ -10,7 +10,8 @@ Mechanism's (feature 431): a tree of 4 … 12 unit cubes (cube 0 the root at the
 to face to a lower-index parent along one of six rest directions in the parent's frame), one hinge per non-root cube
 with a quarter turn 0 … 3; poses computed from the root with the 24 integer rotation matrices of the cube
 (x(i) = x(p) + O(p)·d(i), O(i) = O(p)·R(d(i), q(i))), so a turn of hinge i twists the cubes beyond i about the line
-from its parent through i; the end-pose `collision` and the swept-band `sweep` decisions in integer squares; the
+from its parent through i; the end-pose `collision` and the exact `sweep` decision (the arc of a swinging cube's centre entering the open
+square of half-side 1 around a still cube, decided in rationals); the
 target matched up to translation and the level's allowed group (`fixed`, `upright`, `any`) through a canonical form
 and its SHA-256 hash; the spent budget (`budget`); the truth metric (occupancy, canonical hash, covered count of the
 best alignment); an immutable, fingerprinted level; the play state machine with records, full undo, redo (undo from
@@ -70,6 +71,6 @@ docs/architecture/voxel-origami.md (new), Packages/ExperiencesRound02/README.md,
 Lead: package, error, lattice, level and fixtures first; then agents A (lattice tests with an independent reference:
 poses recomputed by rotating each subtree's cell list directly about its hinge line one quarter turn at a time from
 the rest pose, collision by a set intersection, the sweep by sampling the quarter arc at 1 000 fine steps with a
-cube-overlap test and comparing with the exact band rule on the cases where sampling is unambiguous, canonical forms by
+cube-overlap test and comparing with the exact sweep rule on the cases where sampling is unambiguous, canonical forms by
 enumerating all rotations and translations — over seeded levels), B (play), C (rules) and D (invariants) in parallel in
 isolated package copies; the lead retests every agent result and records checks after every agent has reported.

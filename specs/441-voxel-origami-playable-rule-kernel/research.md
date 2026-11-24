@@ -9,13 +9,15 @@
 - **R2 Orientation frames.** Decision: each cube carries one of the 24 rotation matrices; rest directions are given in
   the parent's frame. Rationale: composing frames down the tree makes a turn of an inner hinge carry every outer
   hinge's axis with it, as a real hinged chain does; matrices with entries −1, 0, 1 keep everything exact.
-- **R3 End collision, then the swept band.** Decision: first a swinging cube landing on a still cube's cell
-  (`collision`), then a still cube in the swept band (`sweep`): same coordinate along the axis, inside the quarter
-  arc's axis-aligned box, and strictly within one cell of the arc's circle, all tested with integer squares.
-  Rationale: the catalog's "swept AABB collision filter", narrowed to the band a unit cube actually passes, so a cube
-  sitting on the axis (the hinge cube itself) never blocks while a cube beside the arc does; deciding in integer squares
-  is exact on every device. Alternatives: the bare box (blocks every turn of a cube beside its hinge cube, because the
-  box contains the axis); continuous sampling (floating point).
+- **R3 End collision, then the exact sweep.** Decision: first a swinging cube landing on a still cube's cell
+  (`collision`), then a still cube in the same layer whose open square of half-side 1 the open quarter arc of a
+  swinging cube's centre enters (`sweep`), decided exactly by clipping the square to the arc's wedge and comparing the
+  polygon's least and greatest squared distances with ρ² in rationals. Still cubes are every cube outside the turning
+  body (cube i and its subtree). Rationale: the catalog's "swept AABB collision filter" made exact; a cube may neither
+  pass through nor clip a cube that does not turn with it (its parent on the axis included), while the body's own cubes
+  on the axis spin in place and never block. Alternatives: a band of width 2 around the arc inside the arc's box (the
+  first rule; it let a cube orbit through its parent at ρ = 1 and missed clips at the inner edge and above the box);
+  continuous sampling (floating point).
 - **R4 Canonical form.** Decision: the smallest sorted cell list over the allowed rotations, each translated to start at
   the origin; the hash is `StableHash` of its text. Rationale: "occupied voxel set matches target up to allowed global
   rotation" becomes one equality of canonical forms; mirror images are never allowed (a physical chain cannot reflect).

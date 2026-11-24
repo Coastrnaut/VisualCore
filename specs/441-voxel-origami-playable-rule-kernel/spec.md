@@ -62,16 +62,22 @@ disconnect the tree.
   hierarchy is fixed, so "disconnected hierarchy" can never arise from a turn; the kernel re-checks after every turn
   that every hinge's two cubes are face to face and refuses a stored state or level that breaks it (`r02-g15.level`).
   Impact: FR-R02G1501-002, 006; SC-R02G1501-003.
-- Q: When does a turn collide, exactly? → A: the swinging cubes are cube i's descendants with a non-zero offset from
-  the axis; all other cubes stand still. First the end pose: a swinging cube landing on a still cube's cell fails the
-  turn (`collision`, naming the lowest such swinging cube, the still cube and the cell). Then the sweep: each swinging
-  cube's centre traces a quarter arc of radius ρ (ρ² = the integer squared distance of its offset from the axis) in the
-  plane across the axis; a still cube in the same plane (same coordinate along the axis) blocks the turn when its centre
-  lies inside the axis-aligned box of that quarter arc (the box of the two end points, extended to ±ρ along each
-  half-axis the open arc crosses) and its distance from the axis is strictly between ρ − 1 and ρ + 1; every comparison
-  is made with integer squares (the "swept box" filter of the catalog, narrowed to the band the moving cube actually
-  passes). A blocked turn fails (`sweep`, naming the lowest blocked swinging cube, the still cube and its cell).
-  Swinging cubes never collide with each other (they move rigidly). A failed turn leaves the pose as it was. Impact:
+- Q: When does a turn collide, exactly? → A: the turning body is cube i and its subtree; the swinging cubes are its
+  descendants with a non-zero offset from the axis (cube i and its descendants on the axis spin in place); every cube
+  outside the body stands still. First the end pose: a swinging cube landing on a still cube's cell fails the turn
+  (`collision`, naming the lowest such swinging cube, the still cube and the cell). Then the sweep: each swinging cube's
+  centre traces an open quarter arc of radius ρ (ρ² = the integer squared distance of its offset from the axis) in the
+  plane across the axis; a still cube in the same layer (same coordinate along the axis) blocks the turn when that arc
+  passes strictly within one cell of its centre in both in-plane coordinates (inside the open square of half-side 1
+  around it), so a swinging cube may not pass through or clip a still cube, the parent on the axis included. The
+  decision is exact: the square is clipped to the arc's 90° wedge and the arc enters it exactly when the clipped
+  polygon's least squared distance from the axis is below ρ² and its greatest above ρ², every coordinate a rational
+  number of small integers (the catalog's "swept AABB collision filter", decided without sampling). A blocked turn
+  fails (`sweep`, naming the lowest blocked swinging cube, the lowest still cube in its way and that cube's cell).
+  Swinging cubes never collide with each other (they move rigidly). A failed turn leaves the pose as it was. (Revised
+  during implementation: the first rule, a band strictly between ρ − 1 and ρ + 1 inside the arc's box, let a cube orbit
+  through its parent's corners at ρ = 1 and missed clips at the band's inner edge and above the box, as an independent
+  1 000-step sampling of the arc showed; the rule above agrees with that sampling in every unambiguous case.) Impact:
   FR-R02G1501-003; SC-R02G1501-004.
 - Q: When is the target matched, and what is the truth metric? → A: the target is a set of n distinct cells; the level
   allows the orientations `fixed` (the identity), `upright` (the 4 quarter turns about +y) or `any` (the 24 rotations

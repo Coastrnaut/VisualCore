@@ -23,9 +23,7 @@ will consume).
   right-hand rule; the pose "x(i) = x(p) + O(p) · d(i), O(i) = O(p) · R(d(i), q(i))" from cube 0 at (0, 0, 0) with the
   identity; the swinging set "cube i's descendants with a non-zero offset from the axis"; the turn check "collision
   first (a swinging cube landing on a still cube's cell, naming the lowest such swinging cube, the still cube and the
-  cell), then the sweep (a still cube with the same coordinate along the axis, inside the quarter arc's axis-aligned box
-  (end points, extended to ±ρ along each half-axis the open arc crosses), strictly between ρ − 1 and ρ + 1 from the
-  axis, every comparison in integer squares)"; the canonical form "the lexicographically smallest sorted cell list among
+  cell), then the sweep (a still cube outside the turning body, in the same layer, whose open square of half-side 1 the open quarter arc of a swinging cube's centre enters, decided exactly in rationals by clipping the square to the arc's wedge)"; the canonical form "the lexicographically smallest sorted cell list among
   the allowed rotations, each translated so its smallest x, y and z are 0" and its `StableHash`; the covered count over
   every allowed rotation and every translation mapping a target cell onto an occupied cell),
   `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiLevel.swift` ("4 … 12 cubes", cube 0 the root with no
@@ -46,7 +44,7 @@ will consume).
   still cubes) wherever the sampling is unambiguous; canonical forms and covered counts equal an enumeration of all
   allowed rotations and translations; the 24 rotations are distinct, closed under composition and orthogonal; hand
   cases: an L of three cubes turning about its middle (the hinge cube never blocks, a cube diagonal to the arc does), a
-  cube one cell clear of the swept band and one inside it, a straight chain whose turn is idle, a target matched only
+  cube one cell clear of the swept path and one clipped by it, a straight chain whose turn is idle, a target matched only
   under `any` and not under `upright`); `--name host-2`
 
 ## Phase 4: Stories 2 and 3 — failures, budget, undo, redo, replay (P1)

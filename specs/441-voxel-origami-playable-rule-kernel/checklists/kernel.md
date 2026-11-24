@@ -22,8 +22,9 @@ hinges were refused); clarification Q2 now refuses every hinge with nothing that
   turns 0 … 3, the 24 cube rotations, budget 1 … 40)? [Clarity, Spec §Clarifications Q1, Q2, Q5]
 - [x] CHK003 Are the pose rule (x(i) = x(p) + O(p) · d(i), O(i) = O(p) · R(d(i), q(i)), right-hand rule), which cubes
   swing on a turn and which stand still defined? [Measurability, Spec §FR-R02G1501-002; Clarifications Q2, Q3]
-- [x] CHK004 Are the end-pose collision and the swept band (same coordinate along the axis, inside the quarter arc's
-  box, strictly within one cell of its circle, integer squares) defined so two readers decide every case the same?
+- [x] CHK004 Are the end-pose collision and the sweep (still cubes outside the turning body, same layer, the open quarter
+  arc entering the open square of half-side 1 around a still cube, decided exactly in rationals) defined so two readers
+  decide every case the same?
   [Clarity, Spec §FR-R02G1501-003; Clarifications Q3]
 - [x] CHK005 Is the truth metric (occupancy, canonical hash, covered count with its alignment) required after every
   action and excluded from deciding on its own? [Measurability, Spec §FR-R02G1501-014; Clarifications Q4]
@@ -73,5 +74,9 @@ hinges were refused); clarification Q2 now refuses every hinge with nothing that
 - [x] CHK017 Is it stated that this feature has no device-only item? [Completeness, Spec §Canonical overrides]
 
 ## Notes
+
+- 2026-11-24, during implementation: the sweep rule of clarification Q3 was revised (an independent sampling of the
+  arc showed the first band rule let a cube orbit through its parent); CHK004 was re-read against the revised rule and
+  still passes.
 
 - `/speckit-implement` reads these markers and does not change them.
