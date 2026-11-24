@@ -158,8 +158,8 @@ unlink, nudge − and +, listen, undo, redo, next level, "Reset view"), includin
   0.35 s and 22 points reset the view; a press lifted at 0.5 s or later without moving does nothing.
 - **A touch that moves 10 … 16 points:** neither a tap nor a drag; nothing changes.
 - **A drag that ends on its own star, on empty space, or on a pair joined by a fixed link:** sends nothing.
-- **A drag that would exceed a star's degree limit or the link limit:** sent and refused by the kernel with its reason,
-  shown to the player.
+- **A link, unlink, nudge or listen the kernel refuses** (a star's degree limit, the link limit, the budget, the
+  stage): sent and refused with its reason code, which the presenter logs and shows.
 - **A finished play (won or failed):** gestures send no kernel action (a star tap only chooses the star) and the
   description says the play is over (undo or next level); inspecting links and orbit still work.
 - **A stage other than playing:** gestures send no kernel action.
