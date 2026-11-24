@@ -31,5 +31,5 @@
 
 ## Notes
 
-- All items pass on the first validation; the stored trace, reconciliation, migration, replay and settings are left
-  to `/speckit-clarify`, as in feature 417.
+- The stored trace, reconciliation, migration, replay and settings were settled by `/speckit-clarify` (session
+  2026-11-23).
