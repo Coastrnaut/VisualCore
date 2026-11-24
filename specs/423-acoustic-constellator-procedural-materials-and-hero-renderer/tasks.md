@@ -58,7 +58,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   report snaps; gauge bars at 0, half and the budget; a won level's links brighter and in place; the glow mesh empty at level-2 and its shell counts per tier; only the
   glow mesh differs between tiers); agent B; `--name
   host-3`
-- [ ] T-R02G1303-005 [P] [US2] Create
+- [X] T-R02G1303-005 [P] [US2] Create — Verified 2026-11-23: 2026-11-23: agent C adapter (100-entry candidate table), core and purity tests, lead retest host-4 exit 0 (.autonomy/migration/checks/R02-G13-03.host-4.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorExperienceCore.swift` (controls "link.add
   [a, b], link.remove [a, b], star.nudge [s, ±1], constellation.listen, play.undo, play.redo, level.next"; digest "level
   number and play fingerprint"; schema 1 `{level, records}`; quality profile of three levels (the Core's `qualityTiers`
