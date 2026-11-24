@@ -875,3 +875,13 @@ tests `VOPlayUITests` and `VOReplayUITests` (serial chunk `x3`).
 Feature 450 (R02-G15-10) prepares Voxel Origami's device campaign without touching a device:
 `docs/apps/voxel-origami/device-rows.json` (rows VO-D1 … VO-D8, all pending), the written plan
 `docs/apps/voxel-origami/device-campaign.md`, and the release step `device-rows-r02-g15`.
+
+## Starlit Cartouche (R02-G16, `r02-g16.starlit-cartouche`, free)
+
+`StarlitCartoucheCore` (feature 451, R02-G16-01) is the playable rule kernel: the star chart (`StarlitCartoucheVector`,
+`StarlitCartoucheGlyphPoint`, `StarlitCartoucheStar` on periodic lattice orbits, `StarlitCartoucheCorridor` flyable within
+the level's range, `StarlitCartoucheHazard`), the exact leg rules (`StarlitCartoucheChart`: refusals, the failures
+window, hazard, window, deadline and stroke in that order, the route report with missing and stray strokes, glyph
+mismatch and hazard clearance), `StarlitCartoucheLevel` (immutable, fingerprinted, JSON schema 1, with names in words),
+the play state `StarlitCartouchePlay` with stages, events, records, undo, redo and replay, and `StarlitCartoucheRules`
+(an R02-F23 `PuzzleRules`). See [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).

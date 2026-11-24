@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G15-10: Voxel Origami device rows).
+Last updated: 2026-11-24 (R02-G16-01: Starlit Cartouche rule kernel).
 
 ## 1. What is tested, and where
 
@@ -840,6 +840,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   23 s because each attempt hashes a fingerprint, so 8 walks are exhaustive and 192 sample 24 cells per step. Write
   fixtures' comments from the drawn ranges: energy 1 + 0 … 3 lets the known pulse end the level, which all four agents
   found; the tests now rely on both kinds of fixture.
+- **Starlit Cartouche rule kernel** (R02-G16-01, 2026-11-24). `swift test --package-path Packages/ExperiencesRound02
+  --filter StarlitCartouche`: level checks and stored form with 200 fixtures winning through the chart, the chart against
+  an independent beat-by-beat reference on 500 seeded levels (hazard meetings by listing every beat), the play (500
+  seeded traces replayed, undo from failed, every refusal), the puzzle contract against the play and the nine source
+  invariants. One lesson: a bound written to keep levels tidy (every window closing by the deadline) made one of the
+  spec's failures unreachable; the chart tests tallied every outcome over the seeded levels and asserted each occurs,
+  which exposed it. Tally outcomes in a seeded test and require each named failure to happen at least once.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15
