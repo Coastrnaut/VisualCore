@@ -16,8 +16,8 @@ tests stay short (< 10 s each); no wall-clock assertion.
 - [ ] T-R02G1408-002 [P] [US1] Create `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismRegressionSolverTests.swift` (agent A: for every
   level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's actions replay
   on a fresh play to a win in exactly its action count within the budget, with its per-action fingerprints and digests;
-  plan returns exactly the witness's turns, lamp steps and re-seats with its smallerVectors (the counterexample's
-  vectors) and norm, with work ≤ workBound"; thirteen named alterations of clarification Q2 (a gear's tooth count, a
+  plan returns exactly the witness's turns, lamp steps and re-seats with its smallerVectors (the sum of the
+  counterexample's vector counts over norms 0 … its norm = plan size − 1) and norm, with work ≤ workBound"; thirteen named alterations of clarification Q2 (a gear's tooth count, a
   gear's centre, a gear's depth, a gear's starting phase, a slot table offset, the lamp's starting height, a key frame's
   target cell, a forbidden cell, the budget; a plan component; a witness action, a per-action fingerprint; the
   smaller-vectors count) each fail naming the level and the part); `--name host -- swift test

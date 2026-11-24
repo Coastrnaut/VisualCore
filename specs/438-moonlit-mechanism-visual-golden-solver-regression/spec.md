@@ -45,8 +45,8 @@ bar 0.1 from the paper, the backdrop within 0.05 of night, each point at least 6
 - Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
   the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
   play to a win in exactly its action count, within the budget, with exactly its per-action fingerprints and digests;
-  and `plan` returns exactly the witness's turns, lamp steps and re-seats with exactly its `smallerVectors` (the
-  counterexample's `vectors`) and norm; `work` is at most `workBound` (counted, never timed). The run is split into tests
+  and `plan` returns exactly the witness's turns, lamp steps and re-seats with exactly its `smallerVectors` (the sum of
+  the counterexample's vector counts over norms 0 … its norm, the norm being the plan size − 1) and norm; `work` is at most `workBound` (counted, never timed). The run is split into tests
   of 10 levels so each stays short. Impact: FR-R02G1408-001; SC-R02G1408-001.
 - Q: Which alterations must the regression detect and how is each named? → A: thirteen kinds, each applied to a copy
   and each producing a failure message naming the level and the part: a gear's tooth count, a gear's centre, a gear's
