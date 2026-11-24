@@ -24,7 +24,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1308-003 [US2] Create `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G1308-003 [US2] Create `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-24: 2026-11-24: agent E AcousticConstellatorGolden (16 frames, code-only descriptions, SHA-256 via StableHash, one-quantum comparison, pinned-digest self-check, writer behind ACOUSTIC_CONSTELLATOR_WRITE_GOLDEN=1) and golden-frames.json (schema 1, written twice byte-identical); AcousticConstellatorGolden added to RELEASE_FORBIDDEN; the round-two package builds with tests; comparison proven by T-004
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after the witness's links and nudges and before its
   listen, plus the hero frame of `scenario-manifest.json` at tier 0; at 1,152 × 768 with the authored camera: every star
   centre and every link check point (index order), the first coherence bar, the first hold pip and the first moves bar,

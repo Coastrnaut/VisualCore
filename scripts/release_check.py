@@ -337,7 +337,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 408 (R02-G11-08): Echo Cartographer's golden frames, test builds only.
                      "EchoCartographerGolden",
                      # Feature 418 (R02-G12-08): Harmonic Bridges's golden frames, test builds only.
-                     "HarmonicBridgesGolden"]
+                     "HarmonicBridgesGolden",
+                     # Feature 428 (R02-G13-08): Acoustic Constellator's golden frames, test builds only.
+                     "AcousticConstellatorGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:
