@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Validated 2026-11-24 by the lead; every item passes. The stars and links, the phase and coupling rules, the snap and
-  coherence rules, the actions and budget, the order of decisions and the stored form are settled by `/speckit-clarify`.
+- Validated 2026-11-24 by the lead; every item passes. The gears and train, the phase and mesh rules, the lamp and
+  projection rules, the key frames and match, the actions and budget and the stored form are settled by `/speckit-clarify`.
