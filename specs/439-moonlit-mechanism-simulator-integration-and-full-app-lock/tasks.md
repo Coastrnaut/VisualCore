@@ -15,7 +15,7 @@ change (the shaders and reference of R02-G14-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1409-002 Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSchemaExamples.swift`
+- [X] T-R02G1409-002 Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSchemaExamples.swift` — Verified 2026-11-24: 2026-11-24: schema examples (lead), agent A 7 restore tests, registry examples and comment; lead retest host exit 0 (.autonomy/migration/checks/R02-G14-09.host.json); registry use proven by app-unit (T-005)
   (contracts/api.md; data-model: schema 1 "`{level: 1, records}` of a seeded play of level 1 with its first certified
   action applied (playing, not won), seed 7"; schema 2 "campaign mode, the tutorial done, progress (frontier 2, level 1
   solved with actions spent one above the certified count and its stars), records []", "the result is kept, unverified,

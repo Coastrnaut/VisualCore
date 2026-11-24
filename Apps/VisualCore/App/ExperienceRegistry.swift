@@ -135,11 +135,13 @@ enum ExperienceRegistry {
     static let candidates: [ExperienceRegistration] = [moonlitMechanism].compactMap { $0 }
 
     /// R02-G14 Moonlit Mechanism (feature 433, R02-G14-03): a candidate until X-R02-G14. Snapshot schema 3 since
-    /// feature 437; its schema-1 and schema-2 examples are registered at R02-G14-09, before the X gate's follow-through
-    /// needs them.
+    /// feature 437, so the schema-1 and schema-2 examples are stored (feature 439, R02-G14-09).
     fileprivate static var moonlitMechanism: ExperienceRegistration? {
         guard let id = MoonlitMechanismExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: MoonlitMechanismExperienceCore.self) { launch in
+        let examples = [MoonlitMechanismExperienceCore.schemaOneExample(),
+                        MoonlitMechanismExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: MoonlitMechanismExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return MoonlitMechanismExperience.make(
                 id: id, storage: launch.storage,
