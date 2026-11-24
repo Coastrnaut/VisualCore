@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G13-10: Acoustic Constellator device rows).
+Last updated: 2026-11-24 (R02-G14-01: Moonlit Mechanism rule kernel).
 
 ## 1. What is tested, and where
 
@@ -669,6 +669,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   AcousticConstellatorCatalogTests` (the tests that read the stored files fail on that first run, before the files
   exist; run again without the variable). The independent brute force covers every play action in bands 1 … 3 and the
   pruned options in bands 4 and 5, where every play action at size 5 (about 650,000 listens) would not fit 10 s.
+- **Moonlit Mechanism rule kernel** (R02-G14-01, 2026-11-24). `swift test --package-path Packages/ExperiencesRound02
+  --filter MoonlitMechanism` (41 tests, under 10 s): turns, alignment errors, casts and runs against an independent
+  reference (a tooth-by-tooth walk, a brute-force cyclic distance, a separate rasterisation, a transcription of the run
+  order) on 500 seeded set-ups; the play on 200 fixtures and 500 seeded traces; the rules on 200 walks against the real
+  play; nine invariant boundaries. The fixtures build each level from a solution set-up (targets are the solution's
+  casts, alignments the solution's sums) and scramble it, so every fixture has a known winning trace and a start that
+  does not win.
 - **Acoustic Constellator rule kernel** (R02-G13-01, 2026-11-23). `swift test --package-path
   Packages/ExperiencesRound02 --filter AcousticConstellator` (46 tests, a few seconds): the coupling table against the
   rounded sine; the exact comparison A + B√3 ≥ θ exhaustively over 1.27 million triples against rational bounds of √3;

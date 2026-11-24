@@ -760,3 +760,15 @@ interface tests `ACNPlayUITests` and `ACNReplayUITests` (serial chunk `v3`).
 Feature 430 (R02-G13-10) prepares Acoustic Constellator's device campaign without touching a device:
 `docs/apps/acoustic-constellator/device-rows.json` (rows ACN-D1 … ACN-D8, all pending), the written plan
 `docs/apps/acoustic-constellator/device-campaign.md`, and the release step `device-rows-r02-g13`.
+
+## Moonlit Mechanism (R02-G14, `r02-g14.moonlit-mechanism`, free)
+
+`MoonlitMechanismCore` (feature 431, R02-G14-01) is the playable rule kernel: the gear train in whole teeth with
+alternating directions, the mesh alignment modulo the common divisor and its error, shadows cast from slot tables with
+the lamp's integer shift, and the run over key frames (`MoonlitMechanismTrain`, `MoonlitMechanismGear`,
+`MoonlitMechanismKeyFrame`, `MoonlitMechanismRunReport`, `MoonlitMechanismOutcome`, `MoonlitMechanismAction`),
+`MoonlitMechanismLevel` (immutable, fingerprinted, JSON schema 1, with names in words), the play state
+`MoonlitMechanismPlay` with `MoonlitMechanismStage`, `MoonlitMechanismEvent`, `MoonlitMechanismFailure` and append-only
+`MoonlitMechanismRecord`s, and `MoonlitMechanismRules` for the R02-F23 puzzle contract. Refusals are
+`MoonlitMechanismError` with `r02-g14.*` codes. Rules:
+[docs/architecture/moonlit-mechanism.md](../../docs/architecture/moonlit-mechanism.md).
