@@ -1432,7 +1432,7 @@
       "id": "r02-g15.voxel-origami",
       "code": "R02-G15",
       "title": "Voxel Origami",
-      "summary": "Reconfigure hinged voxels into a target solid without collisions",
+      "summary": "Turn the hinges of a chain of frosted-ivory cubes a quarter turn at a time, never through another cube, until the chain folds into the turquoise target solid before the moves run out. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1441,11 +1441,30 @@
         "spatial-origami"
       ],
       "order": 40,
-      "palette": [],
+      "palette": [
+        "#0B0D16",
+        "#EDE8DC",
+        "#2EE6D6",
+        "#FF3C8C",
+        "#B9B2A3"
+      ],
       "tile_seed": 2005980415,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Turn hinges to fold a cube chain",
+        "Match a target solid without collisions",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "b02e58ecabf2a0ff47050b17f42b7d0dc9a49a3ccb68af604c12a0610edff611",
+        "levels": 100
+      },
       "available": false
     },
     {

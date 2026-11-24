@@ -49,6 +49,8 @@ let package = Package(
         .library(name: "MoonlitMechanismExperience", targets: ["MoonlitMechanismExperience"]),
         // Feature 441 (R02-G15-01): Voxel Origami's rule kernel, a candidate until X-R02-G15.
         .library(name: "VoxelOrigamiCore", targets: ["VoxelOrigamiCore"]),
+        // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
+        .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
         .library(name: "AcousticConstellatorExperience", targets: ["AcousticConstellatorExperience"]),
         // Feature 413 (R02-G12-03): Harmonic Bridges' experience (iOS only; a registered candidate until X-R02-G12).
@@ -734,5 +736,26 @@ let package = Package(
                                    .product(name: "VisualCoreDiagnostics", package: visualCore),
                                    .product(name: "VisualCorePersistence", package: visualCore)],
                     path: "VoxelOrigami/CoreTests"),
+        // Feature 443 (R02-G15-03): Voxel Origami's experience (presenter, scene, controls).
+        .target(name: "VoxelOrigamiExperience",
+                dependencies: ["VoxelOrigamiCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "VoxelOrigami/Experience"),
+        // Feature 443 (R02-G15-03): the simulator tests of Voxel Origami's experience.
+        .testTarget(name: "VoxelOrigamiExperienceTests",
+                    dependencies: ["VoxelOrigamiExperience", "VoxelOrigamiCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "VoxelOrigami/ExperienceTests"),
     ]
 )

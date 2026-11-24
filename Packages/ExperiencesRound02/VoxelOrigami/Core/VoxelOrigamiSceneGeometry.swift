@@ -279,6 +279,20 @@ public enum VoxelOrigamiSceneGeometry {
         return (cubeCentre(parent(h, snapshot), snapshot) + cubeCentre(h, snapshot)) / 2
     }
 
+    /// How far a hinge mark is drawn from its face towards the eye, as a fraction of s: more than half a cell, so the
+    /// mark is nearer the eye than both of its cubes' centres and is painted after them (a mark left in the seam
+    /// between the two cubes would be hidden by the nearer one).
+    public static let hingeLift: Double = 0.55
+
+    /// Where hinge `hinge`'s mark is drawn for `camera`: ``hingeCentre(_:_:)`` moved ``hingeLift`` · s along the ray
+    /// towards the eye, so it projects to the same view point as the face's middle.
+    public static func hingeMark(_ hinge: Int, _ snapshot: VoxelOrigamiSceneSnapshot,
+                                 camera: VoxelOrigamiCamera) -> SIMD3<Double> {
+        let centre: SIMD3<Double> = hingeCentre(hinge, snapshot)
+        let toEye: SIMD3<Double> = unit(camera.eye - centre)
+        return centre + toEye * (hingeLift * scale(snapshot))
+    }
+
     /// The unit world axis of hinge `hinge` (clamped): from its parent's centre to its cube's.
     public static func hingeAxis(_ hinge: Int, _ snapshot: VoxelOrigamiSceneSnapshot) -> SIMD3<Double> {
         guard snapshot.cubes.count > 1 else { return SIMD3(1, 0, 0) }
@@ -337,7 +351,7 @@ public enum VoxelOrigamiSceneGeometry {
 
     /// Every element with its centre and distance from `camera`'s eye, in painter's order: farthest first, ties by
     /// kind (target outline, cube, hinge, pip, bar) then index (clarification Q1). This is the CPU reference of the
-    /// cube centres, hinge centres, pips and bars.
+    /// cube centres, hinge marks (``hingeMark(_:_:camera:)``), pips and bars.
     public static func paintOrder(_ snapshot: VoxelOrigamiSceneSnapshot,
                                   camera: VoxelOrigamiCamera) -> [VoxelOrigamiElement] {
         var elements: [VoxelOrigamiElement] = []
@@ -349,7 +363,7 @@ public enum VoxelOrigamiSceneGeometry {
         for index in snapshot.target.indices { add(.targetOutline, index, world(snapshot.target[index], snapshot)) }
         for index in snapshot.cells.indices { add(.cube, index, cubeCentre(index, snapshot)) }
         if snapshot.cubes.count > 1 {
-            for hinge in 1..<snapshot.cubes.count { add(.hinge, hinge, hingeCentre(hinge, snapshot)) }
+            for hinge in 1..<snapshot.cubes.count { add(.hinge, hinge, hingeMark(hinge, snapshot, camera: camera)) }
         }
         for index in 0..<snapshot.cubes.count { add(.pip, index, coveredPip(index, snapshot)) }
         for index in 0..<max(snapshot.budget, 0) { add(.bar, index, movesBar(index, snapshot)) }

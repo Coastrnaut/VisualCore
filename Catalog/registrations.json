@@ -998,6 +998,34 @@
       "manifest": "Packages/ExperiencesRound02/MoonlitMechanism/scenario-manifest.json",
       "permissions": [],
       "summary": "Turn a train of translucent gears, re-seat a gear by a tooth and raise the lunar lamp until the ink shadows on the paper wall cover every key frame's symbol without touching a forbidden mark, with every mesh aligned and the moves to spare."
+    },
+    "r02-g15.voxel-origami": {
+      "capabilities": [
+        "Turn hinges to fold a cube chain",
+        "Match a target solid without collisions",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#0B0D16",
+        "#EDE8DC",
+        "#2EE6D6",
+        "#FF3C8C",
+        "#B9B2A3"
+      ],
+      "content": {
+        "catalog_sha256": "b02e58ecabf2a0ff47050b17f42b7d0dc9a49a3ccb68af604c12a0610edff611",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/VoxelOrigami/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Turn the hinges of a chain of frosted-ivory cubes a quarter turn at a time, never through another cube, until the chain folds into the turquoise target solid before the moves run out. 100 certified levels. Drawn in code; offline."
     }
   }
 }

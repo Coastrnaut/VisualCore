@@ -74,7 +74,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G1503-006 [US3] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiExperience.swift`,
+- [X] T-R02G1503-006 [US3] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiExperience.swift`, — Verified 2026-11-24: 2026-11-24: experience target (experience, presenter with probes and tier log, voxel scene, controls), scenarios (94: 80 QA rows) and manifest, candidate registration (registrations, catalog, registry, project.yml, AppModelTests candidate r02-g16, script list); hinge marks lifted 0.55 s toward the eye so the nearer cube no longer hides them; won level lifts cube faces in the shader too; sim-27 22 tests exit 0, packages-2 exit 0 (first packages run failed before the test target existed), catalog-search exit 0, host-5 exit 0
   `…Presenter.swift`, `…VoxelScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and
   Reduce Flashing; the presenter declares `probes(_:)` — two backdrop corners, as the round-two X gates require — and its
   quality levels equal the Core's `qualityTiers`), `…Controls.swift` (labelled hinge − and +, turn − and +, undo, redo,

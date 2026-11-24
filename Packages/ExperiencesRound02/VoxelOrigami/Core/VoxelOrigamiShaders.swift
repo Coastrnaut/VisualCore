@@ -245,6 +245,10 @@ public enum VoxelOrigamiShaders {
     public static let stripeCount: Double = 5
     /// The share of a stripe period that is hot pink, centred in the period (the rest is the hinge grey).
     public static let stripeDuty: Double = 0.6
+    /// How far a won level lifts the lit cube faces and bevels toward white, times `u_won` (equal to
+    /// ``VoxelOrigamiSceneGeometry/wonLift``, the fallback's lift), so every cube lights at every tier.
+    public static let wonLift: Double = 0.35
+
     /// How far a won level flares the target wireframe toward the target-glow colour, times `u_won`.
     public static let flareLift: Double = 0.7
 
@@ -287,6 +291,7 @@ public enum VoxelOrigamiShaders {
     out vec3 v_normal;
     out float v_material;
     out float v_local;
+    out float v_won;
     const vec3 VO_NIGHT = \(vec3Literal(VoxelOrigamiPalette.night));
     const vec3 VO_TARGET = \(vec3Literal(VoxelOrigamiPalette.target));
     const vec3 VO_TARGET_GLOW = \(vec3Literal(VoxelOrigamiPalette.targetGlow));
@@ -328,6 +333,7 @@ public enum VoxelOrigamiShaders {
         v_normal = a_normal;
         v_material = m;
         v_local = clamp(a_uv.y, -1.0, 1.0) * (1.0 - plain);
+        v_won = won;
         gl_Position = u_mvp * vec4(a_position, 1.0);
     }
     """
@@ -343,6 +349,7 @@ public enum VoxelOrigamiShaders {
     in vec3 v_normal;
     in float v_material;
     in float v_local;
+    in float v_won;
     out vec4 color;
     const vec3 VO_IVORY = \(vec3Literal(VoxelOrigamiPalette.ivory));
     const vec3 VO_IVORY_SHADE = \(vec3Literal(VoxelOrigamiPalette.ivoryShade));
@@ -356,6 +363,7 @@ public enum VoxelOrigamiShaders {
     const float VO_DIFFUSE = \(fixed(diffuse));
     const float VO_STRIPE_COUNT = \(fixed(stripeCount));
     const float VO_STRIPE_DUTY = \(fixed(stripeDuty));
+    const float VO_WON_LIFT = \(fixed(wonLift));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
@@ -375,6 +383,7 @@ public enum VoxelOrigamiShaders {
         vec3 n = v_normal / max(nl, 0.0001);
         float lambert = VO_AMBIENT + VO_DIFFUSE * max(dot(n, VO_LIGHT_DIR), 0.0) * step(0.0001, nl);
         rgb = rgb * mix(1.0, lambert, isFace + isBevel);
+        rgb = mix(rgb, vec3(1.0), VO_WON_LIFT * clamp(v_won, 0.0, 1.0) * (isFace + isBevel));
         float t = (clamp(v_local, -1.0, 1.0) + 1.0) * 0.5;
         float phase = fract(t * VO_STRIPE_COUNT);
         float stripe = 1.0 - step(VO_STRIPE_DUTY * 0.5, abs(phase - 0.5));
@@ -479,21 +488,27 @@ public enum VoxelOrigamiShaders {
     /// The colour the voxel fragment shader gives a lit `material` (``Material/cubeFace`` or ``Material/cubeBevel``)
     /// with `normal` at local coordinate `local` (|local| clamped to 0 … 1; non-finite counts as 1): the frosted face
     /// (ivory toward the shade colour by ``frostEdge`` · smoothstep(``frostStart``, 1, |d|)) or the bevel (the shade
-    /// colour toward the ivory by ``bevelSheen`` (1 - |d|)), times ``light(normal:)``; any other material its palette
-    /// colour, unlit.
-    public static func cubeShade(material: Material, normal: SIMD3<Double>, local: Double) -> SIMD3<Double> {
+    /// colour toward the ivory by ``bevelSheen`` (1 - |d|)), times ``light(normal:)``, then lifted toward white by
+    /// ``wonLift`` times `won` (clamped to 0 … 1; non-finite counts as 0); any other material its palette colour, unlit.
+    public static func cubeShade(material: Material, normal: SIMD3<Double>, local: Double,
+                                 won: Double = 0) -> SIMD3<Double> {
         let d: Double = local.isFinite ? min(abs(local), 1) : 1
+        let w: Double = won.isFinite ? min(max(won, 0), 1) : 0
         let ivory: SIMD3<Double> = VoxelOrigamiPalette.ivory
         let shade: SIMD3<Double> = VoxelOrigamiPalette.ivoryShade
+        let white: SIMD3<Double> = SIMD3(1, 1, 1)
+        let lit: SIMD3<Double>
         switch material {
         case .cubeFace:
             let frost: Double = frostEdge * smoothstep(frostStart, 1, d)
-            return (ivory + (shade - ivory) * frost) * light(normal: normal)
+            lit = (ivory + (shade - ivory) * frost) * light(normal: normal)
         case .cubeBevel:
-            return (shade + (ivory - shade) * (bevelSheen * (1 - d))) * light(normal: normal)
+            lit = (shade + (ivory - shade) * (bevelSheen * (1 - d))) * light(normal: normal)
         default:
             return material.colour
         }
+        let mixed: SIMD3<Double> = lit + (white - lit) * (wonLift * w)
+        return SIMD3(min(mixed.x, 1), min(mixed.y, 1), min(mixed.z, 1))
     }
 
     /// The target wireframe's colour at won light `won` (clamped to 0 … 1; non-finite counts as 0): the target colour

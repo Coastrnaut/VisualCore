@@ -1,0 +1,7056 @@
+{
+  "controls" : [
+    "hinge.turn",
+    "play.undo",
+    "play.redo",
+    "level.next",
+    "hinge.choose"
+  ],
+  "experience" : "r02-g15.voxel-origami",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ffcbe696147126a818c377f19a8fb8b2cc80e0b5a3baa68831af4d93f32108c6",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0.5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g15.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g15.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.hinge",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "action.rule.r02-g15.hinge",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ffcbe696147126a818c377f19a8fb8b2cc80e0b5a3baa68831af4d93f32108c6",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e2ce354c567aedad3021be9b3a4ae0b3e343320bf021ad8d1151986ca4ad649a",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ffcbe696147126a818c377f19a8fb8b2cc80e0b5a3baa68831af4d93f32108c6",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "250d8b771f931506a3aa47908134d2df05f690b9675a7735fd487c2afc050a3a",
+        "initialDigest" : "6bbcc0b0f97ce90a715c68554e6450e9a1760a560813a6f9c55ecf4f8a0ae656"
+      },
+      "name" : "acceptance-001",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              7,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "96ff372ccb2c4070a39e381afd27df8b0bc74bfa2b398baa7db34599f3ff0912",
+        "initialDigest" : "1a474a166951bb8d404b03a8a97b266691a4976f409bbd5cf1851e50c284ad6d"
+      },
+      "name" : "acceptance-002",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.hinge",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2c633015a71a30273e4eef1a3e41b30bf0af98aa675c999e112b75b2fbe74c04",
+        "initialDigest" : "2c633015a71a30273e4eef1a3e41b30bf0af98aa675c999e112b75b2fbe74c04"
+      },
+      "name" : "acceptance-003",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g15.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2a1bfc42b951230058a6221bb27af62ed706c162ec770b56ee396e1fe8639533",
+        "initialDigest" : "969897d1a99c70492c1d171dab411c6b8fae3bb2ccf9e812ad4714336f13b07b"
+      },
+      "name" : "acceptance-004",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "daba724b0fba17f09956ea44a61d34116f58a29a0eddf1d6193344fb7c1ce011",
+        "initialDigest" : "bf25261a9a0d1047d15a888666dc7c3dbfc85b99c87951e73dca2f7e7513f511"
+      },
+      "name" : "acceptance-005",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4321159f41eb1d4aa5c3441ba6d660d1102c4790d197ef062ef27cee3c441aa6",
+        "initialDigest" : "f2313a2cdf9192b773c13beddeaaea5da5da6bea51bee1a019f25c5afa6546c9"
+      },
+      "name" : "acceptance-006",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              10,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "915e926d52b403d09c236b90f062d4a80338030cb1198fb7712816f2b5f423f2",
+        "initialDigest" : "d47db2604fe0a84b8e1675f18b453086bae92ab6ef4c1ceae8f3d4b642fa79ef"
+      },
+      "name" : "acceptance-007",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.hinge",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "67ec5767174c9e759541be941b5d4f386014b916c4f482cece3ca24c297b80e5",
+        "initialDigest" : "67ec5767174c9e759541be941b5d4f386014b916c4f482cece3ca24c297b80e5"
+      },
+      "name" : "acceptance-008",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g15.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "db3bdb711735964d172cc3893e95136e782ecfa21dcde82ff9f8acb460f074c5",
+        "initialDigest" : "051b8ae7efc8565ad8dde5b2aaaa0b56435b56642e3bbfda87163722f2ec3fa6"
+      },
+      "name" : "acceptance-009",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "740aabcdce58be93a6f7b2ef44ae638d06b04878252f5986a36f188343147003",
+        "initialDigest" : "a5a740bf8909251094e2d67edf5bdfc383ca08a0d98d125d7d6c4f6a0b1df183"
+      },
+      "name" : "acceptance-010",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5e83ad2209860d6d5d14b73992128fd446bee5faa0d2c5a64b528680a2d57fc8",
+        "initialDigest" : "6a149d9e23740929693f02230c07bc703259998f8f0fba3870bbd6176943790f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-011",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "54df039f6c007519edd2eb711e4c9ef7b700fa10f4ad3526b42902f7e6a5ea3e",
+        "initialDigest" : "0defaa768da10db8b7f5f6b9f9bb219ac08c7d54cbecc8ccfda8a034d0fc2720",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-012",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ca3f7a132ba606c1542ac56e0e3f60a7b7fd2400e5a0e9576196b9808cd07a36",
+        "initialDigest" : "02d2534a75a5679569c9f67bddada62d1602c958ccf16022e6c643d2c0ff9f48",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-013",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d7f376d06f6b689575a4067694d9e8a3cdf98df3bf0f848664c19ff393cf0c88",
+        "initialDigest" : "72d13806e1de837fe632f8f6feefa3e612e3ff3bdaccb30fe0f2ff52732d1513",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-014",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "83cc1446d0b1444494e520375f143962cffb1e87587ad9b76b208822eddcd778",
+        "initialDigest" : "2889bf45dee7de0b29f7ef3e03fdb21ea8f9bd5f59b8e2be413c261177cb36f2",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-015",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0181798421c791045d111d2d94ad85920d8f9037e5fb1e82c82b9c44f6401e03",
+        "initialDigest" : "836d08ed420b46775b019813cde472e5311b1b9a475f7d86ebda6b0912b0ab2f",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-016",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9906633c83900c34f56c892d7369046006f96ee19c1e8c72b1ef3b3bce2085e8",
+        "initialDigest" : "3fe08ef2b38148424bcd939a02938942df29301bae9c2d057dd48ebd61a45779",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-017",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6104a8efef39bceaee71f82a743f072eac68bc6c1cc5acc4fba79aacd3febccc",
+        "initialDigest" : "fbcdaf61b82b96fe0bb5095781b1504163ee8587fce8987bda028e74dd5c409b",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-018",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1ac7e8afd7f7e99d60013a2aa26e249a25bfbf7bcc8d344c69a02dbdf04d411e",
+        "initialDigest" : "6fe9bff5fed297d9056a0a59b161c0b5b91467161209ed437fe9822fd8982057",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-019",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf00663fedd6ab25c11b2535787f1a88a0c3feeb8fcb52e774d4f3ddc2fba05d",
+        "initialDigest" : "557b8197956f4415d80f1d6a6b05909f67048751932a99ddfd1f7f5149a292af",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-020",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              10,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "caf5316640d0d4163d64065792f9af3f4baef05c0d4eaa7c4ce9b7d6f57216d8",
+        "initialDigest" : "caf5316640d0d4163d64065792f9af3f4baef05c0d4eaa7c4ce9b7d6f57216d8"
+      },
+      "name" : "acceptance-021",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              10,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "42579d9f4042af725e646d678434e993e7e1325453d0c126e8a05c4c21bb834f",
+        "initialDigest" : "42579d9f4042af725e646d678434e993e7e1325453d0c126e8a05c4c21bb834f"
+      },
+      "name" : "acceptance-022",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a92d60b988e0f5dcecdc7599284d88b7872e01bd1d05a54895212f03479f4a77",
+        "initialDigest" : "a92d60b988e0f5dcecdc7599284d88b7872e01bd1d05a54895212f03479f4a77"
+      },
+      "name" : "acceptance-023",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ddcee303b70252120a18bcafa1d03b1c6cc5d2dd5685ebb9bdfa2364d3360ab3",
+        "initialDigest" : "ddcee303b70252120a18bcafa1d03b1c6cc5d2dd5685ebb9bdfa2364d3360ab3"
+      },
+      "name" : "acceptance-024",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6a466560467c66652cb5bebe588e7f0f9235f7a7a654b98179f0163861f17bfc",
+        "initialDigest" : "6a466560467c66652cb5bebe588e7f0f9235f7a7a654b98179f0163861f17bfc"
+      },
+      "name" : "acceptance-025",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b19d805df6fb3bb6eafef302b3451fcea3cd1dc11323f317a07980a960734d27",
+        "initialDigest" : "b19d805df6fb3bb6eafef302b3451fcea3cd1dc11323f317a07980a960734d27"
+      },
+      "name" : "acceptance-026",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "40e4c6bf8de9f6a82d6f0c2da426ae181307a9e1e150575fc633f79a515e5b5d",
+        "initialDigest" : "40e4c6bf8de9f6a82d6f0c2da426ae181307a9e1e150575fc633f79a515e5b5d"
+      },
+      "name" : "acceptance-027",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              8,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "707896cfde23582a0ee29cc2ab514b12840210af8eaea47e2606a4919887ee27",
+        "initialDigest" : "707896cfde23582a0ee29cc2ab514b12840210af8eaea47e2606a4919887ee27"
+      },
+      "name" : "acceptance-028",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              8,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1bbc8594941985bcd85edbc6d54e53df1c3696ce0bd0478797a790f172a3e8c5",
+        "initialDigest" : "1bbc8594941985bcd85edbc6d54e53df1c3696ce0bd0478797a790f172a3e8c5"
+      },
+      "name" : "acceptance-029",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              -1,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              7,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "93e83a875f7deb0e790406e56743ddeda6b6159ff427ac45ac633ead74fa488f",
+        "initialDigest" : "93e83a875f7deb0e790406e56743ddeda6b6159ff427ac45ac633ead74fa488f"
+      },
+      "name" : "acceptance-030",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ff4c7d552aab21e19368b99a34b4166a0d7e3c3d936365d08c6cac0809259bcf",
+        "initialDigest" : "6f7f240ee1b9bdf485bc283d0ddbbe296850ac1af016a9a62de48ba384db488b"
+      },
+      "name" : "acceptance-031",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5bd17491530e17d3a68e18f3e0ed9b9ce1bf179830cb9d013ab6cdd96ebfaf66",
+        "initialDigest" : "3c7fa602d7bbc4dab0aa8a0180a92d0826375c077c5d2db5b097194084929d2f"
+      },
+      "name" : "acceptance-032",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8219ba4554120ee9e998367de42f1ad92d01f5e77a94a549ad2f19ad5dd6281b",
+        "initialDigest" : "d5f3184649a2ed3cbe6f15ebc86004d5f5f7f41c6a069e233b7fbea3c330fa60"
+      },
+      "name" : "acceptance-033",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3bce2ab1d61b3eb3608253479624e3dd740900832adac909f192c292fe3da836",
+        "initialDigest" : "eb356acdfc984f5e208b5f6da6f7e2658811067a27a891db24d8c04babda9095"
+      },
+      "name" : "acceptance-034",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3a1dc365be6ba15c1e566ffa7626210f1fad79fb0bcf4a4bf390f9583c130616",
+        "initialDigest" : "9708fb9562e18775bb58753883790144b548758631487318c0365c20fb9419c2"
+      },
+      "name" : "acceptance-035",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bdf7a3fb6263092731132ca08dc6a94add23dd27dad0ff11844f272e662cfd53",
+        "initialDigest" : "35f21e429d25470751a0e6a61c19c7c1d4436caa0f3bf6068cd013b3f7562e9a"
+      },
+      "name" : "acceptance-036",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "252dae68bbfe3c41332460646a0d8aed4884247cea5a1e516e90448d17165308",
+        "initialDigest" : "48a371f63ebf9353d43dcc98da80a3b8e417a9c3405c9dd12888417d6678e69f"
+      },
+      "name" : "acceptance-037",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e4b8812603627025a51312d041803ab62d1955f58e46bea11b131efa97dda19f",
+        "initialDigest" : "57c250ee43df57b7ebe5ad32d5aa6d7116a484ff17285e37be24249b19082a11"
+      },
+      "name" : "acceptance-038",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aa8590ffad8712b0ed2cd0839e0f050a9ec891c1c59d0862f0664fa93a18b953",
+        "initialDigest" : "23898cbb55d79ce6ac77dce203842bb6a8284e7740ab63af34b9ca6ef9a1729d"
+      },
+      "name" : "acceptance-039",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "56a66488c320e372d12031ea7f563693a688d8bccd6b5f0046fc3b5390588260",
+        "initialDigest" : "723ab60b7db8f64a8f5e2e9e50e46ac2a74e4562c5f2ae432961107870da407f"
+      },
+      "name" : "acceptance-040",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5bf2247d71e1013d722b62b0812edf7b2b15ab05504aca74d0d5050804926c1f",
+        "initialDigest" : "3e45612994485b83b9011944bdec16d17461d347992087cd7e209c25fa654ecb",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-041",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "09a0b9529358d8f242c1f16f9352ccf6fb913ad1bb19f9c5cf7b3e9e9efd58d3",
+        "initialDigest" : "55fb10e59b39b08b98d593fb8ca607b60c99c51019ab83966d045b848baf23e4",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-042",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "005c7a4278ebb3ab6c6cdfe24e0b9aa3f3b27d0025e26f09464052a77bc3cca6",
+        "initialDigest" : "71154bc28444606b65d5b6427c2a1467baf751d22c0e5655d5343d592dc5ee36",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-043",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bd5e3dfa3298beef54de91ccc0f140ce045f2d7fdccbbb0e0fe709863760dd43",
+        "initialDigest" : "3c7e1534c8121a62f1f854a00b4f8f3b29c03589f1f453fad55c93c70076f579",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-044",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3a87f4b6dfd64b00abded95fe2d016411689dd47f898594264f28472c06344fb",
+        "initialDigest" : "9f40735aa268de28f4811b1ed8ca21cc859da350d2b06d3c9e35ecf281cde81d",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-045",
+      "seed" : "60"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "98544577929f5404e5736eead98480020ac6e59963d79cd8a64cda4d24eb95ba",
+        "initialDigest" : "55e16c41b07db97dce261e2a4a0cd5e633d10ea2c34a2e30aa36cf76d88f51a5",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-046",
+      "seed" : "67"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9863fa50b36b361c711fbe9b05931871ef5c861b82bd67075a482d0567e5867d",
+        "initialDigest" : "b9b1194143c214e44daf5bbb17e652def8831d56961c361d452d7af5fdd53472",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-047",
+      "seed" : "74"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d4013d8fb42d3ce84ecd7bddaa87132d3450a63f4e0800fd02b4e9f16e13446f",
+        "initialDigest" : "472d296b22a39df5c82ec543fa32016d427f361973d3a1d06e838415dc831574",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-048",
+      "seed" : "81"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              5,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c43304bcc3857b985ca541772aec448b3eb03baf617428d414649c3d34a9d419",
+        "initialDigest" : "0a098e7531acb913b0253ea7b9e9088f3bab529f366bf417dabfd05fd7c50f67",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-049",
+      "seed" : "88"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              8,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              8,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f6aca7d7f54eea6e766748daba07bdc1e106e8b61176847c16603465a3965227",
+        "initialDigest" : "3beed518a96a79ffd0f5c0a56aca99ec7bcfc3390fa9ad7d7e317d247f76a79e",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-050",
+      "seed" : "95"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a64cbf7bf9eb559d441a652050e11d05804e79022f29be780c44d90713e8f83e",
+        "initialDigest" : "827eef2eabfac9fcb06837d979bd0d4c5d4737c12afa3b8d5df32292a9efca5b"
+      },
+      "name" : "acceptance-051",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "10bcd897a6b43c0f81fcabd6dab2940e7a38e45442b31ddd95cd028d98f6023c",
+        "initialDigest" : "10bcd897a6b43c0f81fcabd6dab2940e7a38e45442b31ddd95cd028d98f6023c"
+      },
+      "name" : "acceptance-052",
+      "seed" : "9"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9e21c8f9838af480ef5cec5019e4fff5ac1ecbfd8054d9682539f27141def182",
+        "initialDigest" : "ea3039f66d9636a9684cc6b05df0d323dc1a5fd8c888cdf1fad218e3b5f551a8"
+      },
+      "name" : "acceptance-053",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "332d180983210bf3eb1d061410caa5d9f74d9a68ed9a044544d1b1aa5fe09b44",
+        "initialDigest" : "332d180983210bf3eb1d061410caa5d9f74d9a68ed9a044544d1b1aa5fe09b44"
+      },
+      "name" : "acceptance-054",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c6d78172550035de469670bc886cf7808f186f38f37cdb1723ad1a7522802099",
+        "initialDigest" : "05b0fc1c96381343d4e49e1b44e48f01ae7fddffc591f9c2c1032281ea7d06c0"
+      },
+      "name" : "acceptance-055",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "088e887c1f430055102a9513800f9ff47b2ef34a41d7c71d493f11b3d0bc12d1",
+        "initialDigest" : "e3b9f7c54c792588dd1d1db480cdabf77d87c8d3d853514d059ae9f9c60328b5"
+      },
+      "name" : "acceptance-056",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "319e1cb69e3ef9e492b36b14778f28f55acb6228a05435e2c742d1a591014b5f",
+        "initialDigest" : "37e60d4b7ae32a66d5fcfa41fb587ab97ebe18b2472d4453ebffe694313362a1"
+      },
+      "name" : "acceptance-057",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b1a39fdd869ed60a27ac7bedd1116af44a14669427012264217c6edb913f5285",
+        "initialDigest" : "64e570bf98e88e22568ae6c259dc5dfa2f7098086542cb175f64669f765d230a"
+      },
+      "name" : "acceptance-058",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4478f80b2deb0c737690b9d5ebe3e36ddc9301e13e1dd10dba85da075be50f6e",
+        "initialDigest" : "c52a5bfbb787f7bece2e97e25f300166220e8f4316af57ea752245bbbb19a1d4"
+      },
+      "name" : "acceptance-059",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6c2d3ebb9190d288ec59b775743e4cf5018e33b0e92353a5dd1a196f2db0c809",
+        "initialDigest" : "6c2d3ebb9190d288ec59b775743e4cf5018e33b0e92353a5dd1a196f2db0c809"
+      },
+      "name" : "acceptance-060",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1b8c333ef65ee4a08fcd34d826ccec18e703b72767867f6ee1f55a988fb1fb63",
+        "initialDigest" : "836cd7a00198354fd22c10e0d3297e70e6542ba25224e40a07fd4788a1825cb3",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-061",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              6,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0ba5b2afacf9c7ba91e9e1b980fe3a642cbdbc25abba20e24ef696529f785f9b",
+        "initialDigest" : "5293d59e217cec497f4c6d3c04bbccde920bebb2f67a5eb6fd626241e5e18d6c",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-062",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c4b3190cb4d522846cdb53c4006f2b6df9386c20afc817c16b8c3172c51b3453",
+        "initialDigest" : "2dbd2489150dbec85eed27adff86311403b20c23ac263926c8180767afd32cec",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-063",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8cf9f7e7ab17e36ad2a1362d5fb159474b0d364079f421a6e2b617005b595e8e",
+        "initialDigest" : "a35e36e6c058e60b0a6aca22562ab99fd3e9864ebf5f0350e48f597257f959ed",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-064",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a97b824b30b0f7df60f0d5b1576178f5dc825db1313c489c6e4c688d549dcf5e",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-065",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2c1e4cc8a5a986282e170d4fc056afbfb8699a48a49cb6181f77f585fbca67d9",
+        "initialDigest" : "101131d091b9276c14546fc040c968230902da1da332a0481b6e3f41cedf894c",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-066",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "431d6bb9faaa1fd8527d89acaf9f0270273df260c6a6c11de2fb3bcc0c59695d",
+        "initialDigest" : "a90e5f867b4952dc6e77dcfbba7804145b2d5e1e4e2ed6aa23bb9e063134278f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-067",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "513c11e36c0205bb67aed361432313a7da1989e7020bee56289da138bd48814c",
+        "initialDigest" : "ff865239f9f81e68187ce08c6e85dbf4b8a68d79bfc8e335ddb68cb183691de7",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-068",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5585cd961bac7e7f176a514c90bdcf285bdc0db41aa567c30cc836244511f43d",
+        "initialDigest" : "3ca39a070efc42eae90295d2cb30b29f242de0f9d2cb55461728ad935b0c9316",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-069",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9579facc9f1efe0eda4b3e1f456534835720a2a4f6e02be6a99a2d286f5e0733",
+        "initialDigest" : "17a5f4e382b88f04365ca8ec4c96d69d74e032a4b98f72a7c6cb820f8ff6b35a",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-070",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "72d13806e1de837fe632f8f6feefa3e612e3ff3bdaccb30fe0f2ff52732d1513",
+        "initialDigest" : "690b4a6826fa62c39ed0e1b915a2da9164fc9dc0725367009890ba95a88f4aef"
+      },
+      "name" : "acceptance-071",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2889bf45dee7de0b29f7ef3e03fdb21ea8f9bd5f59b8e2be413c261177cb36f2",
+        "initialDigest" : "663f348a27b660bc057364fab536241d945739a4e393c762eae0a2beb2a9a21f"
+      },
+      "name" : "acceptance-072",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "836d08ed420b46775b019813cde472e5311b1b9a475f7d86ebda6b0912b0ab2f",
+        "initialDigest" : "92623f2316a2fde32e6a58cb564305bec3ef9eeab802e77e7ac2643a7e96d762"
+      },
+      "name" : "acceptance-073",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3fe08ef2b38148424bcd939a02938942df29301bae9c2d057dd48ebd61a45779",
+        "initialDigest" : "f914c1ab9ea30a1eabd709ab44003ad4da20252938d7d9e7c8a7b60642280609"
+      },
+      "name" : "acceptance-074",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fbcdaf61b82b96fe0bb5095781b1504163ee8587fce8987bda028e74dd5c409b",
+        "initialDigest" : "e2cefda6779ccb794def6b084771be52322b8b74de16e620b4fc852171407a8b"
+      },
+      "name" : "acceptance-075",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6fe9bff5fed297d9056a0a59b161c0b5b91467161209ed437fe9822fd8982057",
+        "initialDigest" : "67e3ca80e04334a3bfb3dafbb9a37799be3556678d15d86d88523905de9e8008"
+      },
+      "name" : "acceptance-076",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "557b8197956f4415d80f1d6a6b05909f67048751932a99ddfd1f7f5149a292af",
+        "initialDigest" : "e352cb5caf1934ad188bd2daeff3e576ce2ea5ef87e31ed370836efc98a3c246"
+      },
+      "name" : "acceptance-077",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "caf5316640d0d4163d64065792f9af3f4baef05c0d4eaa7c4ce9b7d6f57216d8",
+        "initialDigest" : "5cc9659f39041ba6b68210a66118b11dde166f3f994f60ab4f9f377a21004d56"
+      },
+      "name" : "acceptance-078",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              2,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "42579d9f4042af725e646d678434e993e7e1325453d0c126e8a05c4c21bb834f",
+        "initialDigest" : "b6fd31f6af15fd107f64f0179fcbe7cc50e91e29bf7597b6eee11fc0c58b53ff"
+      },
+      "name" : "acceptance-079",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g15.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a92d60b988e0f5dcecdc7599284d88b7872e01bd1d05a54895212f03479f4a77",
+        "initialDigest" : "63794c9102df54024f23e62a30d1cbdbd5d871af701fbebb344b3a1ea7c67952"
+      },
+      "name" : "acceptance-080",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a97b824b30b0f7df60f0d5b1576178f5dc825db1313c489c6e4c688d549dcf5e",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e200aaf68bb081006369cf740b5ee204a01beef6299605ae5370d5afe544c23f",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-budget-out",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "hinge.turn",
+            "values" : [
+              4,
+              -1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ffcbe696147126a818c377f19a8fb8b2cc80e0b5a3baa68831af4d93f32108c6",
+        "initialDigest" : "b31ee1da65a46ae444491514e290cb5c6069b22f4539a05e2597367a561b0813"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

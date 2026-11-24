@@ -288,7 +288,7 @@ import Testing
             #expect(program.fragment.contains("color = vec4(rgb * alpha, alpha);"), "\(program.name) premultiplied")
         }
         let voxelOuts: [String: String] = [
-            "v_base": "vec3", "v_normal": "vec3", "v_material": "float", "v_local": "float",
+            "v_base": "vec3", "v_normal": "vec3", "v_material": "float", "v_local": "float", "v_won": "float",
         ]
         #expect(Self.interface("out", in: Shaders.voxelVertex) == voxelOuts)
         let glowOuts: [String: String] = ["v_colour": "vec3", "v_kind": "float", "v_factor": "float",
@@ -596,4 +596,20 @@ import Testing
         }
         #endif
     }
+
+    /// A won level lifts the lit cube faces and bevels toward white by the fallback's lift, at every tier.
+    @Test func aWonLevelLiftsTheCubesLikeTheFallback() {
+        #expect(VoxelOrigamiShaders.wonLift == VoxelOrigamiSceneGeometry.wonLift)
+        #expect(VoxelOrigamiShaders.voxelFragment.contains("VO_WON_LIFT"))
+        let normal: SIMD3<Double> = SIMD3(0, 0, 1)
+        let materials: [VoxelOrigamiShaders.Material] = [.cubeFace, .cubeBevel]
+        for material in materials {
+            let plain: SIMD3<Double> = VoxelOrigamiShaders.cubeShade(material: material, normal: normal, local: 0.5)
+            let won: SIMD3<Double> = VoxelOrigamiShaders.cubeShade(material: material, normal: normal, local: 0.5,
+                                                                   won: 1)
+            #expect(won.x > plain.x && won.y > plain.y && won.z > plain.z)
+            #expect(won.x <= 1 && won.y <= 1 && won.z <= 1)
+        }
+    }
+
 }
