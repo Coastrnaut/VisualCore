@@ -17,8 +17,8 @@
   approximations of blade polygons, so the kernel never rasterises with floating point; depth gives parallax.
   Alternatives: rasterising polygons at play time (floating point at the boundary); a per-height table (larger levels).
 - **R5 Decision order.** Decision: jam first, then key frames in order, within a key frame forbidden before missing
-  before stray. Rationale: a jammed machine casts nothing; forbidden cells hold at every key frame; one fixed reporting
-  order.
+  before stray. Rationale: a jam decides the outcome before any key frame is judged (the report still lists every key
+  frame's cast and counts as the truth metric); forbidden cells hold at every key frame; one fixed reporting order.
 - **R6 Truth metric as a report.** Decision: alignment errors and per-key-frame covered, missing, stray and forbidden
   counts are reported after every action, never deciding by themselves. Rationale: the catalog's "angular relation
   error and target-mask overlap per frame", exact and shown to the player.
