@@ -37,7 +37,7 @@ offscreen host resizes before every still (R02-G14-03), so orbit changes the cam
 
 ## Phase 3: Stories 1 to 4 — gear drags, lamp, taps, run (P1) 🎯
 
-- [ ] T-R02G1404-003 [US1] [US2] [US3] [US4] Create
+- [X] T-R02G1404-003 [US1] [US2] [US3] [US4] Create — Verified 2026-11-24: 2026-11-24: agent C gesture controller (rotary gear drags with unwrap, dead zone and cap, lamp drags 24 pt per rung, taps, double taps with the driver flag, card and lamp taps, orbit); 500 seeded scripts against an independent expectation and 6 targeted tests; lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G14-04.host-3.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismGestureController.swift` (FR-R02G1404-001 … 004,
   006; SC-R02G1404-001 … 003; `MoonlitMechanismGestureAction` chooseGear(g), pendingTurn(gear, teeth), turn(step, count),
   pendingLamp(steps), lampStep(step, count), reseat(gear), showFrame(k), run, resetView; states idle, gearPress,

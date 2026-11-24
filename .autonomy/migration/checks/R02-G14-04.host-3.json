@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MoonlitMechanismGestureControllerTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter MoonlitMechanismGestureControllerTests",
+  "elapsed_seconds": 4.855,
+  "exit_code": 0,
+  "finished": "2026-11-24T10:21:42+00:00",
+  "gate": "R02-G14-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G14-04.host-3.log",
+  "log_sha256": "15e42e286edb923803883a448dc588debf7b1ee7c06075499005488dc0c7814f",
+  "name": "host-3",
+  "started": "2026-11-24T10:21:37+00:00",
+  "timed_out": false
+}
