@@ -18,6 +18,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show and choose: the latest state the presenter described, the shown key frame and the panel's
 /// chosen gear.
@@ -47,6 +48,8 @@ final class MoonlitMechanismMirror {
     var play: MoonlitMechanismPlay?
     /// The text of the last refused change, if any.
     var message: String?
+    /// The pending turn or lamp steps of a canvas drag in words (feature 434), nil when no drag is pending.
+    var pending: String?
 
     /// The number of gears of the followed level (2 while no play is followed, so gear 1 exists).
     var gearCount: Int { max(play?.level.gears.count ?? 2, 1) }
@@ -105,9 +108,17 @@ final class MoonlitMechanismMirror {
         }
     }
 
-    /// A refused action's reason code in words.
+    /// The engine's prefix on a kernel refusal's code (`action.rule.` before the kernel's `r02-g14.*` code).
+    static let rulePrefix = "action.rule."
+
+    /// `code` without the engine's ``rulePrefix`` (feature 434: codes are read with or without it).
+    static func bareCode(_ code: String) -> String {
+        code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+    }
+
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
     static func refusalText(code: String) -> String {
-        switch code {
+        switch bareCode(code) {
         case "r02-g14.stage": "the play is over: undo or go to the next level"
         case "r02-g14.action": "that change is not allowed for this machine"
         case "r02-g14.stale": "the play changed before the action arrived"
@@ -145,6 +156,12 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
     private(set) var tierLog: [MoonlitMechanismTierChange] = []
     /// The last snapshot drawn (tests and the description).
     private(set) var lastSnapshot: MoonlitMechanismSceneSnapshot?
+    /// The gesture controller (feature 434): gear drags, lamp drags, taps, double taps, orbit.
+    private(set) var gestures = MoonlitMechanismGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability, feature 434).
+    private(set) var refusalLog: [String] = []
+    /// How many refusal codes ``refusalLog`` keeps.
+    static let refusalLogLimit = 64
 
     /// What restarts the presentation clock: the play's level, phases, lamp, actions spent, stage, failure and the
     /// shown key frame.
@@ -277,12 +294,137 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
             mirror.status = play.records.isEmpty ? "Ready" : "Playing"
             mirror.failureText = nil
         }
+        if let pending = mirror.pending { text += " " + pending + "." }
+        if play.stage == .won || play.stage == .failed || play.stage == .result {
+            text += " " + Self.finishedMessage + "."
+        }
         return text
     }
 
-    /// The control panel.
+    /// The control panel: "Reset view" returns to the authored orbit; every button sends through ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(MoonlitMechanismControls(port: port, mirror: mirror))
+        AnyView(MoonlitMechanismControls(port: port, mirror: mirror,
+                                         resetView: { [weak self] in self?.resetView() },
+                                         sender: { [weak self] control, values in
+                                             self?.send(control, values, port: port)
+                                         }))
+    }
+
+    // MARK: Touch controls (feature 434, R02-G14-04)
+
+    /// What a finished play says when a one-finger gesture sent nothing.
+    static let finishedMessage = "The play is over: undo or go to the next level"
+    /// What a double tap on the driver says.
+    static let driverMessage = "The driver cannot be re-seated"
+
+    /// The pending turn of a gear drag in words.
+    static func pendingTurnText(teeth: Int) -> String {
+        let count: Int = abs(teeth)
+        return "Turn \(count) \(count == 1 ? "tooth" : "teeth") (\(count) \(count == 1 ? "action" : "actions"))"
+    }
+
+    /// The pending lamp steps of a lamp drag in words.
+    static func pendingLampText(steps: Int) -> String {
+        let count: Int = abs(steps)
+        let way: String = steps > 0 ? "up" : "down"
+        return "Lamp \(count) \(count == 1 ? "step" : "steps") \(way)"
+    }
+
+    /// The canvas gestures send handle turns, lamp steps, re-seats, runs and shown key frames; the chosen gear, the
+    /// pending texts and the orbit are presentation state.
+    var gestureActions: Set<String> { ["handle.turn", "lamp.step", "gear.reseat", "machine.run", "frame.show"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(MoonlitMechanismExperienceCore.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
+    /// order: kernel actions are sent through the port (a turn or lamp drag as that many single steps, each its own
+    /// undo step), the chosen gear and the pending texts go to the mirror; a double tap on the driver says it cannot be
+    /// re-seated; a one-finger gesture that ends on a won or failed play without choosing explains that the play is
+    /// over.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot else { return }
+        let before: MoonlitMechanismGestureController.State = gestures.state
+        let actions: [MoonlitMechanismGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
+        let finished: Bool = snapshot.stage == .won || snapshot.stage == .failed || snapshot.stage == .result
+        let oneFinger: Bool = [.gearPress, .gearDrag, .lampPress, .lampDrag, .cardPress].contains(before)
+        var sentKernel = false
+        var chose = false
+        for action in actions {
+            switch action {
+            case let .chooseGear(gear):
+                chose = true
+                mirror.gear = mirror.clampedGear(gear)
+            case let .pendingTurn(_, teeth):
+                mirror.pending = teeth == 0 ? nil : Self.pendingTurnText(teeth: teeth)
+            case let .turn(step, count):
+                sentKernel = true
+                mirror.pending = nil
+                for _ in 0..<max(count, 0) {
+                    // The count is capped at the actions left; a refusal (the play ended) stops the rest.
+                    if !send("handle.turn", [Double(step)], port: port).isAccepted { break }
+                }
+            case let .pendingLamp(steps):
+                mirror.pending = steps == 0 ? nil : Self.pendingLampText(steps: steps)
+            case let .lampStep(step, count):
+                sentKernel = true
+                mirror.pending = nil
+                for _ in 0..<max(count, 0) {
+                    send("lamp.step", [Double(step)], port: port)
+                }
+            case let .reseat(gear):
+                sentKernel = true
+                send("gear.reseat", [Double(gear), 1], port: port)
+            case let .showFrame(frame):
+                chose = true
+                send("frame.show", [Double(frame)], port: port)
+            case .run:
+                sentKernel = true
+                send("machine.run", [], port: port)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+        if gestures.refusedDriverReseat {
+            mirror.message = Self.driverMessage
+        }
+        if event.phase == .ended || event.phase == .cancelled || gestures.state == .orbiting
+            || gestures.state == .cancelled {
+            if !sentKernel { mirror.pending = nil }
+        }
+        if event.phase == .ended, finished, oneFinger, !chose, !sentKernel {
+            mirror.message = Self.finishedMessage
+        }
+        scene.orbit = gestures.orbit
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the pending text disappears.
+    func cancelPointers() {
+        gestures.cancel()
+        mirror.pending = nil
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its code (read with or without
+    /// the engine's `action.rule.` prefix) in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(MoonlitMechanismMirror.refusalText(code: result.code))."
+            refusalLog.append(MoonlitMechanismMirror.bareCode(result.code))
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        return result
     }
 }
 #endif

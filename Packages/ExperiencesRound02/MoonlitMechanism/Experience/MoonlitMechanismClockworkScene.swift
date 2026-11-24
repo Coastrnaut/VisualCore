@@ -13,6 +13,7 @@
 // passes `MoonlitMechanismShaders.glowLimit(reduceFlashing:)` as `u_glowLimit`. If a program fails, the scene falls
 // back to the level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, the geometry's fallback colours)
 // and keeps the reason; nothing here can reach the kernel. A zero-sized drawable is cleared and nothing else is drawn.
+// Since feature 434 (R02-G14-04) the camera follows the gesture controller's orbit (`orbit`), presentation only.
 #if os(iOS)
 import Foundation
 import MoonlitMechanismCore
@@ -29,6 +30,9 @@ final class MoonlitMechanismClockworkScene {
     var clockworkFragment = MoonlitMechanismShaders.clockworkFragment
     /// Whether the glow gain is capped (Reduce Flashing).
     var reducedFlash = false
+    /// The orbit the camera is drawn at (feature 434, presentation only; the gesture controller's). Only the camera
+    /// follows it: the meshes do not depend on the view, so an orbit never rebuilds them.
+    var orbit = MoonlitMechanismOrbit.authored
     /// Whether the gears are drawn at the shown key frame's set-up phases without a turning preview (Reduce Motion).
     var reduceMotion = false
     /// How many times the clockwork mesh was built (tests: it is not rebuilt while only the time moves).
@@ -106,7 +110,7 @@ final class MoonlitMechanismClockworkScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let still: Bool = reduceMotion || !animate
-        let camera = MoonlitMechanismSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = MoonlitMechanismSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         if key(snapshot, tier: tier, still: still) != geometryKey { try rebuild(snapshot, tier: tier, still: still) }
         geometryKey = key(snapshot, tier: tier, still: still)
         if fallbackReason != nil {

@@ -4,8 +4,9 @@
 // `gear.reseat [gear, ±1]`), the lamp (lamp − and +), the shown key frame (key frame − and +, `frame.show [k]`), run,
 // undo, redo and next level (kernel actions through the action port), each with an accessibility label, value and
 // identifier; the header shows the actions left of the budget, the status (stage, or the failure in words), the
-// progress description, the failure in words and a refused action in words. Touching gears on the canvas and full
-// accessibility come in later features of R02-G14.
+// progress description, the failure in words and a refused action in words. Since feature 434 (R02-G14-04) the panel
+// shows the pending turn or lamp steps of a canvas drag and has "Reset view"; full accessibility comes in a later
+// feature of R02-G14.
 #if os(iOS)
 import MoonlitMechanismCore
 import SwiftUI
@@ -17,6 +18,11 @@ struct MoonlitMechanismControls: View {
     let port: ExperienceActionPort
     /// What the panel shows and chooses.
     let mirror: MoonlitMechanismMirror
+    /// Returns the camera to the authored view (feature 434; presentation only).
+    var resetView: () -> Void = {}
+    /// Sends a control and shows a refusal in words (the presenter's `send`, feature 434); nil sends through the port
+    /// directly.
+    var sender: ((String, [Double]) -> Void)? = nil
 
     /// The panel.
     var body: some View {
@@ -47,6 +53,10 @@ struct MoonlitMechanismControls: View {
         Text(mirror.measureLabel).font(.footnote)
             .accessibilityIdentifier(port.identifier("progress"))
         Text(mirror.targetLabel).font(.footnote)
+        if let pending = mirror.pending {
+            Text(pending).font(.footnote)
+                .accessibilityIdentifier(port.identifier("pending"))
+        }
         if let message = mirror.message {
             Text(message).font(.footnote)
                 .accessibilityIdentifier(port.identifier("message"))
@@ -144,10 +154,18 @@ struct MoonlitMechanismControls: View {
                 .accessibilityLabel("Go to the next level")
                 .accessibilityIdentifier(port.identifier("next-level"))
         }
+        Button("Reset view") { resetView() }
+            .accessibilityLabel("Return the camera to the authored view")
+            .accessibilityValue("presentation only")
+            .accessibilityIdentifier(port.identifier("reset-view"))
     }
 
     /// Sends `control` and shows a refusal in words.
     private func send(_ control: String, _ values: [Double] = []) {
+        if let sender {
+            sender(control, values)
+            return
+        }
         let result = port.send(control, values)
         mirror.message = result.isAccepted
             ? nil : "That change was refused: \(MoonlitMechanismMirror.refusalText(code: result.code))."
