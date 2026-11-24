@@ -65,7 +65,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
 - [X] T-R02G1402-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24: rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G14-02.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
-- [ ] T-R02G1402-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1402-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-24: 2026-11-24: reference-1 exit 0 (.autonomy/migration/checks/R02-G14-02.reference-1.json)
 - [ ] T-R02G1402-010 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02G1402-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-24: 2026-11-24: script-tests exit 0, run alone (.autonomy/migration/checks/R02-G14-02.script-tests.json)
 - [ ] T-R02G1402-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
