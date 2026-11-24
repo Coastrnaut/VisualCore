@@ -75,7 +75,7 @@ consume).
 
 - [X] T-R02G1601-007 Docs: `docs/architecture/starlit-cartouche.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-24: 2026-11-24 round02-host-1/2/3 exit 0 (59 s, 45 s, 340 s; .autonomy/migration/checks/R02-G16-01.round02-host-*.json)
   `docs/automatedtesting.md`; `--name round02-host-1 … 3`
-- [ ] T-R02G1601-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1601-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24 rendering-27, rendering-26, experiences, host-full exit 0 (app-unit too; .autonomy/migration/checks/R02-G16-01.*.json)
   `--name host-full`
 - [ ] T-R02G1601-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1601-010 Reference regression chunk 2 (`--name reference-2`)
