@@ -81,6 +81,6 @@ catalog tests, witness files, docs) stay with the lead. Agents and the lead may 
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G1402-013 Align `specs/432-moonlit-mechanism-level-generator-and-solver-witness/contracts/api.md` with the
+- [X] T-R02G1402-013 Align `specs/432-moonlit-mechanism-level-generator-and-solver-witness/contracts/api.md` with the — Verified 2026-11-24: 2026-11-24: contracts/api.md lists MoonlitMechanismCounterexample (norm, vectors), canonicalText(phases:height:), vectors(dimensions:norm:) and the witness schema, matching MoonlitMechanismWitness.swift
   witness's public names (`MoonlitMechanismCounterexample` with `norm` and `vectors`, `canonicalText(phases:height:)`,
   `vectors(dimensions:norm:)`, the closed-form count of vectors of one norm) per plan: contract (unrequested)

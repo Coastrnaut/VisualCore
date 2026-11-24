@@ -32,8 +32,15 @@ public enum MoonlitMechanismGenerator {
     public static func candidate(_ entry: MoonlitMechanismManifestEntry, index: Int) -> MoonlitMechanismLevel?
     public static func generate(_ entry: MoonlitMechanismManifestEntry) throws(MoonlitMechanismError) -> MoonlitMechanismGenerated
     public static func catalogDigest(_ levels: [MoonlitMechanismLevel]) -> String }
+public struct MoonlitMechanismCounterexample: Sendable, Hashable, Codable {
+    public let norm: Int      // plan.size − 1
+    public let vectors: Int   // vectors of exactly that norm the solver tried (all of them; none won)
+    public init(norm: Int, vectors: Int) }
 public struct MoonlitMechanismWitness: Sendable, Equatable, Codable { /* fields per data-model.md */
-    public static func digest(phases: [Int], height: Int) -> String   // first 16 hex of SHA-256
+    public static let schema: Int                                          // 1
+    public static func canonicalText(phases: [Int], height: Int) -> String   // "phases=3,0,11;height=2"
+    public static func digest(phases: [Int], height: Int) -> String   // first 16 hex of SHA-256 of canonicalText
+    public static func vectors(dimensions: Int, norm: Int) -> Int     // Σₖ 2ᵏ·C(d,k)·C(c−1,k−1); 1 at norm 0
     public static func make(_ generated: MoonlitMechanismGenerated) throws(MoonlitMechanismError) -> Self
     public static func decode(_ data: Data) throws(MoonlitMechanismError) -> Self; public func encoded() -> Data }
 ```
