@@ -81,7 +81,7 @@ will consume).
   `docs/automatedtesting.md`; `--name round02-host`
 - [X] T-R02G1401-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24: rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G14-01.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
-- [ ] T-R02G1401-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1401-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-24: 2026-11-24: reference-1 exit 0 (.autonomy/migration/checks/R02-G14-01.reference-1.json)
 - [ ] T-R02G1401-010 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02G1401-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-24: 2026-11-24: script-tests exit 0, run alone (.autonomy/migration/checks/R02-G14-01.script-tests.json)
 - [ ] T-R02G1401-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
