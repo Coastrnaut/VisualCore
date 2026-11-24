@@ -18,5 +18,5 @@
   is forbidden in the Release binary. Rationale: as `EchoCartographerGolden` (feature 418).
 - **R6 Frame actions.** Decision: a golden frame applies the witness's links and nudges (not its test) at presentation time 0,
   so links, gauges and spent moves bars show but the level is not won (a won level lifts its links).
-  Rationale: positions do not depend on time (the link wave and shells are shader work); every certified plan has at
+  Rationale: positions do not depend on time (the star pulse and the wave shells are shader and glow work); every certified plan has at
   least one link or nudge, and the listen comes last, so the frame is never won.
