@@ -1,7 +1,7 @@
 // MoonlitMechanismExperienceIdentityTests — feature 433 (R02-G14-03) T-R02G1403-006 (FR-R02G1403-005, 007, 008). The
 // experience's id is the catalog id, the factory builds a shell around the presenter with the accessibility settings
 // passed through, the controls are the eight declared actions in order, the registration facts hold (100 certified
-// levels, schema 1, the tiers level-0 … level-2), and the presenter holds no GPU object and no snapshot before setup.
+// levels, schema 2, the tiers level-0 … level-2), and the presenter holds no GPU object and no snapshot before setup.
 // iOS only, as the target.
 #if os(iOS)
 import Foundation
@@ -23,7 +23,7 @@ import VisualCoreExperienceHost
     @Test func theRegistrationFactsHold() {
         #expect(MoonlitMechanismExperienceCore.levelNumbers == 1...100)
         #expect(MoonlitMechanismExperienceCore.certifiedCandidates.count == 100)
-        #expect(MoonlitMechanismExperienceCore.schemaVersion == 1)
+        #expect(MoonlitMechanismExperienceCore.schemaVersion == 2)
         var names: [String] = []
         for level in MoonlitMechanismExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -36,7 +36,8 @@ import VisualCoreExperienceHost
         for control in MoonlitMechanismExperienceCore.controls { ids.append(control.id) }
         #expect(ids == MoonlitMechanismExperienceCore.actionIDs)
         #expect(ids == ["handle.turn", "gear.reseat", "lamp.step", "machine.run", "play.undo", "play.redo",
-                        "level.next", "frame.show"])
+                        "level.next", "frame.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss"])
     }
 
     /// The factory builds a shell around the presenter and passes the accessibility settings through.

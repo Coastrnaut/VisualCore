@@ -28,7 +28,8 @@
 //                               failed `jammed`, `forbidden`, `missing` or `stray`;
 //   play.undo, play.redo        the kernel's exact undo and redo (`r02-g14.action` when there is nothing to undo or
 //                               redo; undo works in a failed play and returns it to playing; a won play is final);
-//   level.next                  the next certified level (100 wraps to 1) with a fresh play and key frame 0 shown;
+//   level.next                  the next certified level with a fresh play and key frame 0 shown (since feature 435 the
+//                               next open level; see below);
 //   frame.show [0…5]            shows key frame k (presentation only; accepted in every stage); a key frame the level
 //                               lacks is refused `r02-g14.frame`.
 // The declared gear and key-frame ranges are the widest any level allows (`MoonlitMechanismLevel.gearCounts`: at most 5
@@ -43,6 +44,33 @@
 // (`MoonlitMechanismPlay.replay`), shows key frame 0, and throws `MoonlitMechanismRestoreRefusal` for a damaged
 // payload, a level number outside 1 … 100 or a trace the kernel refuses (a record of a newer schema or of another
 // level's seed among them). An envelope of a newer schema is refused by the engine before the core sees it.
+//
+// Feature 435 (R02-G14-05) T-R02G1405-004 (FR-R02G1405-001, 004 … 007; clarifications Q2–Q5): the core also holds the
+// player's progress (`MoonlitMechanismProgress`: won levels with the least actions spent and stars, the open frontier),
+// the mode (campaign, practice with the budget raised to the kernel's maximum 40, daily) and the tutorial step. No
+// level is ever gated by payment: a locked level is one not yet unlocked (FR-R02G1405-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g14.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g14.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 40 (a copy of the level);
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing a level or a mode drops the left level's records (the play starts fresh, key frame 0 shown). `level.next`
+// moves to the next open level in campaign mode and is refused with `r02-g14.locked` when there is none (100 does not
+// wrap). A win (the play reaching `won` on an accepted run or redo) records
+// `progress.record(level:actionsSpent:certified:mode:)` with the actions spent (`MoonlitMechanismProgress.actionsSpent`:
+// every turn, re-seat, lamp step and run record, undone ones included) against the certified witness's action count
+// (its turns, re-seats and lamp steps plus the run): campaign opens the next level, daily records the level's best
+// result and stars and opens nothing, practice records nothing. The tutorial starts at
+// `MoonlitMechanismTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and is advanced after
+// every accepted turn, re-seat, lamp step, run, undo and redo by `advanced(afterChange:aligned:ended:)` (afterChange for
+// a turn, re-seat or lamp step; aligned when the run report of the current set-up wins,
+// `MoonlitMechanismTutorialStep.isAligned(_:)`; ended when the play is won or failed — an undo never ends it, a redo only
+// when it restores a won or failed moment), never back; `frame.show` never moves it. Digest
+// "r02-g14.moonlit-mechanism.v2": level, play fingerprint, progress and mode (never the tutorial step or the shown key
+// frame). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys; schema-1 payloads
+// migrate (no won levels, level 1 open plus the levels up to the restored level, campaign mode, the tutorial at its
+// first step — `change` on the tutorial levels, else `done`).
 //
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `MoonlitMechanismTier.of(t)`: level-0 = 6 rim segments per tooth, soft shadow edges,
@@ -60,11 +88,16 @@ public enum MoonlitMechanismExperienceRule {
     public static let notWhole = "r02-g14.not-whole"
     /// A key frame the level does not have (`frame.show`).
     public static let frame = "r02-g14.frame"
+    /// A level that is not open yet, or no next open level (feature 435). Never a payment gate.
+    public static let locked = "r02-g14.locked"
+    /// An impossible calendar date (feature 435).
+    public static let date = "r02-g14.date"
 }
 
 /// Why a saved Moonlit Mechanism state was refused on restore (feature 433). A refused restore changes nothing.
 public enum MoonlitMechanismRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress, the mode or the
+    /// tutorial step is invalid (feature 435).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -72,17 +105,20 @@ public enum MoonlitMechanismRestoreRefusal: Error, Equatable, Sendable {
     case kernel(MoonlitMechanismError)
 }
 
-/// The state of Moonlit Mechanism as an experience (see the file header). Snapshot schema 1.
+/// The state of Moonlit Mechanism as an experience (see the file header). Snapshot schema 2.
 public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g14.moonlit-mechanism"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g14.moonlit-mechanism.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g14.moonlit-mechanism.v2"
     /// The action ids in declaration order.
     public static let actionIDs = ["handle.turn", "gear.reseat", "lamp.step", "machine.run", "play.undo", "play.redo",
-                                   "level.next", "frame.show"]
+                                   "level.next", "frame.show", "level.select", "mode.daily", "mode.practice",
+                                   "mode.campaign", "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`MoonlitMechanismMode.practiceBudget`, 40).
+    public static let practiceBudget: Int = MoonlitMechanismMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a step (−1 … 1; the kernel refuses 0).
@@ -103,25 +139,51 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: MoonlitMechanismPlay
+    /// The player's progress (feature 435): in the digest and the snapshot.
+    public private(set) var progress: MoonlitMechanismProgress
+    /// The mode (feature 435): in the digest and the snapshot.
+    public private(set) var mode: MoonlitMechanismMode
+    /// The tutorial step (feature 435): in the snapshot, not in the digest.
+    public private(set) var tutorial: MoonlitMechanismTutorialStep
+    /// The certified witness's action count of the current level (its turns, re-seats and lamp steps plus the run),
+    /// against which a win's stars are counted. Derived from the level number.
+    public private(set) var certifiedActions: Int
     /// The shown key frame, 0 … key frames − 1; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var shownFrame: Int = openingFrame
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: MoonlitMechanismPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
+
+    /// What a reset restores (feature 435).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: MoonlitMechanismPlay
+        /// The opening progress: level 1 open plus the levels up to the opening level, none won.
+        let progress: MoonlitMechanismProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: MoonlitMechanismTutorialStep
+        /// The opening level's certified witness action count.
+        let certifiedActions: Int
+    }
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber` with key frame 0 shown, whose reset returns to `openingPlay` of
-    /// `openingNumber`.
-    init(levelNumber: Int, play: MoonlitMechanismPlay, openingNumber: Int, openingPlay: MoonlitMechanismPlay) {
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial` and key frame 0 shown, whose
+    /// reset returns to `opening` of `openingNumber`.
+    init(levelNumber: Int, play: MoonlitMechanismPlay, progress: MoonlitMechanismProgress, mode: MoonlitMechanismMode,
+         tutorial: MoonlitMechanismTutorialStep, certifiedActions: Int, openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedActions = certifiedActions
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
@@ -191,14 +253,44 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         try MoonlitMechanismPlay.replay(level: level, records: [])
     }
 
-    /// The opening state of manifest number `number`: a play begun and past its tutorial, ready to accept actions,
-    /// with key frame 0 shown.
+    /// The practice copy of `level` (feature 435): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: MoonlitMechanismLevel) throws(MoonlitMechanismError)
+        -> MoonlitMechanismLevel {
+        try MoonlitMechanismLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, gears: level.gears,
+                                  width: level.width, rows: level.rows, lampHeights: level.lampHeights,
+                                  startingHeight: level.startingHeight, keyFrames: level.keyFrames,
+                                  forbidden: level.forbidden, allowance: level.allowance,
+                                  budget: MoonlitMechanismMode.practice.budget(base: level.budget),
+                                  tutorial: level.tutorial)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: MoonlitMechanismGenerated,
+                            mode: MoonlitMechanismMode) throws(MoonlitMechanismError) -> MoonlitMechanismLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
+    /// accept actions, with key frame 0 shown; campaign mode, level 1 open plus the levels up to `number`, none won,
+    /// the tutorial at its first step.
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(MoonlitMechanismError) -> MoonlitMechanismExperienceCore {
-        let play: MoonlitMechanismPlay = try freshPlay(of: try level(number: number))
-        return MoonlitMechanismExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                              openingPlay: play)
+        let certified: MoonlitMechanismGenerated = try generated(number: number)
+        let play: MoonlitMechanismPlay = try freshPlay(of: certified.level)
+        var progress: MoonlitMechanismProgress = MoonlitMechanismProgress()
+        progress.open(through: number)
+        let tutorial: MoonlitMechanismTutorialStep = MoonlitMechanismTutorialStep.initial(level: number)
+        let actions: Int = MoonlitMechanismSolver.actions(certified.plan).count
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial, certifiedActions: actions)
+        return MoonlitMechanismExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                              tutorial: tutorial, certifiedActions: actions, openingNumber: number,
+                                              opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -240,15 +332,44 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the shown key frame, the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown key frame,
+    /// the quality tier or the opening level).
     public static func == (lhs: MoonlitMechanismExperienceCore, rhs: MoonlitMechanismExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 435): no won levels with level 1 open
+    /// plus the levels up to the restored level, campaign mode, no tutorial key (restore starts the tutorial at its
+    /// first step: `change` on the tutorial levels 1 … 3, else `done`).
+    ///
+    /// - Throws: ``MoonlitMechanismRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw MoonlitMechanismRestoreRefusal.damaged
+        }
+        var progress: MoonlitMechanismProgress = MoonlitMechanismProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(MoonlitMechanismMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the ranges of the file header as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -260,6 +381,11 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
         ExperienceControl(id: "frame.show", ranges: [declared(frameRange)]),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(MoonlitMechanismProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -267,7 +393,8 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The eight controls with their declared ranges (see the file header); run, undo, redo and next take no values.
+    /// The thirteen controls with their declared ranges (see the file header); `machine.run`, `play.undo`, `play.redo`,
+    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with key frame 0 shown; no clock is read.
@@ -304,28 +431,52 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
             switch action.control {
             case "handle.turn":
                 try play.apply(.turn(values[0]), expecting: play.fingerprint)
+                advanceTutorial(afterChange: true)
             case "gear.reseat":
                 try play.apply(.reseat(values[0], values[1]), expecting: play.fingerprint)
+                advanceTutorial(afterChange: true)
             case "lamp.step":
                 try play.apply(.lamp(values[0]), expecting: play.fingerprint)
+                advanceTutorial(afterChange: true)
             case "machine.run":
                 try play.apply(.run, expecting: play.fingerprint)
+                advanceTutorial(afterChange: false)
+                recordIfWon()
             case "play.undo":
                 try play.undo()
+                advanceTutorial(afterChange: false)
             case "play.redo":
                 try play.redo()
+                advanceTutorial(afterChange: false)
+                recordIfWon()
             case "frame.show":
                 // Presentation only: the play and the digest do not change.
                 guard values[0] < play.level.keyFrames.count else {
                     return .rejected(.rule(code: MoonlitMechanismExperienceRule.frame))
                 }
                 shownFrame = values[0]
-            default:   // level.next
-                let next: Int = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh: MoonlitMechanismPlay = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
-                shownFrame = Self.openingFrame
+            case "level.next":
+                guard let next = progress.nextOpen(after: levelNumber) else {
+                    return .rejected(.rule(code: MoonlitMechanismExperienceRule.locked))
+                }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(values[0]) else {
+                    return .rejected(.rule(code: MoonlitMechanismExperienceRule.locked))
+                }
+                try open(number: values[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = MoonlitMechanismProgress.dailyLevel(year: values[0], month: values[1],
+                                                                      day: values[2]) else {
+                    return .rejected(.rule(code: MoonlitMechanismExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            default:   // tutorial.dismiss
+                tutorial = tutorial.dismissed()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
@@ -339,11 +490,51 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose with key frame 0 shown; the quality tier, which is not
-    /// state, is kept.
+    /// Advances the tutorial step after an accepted turn, re-seat, lamp step, run, undo or redo
+    /// (`MoonlitMechanismTutorialStep.advanced(afterChange:aligned:ended:)`): `afterChange` for a turn, re-seat or lamp
+    /// step, aligned when the run report of the current set-up wins (`MoonlitMechanismTutorialStep.isAligned(_:)`),
+    /// ended when the play is won or failed (never after an undo, which always lands on a moment before the end; after a
+    /// redo only when it restores a won or failed moment). Never back.
+    private mutating func advanceTutorial(afterChange: Bool) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterChange: afterChange, aligned: MoonlitMechanismTutorialStep.isAligned(play),
+                                     ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's first
+    /// tutorial step and key frame 0 shown; the records of the level left are dropped. Changes nothing when the kernel
+    /// refuses.
+    private mutating func open(number: Int, mode: MoonlitMechanismMode) throws(MoonlitMechanismError) {
+        let certified: MoonlitMechanismGenerated = try Self.generated(number: number)
+        let fresh: MoonlitMechanismPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedActions = MoonlitMechanismSolver.actions(certified.plan).count
+        tutorial = MoonlitMechanismTutorialStep.initial(level: number)
+        shownFrame = Self.openingFrame
+    }
+
+    /// After an accepted action that won the play: records the actions spent
+    /// (`MoonlitMechanismProgress.actionsSpent(_:)`) against the certified witness's action count in the current mode
+    /// (campaign opens the next level; daily records the best result and stars and opens nothing; practice records
+    /// nothing). A won play is final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, actionsSpent: MoonlitMechanismProgress.actionsSpent(play),
+                        certified: certifiedActions, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode, key frame 0 shown); the quality
+    /// tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedActions = opening.certifiedActions
         shownFrame = Self.openingFrame
     }
 
@@ -356,38 +547,49 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g14.moonlit-mechanism.v1", then the level number and the play's fingerprint (level, phases, lamp height,
-    /// actions spent, stage, failure).
+    /// "r02-g14.moonlit-mechanism.v2", then the level number, the play's fingerprint (level, phases, lamp height,
+    /// actions spent, stage, failure), the progress and the mode (their sorted JSON); never the tutorial step or the
+    /// shown key frame.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly; never the
         // shown key frame (presentation).
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: MoonlitMechanismMode
+        /// The progress.
+        var progress: MoonlitMechanismProgress
         /// The play's records.
         var records: [MoonlitMechanismRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: MoonlitMechanismTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level, key frame 0 shown; a reset
-    /// returns to the level `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), key frame 0 shown;
+    /// a reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``MoonlitMechanismRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level
-    ///   or trace the kernel refuses.
+    /// - Throws: ``MoonlitMechanismRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or tutorial
+    ///   step, or a daily mode naming another level among them), a level number outside 1 … 100 or a level or trace the
+    ///   kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> MoonlitMechanismExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw MoonlitMechanismRestoreRefusal.damaged
@@ -395,15 +597,21 @@ public struct MoonlitMechanismExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw MoonlitMechanismRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw MoonlitMechanismRestoreRefusal.damaged
+        }
         do throws(MoonlitMechanismError) {
-            let saved: MoonlitMechanismLevel = try level(number: decoded.level)
-            let play: MoonlitMechanismPlay = try MoonlitMechanismPlay.replay(level: saved, records: decoded.records)
-            let openingNumber: Int = levelNumber(forSeed: seed)
-            let openingPlay: MoonlitMechanismPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return MoonlitMechanismExperienceCore(levelNumber: decoded.level, play: play,
-                                                  openingNumber: openingNumber, openingPlay: openingPlay)
+            let certified: MoonlitMechanismGenerated = try generated(number: decoded.level)
+            let play: MoonlitMechanismPlay = try MoonlitMechanismPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: MoonlitMechanismTutorialStep = decoded.tutorial
+                ?? MoonlitMechanismTutorialStep.initial(level: decoded.level)
+            let openingCore: MoonlitMechanismExperienceCore = try opening(number: levelNumber(forSeed: seed))
+            return MoonlitMechanismExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                  mode: decoded.mode, tutorial: tutorial,
+                                                  certifiedActions: MoonlitMechanismSolver.actions(certified.plan).count,
+                                                  openingNumber: openingCore.openingNumber,
+                                                  opening: openingCore.opening)
         } catch {
             throw MoonlitMechanismRestoreRefusal.kernel(error)
         }

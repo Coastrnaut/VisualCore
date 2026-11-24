@@ -111,19 +111,22 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g14.moonlit-mechanism" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g14.moonlit-mechanism.v1")
+        #expect(Core.experienceID == "r02-g14.moonlit-mechanism" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g14.moonlit-mechanism.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["handle.turn", "gear.reseat", "lamp.step", "machine.run", "play.undo", "play.redo",
-                             "level.next", "frame.show"]
+                             "level.next", "frame.show", "level.select", "mode.daily", "mode.practice",
+                             "mode.campaign", "tutorial.dismiss"]
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [-1...1] && Core.controls[2].ranges == [-1...1])
         #expect(Core.controls[1].ranges == [0...4, -1...1])
         #expect(Core.controls[7].ranges == [0...5])
-        let plainIndices: [Int] = [3, 4, 5, 6]
+        #expect(Core.controls[8].ranges == [1...100])
+        #expect(Core.controls[9].ranges == [1...9999, 1...12, 1...31])
+        let plainIndices: [Int] = [3, 4, 5, 6, 10, 11, 12]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == MoonlitMechanismTier.all.count)
-        #expect(Core.migrations.currentVersion == 1)
+        #expect(Core.migrations.currentVersion == 2)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == MoonlitMechanismTier.all.map(\.name))
@@ -373,10 +376,11 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(core.apply(Self.act("play.undo")) == .accepted)
         #expect(core.shownFrame == 2 && core.play.records.count == 2)
         #expect(core.apply(Self.act("play.undo")) == .rejected(.rule(code: "r02-g14.action")))
-        // level.next, reset and restore show key frame 0 again.
+        // A new opening (here practice; since feature 435 `level.next` needs the next level open), reset and restore
+        // show key frame 0 again.
         var next: Core = shown
-        #expect(next.apply(Self.act("level.next")) == .accepted)
-        #expect(next.levelNumber == 22 && next.shownFrame == 0)
+        #expect(next.apply(Self.act("mode.practice")) == .accepted)
+        #expect(next.levelNumber == 21 && next.shownFrame == 0)
         var reset: Core = shown
         reset.reset()
         #expect(reset.shownFrame == 0 && reset.levelNumber == 21 && reset.play.records.isEmpty)
@@ -442,11 +446,17 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         }
     }
 
-    @Test func nextLevelWrapsAndResetReturnsToTheSeedsLevel() async throws {
+    @Test func nextLevelNeedsAnOpenLevelAndResetReturnsToTheSeedsLevel() async throws {
         var core: Core = try await Core.prepare(seed: 40)
         #expect(core.levelNumber == 41)
+        // Feature 435: level 42 is not open until level 41 is won in the campaign.
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g14.locked")))
         #expect(core.apply(Self.act("handle.turn", [1])) == .accepted)
         #expect(core.apply(Self.act("frame.show", [2])) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        let generated: MoonlitMechanismGenerated = try Core.generated(number: 41)
+        for step in generated.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.frontier == 42)
         #expect(core.apply(Self.act("level.next")) == .accepted)
         #expect(core.levelNumber == 42 && core.play.records.isEmpty && core.play.stage == .playing)
         core.reset()
@@ -454,11 +464,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let resetDigest: StateDigest = try Self.digest(core)
         let freshDigest: StateDigest = try Self.digest(fresh)
         #expect(core == fresh && resetDigest == freshDigest && core.shownFrame == 0)
-        // The wrap: level 100 → 1.
+        // No wrap: after winning level 100, `level.next` is refused; level 1 is chosen with `level.select`.
         var last: Core = try Core.opening(number: 100)
-        #expect(last.apply(Self.act("level.next")) == .accepted)
-        let first: Core = try await Core.prepare(seed: 0)
-        #expect(last.levelNumber == 1 && last == first)
+        let hundred: MoonlitMechanismGenerated = try Core.generated(number: 100)
+        for step in hundred.actions { #expect(last.apply(Self.act(step)) == .accepted) }
+        #expect(last.play.stage == .won)
+        #expect(last.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g14.locked")))
+        #expect(last.apply(Self.act("level.select", [1])) == .accepted)
+        #expect(last.levelNumber == 1 && last.play.records.isEmpty)
         last.reset()
         #expect(last.levelNumber == 100)
     }
@@ -475,7 +488,7 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         let payload: Data = try core.snapshotPayload()
         #expect(try core.snapshotPayload() == payload)
         let text: String = try #require(String(data: payload, encoding: .utf8))
-        #expect(text.hasPrefix("{\"level\":21,\"records\":["))
+        #expect(text.hasPrefix("{\"level\":21,\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":21,"))
         let restored: Core = try Core.restore(payload: payload, seed: 20)
         let restoredDigest: StateDigest = try Self.digest(restored)
         let savedDigest: StateDigest = try Self.digest(core)
@@ -498,7 +511,9 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         // A fresh play round-trips too.
         let opening: Core = try await Core.prepare(seed: 7)
         let openingPayload: Data = try opening.snapshotPayload()
-        #expect(String(data: openingPayload, encoding: .utf8) == "{\"level\":8,\"records\":[]}")
+        #expect(String(data: openingPayload, encoding: .utf8)
+            == "{\"level\":8,\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":8,\"solved\":[]},"
+            + "\"records\":[],\"tutorial\":\"done\"}")
         #expect(try Core.restore(payload: openingPayload, seed: 7) == opening)
 
         #expect(throws: MoonlitMechanismRestoreRefusal.damaged) {
@@ -510,11 +525,12 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(throws: MoonlitMechanismRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":\"21\",\"records\":[]}".utf8), seed: 20)
         }
+        let rest: String = ",\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":1,\"solved\":[]},\"records\":[]}"
         #expect(throws: MoonlitMechanismRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":0" + rest).utf8), seed: 20)
         }
         #expect(throws: MoonlitMechanismRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":101" + rest).utf8), seed: 20)
         }
         // The same records on another level: the records carry level 21's seed.
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "\"level\":21", with: "\"level\":1").utf8)
@@ -550,14 +566,14 @@ private let coreWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(engine.handle(control: "handle.turn", values: [1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)

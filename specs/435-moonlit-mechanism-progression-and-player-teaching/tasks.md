@@ -58,7 +58,7 @@ final copy).
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1405-004 Edit `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismExperienceCore.swift`
+- [X] T-R02G1405-004 Edit `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismExperienceCore.swift` — Verified 2026-11-24: 2026-11-24: adapter level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss, r02-g14.locked/date, practice copy (budget 40), progress and mode digested (v2), schema 2 with migration from 1; scenarios integration rows win first, manifest regenerated; ExperienceCore tests updated plus 6 progression tests (agent); identity test and registry comment; host-4 exit 0 (.autonomy/migration/checks/R02-G14-05.host-4.json); all 186 MoonlitMechanism host tests and 33 simulator tests pass
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g14.locked`, `r02-g14.date`; practice budget 40 on a copy of the level, no stars, no
   unlocks; a daily win records the level's best result and stars and opens nothing; progress and mode in the digest,

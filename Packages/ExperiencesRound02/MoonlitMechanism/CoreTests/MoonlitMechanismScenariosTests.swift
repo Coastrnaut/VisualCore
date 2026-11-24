@@ -6,9 +6,10 @@
 // standard scenario and fixture ends in the kernel state its actions describe; every acceptance row ends in the state
 // of its family (a refusal with the kernel's code, a failed run — `jammed`, `forbidden` and `missing` all reached —
 // a spent budget, a won witness whose digest no quality tier changes, undo and redo restoring digests, a shown key
-// frame that leaves the digest alone, the next level's opening digest); and the committed `scenario-manifest.json`
-// equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run (`swift test`); explicit types,
-// plain loops.
+// frame that leaves the digest alone, the next level's fresh play after a campaign win — since feature 435 (R02-G14-05)
+// T-R02G1405-004 `level.next` needs the next level open, and on level 100 it is refused `r02-g14.locked` and level 1 is
+// chosen); and the committed `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1`
+// rewrites it). Host-run (`swift test`); explicit types, plain loops.
 #if DEBUG || VISUALCORE_AUTOMATION
 @testable import MoonlitMechanismCore
 import Foundation
@@ -285,12 +286,31 @@ private func digest(of core: MoonlitMechanismExperienceCore) throws -> String {
                 let restoredDigest: String = try digest(of: restored)
                 #expect(restored == core && restoredDigest == played.final, "\(name)")
             case .integration:
+                // Feature 435: `level.next` needs the next level open, so the row first wins its level's witness; on
+                // level 100 `level.next` is refused `r02-g14.locked` (no wrap) and level 1 is chosen instead.
                 let next: Int = Core.nextLevel(after: level)
                 #expect(core.levelNumber == next && core.play.stage == .playing, "\(name)")
-                let nextOpening: String = try #require(Core.expectedDigest(for: scenarioID, seed: UInt64(next - 1),
-                                                                           entries: []))
-                #expect(played.final == nextOpening, "\(name)")
-                #expect(played.results == ["accepted", "accepted", "accepted", Core.kernelActionCode], "\(name)")
+                #expect(Self.kinds(core).count == 2 && Self.kinds(core)[1] == .undo, "\(name)")
+                #expect(core.play.actionsSpent == 0, "\(name)")
+                #expect(core.mode == .campaign && core.progress.solved[level] != nil, "\(name)")
+                let move: [ScenarioStep] = Core.integrationMoveEntries(level)
+                var won: [ScenarioStep] = []
+                for action in actions { won.append(Core.actionEntry(action)) }
+                won += move
+                let nextFresh: String = try #require(Core.expectedDigest(for: scenarioID, seed: spec.seed,
+                                                                         entries: won))
+                #expect(played.final == nextFresh, "\(name)")
+                var results: [String] = []
+                for _ in actions { results.append("accepted") }
+                if level == Core.levelNumbers.upperBound {
+                    #expect(core.progress.frontier == Core.levelNumbers.upperBound, "\(name)")
+                    results += [Core.lockedCode, "accepted"]
+                } else {
+                    #expect(core.progress.frontier == next, "\(name)")
+                    results.append("accepted")
+                }
+                results += ["accepted", "accepted", Core.kernelActionCode]
+                #expect(played.results == results, "\(name)")
             }
         }
         #expect(runFailures == ["budget", "forbidden", "jammed", "missing"], "\(runFailures)")
