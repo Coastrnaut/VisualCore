@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G16-01 (migration ledger, game feature of experience R02-G16) · ID namespace FR-R02G1601-###,
 SC-R02G1601-###, T-R02G1601-###
@@ -30,6 +30,65 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract,
   so R02-G16-02 can certify levels).
 - **Model:** feature 441 (Voxel Origami's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+441's answers where the games agree. Facts checked in code (read-only, 2026-11-24): `Packages/ExperiencesRound02` holds
+Aurora Loom … Voxel Origami as the pattern (Core with level, play, records with previous and next fingerprints, rules
+as R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.action`, `.stage`, `.stale`, `.level` reason codes); no
+`StarlitCartouche*` source exists; the catalog sets the timestep at 0.008333 s, the content at 80 stages, the state
+model "ship transitions between node orbits on quantized launch ticks; completed trail projected into an authored glyph
+skeleton", the controls "tap route nodes to queue legs, drag time slider, preview gliding 3D route", the failure "route
+crosses hazard tube or violates node time window" and the truth metric "projected glyph skeleton mismatch and hazard
+clearance". Checked by reasoning: with integer orbits, integer travel times and integer windows every rule is a
+comparison of small integers, so no rounding can differ between devices.
+
+- Q: What are the stars, their motion and their glyph points, exactly? → A: a level has 4 … 12 stars (index 0 … n − 1).
+  Star i has an orbit of 1 … 4 lattice positions (each coordinate in −8 … 8) and sits at orbit[b mod length] at beat b
+  (beats are whole numbers from 0); its glyph point is a cell of a 5 × 5 grid (x, y in 0 … 4), the authored projection
+  of the star onto the cartouche, distinct for every star. The level's range r (1 … 12) makes a corridor flyable at beat
+  b when the squared distance between its two stars' positions at b is at most r². Impact: FR-R02G1601-001, 002;
+  SC-R02G1601-003.
+- Q: How does a leg work, exactly? → A: the ship starts at the start star s at beat 0. `leg(j, w)` with a wait w in
+  0 … 8 departs at beat t₀ = t + w (t the current beat) along the corridor between the ship's star i and j (each
+  undirected corridor lists its travel time τ in 1 … 3 beats; at most 24 corridors, no star joined to itself, no
+  corridor twice) and arrives at t₁ = t₀ + τ; afterwards the ship is at j at beat t₁. Refused without change
+  (`r02-g16.action`): an unknown star, j equal to i, no corridor between i and j, a wait outside 0 … 8, and stars out of
+  range at t₀ (naming both positions' squared distance and r²). Impact: FR-R02G1601-002, 006.
+- Q: When does a leg fail, and in which order are the checks made? → A: each star has a window [open, close] (beats,
+  0 ≤ open ≤ close ≤ deadline; the start star's window contains 0); each hazard tube names a corridor and a closed beat
+  interval [from, to]. In this order the leg fails the level: `window` when t₀ > close of i (the ship lingered past its
+  star's window), `hazard` when a hazard on the leg's corridor has an interval meeting [t₀, t₁] (closed intervals;
+  naming the lowest such hazard), `window` when t₁ is outside j's window (naming j and the window), `deadline` when
+  t₁ exceeds the level's deadline (1 … 64), and `stroke` when the leg's corridor is not one of the symbol's strokes
+  (naming the stray stroke). A failed leg leaves the ship, beat and strokes as they were. Impact: FR-R02G1601-003;
+  SC-R02G1601-004.
+- Q: When is the level won, and what is the truth metric? → A: the symbol is a set of 1 … 12 strokes, each a corridor
+  (an unordered pair of stars; its glyph segment joins the two stars' glyph points). The drawn set is the set of
+  corridors flown by accepted legs (a retraced stroke counts once). After every accepted leg the level is won when the
+  drawn set equals the symbol and the ship is at the beacon b (b may equal s). The truth metric after every action:
+  missing strokes (in the symbol, not drawn), stray strokes (drawn, not in the symbol; zero in any playing state, since
+  a stray stroke fails), the glyph mismatch (their sum) and the hazard clearance (over every leg flown and every hazard on
+  its corridor, the fewest beats between the hazard interval and the leg's [t₀, t₁], or clear when none shares a
+  corridor); it never decides by itself. A level whose start already matches is refused (the symbol is never empty).
+  Impact: FR-R02G1601-004, 014; SC-R02G1601-003.
+- Q: Which actions cost what, when is one refused, and how are records and stored forms defined? → A: as feature 441:
+  `leg` spends 1 action; after an accepted leg a win is checked first, otherwise a budget (1 … 16) fully spent fails the
+  level (`budget`); a window, hazard, deadline or stroke failure fails the level on that leg. Refused without change: as
+  above, a wrong stage (`r02-g16.stage`) or a stale fingerprint (`r02-g16.stale`). Undo and redo spend nothing; a new
+  leg clears the redo stack; undo works in playing and paused; from failed, undo returns to playing before the failing
+  leg and refunds its action (an honest retry, recorded); a won level is final and refuses undo. The life of a level is
+  loading → tutorial (when it has one) → playing ⇄ paused → won or failed → result (`begin`, `dismissTutorial`, `pause`,
+  `resume`, `showResult`). Every accepted action appends a record (schema, level seed, action index, kind, star, wait,
+  previous and next fingerprints); the play fingerprint is the SHA-256 of the schema, the level fingerprint, the ship's
+  star and beat, the drawn strokes, the legs flown, the actions spent, the stage and the failure; levels are JSON
+  schema 1 with sorted keys and a fingerprint re-checked on decode; a level breaking any bound above (star count, orbit
+  length and coordinates, distinct glyph points, range, corridors, travel times, windows, hazards, symbol strokes on
+  corridors, start and beacon, deadline, budget) and damaged, edited and newer forms are refused (`r02-g16.level`).
+  Impact: FR-R02G1601-005 … 011; SC-R02G1601-002, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -114,7 +173,8 @@ refused.
 - **FR-R02G1601-012**: The source's invariants this kernel owns (time, input budget, goal, repeatability, undo, failure
   honesty, stability, save, renderer purity) MUST each have a named direct test and a seeded neighbouring-input check.
 - **FR-R02G1601-013**: Every star, corridor and measure MUST be identifiable without colour vision: the kernel names
-  them in words (star numbers, the ship's star and beat, strokes drawn and missing, actions left, beats to the deadline).
+  them in words (star numbers, the ship's star and beat, strokes drawn and missing, actions left, beats to the
+  deadline).
 - **FR-R02G1601-014**: The truth metric MUST be computed exactly and reported after every action: the projected
   glyph mismatch (strokes of the symbol not yet drawn and strokes drawn outside it) and the hazard clearance (the
   fewest beats between any leg flown and a hazard on its corridor, or clear).
