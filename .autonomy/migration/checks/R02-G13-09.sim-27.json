@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "AcousticConstellatorExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing AcousticConstellatorExperienceTests",
+  "elapsed_seconds": 17.81,
+  "exit_code": 0,
+  "finished": "2026-11-24T06:31:28+00:00",
+  "gate": "R02-G13-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-09.sim-27.log",
+  "log_sha256": "96cfbe9b5f029358650d78e490457fbbf6d4124569e637b523f81461c70e59d1",
+  "name": "sim-27",
+  "started": "2026-11-24T06:31:10+00:00",
+  "timed_out": false
+}

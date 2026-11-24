@@ -28,7 +28,7 @@ change (the shaders and reference of R02-G13-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1309-003 [US1] Edit `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorControls.swift`:
+- [X] T-R02G1309-003 [US1] Edit `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorControls.swift`: — Verified 2026-11-24: 2026-11-24: identifierNames pins the 35 names; agent E 4 identifier tests (listed once, lower-case tokens, panel uses each once, port prefix); sim-27 exit 0, 71 simulator tests (.autonomy/migration/checks/R02-G13-09.sim-27.json)
   `identifierNames` lists the 35 identifiers the panel already gives through `port.identifier` (spec Clarifications
   Q1: star, partner, link, unlink, nudge-minus, nudge-plus, listen, undo, redo, next-level, reset-view, dismiss-tutorial,
   hint, failure-undo, retry, campaign, daily, practice, level-picker, play-level, replay, replay-step, replay-stop, sound,

@@ -24,6 +24,8 @@
 // n", identifier `replay-position`) with Step (identifier `replay-step`, value "Action k of n") and Stop (identifier
 // `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
 // `settings.sound`; the mode's name includes "replay".
+// Feature 429 (R02-G13-09) T-R02G1309-003 (FR-R02G1309-001; clarification Q1): the identifiers the panel gives through
+// `port.identifier` (`experience.r02-g13.acoustic-constellator.<name>`) are listed in ``identifierNames``, each once.
 #if os(iOS)
 import AcousticConstellatorCore
 import SwiftUI
@@ -41,6 +43,15 @@ struct AcousticConstellatorControls: View {
     let resetView: () -> Void
     /// Sends a control with its values through the presenter (which shows and logs a refusal).
     let sender: (String, [Double]) -> Void
+    /// Every identifier name the panel gives (clarification Q1 of feature 429), each once; the identifier is
+    /// `experience.r02-g13.acoustic-constellator.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "star", "partner", "link", "unlink", "nudge-minus", "nudge-plus", "listen", "undo", "redo", "next-level",
+        "reset-view", "dismiss-tutorial", "hint", "failure-undo", "retry", "campaign", "daily", "practice", "level-picker",
+        "play-level", "replay", "replay-step", "replay-stop", "sound", "summary", "choice", "status", "actions", "progress",
+        "message", "failure", "instruction", "hint-text", "goal", "replay-position",
+    ]
+
     /// The text size: rows become columns at accessibility sizes (feature 426).
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 426).
