@@ -84,8 +84,8 @@ round-two games' daily multipliers are 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 7
   (level 1 open plus the restored level, campaign mode, tutorial at its first step on tutorial levels). A failure is
   explained from the failing action, actions numbered from 1 and gears, key frames and cells from 0: a jam — "Action m
   (the run): gear c jammed against its parent, gear p."; a forbidden shadow — "Action m (the run): key frame k cast a
-  shadow on forbidden cell x."; missing — "Action m (the run): key frame k missed n target cells."; stray — "Action m
-  (the run): key frame k cast n stray cells, more than the a allowed."; the budget — "Action m (a turn of the handle by
+  shadow on forbidden cell x."; missing — "Action m (the run): key frame k missed n target cells." ("1 target cell" when n is 1); stray —
+  "Action m (the run): key frame k cast n stray cells, more than the a allowed." ("1 stray cell" when n is 1); the budget — "Action m (a turn of the handle by
   ±1 | a re-seat of gear g by ±1 | a lamp step by ±1 | the run) spent the last action without a win." — each followed
   by "Undo the last action or retry the level." Impact: FR-R02G1405-003, 007; SC-R02G1405-003.
 
