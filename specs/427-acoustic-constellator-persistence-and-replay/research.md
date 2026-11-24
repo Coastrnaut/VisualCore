@@ -11,7 +11,7 @@
   budget); keep the result only when it wins, the actions the trace spends is at most `actionsSpent` (which counts undone
   actions too) and the stars match the stars rule for `actionsSpent`; report the count dropped. Rationale: an edited save cannot claim
   unearned scores; honest saves lose nothing.
-- **R4 Frontier as saved.** Decision: restore the frontier exactly as saved (the lesson of features 307 … 407).
+- **R4 Frontier as saved.** Decision: restore the frontier exactly as saved (the lesson of features 307 … 417).
   Rationale: raising it from kept results would open levels for an honest daily win, which never opens levels.
 - **R5 Replay as a mode.** Decision: `replay(level)` with `replay.start/step/stop` in the core, so a replay is part of
   the deterministic state and testable on the host.

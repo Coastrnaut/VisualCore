@@ -25,7 +25,7 @@ Canonical overrides:
   D1–D3 observation after ImplementationLock-100. **Owner-only items:** none.
 - **Shared features used:** the saved-state store and migration chain of the experience contract (UA-F05), R02-F14
   (reversible history), R02-F24 progression, and R02-G13-01 … 06.
-- **Model:** feature 417 (Acoustic Constellator' persistence and replay), including the lesson carried since feature 327:
+- **Model:** feature 417 (Harmonic Bridges' persistence and replay), including the lesson carried since feature 327:
   the saved frontier is restored as saved (raising it from the kept results would open levels for an honest daily win).
 
 ## Clarifications
