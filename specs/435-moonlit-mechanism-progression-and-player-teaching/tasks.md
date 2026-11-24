@@ -42,7 +42,7 @@ final copy).
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1405-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismProgress.swift`
+- [X] T-R02G1405-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismProgress.swift` — Verified 2026-11-24: 2026-11-24: agent C tutorial steps change/align/run/done (advance after any turn, re-seat or lamp step; witnesses of levels 1-3 walk every step), progress with stars and frontier, daily ×97, modes with practice budget 40; 17 tests; lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G14-05.host-3.json)
   (`MoonlitMechanismTutorialStep` change → align → run → done with the texts of clarification Q2, advanced by an
   accepted turn, re-seat or lamp step (change → align, and on to run at once when that change makes the run report of
   the current set-up win), a winning run report (align → run) or the level's end (→ done), never moved back by undo —
