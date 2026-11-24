@@ -26,7 +26,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1508-003 [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
+- [X] T-R02G1508-003 [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames: — Verified 2026-11-24: 2026-11-24 VoxelOrigamiGolden + golden-frames.json (16 frames, chosen hinge recorded) generated with VOXEL_ORIGAMI_WRITE_GOLDEN=1; RELEASE_FORBIDDEN gains VoxelOrigamiGolden; host-2 exit 0
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all of the witness's turns but the last (a
   one-turn witness applies none) with hinge 1 chosen, plus the hero frame of `scenario-manifest.json` at tier 0; at 1,152 × 768 with the
   authored camera: every cube centre, every hinge mark centre, every target cell centre (index order), the first covered

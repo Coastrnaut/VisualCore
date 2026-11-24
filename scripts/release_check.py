@@ -347,7 +347,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 428 (R02-G13-08): Acoustic Constellator's golden frames, test builds only.
                      "AcousticConstellatorGolden",
                      # Feature 438 (R02-G14-08): Moonlit Mechanism's golden frames, test builds only.
-                     "MoonlitMechanismGolden"]
+                     "MoonlitMechanismGolden",
+                     # Feature 448 (R02-G15-08): Voxel Origami's golden frames, test builds only.
+                     "VoxelOrigamiGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:
