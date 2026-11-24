@@ -18,9 +18,10 @@ Quickstart: [quickstart.md](quickstart.md).
 ## Technical Context
 
 **Audit (2026-11-23)**: `AcousticConstellatorCore` and `AcousticConstellatorExperience` exist in
-`Packages/ExperiencesRound02/Package.swift` and are linked by `project.yml`; Acoustic Constellator' targets already depend on
-VisualCoreAudioDSP (Core) and VisualCoreAudio (Experience) for the shared ambient player, so Acoustic Constellator gains
-the same dependencies; no new target.
+`Packages/ExperiencesRound02/Package.swift` and are linked by `project.yml`; Harmonic Bridges' targets depend on
+VisualCoreAudioDSP (Core) and VisualCoreAudio (Experience) for the shared ambient player; `AcousticConstellatorCore`
+already has VisualCoreAudioDSP, so only the experience target and its tests gain VisualCoreAudioDSP and
+VisualCoreAudio; no new target.
 **Language/Version**: Swift 6. **Primary dependencies**: the Acoustic Constellator Core of R02-G13-01 … 05, VisualCoreExperience
 (`AnnouncementKind`, `HapticKind`), VisualCoreAudioDSP (`AmbientLoopRecipe`), VisualCoreExperienceHost
 (`ExperienceFeedback`), VisualCoreAudio (`AmbientLoopPlayer`). No new package, GLSL file, Objective-C++ or VisualCore API.
@@ -47,11 +48,12 @@ Post-design re-check: PASS.
 ## Project Structure
 
 ```text
-Packages/ExperiencesRound02/Package.swift                                   edit  Core + VisualCoreAudioDSP; Experience + VisualCoreAudio (lead)
+Packages/ExperiencesRound02/Package.swift                                   edit  Experience (+ tests) + VisualCoreAudioDSP, VisualCoreAudio (lead)
 Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorFeedbackPlan.swift        new   (agent A)
 Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorLights.swift              new   (agent B)
 Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSoundRecipe.swift         new   (agent B)
 Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorShaders.swift             edit  u_wonLight (lead)
+Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSceneGeometry.swift       edit  won level in the fallback parts (lead)
 Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorFeedbackPlanTests.swift                            new (agent A)
 Packages/ExperiencesRound02/AcousticConstellator/CoreTests/{AcousticConstellatorLightsTests, AcousticConstellatorSoundRecipeTests}.swift new (agent B)
 Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorShaderSourceTests.swift                            edit (lead)
