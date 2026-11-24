@@ -38,7 +38,7 @@ consume).
 
 ## Phase 3: Story 1 — fly a route that draws the cartouche (P1) 🎯
 
-- [ ] T-R02G1601-003 [P] [US1] Create `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheChartTests.swift`
+- [X] T-R02G1601-003 [P] [US1] Create `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheChartTests.swift` — Verified 2026-11-24: 2026-11-24 host-2 exit 0, 8 chart tests on 500 seeded levels with an independent beat-by-beat reference (.autonomy/migration/checks/R02-G16-01.host-2.json)
   (agent A: on 500 seeded levels and leg sequences, star positions, range decisions, departure and arrival beats,
   hazard meetings (by listing every beat of [t₀, t₁] against every hazard beat), window and deadline decisions, stroke
   sets, missing, stray, mismatch and clearance equal an independent recomputation; hand cases: a range one unit inside
