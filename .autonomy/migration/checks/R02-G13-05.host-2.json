@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AcousticConstellatorHints|AcousticConstellatorSolver|AcousticConstellatorCatalog|AcousticConstellatorGenerator|AcousticConstellatorWitness"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'AcousticConstellatorHints|AcousticConstellatorSolver|AcousticConstellatorCatalog|AcousticConstellatorGenerator|AcousticConstellatorWitness'",
+  "elapsed_seconds": 23.646,
+  "exit_code": 0,
+  "finished": "2026-11-24T03:41:58+00:00",
+  "gate": "R02-G13-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-05.host-2.log",
+  "log_sha256": "d9eb61cd8aa7e5a2dc11a84c5d136696e2ef189f134511543e16a00b184cafe6",
+  "name": "host-2",
+  "started": "2026-11-24T03:41:35+00:00",
+  "timed_out": false
+}

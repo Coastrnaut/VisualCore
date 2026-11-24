@@ -18,6 +18,12 @@
 // plan's size was reached) is stored as `smallerSets`. The witness is the plan's links in pair order, then its nudges
 // in star order (one action per step), then one listen, replayed through the kernel's play. Integers only; no clock,
 // no random source.
+//
+// Feature 425 (R02-G13-05) T-R02G1305-002 (FR-R02G1305-002; clarification Q1, research R1): the same search runs from a
+// state of play through `plan(_:links:phases:maxActions:workBound:)` — the given links (fixed and placed) in place of
+// the fixed links and the given phases in place of the starting phases; the plan's links exclude the given ones.
+// `plan(_:maxActions:workBound:)` is that entry at the level's fixed links and starting phases, so certified plans and
+// witnesses are unchanged.
 import Foundation
 
 /// One nudge of a plan: a star (0-based) and a step of −1 or +1.
@@ -80,12 +86,32 @@ public enum AcousticConstellatorSolver {
 
     /// The minimal plan of `level`: the first winning set of the smallest size, with the count of every set of a
     /// smaller size listened to. Nil when the fixed links and the missing symbol pairs already break the degree or link
-    /// limit, when no set of at most `maxActions` actions wins, or when more than `workBound` listens would be run.
+    /// limit, when no set of at most `maxActions` actions wins, or when more than `workBound` listens would be run. It is
+    /// ``plan(_:links:phases:maxActions:workBound:)`` at the level's fixed links and starting phases.
     public static func plan(_ level: AcousticConstellatorLevel, maxActions: Int = maxActions,
                             workBound: Int = workBound) -> AcousticConstellatorPlan? {
+        plan(level, links: level.fixedLinks, phases: level.startingPhases, maxActions: maxActions,
+             workBound: workBound)
+    }
+
+    /// The minimal plan of `level` from a state of play (feature 425 (R02-G13-05) T-R02G1305-002, clarification Q1):
+    /// the search of ``plan(_:maxActions:workBound:)`` with `links` (the fixed links and any links already placed) in
+    /// place of the fixed links and `phases` (one per star, 0 … 11) in place of the starting phases. The base is `links`
+    /// plus the symbol pairs they lack (always in the plan, in pair order); the options are the helper links the degree
+    /// and link limits still allow and the ±1 nudges; every listen runs from `phases` nudged by the set. The plan's links
+    /// are the links to add (they exclude `links`), in pair order; nudges are relative to `phases`. Nil when `phases`
+    /// does not hold one phase per star in 0 … 11, when `links` names a star out of range or a repeated pair, when the
+    /// base breaks the degree or link limit, when no set of at most `maxActions` actions wins, or when more than
+    /// `workBound` listens would be run. Not limited to six links: a play may hold more than a level's fixed links.
+    public static func plan(_ level: AcousticConstellatorLevel, links given: [AcousticConstellatorLink], phases: [Int],
+                            maxActions: Int = maxActions, workBound: Int = workBound) -> AcousticConstellatorPlan? {
         let n: Int = level.stars.count
-        let required: [AcousticConstellatorLink] = missing(level)
-        let base: [AcousticConstellatorLink] = (level.fixedLinks + required).sorted()
+        guard phases.count == n, phases.allSatisfy({ AcousticConstellatorLevel.phases.contains($0) }) else { return nil }
+        let givenSet: Set<AcousticConstellatorLink> = Set(given)
+        guard givenSet.count == given.count,
+              given.allSatisfy({ $0.a >= 0 && $0.a < $0.b && $0.b < n }) else { return nil }
+        let required: [AcousticConstellatorLink] = level.symbol.filter { !givenSet.contains($0) }.sorted()
+        let base: [AcousticConstellatorLink] = (given + required).sorted()
         let baseSet: Set<AcousticConstellatorLink> = Set(base)
         var degrees: [Int] = Array(repeating: 0, count: n)
         for link in base {
@@ -93,7 +119,7 @@ public enum AcousticConstellatorSolver {
             degrees[link.b] += 1
         }
         guard base.count <= level.linkLimit, degrees.allSatisfy({ $0 <= level.degreeLimit }) else { return nil }
-        guard required.count <= maxActions else { return nil }
+        guard maxActions >= 0, required.count <= maxActions else { return nil }
         var options: [Option] = []
         if base.count < level.linkLimit {
             for a in 0..<n {
@@ -109,7 +135,8 @@ public enum AcousticConstellatorSolver {
             options.append(.nudge(star: star, step: -1))
             options.append(.nudge(star: star, step: 1))
         }
-        var search = Search(level: level, base: base, degrees: degrees, options: options, workBound: workBound)
+        var search = Search(level: level, phases: phases, base: base, degrees: degrees, options: options,
+                            workBound: workBound)
         for extra in 0...(maxActions - required.count) {
             let smaller: Int = search.work
             switch search.walk(size: extra) {
@@ -178,7 +205,9 @@ public enum AcousticConstellatorSolver {
     struct Search {
         /// The level.
         let level: AcousticConstellatorLevel
-        /// The fixed links and the missing symbol pairs, sorted.
+        /// The phases every listen starts from before the set's nudges, one per star.
+        let phases: [Int]
+        /// The given links and the missing symbol pairs, sorted.
         let base: [AcousticConstellatorLink]
         /// The degree of every star under `base`.
         let degrees: [Int]
@@ -190,9 +219,21 @@ public enum AcousticConstellatorSolver {
         private(set) var work: Int = 0
 
         /// A walk of the given values.
+        init(level: AcousticConstellatorLevel, phases: [Int], base: [AcousticConstellatorLink], degrees: [Int],
+             options: [Option], workBound: Int) {
+            self.level = level
+            self.phases = phases
+            self.base = base
+            self.degrees = degrees
+            self.options = options
+            self.workBound = workBound
+        }
+
+        /// A walk from the level's starting phases (the certifying search, as the witness's counterexample uses it).
         init(level: AcousticConstellatorLevel, base: [AcousticConstellatorLink], degrees: [Int], options: [Option],
              workBound: Int) {
             self.level = level
+            self.phases = level.startingPhases
             self.base = base
             self.degrees = degrees
             self.options = options
@@ -215,11 +256,11 @@ public enum AcousticConstellatorSolver {
             if chosen.count == size {
                 work += 1
                 if work > workBound { return .over }
-                var phases: [Int] = level.startingPhases
-                for star in phases.indices {
-                    phases[star] = AcousticConstellatorClock.reduce(phases[star] + shift[star])
+                var nudged: [Int] = phases
+                for star in nudged.indices {
+                    nudged[star] = AcousticConstellatorClock.reduce(nudged[star] + shift[star])
                 }
-                return level.listen(links: links.sorted(), phases: phases).won ? .won(chosen) : .lost
+                return level.listen(links: links.sorted(), phases: nudged).won ? .won(chosen) : .lost
             }
             var index: Int = start
             while index < options.count {

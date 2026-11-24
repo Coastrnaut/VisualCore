@@ -15,7 +15,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 415
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1305-002 [P] [US2] [US3] Add `plan(_:links:phases:maxActions:workBound:)` to
+- [X] T-R02G1305-002 [P] [US2] [US3] Add `plan(_:links:phases:maxActions:workBound:)` to — Verified 2026-11-23: 2026-11-23: agent B solver entry plan(_:links:phases:) (catalog regenerates all 100 witnesses byte-identical), hints and failure explanation; 9 hint tests (exact hints win all 100 levels at the witness's count, 200 seeded states, 500 seeded failures, more than six links); lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G13-05.host-2.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSolver.swift` (the minimal-plan search of
   `plan(_:maxActions:workBound:)` from the given links and starting phases: the base is the given links plus the missing
   symbol pairs, the options the helper links the degree and link limits allow and ±1 nudges, listens run from the given
