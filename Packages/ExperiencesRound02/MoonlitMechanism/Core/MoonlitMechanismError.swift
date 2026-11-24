@@ -1,6 +1,7 @@
 // MoonlitMechanismError — feature 431 (R02-G14-01) T-R02G1401-002 (FR-R02G1401-006, 009, 011; clarification Q5). The
 // refusals of Moonlit Mechanism's rule kernel, each with a stable reason code `r02-g14.*` that the experience logs with
-// the level id and the action.
+// the level id and the action. Feature 432 (R02-G14-02) T-R02G1402-002 adds the content pipeline's refusals,
+// `generation` and `witness`.
 
 /// A refusal of a Moonlit Mechanism level, action or event.
 public enum MoonlitMechanismError: Error, Equatable, Sendable {
@@ -17,6 +18,11 @@ public enum MoonlitMechanismError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of a manifest entry qualified within the candidate bound; the payload is the level number
+    /// (feature 432).
+    case generation(Int)
+    /// A witness file is damaged, newer, edited or no longer replays; the payload names the part (feature 432).
+    case witness(String)
 
     /// The stable reason code, `r02-g14.<kebab-case>`.
     public var reasonCode: String {
@@ -27,6 +33,8 @@ public enum MoonlitMechanismError: Error, Equatable, Sendable {
         case .stale: "r02-g14.stale"
         case .newerSchema: "r02-g14.newer-schema"
         case .malformed: "r02-g14.malformed"
+        case .generation: "r02-g14.generation"
+        case .witness: "r02-g14.witness"
         }
     }
 }

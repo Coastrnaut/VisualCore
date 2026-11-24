@@ -15,7 +15,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1402-002 Add `generation(Int)` ("r02-g14.generation") and `witness(String)` ("r02-g14.witness") to
+- [X] T-R02G1402-002 Add `generation(Int)` ("r02-g14.generation") and `witness(String)` ("r02-g14.witness") to — Verified 2026-11-24: 2026-11-24: generation and witness refusals (r02-g14.generation, .witness), the 100-entry manifest from the archived table, difficulty (with the solver's plan type it needs); host exit 0, existing 41 tests (.autonomy/migration/checks/R02-G14-02.host.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismError.swift`; create
   `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismManifest.swift` (the 100 entries "number 1 … 100,
   planned seed, band 1 … 5, budget 8 … 19" copied from `python3 scripts/planning_index.py levels --experience R02-G14`,
