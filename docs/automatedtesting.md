@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G13-08: Acoustic Constellator regression net).
+Last updated: 2026-11-24 (R02-G13-09: Acoustic Constellator interface journeys).
 
 ## 1. What is tested, and where
 
@@ -450,6 +450,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `Apps/VisualCore/Tests/UI/EchoCartographer/` the first `app-ui-ios27-t3` run built the old project and executed 0
   tests ("NOT RUN or not passed", the enumeration guard failed). Run `xcodegen generate --spec project.yml` after adding
   or removing app source or test files, then the check.
+- **Acoustic Constellator interface journeys** (R02-G13-09, 2026-11-24). `ACNPlayUITests` and `ACNReplayUITests` run
+  as the serial chunk `v3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-v3`);
+  level 1 opens with its certified pair already chosen, so the play steps the star and partner steppers only when a
+  value differs (a press counts only when the value moves), then taps Link and Listen. The namespace is `ACN` because
+  `AC` is Ambient Clock's: grep the UI test folder before naming a namespace. The pinned literals in `ACN` are checked
+  against the Core by `testAcousticConstellatorLevelOnePinsInACNEqualTheCore`. Measured on 2026-11-24: win 66 s,
+  relaunch 100 s (two launches), replay 53 s.
 - **Harmonic Bridges interface journeys** (R02-G12-09, 2026-11-23). `HBPlayUITests` and `HBReplayUITests` run as
   the serial chunk `u3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-u3`); they
   play level 1's certified actions (string 0 from peg 11 to peg 12, Tune, Test) with the peg stepper, counting a press

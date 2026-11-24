@@ -752,3 +752,7 @@ Feature 428 (R02-G13-08) adds the regression net: the solver regression over all
 alterations, the code-only golden frames (`AcousticConstellatorGolden`, `golden-frames.json`), the simulator frame and
 memory checks, the CI step and `scripts/acoustic_constellator_regression.py`.
 
+
+Feature 429 (R02-G13-09) adds the in-app integration: the pinned identifier list of the panel, the schema-1 and
+schema-2 examples (`AcousticConstellatorSchemaExamples`) stored by the app registration, app unit tests, and the
+interface tests `ACNPlayUITests` and `ACNReplayUITests` (serial chunk `v3`).

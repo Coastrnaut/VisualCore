@@ -230,3 +230,22 @@ and refuses damaged, edited and newer forms (`r02-g13.malformed`, `.newer-schema
   and the scene holds no GPU objects after each close and memory warning.
 - **CI and local command.** The `round02-host-tests` job runs the host part as "Acoustic Constellator regression
   (host)"; `python3 scripts/acoustic_constellator_regression.py` runs the host and simulator parts with one summary.
+
+## In-app integration (feature 429, R02-G13-09)
+
+- **Identifiers.** Every panel control and text element carries `experience.r02-g13.acoustic-constellator.<name>`
+  (`AcousticConstellatorControls.identifierNames`, 35 names: star, partner, link, unlink, nudge-minus, nudge-plus,
+  listen, undo, redo, next-level, reset-view, dismiss-tutorial, hint, failure-undo, retry, campaign, daily, practice,
+  level-picker, play-level, replay, replay-step, replay-stop, sound, summary, choice, status, actions, progress, message,
+  failure, instruction, hint-text, goal, replay-position); an experience test checks each is listed once and used
+  exactly once in the panel.
+- **Interface tests.** `ACNPlayUITests` wins level 1 through the panel (its certified actions: link star 0 with star 1,
+  the opening choice, then Listen: "The symbol rings together.", "Stars: 3 of 3.", level 2 open) and keeps the progress
+  over a relaunch; `ACNReplayUITests` replays the win (two actions) to its end and stops. They run as serial chunk `v3`,
+  each under 90 s apart from the simulator's automation-session setup per launch. Level 1's certified actions, the
+  opening choice (star 0, partner 1) and the budget (9) are pinned in `ACN` (`AC` is Ambient Clock's) and checked
+  against the Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`AcousticConstellatorSchemaExamples`,
+  seed 7), which the app restores into schema 3; Acoustic Constellator stays a candidate (not available without
+  `-vcCandidates`) until X-R02-G13.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
