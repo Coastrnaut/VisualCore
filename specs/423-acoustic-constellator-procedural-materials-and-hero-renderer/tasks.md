@@ -104,7 +104,7 @@ pass.
 
 - [X] T-R02G1303-007 Docs: `docs/architecture/acoustic-constellator.md` (renderer and experience), — Verified 2026-11-23: 2026-11-23: architecture (renderer and experience), package README, automatedtesting.md; round02-host exit 0 (.autonomy/migration/checks/R02-G13-03.round02-host.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1303-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1303-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-23: 2026-11-23: rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G13-03.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1303-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1303-010 Reference regression chunk 2 (`--name reference-2`)
