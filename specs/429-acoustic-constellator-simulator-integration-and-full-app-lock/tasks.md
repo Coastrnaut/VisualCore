@@ -15,7 +15,7 @@ change (the shaders and reference of R02-G13-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1309-002 Create `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSchemaExamples.swift`
+- [X] T-R02G1309-002 Create `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSchemaExamples.swift` — Verified 2026-11-24: 2026-11-24: lead examples source (schema 1 one certified link, schema 2 won level 1 unverified without a trace), agent A 7 tests, registry examples: and comment; lead retest host exit 0, 7 tests (.autonomy/migration/checks/R02-G13-09.host.json)
   (contracts/api.md; data-model: schema 1 "`{level: 1, records}` of a seeded play of level 1 with its one certified
   link applied (playing, not won), seed 7"; schema 2 "campaign mode, the tutorial step, progress (level 2 open, level 1 solved with its
   actions spent and stars), records []", "the result is kept, unverified, without a trace"; the envelope of

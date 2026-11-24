@@ -131,12 +131,14 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [acousticConstellator].compactMap { $0 }
 
-    /// R02-G13 Acoustic Constellator (feature 423, R02-G13-03): a candidate until X-R02-G13. Snapshot schema 3 since
-    /// feature 427; its schema-1 and schema-2 examples are registered at R02-G13-09, before the X gate's follow-through
-    /// needs them.
+    /// R02-G13 Acoustic Constellator (feature 423, R02-G13-03): a candidate until X-R02-G13. Snapshot schema 3 (feature
+    /// 427), so the schema-1 and schema-2 examples are stored (feature 429, R02-G13-09).
     fileprivate static var acousticConstellator: ExperienceRegistration? {
         guard let id = AcousticConstellatorExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: AcousticConstellatorExperienceCore.self) { launch in
+        let examples = [AcousticConstellatorExperienceCore.schemaOneExample(),
+                        AcousticConstellatorExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: AcousticConstellatorExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return AcousticConstellatorExperience.make(
                 id: id, storage: launch.storage,
