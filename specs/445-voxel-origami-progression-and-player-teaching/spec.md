@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G15-05 (migration ledger, game feature of experience R02-G15) · ID namespace FR-R02G1505-###,
 SC-R02G1505-###, T-R02G1505-###
@@ -26,6 +26,62 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G15-01 … 04.
 - **Model:** feature 435 (Moonlit Mechanism's progression and teaching) for hints, tutorial, failure text, progress,
   daily and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+435's answers where the games agree. Facts checked in code (read-only, 2026-11-24): `VoxelOrigamiSolver.plan` certifies a
+level by a breadth-first search over quarter-turn states from the level's start turns, hinges in index order and steps
+−1 before +1, skipping idle hinges and turns that collide or sweep, for at most `maxTurns` (6) turns and `workBound`
+(300,000) turns tried; a plan is its list of `.turn(hinge, step)` actions; every turn spends 1 action and the play is
+won the moment the shape matches the target (there is no separate run); a turn fails `collision(hinge, moving, still,
+cell)` or `sweep(hinge, moving, still, cell)` and the last action spent without a match fails `budget(index)` (0-based);
+undo works in playing and failed plays, a won play is final; levels 1 … 3 carry the tutorial flag; budgets are 8 … 19
+in the catalog (1 … 40 allowed); the adapter prepares level (seed mod 100) + 1, keeps the chosen hinge outside the play
+and snapshots `{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily
+multipliers are 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89 and 97.
+
+- Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
+  failed play's hint is "Undo the last action or retry the level." While playing: the solver's plan is computed from the
+  current turns through a solver entry that starts from them (`plan(_:turns:)`, the certifying `plan(_:)` being that
+  entry at the level's start turns); its first turn (h, s) is the hint; the whole plan must fit the actions left, or
+  else, as when the work bound is exceeded or no plan exists: "No way to win was found in the actions left: undo the last
+  action or retry the level." Level 1 names what moves ("The next turn swings cube k", k the hinge's tracked cube — the
+  swinging cube farthest from the hinge line), level 2 the hinge ("Turn hinge h"), level 3 the exact turn ("Turn hinge h
+  forward (+1)" or "Turn hinge h back (−1)"). Hints never change the state, are unlimited, do not affect stars and reset
+  to level 1 after any change of the play. Impact: FR-R02G1505-002; SC-R02G1505-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
+  instructions in order: (1) "Tap a cube to choose its hinge, then drag the cube (or use Turn − and +) to turn the hinge a
+  quarter turn: every cube beyond it swings" — it advances once a turn has been accepted; (2) "Orbit with two fingers to
+  see every side and compare the chain with the turquoise target — a hint shows which turn is next" — it advances once
+  a second turn has been accepted or the level ends (a turn that wins ends the level); (3) "If a turn would hit another
+  cube the level fails: undo and choose another hinge or way" — until the level ends. `tutorial.dismiss` ends it for that
+  level; undo never moves it back. Impact: FR-R02G1505-001; SC-R02G1505-001.
+- Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted turn record, undone
+  ones included: 3 when at most the certified witness's turn count, 2 when at most that + 2, else 1; per level the best
+  (least) actions spent of a won campaign play and its stars, a better result replacing a worse one; level 1 open; a
+  campaign win opens the next; `level.select [n]` opens any open level and refuses others (`r02-g15.locked`);
+  `level.next` moves to the next open level (refused when none, `r02-g15.locked`); the five bands of 20 are the certified
+  difficulty bands. Impact: FR-R02G1505-004; SC-R02G1505-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 31) mod 100 + 1, negative day counts wrapped into 0 … 99 (31 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g15.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the budget raised to the kernel's
+  maximum (40); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G1505-005;
+  SC-R02G1505-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 435: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the chosen hinge stays presentation; the
+  snapshot payload becomes schema 2 (`{level, mode, progress, records, tutorial}`) with a migration from schema 1 (level
+  1 open plus the restored level, campaign mode, tutorial at its first step on tutorial levels). A failure is explained
+  from the failing action, actions numbered from 1, cubes and hinges by index and cells as (x, y, z): a collision —
+  "Action m (a turn of hinge h by ±1) would put cube a on cube b at (x, y, z)."; a sweep — "Action m (a turn of hinge h
+  by ±1) would swing cube a through cube b at (x, y, z)."; the budget — "Action m (a turn of hinge h by ±1) spent the
+  last action without a match." — each followed by "Undo the last action or retry the level." Impact: FR-R02G1505-003,
+  007; SC-R02G1505-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -80,7 +136,7 @@ budget without affecting progress.
 - **A hint after the level is won or failed:** a won level has no hint; a failed one suggests undo or retry.
 - **A hint when no win was found in the actions left:** it says so and never suggests a useless turn.
 - **A hint search that would run long:** bounded by the solver's work limit; it never stalls the frame.
-- **A locked level or an impossible date:** refused with a named reason.
+- **A locked level or an impossible date:** refused with a named reason (`r02-g15.locked`, `r02-g15.date`).
 - **Practice and daily results:** never open levels; practice never awards stars.
 - **A daily level still locked in the campaign:** playable as the daily level without opening it.
 - **Tutorial in practice or daily mode:** shown on the tutorial levels in every mode, with the same steps.
@@ -134,8 +190,6 @@ budget without affecting progress.
 - The kernel's tutorial stage is dismissed by the adapter today; the tutorial steps become the experience's own state.
 - The tutorial instruction, the hint and the failure text appear as wrapping text in the control panel on iPhone and
   iPad, never over the solid.
-- The hint and failure details (wording per level, thresholds, the daily formula, the snapshot layout) follow feature
-  435's pattern and are settled by `/speckit-clarify`.
 
 ## Traceability
 
