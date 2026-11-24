@@ -61,8 +61,8 @@ order by distance with back faces culled.
   root has no hinge; nothing would move; the play is over). Impact: FR-R02G1504-001; SC-R02G1504-001.
 - Q: What do taps and double taps do? → A: a tap on a non-root cube sends `hinge.choose [h]` in any stage (presentation
   only, never an undo step); a tap on the root changes nothing. A second tap on the same non-root cube within 0.35 s and
-  22 points while playing sends `hinge.turn [h, +1]` when that hinge can turn and nothing otherwise (the first tap chose
-  it). A tap on empty space changes nothing; two such taps within 0.35 s and 22 points reset the view. On a won or failed
+  22 points while playing sends `hinge.turn [h, +1]` when that hinge can turn; otherwise it sends nothing and the
+  description says nothing would move (the first tap chose it). A tap on empty space changes nothing; two such taps within 0.35 s and 22 points reset the view. On a won or failed
   play no kernel action is sent (taps choose, orbit works) and the description says the play is over (undo or next
   level). Impact: FR-R02G1504-002, 005; SC-R02G1504-002.
 - Q: How do two fingers behave and how far may the view turn? → A: as feature 434: a second finger cancels any
