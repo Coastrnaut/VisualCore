@@ -233,3 +233,21 @@ Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decod
 - **CI and local command.** The `round02-host-tests` job runs the host part as "Voxel Origami regression (host)";
   `python3 scripts/voxel_origami_regression.py` runs the host and simulator parts with one summary.
 
+## In-app integration (feature 449, R02-G15-09)
+
+- **Identifiers.** Every panel control and text element carries `experience.r02-g15.voxel-origami.<name>`
+  (`VoxelOrigamiControls.identifierNames`, 35 names: hinge, hinge-minus, hinge-plus, hinge-detail, turn-minus,
+  turn-plus, undo, redo, next-level, reset-view, dismiss-tutorial, hint, failure-undo, retry, campaign, daily,
+  practice, level-picker, play-level, replay, replay-step, replay-stop, sound, summary, status, actions, pending,
+  progress, message, failure, explanation, instruction, hint-text, goal, replay-position); an experience test checks
+  each is listed once and used exactly once in the panel.
+- **Interface tests.** `VOPlayUITests` wins level 1 through the panel (its certified turns: hinge 4 chosen with Hinge +
+  or Hinge −, then Turn − twice: "The chain matches the target shape.", "Stars: 3 of 3.", level 2 open) and keeps the
+  progress over a relaunch; `VOReplayUITests` replays the win (two turns) to its end and stops. They run as serial
+  chunk `x3`, each under 90 s apart from the simulator's automation-session setup per launch. Level 1's certified
+  turns and the budget (9) are pinned in `VO` and checked against the Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`VoxelOrigamiSchemaExamples`, seed 7),
+  which the app restores into schema 3; Voxel Origami stays a candidate (not available without `-vcCandidates`) until
+  X-R02-G15.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
+

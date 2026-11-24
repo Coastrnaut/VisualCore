@@ -867,3 +867,7 @@ and 2, the saved sound choice (`settings.sound`) and `replay.start`, `replay.ste
 Feature 448 (R02-G15-08) adds the regression net: the solver regression over all 100 levels with eleven named
 alterations, `VoxelOrigamiGolden` (16 code-computed frame descriptions pinned in `golden-frames.json`, test builds only),
 simulator golden-frame and memory tests, `scripts/voxel_origami_regression.py` and a named CI step.
+
+Feature 449 (R02-G15-09) adds the in-app integration: the pinned identifier list of the panel, the schema-1 and
+schema-2 examples (`VoxelOrigamiSchemaExamples`) stored by the app registration, app unit tests, and the interface
+tests `VOPlayUITests` and `VOReplayUITests` (serial chunk `x3`).

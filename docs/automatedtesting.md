@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G15-08: Voxel Origami regression net).
+Last updated: 2026-11-24 (R02-G15-09: Voxel Origami in-app integration).
 
 ## 1. What is tested, and where
 
@@ -450,6 +450,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `Apps/VisualCore/Tests/UI/EchoCartographer/` the first `app-ui-ios27-t3` run built the old project and executed 0
   tests ("NOT RUN or not passed", the enumeration guard failed). Run `xcodegen generate --spec project.yml` after adding
   or removing app source or test files, then the check.
+- **Voxel Origami interface journeys** (R02-G15-09, 2026-11-24). `VOPlayUITests` and `VOReplayUITests` run as the
+  serial chunk `x3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-x3`); level 1's
+  certified plan is two turns of hinge 4, so the play first brings the chosen hinge to 4 with Hinge + or Hinge −
+  (reading the hinge from the `hinge` text, falling back to the hinge controls' value; choosing spends no action), then
+  taps Turn − twice, a press counting only when the actions-left count of the `actions` text moves. The pinned
+  literals in `VO` are checked against the Core by `testVoxelOrigamiLevelOnePinsInVOEqualTheCore`. Measured on
+  2026-11-24: win 59 s, relaunch 112 s (two launches), replay 59 s; every test passed on its first run, since the
+  agents read the panel source for the identifiers and values instead of guessing them.
 - **Moonlit Mechanism interface journeys** (R02-G14-09, 2026-11-24). `MMPlayUITests` and `MMReplayUITests` run as
   the serial chunk `w3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-w3`); level 1
   needs no gear choice, so the play taps Turn + and Lamp − (a press counts only when the actions-left count of the
