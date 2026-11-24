@@ -8,7 +8,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1510-001 Baselines after R02-G15-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1510-001 Baselines after R02-G15-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24 baseline-host, baseline-timing, baseline-round02-1/2/3 exit 0 (.autonomy/migration/checks/R02-G15-10.baseline-*.json)
   baseline-round02-1 … 3` (the three round-two filters of feature 446; no Swift changes follow; the rendering baseline
   is R02-G15-09's runs)
 

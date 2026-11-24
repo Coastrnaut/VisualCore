@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--skip",
+    "VoxelOrigami|MoonlitMechanism|AcousticConstellator|HarmonicBridges"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --skip 'VoxelOrigami|MoonlitMechanism|AcousticConstellator|HarmonicBridges'",
+  "elapsed_seconds": 343.572,
+  "exit_code": 0,
+  "finished": "2026-11-24T21:53:40+00:00",
+  "gate": "R02-G15-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-10.baseline-round02-3.log",
+  "log_sha256": "1be274a29232a4b1d187f6b7cd659d3011c88cae5dcedc6f1c025b7f8b1f2d2b",
+  "name": "baseline-round02-3",
+  "started": "2026-11-24T21:47:57+00:00",
+  "timed_out": false
+}
