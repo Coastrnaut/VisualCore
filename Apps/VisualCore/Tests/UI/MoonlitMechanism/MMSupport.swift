@@ -1,7 +1,8 @@
 // MMSupport — feature 439 (R02-G14-09) T-R02G1409-004, modelled on feature 429 (FR-R02G1409-002; SC-R02G1409-001;
 // clarifications Q1, Q2): helpers of the interface tests of Moonlit Mechanism (R02-G14) inside the one app, modelled on
-// `ACNSupport` (feature 429). The namespace is `MM` (no other UI test uses `MM`). Every launch carries `-vcCandidates`
-// (DebugLaunch: the candidates' catalog entries become available and are registered). A fresh start erases the data
+// `ACNSupport` (feature 429). The namespace is `MM` (no other UI test uses `MM`). Moonlit Mechanism was a candidate until
+// X-R02-G14 (2026-11-24); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries
+// become available and are registered). A fresh start erases the data
 // (`-vcResetData`, so no level is solved), skips the welcome and opens the experience directly with `-openExperience
 // r02-g14.moonlit-mechanism`; a relaunch (`MM.reopen`) backgrounds the app first (its save point), terminates it and
 // starts again without the reset, so the stored progress (solved levels, stars, the frontier, the verified winning
