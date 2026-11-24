@@ -812,3 +812,7 @@ panel's replay controls and the dropped-results announcement.
 Feature 438 (R02-G14-08) adds the regression net: the solver regression over all 100 levels with thirteen named
 alterations, the code-only golden frames (`MoonlitMechanismGolden`, `golden-frames.json`), the simulator frame and
 memory checks, the CI step and `scripts/moonlit_mechanism_regression.py`.
+
+Feature 439 (R02-G14-09) adds the in-app integration: the pinned identifier list of the panel, the schema-1 and
+schema-2 examples (`MoonlitMechanismSchemaExamples`) stored by the app registration, app unit tests, and the interface
+tests `MMPlayUITests` and `MMReplayUITests` (serial chunk `w3`).

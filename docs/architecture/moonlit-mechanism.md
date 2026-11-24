@@ -239,3 +239,22 @@ the level certification of R02-G14-02.
   close and memory warning.
 - **CI and local command.** The `round02-host-tests` job runs the host part as "Moonlit Mechanism regression (host)";
   `python3 scripts/moonlit_mechanism_regression.py` runs the host and simulator parts with one summary.
+
+## In-app integration (feature 439, R02-G14-09)
+
+- **Identifiers.** Every panel control and text element carries `experience.r02-g14.moonlit-mechanism.<name>`
+  (`MoonlitMechanismControls.identifierNames`, 44 names: gear, gear-minus, gear-plus, gear-detail, turn-minus,
+  turn-plus, reseat-minus, reseat-plus, lamp, lamp-minus, lamp-plus, frame, frame-minus, frame-plus, run, undo, redo,
+  next-level, reset-view, dismiss-tutorial, hint, failure-undo, retry, campaign, daily, practice, level-picker,
+  play-level, replay, replay-step, replay-stop, sound, summary, status, actions, pending, progress, message, failure,
+  explanation, instruction, hint-text, goal, replay-position); an experience test checks each is listed once and used
+  exactly once in the panel.
+- **Interface tests.** `MMPlayUITests` wins level 1 through the panel (its certified actions: Turn +, Lamp −, then
+  Run: "The shadows match every required key frame.", "Stars: 3 of 3.", level 2 open) and keeps the progress over a
+  relaunch; `MMReplayUITests` replays the win (three actions, the run included) to its end and stops. They run as
+  serial chunk `w3`, each under 90 s apart from the simulator's automation-session setup per launch. Level 1's
+  certified actions and the budget (9) are pinned in `MM` and checked against the Core by an app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`MoonlitMechanismSchemaExamples`,
+  seed 7), which the app restores into schema 3; Moonlit Mechanism stays a candidate (not available without
+  `-vcCandidates`) until X-R02-G14.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.

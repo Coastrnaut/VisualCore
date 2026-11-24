@@ -450,6 +450,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `Apps/VisualCore/Tests/UI/EchoCartographer/` the first `app-ui-ios27-t3` run built the old project and executed 0
   tests ("NOT RUN or not passed", the enumeration guard failed). Run `xcodegen generate --spec project.yml` after adding
   or removing app source or test files, then the check.
+- **Moonlit Mechanism interface journeys** (R02-G14-09, 2026-11-24). `MMPlayUITests` and `MMReplayUITests` run as
+  the serial chunk `w3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-w3`); level 1
+  needs no gear choice, so the play taps Turn + and Lamp − (a press counts only when the actions-left count of the
+  `actions` text moves), then Run. The run spends an action too, so the win ends at 6 of 9 actions left and the replay
+  has three steps. The pinned literals in `MM` are checked against the Core by
+  `testMoonlitMechanismLevelOnePinsInMMEqualTheCore`. Measured on 2026-11-24: win 58 s, relaunch 122 s (two launches),
+  replay 57 s. Never add a file to the tree while a baseline runs: `swift test` plans the build from the files present
+  when it starts, and a file moved away mid-run fails the build ("Build input file cannot be found"), which happened
+  to R02-G14-09's first baseline-round02.
 - **Acoustic Constellator interface journeys** (R02-G13-09, 2026-11-24). `ACNPlayUITests` and `ACNReplayUITests` run
   as the serial chunk `v3` (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-v3`);
   level 1 opens with its certified pair already chosen, so the play steps the star and partner steppers only when a
