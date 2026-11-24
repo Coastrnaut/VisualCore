@@ -16,7 +16,7 @@ final copy; round02-host split by test bundle, since it reached 401 s at R02-G15
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1505-002 [P] [US2] [US3] Add `plan(_:turns:maxTurns:workBound:)` to
+- [X] T-R02G1505-002 [P] [US2] [US3] Add `plan(_:turns:maxTurns:workBound:)` to — Verified 2026-11-24: 2026-11-24: agent B solver entry plan(_:turns:) (plan(_:) delegates; witness files still byte-identical), VoxelOrigamiHints (three levels, stuck and failed texts), VoxelOrigamiFailureExplanation (collision, sweep, budget, action from 1); hints win all 100 levels (one case per level, max ~2.8 s), 200 seeded states, 500 seeded failures; lead retest host-2 exit 0
   `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiSolver.swift` (the breadth-first search of
   `plan(_:maxTurns:workBound:)` from the given quarter turns — hinges in index order, −1 before +1, idle hinges,
   collisions and sweeps skipped; `plan(_:)` unchanged and equal to `plan(level, turns: level.startTurns)`; nil for turns

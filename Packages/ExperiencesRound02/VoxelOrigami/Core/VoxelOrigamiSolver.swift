@@ -8,6 +8,11 @@
 // plan. Work = turns tried, counted and bounded; over the bound, or past the most turns asked for, there is no plan. The
 // minimality proof is that every state reachable in fewer turns was reached and none matched (the states reached at
 // each smaller depth are counted). Nothing here reads a clock.
+//
+// Feature 445 (R02-G15-05) T-R02G1505-002 (FR-R02G1505-002; clarification Q1, research R1): the same search starts
+// from any given quarter turns (`plan(_:turns:maxTurns:workBound:)`), so a hint is the first turn of the minimal plan
+// from the current state; the certifying `plan(_:maxTurns:workBound:)` is that entry at the level's start turns, its
+// results unchanged.
 
 /// A minimal plan of a level: its turns in order, the states reached at each smaller depth and the work.
 public struct VoxelOrigamiPlan: Sendable, Equatable, Codable {
@@ -39,13 +44,30 @@ public enum VoxelOrigamiSolver {
     /// The most turns a plan may have.
     public static let maxTurns: Int = 6
 
-    /// The minimal plan of `level` from its start within `maxTurns` turns and `workBound` turns tried, or nil.
+    /// The minimal plan of `level` from its start within `maxTurns` turns and `workBound` turns tried, or nil. It is
+    /// ``plan(_:turns:maxTurns:workBound:)`` at the level's start turns.
     public static func plan(_ level: VoxelOrigamiLevel, maxTurns: Int = maxTurns,
+                            workBound: Int = workBound) -> VoxelOrigamiPlan? {
+        plan(level, turns: level.startTurns, maxTurns: maxTurns, workBound: workBound)
+    }
+
+    /// The minimal plan of `level` from the quarter turns `turns` (one per cube, each 0 … 3) within `maxTurns` turns
+    /// and `workBound` turns tried (feature 445 (R02-G15-05) T-R02G1505-002, clarification Q1): the breadth-first
+    /// search of the file header with `turns` in place of the start turns — hinges ascending, step −1 then +1, idle
+    /// hinges, collisions and sweeps skipped. The plan's turns lead from `turns` to a pose that matches the target, and
+    /// its states and work count from `turns`. Nil when `turns` does not hold one turn per cube in 0 … 3, when its pose
+    /// puts two cubes on one cell, when its pose already matches the target, when no plan of at most `maxTurns` turns
+    /// exists, or when more than `workBound` turns would be tried.
+    public static func plan(_ level: VoxelOrigamiLevel, turns: [Int], maxTurns: Int = maxTurns,
                             workBound: Int = workBound) -> VoxelOrigamiPlan? {
         let cubes: [VoxelOrigamiCube] = level.cubes
         let group: [VoxelOrigamiRotation] = level.orientations.group
-        let start: [Int] = level.startTurns
-        guard VoxelOrigamiLattice.canonical(level.pose(turns: start).cells, group: group) != level.targetCanonical
+        guard turns.count == cubes.count else { return nil }
+        for turn in turns where turn < 0 || turn > 3 { return nil }
+        let start: [Int] = turns
+        let startPose: VoxelOrigamiPose = level.pose(turns: start)
+        guard startPose.isCollisionFree,
+              VoxelOrigamiLattice.canonical(startPose.cells, group: group) != level.targetCanonical
         else { return nil }
         var parent: [[Int]: ([Int], VoxelOrigamiAction)] = [:]
         var seen: Set<[Int]> = [start]
