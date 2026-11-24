@@ -68,7 +68,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 - [X] T-R02G1402-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-24: 2026-11-24: reference-1 exit 0 (.autonomy/migration/checks/R02-G14-02.reference-1.json)
 - [X] T-R02G1402-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-24: 2026-11-24: reference-2 exit 0 (.autonomy/migration/checks/R02-G14-02.reference-2.json)
 - [X] T-R02G1402-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-24: 2026-11-24: script-tests exit 0, run alone (.autonomy/migration/checks/R02-G14-02.script-tests.json)
-- [ ] T-R02G1402-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1402-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-24: 2026-11-24: converge round 1 appended T-013 (contract alignment), round 2 appended nothing; README row, gate list and feature count updated
   README row and gate list updated
 
 ## Dependencies and parallel work
