@@ -38,7 +38,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismShaderSourceTests.swift` (version line,
   declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match); agent A;
   `--name host-2`
-- [ ] T-R02G1403-004 [P] [US1] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSceneGeometry.swift`
+- [X] T-R02G1403-004 [P] [US1] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSceneGeometry.swift` — Verified 2026-11-24: 2026-11-24: agent B wall/gears/lamp/gauges geometry (Q1 numbers, counter-rotating gears by train direction, feathers by tier, failure outlines, won lift), camera fit, project and CPU reference, fallback parts, vertex streams matching the shaders; 12 tests (480 extreme builds, all 100 levels in view at 7 aspects); lead retest with the real shaders host-3 exit 0 (.autonomy/migration/checks/R02-G14-03.host-3.json)
   (clarification Q1: the wall a vertical plane at z = −0.6, cell size s = min(1.8 / W, 1.2 / H), cell (c, r) at x =
   (c − (W − 1)/2) · s, y = 0.65 − (r − (H − 1)/2) · s; night backdrop at z = −0.62 over x −1.2 … 1.2, y −0.5 … 1.7; the
   paper wall; the shown key frame's cast cells as ink squares of side 0.92 s with a feather quad 0.15 s wide at level-0

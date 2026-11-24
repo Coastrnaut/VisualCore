@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MoonlitMechanismSceneGeometryTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter MoonlitMechanismSceneGeometryTests",
+  "elapsed_seconds": 10.109,
+  "exit_code": 0,
+  "finished": "2026-11-24T09:18:01+00:00",
+  "gate": "R02-G14-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G14-03.host-3.log",
+  "log_sha256": "7f19624cfe2d99fe003909a671d15c901a0a7dc9945eb55dc0d67aaccee5fc86",
+  "name": "host-3",
+  "started": "2026-11-24T09:17:51+00:00",
+  "timed_out": false
+}
