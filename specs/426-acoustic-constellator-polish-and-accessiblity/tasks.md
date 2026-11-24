@@ -12,7 +12,7 @@ faded in the unlit fallback too) taken into the first pass.
 - [X] T-R02G1306-001 Baselines after R02-G13-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-23: 2026-11-23: baseline-host, baseline-timing, baseline-round02 exit 0 on d89682515 (.autonomy/migration/checks/R02-G13-06.baseline-*.json); rendering baseline = R02-G13-05 rendering-27/26
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G13-05's
   rendering runs (exit 0)
-- [ ] T-R02G1306-002 Edit `Packages/ExperiencesRound02/Package.swift` (`AcousticConstellatorCore` already has
+- [X] T-R02G1306-002 Edit `Packages/ExperiencesRound02/Package.swift` (`AcousticConstellatorCore` already has — Verified 2026-11-23: 2026-11-23: AcousticConstellatorExperience and its tests gain VisualCoreAudioDSP and VisualCoreAudio (iOS-conditioned), the Core already had VisualCoreAudioDSP; host exit 0 (.autonomy/migration/checks/R02-G13-06.host.json)
   VisualCoreAudioDSP; `AcousticConstellatorExperience` and its tests gain VisualCoreAudioDSP and VisualCoreAudio,
   iOS-conditioned, as Harmonic Bridges' targets have); `--name host -- swift test --package-path
   Packages/ExperiencesRound02 --filter AcousticConstellatorCoreTests`
