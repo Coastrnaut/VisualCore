@@ -44,7 +44,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1508-005 [US2] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/ExperienceTests/VoxelOrigamiRegressionGoldenFrameTests.swift` and
+- [X] T-R02G1508-005 [US2] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/ExperienceTests/VoxelOrigamiRegressionGoldenFrameTests.swift` and — Verified 2026-11-24: 2026-11-24 sim-27 exit 0, 59 Voxel simulator tests incl. 3 golden-frame and 3 memory tests (.autonomy/migration/checks/R02-G15-08.sim-27.json)
   `Packages/ExperiencesRound02/VoxelOrigami/ExperienceTests/VoxelOrigamiRegressionMemoryTests.swift` (agent C: the 16 frames rendered and checked
   against their descriptions with the feature-443 tolerances (a cube centre 0.25 brighter than the night in luminance,
   the chosen hinge with red above blue by 0.08, the first moves bar 0.1 from the night, the corners within 0.05 of
