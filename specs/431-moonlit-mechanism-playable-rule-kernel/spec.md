@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G14-01 (migration ledger, game feature of experience R02-G14) · ID namespace FR-R02G1401-###,
 SC-R02G1401-###, T-R02G1401-###
@@ -32,6 +32,69 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract,
   so R02-G14-02 can certify levels).
 - **Model:** feature 421 (Acoustic Constellator's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+421's answers where the games agree. Facts checked in code (read-only, 2026-11-24): `Packages/ExperiencesRound02` holds
+Aurora Loom … Acoustic Constellator as the pattern (Core with level, play, records with previous and next fingerprints,
+rules as R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.*` reason codes); no `MoonlitMechanism*` source
+exists (the id `r02-g14.moonlit-mechanism` appears only in the catalog fixtures and as the synthetic candidate of
+`AppModelTests`, which R02-G14-03 moves to the next game, as R02-G13-03 did); the catalog sets the timestep at
+0.008333 s, the content at 77 stages, gears of 6–20 teeth in trains of two to five gears, the controls "turn a gear
+handle, adjust lamp height, scrub shadow sequence", the law "angular phases constrained by integer tooth count;
+projected polygons transformed by light matrix and tested across key frames" and the truth metric "angular relation
+error and target-mask overlap per frame". Checked by reasoning: when the handle turns, two meshing gears turn by the
+same number of teeth in opposite directions, so the sum of their phases is unchanged modulo the greatest common divisor
+of their tooth counts; that sum is the mesh alignment a turn can never break and a re-seat can.
+
+- Q: What are the gears, the train and the blades, exactly? → A: a level has 2 … 5 gears (index 0 … n − 1); gear 0 is
+  the driver; every other gear meshes with exactly one lower-index gear (its parent), so the train is a tree; each gear
+  has a tooth count T in 6 … 20, a starting phase in 0 … T − 1 (whole teeth), a blade pattern of T bits (bit k: the
+  blade at slot k is solid or open; at least one solid and one open), a depth in 1 … 3 and a placement (the wall cell of
+  its centre at lamp height 0); each meshing pair (parent p, child c) has the divisor g = gcd(Tₚ, T_c), which must be at
+  least 2, and an alignment value a in 0 … g − 1. A level breaking any of these is refused. Impact: FR-R02G1401-001;
+  SC-R02G1401-001.
+- Q: How do the handle, a re-seat and the lamp change the machine, exactly? → A: a gear's direction is +1 when its
+  distance from the driver in the train is even and −1 when odd; `turn(δ)` with δ = +1 or −1 moves every gear's phase
+  to (phase + direction · δ) mod T; `reseat(i, δ)` with δ = ±1 moves only gear i (never the driver) to (phase + δ) mod
+  T; `lamp(δ)` moves the lamp height (0 … L − 1, L in 2 … 5, a starting height in range) by δ = ±1. A pair is aligned
+  when (phaseₚ + phase_c) mod g = a; a turn keeps every alignment, a re-seat can break it. The angular relation error of
+  a pair is the cyclic distance between (phaseₚ + phase_c) mod g and a (0 when aligned, at most ⌊g / 2⌋). Impact:
+  FR-R02G1401-002, 014.
+- Q: How is a shadow cast on the wall, exactly? → A: the wall is a grid of W × H cells (W in 8 … 24, H in 6 … 16),
+  cells numbered row by row; each gear has a slot table: for every slot k in 0 … T − 1 a non-empty list of cell offsets
+  (whole columns and rows from the gear's centre, each within ±8) that a solid blade at slot k covers; the blade at
+  pattern bit b of a gear at phase q sits at slot (b + q) mod T; at lamp height h the light shifts every cell of a gear
+  down by h · depth rows (the light matrix: an integer shift that grows with depth, so near and far gears part as the
+  lamp rises); cells outside the wall are dropped. A key frame's shadow is the union of the cells of every solid blade of
+  every gear at the phases after that key frame's handle turns. Impact: FR-R02G1401-003; SC-R02G1401-003.
+- Q: How do the key frames decide a run, and in which order? → A: a level has 2 … 6 key frames in order, each with a
+  handle-turn count (strictly increasing, the first may be 0; a key frame's phases are those of the current set-up
+  turned that many times by +1), a non-empty target cell set and a required flag (at least one key frame required);
+  forbidden cells (0 … 12, disjoint from every target) hold at every key frame; the stray allowance is 0 … 4. A run first
+  checks every meshing pair in pair order (child index) and fails `jammed` naming the first misaligned pair; it then
+  walks the key frames in order: a shadow on a forbidden cell fails `forbidden` (naming the key frame and the
+  lowest-numbered such cell); at a required key frame a target cell left uncovered fails `missing` (naming the key frame
+  and the count) and more stray cells than the allowance fail `stray` (naming the key frame and the count); otherwise
+  the run wins. Impact: FR-R02G1401-005; SC-R02G1401-004.
+- Q: Which actions cost what, when is one refused, and how are records and stored forms defined? → A: `turn`,
+  `reseat`, `lamp` and `run` each spend 1 action; `run` decides the level (won, or failed with its reason); after any
+  other accepted action a budget (1 … 40) fully spent without a win fails the level (`budget`). Refused without change:
+  an unknown gear, re-seating the driver, a step other than ±1, a lamp step out of range (`r02-g14.action`); a wrong
+  stage (`r02-g14.stage`) or a stale fingerprint (`r02-g14.stale`). Undo and redo spend nothing; a new action clears the
+  redo stack; undo works in playing and paused; from failed, undo returns to playing (an honest retry, recorded); a won
+  level is final and refuses undo. The life of a level is loading → tutorial (when it has one) → playing ⇄ paused → won
+  or failed → result (`begin`, `dismissTutorial`, `pause`, `resume`, `showResult`). Records and stored forms are as in
+  R02-G13-01: every accepted action appends a record (schema, level seed, action index, kind, gear, step, previous and
+  next fingerprints); the play fingerprint is the SHA-256 of the schema, the level fingerprint, the phases, the lamp
+  height, the actions spent, the stage and the failure; levels are JSON schema 1 with sorted keys and a fingerprint
+  re-checked on decode; damaged, edited and newer forms are refused (`r02-g14.level`). The truth metric (every pair's
+  alignment error, every key frame's covered, missing, stray and forbidden counts and the outcome a run would give) is
+  reported after every action and never decides by itself. Impact: FR-R02G1401-004, 006 … 011, 014; SC-R02G1401-002,
+  005.
 
 ## User Scenarios & Testing *(mandatory)*
 
