@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G15-01 (migration ledger, game feature of experience R02-G15) · ID namespace FR-R02G1501-###,
 SC-R02G1501-###, T-R02G1501-###
@@ -29,6 +29,70 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract,
   so R02-G15-02 can certify levels).
 - **Model:** feature 431 (Moonlit Mechanism's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+431's answers where the games agree. Facts checked in code (read-only, 2026-11-24): `Packages/ExperiencesRound02` holds
+Aurora Loom … Moonlit Mechanism as the pattern (Core with level, play, records with previous and next fingerprints,
+rules as R02-F23 `PuzzleRules`, `StableHash` fingerprints, `r02-gNN.action`, `.stage`, `.stale`, `.level` reason
+codes); no `VoxelOrigami*` source exists; the catalog sets the timestep at 0.008333 s, the content at 88 stages, the
+state model "each cube occupies integer local lattice coordinates; hinge angle one of {0, 90, 180, 270} degrees; tree
+hierarchy; reject interpenetrations", the controls "tap hinge, drag arc to discrete angle, rotate view with two fingers,
+undo" and the truth metric "collision-free occupancy and canonical polycube hash". Checked by reasoning: a quarter turn
+about a lattice line through cube centres maps lattice cells to lattice cells, so every pose is exact in integers; a
+hinge whose axis is the line from parent to child keeps that pair face to face in every pose, so a turn can never
+disconnect the tree.
+
+- Q: What are the cubes and hinges, exactly? → A: a level has 4 … 12 cubes (index 0 … n − 1); cube 0 is the root, fixed
+  at cell (0, 0, 0) with the identity orientation; every other cube i has a parent p(i) < i and a rest direction d(i),
+  one of the six unit vectors ±x, ±y, ±z, given in the parent's frame; the joint between i and p(i) is hinge i (hinges
+  1 … n − 1), with a quarter turn q(i) in 0 … 3 (0°, 90°, 180°, 270°) and a starting value. The rest pose (every
+  q = 0) and the starting pose must place every cube in its own cell. A level breaking any of these is refused
+  (`r02-g15.level`). Impact: FR-R02G1501-001; SC-R02G1501-001.
+- Q: How does a hinge turn move the cubes, exactly? → A: poses are computed from the root: cube i sits at
+  x(i) = x(p) + O(p) · d(i) and has the orientation O(i) = O(p) · R(d(i), q(i)), where R(a, k) is k quarter turns
+  counter-clockwise (right-hand rule) about the axis a and O is one of the 24 rotation matrices of the cube (integer
+  entries). So hinge i twists everything beyond cube i about the line from p(i) through i: cube i stays, its
+  descendants swing. `turn(i, δ)` with δ = +1 or −1 sets q(i) to (q(i) + δ) mod 4. A hinge whose cube has no
+  descendant is refused (`r02-g15.action`: nothing would swing), as are an unknown hinge and a step other than ±1. The
+  hierarchy is fixed, so "disconnected hierarchy" can never arise from a turn; the kernel re-checks after every turn
+  that every hinge's two cubes are face to face and refuses a stored state or level that breaks it (`r02-g15.level`).
+  Impact: FR-R02G1501-002, 006; SC-R02G1501-003.
+- Q: When does a turn collide, exactly? → A: the swinging cubes are cube i's descendants with a non-zero offset from
+  the axis; all other cubes stand still. First the end pose: a swinging cube landing on a still cube's cell fails the
+  turn (`collision`, naming the lowest such swinging cube, the still cube and the cell). Then the sweep: each swinging
+  cube's centre traces a quarter arc of radius ρ (ρ² = the integer squared distance of its offset from the axis) in the
+  plane across the axis; a still cube in the same plane (same coordinate along the axis) blocks the turn when its centre
+  lies inside the axis-aligned box of that quarter arc (the box of the two end points, extended to ±ρ along each
+  half-axis the open arc crosses) and its distance from the axis is strictly between ρ − 1 and ρ + 1; every comparison
+  is made with integer squares (the "swept box" filter of the catalog, narrowed to the band the moving cube actually
+  passes). A blocked turn fails (`sweep`, naming the lowest blocked swinging cube, the still cube and its cell).
+  Swinging cubes never collide with each other (they move rigidly). A failed turn leaves the pose as it was. Impact:
+  FR-R02G1501-003; SC-R02G1501-004.
+- Q: When is the target matched, and what is the truth metric? → A: the target is a set of n distinct cells; the level
+  allows the orientations `fixed` (the identity), `upright` (the 4 quarter turns about +y) or `any` (the 24 rotations
+  of the cube; never a mirror image). The canonical form of a cell set under the allowed group is the lexicographically
+  smallest sorted cell list among its rotations, each translated so its smallest x, y and z are 0; the canonical hash is
+  the SHA-256 (`StableHash`) of that list's text. After every accepted turn the level is won when the occupied cells'
+  canonical form equals the target's. The truth metric after every action: occupancy (true when no cell holds two
+  cubes), the canonical hash, and the covered count (the most cubes any allowed rotation and translation of the target
+  covers) with that alignment; it never decides by itself. A level whose starting pose already matches is refused.
+  Impact: FR-R02G1501-004, 014; SC-R02G1501-003.
+- Q: Which actions cost what, when is one refused, and how are records and stored forms defined? → A: as feature 431:
+  `turn` spends 1 action; after an accepted turn a match wins, otherwise a budget (1 … 40) fully spent fails the level
+  (`budget`); a collision or sweep fails the level on that turn. Refused without change: as above, a wrong stage
+  (`r02-g15.stage`) or a stale fingerprint (`r02-g15.stale`). Undo and redo spend nothing; a new turn clears the redo
+  stack; undo works in playing and paused; from failed, undo returns to playing before the failing turn and refunds its
+  action (an honest retry, recorded); a won level is final and refuses undo. The life of a level is loading → tutorial
+  (when it has one) → playing ⇄ paused → won or failed → result (`begin`, `dismissTutorial`, `pause`, `resume`,
+  `showResult`). Every accepted action appends a record (schema, level seed, action index, kind, hinge, step, previous
+  and next fingerprints); the play fingerprint is the SHA-256 of the schema, the level fingerprint, the quarter turns,
+  the actions spent, the stage and the failure; levels are JSON schema 1 with sorted keys and a fingerprint re-checked on
+  decode; damaged, edited and newer forms are refused (`r02-g15.level`). Impact: FR-R02G1501-005 … 011; SC-R02G1501-002,
+  005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -73,7 +137,8 @@ refused.
 
 ### Edge Cases
 
-- **An unknown hinge, a turn other than one quarter turn either way:** refused without cost.
+- **An unknown hinge, a turn other than one quarter turn either way, a hinge with nothing beyond it:** refused without
+  cost.
 - **A turn whose swinging cubes end exactly beside, but not inside, another cube's cell:** allowed.
 - **A turn that would make two cubes share a cell, or sweep a cube through an occupied cell:** fails the level, naming
   the moving cube, the cube in the way and the cell; undo returns to playing.
@@ -145,7 +210,8 @@ refused.
 - "Tap hinge, drag arc to discrete angle" is choosing a hinge and turning it by quarter turns; "rotate view with two
   fingers" is presentation only; "undo" is the kernel's undo.
 - "Self-collision or disconnected hierarchy on a move" is read as a turn that would put two cubes in one cell or sweep
-  a cube through an occupied cell; how the hierarchy can or cannot come apart is settled in clarification.
+  a cube through an occupied cell; a turn cannot disconnect the hierarchy (clarification Q2), which the kernel
+  re-checks after every turn.
 - "Occupied voxel set matches target up to allowed global rotation" is exact equality of cell sets after a translation
   and one of the level's allowed orientations.
 - "Collision-free occupancy and canonical polycube hash" is the exact truth metric of FR-R02G1501-014.

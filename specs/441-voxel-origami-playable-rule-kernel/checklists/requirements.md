@@ -33,5 +33,5 @@
 
 - The module path in the canonical overrides names where the one app keeps experiences (ADR-0009), not an
   implementation choice.
-- The exact lattice rules (hinge geometry, sweep, orientations, refusals, stored form) are left to `/speckit-clarify`
+- The exact lattice rules (hinge geometry, sweep, orientations, refusals, stored form) are settled by `/speckit-clarify`
   (following feature 431's structure).
