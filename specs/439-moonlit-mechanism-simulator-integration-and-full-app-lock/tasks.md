@@ -39,7 +39,7 @@ change (the shaders and reference of R02-G14-03 are unchanged and re-proven by t
   name of Q1 is listed once, has the prefix `experience.r02-g14.moonlit-mechanism.`, and the panel source uses each
   exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing MoonlitMechanismExperienceTests`
-- [ ] T-R02G1409-004 [US1] Create `Apps/VisualCore/Tests/UI/MoonlitMechanism/MMSupport.swift`, `MMPlayUITests.swift`,
+- [X] T-R02G1409-004 [US1] Create `Apps/VisualCore/Tests/UI/MoonlitMechanism/MMSupport.swift`, `MMPlayUITests.swift`, — Verified 2026-11-24: 2026-11-24: agent C MM interface tests, agent D chunk w3 (serial, key unique) and script test; xcodegen generate; lead retest app-ui exit 0, 3 tests (57.7 s, 122.0 s with two launches, 57.3 s) (.autonomy/migration/checks/R02-G14-09.app-ui.json)
   `MMReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified actions (handle turn +1, lamp step −1,
   then the run) and the budget (9) pinned in `MM`; Turn + and Lamp − tapped, each press counted only when the
   actions-left count of the `actions` text moves; then Run; read "The shadows match every required key frame." and

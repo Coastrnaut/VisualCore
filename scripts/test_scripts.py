@@ -1245,6 +1245,20 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(argv[start:start + 2],
                          ["VisualCoreUITests/ACNPlayUITests", "VisualCoreUITests/ACNReplayUITests"])
 
+    def test_moonlit_mechanism_ui_chunk(self):
+        """Feature 439 R02-G14-09 (T-R02G1409-004): the serial chunk `w3` runs the Moonlit Mechanism interface
+        journeys; its key appears once in the `UI_CHUNKS` literal."""
+        self.assertEqual(relcheck.UI_CHUNKS["w3"], ["MMPlayUITests", "MMReplayUITests"])
+        self.assertIn("w3", relcheck.SERIAL_CHUNKS)
+        source = Path(relcheck.__file__).read_text(encoding="utf-8")
+        self.assertEqual(source.count('"w3": ['), 1)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-w3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2],
+                         ["VisualCoreUITests/MMPlayUITests", "VisualCoreUITests/MMReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""
