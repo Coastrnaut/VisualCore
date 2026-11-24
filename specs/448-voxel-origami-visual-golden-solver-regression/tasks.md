@@ -14,7 +14,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1508-002 [P] [US1] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiRegressionSolverTests.swift` (agent A: for every
+- [X] T-R02G1508-002 [P] [US1] Create `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiRegressionSolverTests.swift` (agent A: for every — Verified 2026-11-24: 2026-11-24 host exit 0, 24 tests, slowest group ~3.7 s parallel (.autonomy/migration/checks/R02-G15-08.host.json)
   level in twenty groups of 5, "the generated level equals its witness's level (fingerprint); the witness's turns replay
   on a fresh play to a win on exactly the last turn and not before, within the budget, with its per-action fingerprints
   (after begin, after the tutorial on a tutorial level, then one per turn) and digests; plan returns exactly the
