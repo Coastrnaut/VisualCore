@@ -48,7 +48,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G1502-005 [P] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiWitness.swift` (agent B:
+- [X] T-R02G1502-005 [P] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiWitness.swift` (agent B: — Verified 2026-11-24: 2026-11-24: agent B witness (schema 1, digests of the quarter turns, fingerprints, counterexample, difficulty, decode refusals by named part), 14 tests; lead retest host-4 exit 0 (.autonomy/migration/checks/R02-G15-02.host-4.json)
   schema 1 sorted-key JSON; state digests "first 16 hex of SHA-256 of the quarter turns" after each action; play
   fingerprints after begin (and dismissTutorial) and each action; counterexample (the depth one below and the count of
   states reached at it); difficulty; skipped; decode refuses newer, damaged and non-replaying files) with
