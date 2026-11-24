@@ -101,7 +101,7 @@ pass.
 
 - [X] T-R02G1503-007 Docs: `docs/architecture/voxel-origami.md` (renderer and experience), — Verified 2026-11-24: 2026-11-24: docs/architecture/voxel-origami.md (renderer and experience), package README, docs/automatedtesting.md; round02-host exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1503-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1503-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1503-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1503-010 Reference regression chunk 2 (`--name reference-2`)
