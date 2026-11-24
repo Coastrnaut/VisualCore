@@ -742,7 +742,8 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   traces without undone turns, migrations 1 → 3 and 2 → 3, reconciliation on restore, replay rules and codes, a mid-way
   replay restored, altered replays damaged, the sound setting never digested), `VoxelOrigamiPersistenceTests` (500 round
   trips, 100 schema-1 and 100 schema-2 migrations, 200 reconciled saves, each edit alone, the daily rule; 8 tests in
-  about 9 s); simulator: `VoxelOrigamiReplayTests` (7 tests through the action port; 53 Voxel simulator tests in about 6 s). One lesson: the persistence agent kept its
+  about 9 s); `VoxelOrigamiReplayCatalogTests` (all 100 stored traces replayed through the adapter
+  against the witness files' recorded fingerprints, 10 groups, about 3 s; added by converge for SC-R02G1507-004); simulator: `VoxelOrigamiReplayTests` (7 tests through the action port; 53 Voxel simulator tests in about 6 s). One lesson: the persistence agent kept its
   seeded walks on levels 1 … 6 and certified those levels once, concurrently, before the tests used them, which kept
   500 round trips inside the 10 s rule; and an edit that reverses a trace turn may still win, so the tests edit a turn
   into a root-hinge turn (never legal) instead.
