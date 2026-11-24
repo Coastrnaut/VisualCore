@@ -79,7 +79,7 @@ will consume).
 
 - [X] T-R02G1401-007 Docs: `docs/architecture/moonlit-mechanism.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-24: 2026-11-24: docs/architecture/moonlit-mechanism.md (rules), ExperiencesRound02 README section, testing doc entry; round02-host exit 0 (.autonomy/migration/checks/R02-G14-01.round02-host.json)
   `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1401-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1401-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24: rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G14-01.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
 - [ ] T-R02G1401-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1401-010 Reference regression chunk 2 (`--name reference-2`)
