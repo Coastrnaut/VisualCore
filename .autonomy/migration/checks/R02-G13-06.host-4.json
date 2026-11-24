@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AcousticConstellatorShaderSource|AcousticConstellatorSceneGeometry"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'AcousticConstellatorShaderSource|AcousticConstellatorSceneGeometry'",
+  "elapsed_seconds": 10.475,
+  "exit_code": 0,
+  "finished": "2026-11-24T04:31:18+00:00",
+  "gate": "R02-G13-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-06.host-4.log",
+  "log_sha256": "052379131caad0ec9458f35eba64cbe0e54d46ae5ffe0d1406f47cbadce0c9cb",
+  "name": "host-4",
+  "started": "2026-11-24T04:31:07+00:00",
+  "timed_out": false
+}

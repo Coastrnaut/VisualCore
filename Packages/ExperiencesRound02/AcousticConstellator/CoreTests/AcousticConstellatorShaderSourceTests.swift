@@ -12,6 +12,8 @@
 // The version literal "#version 300 es" is VisualCoreShaderSource's `ShaderLibrary.versionLine`; the attributes
 // `a_position` at 0, `a_normal` at 1 and `a_uv` at 2 are VisualCoreRendering's `ShaderMeshRenderer` streams (none of
 // these is a dependency of this target). Test data uses explicit types and plain loops (CI type-check rule).
+// Feature 426 (R02-G13-06) T-R02G1306-005: the constellation vertex stage and the glow fragment stage declare
+// `u_wonLight`, which scales the won link's and the won glow's lift (8 and 7 vec4 slots).
 import Foundation
 import Testing
 @testable import AcousticConstellatorCore
@@ -207,15 +209,19 @@ import Testing
         }
         #expect(Shaders.uniformNames.count == 2)
         let constants: [String] = [Shaders.mvpUniform, Shaders.phasesLowUniform, Shaders.phasesHighUniform, Shaders.pulseUniform,
-                                   Shaders.glowGainUniform, Shaders.glowLimitUniform]
-        #expect(constants == ["u_mvp", "u_phasesLow", "u_phasesHigh", "u_pulse", "u_glowGain", "u_glowLimit"])
+                                   Shaders.glowGainUniform, Shaders.glowLimitUniform, Shaders.wonLightUniform]
+        #expect(constants == ["u_mvp", "u_phasesLow", "u_phasesHigh", "u_pulse", "u_glowGain", "u_glowLimit",
+                              "u_wonLight"])
         #expect(Set(constants) == Set(Shaders.constellationUniforms + Shaders.glowUniforms))
-        #expect(Shaders.constellationUniforms == ["u_mvp", "u_phasesLow", "u_phasesHigh", "u_pulse"])
+        #expect(Shaders.constellationUniforms == ["u_mvp", "u_phasesLow", "u_phasesHigh", "u_pulse", "u_wonLight"])
         #expect(Shaders.phaseRowUniforms == ["u_phasesLow", "u_phasesHigh"])
-        #expect(Shaders.glowUniforms == ["u_mvp", "u_glowGain", "u_glowLimit"])
+        #expect(Shaders.glowUniforms == ["u_mvp", "u_glowGain", "u_glowLimit", "u_wonLight"])
         let vertex: String = Shaders.constellationVertex
-        let declarations: [String] = ["uniform mat4 u_mvp;", "uniform vec4 u_phasesLow;", "uniform vec4 u_phasesHigh;", "uniform float u_pulse;"]
+        let declarations: [String] = ["uniform mat4 u_mvp;", "uniform vec4 u_phasesLow;", "uniform vec4 u_phasesHigh;", "uniform float u_pulse;", "uniform float u_wonLight;"]
         for declaration in declarations { #expect(vertex.contains(declaration), "\(declaration)") }
+        // Feature 426: the glow program declares the won light in its fragment stage only.
+        #expect(Self.declared("uniform", in: Shaders.glowFragment) == ["u_glowGain", "u_glowLimit", "u_wonLight"])
+        #expect(Shaders.glowFragment.contains("uniform float u_wonLight;"))
         #expect(Self.declared("uniform", in: Shaders.constellationFragment).isEmpty)
         // The glow has no time or pulse input: it never pulses.
         let glow: String = Shaders.glowVertex + Shaders.glowFragment
@@ -240,7 +246,7 @@ import Testing
             #expect(slots <= Shaders.maxUniformVec4s, "\(program.name) uses \(slots) vec4 slots")
             slotsByProgram[program.name] = slots
         }
-        #expect(slotsByProgram == ["constellation": 7, "glow": 6])
+        #expect(slotsByProgram == ["constellation": 8, "glow": 7])
         #expect(Shaders.maxStars == AcousticConstellatorLevel.starCounts.upperBound)
         #expect(Shaders.phaseRows * 4 == Shaders.maxStars)
         #expect(Shaders.clockSteps == AcousticConstellatorClock.steps)
@@ -567,11 +573,16 @@ import Testing
         #expect(glow.contains("vec3 fallback = mix(AC_GLOW, AC_SHELL, isShell);"))
     }
 
+    /// Feature 426 (R02-G13-06): the won link's and the won glow's lift are scaled by the eased won light `u_wonLight`.
     @Test func aWonLevelLiftsTheSymbolLinksAndTheirGlow() {
         let vertex: String = Shaders.constellationVertex
-        #expect(vertex.contains("base = mix(base, mix(AC_TEAL, AC_GLOW, AC_WON_LIFT), isCode(m, 14.0));"))
+        #expect(vertex.contains(
+            "base = mix(base, mix(AC_TEAL, AC_GLOW, AC_WON_LIFT * clamp(u_wonLight, 0.0, 1.0)), isCode(m, 14.0));"))
         let glow: String = Shaders.glowFragment
-        #expect(glow.contains("float won = isCode(kind, 1.0);"))
+        #expect(glow.contains("float isWon = isCode(kind, 1.0);"))
+        #expect(glow.contains("float light = clamp(u_wonLight, 0.0, 1.0);"))
+        #expect(glow.contains("float won = isWon * light;"))
+        #expect(glow.contains("colour = mix(colour, mix(AC_GLOW, colour, light), isWon);"))
         #expect(glow.contains(
             "vec3 rgb = mix(colour, AC_STAR, clamp((AC_CORE * gain + AC_WON_LIFT * won) * factor, 0.0, 1.0));"))
         let plain: SIMD4<Double> = Shaders.glowColour(colour: Palette.glow, kind: .glow, factor: 1, age: 0, gain: 1)
@@ -583,6 +594,42 @@ import Testing
         let aged: SIMD4<Double> = Shaders.glowColour(colour: Palette.glow, kind: .wonGlow, factor: 1, age: 0.9, gain: 1)
         #expect(aged.w == won.w)
         #expect(Shaders.wonLift > 0 && Shaders.wonLift <= 1)
+    }
+
+    /// Feature 426 (R02-G13-06) T-R02G1306-005: at won light 0 a won link is teal and a won glow (even with the
+    /// geometry's lifted stream colour) a plain glow; at 1 both are as before; in between the lift grows
+    /// monotonically and the alpha never changes.
+    @Test func theWonLightScalesTheWonLinkAndTheWonGlow() {
+        #expect(Self.distance(Shaders.wonLinkColour(light: 0), Palette.teal) < 1e-12)
+        #expect(Self.distance(Shaders.wonLinkColour(light: 1), Shaders.wonLinkColour) < 1e-12)
+        #expect(Self.distance(Shaders.wonLinkColour(light: .nan), Shaders.wonLinkColour) < 1e-12)
+        #expect(Self.distance(Shaders.wonLinkColour(light: -2), Palette.teal) < 1e-12)
+        let stream: SIMD3<Double> = Palette.glow + (SIMD3<Double>(1, 1, 1) - Palette.glow) * 0.35
+        let plain: SIMD4<Double> = Shaders.glowColour(colour: Palette.glow, kind: .glow, factor: 0.5, age: 0, gain: 1)
+        let off: SIMD4<Double> = Shaders.glowColour(colour: stream, kind: .wonGlow, factor: 0.5, age: 0, gain: 1,
+                                                    wonLight: 0)
+        #expect(abs(off.x - plain.x) < 1e-12 && abs(off.y - plain.y) < 1e-12 && abs(off.z - plain.z) < 1e-12)
+        let today: SIMD4<Double> = Shaders.glowColour(colour: stream, kind: .wonGlow, factor: 0.5, age: 0, gain: 1)
+        #expect(today == Shaders.glowColour(colour: stream, kind: .wonGlow, factor: 0.5, age: 0, gain: 1, wonLight: 1))
+        var previous: Double = -1
+        var previousLink: Double = -1
+        for tenth in 0...10 {
+            let light: Double = Double(tenth) / 10
+            let glow: SIMD4<Double> = Shaders.glowColour(colour: stream, kind: .wonGlow, factor: 0.5, age: 0, gain: 1,
+                                                         wonLight: light)
+            #expect(glow.w == plain.w, "the won light never changes the alpha")
+            let sum: Double = glow.x + glow.y + glow.z
+            #expect(sum >= previous - 1e-12, "the won glow brightens with the light")
+            previous = sum
+            let link: SIMD3<Double> = Shaders.wonLinkColour(light: light)
+            let distance: Double = Self.distance(link, Palette.teal)
+            #expect(distance >= previousLink - 1e-12, "the won link moves away from teal with the light")
+            previousLink = distance
+        }
+        // A plain glow ignores the won light.
+        let plainOff: SIMD4<Double> = Shaders.glowColour(colour: Palette.glow, kind: .glow, factor: 0.5, age: 0,
+                                                         gain: 1, wonLight: 0)
+        #expect(plainOff == plain)
     }
 
     @Test func glowGainFollowsTheTierAndReduceFlashingCapsIt() {

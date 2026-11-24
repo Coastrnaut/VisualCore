@@ -276,7 +276,9 @@ import VisualCoreMath
         #expect(core.outcome?.code == AcousticConstellatorExperienceCore.wonCode)
         _ = shell.presenter.describe(core)
         #expect(shell.presenter.mirror.status == "Won")
-        let won: [UInt8] = try AcousticConstellatorTest.still(session)
+        // Since feature 426 the won brightening eases in over presentation time: the frame 10 s later shows it settled.
+        // The play changed at that frame, so its preview clock starts there and tick 0 is still shown.
+        let won: [UInt8] = try AcousticConstellatorTest.still(session, time: 10)
         let snapshot: AcousticConstellatorSceneSnapshot = try #require(shell.presenter.lastSnapshot)
         #expect(snapshot.stage == .won)
         #expect(snapshot.shownTick == 0)

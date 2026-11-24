@@ -19,6 +19,12 @@
 // Feature 424 (R02-G13-04) T-R02G1304-005: the scene draws the presenter's orbit (`orbit`; the stars' painter's order
 // and the strips' winding follow the drawn eye, so the geometry key includes the orbit) and, while a link is dragged,
 // the teal filament from the dragged star to the finger (`filament`, its own renderer, drawn after the constellation).
+// Feature 426 (R02-G13-06) T-R02G1306-005 (FR-R02G1306-004; clarification Q3): the presenter's eased lights scale the
+// glow gain (`lights.glow`) and the won look of both programs (`u_wonLight`, `lights.won`), so a win brightens as a
+// fade rather than at once; under Reduce Flashing the scene also draws tick 0 with `u_pulse` 0 and no wave shell,
+// exactly as under Reduce Motion (`starsAtRest`). The lights are uniforms, so a fade rebuilds no shaded geometry; in the
+// fallback path the won level is passed to the parts (`won: lights.won`) and the unlit fallback is rebuilt when the
+// level moves by a tenth or more (its tenths are part of the geometry key).
 #if os(iOS)
 import AcousticConstellatorCore
 import Foundation
@@ -37,6 +43,12 @@ final class AcousticConstellatorConstellationScene {
     var reducedFlash = false
     /// Whether the stars are drawn at tick 0 without pulsing and the preview is not played (Reduce Motion).
     var reduceMotion = false
+    /// The eased light levels (presentation only), set by the presenter before each frame (feature 426); nil draws the
+    /// full levels (the full glow gain and won look).
+    var lights: AcousticConstellatorLights?
+    /// Whether the stars are drawn at tick 0 without pulsing, the preview is not played and no wave shell is drawn:
+    /// under Reduce Motion or Reduce Flashing (feature 426).
+    var starsAtRest: Bool { reduceMotion || reducedFlash }
     /// How many times the constellation mesh was built (tests: it is not rebuilt while only the pulse moves).
     private(set) var constellationBuilds = 0
     /// How many times the glow mesh was built (tests: rebuilt while wave shells expand).
@@ -56,6 +68,9 @@ final class AcousticConstellatorConstellationScene {
         let fallback: Bool
         /// The drawn orbit (feature 424): the stars' order and the strips' winding follow its eye.
         let orbit: AcousticConstellatorOrbit
+        /// The fallback's won light in tenths (feature 426): the unlit fallback rebuilds as the won look fades; 10 while
+        /// the shader programs draw (their uniform fades instead).
+        let fallbackWonTenths: Int
     }
 
     /// What the glow mesh depends on: the geometry key and, while wave shells are shown, the time into the shown tick.
@@ -129,18 +144,33 @@ final class AcousticConstellatorConstellationScene {
     /// The glow limit passed as `u_glowLimit`.
     var glowLimit: Double { AcousticConstellatorShaders.glowLimit(reduceFlashing: reducedFlash) }
 
-    /// The tick drawn for `snapshot`: tick 0 under Reduce Motion (or when `animate` is false), else the shown tick.
+    /// The tick drawn for `snapshot`: tick 0 under Reduce Motion or Reduce Flashing (feature 426), or when `animate`
+    /// is false, else the shown tick.
     func drawnTick(_ snapshot: AcousticConstellatorSceneSnapshot, animate: Bool) -> Int {
-        AcousticConstellatorSceneGeometry.drawnTick(snapshot, reduceMotion: reduceMotion || !animate)
+        AcousticConstellatorSceneGeometry.drawnTick(snapshot, reduceMotion: starsAtRest || !animate)
     }
 
-    /// The `u_pulse` value drawn for `tier`: 0 under Reduce Motion (or when `animate` is false) and at level-2.
+    /// The `u_pulse` value drawn for `tier`: 0 under Reduce Motion or Reduce Flashing (feature 426), when `animate` is
+    /// false, and at level-2.
     func pulse(for tier: AcousticConstellatorTier, animate: Bool) -> Double {
-        AcousticConstellatorShaders.pulse(for: tier, reduceMotion: reduceMotion || !animate)
+        AcousticConstellatorShaders.pulse(for: tier, reduceMotion: starsAtRest || !animate)
     }
 
-    /// Draws `snapshot` at `tier` into `context`'s framebuffer; `animate` false draws the stars at tick 0 without
-    /// pulsing and does not play the preview.
+    /// The won light passed as `u_wonLight`: `lights.won` clamped to 0 … 1, or 1 without lights (feature 426).
+    var wonLight: Double { min(max(lights?.won ?? 1, 0), 1) }
+
+    /// The won level passed to the fallback parts: `lights.won` clamped to 0 … 1, or nil without lights (the parts then
+    /// use the snapshot's won state) (feature 426).
+    var fallbackWon: Double? { lights.map { min(max($0.won, 0), 1) } }
+
+    /// The glow gain drawn at `tier`: the tier's gain times `lights.glow` clamped to 0 … 1 (1 without lights;
+    /// feature 426).
+    func glowGain(for tier: AcousticConstellatorTier) -> Double {
+        AcousticConstellatorShaders.glowGain(for: tier) * min(max(lights?.glow ?? 1, 0), 1)
+    }
+
+    /// Draws `snapshot` at `tier` into `context`'s framebuffer; `animate` false (and, since feature 426, Reduce
+    /// Flashing as Reduce Motion) draws the stars at tick 0 without pulsing and does not play the preview.
     func render(_ snapshot: AcousticConstellatorSceneSnapshot, tier: AcousticConstellatorTier, context: RenderContext,
                 frame: FrameInfo, animate: Bool) throws {
         GLState.resetForVisualCore(framebuffer: context.framebuffer, width: context.pixelWidth,
@@ -150,7 +180,7 @@ final class AcousticConstellatorConstellationScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let still: Bool = reduceMotion || !animate
+        let still: Bool = starsAtRest || !animate
         let camera = AcousticConstellatorSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let wanted = key(snapshot, tier: tier, still: still)
         let rebuilt: Bool = wanted != geometryKey
@@ -165,12 +195,13 @@ final class AcousticConstellatorConstellationScene {
         let glowWanted = GlowKey(geometry: current, shellTime: shellTime(snapshot, tier: tier, still: still))
         if !rebuilt, glowWanted != glowKey { try rebuildGlow(snapshot, tier: tier, still: still) }
         glowKey = glowWanted
-        try drawConstellation(snapshot, camera: camera, tier: tier, still: still)
-        try drawFilament(snapshot, camera: camera)
+        let won = Float(wonLight)
+        try drawConstellation(snapshot, camera: camera, tier: tier, still: still, wonLight: won)
+        try drawFilament(snapshot, camera: camera, wonLight: won)
         // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
-        let gain = AcousticConstellatorShaders.glowGain(for: tier)
+        let gain = glowGain(for: tier)
         guard gain > 0 else { return }
-        try drawGlow(camera, gain: gain)
+        try drawGlow(camera, gain: gain, wonLight: won)
     }
 
     /// The geometry key of `snapshot` at `tier` in the current mode.
@@ -179,7 +210,8 @@ final class AcousticConstellatorConstellationScene {
         GeometryKey(levelNumber: s.levelNumber, links: s.links, phases: s.phases, stage: s.stage, failure: s.failure,
                     actionsLeft: s.actionsLeft,
                     tick: AcousticConstellatorSceneGeometry.drawnTick(s, reduceMotion: still), tier: tier.index,
-                    reduceMotion: still, fallback: fallbackReason != nil, orbit: orbit)
+                    reduceMotion: still, fallback: fallbackReason != nil, orbit: orbit,
+                    fallbackWonTenths: fallbackReason != nil ? Int((wonLight * 10).rounded(.down)) : 10)
     }
 
     /// The time into the shown tick while wave shells are shown (the tier has them, the drawn tick is coherent and
@@ -222,8 +254,10 @@ final class AcousticConstellatorConstellationScene {
         let minimal = AcousticConstellatorTier.of(AcousticConstellatorTier.all.count - 1)
         let up = Vec3(0, 1, 0)
         let parts: [AcousticConstellatorColouredMesh] = [
-            try AcousticConstellatorSceneGeometry.constellationPart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit),
-            try AcousticConstellatorSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit),
+            try AcousticConstellatorSceneGeometry.constellationPart(snapshot, tier: minimal, reduceMotion: still,
+                                                                    orbit: orbit, won: fallbackWon),
+            try AcousticConstellatorSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit,
+                                                           won: fallbackWon),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh
@@ -258,9 +292,10 @@ final class AcousticConstellatorConstellationScene {
                                vertexName: name + ".vert", fragmentName: name + ".frag")
     }
 
-    /// Draws the constellation mesh: `u_mvp`, `u_phasesLow` and `u_phasesHigh` (the phases at the drawn tick) and `u_pulse`.
+    /// Draws the constellation mesh: `u_mvp`, `u_phasesLow` and `u_phasesHigh` (the phases at the drawn tick),
+    /// `u_pulse` and `u_wonLight` (feature 426).
     private func drawConstellation(_ snapshot: AcousticConstellatorSceneSnapshot, camera: AcousticConstellatorCamera,
-                                   tier: AcousticConstellatorTier, still: Bool) throws {
+                                   tier: AcousticConstellatorTier, still: Bool, wonLight: Float) throws {
         guard let constellationRenderer else { return }
         let mvp = camera.viewProjection
         let tick: Int = AcousticConstellatorSceneGeometry.drawnTick(snapshot, reduceMotion: still)
@@ -272,12 +307,15 @@ final class AcousticConstellatorConstellationScene {
             p.set(AcousticConstellatorShaders.mvpUniform, matrix4: mvp.floats)
             for (name, row) in zip(AcousticConstellatorShaders.phaseRowUniforms, rows) { p.set(name, row) }
             p.set(AcousticConstellatorShaders.pulseUniform, pulse)
+            p.set(AcousticConstellatorShaders.wonLightUniform, wonLight)
         }
     }
 
     /// Draws the drag filament with the constellation program (no pulse; both faces, since it may face away from an
-    /// orbiting eye), rebuilding its mesh when the filament changes; nothing without a filament.
-    private func drawFilament(_ snapshot: AcousticConstellatorSceneSnapshot, camera: AcousticConstellatorCamera) throws {
+    /// orbiting eye), rebuilding its mesh when the filament changes; nothing without a filament. `u_wonLight` is set as
+    /// for the constellation (feature 426; the filament has no won material).
+    private func drawFilament(_ snapshot: AcousticConstellatorSceneSnapshot, camera: AcousticConstellatorCamera,
+                              wonLight: Float) throws {
         guard let filament, let registry else {
             filamentRenderer?.release()
             filamentRenderer = nil
@@ -304,11 +342,12 @@ final class AcousticConstellatorConstellationScene {
             p.set(AcousticConstellatorShaders.mvpUniform, matrix4: mvp.floats)
             for (name, row) in zip(AcousticConstellatorShaders.phaseRowUniforms, rows) { p.set(name, row) }
             p.set(AcousticConstellatorShaders.pulseUniform, Float(0))
+            p.set(AcousticConstellatorShaders.wonLightUniform, wonLight)
         }
     }
 
-    /// Draws the glow additively: `u_mvp`, `u_glowGain` and `u_glowLimit`.
-    private func drawGlow(_ camera: AcousticConstellatorCamera, gain: Double) throws {
+    /// Draws the glow additively: `u_mvp`, `u_glowGain`, `u_glowLimit` and `u_wonLight` (feature 426).
+    private func drawGlow(_ camera: AcousticConstellatorCamera, gain: Double, wonLight: Float) throws {
         guard let glowRenderer else { return }
         let mvp = camera.viewProjection
         let limit = Float(glowLimit)
@@ -316,6 +355,7 @@ final class AcousticConstellatorConstellationScene {
             p.set(AcousticConstellatorShaders.mvpUniform, matrix4: mvp.floats)
             p.set(AcousticConstellatorShaders.glowGainUniform, Float(gain))
             p.set(AcousticConstellatorShaders.glowLimitUniform, limit)
+            p.set(AcousticConstellatorShaders.wonLightUniform, wonLight)
         }
     }
 

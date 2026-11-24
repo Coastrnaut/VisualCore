@@ -52,6 +52,12 @@
 // Tiers change only the glow mesh: the constellation mesh is identical at every tier (the pulse is a shader uniform).
 // Doubles are used for drawing only; nothing here is consulted by the rules.
 //
+// Feature 426 (R02-G13-06) T-R02G1306-005: `constellationPart` and `glowPart` take a won level `won` (0 … 1, nil = the
+// snapshot's won state) that scales the lift of the fallback colours on a won level — a won link's colour runs from
+// teal (0) to ``AcousticConstellatorShaders/wonLinkColour`` (1) and a won glow's from the plain glow colour (0) to the
+// lifted one (1) — so the unlit fallback fades with the presenter's won light as the shaders do under `u_wonLight`.
+// Positions, the streams and every other colour never change; nil is byte-identical to the output before.
+//
 // Feature 424 (R02-G13-04) T-R02G1304-002 (FR-R02G1304-005; SC-R02G1304-004; clarifications Q1, Q4) adds the player's
 // orbit (`AcousticConstellatorOrbit`: yaw ±35° about the vertical axis through the authored box centre
 // (0, 0.15, 0.275), pitch −15° … +20° about the authored view's right axis, positive raising the eye so the
@@ -457,13 +463,22 @@ public enum AcousticConstellatorSceneGeometry {
 
     /// The constellation with fallback colours (unlit palette colours) for the shared unlit renderer: the same mesh as
     /// ``constellationMesh(_:tier:reduceMotion:orbit:)`` (which draws the level-2 look when shaded unlit), the stars in
-    /// painter's order for `orbit`.
+    /// painter's order for `orbit`. `won` (0 … 1, feature 426) scales the won links' fallback colour from teal (0) to
+    /// ``AcousticConstellatorShaders/wonLinkColour`` (1), as `u_wonLight` does in the shader; nil keeps the snapshot's
+    /// won state at full strength. Positions and streams never change.
     public static func constellationPart(_ snapshot: AcousticConstellatorSceneSnapshot, tier: AcousticConstellatorTier,
                                          reduceMotion: Bool = false,
-                                         orbit: AcousticConstellatorOrbit = .authored) throws(MeshError)
+                                         orbit: AcousticConstellatorOrbit = .authored,
+                                         won: Double? = nil) throws(MeshError)
         -> AcousticConstellatorColouredMesh {
         _ = tier
-        return try build(snapshot, tick: drawnTick(snapshot, reduceMotion: reduceMotion), orbit: orbit)
+        return try build(snapshot, tick: drawnTick(snapshot, reduceMotion: reduceMotion), orbit: orbit, won: won)
+    }
+
+    /// The won level `won` made usable (feature 426): clamped to 0 … 1, 1 when not finite; nil when nil (the
+    /// snapshot's won state at full strength).
+    static func usableWon(_ won: Double?) -> Double? {
+        won.map { (level: Double) -> Double in level.isFinite ? min(max(level, 0), 1) : 1 }
     }
 
     /// The drag preview (feature 424, T-R02G1304-002): a straight strip 0.01 wide (one segment, d = −1 and +1 on its
@@ -484,10 +499,15 @@ public enum AcousticConstellatorSceneGeometry {
         return parts.built().mesh
     }
 
-    /// Builds the constellation at `tick` in painter's order for `orbit`.
+    /// Builds the constellation at `tick` in painter's order for `orbit`; `won` scales the won links' fallback colour
+    /// (``constellationPart(_:tier:reduceMotion:orbit:won:)``).
     static func build(_ snapshot: AcousticConstellatorSceneSnapshot, tick: Int,
-                      orbit: AcousticConstellatorOrbit = .authored) throws(MeshError) -> AcousticConstellatorColouredMesh {
+                      orbit: AcousticConstellatorOrbit = .authored,
+                      won: Double? = nil) throws(MeshError) -> AcousticConstellatorColouredMesh {
         var parts: Parts = Parts()
+        let wonTint: SIMD3<Double>? = usableWon(won).map { (level: Double) -> SIMD3<Double> in
+            AcousticConstellatorShaders.wonLinkColour(light: level)
+        }
         parts.eye = orbitView(orbit).eye
         let up: SIMD3<Double> = SIMD3(0, 1, 0)
         // Sky.
@@ -546,14 +566,15 @@ public enum AcousticConstellatorSceneGeometry {
         for index in snapshot.links.indices {
             let ends = linkEnds(index, snapshot)
             let material: Material = linkMaterial(index, tick: tick, snapshot)
+            let tint: SIMD3<Double>? = material == .wonLink ? wonTint : nil
             if snapshot.isSnapped(index, at: tick) {
                 try parts.strip(ends.a, ends.b, rise: linkRise, from: 0, to: keep, segments: halfSegments,
-                                band: 0...(linkWidth / 2), material: material, item: Double(index))
+                                band: 0...(linkWidth / 2), material: material, item: Double(index), colour: tint)
                 try parts.strip(ends.a, ends.b, rise: linkRise, from: 1 - keep, to: 1, segments: halfSegments,
-                                band: 0...(linkWidth / 2), material: material, item: Double(index))
+                                band: 0...(linkWidth / 2), material: material, item: Double(index), colour: tint)
             } else {
                 try parts.strip(ends.a, ends.b, rise: linkRise, from: 0, to: 1, segments: linkSegments,
-                                band: 0...(linkWidth / 2), material: material, item: Double(index))
+                                band: 0...(linkWidth / 2), material: material, item: Double(index), colour: tint)
             }
         }
         if let index = brokenLinkIndex(snapshot) {
@@ -583,15 +604,19 @@ public enum AcousticConstellatorSceneGeometry {
     /// shells (`tier.waveShells` per star on a coherent drawn tick, none under `reduceMotion`) and the glow shells
     /// (`tier.glowShells`, outermost first) around every star and every unsnapped teal link (on a won level every
     /// symbol link, its glow lifted). Empty at level-2. The star shells are in painter's order for `orbit`
-    /// (``starOrder(_:orbit:)``) and the link glow strips face its eye.
+    /// (``starOrder(_:orbit:)``) and the link glow strips face its eye. `won` (0 … 1, feature 426) scales the won
+    /// glow's fallback colour from the plain glow colour (0) to the lifted one (1), as `u_wonLight` does in the shader;
+    /// nil keeps the snapshot's won state at full strength. The normal slot (the stream colour) is never scaled.
     public static func glowPart(_ snapshot: AcousticConstellatorSceneSnapshot, tier: AcousticConstellatorTier,
                                 reduceMotion: Bool = false,
-                                orbit: AcousticConstellatorOrbit = .authored) throws(MeshError)
+                                orbit: AcousticConstellatorOrbit = .authored,
+                                won level: Double? = nil) throws(MeshError)
         -> AcousticConstellatorColouredMesh {
         var parts: Parts = Parts()
         parts.eye = orbitView(orbit).eye
         let tick: Int = drawnTick(snapshot, reduceMotion: reduceMotion)
         let won: Double = wonFlag(snapshot)
+        let liftLevel: Double? = usableWon(level)
         // Wave shells.
         let shells: Int = reduceMotion ? 0 : min(max(tier.waveShells, 0), 2)
         if shells > 0, snapshot.isCoherent(at: tick) {
@@ -622,11 +647,12 @@ public enum AcousticConstellatorSceneGeometry {
                     continue
                 }
                 let base: SIMD3<Double> = symbolWon ? lifted(glow, won: 1) : glow
+                let tint: SIMD3<Double> = symbolWon && liftLevel != nil ? lifted(glow, won: liftLevel ?? 1) : base
                 let kind: AcousticConstellatorGlowKind = symbolWon ? .wonGlow : .glow
                 let ends = linkEnds(index, snapshot)
                 let lift: SIMD3<Double> = SIMD3(0, glowLift * Double(k), 0)
                 try parts.glowStrip(ends.a + lift, ends.b + lift, halfWidth: linkWidth / 2 + linkGlowGrowth * Double(k),
-                                    slot: base, code: kind.code(factor: factor), colour: base * factor)
+                                    slot: base, code: kind.code(factor: factor), colour: tint * factor)
             }
             for index in starOrder(snapshot, orbit: orbit) {
                 let grow: Double = starGlowGrowth * Double(k)
@@ -848,10 +874,11 @@ public enum AcousticConstellatorSceneGeometry {
         /// A strip along the spline from `a` to `b` rising `rise` at its middle, over u `from` … `to` in `segments`
         /// segments, covering the band `band` of distances from the axis along the chord's sideways direction (a band
         /// from 0: one strip, d = −1 on the −side edge, +1 on the +side edge; a band from above 0: two strips, d = −1
-        /// at the inner edge, +1 at the outer). Normal slot (u, `item`, 0); wound to face the eye.
+        /// at the inner edge, +1 at the outer). Normal slot (u, `item`, 0); wound to face the eye. `colour` overrides the
+        /// material's fallback colour (feature 426: a won link at a won level below 1).
         mutating func strip(_ a: SIMD3<Double>, _ b: SIMD3<Double>, rise: Double, from: Double, to: Double,
                             segments: Int, band: ClosedRange<Double>, material: Material,
-                            item: Double) throws(MeshError) {
+                            item: Double, colour: SIMD3<Double>? = nil) throws(MeshError) {
             let side: SIMD3<Double> = AcousticConstellatorSceneGeometry.side(a, b)
             var lanes: [(near: Double, far: Double, dNear: Double, dFar: Double)] = []
             if band.lowerBound <= 0 {
@@ -876,7 +903,7 @@ public enum AcousticConstellatorSceneGeometry {
                                                   SIMD3(u0, item, 0)]
                     let front: SIMD3<Double> = eye - (p0 + p1) * 0.5
                     try quad(corners, front: front, slots: slots, material: material,
-                             local: [lane.dNear, lane.dNear, lane.dFar, lane.dFar])
+                             local: [lane.dNear, lane.dNear, lane.dFar, lane.dFar], colour: colour)
                 }
             }
         }

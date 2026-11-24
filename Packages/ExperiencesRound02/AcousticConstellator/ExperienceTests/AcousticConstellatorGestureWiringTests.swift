@@ -697,8 +697,10 @@ enum AcousticConstellatorGestureScript {
         #expect(code == refusal.code)
         #expect(code == "action.rule.r02-g13.action" || code == "r02-g13.action", "\(code)")
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message == "That change was refused: \(AcousticConstellatorMirror.refusalText(code: code)).")
-        #expect(message == "That change was refused: that change is not allowed for these stars.", "\(message)")
+        // Since feature 426 the refusal is shown in the feedback plan's words.
+        #expect(message == AcousticConstellatorFeedbackPlan.refusalText(code: code), "\(message)")
+        #expect(message == AcousticConstellatorMirror.refusalText(code: code))
+        #expect(message == "That change is not allowed for these stars.", "the kernel code in words")
         #expect(shell.presenter.scene.filament == nil)
         #expect(shell.presenter.gestures.state == .idle)
     }

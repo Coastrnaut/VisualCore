@@ -26,14 +26,32 @@
 // count); `retry` starts the level again in its mode, `undoAction` takes back the last action, and the daily level is
 // chosen from the local calendar date read here (`playDaily(port:date:)`), never by the core. A refused `level.next`
 // before a win (`r02-g13.locked`) and an impossible date (`r02-g13.date`) read in words.
+// Feature 426 (R02-G13-06) T-R02G1306-005 (FR-R02G1306-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `AcousticConstellatorFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route
+// (`feedback`, injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log (`feedbackLog`);
+// refusals are shown and announced in words (`refused(code:)`; the panel shows exactly the plan's text,
+// `AcousticConstellatorFeedbackPlan.refusalText(code:)`), and a revealed hint is announced as `state` (`hint(text:)`);
+// choosing a star or partner, a drag preview and orbit are not announced (the star and partner speak their values).
+// The scene's lights (`AcousticConstellatorLights`: the glow and the won brightening) step toward the drawn snapshot
+// every frame (0.15 s fades, 0.45 s under Reduce Flashing; the first frame settles them), and under Reduce Flashing the
+// stars are drawn at tick 0 without pulsing and no wave shell is drawn, exactly as under Reduce Motion. The ambient
+// loop (`AcousticConstellatorSound`) is offered the recipe of the actions left, the lit quarters and the stage
+// (`AcousticConstellatorSoundRecipe.recipe(play:)`) when the first state is described, when a level or mode opens and
+// when that recipe changes; a link inspection (a tap on a link: the gesture's `choosePair` from `linkPress`) plays the
+// link's audition (`AcousticConstellatorAudition.of(_:link:tick:)` at the drawn tick) when the sound is on, on screen
+// and active. The mirror carries the summary element's text
+// (`AcousticConstellatorFeedbackPlan.summaryText(core:star:partner:)`) and the sound choice (off by default).
+// Presentation only.
 import AcousticConstellatorCore
 import Foundation
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
+import VisualCoreSimulation
 
 /// What the controls show and choose: the latest state the presenter described and the panel's chosen star and
 /// partner.
@@ -81,6 +99,11 @@ final class AcousticConstellatorMirror {
     var certifiedActions = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen) (feature 425).
     var pickedLevel = 1
+    /// The summary element's text (feature 426): `AcousticConstellatorFeedbackPlan.summaryText(core:star:partner:)` of
+    /// the latest core and the chosen star and partner.
+    var summary = ""
+    /// Whether the sound is on (feature 426; off by default; presentation only).
+    var soundOn = false
 
     /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 425).
     var goalLabel: String {
@@ -104,6 +127,29 @@ final class AcousticConstellatorMirror {
     var isLinked: Bool {
         guard let play, star != partner else { return false }
         return play.links.contains(AcousticConstellatorLink.between(star, partner))
+    }
+    /// The adjustable partner's value (feature 426): the partner as the level words it, with its rate and phase, and
+    /// ", linked" or ", not linked" (whether the chosen pair is linked) when it differs from the star; "partner star i"
+    /// while no play is followed.
+    var partnerWords: String {
+        guard let words = detail(partner) else { return partnerLabel }
+        guard partner != star, detail(star) != nil else { return words }
+        return words + (isLinked ? ", linked" : ", not linked")
+    }
+    /// The level's symbol pairs not among the followed play's links (0 while no play is followed).
+    var missingPairs: Int {
+        guard let play else { return 0 }
+        let present: Set<AcousticConstellatorLink> = Set(play.links)
+        var missing = 0
+        for pair in play.level.symbol where !present.contains(pair) { missing += 1 }
+        return missing
+    }
+    /// The missing symbol pairs in words (feature 426: Listen's value): "k symbol pairs missing" ("1 symbol pair
+    /// missing" for one), or "the symbol is linked" when none is missing.
+    var missingLabel: String {
+        let missing: Int = missingPairs
+        if missing == 0 { return "the symbol is linked" }
+        return missing == 1 ? "1 symbol pair missing" : "\(missing) symbol pairs missing"
     }
     /// The chosen pair in words: the link with its gap when linked, else that the stars are not linked.
     var choiceLabel: String {
@@ -143,22 +189,14 @@ final class AcousticConstellatorMirror {
     }
 
     /// The engine's prefix of a refusal that the core itself returned (`action.rule.<kernel code>`).
-    static let rulePrefix = "action.rule."
+    static let rulePrefix = AcousticConstellatorFeedbackPlan.rulePrefix
 
     /// A refused action's reason code in words; accepts the kernel's code bare or as the engine reports it
-    /// (`action.rule.r02-g13.action`).
+    /// (`action.rule.r02-g13.action`). Since feature 426 it forwards to
+    /// `AcousticConstellatorFeedbackPlan.refusalText(code:)` (clarification Q1's sentences, e.g. "That change is not
+    /// allowed for these stars.").
     static func refusalText(code: String) -> String {
-        let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
-        return switch bare {
-        case "r02-g13.stage": "the play is over: undo or go to the next level"
-        case "r02-g13.action": "that change is not allowed for these stars"
-        case "r02-g13.stale": "the play changed before the action arrived"
-        case "r02-g13.level": "the next level could not be made"
-        case AcousticConstellatorExperienceRule.locked: "that level is not open yet: win the level before it first"
-        case AcousticConstellatorExperienceRule.date: "that date is not a calendar date"
-        case AcousticConstellatorExperienceRule.notWhole: "a star and a step must be whole numbers"
-        default: "that action is not available now"
-        }
+        AcousticConstellatorFeedbackPlan.refusalText(code: code)
     }
 }
 
@@ -208,6 +246,16 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
     static let searchingText = "Finding a hint…"
     /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 425).
     private(set) var dailyDate: DateComponents?
+    /// The feedback route of announcements and haptics (feature 426; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 426; tests and diagnostics).
+    private(set) var feedbackLog: [AcousticConstellatorFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 426).
+    private(set) var lights: AcousticConstellatorLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the link inspection's audition (feature 426).
+    let sound: AcousticConstellatorSound
 
     /// What restarts the preview clock: the play's level, links, phases, actions spent, stage and failure.
     private struct PlayKey: Equatable {
@@ -227,6 +275,9 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = AcousticConstellatorLights(reducedFlash: reduceFlashing)
+        sound = AcousticConstellatorSound(recipe: AcousticConstellatorSoundRecipe.recipe(rootStep: 0, quarters: 0,
+                                                                                         stage: .loading))
         scene.reducedFlash = reduceFlashing
         scene.reduceMotion = reduceMotion
     }
@@ -282,6 +333,14 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
         let time = previewTime(core, now: frame.time)
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // The lights settle on the very first frame only; every later change, a level change included, fades.
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, animate: !reduceMotion)
     }
 
@@ -310,7 +369,18 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        let previous: AcousticConstellatorExperienceCore? = latestCore
+        if let previous {
+            route(AcousticConstellatorFeedbackPlan.after(old: previous, new: core))
+            let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         absorbProgress(core)
+        mirror.summary = AcousticConstellatorFeedbackPlan.summaryText(core: core, star: mirror.star,
+                                                                      partner: mirror.partner)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -376,6 +446,7 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
         let actions: [AcousticConstellatorGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
         let finished: Bool = snapshot.stage == .won || snapshot.stage == .failed || snapshot.stage == .result
         let oneFinger: Bool = [.starPress, .linkDrag, .targetPress, .linkPress].contains(before)
+        let chosenBefore: (star: Int, partner: Int) = (mirror.star, mirror.partner)
         var sentKernel = false
         var chose = false
         for action in actions {
@@ -400,9 +471,7 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
                 mirror.star = mirror.clampedStar(a)
                 mirror.partner = mirror.clampedStar(b)
                 if before == .linkPress {
-                    mirror.message = Self.linkText(a, b, snapshot: snapshot,
-                                                   tick: AcousticConstellatorSceneGeometry.drawnTick(
-                                                       snapshot, reduceMotion: reduceMotion))
+                    inspect(a, b, snapshot: snapshot)
                 } else if !sentKernel, !finished, snapshot.fixedLinks.contains(.between(a, b)) {
                     mirror.message = Self.fixedText(a, b)
                 }
@@ -421,7 +490,20 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
         if event.phase == .ended, finished, oneFinger, !chose, !sentKernel {
             mirror.message = Self.finishedMessage
         }
+        if mirror.star != chosenBefore.star || mirror.partner != chosenBefore.partner { refreshSummary() }
         scene.orbit = gestures.orbit
+    }
+
+    /// Describes the inspected link between stars `a` and `b` at the drawn tick (tick 0 under Reduce Motion or Reduce
+    /// Flashing) and, since feature 426, plays its audition at that tick when the sound is on
+    /// (``AcousticConstellatorSound/audition(_:)`` plays only while the sound is on, the controls are on screen and the
+    /// scene is active).
+    private func inspect(_ a: Int, _ b: Int, snapshot: AcousticConstellatorSceneSnapshot) {
+        let tick: Int = scene.drawnTick(snapshot, animate: !reduceMotion)
+        mirror.message = Self.linkText(a, b, snapshot: snapshot, tick: tick)
+        if mirror.soundOn {
+            sound.audition(AcousticConstellatorAudition.of(snapshot, link: .between(a, b), tick: tick))
+        }
     }
 
     /// Cancels the touches in progress (suspension): nothing is sent and the filament disappears.
@@ -505,9 +587,11 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
             clearHint()
             return
         }
+        let revealed: Bool = mirror.hintLevel != level || mirror.hintText != hint.text
         hintKey = key
         mirror.hintLevel = level
         mirror.hintText = hint.text
+        if revealed { route(AcousticConstellatorFeedbackPlan.hint(text: hint.text)) }   // feature 426: announced as state
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -608,20 +692,62 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
         return "The link from star \(link.a) to star \(link.b) is fixed: it cannot be removed."
     }
 
-    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its code in ``refusalLog``.
+    /// Sends `control` with `values`, shows a refusal in words in the panel (since feature 426 exactly the plan's
+    /// text, `AcousticConstellatorFeedbackPlan.refusalText(code:)`), routes the refusal's plan (an announcement and an
+    /// error haptic) and keeps its code in ``refusalLog``.
     @discardableResult
     func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
         let result = port.send(control, values)
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(AcousticConstellatorMirror.refusalText(code: result.code))."
+            let plan = AcousticConstellatorFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(result.code)
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
             }
         }
         return result
+    }
+
+    // MARK: Feedback and sound (feature 426, R02-G13-06)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: AcousticConstellatorFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its actions left, the lit quarters of its coherence gauge and its stage.
+    static func recipe(_ core: AcousticConstellatorExperienceCore) -> AmbientLoopRecipe {
+        AcousticConstellatorSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Turns the sound on or off; turning it on plays the recipe of the current play.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
+
+    /// The summary element's text for the chosen star and partner (the choice is presentation state of the panel).
+    func refreshSummary() {
+        guard let core = latestCore else { return }
+        mirror.summary = AcousticConstellatorFeedbackPlan.summaryText(core: core, star: mirror.star,
+                                                                      partner: mirror.partner)
     }
 }
 #endif

@@ -44,10 +44,16 @@
 // Attributes follow VisualCoreRendering's `ShaderMeshRenderer`: `a_position` (location 0), `a_normal` (location 1) from
 // `Mesh.interleavedPositionNormal()` and `a_uv` (location 2) from `Mesh.uvs`. Every source starts with
 // `#version 300 es` and states one float precision. Plain uniforms in the default block (at most 16 vec4 slots per
-// program; the constellation program uses 7: u_mvp 4, u_phasesLow 1, u_phasesHigh 1, u_pulse 1; the glow program 6: u_mvp 4, u_glowGain
-// and u_glowLimit 1 each), no texture samplers, no image assets, no `discard` and no loops. Output is premultiplied
+// program; the constellation program uses 8: u_mvp 4, u_phasesLow 1, u_phasesHigh 1, u_pulse 1, u_wonLight 1; the glow
+// program 7: u_mvp 4, u_glowGain, u_glowLimit and u_wonLight 1 each), no texture samplers, no image assets, no `discard` and no loops. Output is premultiplied
 // alpha. Palette constants are written with six fixed decimals from `AcousticConstellatorPalette`, so the shader
 // colours equal the CPU's within 1e-6.
+// Feature 426 (R02-G13-06) T-R02G1306-005: the won look is scaled by the presenter's eased won light `u_wonLight`
+// (``wonLightUniform``, 0 … 1): the won link's lift toward the glow colour in the constellation vertex stage
+// (``wonLinkColour(light:)``) and the won glow's lift in the glow fragment stage, where the stream's lifted colour is
+// also mixed back toward the glow colour (``glowColour(colour:kind:factor:age:gain:wonLight:)``). At 0 a won link
+// looks like a teal link and its won glow like a plain glow; at 1 both look as before. The constellation program now
+// uses 8 vec4 slots (u_wonLight 1, vertex stage) and the glow program 7 (u_wonLight 1, fragment stage).
 
 import Foundation
 
@@ -199,12 +205,17 @@ public enum AcousticConstellatorShaders {
     public static let glowGainUniform = "u_glowGain"
     /// `float`: the glow limit (glow): ``glowLimit(reduceFlashing:)``.
     public static let glowLimitUniform = "u_glowLimit"
+    /// `float`: the won look's eased light, 0 … 1 (feature 426; constellation vertex stage and glow fragment stage):
+    /// scales the won link's lift toward the glow colour and the won glow's lift; 0 draws a won link as a teal link
+    /// and its won glow as a plain glow, 1 at full strength.
+    public static let wonLightUniform = "u_wonLight"
 
     /// Every uniform the constellation program declares, each once, in order of declaration (vertex stage first).
-    public static let constellationUniforms: [String] = [mvpUniform, phasesLowUniform, phasesHighUniform, pulseUniform]
+    public static let constellationUniforms: [String] = [mvpUniform, phasesLowUniform, phasesHighUniform, pulseUniform,
+                                                          wonLightUniform]
 
     /// Every uniform the glow program declares, each once, in order of declaration (vertex stage first).
-    public static let glowUniforms: [String] = [mvpUniform, glowGainUniform, glowLimitUniform]
+    public static let glowUniforms: [String] = [mvpUniform, glowGainUniform, glowLimitUniform, wonLightUniform]
 
     /// The uniform lists per program name (`constellation`, `glow`).
     public static let uniformNames: [String: [String]] = ["constellation": constellationUniforms, "glow": glowUniforms]
@@ -291,6 +302,15 @@ public enum AcousticConstellatorShaders {
     public static let wonLinkColour: SIMD3<Double> =
         AcousticConstellatorPalette.teal + (AcousticConstellatorPalette.glow - AcousticConstellatorPalette.teal) * wonLift
 
+    /// The won-link colour at won light `light` (feature 426): teal lifted toward the glow colour by ``wonLift`` times
+    /// `light` clamped to 0 … 1 (non-finite counts as 1), as the vertex shader mixes it under `u_wonLight`; 0 is teal,
+    /// 1 is ``wonLinkColour``.
+    public static func wonLinkColour(light: Double) -> SIMD3<Double> {
+        let l: Double = light.isFinite ? min(max(light, 0), 1) : 1
+        return AcousticConstellatorPalette.teal
+            + (AcousticConstellatorPalette.glow - AcousticConstellatorPalette.teal) * (wonLift * l)
+    }
+
     // MARK: Sources
 
     /// `x` with six fixed decimals, as the sources write every constant.
@@ -299,8 +319,9 @@ public enum AcousticConstellatorShaders {
     /// `v` as a GLSL `vec3(...)` literal with six fixed decimals.
     static func vec3Literal(_ v: SIMD3<Double>) -> String { "vec3(\(fixed(v.x)), \(fixed(v.y)), \(fixed(v.z)))" }
 
-    /// The constellation vertex shader. Uniforms: `u_mvp`, `u_phasesLow`, `u_phasesHigh`, `u_pulse`. Selects the material colour from
-    /// `a_uv.x` (the won link mixed from teal and glow); moves star vertices by the pulse of their star's phase
+    /// The constellation vertex shader. Uniforms: `u_mvp`, `u_phasesLow`, `u_phasesHigh`, `u_pulse`, `u_wonLight`. Selects
+    /// the material colour from `a_uv.x` (the won link mixed from teal and glow, its lift scaled by `u_wonLight`;
+    /// feature 426); moves star vertices by the pulse of their star's phase
     /// (``pulseScale(phase:pulse:)``; nothing moves when `u_pulse` is 0); passes the normal (a star's true ellipsoid
     /// normal), the material code and the local coordinate (0 on stars).
     public static let constellationVertex = """
@@ -313,6 +334,7 @@ public enum AcousticConstellatorShaders {
     uniform vec4 u_phasesLow;
     uniform vec4 u_phasesHigh;
     uniform float u_pulse;
+    uniform float u_wonLight;
     out vec3 v_normal;
     out vec3 v_base;
     out float v_material;
@@ -356,7 +378,7 @@ public enum AcousticConstellatorShaders {
         base = mix(base, AC_HOLD_UNLIT, isCode(m, 11.0));
         base = mix(base, AC_MOVES_LIT, isCode(m, 12.0));
         base = mix(base, AC_MOVES_UNLIT, isCode(m, 13.0));
-        base = mix(base, mix(AC_TEAL, AC_GLOW, AC_WON_LIFT), isCode(m, 14.0));
+        base = mix(base, mix(AC_TEAL, AC_GLOW, AC_WON_LIFT * clamp(u_wonLight, 0.0, 1.0)), isCode(m, 14.0));
         float isStar = isCode(m, 5.0);
         float index = clamp(floor(a_uv.y + 0.5), 0.0, AC_MAX_STAR);
         float upper = step(3.5, index);
@@ -431,8 +453,9 @@ public enum AcousticConstellatorShaders {
     }
     """
 
-    /// The glow fragment shader. Uniforms: `u_glowGain`, `u_glowLimit`. Gain ``glowGain(gain:limit:)``, colour and
-    /// alpha ``glowColour(colour:kind:factor:age:gain:)`` (a zero colour counts as the glow colour, or the shell colour
+    /// The glow fragment shader. Uniforms: `u_glowGain`, `u_glowLimit`, `u_wonLight` (the won glow's scale, feature
+    /// 426). Gain ``glowGain(gain:limit:)``, colour and alpha ``glowColour(colour:kind:factor:age:gain:wonLight:)``
+    /// (a zero colour counts as the glow colour, or the shell colour
     /// on a wave shell); premultiplied RGBA in 0 ... 1, drawn with additive blending.
     public static let glowFragment = """
     #version 300 es
@@ -443,6 +466,7 @@ public enum AcousticConstellatorShaders {
     in float v_age;
     uniform float u_glowGain;
     uniform float u_glowLimit;
+    uniform float u_wonLight;
     out vec4 color;
     const vec3 AC_GLOW = \(vec3Literal(AcousticConstellatorPalette.glow));
     const vec3 AC_SHELL = \(vec3Literal(AcousticConstellatorPalette.shell));
@@ -457,11 +481,14 @@ public enum AcousticConstellatorShaders {
     void main() {
         float gain = min(clamp(u_glowGain, 0.0, AC_MAX_GAIN), clamp(u_glowLimit, 0.0, AC_MAX_GAIN));
         float kind = floor(v_kind + 0.5);
-        float won = isCode(kind, 1.0);
+        float isWon = isCode(kind, 1.0);
+        float light = clamp(u_wonLight, 0.0, 1.0);
+        float won = isWon * light;
         float isShell = isCode(kind, 2.0);
         float factor = clamp(v_factor, 0.0, 1.0);
         vec3 fallback = mix(AC_GLOW, AC_SHELL, isShell);
         vec3 colour = mix(fallback, v_colour, step(0.0001, v_colour.r + v_colour.g + v_colour.b));
+        colour = mix(colour, mix(AC_GLOW, colour, light), isWon);
         vec3 rgb = mix(colour, AC_STAR, clamp((AC_CORE * gain + AC_WON_LIFT * won) * factor, 0.0, 1.0));
         float fade = mix(1.0, 1.0 - clamp(v_age, 0.0, 1.0), isShell);
         float alpha = clamp(AC_GLOW_WEIGHT * gain * factor * fade, 0.0, 1.0);
@@ -558,16 +585,21 @@ public enum AcousticConstellatorShaders {
     /// `kind`, glow factor `factor`, wave-shell `age` and the applied `gain`, before premultiplying: the colour lifted
     /// toward the star colour by (``coreLift`` gain + ``wonLift`` on a won glow) factor (rgb) and the alpha
     /// ``glowWeight`` gain factor, times 1 - age on a wave shell; every component clamped to 0 ... 1.
+    /// `wonLight` (feature 426, `u_wonLight`, clamped to 0 … 1, non-finite counts as 1) scales a won glow: its colour
+    /// is first mixed from the glow colour toward `colour` by `wonLight` and its ``wonLift`` is scaled by it, so 0
+    /// draws a won glow as a plain glow and the default 1 as before.
     public static func glowColour(colour: SIMD3<Double>, kind: AcousticConstellatorGlowKind, factor: Double,
-                                  age: Double, gain: Double) -> SIMD4<Double> {
+                                  age: Double, gain: Double, wonLight: Double = 1) -> SIMD4<Double> {
         func unit(_ x: Double) -> Double { x.isFinite ? min(max(x, 0), 1) : 0 }
         var c: SIMD3<Double> = SIMD3<Double>(unit(colour.x), unit(colour.y), unit(colour.z))
         if c.x + c.y + c.z < 0.0001 {
             c = kind == .waveShell ? AcousticConstellatorPalette.shell : AcousticConstellatorPalette.glow
         }
+        let light: Double = wonLight.isFinite ? min(max(wonLight, 0), 1) : 1
+        if kind == .wonGlow { c = AcousticConstellatorPalette.glow + (c - AcousticConstellatorPalette.glow) * light }
         let f: Double = unit(factor)
         let k: Double = gain.isFinite ? gain : 0
-        let lift: Double = unit((coreLift * k + (kind == .wonGlow ? wonLift : 0)) * f)
+        let lift: Double = unit((coreLift * k + (kind == .wonGlow ? wonLift * light : 0)) * f)
         let lifted: SIMD3<Double> = c + (AcousticConstellatorPalette.star - c) * lift
         let fade: Double = kind == .waveShell ? 1 - unit(age) : 1
         return SIMD4<Double>(unit(lifted.x), unit(lifted.y), unit(lifted.z), unit(glowWeight * k * f * fade))

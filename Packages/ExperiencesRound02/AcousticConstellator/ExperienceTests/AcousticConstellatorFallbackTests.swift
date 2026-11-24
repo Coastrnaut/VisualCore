@@ -247,7 +247,10 @@ import VisualCoreMath
             AcousticConstellatorTest.pin(session, shell, tier: 0)
             let rgba: [UInt8] = try AcousticConstellatorTest.still(session)
             let snapshot: AcousticConstellatorSceneSnapshot = try #require(shell.presenter.lastSnapshot)
-            AcousticConstellatorTest.checkFrame(rgba, snapshot: snapshot, mode: .tier(0),
+            // Since feature 426 Reduce Flashing also draws tick 0 without pulsing and with no wave shell, so the
+            // reference is the Reduce Motion one.
+            #expect(shell.presenter.scene.starsAtRest == reduceFlashing)
+            AcousticConstellatorTest.checkFrame(rgba, snapshot: snapshot, mode: .tier(0, reduceMotion: reduceFlashing),
                                                 "Reduce Flashing \(reduceFlashing)")
             stills.append(rgba)
             session.qualityPin = 0

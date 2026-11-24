@@ -47,7 +47,7 @@ faded in the unlit fallback too) taken into the first pass.
 
 ## Phase 3: Wiring — shader, geometry fallback, presenter, scene, sound and panel
 
-- [ ] T-R02G1306-005 [US1] [US2] [US3] Edit
+- [X] T-R02G1306-005 [US1] [US2] [US3] Edit — Verified 2026-11-23: 2026-11-23: agent H u_wonLight and the fallback won level (host-4 exit 0, .autonomy/migration/checks/R02-G13-06.host-4.json); agent G sound, presenter feedback and lights, scene, panel labels/values, adjustable star and partner, summary, Sound toggle; agent C's 9 accessibility tests; sim-27 exit 0, 55 simulator tests (.autonomy/migration/checks/R02-G13-06.sim-27.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorShaders.swift` (`u_wonLight` scales the won
   look: the `wonLink` material's lift and the `.wonGlow` strips; `wonLightUniform`) with its source test in
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorShaderSourceTests.swift`; give

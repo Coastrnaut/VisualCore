@@ -16,6 +16,10 @@
 // raises, yaw turns about the box centre; the orbit is clamped; the authored orbit is the fixed camera bit for bit; the
 // stars are painted back to front for every orbit (the authored orbit keeps the authored order) and nothing moves; the
 // drag filament is finite, teal, 0.01 wide and in place between the star's centre and the world point.
+//
+// Feature 426 (R02-G13-06) T-R02G1306-005: the won level `won` of `constellationPart` and `glowPart` scales the won
+// links' and the won glow's fallback lift monotonically (0: teal links and plain glow; 1 and nil: today's output);
+// positions, indices and streams never change.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -490,6 +494,79 @@ import VisualCoreScenes
         #expect(sumWon > sumBefore)
         #expect(Self.glowTriangles(glowBefore.mesh, .wonGlow) == 0)
         #expect(Self.glowTriangles(glowWon.mesh, .wonGlow) == 2 * won.symbol.count * Geometry.linkSegments * 2)
+    }
+
+    /// Feature 426 (R02-G13-06) T-R02G1306-005: the won level scales the fallback lift of won links and won glow.
+    @Test func theWonLevelScalesTheFallbackLiftOfWonLinksAndWonGlow() throws {
+        let won: Snapshot = try Self.sixteenCalm(listen: true, time: 0)
+        let before: Snapshot = try Self.sixteenCalm(listen: false, time: 0)
+        #expect(Geometry.wonFlag(won) == 1)
+        let tier = AcousticConstellatorTier.of(0)
+        let full: AcousticConstellatorColouredMesh = try Geometry.constellationPart(won, tier: tier)
+        let glowFull: AcousticConstellatorColouredMesh = try Geometry.glowPart(won, tier: tier)
+        // nil is today's output; 1 equals it.
+        #expect(full == (try Geometry.constellationPart(won, tier: tier, won: nil)))
+        #expect(full == (try Geometry.constellationPart(won, tier: tier, won: 1)))
+        #expect(glowFull == (try Geometry.glowPart(won, tier: tier, won: nil)))
+        #expect(glowFull == (try Geometry.glowPart(won, tier: tier, won: 1)))
+        var wonVertices: [Int] = []
+        for k in full.mesh.positions.indices where Self.code(full.mesh, k) == Material.wonLink.rawValue {
+            wonVertices.append(k)
+        }
+        #expect(!wonVertices.isEmpty)
+        var previous: Double = -1
+        var previousGlow: Double = -1
+        for tenth in 0...10 {
+            let level: Double = Double(tenth) / 10
+            let part: AcousticConstellatorColouredMesh = try Geometry.constellationPart(won, tier: tier, won: level)
+            #expect(part.mesh == full.mesh, "positions and streams never change")
+            var brightness: Double = 0
+            for k in part.colours.indices {
+                if Self.code(part.mesh, k) == Material.wonLink.rawValue {
+                    brightness += Self.luminance(part.colours[k])
+                } else {
+                    #expect(part.colours[k] == full.colours[k], "only won links change")
+                }
+            }
+            #expect(brightness >= previous - 1e-9, "the won link's lift grows with the level")
+            previous = brightness
+            let glow: AcousticConstellatorColouredMesh = try Geometry.glowPart(won, tier: tier, won: level)
+            #expect(glow.mesh == glowFull.mesh, "the glow's positions and streams never change")
+            var glowBrightness: Double = 0
+            for k in glow.colours.indices {
+                if Self.kind(glow.mesh, k) == AcousticConstellatorGlowKind.wonGlow.rawValue {
+                    glowBrightness += Self.luminance(glow.colours[k])
+                } else {
+                    #expect(glow.colours[k] == glowFull.colours[k], "only won glow changes")
+                }
+            }
+            #expect(glowBrightness >= previousGlow - 1e-9, "the won glow's lift grows with the level")
+            previousGlow = glowBrightness
+        }
+        // At 0 a won link has the teal link's colour and a won glow the plain glow's colour.
+        let none: AcousticConstellatorColouredMesh = try Geometry.constellationPart(won, tier: tier, won: 0)
+        let teal: SIMD3<Double> = AcousticConstellatorPalette.teal
+        for k in wonVertices {
+            let c: Vec4 = none.colours[k]
+            #expect(abs(c.x - teal.x) < 1e-12 && abs(c.y - teal.y) < 1e-12 && abs(c.z - teal.z) < 1e-12)
+            #expect(Self.luminance(full.colours[k]) > Self.luminance(c) + 0.05)
+        }
+        let glowNone: AcousticConstellatorColouredMesh = try Geometry.glowPart(won, tier: tier, won: 0)
+        let glow: SIMD3<Double> = AcousticConstellatorPalette.glow
+        for k in glowNone.colours.indices where Self.kind(glowNone.mesh, k) == AcousticConstellatorGlowKind.wonGlow.rawValue {
+            let factor: Double = AcousticConstellatorGlowKind.decode(glowNone.mesh.uvs[k].x).factor
+            let c: Vec4 = glowNone.colours[k]
+            #expect(abs(c.x - glow.x * factor) < 1e-9 && abs(c.y - glow.y * factor) < 1e-9
+                    && abs(c.z - glow.z * factor) < 1e-9)
+        }
+        // Out-of-range levels are clamped; a non-finite level counts as 1; a level never affects an unwon play.
+        #expect(none == (try Geometry.constellationPart(won, tier: tier, won: -3)))
+        #expect(full == (try Geometry.constellationPart(won, tier: tier, won: 7)))
+        #expect(full == (try Geometry.constellationPart(won, tier: tier, won: .nan)))
+        #expect(glowFull == (try Geometry.glowPart(won, tier: tier, won: .infinity)))
+        #expect((try Geometry.constellationPart(before, tier: tier)) ==
+                (try Geometry.constellationPart(before, tier: tier, won: 0)))
+        #expect((try Geometry.glowPart(before, tier: tier)) == (try Geometry.glowPart(before, tier: tier, won: 0)))
     }
 
     @Test func failuresOutlineTheMissingGuideOrTheSnappedLink() throws {

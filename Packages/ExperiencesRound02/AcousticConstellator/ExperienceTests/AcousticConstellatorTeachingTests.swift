@@ -12,8 +12,8 @@
 // linked); the explanation of `AcousticConstellatorFailureExplanation(play:)` is in `mirror.failureText` and the
 // description; Undo returns to playing; Retry in campaign is `level.select` of the level and starts it fresh. Goal:
 // "band 1 of 5"; after the certified win "best 3 of 3 stars" and "Stars: 3 of 3." in the description. Progression:
-// `level.next` before a win is refused with `r02-g13.locked`, shown as "That change was refused: that level is not open
-// yet: win the level before it first."; after the win it opens level 2; the picker plays an open level and refuses a
+// `level.next` before a win is refused with `r02-g13.locked`, shown (since feature 426 in the feedback plan's words) as
+// "That level is not open yet."; after the win it opens level 2; the picker plays an open level and refuses a
 // locked one. Modes: Daily of 2026-11-23 opens `AcousticConstellatorProgress.dailyLevel(year: 2026, month: 11, day: 23)`
 // and Retry keeps that date; an impossible date reads the date refusal; Practice raises the budget to 40; Campaign
 // returns to the frontier. Synthetic data, no wall-clock assertion; each test short. Explicit types and plain loops (CI
@@ -36,12 +36,11 @@ enum AcousticConstellatorTeaching {
     /// The fixed calendar day of the daily test.
     static let dailyDate: DateComponents = DateComponents(year: 2026, month: 11, day: 23)
 
-    /// What the panel shows for a locked level.
-    static let lockedMessage: String =
-        "That change was refused: that level is not open yet: win the level before it first."
+    /// What the panel shows for a locked level (since feature 426 exactly the feedback plan's words).
+    static let lockedMessage: String = "That level is not open yet."
 
-    /// What the panel shows for an impossible date.
-    static let dateMessage: String = "That change was refused: that date is not a calendar date."
+    /// What the panel shows for an impossible date (since feature 426 exactly the feedback plan's words).
+    static let dateMessage: String = "That date cannot be used."
 
     /// Opens level `seed % 100 + 1` at a small view (one frame drawn) and describes the opening so the presenter holds
     /// the latest core.
