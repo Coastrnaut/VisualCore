@@ -19,6 +19,13 @@
 // their code in `refusalLog`); a drag onto a fixed pair says the link is fixed; a one-finger gesture on a won or failed
 // play says that the play is over; the scene draws the controller's orbit, and "Reset view" or a double tap on empty
 // space returns to the authored view.
+// Feature 425 (R02-G13-05) T-R02G1305-005 (FR-R02G1305-001 … 005; clarifications Q1–Q5): the mirror carries the
+// tutorial instruction, the hint revealed so far (`showHint()` reveals the next of three levels; the bounded search
+// runs off the main actor, a stale search owns nothing, and any change of the play hides it), the failure
+// explanation, the mode, the open levels with their bands and stars and the goal (the certified witness's action
+// count); `retry` starts the level again in its mode, `undoAction` takes back the last action, and the daily level is
+// chosen from the local calendar date read here (`playDaily(port:date:)`), never by the core. A refused `level.next`
+// before a win (`r02-g13.locked`) and an impossible date (`r02-g13.date`) read in words.
 import AcousticConstellatorCore
 import Foundation
 import SwiftUI
@@ -56,6 +63,32 @@ final class AcousticConstellatorMirror {
     var play: AcousticConstellatorPlay?
     /// The text of the last refused change, if any.
     var message: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 425).
+    var instruction: String?
+    /// The hint level revealed (0 … 3; 0 while no hint is shown) (feature 425).
+    var hintLevel = 0
+    /// The text of the hint revealed, or ``AcousticConstellatorPresenter/searchingText`` while its search runs
+    /// (feature 425).
+    var hintText: String?
+    /// The mode (feature 425).
+    var mode: AcousticConstellatorMode = .campaign
+    /// The highest open level (feature 425).
+    var frontier = 1
+    /// The stars of each won level, by level number (feature 425).
+    var stars: [Int: Int] = [:]
+    /// The certified witness's action count of the current level (its links and nudges plus the listen; the goal,
+    /// feature 425).
+    var certifiedActions = 0
+    /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen) (feature 425).
+    var pickedLevel = 1
+
+    /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 425).
+    var goalLabel: String {
+        let band: Int = AcousticConstellatorProgress.band(of: levelNumber)
+        var text = "Goal: link the symbol and hold it spending \(certifiedActions) actions; band \(band) of 5"
+        if let best = stars[levelNumber] { text += "; best \(best) of 3 stars" }
+        return text
+    }
 
     /// The number of stars of the followed level (2 while no play is followed, so star 0 and partner 1 exist).
     var starCount: Int { max(play?.level.stars.count ?? 2, 1) }
@@ -121,6 +154,8 @@ final class AcousticConstellatorMirror {
         case "r02-g13.action": "that change is not allowed for these stars"
         case "r02-g13.stale": "the play changed before the action arrived"
         case "r02-g13.level": "the next level could not be made"
+        case AcousticConstellatorExperienceRule.locked: "that level is not open yet: win the level before it first"
+        case AcousticConstellatorExperienceRule.date: "that date is not a calendar date"
         case AcousticConstellatorExperienceRule.notWhole: "a star and a step must be whole numbers"
         default: "that action is not available now"
         }
@@ -161,6 +196,18 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
     static let refusalLogLimit = 64
     /// What a gesture on a finished play shows, and what the description adds on a won or failed play.
     static let finishedMessage = "The play is over: undo or go to the next level"
+    /// The latest core described (feature 425): hints and retry read it.
+    private(set) var latestCore: AcousticConstellatorExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 425).
+    private var hintKey: String?
+    /// The hints searched for a play, by that play's key: one search per play, every level from it (feature 425).
+    private var hintCache: (key: String, hints: [AcousticConstellatorHint?])?
+    /// The search under way, off the main actor, for the play of ``hintKey`` (feature 425).
+    private(set) var hintSearch: Task<Void, Never>?
+    /// What the hint line shows while the search runs (feature 425).
+    static let searchingText = "Finding a hint…"
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 425).
+    private(set) var dailyDate: DateComponents?
 
     /// What restarts the preview clock: the play's level, links, phases, actions spent, stage and failure.
     private struct PlayKey: Equatable {
@@ -263,6 +310,7 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbProgress(core)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -276,24 +324,33 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
         text += measure + ". "
         switch play.stage {
         case .won, .result where play.failure == nil:
-            text += "The symbol rings together. " + Self.finishedMessage + "."
+            text += "The symbol rings together."
+            if let stars = mirror.stars[core.levelNumber] { text += " Stars: \(stars) of 3." }
             mirror.status = "Won"
             mirror.failureText = nil
         case .failed, .result:
-            let reason: String = AcousticConstellatorSceneSnapshot.failureText(play.failure) ?? "The play failed."
-            text += reason + " " + Self.finishedMessage + "."
+            // Since feature 425 the failure explanation (the failing action, its cause and the advice).
+            let reason: String = mirror.failureText
+                ?? AcousticConstellatorSceneSnapshot.failureText(play.failure) ?? "The play failed."
+            text += reason
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         default:
             mirror.status = play.records.isEmpty ? "Ready" : "Playing"
             mirror.failureText = nil
         }
+        text += " " + mirror.goalLabel + "."
+        if let instruction = mirror.instruction { text += " Tutorial: " + instruction }
+        if let hint = mirror.hintText { text += " Hint: " + hint }
+        if play.stage == .won || play.stage == .failed || play.stage == .result {
+            text += " " + Self.finishedMessage + "."
+        }
         return text
     }
 
     /// The control panel.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(AcousticConstellatorControls(port: port, mirror: mirror,
+        AnyView(AcousticConstellatorControls(port: port, mirror: mirror, presenter: self,
                                              resetView: { [weak self] in self?.resetView() },
                                              sender: { [weak self] control, values in
                                                  self?.send(control, values, port: port)
@@ -371,6 +428,136 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
     func cancelPointers() {
         gestures.cancel()
         scene.filament = nil
+    }
+
+    // MARK: Teaching and progression (feature 425, R02-G13-05)
+
+    /// Takes the core's teaching and progress state into the mirror: the tutorial instruction, the failure
+    /// explanation, the mode, the open levels with their stars and the goal; a change of the play hides the hint.
+    private func absorbProgress(_ core: AcousticConstellatorExperienceCore) {
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) { clearHint() }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.failureText = AcousticConstellatorFailureExplanation(play: core.play)?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.certifiedActions = core.certifiedActions
+    }
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: AcousticConstellatorExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Hides the hint shown and drops a search under way.
+    private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hintKey = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; the hint is hidden when the play has none (won).
+    /// Hints never change the state: no action is sent. The bounded search runs once per play in a detached task,
+    /// never on the frame: meanwhile the panel reads "Finding a hint…", and the result is shown only if the play it
+    /// belongs to is still the current one; later levels come from the cache.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let key: String = Self.hintKey(core)
+        let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        if let cached = hintCache, cached.key == key {
+            reveal(cached.hints, level: next, key: key)
+            return
+        }
+        guard hintSearch == nil || hintKey != key else { return }   // the search for this play is running
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        let play: AcousticConstellatorPlay = core.play
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            // One search: the plan's first action gives every level (`AcousticConstellatorHint.at(level:)`).
+            let first: AcousticConstellatorHint? = AcousticConstellatorHints.hint(level: 1, play: play)
+            var hints: [AcousticConstellatorHint?] = []
+            for level in 1...3 { hints.append(first?.at(level: level)) }
+            await self?.finishSearch(hints, key: key)
+        }
+    }
+
+    /// Takes the three hint levels searched for the play of `key`: cached, and shown when that play is still current.
+    private func finishSearch(_ hints: [AcousticConstellatorHint?], key: String) {
+        // A search for a play that is no longer the hinted one (hidden or replaced since) owns nothing: it must not
+        // clear a newer search's handle or overwrite the cache.
+        guard hintKey == key else { return }
+        hintSearch = nil
+        hintCache = (key, hints)
+        guard let core = latestCore, Self.hintKey(core) == key else { return }
+        reveal(hints, level: mirror.hintLevel, key: key)
+    }
+
+    /// Shows `hints`' level `level` for the play of `key`, or hides the hint when the play has none.
+    private func reveal(_ hints: [AcousticConstellatorHint?], level: Int, key: String) {
+        guard hints.indices.contains(level - 1), let hint = hints[level - 1] else {
+            clearHint()
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = level
+        mirror.hintText = hint.text
+    }
+
+    /// Ends the tutorial of the current level (`tutorial.dismiss`).
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Takes back the last action (`play.undo`); after a failure this returns the play to playing.
+    @discardableResult
+    func undoAction(port: ExperienceActionPort) -> ActionResult {
+        send("play.undo", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort,
+               date: DateComponents = AcousticConstellatorPresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = AcousticConstellatorPresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
 
     /// Returns the camera to the authored view ("Reset view"; presentation only).

@@ -72,7 +72,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks. Model: feature 415
   `Packages/ExperiencesRound02/AcousticConstellator/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); update
   `AcousticConstellatorPanelWinTests`, the gesture wiring tests and other suites whose `level.next` expectation changes;
   lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter AcousticConstellatorCoreTests`
-- [ ] T-R02G1305-005 Edit `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorPresenter.swift`
+- [X] T-R02G1305-005 Edit `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorPresenter.swift` — Verified 2026-11-23: 2026-11-23: agent G drafted the presenter and panel (tutorial, three hint levels searched off the main actor, failure explanation, goal with band and stars, level picker, practice, daily, campaign, retry) and updated the identity and render tests; agent D's 7 teaching tests; sim-27 exit 0, 46 simulator tests (.autonomy/migration/checks/R02-G13-05.sim-27.json)
   (the tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets
   it, the search off the main actor and a stale search never owning the hint state — and the failure explanation as
   panel text, with the level's difficulty band (of the five bands of 20), its goal and its best stars (FR-R02G1305-004);

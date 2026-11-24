@@ -181,7 +181,14 @@ import VisualCoreMath
         let failure: AcousticConstellatorFailure = try #require(core.play.failure)
         #expect(failure == .missing(lowest), "\(failure)")
         #expect(core.outcome?.code == AcousticConstellatorExperienceCore.failedCode)
-        let named: String = try #require(AcousticConstellatorSceneSnapshot.failureText(failure))
+        // Since feature 425 the description and the mirror name the failure with its explanation (the failing listen,
+        // the unlinked pair) and offer undo or retry.
+        #expect(AcousticConstellatorSceneSnapshot.failureText(failure) != nil)
+        let explanation: AcousticConstellatorFailureExplanation =
+            try #require(AcousticConstellatorFailureExplanation(play: core.play))
+        let named: String = explanation.text
+        #expect(named == "Action 1 (the listen) found the symbol's pair star \(lowest.a) \u{2013} star \(lowest.b) "
+            + "unlinked. " + AcousticConstellatorFailureExplanation.advice, "\(named)")
         let text: String = shell.presenter.describe(core)
         #expect(text.contains(named), "\(text)")
         #expect(shell.presenter.mirror.failureText == named)
@@ -228,7 +235,13 @@ import VisualCoreMath
             Issue.record("level 11 without its nudges fails \(failure), not disconnected")
             return
         }
-        let named: String = try #require(AcousticConstellatorSceneSnapshot.failureText(failure))
+        // Since feature 425 the description names the failure with its explanation (the failing listen, the tick and
+        // the snapped link).
+        #expect(AcousticConstellatorSceneSnapshot.failureText(failure) != nil)
+        let explanation: AcousticConstellatorFailureExplanation =
+            try #require(AcousticConstellatorFailureExplanation(play: core.play))
+        let named: String = explanation.text
+        #expect(named.contains("the link from star \(link.a) to star \(link.b) snapped"), "\(named)")
         let text: String = shell.presenter.describe(core)
         #expect(text.contains(named), "\(text)")
         let rgba: [UInt8] = try AcousticConstellatorTest.still(session)

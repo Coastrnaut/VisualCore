@@ -1,13 +1,14 @@
 // AcousticConstellatorExperienceIdentityTests — feature 423 (R02-G13-03) T-R02G1303-006 (FR-R02G1303-003, 004, 005,
 // 007, 008, 009; clarifications Q2, Q3, Q4, Q5). The experience's id is the catalog id, the factory (with and without
 // storage) builds a shell around the presenter (with the accessibility settings passed through), the controls are the
-// seven declared actions in order with their arities and ranges, the registration facts hold (100 certified levels,
-// schema 1, the tiers level-0 … level-2, the palette's five hex strings), the quality profile's levels equal the Core's
-// `qualityTiers` and the presenter's, the palette is clarification Q3's colours, the frame probes are none before a
-// frame and the two dark sky corners after one (declared, as the round-two X gates require), the description names the
-// level and the progress, and the mirror follows the description with the panel's choice opening on star 0 and
-// partner 1, clamped to the level's stars, and returning to star 0 and partner 1 on a new level. iOS only, as the
-// target.
+// declared actions in order with their arities and ranges (twelve since feature 425), the registration facts hold (100
+// certified levels, schema 2 since feature 425, the tiers level-0 … level-2, the palette's five hex strings), the
+// quality profile's levels equal the Core's `qualityTiers` and the presenter's, the palette is clarification Q3's
+// colours, the frame probes are none before a frame and the two dark sky corners after one (declared, as the round-two
+// X gates require), the description names the level and the progress, and the mirror follows the description with the panel's choice opening on star 0 and
+// partner 1, clamped to the level's stars, and returning to star 0 and partner 1 on a new level (since feature 425
+// (R02-G13-05) T-R02G1305-005 the next level opens only after a win: `level.next` before it is refused
+// `r02-g13.locked`). iOS only, as the target.
 #if os(iOS)
 import Foundation
 import AcousticConstellatorCore
@@ -25,11 +26,12 @@ import VisualCoreExperienceHost
         #expect(AcousticConstellatorTest.id.rawValue == AcousticConstellatorExperienceCore.experienceID)
     }
 
-    /// The registration's content facts: 100 certified levels, schema 1, three tiers, five palette hex strings.
+    /// The registration's content facts: 100 certified levels, schema 2 (since feature 425), three tiers, five palette
+    /// hex strings.
     @Test func theRegistrationFactsHold() {
         #expect(AcousticConstellatorExperienceCore.levelNumbers == 1...100)
         #expect(AcousticConstellatorExperienceCore.certifiedCandidates.count == 100)
-        #expect(AcousticConstellatorExperienceCore.schemaVersion == 1)
+        #expect(AcousticConstellatorExperienceCore.schemaVersion == 2)   // schema 2 since feature 425
         #expect(AcousticConstellatorExperienceCore.levelNumber(forSeed: 0) == 1)
         #expect(AcousticConstellatorExperienceCore.levelNumber(forSeed: 199) == 100)
         #expect(AcousticConstellatorPalette.hex == ["#05060F", "#F4F1E8", "#3FD6C6", "#8A5A9C", "#B8C0D0"])
@@ -82,9 +84,11 @@ import VisualCoreExperienceHost
         #expect(experience.frameProbes.isEmpty, "no probes before a frame")
     }
 
-    /// The controls are the seven declared actions in order: `link.add` and `link.remove` [star 0 … 7, star 0 … 7],
-    /// `star.nudge` [star 0 … 7, step −1 … 1], then four without values.
-    @Test func theControlsAreTheSevenActions() {
+    /// The controls are the declared actions in order: the seven of feature 423 (`link.add` and `link.remove` [star
+    /// 0 … 7, star 0 … 7], `star.nudge` [star 0 … 7, step −1 … 1], then four without values), then (feature 425)
+    /// `level.select` [1 … 100], `mode.daily` [year 1 … 9999, month 1 … 12, day 1 … 31], `mode.practice`,
+    /// `mode.campaign` and `tutorial.dismiss`.
+    @Test func theControlsAreTheDeclaredActions() {
         var ids: [String] = []
         var arities: [Int] = []
         for control in AcousticConstellatorExperienceCore.controls {
@@ -92,9 +96,10 @@ import VisualCoreExperienceHost
             arities.append(control.ranges.count)
         }
         #expect(ids == ["link.add", "link.remove", "star.nudge", "constellation.listen", "play.undo", "play.redo",
-                        "level.next"])
+                        "level.next", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss"])
         #expect(ids == AcousticConstellatorExperienceCore.actionIDs)
-        #expect(arities == [2, 2, 2, 0, 0, 0, 0])
+        #expect(arities == [2, 2, 2, 0, 0, 0, 0, 1, 3, 0, 0, 0])
         let controls: [ExperienceControl] = AcousticConstellatorExperienceCore.controls
         for index in 0..<2 where controls[index].ranges.count == 2 {
             #expect(controls[index].ranges[0] == 0.0...7.0, "\(controls[index].id) first star")
@@ -106,6 +111,10 @@ import VisualCoreExperienceHost
             #expect(nudge.ranges[0] == 0.0...7.0, "star range \(nudge.ranges[0])")
             #expect(nudge.ranges[1] == -1.0...1.0, "step range \(nudge.ranges[1])")
         }
+        let select: ExperienceControl = controls[7]
+        #expect(select.ranges == [1.0...100.0], "level range \(select.ranges)")
+        let daily: ExperienceControl = controls[8]
+        #expect(daily.ranges == [1.0...9999.0, 1.0...12.0, 1.0...31.0], "date ranges \(daily.ranges)")
     }
 
     /// The quality profile names level-0 … level-2 and equals the presenter's (the X follow-through declares the same
@@ -220,7 +229,12 @@ import VisualCoreExperienceHost
         try AcousticConstellatorTest.draw(session)
         #expect(try AcousticConstellatorTest.digest(shell) == before)
         #expect(mirror.star == stars - 1, "a frame of the same level keeps the choice")
-        // The next level chooses its star 0 and partner 1.
+        // The next level chooses its star 0 and partner 1 (since feature 425 level 25 opens with level 24's win; before
+        // it `level.next` is refused `r02-g13.locked`).
+        #expect(shell.handle(control: "level.next")
+            == .rejected(.rule(code: AcousticConstellatorExperienceRule.locked)))
+        AcousticConstellatorTest.issue(shell, try AcousticConstellatorTest.certifiedActions(24))
+        #expect(try AcousticConstellatorTest.core(shell).play.stage == .won)
         #expect(shell.handle(control: "level.next") == .accepted)
         try AcousticConstellatorTest.draw(session)
         let next: AcousticConstellatorExperienceCore = try AcousticConstellatorTest.core(shell)
