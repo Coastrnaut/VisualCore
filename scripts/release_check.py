@@ -163,6 +163,8 @@ def steps(stamp: str) -> list[Step]:
         Step("device-rows-r02-g11", [PY, "scripts/check_device_rows.py", "--experience", "r02-g11.echo-cartographer"]),
         # Feature 420 (R02-G12-10): Harmonic Bridges's device-row definition (no device is contacted).
         Step("device-rows-r02-g12", [PY, "scripts/check_device_rows.py", "--experience", "r02-g12.harmonic-bridges"]),
+        Step("device-rows-r02-g13", [PY, "scripts/check_device_rows.py", "--experience",
+                                     "r02-g13.acoustic-constellator"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),

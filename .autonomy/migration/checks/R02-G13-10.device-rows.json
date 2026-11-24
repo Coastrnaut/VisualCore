@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g13.acoustic-constellator"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g13.acoustic-constellator",
+  "elapsed_seconds": 0.026,
+  "exit_code": 0,
+  "finished": "2026-11-24T07:03:19+00:00",
+  "gate": "R02-G13-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-10.device-rows.log",
+  "log_sha256": "07c47d8f4cbd754d9e2b32f2acf6a99d3047fc580405624ba4d5c8e7e82b409d",
+  "name": "device-rows",
+  "started": "2026-11-24T07:03:19+00:00",
+  "timed_out": false
+}
