@@ -28,7 +28,7 @@ faded in the unlit fallback too) taken into the first pass.
   sequences of links, unlinks, nudges, undos, redos, refusals of every code (bare and prefixed), wins in campaign and
   practice, failures by each listen outcome and by the budget, and level and mode changes compare texts, kinds and
   haptics exactly; choosing and the drag preview plan nothing); agent A; `--name host-2`
-- [ ] T-R02G1306-004 [P] [US2] [US3] Create
+- [X] T-R02G1306-004 [P] [US2] [US3] Create — Verified 2026-11-23: 2026-11-23: agent B lights (fades 0.15/0.45 s, crossing measure) and sound recipes (two-tone audition detuned by the gap; ambient by lit coherence quarters); 16 tests incl. seven flicker patterns; lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G13-06.host-3.json)
   `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorLights.swift` ("glow 0.7 playing / 1 won /
   0.35 failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade
   under Reduce Flashing; `maxHalfRangeCrossingsPerSecond`) and

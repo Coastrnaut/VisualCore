@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AcousticConstellatorLights|AcousticConstellatorSoundRecipe"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'AcousticConstellatorLights|AcousticConstellatorSoundRecipe'",
+  "elapsed_seconds": 4.78,
+  "exit_code": 0,
+  "finished": "2026-11-24T04:22:37+00:00",
+  "gate": "R02-G13-06",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G13-06.host-3.log",
+  "log_sha256": "8427ecd98c4a3460a8a353b21383cee89e01706b818641f73887ef9e67a5428f",
+  "name": "host-3",
+  "started": "2026-11-24T04:22:32+00:00",
+  "timed_out": false
+}
