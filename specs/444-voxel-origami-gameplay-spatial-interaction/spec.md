@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G15-04 (migration ledger, game feature of experience R02-G15) · ID namespace FR-R02G1504-###,
 SC-R02G1504-###, T-R02G1504-###
@@ -28,6 +28,59 @@ Canonical overrides:
 - **Model:** feature 434 (Moonlit Mechanism's gameplay spatial interaction) for the gesture controller, picker, orbit
   and panel, adapted to a chain of hinged cubes seen in three dimensions.
 
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+434's answers where the games agree. Facts checked in code (read-only, 2026-11-24): the host's `PointerEvent` (id,
+phase began/moved/ended/cancelled, location in view points with the origin top-left, timestamp); feature 434's
+thresholds (`MoonlitMechanismGestureController`: tap below 10 points and 0.5 s, drag from 16 points, double tap within
+0.35 s and 22 points, orbit 90° per view width and 60° per view height) and orbit bounds (Moonlit yaw ±25°, pitch
+−10° … +15°; Acoustic Constellator yaw ±35°, pitch −15° … +20°). Voxel Origami's adapter declares `hinge.turn`
+[hinge, ±1], `play.undo`, `play.redo`, `level.next` and `hinge.choose` [hinge] (presentation only); hinge h twists the
+subtree of cube h about the line from its parent to cube h, so cube h itself stays and only the cubes off that line
+swing (`VoxelOrigamiLattice.swinging`); the kernel refuses a hinge with nothing to swing (`r02-g15.action`) and fails a
+turn on a collision or a sweep. The scene (`VoxelOrigamiSceneGeometry`) draws cubes of side 0.9 s at w(cell) from eye
+(1.4, 1.1, 2.6) towards (0, −0.1, 0), fitted to the box x −0.95 … 0.95, y −1.25 … 0.95, z −0.95 … 0.95, in painter's
+order by distance with back faces culled.
+
+- Q: How is a touch picked? → A: at touch-down every cube is projected through the drawn camera (orbit included) into
+  view points; a cube is hit when the touch lies inside the convex outline of its eight projected corners (side 0.9 s)
+  grown by 8 points; of several hits the front-most wins (the one drawn last: the nearest centre to the eye, then the
+  higher index, as the paint order draws it). Anything else (the target wireframe, hinge marks, gauges, backdrop) is
+  empty space; a touch on the root cube (cube 0, which has no hinge) picks the root. Tap, drag and double-tap thresholds
+  are feature 434's. Impact: FR-R02G1504-001 … 003; SC-R02G1504-001.
+- Q: How does a drag on a cube turn its hinge? → A: the controller predicts, for the touched cube h, the on-screen motion
+  of the centroid of the cubes hinge h swings, for a `+1` and a `−1` quarter turn (the projected centroid after the turn
+  minus before, ignoring collisions); with the finger's travel d from touch-down, the pending step is the sign whose
+  predicted motion has the larger projection d · û (û its unit direction), shown once that projection reaches 24 points
+  (cleared if it falls back below). On release while playing, exactly one `hinge.turn [h, step]` is sent (one quarter
+  turn per drag; a half turn is two drags); below 24 points nothing is sent. A drag on the root, on a cube whose hinge
+  swings nothing, or in any stage other than playing previews nothing and sends nothing; the description says why (the
+  root has no hinge; nothing would move; the play is over). Impact: FR-R02G1504-001; SC-R02G1504-001.
+- Q: What do taps and double taps do? → A: a tap on a non-root cube sends `hinge.choose [h]` in any stage (presentation
+  only, never an undo step); a tap on the root changes nothing. A second tap on the same non-root cube within 0.35 s and
+  22 points while playing sends `hinge.turn [h, +1]` when that hinge can turn and nothing otherwise (the first tap chose
+  it). A tap on empty space changes nothing; two such taps within 0.35 s and 22 points reset the view. On a won or failed
+  play no kernel action is sent (taps choose, orbit works) and the description says the play is over (undo or next
+  level). Impact: FR-R02G1504-002, 005; SC-R02G1504-002.
+- Q: How do two fingers behave and how far may the view turn? → A: as feature 434: a second finger cancels any
+  one-finger gesture (nothing sent) and orbits — yaw ±60° about the vertical axis through the authored box centre (90°
+  per view width) and pitch −20° … +35° (60° per view height), wider than 434's because the solid must be seen from its
+  sides and above; a third finger re-bases the midpoint; a double tap on empty space or "Reset view" returns to the
+  authored view (orbit 0, 0); the camera refits so the authored box stays inside the view with a 5 % margin at every
+  orbit and aspect 0.4 … 2.5, and the eye stays outside the box. The meshes face the drawn eye (billboards, paint order,
+  culling), so they are rebuilt when the orbit changes. Orbit is not saved (schema stays 1). Impact: FR-R02G1504-004;
+  SC-R02G1504-003, 004.
+- Q: How is it built and tested? → A: a Core gesture controller (`VoxelOrigamiGestureController`) with a picker
+  (`VoxelOrigamiPicker`) and an orbit (`VoxelOrigamiOrbit`, with `camera(_:aspect:orbit:)` equal to the authored camera
+  at orbit 0) takes pointer events with the view size, the drawn snapshot and the orbit and returns gesture actions
+  (chooseHinge, pendingTurn, turn, clearPending, resetView, explain) and the orbit; host tests feed 500 seeded taps and
+  drags on certified levels at several sizes and orbits against an independent pick and prediction in the test;
+  simulator tests send touches through the experience's pointer entry; a host test wins all 100 certified levels through
+  panel actions alone. Impact: FR-R02G1504-003, 006, 007; SC-R02G1504-001 … 005.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Turn a hinge by dragging its cube (Priority: P1) 🎯
@@ -42,8 +95,9 @@ computation predicts from the finger's travel and the drawn chain.
 
 **Acceptance Scenarios**:
 
-1. **Given** a level while playing, **When** the player drags a turnable cube far enough in the direction its +1 quarter
-   turn moves it on screen and lifts, **Then** exactly one `+1` turn of that cube's hinge is sent.
+1. **Given** a level while playing, **When** the player drags a turnable cube 24 points or more in the direction a `+1`
+   quarter turn of its hinge moves the swinging cubes on screen and lifts, **Then** exactly one `+1` turn of that cube's
+   hinge is sent.
 2. **Given** the same drag in the opposite direction, **When** it lifts, **Then** exactly one `−1` turn is sent.
 3. **Given** a drag shorter than the turn threshold, **When** it lifts, **Then** nothing is sent.
 4. **Given** a drag on the root cube or on a cube whose hinge cannot turn, **When** it lifts, **Then** nothing is sent
@@ -84,10 +138,14 @@ redo, next level, "Reset view"), including winning every certified level.
 
 ### Edge Cases
 
-- **A touch that never moves far enough:** a short, quick touch is a tap; two taps on the same cube close in time and
-  place are a double tap; two such taps on empty space reset the view; a long press without movement does nothing.
-- **A touch between a tap and a drag:** nothing changes.
+- **A touch that never moves far enough:** a tap (below 10 points, lifted within 0.5 s); two taps on the same cube within
+  0.35 s and 22 points are a double tap; two such taps on empty space reset the view; a press lifted at 0.5 s or later
+  without moving does nothing.
+- **A touch that moves 10 … 16 points:** neither a tap nor a drag; nothing changes.
+- **A drag that comes back:** the pending turn follows the finger and clears when the projection falls below 24 points;
+  only the state at release counts.
 - **A drag on a cube that the nearer cube hides:** the front-most cube under the finger is picked, as drawn.
+- **A drag on the root or on a hinge that swings nothing:** nothing is sent; the description says why.
 - **A turn the kernel refuses or fails** (a collision, a sweep, the budget, the stage): sent; a refusal is logged and
   shown with its reason code, a failure ends the level as the kernel decides.
 - **A finished play (won or failed):** gestures send no kernel action (a tap only chooses the hinge) and the description
@@ -100,14 +158,17 @@ redo, next level, "Reset view"), including winning every certified level.
 
 ### Functional Requirements
 
-- **FR-R02G1504-001**: A drag that starts on a turnable non-root cube while playing MUST show the pending turn and, on
-  release, MUST send that cube's hinge turned by the step whose on-screen motion of the cube best matches the finger's
-  travel, through the declared turn control; a drag below the threshold MUST send nothing.
-- **FR-R02G1504-002**: A tap on a non-root cube MUST choose its hinge (no kernel action) in any stage; a double tap on a
-  turnable cube while playing MUST send exactly one `+1` turn of its hinge.
-- **FR-R02G1504-003**: Picking MUST be analytic and deterministic: the cubes projected through the drawn camera (orbit
-  included), the front-most first, each with a stated touch target; anything else is empty space.
-- **FR-R02G1504-004**: Two-finger orbit MUST stay within stated bounds, keep the scene inside the view with a 5 % margin
+- **FR-R02G1504-001**: A drag that starts on a turnable non-root cube h while playing MUST show the pending step (the
+  sign whose predicted on-screen motion of the centroid of the cubes hinge h swings has the larger projection of the
+  finger's travel) once that projection reaches 24 points and, on release, MUST send exactly one `hinge.turn [h, step]`;
+  below 24 points, on the root, on a hinge that swings nothing or outside playing it MUST send nothing.
+- **FR-R02G1504-002**: A tap on a non-root cube MUST choose its hinge through `hinge.choose` (presentation only) in any
+  stage; a double tap on a turnable cube while playing (within 0.35 s and 22 points) MUST send exactly one `+1` turn of
+  its hinge.
+- **FR-R02G1504-003**: Picking MUST be analytic and deterministic: the convex outline of each cube's eight corners
+  projected through the drawn camera (orbit included), grown by 8 points, the front-most (drawn last) first; anything
+  else is empty space.
+- **FR-R02G1504-004**: Two-finger orbit MUST stay within yaw ±60° and pitch −20° … +35°, keep the scene inside the view with a 5 % margin
   at every aspect 0.4 … 2.5 and never enter the digest, the snapshot's game state or the kernel; a double tap on empty
   space or "Reset view" returns to the authored view.
 - **FR-R02G1504-005**: Gestures on a finished play, cancelled touches and second fingers MUST send no kernel action.
@@ -120,10 +181,10 @@ redo, next level, "Reset view"), including winning every certified level.
 ### Key Entities
 
 - **Gesture controller**: its state (idle, cube press, cube drag, empty press, orbiting, cancelled), the touched cube,
-  the start and last points, the press time and the last tap's time, place and target.
+  the start and last points, the pending step, the press time and the last tap's time, place and target.
 - **Orbit**: yaw and pitch offsets from the authored view.
-- **Gesture action**: choose hinge, pending turn, turn, reset view; the turn and the choice map onto declared adapter
-  controls.
+- **Gesture action**: chooseHinge, pendingTurn, turn, clearPending, resetView, explain; turn and chooseHinge map onto
+  the declared adapter controls `hinge.turn` and `hinge.choose`.
 
 ## Success Criteria *(mandatory)*
 
