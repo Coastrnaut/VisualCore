@@ -85,3 +85,7 @@ the progress and a new reconciliation file). Shared files (adapter, scenarios, f
 with the lead. MVP: Stories 1 and 2. Requirement coverage: FR-001/002/005/007 → 003, 004; FR-003 → 002, 003, 004; FR-004 →
 003, 005; FR-006 → 006 … 010.
 
+
+## Phase 6: Convergence
+
+- [ ] T-R02G1507-013 Add `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiReplayCatalogTests.swift`: for each of the 100 certified levels (10 groups of 10, each under 10 s) win the level in campaign through the adapter with its certified turns, then `replay.start [level]` and `replay.step` to the end, checking each step's play fingerprint against the witness file's recorded fingerprints (as `VoxelOrigamiWitnessTests` reads `docs/games/voxel-origami/levels/NNN.witness.json`), the replay ending won and the progress unchanged; `--name host-4` per SC-R02G1507-004 (partial)
