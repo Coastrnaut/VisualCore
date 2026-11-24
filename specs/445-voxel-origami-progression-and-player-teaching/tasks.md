@@ -67,7 +67,7 @@ final copy; round02-host split by test bundle, since it reached 401 s at R02-G15
   (`UPDATE_SCENARIO_MANIFEST=1`); update `VoxelOrigamiPanelWinTests`, the gesture wiring tests and other suites whose
   `level.next` expectation changes; lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02
   --filter VoxelOrigamiCoreTests`
-- [ ] T-R02G1505-005 Edit `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiPresenter.swift` (the
+- [X] T-R02G1505-005 Edit `Packages/ExperiencesRound02/VoxelOrigami/Experience/VoxelOrigamiPresenter.swift` (the — Verified 2026-11-24: 2026-11-24: presenter tutorial instruction, hints (three levels from one off-main search, stale searches own nothing, hidden on any play change), failure explanation, goal with band and stars, retry/undo/daily; panel Hint, Dismiss, Undo, Retry, Campaign/Daily/Practice, level picker; agent D 6 teaching tests; 36 simulator tests, no warnings; sim-27 exit 0
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it,
   the search off the main actor and a stale search never owning the hint state — and the failure explanation as panel
   text, with the level's difficulty band (of the five bands of 20), its goal and its best stars (FR-R02G1505-004); the
