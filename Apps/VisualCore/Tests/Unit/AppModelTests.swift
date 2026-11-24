@@ -22,6 +22,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCorePersistence
 import VisualCoreRendering
+import VoxelOrigamiCore
 import WaveKnotKeeperCore
 import XCTest
 @testable import VisualCoreApp
@@ -3054,6 +3055,155 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(opening.play.stage, MoonlitMechanismStage.playing, "the opening accepts actions")
         XCTAssertEqual(opening.certifiedActions, certifiedActions.count, "stars are counted against the witness")
         XCTAssertEqual(MoonlitMechanismExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Voxel Origami in the app (feature 449, R02-G15-09; T-R02G1509-005, FR-R02G1509-003, 006; SC-R02G1509-002)
+
+    /// Voxel Origami's registration: a candidate until X-R02-G15.
+    private func voxelOrigamiRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(VoxelOrigamiExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Voxel Origami is a candidate")
+    }
+
+    /// FR-R02G1509-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheVoxelOrigamiRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try voxelOrigamiRegistration()
+        XCTAssertEqual(VoxelOrigamiExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(VoxelOrigamiExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(VoxelOrigamiExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1509-006: without `-vcCandidates` Voxel Origami is a candidate only: in `candidates`, outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testVoxelOrigamiIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(VoxelOrigamiExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g15.voxel-origami")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1509-003, SC-R02G1509-002: with `-vcCandidates` Voxel Origami is shown, opens through the registry and
+    /// engine with seed 0 (level 1), and level 1 is won by its certified turns
+    /// (`VoxelOrigamiExperienceCore.generated(number: 1).plan.turns`) sent as `hinge.turn [hinge, step]` with three
+    /// stars (the opening play is already past the kernel's tutorial stage; the tutorial step is presentation and
+    /// blocks no action, so no `tutorial.dismiss` is needed); the win is recorded verified with its trace, opens
+    /// level 2, and `level.next` plays it.
+    func testVoxelOrigamiOpensAsACandidateAndLevelOneIsWonByItsCertifiedTurns() async throws {
+        let registration = try voxelOrigamiRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["hinge.turn", "play.undo", "play.redo", "level.next", "hinge.choose", "level.select",
+                        "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "replay.start",
+                        "replay.step", "replay.stop", "settings.sound"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(VoxelOrigamiExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<VoxelOrigamiExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, VoxelOrigamiStage.playing, "the opening play accepts actions")
+        let certified = try VoxelOrigamiExperienceCore.generated(number: 1)
+        let turns: [VoxelOrigamiAction] = certified.plan.turns
+        XCTAssertFalse(turns.isEmpty)
+        for turn in turns {
+            switch turn {
+            case .turn(let hinge, let step):
+                let values: [Double] = [Double(hinge), Double(step)]
+                XCTAssertEqual(engine.handle(control: "hinge.turn", values: values), .accepted, "turn \(values)")
+            }
+        }
+        XCTAssertEqual(engine.outcome?.code, VoxelOrigamiExperienceCore.wonCode)
+        XCTAssertEqual(VoxelOrigamiExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, VoxelOrigamiStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified turns earn three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.trace, turns, "the trace is the certified turns")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `VO` (their own literals in
+    /// Tests/UI/VoxelOrigami/VOSupport.swift, which this target cannot import); the same literals equal the Core's
+    /// certified level 1: two turns of hinge 4 by −1 (a hinge with its step); the budget is 9; each hinge is one of
+    /// the level's hinges and can turn at the opening; each step is a quarter turn (−1 or +1). Seed 0 opens level 1.
+    func testVoxelOrigamiLevelOnePinsInVOEqualTheCore() throws {
+        // The same literals as `VO.levelOneTurns` and `VO.levelOneBudget` in VOSupport.swift.
+        let levelOneTurns: [(hinge: Int, step: Int)] = [(4, -1), (4, -1)]
+        let levelOneBudget = 9
+
+        let certified = try VoxelOrigamiExperienceCore.generated(number: 1)
+        let certifiedTurns: [VoxelOrigamiAction] = certified.plan.turns
+        XCTAssertEqual(certifiedTurns, [.turn(4, -1), .turn(4, -1)], "level 1's certified turns")
+        var coreHinges: [Int] = []
+        var coreSteps: [Int] = []
+        for turn in certifiedTurns {
+            switch turn {
+            case .turn(let hinge, let step):
+                coreHinges.append(hinge)
+                coreSteps.append(step)
+            }
+        }
+        let pinnedHinges: [Int] = levelOneTurns.map { $0.hinge }
+        let pinnedSteps: [Int] = levelOneTurns.map { $0.step }
+        XCTAssertEqual(coreHinges, pinnedHinges, "level 1 certified turn hinges")
+        XCTAssertEqual(coreSteps, pinnedSteps, "level 1 certified turn steps")
+
+        let level: VoxelOrigamiLevel = certified.level
+        XCTAssertEqual(level.budget, levelOneBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, certifiedTurns.count, "the witness fits the budget")
+        for turn in levelOneTurns {
+            XCTAssertTrue((1..<level.cubes.count).contains(turn.hinge), "one of the level's hinges \(turn)")
+            XCTAssertTrue(VoxelOrigamiExperienceCore.stepRange.contains(turn.step), "a quarter-turn step \(turn)")
+            XCTAssertNotEqual(turn.step, 0, "a turn of 0 is refused")
+        }
+
+        let opening = try VoxelOrigamiExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, levelOneBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, VoxelOrigamiStage.playing, "the opening accepts actions")
+        XCTAssertEqual(opening.certifiedTurns, certifiedTurns.count, "stars are counted against the witness")
+        for turn in levelOneTurns {
+            XCTAssertTrue(opening.play.level.canTurn(turn.hinge, turns: opening.play.turns),
+                          "hinge \(turn.hinge) can turn at the opening")
+        }
+        XCTAssertEqual(VoxelOrigamiExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
