@@ -34,7 +34,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   sorted keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/AcousticConstellator/golden-frames.json` (schema 1) with `ACOUSTIC_CONSTELLATOR_WRITE_GOLDEN=1`, and
   add `AcousticConstellatorGolden` to `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G1308-004 [P] [US2] Create `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G1308-004 [P] [US2] Create `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-24: 2026-11-24: agent B pinned-description tests (recompute, digest, moved/changed/missing/unknown/schema/hand-edit fail naming the frame, rewrite only with the switch); lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G13-08.host-2.json)
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a moved
   position beyond a quantum, a changed colour or count, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
