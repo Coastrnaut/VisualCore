@@ -118,3 +118,26 @@ the level certification of R02-G14-02.
 - **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest 7de63603…9744) and linked into the app
   as a candidate (`ExperienceRegistry.candidates`) until X-R02-G14; the scenario manifest holds the standard scenarios,
   `full-playthrough`, `hero`, 80 acceptance scenarios and the fixtures.
+
+## Gestures (feature 434, R02-G14-04)
+
+- **Picking.** `MoonlitMechanismPicker` projects the targets through the drawn camera (orbit included) into view points:
+  the lamp (centre within 22 points) or its ladder (within 22 points of the segment from the bottom rung to the top
+  rung), then a key-frame card (inside its projected rectangle or its centre within 22 points; the nearest centre, ties
+  to the lower index), then a gear (inside its projected outline circle of radius 3.75 s, the largest of eight projected
+  directions, grown by 8 points; the front-most, drawn last, first); anything else is empty space.
+- **Gestures.** `MoonlitMechanismGestureController` takes the host's pointer events with the view size and the drawn
+  snapshot. A tap is below 10 points and lifted within 0.5 s; a drag moves at least 16 points. A gear drag accumulates
+  the clockwise swept angle about the gear's projected centre (samples within 12 points skipped, wrap-around unwrapped)
+  and turns the train by n = round(swept ÷ one tooth) handle turns of step direction(gear) × sign(n), capped at the
+  actions left, so the dragged gear follows the finger tooth for tooth; a vertical lamp drag steps the lamp one rung per
+  24 points. A gear tap chooses the gear; a double tap re-seats it by +1 (never the driver, which says why); a card tap
+  shows its key frame; a lamp tap runs; a double tap on empty space resets the view. Pending turns and lamp steps are
+  shown in words while dragging and sent on release, one action per step. Gestures send kernel actions only while
+  playing; on a finished play the description says the play is over.
+- **Orbit.** Two fingers orbit: yaw ±25° (90° per view width) and pitch −10° … +15° (60° per view height) about the
+  authored view; the field of view refits so the authored box keeps a 5 % margin at every orbit and aspect 0.4 … 2.5.
+  Orbit is presentation only: not saved, not in the digest; only the camera follows it, never the meshes.
+- **Panel.** Every move remains on the panel ("Reset view" added); all 100 certified levels are won through panel
+  actions alone (`MoonlitMechanismPanelWinTests`). Refusals are shown in words and their codes kept, with or without the
+  engine's `action.rule.` prefix.

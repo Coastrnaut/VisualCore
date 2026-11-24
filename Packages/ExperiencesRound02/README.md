@@ -785,3 +785,8 @@ blades, the lamp and its ladder; camera; CPU reference), `MoonlitMechanismShader
 signed-distance shading), the adapter `MoonlitMechanismExperienceCore`, `MoonlitMechanismScenarios` with the scenario
 manifest, and the iOS target `MoonlitMechanismExperience` (presenter, clockwork scene, control panel), registered as a
 candidate.
+
+Feature 434 (R02-G14-04) adds the touch controls: `MoonlitMechanismOrbit` and the orbiting camera,
+`MoonlitMechanismPicker` (lamp, ladder, key-frame cards, front-most gear) and `MoonlitMechanismGestureController`
+(rotary gear drags that turn the train tooth for tooth, lamp drags, gear taps and double taps, card taps, lamp taps,
+two-finger orbit), wired into the presenter with "Reset view".

@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G14-03: Moonlit Mechanism renderer).
+Last updated: 2026-11-24 (R02-G14-04: Moonlit Mechanism touch controls).
 
 ## 1. What is tested, and where
 
@@ -669,6 +669,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   AcousticConstellatorCatalogTests` (the tests that read the stored files fail on that first run, before the files
   exist; run again without the variable). The independent brute force covers every play action in bands 1 … 3 and the
   pruned options in bands 4 and 5, where every play action at size 5 (about 650,000 listens) would not fit 10 s.
+- **Moonlit Mechanism touch controls** (R02-G14-04, 2026-11-24). Host: `MoonlitMechanismPickerTests` (500 seeded
+  points per level, size and orbit against an independent pick written in the test), `MoonlitMechanismGestureControllerTests`
+  (500 seeded scripts against an independent arbitration, every action applied through the adapter, angle wrap, the
+  centre dead zone, the cap at the actions left), `MoonlitMechanismPanelWinTests` (all 100 levels through the panel in
+  ten groups, under 0.3 s); simulator: `MoonlitMechanismGestureWiringTests` (10 tests through the pointer entry). Two
+  lessons. A wiring-test agent may keep editing after the lead copies its file, so a simulator check is recorded only on
+  the agent's final copy (here `sim-27-2`; `sim-27` ran on a draft). And the controller signals the driver's double tap
+  with a one-event flag (`refusedDriverReseat`) rather than a new action case, which kept the fixed contract intact.
 - **Moonlit Mechanism renderer** (R02-G14-03, 2026-11-24). Host: the shader-source, geometry, adapter, purity and
   scenario tests (`swift test --package-path Packages/ExperiencesRound02 --filter MoonlitMechanism`); simulator:
   `MoonlitMechanismExperienceTests` (23 tests, about 4 s: frames against the CPU reference at three tiers on five
