@@ -52,7 +52,7 @@ final class AppModelTests: XCTestCase {
         let report = manifest.registryReport(registered: registered)
         XCTAssertTrue(report.isMatch, "missing \(report.missingRegistrations), unexpected "
             + "\(report.unexpectedRegistrations), duplicates \(report.duplicates)")
-        // A01–A25 and R02-G01 … G14 are integrated (X-A01 to X-A25 and X-R02-G01 … G14 pass): registered and
+        // A01–A25 and R02-G01 … G15 are integrated (X-A01 to X-A25 and X-R02-G01 … G15 pass): registered and
         // available, nothing else.
         XCTAssertEqual(registered.count, manifest.available.count)
         XCTAssertEqual(registered.map(\.rawValue), ["a01.generative-art-studio", "a02.fluid-art-playground",
@@ -79,7 +79,8 @@ final class AppModelTests: XCTestCase {
                                                      "r02-g11.echo-cartographer",
                                                      "r02-g12.harmonic-bridges",
                                                      "r02-g13.acoustic-constellator",
-                                                     "r02-g14.moonlit-mechanism"])
+                                                     "r02-g14.moonlit-mechanism",
+                                                     "r02-g15.voxel-origami"])
         XCTAssertEqual(manifest.available.map(\.id), registered)
     }
 
@@ -105,7 +106,7 @@ final class AppModelTests: XCTestCase {
         let storage = try TestStorage(self)
         let integrated = ExperienceRegistry.all.map(\.id)
         // Any catalog experience before its X gate works as a candidate; R02-G16 is one (unavailable, not in `all`, not yet
-        // registered; R02-G01 … R02-G14 were real candidates until their X gates, and R02-G15 is a registered one).
+        // registered; R02-G01 … R02-G15 were real candidates until their X gates).
         // The synthetic debug registration stands in for one.
         let id = try XCTUnwrap(ExperienceID(rawValue: "r02-g16.starlit-cartouche"))
         XCTAssertFalse(integrated.contains(id), "the synthetic candidate is not integrated")
@@ -505,7 +506,7 @@ final class AppModelTests: XCTestCase {
             XCTAssertEqual(QualityDeclaration.problems(profile: profile, tierCount: profile.count,
                                                        catalogNames: names), [], "\(registration.id)")
         }
-        XCTAssertEqual(ExperienceRegistry.all.count, 39, "A01–A25 and R02-G01 … G14 are integrated")
+        XCTAssertEqual(ExperienceRegistry.all.count, 40, "A01–A25 and R02-G01 … G15 are integrated")
     }
 
     /// FR-U06-013: a pinned level is in force when the first frame is drawn, and the record says so.
@@ -1260,7 +1261,8 @@ final class AppModelTests: XCTestCase {
                                     EchoCartographerExperienceCore.experienceID,
                                     HarmonicBridgesExperienceCore.experienceID,
                                     AcousticConstellatorExperienceCore.experienceID,
-                                    MoonlitMechanismExperienceCore.experienceID]
+                                    MoonlitMechanismExperienceCore.experienceID,
+                                    VoxelOrigamiExperienceCore.experienceID]
         for other in ExperienceRegistry.all where !puzzles.contains(other.id.rawValue) {
             XCTAssertNil(other.openingSeed, "\(other.id.rawValue) keeps its stable seed")
         }
@@ -3059,11 +3061,11 @@ final class AppModelTests: XCTestCase {
 
     // MARK: Voxel Origami in the app (feature 449, R02-G15-09; T-R02G1509-005, FR-R02G1509-003, 006; SC-R02G1509-002)
 
-    /// Voxel Origami's registration: a candidate until X-R02-G15.
+    /// Voxel Origami's registration (a candidate until X-R02-G15, integrated since 2026-11-24).
     private func voxelOrigamiRegistration() throws -> ExperienceRegistration {
         let id = try ExperienceID(VoxelOrigamiExperienceCore.experienceID)
-        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
-                             "Voxel Origami is a candidate")
+        return try XCTUnwrap(ExperienceRegistry.all.first { $0.id == id },
+                             "Voxel Origami is integrated")
     }
 
     /// FR-R02G1509-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
@@ -3080,25 +3082,25 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(problems, [], "\(registration.id)")
     }
 
-    /// FR-R02G1509-006: without `-vcCandidates` Voxel Origami is a candidate only: in `candidates`, outside `all`,
-    /// listed in the bundled catalog as not available, without a tile and not opened.
-    func testVoxelOrigamiIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+    /// X-R02-G15 (2026-11-24): Voxel Origami is integrated: in `all`, not a candidate, available in the bundled
+    /// catalog, shown and opened without `-vcCandidates` (FR-R02G1509-006 held until then).
+    func testVoxelOrigamiIsIntegratedAndAvailableWithoutTheCandidatesArgument() async throws {
         let id = try ExperienceID(VoxelOrigamiExperienceCore.experienceID)
         XCTAssertEqual(id.rawValue, "r02-g15.voxel-origami")
-        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
-        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertTrue(ExperienceRegistry.all.map(\.id).contains(id))
+        XCTAssertEqual(try voxelOrigamiRegistration().openingSeed, 0)
         let categories = try CategoryList(data: bundled("categories"))
         let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
-        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
-        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available")
         let storage = try TestStorage(self)
         let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
                                                               categories: try bundled("categories"),
                                                               registry: ExperienceRegistry.all))
-        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "a tile")
         let opened = await model.open(id)
-        XCTAssertFalse(opened)
-        XCTAssertNil(model.session.experience)
+        XCTAssertTrue(opened)
+        XCTAssertNotNil(model.session.experience)
     }
 
     /// FR-R02G1509-003, SC-R02G1509-002: with `-vcCandidates` Voxel Origami is shown, opens through the registry and

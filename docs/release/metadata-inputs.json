@@ -325,9 +325,17 @@
       "name": "Moonlit Mechanism",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G15",
+      "id": "r02-g15.voxel-origami",
+      "name": "Voxel Origami",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "3d5fd81a97ef1f32b65e2713a060b3a6cb28382e39c1d3b4269c26520a8e1f21",
+  "ledger_sha256": "7e08c10f1abfc591340d6cf1ebd97a773cc20f08fe9b982d6939807373d7f010",
   "privacy_answers": "unproven",
   "schema": 1
 }

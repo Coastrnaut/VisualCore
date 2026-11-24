@@ -1465,7 +1465,7 @@
         "catalog_sha256": "b02e58ecabf2a0ff47050b17f42b7d0dc9a49a3ccb68af604c12a0610edff611",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g16.starlit-cartouche",

@@ -1,7 +1,7 @@
 // VOSupport — feature 449 (R02-G15-09) T-R02G1509-004, modelled on feature 439 (FR-R02G1509-002; SC-R02G1509-001;
 // clarifications Q1, Q2): helpers of the interface tests of Voxel Origami (R02-G15) inside the one app, modelled on
-// `MMSupport` (feature 439). The namespace is `VO` (no other UI test uses `VO`). Voxel Origami is a candidate until
-// X-R02-G15; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and
+// `MMSupport` (feature 439). The namespace is `VO` (no other UI test uses `VO`). Voxel Origami was a candidate until
+// X-R02-G15 (2026-11-24); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and
 // are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens
 // the experience directly with `-openExperience r02-g15.voxel-origami`; a relaunch (`VO.reopen`) backgrounds the app
 // first (its save point), terminates it and starts again without the reset, so the stored progress (solved levels,

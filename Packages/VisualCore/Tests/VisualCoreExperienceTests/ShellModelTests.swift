@@ -285,7 +285,8 @@ import Testing
                          "r02-g11.echo-cartographer",
                          "r02-g12.harmonic-bridges",
                          "r02-g13.acoustic-constellator",
-                         "r02-g14.moonlit-mechanism"])
+                         "r02-g14.moonlit-mechanism",
+                         "r02-g15.voxel-origami"])
         for search in ["", "aurora"] {
             #expect(LauncherModel.state(manifest: .success(manifest), categories: categories, registered: [],
                                         searchText: search) == .empty, "nothing registered shows nothing")
