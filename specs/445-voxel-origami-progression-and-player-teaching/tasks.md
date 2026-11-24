@@ -84,7 +84,7 @@ final copy; round02-host split by test bundle, since it reached 401 s at R02-G15
 - [X] T-R02G1505-006 Docs: `docs/architecture/voxel-origami.md` (teaching and progression), — Verified 2026-11-24: 2026-11-24: architecture teaching section, ExperiencesRound02 README, testing doc; round02-host in two chunks: round02-host-1 (VoxelOrigami) exit 0 in 57 s, round02-host-2 (the rest) exit 0 in 450 s (split again from R02-G15-06)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host` (split by test bundle:
   Voxel Origami's suites and the rest, each under 450 s)
-- [ ] T-R02G1505-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1505-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1505-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1505-009 Reference regression chunk 2 (`--name reference-2`)
