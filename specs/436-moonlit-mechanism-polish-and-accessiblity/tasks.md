@@ -10,7 +10,7 @@ presentation time Reduce Motion holds at 0) taken into the first pass.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1406-001 Baselines after R02-G14-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1406-001 Baselines after R02-G14-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing, baseline-round02 exit 0 on the committed tree (.autonomy/migration/checks/R02-G14-06.baseline-*.json); rendering baseline = R02-G14-05 rendering-27/26
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G14-05's
   rendering runs (exit 0)
 - [ ] T-R02G1406-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MoonlitMechanismCore` and its tests gain
