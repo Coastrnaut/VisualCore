@@ -37,7 +37,7 @@ final copy; round02-host split by test bundle, since it reached 401 s at R02-G15
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1505-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiProgress.swift`
+- [X] T-R02G1505-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiProgress.swift` — Verified 2026-11-24: 2026-11-24: agent C tutorial steps (turn, compare, recover, done; undo never moves back, a redo to a finished play ends it), progress with stars and frontier, daily level (× 31, Hinnant day count, no clock), modes with practice budget 40; 15 tests (level 2's witness is one turn, so its tutorial goes to done on the winning turn); lead retest host-3 exit 0
   (`VoxelOrigamiTutorialStep` turn → compare → recover → done with the texts of clarification Q2, advanced by an
   accepted turn (turn → compare, compare → recover) or the level's end (→ done), never moved back by undo — documented
   exactly: an undo passes `afterTurn: false` and the play's real end (an undo always lands before the end, so it never
