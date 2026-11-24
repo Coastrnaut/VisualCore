@@ -6,7 +6,8 @@ check and release step, pass conditions, owner steps, no device contact)
 **Feature**: [spec.md](../spec.md)
 
 Ownership: `[x]` means the reviewer judged the requirement's quality sufficient; it says nothing about the code.
-Evaluated by the lead under the owner's standing delegation on 2026-11-24; following feature 440's checklist; every item passed at first reading.
+Evaluated by the lead under the owner's standing delegation on 2026-11-24; following feature 440's checklist; every item
+passed at first reading.
 
 ## Rows and coverage
 
@@ -49,7 +50,7 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-24; follo
 - [x] CHK014 Is the player impact stated (every deferred device promise of the game is measured before release, nothing
   improvised on the devices)? [Clarity, Spec §US1]
 - [x] CHK015 Is it stated that this feature adds no code, visuals or layout, so code-only graphics, licensing and the
-  iPhone and iPad layout stay those of features 433, 436 and 439? [Scope, Spec §Assumptions]
+  iPhone and iPad layout stay those of features 443, 446 and 449? [Scope, Spec §Assumptions]
 
 ## Notes
 
