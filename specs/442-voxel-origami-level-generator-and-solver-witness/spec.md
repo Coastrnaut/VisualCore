@@ -17,7 +17,7 @@ canonical overrides of ADR-0009 and Auto-Creator.md sections 19 and 21.
 Canonical overrides:
 - **Feature directory and ids:** `specs/442-voxel-origami-level-generator-and-solver-witness`;
   FR-R02G1502-###, SC-R02G1502-###, T-R02G1502-###.
-- **Packaging (ADR-0009):** experience R02-G15 (`r02-g14.voxel-origami`, free) in the one app; this feature
+- **Packaging (ADR-0009):** experience R02-G15 (`r02-g15.voxel-origami`, free) in the one app; this feature
   extends the pure `VoxelOrigamiCore` of feature 441.
 - **Superseded parts of the source prompt:** price and "no IAP"; the Round 2 lock and per-round device campaign.
   **Device-only items:** none (pure logic). **Owner-only items:** none.
@@ -25,7 +25,7 @@ Canonical overrides:
   scripts/planning_index.py levels --experience R02-G15`: 20 levels in each of bands 1 … 5, each with its planned seed
   and moves budget 8 … 19). The prompt's "content count 88" (the catalog's "88 solver-certified stages") is a milestone
   figure, as for the earlier round-two games.
-- **Model:** feature 432 (Voxel Origami's content pipeline) for manifest, generator, witness files, digest and
+- **Model:** feature 432 (Moonlit Mechanism's content pipeline) for manifest, generator, witness files, digest and
   progression.
 
 ## User Scenarios & Testing *(mandatory)*
