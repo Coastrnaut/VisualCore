@@ -11,7 +11,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G1403-001 Baselines on the committed tree after R02-G14-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing, baseline-round02 exit 0 on caab4ed3c (.autonomy/migration/checks/R02-G14-03.baseline-*.json); rendering baseline = R02-G14-02 rendering-27/26
   baseline-timing`, `--name baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering
   baseline is R02-G14-02's rendering runs (exit 0)
-- [ ] T-R02G1403-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MoonlitMechanismCore` gains VisualCoreScenes,
+- [X] T-R02G1403-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MoonlitMechanismCore` gains VisualCoreScenes, — Verified 2026-11-24: 2026-11-24: Core gains VisualCoreScenes/Experience/Diagnostics/Persistence; snapshot, palette and tiers; the invariant scans already read only the five named kernel files, so the presentation sources are outside them; host exit 0, 88 tests (.autonomy/migration/checks/R02-G14-03.host.json)
   VisualCoreExperience, VisualCoreDiagnostics and VisualCorePersistence; `MoonlitMechanismExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); make the renderer-purity and
   time scans of `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismInvariantTests.swift` skip the

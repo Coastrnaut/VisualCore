@@ -427,12 +427,21 @@ let package = Package(
         // Feature 431 (R02-G14-01): Moonlit Mechanism's pure rule kernel.
         .target(name: "MoonlitMechanismCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 433 (R02-G14-03): the adapter, snapshot and scene geometry.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "MoonlitMechanism/Core"),
         .testTarget(name: "MoonlitMechanismCoreTests",
                     dependencies: ["MoonlitMechanismCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore)],
                     path: "MoonlitMechanism/CoreTests"),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (presenter, scene, controls).
         .target(name: "AcousticConstellatorExperience",
