@@ -47,7 +47,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G1402-005 [P] [US4] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismWitness.swift`
+- [X] T-R02G1402-005 [P] [US4] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismWitness.swift` — Verified 2026-11-24: 2026-11-24: agent B witness (canonical phase/height digests, play fingerprints, counterexample norm and vector count in closed form, decode re-verification) with 15 tests; host-4 exit 0 (.autonomy/migration/checks/R02-G14-02.host-4.json)
   (agent B: schema 1 sorted-key JSON; state digests "first 16 hex of SHA-256 of the phases and the lamp height" after
   each action; play fingerprints after begin (and dismissTutorial) and each action; counterexample (the norm one below
   and the count of its vectors tried); difficulty; skipped; decode refuses newer, damaged and non-replaying files) with
