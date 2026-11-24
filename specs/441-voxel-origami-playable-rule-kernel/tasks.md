@@ -16,7 +16,7 @@ will consume).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1501-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `VoxelOrigamiCore`, `VoxelOrigamiCoreTests`,
+- [X] T-R02G1501-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `VoxelOrigamiCore`, `VoxelOrigamiCoreTests`, — Verified 2026-11-24: 2026-11-24: package targets, error, lattice (24 rotations, poses, idle hinges, collision then exact sweep in rationals, canonical form, covered count), level (ranges, stored form, names), 500 fixtures with known winning turns; host exit 0, 8 level tests (.autonomy/migration/checks/R02-G15-01.host.json)
   product); create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiError.swift` (codes "r02-g15.level,
   .action, .stage, .stale, .newer-schema, .malformed"), `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiLattice.swift`
   (vectors and the six units; the 24 rotation matrices with "entries −1, 0, 1", quarter turns about an axis by the
