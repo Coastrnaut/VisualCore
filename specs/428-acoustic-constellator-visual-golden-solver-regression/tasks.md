@@ -56,7 +56,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1308-006 [P] [US4] Create `scripts/acoustic_constellator_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G1308-006 [P] [US4] Create `scripts/acoustic_constellator_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-24: 2026-11-24: agent D regression script (host filter then simulator classes, one summary line per part, non-zero on failure), 5 script tests, CI step 'Acoustic Constellator regression (host)'; regression exit 0 (.autonomy/migration/checks/R02-G13-08.regression.json)
   (agent D: host filter `AcousticConstellatorRegression`, then the simulator classes through `xcodebuild_package.py
   --only-testing` with the isolation variable, one summary line per part with pass or fail and the first failing name,
   a non-zero exit on any failure), and add the named step "Acoustic Constellator regression (host)" to the
