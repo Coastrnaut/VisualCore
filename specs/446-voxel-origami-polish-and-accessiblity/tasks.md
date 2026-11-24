@@ -20,7 +20,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G1506-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiFeedbackPlan.swift`
+- [X] T-R02G1506-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiFeedbackPlan.swift` — Verified 2026-11-24: 2026-11-24: agent A VoxelOrigamiFeedbackPlan (Q1 texts word for word, prefix read, outcome-only for level-ending turns, summaryText); 8 tests on real cores (turns, undo, redo, every refusal code, campaign/practice/daily wins, collision, sweep, budget, level and mode changes); lead retest host-2 exit 0
   (texts and kinds of clarification Q1 word for word, the engine's `action.rule.` prefix read as the bare code, a
   revealed hint as `state` (`hint(text:)`); haptics of Q2 — a turn that ends the level plans only the outcome;
   `after(old:new:)`, `refused(code:)`, `refusalText(code:)`, `summaryText(core:hinge:)` of Q5) with
