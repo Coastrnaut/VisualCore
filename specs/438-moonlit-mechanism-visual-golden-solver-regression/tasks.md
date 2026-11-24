@@ -36,7 +36,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
   sorted keys; SHA-256"; manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/MoonlitMechanism/golden-frames.json` (schema 1) with `MOONLIT_MECHANISM_WRITE_GOLDEN=1`, and
   add `MoonlitMechanismGolden` to `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G1408-004 [P] [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismRegressionGoldenTests.swift` (agent B: every frame's
+- [X] T-R02G1408-004 [P] [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismRegressionGoldenTests.swift` (agent B: every frame's — Verified 2026-11-24: 2026-11-24: agent B golden host tests, 10 tests; lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G14-08.host-2.json)
   recomputed description matches its pinned one; each pinned digest equals the digest of its pinned description; a moved
   position beyond a quantum, a changed colour or count, a missing frame, an unknown frame, schema ≠ 1 and a hand-edited
   description all fail naming the frame; the file is rewritten only with the switch); `--name host-2 -- swift test
