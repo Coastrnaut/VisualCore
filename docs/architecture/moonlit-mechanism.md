@@ -54,3 +54,31 @@ A trace replays to the same states. Levels are JSON schema 1 with sorted keys an
 (`r02-g14.level`, `r02-g14.newer-schema`, `r02-g14.malformed`). `MoonlitMechanismRules` expresses the rules as an
 R02-F23 `PuzzleRules` (moves in the order turn −1, +1; every re-seat by gear, −1 then +1; lamp −1, +1 in range; run) for
 the level certification of R02-G14-02.
+
+## Content pipeline (feature 432, R02-G14-02)
+
+- **Manifest.** The 100 planned levels of the archived design (`MoonlitMechanismManifest`): number, planned seed, band
+  1 … 5 (20 each) and moves budget 8 … 19.
+- **Generator.** Candidate c of entry n draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: c))` and
+  is built from a solution: a wall of 12 … 16 × 9 … 12 cells, the gear count and lamp heights by band (2 … 3 gears with
+  2 … 3 heights up to 4 … 5 with 4 … 5), parents and tooth counts with a mesh divisor of at least 2, a solution set-up,
+  blade patterns, depths, centres and slot tables (compass rays of 2 … 3 cells), alignment values taken from the
+  solution, 2 … 5 key frames by band whose targets are the solution's casts, 2 … 6 forbidden cells outside every cast,
+  and a scramble of 2 … 3 up to 7 … 9 random accepted actions that gives the start. Tutorial on levels 1 … 3. A
+  candidate is kept when its start does not win and its minimal plan lies in the band's range (1 … 2 up to 5 … 6
+  actions) and below the budget; at most 256 candidates (`r02-g14.generation`). The ranges were measured with a
+  prototype on the real kernel before they were written down; over the catalog the band means are 1.90, 2.50, 3.50,
+  4.50 and 5.30 actions.
+- **Minimal plan and proof.** Actions commute, so a plan is a vector (net turns, net lamp steps, each gear's net
+  re-seat) and its length is the vector's L1 norm. `MoonlitMechanismSolver.plan` tries the vectors by norm in a fixed
+  order, skips those that leave the lamp out of range or a mesh misaligned (turns never change an alignment, and a
+  jammed machine never wins), runs the kernel on the rest and returns the first winner; the vectors of smaller norms
+  are the minimality proof. Work (runs) is bounded at 400,000; the largest catalog plan used 174 runs.
+- **Witness files.** `docs/games/moonlit-mechanism/levels/NNN.witness.json` (schema 1, sorted keys): the level, the
+  actions (turns, re-seats in gear order, lamp steps, then the run), a state digest of the phases and lamp height after
+  each action, the play fingerprints, the counterexample (the norm one below the plan and the vectors of that norm
+  tried, none winning), the difficulty and the candidates skipped. Regenerated only with
+  `MOONLIT_MECHANISM_WRITE_WITNESSES=1`; decoding re-runs the replay and the solver (`r02-g14.witness`).
+- **Catalog.** `PuzzleCatalog<MoonlitMechanismRules>.digest(id: "moonlit-mechanism", …)` over the 100 fingerprints is
+  pinned; the standard progression rule holds on the witness action count; an independent breadth-first search through
+  the play re-checks minimality on the two levels with the fewest gears in each band.

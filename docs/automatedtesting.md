@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G14-01: Moonlit Mechanism rule kernel).
+Last updated: 2026-11-24 (R02-G14-02: Moonlit Mechanism content pipeline).
 
 ## 1. What is tested, and where
 
@@ -669,6 +669,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   AcousticConstellatorCatalogTests` (the tests that read the stored files fail on that first run, before the files
   exist; run again without the variable). The independent brute force covers every play action in bands 1 … 3 and the
   pruned options in bands 4 and 5, where every play action at size 5 (about 650,000 listens) would not fit 10 s.
+- **Moonlit Mechanism content pipeline** (R02-G14-02, 2026-11-24). `swift test --package-path
+  Packages/ExperiencesRound02 --filter MoonlitMechanism` (88 tests, about 11 s): all 100 levels generate in about a
+  second on a debug build, so the catalog tests run in 5 groups of 20. Minimality is re-checked by a breadth-first
+  search through the play (states merged by phases and lamp height), which is cheap here because every action adds to
+  one vector. Regenerate the witness files only with `MOONLIT_MECHANISM_WRITE_WITNESSES=1` and re-pin the catalog digest
+  after review.
 - **Moonlit Mechanism rule kernel** (R02-G14-01, 2026-11-24). `swift test --package-path Packages/ExperiencesRound02
   --filter MoonlitMechanism` (41 tests, under 10 s): turns, alignment errors, casts and runs against an independent
   reference (a tooth-by-tooth walk, a brute-force cyclic distance, a separate rasterisation, a transcription of the run

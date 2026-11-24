@@ -772,3 +772,8 @@ the lamp's integer shift, and the run over key frames (`MoonlitMechanismTrain`, 
 `MoonlitMechanismRecord`s, and `MoonlitMechanismRules` for the R02-F23 puzzle contract. Refusals are
 `MoonlitMechanismError` with `r02-g14.*` codes. Rules:
 [docs/architecture/moonlit-mechanism.md](../../docs/architecture/moonlit-mechanism.md).
+
+Feature 432 (R02-G14-02) adds the content pipeline: the 100-entry `MoonlitMechanismManifest`, band profiles and the
+constructive `MoonlitMechanismGenerator`, the minimal-plan `MoonlitMechanismSolver` (plan vectors by L1 norm, pruned by
+the lamp range and the mesh alignments, smaller vectors counted as the proof), `MoonlitMechanismDifficulty`,
+`MoonlitMechanismWitness` and the 100 witness files in `docs/games/moonlit-mechanism/levels/`.
