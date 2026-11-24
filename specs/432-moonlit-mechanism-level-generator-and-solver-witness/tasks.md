@@ -1,0 +1,80 @@
+# Tasks: R02-G14-02 — Moonlit Mechanism: level generator and solver witness
+
+**Input**: [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md),
+[contracts/api.md](contracts/api.md), [quickstart.md](quickstart.md). Gate R02-G14-02 (migration ledger). Evidence:
+`python3 scripts/migration_ledger.py run-check --gate R02-G14-02 --name <check> -- <command>` (never a scratchpad path;
+recorded only after every agent has reported). Commit after every task with its check record (no trailers). Test seed
+2_432; tests stay short (< 10 s each; catalog certification in groups of 20 levels, measured locally, never asserted on
+CI). No {owner} or {device} tasks (pure logic); no GLSL.
+
+## Phase 1: Setup
+
+- [ ] T-R02G1402-001 Baselines after R02-G14-01 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+  baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`; the rendering baseline is R02-G14-01's
+  rendering runs (exit 0)
+
+## Phase 2: Foundational
+
+- [ ] T-R02G1402-002 Add `generation(Int)` ("r02-g14.generation") and `witness(String)` ("r02-g14.witness") to
+  `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismError.swift`; create
+  `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismManifest.swift` (the 100 entries "number 1 … 100,
+  planned seed, band 1 … 5, budget 8 … 19" copied from `python3 scripts/planning_index.py levels --experience R02-G14`,
+  with provenance) and `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismDifficulty.swift`; `--name
+  host`
+
+## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
+
+- [ ] T-R02G1402-003 [US1] Implement `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSolver.swift`
+  (lead: plan vectors (t, h, r₁ … rₙ₋₁) by L1 norm c = 0, 1, 2, …, each coordinate from −left to +left in the order t,
+  h, r₁, …, the last coordinate +left before −left; a vector leaving the lamp range skipped; a vector leaving a mesh
+  misaligned skipped without a run; every other vector judged by the kernel's run; the first winning vector is the
+  plan; smaller vectors counted as the minimality proof; work = runs, bounded at 400,000; at most 6 actions; witness
+  actions (turns, re-seats in gear order, lamp steps, run) and replay check) with
+  `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismSolverTests.swift` (agent A: hand levels with
+  known minima; the plan wins and no shorter sequence does; the independent breadth-first search over every action
+  sequence the play accepts (states merged by phases and lamp height) on seeded levels; the work bound respected);
+  `--name host-2`
+
+## Phase 4: Story 2 — levels come from their planned seeds (P1)
+
+- [ ] T-R02G1402-004 [US2] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismGenerator.swift`
+  (lead: band profiles "band 1: 2 … 3, 2 … 3, 2, 2 … 3, 1 … 2; band 2: 3, 3, 2 … 3, 3 … 4, 2 … 3; band 3: 3 … 4, 3 … 4,
+  3, 4 … 6, 3 … 4; band 4: 4, 4, 3 … 4, 5 … 7, 4 … 5; band 5: 4 … 5, 4 … 5, 4 … 5, 7 … 9, 5 … 6" (gears, lamp heights,
+  key frames, scramble, plan range); candidates from `SeedDerivation.derive(plannedSeed, index: c)` in the drawing order
+  of clarification Q1; at most 256 candidates then `generation(n)`; level ids `moonlit-mechanism-NNN`; tutorial on
+  1 … 3; catalog digest) with `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismGeneratorTests.swift`
+  (agent C: determinism, drawing order, band values, filters, the candidate bound and its refusal); `--name host-3`
+
+## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
+
+- [ ] T-R02G1402-005 [P] [US4] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismWitness.swift`
+  (agent B: schema 1 sorted-key JSON; state digests "first 16 hex of SHA-256 of the phases and the lamp height" after
+  each action; play fingerprints after begin (and dismissTutorial) and each action; counterexample (the norm one below
+  and the count of its vectors tried); difficulty; skipped; decode refuses newer, damaged and non-replaying files) with
+  `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismWitnessTests.swift`; `--name host-4`
+- [ ] T-R02G1402-006 [US2] [US3] [US4] Create
+  `Packages/ExperiencesRound02/MoonlitMechanism/CoreTests/MoonlitMechanismCatalogTests.swift` (lead: 100 entries, 20 per
+  band; every level generated, won by its witness within the budget, and no shorter sequence wins; the breadth-first
+  search on the two levels with the fewest gears in each band; pinned digest; progression rule and band means; witness
+  files byte for byte, written only with `MOONLIT_MECHANISM_WRITE_WITNESSES=1`; groups of 20) and the 100 files
+  `docs/games/moonlit-mechanism/levels/001.witness.json` … `100.witness.json`; `--name host-5`
+
+## Phase 6: Regression, documentation and close
+
+- [ ] T-R02G1402-007 Docs: `docs/architecture/moonlit-mechanism.md` (content pipeline),
+  `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
+- [ ] T-R02G1402-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+  `--name host-full`
+- [ ] T-R02G1402-009 Reference regression chunk 1 (`--name reference-1`)
+- [ ] T-R02G1402-010 Reference regression chunk 2 (`--name reference-2`)
+- [ ] T-R02G1402-011 Script tests, run alone (`--name script-tests`)
+- [ ] T-R02G1402-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+  README row and gate list updated
+
+## Dependencies and parallel work
+
+001 → 002 → 003 core and 004 core (lead) → {003 tests (agent A), 004 tests (agent C), 005 (agent B)} → 006 → 007 … 012.
+Agents work in isolated copies against contracts/api.md; shared files (error, manifest, solver, difficulty, generator,
+catalog tests, witness files, docs) stay with the lead. Agents and the lead may draft in isolated copies before 001
+(new files only). MVP: Story 1. Requirement coverage: FR-001 → 004, 006; FR-002 → 003, 006; FR-003 → 002, 004; FR-004 →
+005, 006; FR-005 → 006; FR-006 → 002, 007 … 011.
