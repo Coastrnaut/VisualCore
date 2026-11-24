@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/voxel_origami_regression.py"
+  ],
+  "command": "python3 scripts/voxel_origami_regression.py",
+  "elapsed_seconds": 19.921,
+  "exit_code": 0,
+  "finished": "2026-11-24T21:22:19+00:00",
+  "gate": "R02-G15-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-09.regression.log",
+  "log_sha256": "90af61f87d71712b83e502acc05cff53e919e95250d7007a2c5136d0fcb3b827",
+  "name": "regression",
+  "started": "2026-11-24T21:21:59+00:00",
+  "timed_out": false
+}
