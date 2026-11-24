@@ -10,7 +10,9 @@
 // run of the set-up it reaches. The first winning vector is the plan; every vector of a smaller norm was tried and lost
 // (their count is the minimality proof). Work = runs, bounded; over the bound there is no plan. The witness is |t|
 // turns of t's sign, then each gear's |rᵢ| re-seats of rᵢ's sign in gear order, then |h| lamp steps of h's sign, then
-// the run.
+// the run. Feature 435 (R02-G14-05) T-R02G1405-002 adds the same search from a state of play
+// (`plan(_:phases:height:maxActions:workBound:)`, clarification Q1); `plan(_:)` is that entry at the level's starting
+// phases and height, so certification is unchanged.
 
 /// A minimal plan: the net turns, lamp steps and re-seats, the vectors of smaller norms tried and the work.
 public struct MoonlitMechanismPlan: Sendable, Equatable, Codable {
@@ -46,13 +48,30 @@ public enum MoonlitMechanismSolver {
     public static let maxActions: Int = 6
 
     /// The minimal plan of `level` with at most `maxActions` actions before the run, or nil when there is none
-    /// within `workBound` runs (see the file header).
+    /// within `workBound` runs (see the file header). It is ``plan(_:phases:height:maxActions:workBound:)`` at the
+    /// level's starting phases and starting height.
     public static func plan(_ level: MoonlitMechanismLevel, maxActions: Int = maxActions,
                             workBound: Int = workBound) -> MoonlitMechanismPlan? {
+        plan(level, phases: level.startingPhases, height: level.startingHeight, maxActions: maxActions,
+             workBound: workBound)
+    }
+
+    /// The minimal plan of `level` from a state of play (feature 435 (R02-G14-05) T-R02G1405-002, clarification Q1):
+    /// the plan-vector search of ``plan(_:maxActions:workBound:)`` with `phases` (one per gear, each in
+    /// 0 … teeth − 1) in place of the starting phases and `height` in place of the starting height, pruned by the lamp
+    /// range and the mesh alignments in the same way. The plan's turns, lamp steps and re-seats are relative to
+    /// `phases` and `height`. Nil when `phases` does not hold one phase per gear in range, when `height` is outside
+    /// 0 … L − 1, when `maxActions` is negative, when no vector of norm at most `maxActions` wins, or when more than
+    /// `workBound` runs would be judged.
+    public static func plan(_ level: MoonlitMechanismLevel, phases: [Int], height: Int,
+                            maxActions: Int = maxActions, workBound: Int = workBound) -> MoonlitMechanismPlan? {
         let gears: [MoonlitMechanismGear] = level.gears
         let count: Int = gears.count
+        guard phases.count == count, maxActions >= 0, height >= 0, height < level.lampHeights else { return nil }
+        for gear in 0..<count where phases[gear] < 0 || phases[gear] >= gears[gear].teeth { return nil }
         let dimensions: Int = count + 1
-        let start: [Int] = level.startingPhases
+        let start: [Int] = phases
+        let startHeight: Int = height
         var work: Int = 0
         var tried: Int = 0
         var smaller: Int = 0
@@ -62,7 +81,7 @@ public enum MoonlitMechanismSolver {
 
         func judge() {
             tried += 1
-            let height: Int = level.startingHeight + vector[1]
+            let height: Int = startHeight + vector[1]
             guard height >= 0, height < level.lampHeights else { return }
             var phases: [Int] = start
             for gear in 1..<count {

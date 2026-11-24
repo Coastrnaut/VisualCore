@@ -16,7 +16,7 @@ final copy).
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1405-002 [P] [US2] [US3] Add `plan(_:phases:height:maxActions:workBound:)` to
+- [X] T-R02G1405-002 [P] [US2] [US3] Add `plan(_:phases:height:maxActions:workBound:)` to — Verified 2026-11-24: 2026-11-24: agent B solver entry plan(_:phases:height:) (certification bit-identical, catalog digest and witnesses pass), hint plan and three levels, failure explanation for all five failures; exact hints win all 100 levels, 200 seeded states, 500 seeded failures; lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G14-05.host-2.json)
   `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismSolver.swift` (the plan-vector search of
   `plan(_:maxActions:workBound:)` from the given phases and lamp height, pruned by the lamp range and the mesh
   alignments; `plan(_:)` unchanged and equal to `plan(level, phases: level.startingPhases, height:
