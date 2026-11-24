@@ -797,3 +797,9 @@ Feature 435 (R02-G14-05) adds teaching and progression: the solver entry `plan(_
 and the practice mode; the adapter's `level.select`, `mode.daily`, `mode.practice`, `mode.campaign` and
 `tutorial.dismiss` with snapshot schema 2 and a migration from 1; the presenter's tutorial, hint, explanation, goal and
 mode controls.
+
+Feature 436 (R02-G14-06) adds polish and accessibility: `MoonlitMechanismFeedbackPlan` (announcements and haptics from
+the old and new core), `MoonlitMechanismLights` (glow and won fades eased by the frame clock), `MoonlitMechanismSoundRecipe`
+(a gear's audition from its mesh and an ambient loop from the run report) and the experience's `MoonlitMechanismSound`,
+the fallback's won level, and a panel with labels, values, an adjustable gear and key frame, a summary element and a
+Sound toggle.

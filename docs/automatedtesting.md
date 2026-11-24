@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G14-05: Moonlit Mechanism teaching and progression).
+Last updated: 2026-11-24 (R02-G14-06: Moonlit Mechanism polish and accessibility).
 
 ## 1. What is tested, and where
 
@@ -669,6 +669,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   AcousticConstellatorCatalogTests` (the tests that read the stored files fail on that first run, before the files
   exist; run again without the variable). The independent brute force covers every play action in bands 1 … 3 and the
   pruned options in bands 4 and 5, where every play action at size 5 (about 650,000 listens) would not fit 10 s.
+- **Moonlit Mechanism polish and accessibility** (R02-G14-06, 2026-11-24). Host: `MoonlitMechanismFeedbackPlanTests`
+  (texts, kinds and haptics exactly, a gear drag planned once), `MoonlitMechanismLightsTests` (seven adversarial flicker
+  patterns at 1/60 s, at most 3 half-range crossings per second, every half-range fade at least 0.4 s under Reduce
+  Flashing), `MoonlitMechanismSoundRecipeTests`; simulator: `MoonlitMechanismAccessibilityTests` (10 tests with a
+  recording feedback sink and fake loop and voice players). Three lessons. Fades must ease by the frame clock: under
+  Reduce Motion the presentation time is held at 0, so a fade eased by it would never finish (found at the checklist
+  step). When a renderer's won look starts to fade, a test that draws the won frame at the same instant sees it
+  unlit; draw it later (here 10 s). And a blanket text replacement of `HStack(spacing: 12) {` with a `row {` helper also
+  rewrote the helper's own body into a self-call, which SwiftUI reports as an opaque type defined in terms of itself.
 - **Moonlit Mechanism teaching and progression** (R02-G14-05, 2026-11-24). Host: `MoonlitMechanismHintsTests` (exact
   hints win all 100 levels in ten groups, 200 seeded states, 500 seeded failures explained), `MoonlitMechanismProgressTests`
   (tutorial steps on the witnesses of levels 1 … 3, stars, frontier, every daily date 2026 … 2036),

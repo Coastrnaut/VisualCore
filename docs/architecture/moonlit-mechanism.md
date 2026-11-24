@@ -170,3 +170,26 @@ the level certification of R02-G14-02.
 - **Schema 2.** The digest ("r02-g14.moonlit-mechanism.v2") adds the progress and the mode; the snapshot payload is
   `{level, mode, progress, records, tutorial}` with a migration from schema 1 (level 1 and the restored level open,
   campaign mode, the tutorial at its first step). The shown key frame stays presentation.
+
+## Polish and accessibility (feature 436, R02-G14-06)
+
+- **Feedback.** `MoonlitMechanismFeedbackPlan.after(old:new:)` is a pure plan (announcement text and kind, haptic) from
+  the old and new adapter core: a turn, re-seat, lamp step, undo or redo is announced as `state` with the required target
+  cells covered and the actions left, with a `selection` haptic; a win (`success`) and a failure (`warning`, with the
+  failure explanation) are announced as `outcome` and replace the action's own feedback; level and mode changes as
+  `level`; refusals as `rejection` with an `error` haptic, in words the panel shows too. A gear drag that sends several
+  turns is held and announced once ("Turned the handle forward n teeth."). The presenter routes plans through the shared
+  feedback route and keeps a feedback log.
+- **Lights.** `MoonlitMechanismLights` eases the glow (0.7 playing, 1 won, 0.35 failed) and the won brightening of the
+  wall (0 or 1) linearly over 0.15 s, 0.45 s under Reduce Flashing (a started fade finishes before turning back),
+  stepped by the frame clock — not the presentation time, which Reduce Motion holds at 0. The scene multiplies the glow
+  gain by the glow level and passes the won level as `u_won`; the unlit fallback scales the paper's lift by it and is
+  rebuilt when it moves by a tenth. The machine itself has no time input, so it is still between actions.
+- **Sound.** Off by default (a Sound toggle; presentation only). Choosing a gear plays its audition: its tone
+  220 Hz × 2^((T − 12) / 12) with its parent's, the second detuned by 1.5 Hz per tooth of mesh error (a cyclic distance,
+  0 … ⌊gcd / 2⌋), 0.6 s, through the shared one-shot player; the driver sounds alone. The ambient loop's root follows
+  the actions left, one partial per covered quarter of the required target cells, an octave when won and halved gains
+  when failed, rebuilt only when that recipe changes. Sound plays exactly while wanted, on screen and active.
+- **Panel.** Every control has a label and a value in words; the chosen gear and the shown key frame are adjustable; a
+  summary element reads the actions left, the progress, the lamp, the shown key frame, the chosen gear and the level;
+  rows become columns at accessibility text sizes and the panel keeps a 520-point readable width.
