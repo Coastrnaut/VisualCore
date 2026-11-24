@@ -7,6 +7,10 @@
 // and glow differ between tiers; the paint order sorted with the tie rule; back-face culling: every cube triangle
 // facing away from the eye projects clockwise and every one facing it counter-clockwise, every flat item
 // counter-clockwise.
+// Feature 444 (R02-G15-04) T-R02G1504-002 (FR-R02G1504-004; SC-R02G1504-004; clarification Q4) adds the orbit: every
+// element and box corner inside the view with margin at the four orbit corners (yaw ±60°, pitch −20° and +35°) and 7
+// aspects; the authored-orbit camera and the camera-taking meshes bit-identical to the authored ones, clamping; the eye
+// outside the box at every corner; the winding of the meshes built for an orbited camera suits back-face culling.
 // Explicit types, plain loops; each test well under 2 s.
 import Foundation
 import Testing
@@ -532,6 +536,161 @@ struct VoxelOrigamiSceneGeometryTests {
                 #expect(abs((n.x * n.x + n.y * n.y + n.z * n.z).squareRoot() - 1) < 1e-9)
                 let local: Double = mesh.uvs[index].y
                 #expect(local >= -1 && local <= 1)
+            }
+        }
+    }
+
+    // MARK: Orbit (feature 444, R02-G15-04, T-R02G1504-002)
+
+    /// The four orbit corners: yaw ±60°, pitch −20° and +35°.
+    static let orbitCorners: [VoxelOrigamiOrbit] = {
+        var corners: [VoxelOrigamiOrbit] = []
+        for yaw in [-60.0, 60.0] {
+            for pitch in [-20.0, 35.0] {
+                corners.append(VoxelOrigamiOrbit(yaw: yaw * Double.pi / 180, pitch: pitch * Double.pi / 180))
+            }
+        }
+        return corners
+    }()
+
+    @Test func orbitKeepsEveryElementInsideTheViewAtTheCorners() throws {
+        var all: [VoxelOrigamiLevel] = Array(Self.catalogLevels().prefix(5))
+        all.append(contentsOf: try Self.extremeLevels())
+        for level in all {
+            let snap: Snapshot = Self.snapshot(level)
+            for orbit in Self.orbitCorners {
+                for aspect in Self.aspects {
+                    let camera: VoxelOrigamiCamera = G.camera(snap, aspect: aspect, orbit: orbit)
+                    for element in G.paintOrder(snap, camera: camera) {
+                        let p: SIMD2<Double>? = G.project(element.centre, camera: camera)
+                        #expect(p != nil)
+                        guard let q = p else { continue }
+                        #expect(q.x >= 0.05 && q.x <= 0.95 && q.y >= 0.05 && q.y <= 0.95,
+                                "\(level.id) orbit \(orbit) aspect \(aspect) \(element.kind) at \(q)")
+                    }
+                    // The authored box's corners themselves keep the margin.
+                    for index in 0..<8 {
+                        guard let q = G.project(G.corner(index), camera: camera) else {
+                            Issue.record("box corner \(index) behind the eye")
+                            continue
+                        }
+                        #expect(q.x >= 0.05 - 1e-9 && q.x <= 0.95 + 1e-9 && q.y >= 0.05 - 1e-9 && q.y <= 0.95 + 1e-9)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test func authoredOrbitCameraIsBitIdentical() throws {
+        let snap: Snapshot = Self.snapshot(Self.catalogLevels()[0])
+        var aspects: [Double] = Self.aspects
+        aspects.append(contentsOf: [Double.nan, 0, -1, 20, 0.05])
+        for aspect in aspects {
+            let authored: VoxelOrigamiCamera = G.camera(snap, aspect: aspect)
+            #expect(G.camera(snap, aspect: aspect, orbit: .authored) == authored)
+            #expect(authored.eye == G.eye && authored.target == G.lookAt)
+        }
+        let camera: VoxelOrigamiCamera = G.camera(snap, aspect: 1)
+        for tier in VoxelOrigamiTier.all {
+            #expect(try G.voxelMesh(snap, tier: tier, reduceMotion: false, camera: camera)
+                == G.voxelMesh(snap, tier: tier, reduceMotion: false))
+            #expect(try G.glowMesh(snap, tier: tier, camera: camera) == G.glowMesh(snap, tier: tier))
+            #expect(try G.voxelPart(snap, tier: tier, wonLevel: 0.5, camera: camera)
+                == G.voxelPart(snap, tier: tier, wonLevel: 0.5))
+            #expect(try G.glowPart(snap, tier: tier, camera: camera) == G.glowPart(snap, tier: tier))
+        }
+        // Clamping: beyond the bounds equals the corner, non-finite equals authored.
+        let wild: VoxelOrigamiOrbit = VoxelOrigamiOrbit(yaw: 4, pitch: -3)
+        #expect(wild.clamped() == VoxelOrigamiOrbit(yaw: VoxelOrigamiOrbit.yawLimit,
+                                                    pitch: VoxelOrigamiOrbit.pitchRange.lowerBound))
+        #expect(G.camera(snap, aspect: 1, orbit: wild) == G.camera(snap, aspect: 1, orbit: wild.clamped()))
+        #expect(VoxelOrigamiOrbit(yaw: .nan, pitch: .infinity).clamped() == .authored)
+        #expect(abs(VoxelOrigamiOrbit.yawLimit - Double.pi / 3) < 1e-15)
+        #expect(abs(VoxelOrigamiOrbit.pitchRange.lowerBound + Double.pi / 9) < 1e-15)
+        #expect(abs(VoxelOrigamiOrbit.pitchRange.upperBound - 35 * Double.pi / 180) < 1e-15)
+        // A small orbit moves the eye: positive yaw towards +x, positive pitch upwards.
+        let yawed: VoxelOrigamiCamera = G.camera(snap, aspect: 1, orbit: VoxelOrigamiOrbit(yaw: 0.1, pitch: 0))
+        #expect(yawed.eye.x > G.eye.x && yawed.eye.y == G.eye.y)
+        let raised: VoxelOrigamiCamera = G.camera(snap, aspect: 1, orbit: VoxelOrigamiOrbit(yaw: 0, pitch: 0.1))
+        #expect(raised.eye.y > G.eye.y)
+    }
+
+    @Test func eyeStaysOutsideTheBoxAtEveryOrbitCorner() {
+        let snap: Snapshot = Self.snapshot(Self.catalogLevels()[0])
+        let pivot: SIMD3<Double> = (G.boxLow + G.boxHigh) / 2
+        let authoredReach: Double = Self.length(G.eye - G.lookAt)
+        for orbit in Self.orbitCorners {
+            let camera: VoxelOrigamiCamera = G.camera(snap, aspect: 1, orbit: orbit)
+            let e: SIMD3<Double> = camera.eye
+            let inside: Bool = e.x >= G.boxLow.x && e.x <= G.boxHigh.x && e.y >= G.boxLow.y && e.y <= G.boxHigh.y
+                && e.z >= G.boxLow.z && e.z <= G.boxHigh.z
+            #expect(!inside, "orbit \(orbit) eye \(e)")
+            #expect(Self.length(e - pivot) > Self.length(G.boxHigh - pivot) + 1)
+            #expect(abs(Self.length(e - camera.target) - authoredReach) < 1e-9)
+            // The look-at point stays on the yaw axis's height and every box corner in front of the eye.
+            #expect(camera.target.y == G.lookAt.y)
+            let forward: SIMD3<Double> = (camera.target - e) / Self.length(camera.target - e)
+            for index in 0..<8 {
+                let r: SIMD3<Double> = G.corner(index) - e
+                #expect(r.x * forward.x + r.y * forward.y + r.z * forward.z > camera.near)
+            }
+        }
+    }
+
+    @Test func orbitedWindingSuitsBackFaceCulling() throws {
+        let solids: Set<Float> = [Material.cubeFace.code, Material.cubeBevel.code, Material.glyphSolid.code,
+                                  Material.glyphHollow.code, Material.dots.code]
+        var levels: [VoxelOrigamiLevel] = Array(Self.catalogLevels().prefix(2))
+        levels.append(try Self.extremeLevels()[2])
+        for level in levels {
+            let snap: Snapshot = Self.snapshot(level)
+            for orbit in [Self.orbitCorners[0], Self.orbitCorners[3]] {
+                let camera: VoxelOrigamiCamera = G.camera(snap, aspect: 1.2, orbit: orbit)
+                let tier: VoxelOrigamiTier = VoxelOrigamiTier.all[0]
+                let mesh: Mesh = try G.voxelMesh(snap, tier: tier, reduceMotion: false, camera: camera)
+                let glow: Mesh = try G.glowMesh(snap, tier: tier, camera: camera)
+                #expect(mesh != (try G.voxelMesh(snap, tier: tier, reduceMotion: false)))
+                var front: Int = 0
+                var back: Int = 0
+                var flat: Int = 0
+                for (m, isGlow) in [(mesh, false), (glow, true)] {
+                    for t in stride(from: 0, to: m.indices.count, by: 3) {
+                        let ids: [Int] = [Int(m.indices[t]), Int(m.indices[t + 1]), Int(m.indices[t + 2])]
+                        var pts: [SIMD3<Double>] = []
+                        var screen: [SIMD2<Double>] = []
+                        for id in ids {
+                            let p: SIMD3<Double> = Self.point(m, id)
+                            pts.append(p)
+                            if let q = G.project(p, camera: camera) { screen.append(q) }
+                        }
+                        guard screen.count == 3 else { continue }
+                        let area: Double = (screen[1].x - screen[0].x) * (screen[0].y - screen[2].y)
+                            - (screen[0].y - screen[1].y) * (screen[2].x - screen[0].x)
+                        let code: Float = Float(m.uvs[ids[0]].x)
+                        if !isGlow && solids.contains(code) {
+                            let n: SIMD3<Double> = SIMD3(m.normals[ids[0]].x, m.normals[ids[0]].y,
+                                                         m.normals[ids[0]].z)
+                            let centroid: SIMD3<Double> = (pts[0] + pts[1] + pts[2]) / 3
+                            let toEye: SIMD3<Double> = camera.eye - centroid
+                            let facing: Double = (n.x * toEye.x + n.y * toEye.y + n.z * toEye.z) / Self.length(toEye)
+                            if abs(facing) < 1e-6 || abs(area) < 1e-14 { continue }
+                            if facing > 0 {
+                                front += 1
+                                #expect(area > 0, "orbit \(orbit): front-facing \(code) projects clockwise")
+                            } else {
+                                back += 1
+                                #expect(area < 0, "orbit \(orbit): back-facing \(code) projects counter-clockwise")
+                            }
+                        } else if abs(area) > 1e-14 {
+                            flat += 1
+                            #expect(area > 0, "orbit \(orbit): flat item \(code) (glow \(isGlow)) projects clockwise")
+                        }
+                    }
+                }
+                #expect(front > 0 && back > 0 && flat > 0)
+                // The paint order is for the orbited eye: farthest first.
+                let order: [VoxelOrigamiElement] = G.paintOrder(snap, camera: camera)
+                for k in 1..<order.count { #expect(order[k - 1].distance >= order[k].distance) }
             }
         }
     }

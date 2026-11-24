@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "VoxelOrigamiPicker|VoxelOrigamiSceneGeometry"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'VoxelOrigamiPicker|VoxelOrigamiSceneGeometry'",
+  "elapsed_seconds": 9.609,
+  "exit_code": 0,
+  "finished": "2026-11-24T17:24:25+00:00",
+  "gate": "R02-G15-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G15-04.host-2.log",
+  "log_sha256": "1f8583cb185690555764e3258f3c6069889cfd6d9b11c0b76bf23767c716ff1d",
+  "name": "host-2",
+  "started": "2026-11-24T17:24:15+00:00",
+  "timed_out": false
+}

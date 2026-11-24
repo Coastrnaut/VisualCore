@@ -17,7 +17,7 @@ resize alone.
 
 ## Phase 2: Foundational — orbit, camera, picking and prediction
 
-- [ ] T-R02G1504-002 [P] Add `VoxelOrigamiOrbit` ("yaw ±60°, pitch −20° … +35°; authored (0, 0); presentation only",
+- [X] T-R02G1504-002 [P] Add `VoxelOrigamiOrbit` ("yaw ±60°, pitch −20° … +35°; authored (0, 0); presentation only", — Verified 2026-11-24: 2026-11-24: agent B orbit (yaw ±60°, pitch −20…+35°), camera(_:aspect:orbit:) bit-identical at the authored orbit, camera-taking mesh overloads, VoxelOrigamiPicker (front-most cube outline + 8 pt) and turn prediction; lead changed the prediction from the swinging centroid to the tracked cube (farthest from the hinge line; a symmetric subtree's centroid never moves) in code, test reference, spec Q2/FR-001, research, data model, tasks and CHK006, with a symmetric-subtree test; host-2 and host-2b exit 0
   `clamped()`), `camera(_:aspect:orbit:)` (yaw about the vertical axis through the authored box centre, pitch about the
   authored view; field of view refit so the box x −0.95 … 0.95, y −1.25 … 0.95, z −0.95 … 0.95 stays inside the view
   with at least a 5 % margin at aspects 0.4 … 2.5; the eye outside the box; `camera(_:aspect:)` equals the authored
@@ -29,7 +29,8 @@ resize alone.
   with the origin top-left, nil behind the eye; `outline` the counter-clockwise convex hull of a cube's eight projected
   corners (side 0.9 s, turned by its orientation); `pick`: the front-most cube (drawn last in the paint order) whose
   outline grown by 8 points holds the point, else empty; empty for unusable input; `VoxelOrigamiTurnPrediction` "nil
-  when the hinge swings nothing or for the root" with the projected centroid of the swinging cubes after a +1 and a −1
+  when the hinge swings nothing or for the root" with the projected centre of the tracked cube (`trackedCube`: of the swinging cubes, the one farthest from the hinge
+  line, lowest index on ties) after a +1 and a −1
   turn minus before, and `step(for:threshold:)` choosing the sign with the larger projection of the travel once it
   reaches the threshold) with `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiPickerTests.swift` (an
   independent pick and prediction written in the test on 500 seeded points over certified levels, 3 sizes and 3 orbits;

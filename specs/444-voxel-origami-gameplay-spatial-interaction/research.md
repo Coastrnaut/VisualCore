@@ -6,7 +6,8 @@
   view points give every cube the same allowance at every orbit. Alternatives: a ray against axis-aligned boxes in the
   world (rejected: equal to the outline for unrotated cubes but needs a tolerance in world units that varies with
   depth); picking hinge marks (rejected: they lie on the seam and overlap both cubes).
-- **R2 Drag predicts the swing.** Decision: for the touched cube h, the projected centroid of the cubes hinge h swings
+- **R2 Drag predicts the swing.** Decision: for the touched cube h, the projected centre of the tracked cube (of the cubes hinge h swings, the one farthest
+  from the hinge line, lowest index on ties; a centroid stays put for a subtree symmetric about the line)
   after a +1 and a −1 quarter turn, minus before, gives two screen directions; the step whose direction has the larger
   projection of the finger's travel is pending from 24 points and sent on release, one quarter turn per drag.
   Rationale: cube h itself lies on its hinge line and never moves, so the finger must drive what moves; a prediction

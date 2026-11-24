@@ -52,15 +52,65 @@
 // glyph and dots). Tiers change only the chamfer, the target edge width and the glow: every position named above is
 // the same at every tier. Reduce Motion draws the cubes at their cells without a turning preview; this geometry never
 // previews a turn, so both draw the same. Doubles are used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 444 (R02-G15-04) T-R02G1504-002 (FR-R02G1504-003, 004; SC-R02G1504-004; clarifications Q1, Q4) adds the
+// player's orbit (`VoxelOrigamiOrbit`: yaw ±60° about the vertical axis through the authored box centre
+// (0, −0.15, 0), positive moving the eye from the front (+z) towards +x; pitch −20° … +35° about the authored view's
+// right axis, positive raising the eye so the chain is seen more from above; authored (0, 0)) and
+// `camera(_:aspect:orbit:)`: the eye's offset from the look-at point is pitched (its elevation changed by the pitch,
+// its length and horizontal direction kept), then the eye and the look-at point are yawed together about that axis, and
+// the field of view is refitted exactly as for the fixed camera so the authored box x −0.95 … 0.95, y −1.25 … 0.95,
+// z −0.95 … 0.95 keeps ``VoxelOrigamiSceneGeometry/fitMargin`` (above the required 5 %) per side at every orbit and
+// aspect 0.4 … 2.5. The eye (about 3.2 from the box centre) stays outside the box (half-diagonal about 1.7) at every
+// orbit. At the authored orbit the eye and the look-at point are the authored ones, so `camera(_:aspect:)` (which
+// calls it) is unchanged bit for bit. The camera-taking overloads `voxelMesh(_:tier:reduceMotion:camera:)`,
+// `glowMesh(_:tier:camera:)`, `voxelPart(_:tier:reduceMotion:wonLevel:camera:)` and `glowPart(_:tier:camera:)` build
+// the backdrop, the billboards, the camera-facing strips, the hinge marks' lift, the paint order, the cube pieces'
+// order and the glow lift for the given camera's eye and view, so the winding suits back-face culling seen from it;
+// the overloads without a camera use the authored camera and their output is unchanged. The orbit is presentation
+// only: never saved, never read by the rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
-/// The camera of one frame: eye, target, lens and the matrices built from them.
+/// The player's view of the chain and its target: a yaw about the vertical axis through the authored box centre and a
+/// pitch about the authored view's right axis, both in radians (feature 444, R02-G15-04). Presentation only: never
+/// saved, never read by the rules.
+public struct VoxelOrigamiOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians about the authored view's right axis: positive raises the eye (the chain seen more from
+    /// above), negative lowers it; allowed ``pitchRange`` (−20° … +35°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 0, the fixed camera of R02-G15-03.
+    public static let authored = VoxelOrigamiOrbit(yaw: 0, pitch: 0)
+    /// The largest yaw either way, 60° in radians.
+    public static let yawLimit: Double = 60.0 * Double.pi / 180
+    /// The allowed pitches, −20° … +35° in radians.
+    public static let pitchRange: ClosedRange<Double> = (-20.0 * Double.pi / 180)...(35.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −60° … 60° and pitch to −20° … 35°; a non-finite angle becomes 0.
+    public func clamped() -> VoxelOrigamiOrbit {
+        let y: Double = yaw.isFinite ? yaw : 0
+        let p: Double = pitch.isFinite ? pitch : 0
+        return VoxelOrigamiOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                 pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+}
+
+/// The camera of one frame: eye, target, lens and the matrices built from them (the authored camera at the authored
+/// orbit).
 public struct VoxelOrigamiCamera: Sendable, Equatable {
-    /// The eye position in world units, (1.4, 1.1, 2.6).
+    /// The eye position in world units, (1.4, 1.1, 2.6) at the authored orbit.
     public let eye: SIMD3<Double>
-    /// The point looked at, (0, −0.1, 0).
+    /// The point looked at, (0, −0.1, 0) at the authored orbit.
     public let target: SIMD3<Double>
     /// The vertical field of view in radians (fitted to the authored box at `aspect`).
     public let fovY: Double
@@ -392,32 +442,58 @@ public enum VoxelOrigamiSceneGeometry {
 
     // MARK: Meshes
 
-    /// The voxel mesh for the voxel program, in painter's order (see the header).
+    /// The voxel mesh for the voxel program, in painter's order (see the header), built for the authored camera.
     public static func voxelMesh(_ snapshot: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier,
                                  reduceMotion: Bool) throws(MeshError) -> Mesh {
         try voxelPart(snapshot, tier: tier, reduceMotion: reduceMotion).mesh
     }
 
-    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2.
+    /// The voxel mesh for the voxel program built for `camera` (feature 444): the backdrop, billboards, strips, hinge
+    /// marks, paint order and cube pieces face its eye, so the winding suits back-face culling seen from it. Equals
+    /// ``voxelMesh(_:tier:reduceMotion:)`` for the authored camera.
+    public static func voxelMesh(_ snapshot: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier, reduceMotion: Bool,
+                                 camera: VoxelOrigamiCamera) throws(MeshError) -> Mesh {
+        try voxelPart(snapshot, tier: tier, reduceMotion: reduceMotion, camera: camera).mesh
+    }
+
+    /// The glow mesh for the glow program (`glowPart` without colours), built for the authored camera; empty at
+    /// level-2.
     public static func glowMesh(_ snapshot: VoxelOrigamiSceneSnapshot,
                                 tier: VoxelOrigamiTier) throws(MeshError) -> Mesh {
         try glowPart(snapshot, tier: tier).mesh
     }
 
+    /// The glow mesh for the glow program built for `camera` (feature 444): its bands face that camera and are lifted
+    /// towards its eye. Equals ``glowMesh(_:tier:)`` for the authored camera; empty at level-2.
+    public static func glowMesh(_ snapshot: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier,
+                                camera: VoxelOrigamiCamera) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
     /// The voxel scene with fallback colours (unlit palette colours; the cubes lifted towards white on a won level,
     /// the target edges in the target glow colour) for the shared unlit renderer: the same mesh as
-    /// ``voxelMesh(_:tier:reduceMotion:)``. `wonLevel` (0 … 1) scales the won look; nil uses ``wonFlag(_:)``.
-    /// Positions never depend on it.
+    /// ``voxelMesh(_:tier:reduceMotion:)``, built for the authored camera. `wonLevel` (0 … 1) scales the won look; nil
+    /// uses ``wonFlag(_:)``. Positions never depend on it.
     public static func voxelPart(_ snapshot: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier,
                                  reduceMotion: Bool = false,
                                  wonLevel: Double? = nil) throws(MeshError) -> VoxelOrigamiColouredMesh {
+        try voxelPart(snapshot, tier: tier, reduceMotion: reduceMotion, wonLevel: wonLevel,
+                      camera: camera(snapshot, aspect: 1))
+    }
+
+    /// The voxel scene with fallback colours built for `camera` (feature 444): the same mesh as
+    /// ``voxelMesh(_:tier:reduceMotion:camera:)``. Only the camera's eye and look-at point are used (the lens never
+    /// changes a position). Equals ``voxelPart(_:tier:reduceMotion:wonLevel:)`` for the authored camera.
+    public static func voxelPart(_ snapshot: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier,
+                                 reduceMotion: Bool = false, wonLevel: Double? = nil,
+                                 camera view: VoxelOrigamiCamera) throws(MeshError) -> VoxelOrigamiColouredMesh {
         _ = reduceMotion
-        var parts: Parts = Parts()
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis(view)
+        let eye: SIMD3<Double> = view.eye
+        var parts: Parts = Parts(eye: eye, basis: basis)
         let s: Double = scale(snapshot)
         let won: Double = wonLevel.map { $0.isFinite ? min(max($0, 0), 1) : 0 } ?? wonFlag(snapshot)
-        let view: VoxelOrigamiCamera = camera(snapshot, aspect: 1)
         // 1. Backdrop.
-        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis()
         var depth: Double = 0
         for index in 0..<8 { depth = max(depth, dot(corner(index) - eye, basis.forward)) }
         depth += 1
@@ -492,14 +568,22 @@ public enum VoxelOrigamiSceneGeometry {
     /// (``targetGlowInner``, ``targetGlowGrowth``, colour ``VoxelOrigamiPalette/targetGlow``, factor 0.5^k); each
     /// lifted 0.001 · k towards the eye. a_normal is the base colour, a_uv.x =
     /// ``VoxelOrigamiShaders/GlowKind/code(factor:)``.
-    /// Empty at level-2.
+    /// Empty at level-2. Built for the authored camera.
     public static func glowPart(_ snapshot: VoxelOrigamiSceneSnapshot,
                                 tier: VoxelOrigamiTier) throws(MeshError) -> VoxelOrigamiColouredMesh {
-        var parts: Parts = Parts()
+        try glowPart(snapshot, tier: tier, camera: camera(snapshot, aspect: 1))
+    }
+
+    /// The glow with fallback colours built for `camera` (feature 444): the bands face its view and are lifted
+    /// towards its eye. Equals ``glowPart(_:tier:)`` for the authored camera; empty at level-2.
+    public static func glowPart(_ snapshot: VoxelOrigamiSceneSnapshot, tier: VoxelOrigamiTier,
+                                camera view: VoxelOrigamiCamera) throws(MeshError) -> VoxelOrigamiColouredMesh {
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis(view)
+        var parts: Parts = Parts(eye: view.eye, basis: basis)
         let shells: Int = max(tier.glowShells, 0)
         guard shells > 0 else { return parts.built() }
         let s: Double = scale(snapshot)
-        let towards: SIMD3<Double> = viewBasis().forward * -1
+        let towards: SIMD3<Double> = basis.forward * -1
         let glow: SIMD3<Double> = VoxelOrigamiPalette.glow
         let targetGlow: SIMD3<Double> = VoxelOrigamiPalette.targetGlow
         for k in stride(from: shells, through: 1, by: -1) {
@@ -649,15 +733,70 @@ public enum VoxelOrigamiSceneGeometry {
         return (forward, right, cross(right, forward))
     }
 
+    /// `camera`'s unit forward, right and up vectors (from its eye towards its target, +y up), computed exactly as
+    /// ``viewBasis()`` so the authored camera gives the authored basis bit for bit.
+    static func viewBasis(_ camera: VoxelOrigamiCamera) -> (forward: SIMD3<Double>, right: SIMD3<Double>,
+                                                             up: SIMD3<Double>) {
+        let forward: SIMD3<Double> = unit(camera.target - camera.eye)
+        let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
+        return (forward, right, cross(right, forward))
+    }
+
     /// The fixed camera for `aspect`: from (1.4, 1.1, 2.6) looking at (0, −0.1, 0) with +y up; the vertical field of
     /// view is the smallest that holds every corner of the box x −0.95 … 0.95, y −1.25 … 0.95, z −0.95 … 0.95 inside
     /// the view with ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it —
     /// every cube, hinge, target cell, pip and bar — keeps a margin of at least 5 % for aspect 0.4 … 2.5). Independent
-    /// of the snapshot (accepted for parity), the tier and the time.
+    /// of the snapshot (accepted for parity), the tier and the time. Equals ``camera(_:aspect:orbit:)`` at
+    /// ``VoxelOrigamiOrbit/authored`` bit for bit.
     public static func camera(_ snapshot: VoxelOrigamiSceneSnapshot, aspect: Double) -> VoxelOrigamiCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The vertical axis the orbit yaws about passes through the authored box centre (0, −0.15, 0).
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `p` yawed by `yaw` radians about the vertical axis through ``orbitPivot`` (from +z towards +x).
+    static func yawed(_ p: SIMD3<Double>, _ yaw: Double) -> SIMD3<Double> {
+        let c: Double = cos(yaw)
+        let s: Double = sin(yaw)
+        let d: SIMD3<Double> = p - orbitPivot
+        return SIMD3(orbitPivot.x + d.x * c + d.z * s, p.y, orbitPivot.z - d.x * s + d.z * c)
+    }
+
+    /// The eye and the look-at point of `orbit` (clamped): the authored eye's offset from the look-at point,
+    /// e = (1.4, 1.2, 2.6), pitched about the authored view's right axis (its elevation above the horizontal raised by
+    /// the pitch, its length and horizontal direction kept) and added to the look-at point; then both points yawed
+    /// about the vertical axis through ``orbitPivot``. Exactly ``eye`` and ``lookAt`` at the authored orbit.
+    static func orbitView(_ orbit: VoxelOrigamiOrbit) -> (eye: SIMD3<Double>, target: SIMD3<Double>) {
+        let o: VoxelOrigamiOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return (eye: eye, target: lookAt) }
+        let e: SIMD3<Double> = eye - lookAt
+        let horizontal: Double = (e.x * e.x + e.z * e.z).squareRoot()
+        let length: Double = dot(e, e).squareRoot()
+        let elevation: Double = atan2(e.y, horizontal) + o.pitch
+        let across: Double = length * cos(elevation) / horizontal
+        let pitched: SIMD3<Double> = lookAt + SIMD3(e.x * across, length * sin(elevation), e.z * across)
+        return (eye: yawed(pitched, o.yaw), target: yawed(lookAt, o.yaw))
+    }
+
+    /// The camera for `orbit` (clamped, see ``VoxelOrigamiOrbit/clamped()``) and `aspect` (feature 444,
+    /// T-R02G1504-002): from the orbit's eye looking at its look-at point (``orbitView(_:)``) with +y up (never
+    /// parallel: the view stays within 60° of level); the vertical field of view is the smallest that holds every
+    /// corner of the box x −0.95 … 0.95, y −1.25 … 0.95, z −0.95 … 0.95 inside the view with ``fitMargin`` per side,
+    /// so everything inside the box — every cube, hinge, target cell, pip and bar — keeps a margin of at least 5 % at
+    /// every orbit and aspect 0.4 … 2.5. The eye stays outside the box. Presentation only; independent of the
+    /// snapshot (accepted for parity), the tier and the time.
+    public static func camera(_ snapshot: VoxelOrigamiSceneSnapshot, aspect: Double,
+                              orbit: VoxelOrigamiOrbit) -> VoxelOrigamiCamera {
         _ = snapshot
         let a: Double = usableAspect(aspect)
-        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis()
+        let view0: (eye: SIMD3<Double>, target: SIMD3<Double>) = orbitView(orbit)
+        let eye: SIMD3<Double> = view0.eye
+        let lookAt: SIMD3<Double> = view0.target
+        let forward: SIMD3<Double> = unit(lookAt - eye)
+        let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) =
+            (forward, right, cross(right, forward))
         let limit: Double = 1 - 2 * fitMargin
         var tanHalf: Double = 0
         var nearest: Double = Double.infinity
@@ -696,6 +835,16 @@ public enum VoxelOrigamiSceneGeometry {
         var builder: MeshBuilder = MeshBuilder()
         /// One colour per welded vertex.
         var colours: [Vec4] = []
+        /// The eye the camera-facing pieces face and the cube pieces are ordered for.
+        let eye: SIMD3<Double>
+        /// The drawn view's unit forward, right and up vectors.
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>)
+
+        /// Parts built for the eye `eye` and the view basis `basis`.
+        init(eye: SIMD3<Double>, basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>)) {
+            self.eye = eye
+            self.basis = basis
+        }
 
         /// Adds (or welds) a vertex at `p` with normal slot `slot` and uv (`code`, `local`); its fallback colour is
         /// `colour`.
@@ -775,15 +924,13 @@ public enum VoxelOrigamiSceneGeometry {
         }
 
         /// The unit direction from `point` towards the eye.
-        static func towardsEye(_ point: SIMD3<Double>) -> SIMD3<Double> {
-            let d: SIMD3<Double> = VoxelOrigamiSceneGeometry.unit(VoxelOrigamiSceneGeometry.eye - point)
+        func towardsEye(_ point: SIMD3<Double>) -> SIMD3<Double> {
+            let d: SIMD3<Double> = VoxelOrigamiSceneGeometry.unit(eye - point)
             return VoxelOrigamiSceneGeometry.dot(d, d) > 0 ? d : SIMD3(0, 0, 1)
         }
 
         /// The corners of the camera-facing rectangle of half size `half` around `centre`, anticlockwise from the eye.
-        static func billboard(_ centre: SIMD3<Double>, _ half: SIMD2<Double>) -> [SIMD3<Double>] {
-            let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) =
-                VoxelOrigamiSceneGeometry.viewBasis()
+        func billboard(_ centre: SIMD3<Double>, _ half: SIMD2<Double>) -> [SIMD3<Double>] {
             let r: SIMD3<Double> = basis.right * half.x
             let u: SIMD3<Double> = basis.up * half.y
             return [centre - r - u, centre + r - u, centre + r + u, centre - r + u]
@@ -792,16 +939,16 @@ public enum VoxelOrigamiSceneGeometry {
         /// A camera-facing rectangle of half size `half` around `centre`, as a fan.
         mutating func billboardRectangle(centre: SIMD3<Double>, half: SIMD2<Double>,
                                          material: Material) throws(MeshError) {
-            try fan(centre: centre, outline: Self.billboard(centre, half),
-                    normal: VoxelOrigamiSceneGeometry.viewBasis().forward * -1, material: material)
+            try fan(centre: centre, outline: billboard(centre, half),
+                    normal: basis.forward * -1, material: material)
         }
 
         /// A camera-facing frame between the half sizes `inner` and `outer` around `centre` (local per ``ring``).
         mutating func billboardFrame(centre: SIMD3<Double>, inner: SIMD2<Double>, outer: SIMD2<Double>,
                                      material: Material, code: Double?, normalSlot: SIMD3<Double>?,
                                      colour: SIMD3<Double>?, radial: Bool) throws(MeshError) {
-            try ring(inner: Self.billboard(centre, SIMD2(max(inner.x, 0), max(inner.y, 0))),
-                     outer: Self.billboard(centre, outer), normal: VoxelOrigamiSceneGeometry.viewBasis().forward * -1,
+            try ring(inner: billboard(centre, SIMD2(max(inner.x, 0), max(inner.y, 0))),
+                     outer: billboard(centre, outer), normal: basis.forward * -1,
                      material: material, code: code, slot: normalSlot, colour: colour, radial: radial)
         }
 
@@ -811,10 +958,10 @@ public enum VoxelOrigamiSceneGeometry {
                                   along: Bool, colour: SIMD3<Double>? = nil) throws(MeshError) {
             let direction: SIMD3<Double> = b - a
             guard VoxelOrigamiSceneGeometry.dot(direction, direction) > 0 else { return }
-            let towards: SIMD3<Double> = Self.towardsEye((a + b) / 2)
+            let towards: SIMD3<Double> = towardsEye((a + b) / 2)
             let crossed: SIMD3<Double> = VoxelOrigamiSceneGeometry.cross(direction, towards)
             var side: SIMD3<Double> = VoxelOrigamiSceneGeometry.unit(crossed)
-            if VoxelOrigamiSceneGeometry.dot(side, side) == 0 { side = VoxelOrigamiSceneGeometry.viewBasis().right }
+            if VoxelOrigamiSceneGeometry.dot(side, side) == 0 { side = basis.right }
             let w: SIMD3<Double> = side * (width / 2)
             try quad([a + w, b + w, b - w, a - w], normal: towards, material: material,
                      local: along ? [-1, 1, 1, -1] : [-1, -1, 1, 1], colour: colour)
@@ -853,7 +1000,7 @@ public enum VoxelOrigamiSceneGeometry {
                 for p in piece.corners { corners.append(centre + G.rotate(rotation, p)) }
                 let normal: SIMD3<Double> = G.rotate(rotation, piece.normal)
                 let middle: SIMD3<Double> = centre + G.rotate(rotation, piece.faceCentre)
-                let toEye: SIMD3<Double> = G.eye - middle
+                let toEye: SIMD3<Double> = eye - middle
                 let moved: CubePiece = CubePiece(corners: corners, locals: piece.locals, normal: normal,
                                                  face: piece.face, faceCentre: middle,
                                                  axes: (G.rotate(rotation, piece.axes.u),

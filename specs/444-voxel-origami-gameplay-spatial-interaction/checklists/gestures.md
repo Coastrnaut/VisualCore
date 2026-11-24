@@ -24,7 +24,8 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-24; failu
   §Clarifications Q1; FR-R02G1504-003]
 - [x] CHK005 Are tap, drag and double-tap thresholds numeric and told apart by event timestamps, including a press
   lifted at 0.5 s or later and a 10 … 16-point touch? [Clarity, Spec §Clarifications Q1; Edge Cases]
-- [x] CHK006 Is the step of a cube drag defined exactly (the predicted on-screen motion of the swinging cubes' centroid
+- [x] CHK006 Is the step of a cube drag defined exactly (the predicted on-screen motion of the tracked cube, the swinging cube
+  farthest from the hinge line,
   for +1 and −1, the larger projection of the finger's travel, the 24-point threshold, one turn per drag, the pending
   text following the finger)? [Measurability, Spec §FR-R02G1504-001; Clarifications Q2; Edge Cases]
 - [x] CHK007 Is it stated why the touched cube's own motion is not used (cube h lies on its hinge line and never moves)?

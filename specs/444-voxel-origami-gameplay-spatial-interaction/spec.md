@@ -52,8 +52,9 @@ order by distance with back faces culled.
   empty space; a touch on the root cube (cube 0, which has no hinge) picks the root. Tap, drag and double-tap thresholds
   are feature 434's. Impact: FR-R02G1504-001 … 003; SC-R02G1504-001.
 - Q: How does a drag on a cube turn its hinge? → A: the controller predicts, for the touched cube h, the on-screen motion
-  of the centroid of the cubes hinge h swings, for a `+1` and a `−1` quarter turn (the projected centroid after the turn
-  minus before, ignoring collisions); with the finger's travel d from touch-down, the pending step is the sign whose
+  of the tracked cube — of the cubes hinge h swings, the one farthest from its hinge line (lowest index on ties), since
+  the centroid of a subtree symmetric about the line would not move — for a `+1` and a `−1` quarter turn (its projected
+  centre after the turn minus before, ignoring collisions); with the finger's travel d from touch-down, the pending step is the sign whose
   predicted motion has the larger projection d · û (û its unit direction), shown once that projection reaches 24 points
   (cleared if it falls back below). On release while playing, exactly one `hinge.turn [h, step]` is sent (one quarter
   turn per drag; a half turn is two drags); below 24 points nothing is sent. A drag on the root, on a cube whose hinge
@@ -160,7 +161,7 @@ redo, next level, "Reset view"), including winning every certified level.
 ### Functional Requirements
 
 - **FR-R02G1504-001**: A drag that starts on a turnable non-root cube h while playing MUST show the pending step (the
-  sign whose predicted on-screen motion of the centroid of the cubes hinge h swings has the larger projection of the
+  sign whose predicted on-screen motion of the tracked cube (the swinging cube farthest from the hinge line) has the larger projection of the
   finger's travel) once that projection reaches 24 points and, on release, MUST send exactly one `hinge.turn [h, step]`;
   below 24 points, on the root, on a hinge that swings nothing or outside playing it MUST send nothing.
 - **FR-R02G1504-002**: A tap on a non-root cube MUST choose its hinge through `hinge.choose` (presentation only) in any
