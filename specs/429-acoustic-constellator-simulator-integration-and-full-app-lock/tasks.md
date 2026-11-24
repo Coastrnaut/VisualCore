@@ -17,7 +17,7 @@ change (the shaders and reference of R02-G13-03 are unchanged and re-proven by t
 
 - [ ] T-R02G1309-002 Create `Packages/ExperiencesRound02/AcousticConstellator/Core/AcousticConstellatorSchemaExamples.swift`
   (contracts/api.md; data-model: schema 1 "`{level: 1, records}` of a seeded play of level 1 with its one certified
-  link applied (playing, not won), seed 7"; schema 2 "campaign mode, progress (level 2 open, level 1 solved with its
+  link applied (playing, not won), seed 7"; schema 2 "campaign mode, the tutorial step, progress (level 2 open, level 1 solved with its
   actions spent and stars), records []", "the result is kept, unverified, without a trace"; the envelope of
   `HarmonicBridgesSchemaExamples`, feature 419) with
   `Packages/ExperiencesRound02/AcousticConstellator/CoreTests/AcousticConstellatorSchemaExampleTests.swift` (agent A: both
