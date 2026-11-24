@@ -165,6 +165,8 @@ def steps(stamp: str) -> list[Step]:
         Step("device-rows-r02-g12", [PY, "scripts/check_device_rows.py", "--experience", "r02-g12.harmonic-bridges"]),
         Step("device-rows-r02-g13", [PY, "scripts/check_device_rows.py", "--experience",
                                      "r02-g13.acoustic-constellator"]),
+        # Feature 440 (R02-G14-10): Moonlit Mechanism's device-row definition (no device is contacted).
+        Step("device-rows-r02-g14", [PY, "scripts/check_device_rows.py", "--experience", "r02-g14.moonlit-mechanism"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),
