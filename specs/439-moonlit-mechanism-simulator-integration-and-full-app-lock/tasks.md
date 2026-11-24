@@ -68,7 +68,7 @@ change (the shaders and reference of R02-G14-03 are unchanged and re-proven by t
 - [X] T-R02G1409-007 Docs: `docs/architecture/moonlit-mechanism.md` (in-app integration), — Verified 2026-11-24: 2026-11-24: architecture in-app integration section, ExperiencesRound02 README, testing doc (w3 journeys, baseline lesson); round02-host exit 0 (362 s), script-tests exit 0 alone (.autonomy/migration/checks/R02-G14-09.{round02-host,script-tests}.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`; `--name script-tests`
   (alone)
-- [ ] T-R02G1409-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1409-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24: rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G14-09.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full` (app-unit and app-ui are this gate's own runs)
 - [ ] T-R02G1409-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1409-010 Reference regression chunk 2 (`--name reference-2`)
