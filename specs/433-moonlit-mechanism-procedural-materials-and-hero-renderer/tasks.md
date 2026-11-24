@@ -30,7 +30,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1403-003 [P] [US1] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismShaders.swift`
+- [X] T-R02G1403-003 [P] [US1] Create `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismShaders.swift` — Verified 2026-11-24: 2026-11-24: agent A clockwork and glow GLSL ES 3.00 sources (22 material codes, signed-distance strips/fans/feathers, translucent gold with a rim term, won paper lift, glow gain and Reduce Flashing cap, CPU shading references) with 12 source tests; lead retest host-2 exit 0 (.autonomy/migration/checks/R02-G14-03.host-2.json); first real compile follows on the simulator
   (clockwork and glow sources, GLSL ES 3.00; signed-distance shading of teeth, notch, spokes, shadow edges, outlines,
   crossed marks, hatching and gauges from per-vertex local coordinates; translucent gold with a fresnel-like rim on the
   gears; the soft shadow edge fading ink to paper at level-0 and level-1 only; the glow program shades the lamp and the
