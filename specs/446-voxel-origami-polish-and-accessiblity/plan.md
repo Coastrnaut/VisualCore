@@ -7,7 +7,7 @@
 
 Give Voxel Origami its polish and accessibility, following Moonlit Mechanism's R02-G14-06 (feature 436): a pure
 feedback plan (announcement text and kind, haptic) from the old and new adapter core with the texts of clarification Q1;
-light levels for the glow and the won brightening eased by the frame clock (0.15 s, 0.45 s under Reduce Flashing);
+light levels for the glow and the won look eased by the frame clock (0.15 s, 0.45 s under Reduce Flashing);
 code-made sound recipes (a hinge's audition from its index and whether it can turn, an ambient loop from the cubes in place); the scene drawing the
 eased levels (`u_won` and the glow gain already take them; the fallback's cube lift already takes a won level); the presenter
 routing feedback through the shared route with a feedback log, a Sound toggle, labels and values on every control, an
