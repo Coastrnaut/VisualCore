@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G15-02 (migration ledger, game feature of experience R02-G15) · ID namespace FR-R02G1502-###,
 SC-R02G1502-###, T-R02G1502-###
@@ -27,6 +27,66 @@ Canonical overrides:
   figure, as for the earlier round-two games.
 - **Model:** feature 432 (Moonlit Mechanism's content pipeline) for manifest, generator, witness files, digest and
   progression.
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+432's answers where the games agree. Facts checked (read-only, 2026-11-24): R02-G15-01's `VoxelOrigamiLevel` (4 … 12
+cubes, quarter turns 0 … 3, orientations `fixed`, `upright`, `any`, budget 1 … 40, a start that does not match),
+`VoxelOrigamiLattice` (poses, idle hinges, collision and exact sweep, canonical form), `VoxelOrigamiPlay` and
+`VoxelOrigamiRules`; R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most
+1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries
+(`planning_index.py levels --experience R02-G15`: bands 1 … 5 × 20, moves budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17,
+16 … 19 by band, control emphases `inspect collision`, `lock shape`, `fold hinge`, `select voxel`, `rotate assembly`, 20
+each). The ranges below were measured before they were written down: a prototype of this generator and a breadth-first
+solver on the real kernel (release build, 120 candidates per band) gave a minimal plan inside the band's range for 63,
+44, 30, 18 and 9 candidates (bands 1 … 5) under `any`, 73, 54, 42, 21, 10 under `fixed` and 68, 53, 35, 21, 9 under
+`upright`, with at most 3 670 turns tried per candidate and under 0.2 s per band of 120 candidates.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, budget, control
+  emphasis) are a table in `VoxelOrigamiManifest` with their provenance. Candidate c of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: c))`, in this order: the cube count by band (5 … 6,
+  6 … 7, 7 … 8, 8 … 9, 9 … 10); the tree (each non-root cube's parent a drawn lower index and its rest direction one of
+  the six units, the whole tree redrawn up to 50 times until the rest pose is collision-free, else the candidate is
+  skipped); the solution's quarter turns (one per hinge, 0 … 3; a colliding solution pose skips the candidate); the
+  orientations by emphasis (`rotate assembly` → `any`, `lock shape` → `fixed`, the others → `upright`); the target (the
+  solution's cells under a drawn rotation of that group and a drawn shift of −3 … 3 per axis, sorted); then a scramble
+  of the solution by band (2 … 4, 4 … 6, 6 … 9, 8 … 12, 10 … 14 clear random turns, each a drawn hinge and step that the
+  kernel accepts, at most eight draws per wanted turn) gives the start. Budget = the manifest's; ids `voxel-origami-NNN`;
+  tutorial on levels 1 … 3; difficulty = band. A candidate whose start already matches, or that the solver does not
+  certify with a minimal plan in its band's range (1 … 2, 2 … 3, 3 … 4, 4 … 5, 5 … 6 turns) within its work bound, is
+  skipped; at most 256 candidates, then `generation(n)`. Impact: FR-R02G1502-001; SC-R02G1502-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing shorter matches? → A: a breadth-first search over
+  quarter-turn states from the start (the exact case of the catalog's A-star, with a zero heuristic): at each depth the
+  states are expanded in the order they were reached, each state's moves in the order hinges ascending, step −1 then
+  +1; a move is tried only on a hinge that would swing a cube, and only a turn the kernel's collision and exact sweep
+  rule clear (the swept collision filter) reaches a state; states are merged by their quarter turns. The first reached
+  state whose pose matches the target ends the search; the plan is its path. Work = turns tried, counted and bounded at
+  300 000; over the bound the candidate is skipped. The minimality proof is that every state reachable in fewer turns
+  was reached and none matched (the counts of states at each smaller depth are stored). The witness is the plan's
+  turns, replayed through the kernel's play. Impact: FR-R02G1502-002; SC-R02G1502-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `VoxelOrigamiDifficulty` holds the
+  witness turn count, the cubes, the hinges that can turn at the start, the orientations, the states searched at smaller
+  depths and the solver work. The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1,
+  jump at most 3) on the witness turn count; the band ranges, each two values wide and meeting the next band's at one
+  value, make band means non-decreasing. Impact: FR-R02G1502-003, 005; SC-R02G1502-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/voxel-origami/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the actions, the state digest after every action (16 hex
+  characters of the SHA-256 of the quarter turns), the play fingerprints after `begin` (and `dismissTutorial` when the
+  level has one) and after each action, the counterexample (the depth one below the plan and the number of states
+  reached at that depth, none matching), the difficulty and the candidates skipped. A test rebuilds every witness and
+  compares bytes; it writes the files only with `VOXEL_ORIGAMI_WRITE_WITNESSES=1`. Decoding refuses newer schemas,
+  damaged files and witnesses that no longer replay. Impact: FR-R02G1502-004; SC-R02G1502-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<VoxelOrigamiRules>.digest(id: "voxel-origami", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split into groups of 20 levels so each runs under 10
+  seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New
+  refusals: `generation(Int)` (`r02-g15.generation`) and `witness(String)` (`r02-g15.witness`). The independent check of
+  SC-R02G1502-002 is a depth-first enumeration of every turn sequence the play accepts (no state merging), shorter than
+  the plan, on the two levels with the fewest cubes in each band: none reaches a matching pose. Impact:
+  FR-R02G1502-005, 006; SC-R02G1502-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 

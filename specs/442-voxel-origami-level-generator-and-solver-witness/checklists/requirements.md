@@ -33,4 +33,4 @@
 
 - The witness file location is the manifest's own "Required artifact", not an implementation choice.
 - The generator's draws, the band ranges (measured by a prototype first), the solver's search order, the witness
-  contents and the digest are left to `/speckit-clarify` (following feature 432's structure).
+  contents and the digest are settled by `/speckit-clarify` (following feature 432's structure).
