@@ -567,6 +567,7 @@ final class MoonlitMechanismPresenter: ExperiencePresenter {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay: return ("level.select", [Double(core.levelNumber)])   // feature 437; replay restarts in T-005
         }
     }
 

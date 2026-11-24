@@ -423,7 +423,7 @@ import VisualCoreSimulation
         #expect(String(decoding: try encoder.encode(Mode.campaign), as: UTF8.self) == "{\"mode\":\"campaign\"}")
         #expect(String(decoding: try encoder.encode(Mode.practice), as: UTF8.self) == "{\"mode\":\"practice\"}")
         let badModes: [String] = ["{\"mode\":\"daily\",\"level\":0}", "{\"mode\":\"daily\",\"level\":101}",
-                                  "{\"mode\":\"daily\"}", "{\"mode\":\"replay\",\"level\":1}"]
+                                  "{\"mode\":\"daily\"}", "{\"mode\":\"replay\"}"]
         for text in badModes {
             #expect(throws: DecodingError.self) { try decoder.decode(Mode.self, from: Data(text.utf8)) }
         }
@@ -440,7 +440,8 @@ import VisualCoreSimulation
         var one: Progress = Progress()
         one.record(level: 1, actionsSpent: 4, certified: 3)
         #expect(String(decoding: try one.encoded(), as: UTF8.self)
-            == "{\"frontier\":2,\"solved\":[{\"actionsSpent\":4,\"level\":1,\"stars\":2}]}")
+            == "{\"frontier\":2,\"solved\":[{\"actionsSpent\":4,\"level\":1,\"stars\":2,\"trace\":[],"
+            + "\"verified\":false}]}")
         let badProgress: [String] = ["{\"frontier\":0,\"solved\":[]}",
                                      "{\"frontier\":101,\"solved\":[]}",
                                      "{\"frontier\":1,\"solved\":[{\"level\":0,\"actionsSpent\":1,\"stars\":3}]}",

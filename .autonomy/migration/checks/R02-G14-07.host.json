@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MoonlitMechanism"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter MoonlitMechanism",
+  "elapsed_seconds": 20.674,
+  "exit_code": 0,
+  "finished": "2026-11-24T12:17:38+00:00",
+  "gate": "R02-G14-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G14-07.host.log",
+  "log_sha256": "b1fb82a6726360173b88937805507a586d7e70ed2c14de494dfcb51fb6c6e0e3",
+  "name": "host",
+  "started": "2026-11-24T12:17:18+00:00",
+  "timed_out": false
+}

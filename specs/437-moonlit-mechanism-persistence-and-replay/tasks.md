@@ -14,7 +14,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1407-002 [P] [US2] Edit `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismProgress.swift` (Result gains "trace:
+- [X] T-R02G1407-002 [P] [US2] Edit `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismProgress.swift` (Result gains "trace: — Verified 2026-11-24: 2026-11-24: agent A Result trace and verified (old payloads decode), traced record, drop, replay mode, MoonlitMechanismReconciliation (netTrace, verifies, reconcile); every certified witness verifies, tampering dropped and counted; .replay cases added to modeName (plan and panel) and retry; scenario manifest regenerated (progress JSON in the digest gains trace/verified); host exit 0, all MoonlitMechanism host tests (.autonomy/migration/checks/R02-G14-07.host.json)
   [MoonlitMechanismAction]" (effective turns, re-seats and lamp steps and the run) and "verified: Bool";
   `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing only when better (ties keep the
   earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace = empty, missing verified =

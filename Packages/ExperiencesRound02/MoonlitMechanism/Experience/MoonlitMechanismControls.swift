@@ -195,6 +195,7 @@ struct MoonlitMechanismControls: View {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 
