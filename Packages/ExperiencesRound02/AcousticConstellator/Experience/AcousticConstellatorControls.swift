@@ -4,8 +4,9 @@
 // and unlink (the chosen star and partner), nudge − and + (the chosen star's starting phase by one step) and listen
 // (kernel actions through the action port), undo, redo and next level, each with an accessibility label, value and
 // identifier; the header shows the actions left of the budget, the status (stage, or the failure in words), the progress
-// description, the failure in words and a refused action in words. Touching stars on the canvas and full
-// accessibility come in later features of R02-G13.
+// description, the failure in words and a refused action in words. Feature 424 (R02-G13-04) adds "Reset view" (the
+// authored camera) and sends through the presenter, which shows and logs refusals; full accessibility comes in
+// R02-G13-06.
 #if os(iOS)
 import AcousticConstellatorCore
 import SwiftUI
@@ -13,10 +14,14 @@ import VisualCoreExperienceHost
 
 /// The control panel of Acoustic Constellator.
 struct AcousticConstellatorControls: View {
-    /// Where actions are sent.
+    /// The action port (its identifiers name the controls).
     let port: ExperienceActionPort
     /// What the panel shows and chooses.
     let mirror: AcousticConstellatorMirror
+    /// Returns the camera to the authored view (feature 424).
+    let resetView: () -> Void
+    /// Sends a control with its values through the presenter (which shows and logs a refusal).
+    let sender: (String, [Double]) -> Void
 
     /// The panel.
     var body: some View {
@@ -126,17 +131,18 @@ struct AcousticConstellatorControls: View {
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
                 .accessibilityIdentifier(port.identifier("next-level"))
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 
     /// The chosen star and partner as the values of `link.add` and `link.remove`.
     private var pairValues: [Double] { [Double(mirror.star), Double(mirror.partner)] }
 
-    /// Sends `control` and shows a refusal in words.
+    /// Sends `control` through the presenter.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(AcousticConstellatorMirror.refusalText(code: result.code))."
+        sender(control, values)
     }
 }
 #endif

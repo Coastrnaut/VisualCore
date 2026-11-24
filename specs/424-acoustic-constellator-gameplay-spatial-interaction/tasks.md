@@ -68,7 +68,7 @@ prefix.
 
 ## Phase 5: Story 5 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G1304-005 [US5] Wire `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorPresenter.swift`
+- [X] T-R02G1304-005 [US5] Wire `Packages/ExperiencesRound02/AcousticConstellator/Experience/AcousticConstellatorPresenter.swift` — Verified 2026-11-23: 2026-11-23: lead wired the presenter (pointer entry, refusal log with the action.rule. prefix, fixed and link texts, finished message, partner rule, filament), scene (orbit in the geometry key, filament renderer) and controls (Reset view); agent E's 9 wiring tests landed; sim-27 exit 0, 39 simulator tests (.autonomy/migration/checks/R02-G13-04.sim-27.json)
   (FR-R02G1304-001 … 004, 006 … 008; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn
   snapshot; link, unlink, nudge and listen sent through the port; choose, choosePair and preview changing the mirror's
   star and partner (`choose(star)` moves the partner to the next star, modulo the star count, when it equals the star); a chosen link described (its stars, its gap at the shown tick, fixed or placed); a fixed pair's drag

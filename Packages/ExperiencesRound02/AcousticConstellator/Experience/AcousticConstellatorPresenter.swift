@@ -12,6 +12,13 @@
 // drawing result reaches the kernel (renderer purity). Its probes (two sky corners) let the verification runner check a
 // frame.
 #if os(iOS)
+// Feature 424 (R02-G13-04) T-R02G1304-005: `pointer(_:viewSize:port:)` routes canvas touches through
+// `AcousticConstellatorGestureController` with the drawn snapshot: a tap on a star nudges it forward and chooses it, a
+// tap on a link chooses its stars and describes it, a tap on a gauge listens, a drag from a star draws the filament to
+// the finger and links or unlinks on release; kernel actions go through the port (refusals are shown and kept with
+// their code in `refusalLog`); a drag onto a fixed pair says the link is fixed; a one-finger gesture on a won or failed
+// play says that the play is over; the scene draws the controller's orbit, and "Reset view" or a double tap on empty
+// space returns to the authored view.
 import AcousticConstellatorCore
 import Foundation
 import SwiftUI
@@ -19,6 +26,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show and choose: the latest state the presenter described and the panel's chosen star and
 /// partner.
@@ -101,9 +109,14 @@ final class AcousticConstellatorMirror {
         }
     }
 
-    /// A refused action's reason code in words.
+    /// The engine's prefix of a refusal that the core itself returned (`action.rule.<kernel code>`).
+    static let rulePrefix = "action.rule."
+
+    /// A refused action's reason code in words; accepts the kernel's code bare or as the engine reports it
+    /// (`action.rule.r02-g13.action`).
     static func refusalText(code: String) -> String {
-        switch code {
+        let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+        return switch bare {
         case "r02-g13.stage": "the play is over: undo or go to the next level"
         case "r02-g13.action": "that change is not allowed for these stars"
         case "r02-g13.stale": "the play changed before the action arrived"
@@ -140,6 +153,14 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
     private(set) var tierLog: [AcousticConstellatorTierChange] = []
     /// The last snapshot drawn (tests and the description).
     private(set) var lastSnapshot: AcousticConstellatorSceneSnapshot?
+    /// The gesture controller (feature 424): nudge taps, link drags, inspection, listening, double taps, orbit.
+    private(set) var gestures = AcousticConstellatorGestureController()
+    /// The reason codes of refused actions, oldest first, at most ``refusalLogLimit`` (observability).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
+    /// What a gesture on a finished play shows, and what the description adds on a won or failed play.
+    static let finishedMessage = "The play is over: undo or go to the next level"
 
     /// What restarts the preview clock: the play's level, links, phases, actions spent, stage and failure.
     private struct PlayKey: Equatable {
@@ -210,6 +231,7 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
             tierLog.append(AcousticConstellatorTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
+        scene.orbit = gestures.orbit
         let time = previewTime(core, now: frame.time)
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
@@ -254,12 +276,12 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
         text += measure + ". "
         switch play.stage {
         case .won, .result where play.failure == nil:
-            text += "The symbol rings together."
+            text += "The symbol rings together. " + Self.finishedMessage + "."
             mirror.status = "Won"
             mirror.failureText = nil
         case .failed, .result:
             let reason: String = AcousticConstellatorSceneSnapshot.failureText(play.failure) ?? "The play failed."
-            text += reason
+            text += reason + " " + Self.finishedMessage + "."
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         default:
@@ -271,7 +293,148 @@ final class AcousticConstellatorPresenter: ExperiencePresenter {
 
     /// The control panel.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(AcousticConstellatorControls(port: port, mirror: mirror))
+        AnyView(AcousticConstellatorControls(port: port, mirror: mirror,
+                                             resetView: { [weak self] in self?.resetView() },
+                                             sender: { [weak self] control, values in
+                                                 self?.send(control, values, port: port)
+                                             }))
+    }
+
+    // MARK: Touch controls (feature 424, R02-G13-04)
+
+    /// The canvas gestures send links, unlinks, forward nudges and listens; choices, the filament and the orbit are
+    /// presentation state.
+    var gestureActions: Set<String> { ["link.add", "link.remove", "star.nudge", "constellation.listen"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(AcousticConstellatorExperienceCore.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
+    /// order: kernel actions are sent through the port, choices and previews go to the mirror and the scene's filament;
+    /// a drag released onto a fixed pair says the link is fixed; a one-finger gesture that ends on a won or failed play
+    /// without choosing explains that the play is over.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let snapshot = lastSnapshot else { return }
+        let before: AcousticConstellatorGestureController.State = gestures.state
+        let actions: [AcousticConstellatorGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: snapshot)
+        let finished: Bool = snapshot.stage == .won || snapshot.stage == .failed || snapshot.stage == .result
+        let oneFinger: Bool = [.starPress, .linkDrag, .targetPress, .linkPress].contains(before)
+        var sentKernel = false
+        var chose = false
+        for action in actions {
+            switch action {
+            case let .nudge(star):
+                sentKernel = true
+                send("star.nudge", [Double(star), 1], port: port)
+            case let .link(a, b):
+                sentKernel = true
+                send("link.add", [Double(a), Double(b)], port: port)
+            case let .unlink(a, b):
+                sentKernel = true
+                send("link.remove", [Double(a), Double(b)], port: port)
+            case .listen:
+                sentKernel = true
+                send("constellation.listen", [], port: port)
+            case let .choose(star):
+                chose = true
+                choose(star)
+            case let .choosePair(a, b):
+                chose = true
+                mirror.star = mirror.clampedStar(a)
+                mirror.partner = mirror.clampedStar(b)
+                if before == .linkPress {
+                    mirror.message = Self.linkText(a, b, snapshot: snapshot,
+                                                   tick: AcousticConstellatorSceneGeometry.drawnTick(
+                                                       snapshot, reduceMotion: reduceMotion))
+                } else if !sentKernel, !finished, snapshot.fixedLinks.contains(.between(a, b)) {
+                    mirror.message = Self.fixedText(a, b)
+                }
+            case let .preview(from, target, point):
+                mirror.star = mirror.clampedStar(from)
+                if let target { mirror.partner = mirror.clampedStar(target) }
+                scene.filament = filament(from, target: target, point: point, viewSize: viewSize, snapshot: snapshot)
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            }
+        }
+        if event.phase == .ended || event.phase == .cancelled || gestures.state == .orbiting
+            || gestures.state == .cancelled {
+            scene.filament = nil
+        }
+        if event.phase == .ended, finished, oneFinger, !chose, !sentKernel {
+            mirror.message = Self.finishedMessage
+        }
+        scene.orbit = gestures.orbit
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the filament disappears.
+    func cancelPointers() {
+        gestures.cancel()
+        scene.filament = nil
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Chooses `star` in the panel; the partner moves to the next star (modulo the star count) when it equals it.
+    private func choose(_ star: Int) {
+        mirror.star = mirror.clampedStar(star)
+        if mirror.partner == mirror.star {
+            mirror.partner = (mirror.star + 1) % max(mirror.starCount, 1)
+        }
+    }
+
+    /// The filament of a link drag from `from`: to the target star's centre, or to the point under the finger on the
+    /// dragged star's height plane; nil when neither exists.
+    private func filament(_ from: Int, target: Int?, point: SIMD2<Double>, viewSize: Vec2,
+                          snapshot: AcousticConstellatorSceneSnapshot) -> AcousticConstellatorConstellationScene.Filament? {
+        guard from >= 0, from < snapshot.stars.count else { return nil }
+        if let target, target >= 0, target < snapshot.stars.count {
+            return .init(star: from, point: AcousticConstellatorSceneGeometry.starCentre(target, snapshot))
+        }
+        guard let camera = gestures.camera(viewSize: viewSize, snapshot: snapshot) else { return nil }
+        let height: Double = AcousticConstellatorSceneGeometry.starCentre(from, snapshot).y
+        let size = SIMD2<Double>(Double(viewSize.x), Double(viewSize.y))
+        guard let end = AcousticConstellatorPicker.fingerPoint(point, size: size, camera: camera, height: height) else {
+            return nil
+        }
+        return .init(star: from, point: end)
+    }
+
+    /// The link between stars `a` and `b` in words at `tick`: its gap and whether it is fixed or placed; a pair that is
+    /// not linked says so.
+    static func linkText(_ a: Int, _ b: Int, snapshot: AcousticConstellatorSceneSnapshot, tick: Int) -> String {
+        let link = AcousticConstellatorLink.between(a, b)
+        guard let index = snapshot.links.firstIndex(of: link) else {
+            return "Star \(link.a) and star \(link.b) are not linked."
+        }
+        let kind: String = snapshot.fixedLinks.contains(link) ? "fixed" : "placed"
+        return "Link star \(link.a) to star \(link.b): gap \(snapshot.gap(index, at: tick)) at tick \(tick), \(kind)."
+    }
+
+    /// What a drag onto a fixed pair shows.
+    static func fixedText(_ a: Int, _ b: Int) -> String {
+        let link = AcousticConstellatorLink.between(a, b)
+        return "The link from star \(link.a) to star \(link.b) is fixed: it cannot be removed."
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        if result.isAccepted {
+            mirror.message = nil
+        } else {
+            mirror.message = "That change was refused: \(AcousticConstellatorMirror.refusalText(code: result.code))."
+            refusalLog.append(result.code)
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        return result
     }
 }
 #endif

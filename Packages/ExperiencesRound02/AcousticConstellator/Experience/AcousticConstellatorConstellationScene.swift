@@ -16,6 +16,9 @@
 // `u_glowLimit`. If a program fails, the scene falls back to the level-2 geometry drawn unlit with the shared
 // `MeshRenderer` (ambient 1, the geometry's fallback colours) and keeps the reason; nothing here can reach the kernel.
 // A zero-sized drawable is cleared and nothing else is drawn.
+// Feature 424 (R02-G13-04) T-R02G1304-005: the scene draws the presenter's orbit (`orbit`; the stars' painter's order
+// and the strips' winding follow the drawn eye, so the geometry key includes the orbit) and, while a link is dragged,
+// the teal filament from the dragged star to the finger (`filament`, its own renderer, drawn after the constellation).
 #if os(iOS)
 import AcousticConstellatorCore
 import Foundation
@@ -51,6 +54,8 @@ final class AcousticConstellatorConstellationScene {
         let tier: Int
         let reduceMotion: Bool
         let fallback: Bool
+        /// The drawn orbit (feature 424): the stars' order and the strips' winding follow its eye.
+        let orbit: AcousticConstellatorOrbit
     }
 
     /// What the glow mesh depends on: the geometry key and, while wave shells are shown, the time into the shown tick.
@@ -66,6 +71,23 @@ final class AcousticConstellatorConstellationScene {
     private var geometryKey: GeometryKey?
     private var glowKey: GlowKey?
     private var aspect = 1.0
+    /// The drag filament's renderer and what it was built for (feature 424).
+    private var filamentRenderer: ShaderMeshRenderer?
+    private var filamentKey: Filament?
+
+    /// The orbit drawn (feature 424): presentation only, never part of the snapshot or the digest.
+    var orbit: AcousticConstellatorOrbit = .authored
+
+    /// A link drag's preview: the dragged star and the world point the filament ends at.
+    struct Filament: Equatable {
+        /// The dragged star.
+        let star: Int
+        /// Where the filament ends: the target star's centre or the point under the finger.
+        let point: SIMD3<Double>
+    }
+
+    /// The filament drawn while a link is dragged (feature 424); nil draws none.
+    var filament: Filament?
 
     /// Records the registry and the view's aspect.
     func setup(_ context: RenderContext) {
@@ -84,9 +106,12 @@ final class AcousticConstellatorConstellationScene {
     func release() {
         constellationRenderer?.release()
         glowRenderer?.release()
+        filamentRenderer?.release()
         for renderer in fallbackRenderers { renderer.release() }
         constellationRenderer = nil
         glowRenderer = nil
+        filamentRenderer = nil
+        filamentKey = nil
         fallbackRenderers = []
         geometryKey = nil
         glowKey = nil
@@ -97,6 +122,7 @@ final class AcousticConstellatorConstellationScene {
         var count: Int = fallbackRenderers.count
         if constellationRenderer != nil { count += 1 }
         if glowRenderer != nil { count += 1 }
+        if filamentRenderer != nil { count += 1 }
         return count
     }
 
@@ -125,7 +151,7 @@ final class AcousticConstellatorConstellationScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let still: Bool = reduceMotion || !animate
-        let camera = AcousticConstellatorSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = AcousticConstellatorSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let wanted = key(snapshot, tier: tier, still: still)
         let rebuilt: Bool = wanted != geometryKey
         if rebuilt { try rebuild(snapshot, tier: tier, still: still) }
@@ -140,6 +166,7 @@ final class AcousticConstellatorConstellationScene {
         if !rebuilt, glowWanted != glowKey { try rebuildGlow(snapshot, tier: tier, still: still) }
         glowKey = glowWanted
         try drawConstellation(snapshot, camera: camera, tier: tier, still: still)
+        try drawFilament(snapshot, camera: camera)
         // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
         let gain = AcousticConstellatorShaders.glowGain(for: tier)
         guard gain > 0 else { return }
@@ -152,7 +179,7 @@ final class AcousticConstellatorConstellationScene {
         GeometryKey(levelNumber: s.levelNumber, links: s.links, phases: s.phases, stage: s.stage, failure: s.failure,
                     actionsLeft: s.actionsLeft,
                     tick: AcousticConstellatorSceneGeometry.drawnTick(s, reduceMotion: still), tier: tier.index,
-                    reduceMotion: still, fallback: fallbackReason != nil)
+                    reduceMotion: still, fallback: fallbackReason != nil, orbit: orbit)
     }
 
     /// The time into the shown tick while wave shells are shown (the tier has them, the drawn tick is coherent and
@@ -175,7 +202,8 @@ final class AcousticConstellatorConstellationScene {
         if fallbackReason == nil {
             do {
                 let constellation = try AcousticConstellatorSceneGeometry.constellationMesh(snapshot, tier: tier,
-                                                                                         reduceMotion: still)
+                                                                                         reduceMotion: still,
+                                                                                         orbit: orbit)
                 constellationRenderer = try Self.renderer(constellation,
                                                           vertex: AcousticConstellatorShaders.constellationVertex,
                                                           fragment: constellationFragment,
@@ -194,8 +222,8 @@ final class AcousticConstellatorConstellationScene {
         let minimal = AcousticConstellatorTier.of(AcousticConstellatorTier.all.count - 1)
         let up = Vec3(0, 1, 0)
         let parts: [AcousticConstellatorColouredMesh] = [
-            try AcousticConstellatorSceneGeometry.constellationPart(snapshot, tier: minimal, reduceMotion: still),
-            try AcousticConstellatorSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: still),
+            try AcousticConstellatorSceneGeometry.constellationPart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit),
+            try AcousticConstellatorSceneGeometry.glowPart(snapshot, tier: minimal, reduceMotion: still, orbit: orbit),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh
@@ -215,7 +243,7 @@ final class AcousticConstellatorConstellationScene {
         guard let registry, fallbackReason == nil else { return }
         glowRenderer?.release()
         glowRenderer = nil
-        let glow = try AcousticConstellatorSceneGeometry.glowMesh(snapshot, tier: tier, reduceMotion: still)
+        let glow = try AcousticConstellatorSceneGeometry.glowMesh(snapshot, tier: tier, reduceMotion: still, orbit: orbit)
         glowBuilds += 1
         guard !glow.indices.isEmpty else { return }
         glowRenderer = try Self.renderer(glow, vertex: AcousticConstellatorShaders.glowVertex,
@@ -244,6 +272,38 @@ final class AcousticConstellatorConstellationScene {
             p.set(AcousticConstellatorShaders.mvpUniform, matrix4: mvp.floats)
             for (name, row) in zip(AcousticConstellatorShaders.phaseRowUniforms, rows) { p.set(name, row) }
             p.set(AcousticConstellatorShaders.pulseUniform, pulse)
+        }
+    }
+
+    /// Draws the drag filament with the constellation program (no pulse; both faces, since it may face away from an
+    /// orbiting eye), rebuilding its mesh when the filament changes; nothing without a filament.
+    private func drawFilament(_ snapshot: AcousticConstellatorSceneSnapshot, camera: AcousticConstellatorCamera) throws {
+        guard let filament, let registry else {
+            filamentRenderer?.release()
+            filamentRenderer = nil
+            filamentKey = nil
+            return
+        }
+        if filament != filamentKey || filamentRenderer == nil {
+            filamentRenderer?.release()
+            filamentRenderer = nil
+            filamentKey = filament
+            let mesh = try AcousticConstellatorSceneGeometry.filamentMesh(from: filament.star, to: filament.point,
+                                                                          snapshot)
+            guard !mesh.indices.isEmpty else { return }
+            filamentRenderer = try Self.renderer(mesh, vertex: AcousticConstellatorShaders.constellationVertex,
+                                                 fragment: constellationFragment,
+                                                 name: "acoustic-constellator-filament", registry: registry)
+        }
+        guard let filamentRenderer else { return }
+        let mvp = camera.viewProjection
+        let rows: [SIMD4<Float>] = AcousticConstellatorShaders.phaseUniform([]).map {
+            SIMD4<Float>(Float($0.x), Float($0.y), Float($0.z), Float($0.w))
+        }
+        try filamentRenderer.draw(blend: .premultipliedAlpha, cullBackFaces: false) { p in
+            p.set(AcousticConstellatorShaders.mvpUniform, matrix4: mvp.floats)
+            for (name, row) in zip(AcousticConstellatorShaders.phaseRowUniforms, rows) { p.set(name, row) }
+            p.set(AcousticConstellatorShaders.pulseUniform, Float(0))
         }
     }
 
