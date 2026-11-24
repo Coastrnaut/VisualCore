@@ -74,7 +74,7 @@ will consume).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1501-007 Docs: `docs/architecture/voxel-origami.md` (new: rules), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G1501-007 Docs: `docs/architecture/voxel-origami.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-24: 2026-11-24: docs/architecture/voxel-origami.md (rules), ExperiencesRound02 README section, testing doc (sweep-rule lesson); round02-host exit 0 (.autonomy/migration/checks/R02-G15-01.round02-host.json)
   `docs/automatedtesting.md`; `--name round02-host`
 - [ ] T-R02G1501-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

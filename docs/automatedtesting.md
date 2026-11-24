@@ -738,6 +738,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   search through the play (states merged by phases and lamp height), which is cheap here because every action adds to
   one vector. Regenerate the witness files only with `MOONLIT_MECHANISM_WRITE_WITNESSES=1` and re-pin the catalog digest
   after review.
+- **Voxel Origami rule kernel** (R02-G15-01, 2026-11-24). `swift test --package-path Packages/ExperiencesRound02
+  --filter VoxelOrigami` (43 tests, under 10 s): poses against an independent subtree recomputation, collisions against
+  a set intersection, the sweep against a 1 000-step sampling of each quarter arc, canonical forms and covered counts
+  against a brute force, on 500 fixtures and seeded walks; the play on fixtures and 500 seeded traces; the rules on 200
+  walks against the real play; nine invariant boundaries. The fixtures scramble a solved pose with clear turns, so the
+  reversed turns are a known win. Lesson: the first sweep rule (a band around the arc inside its box, in integer
+  squares) looked exact but let a cube orbit through its parent at radius 1; the sampling test, written independently,
+  found it. When a geometric rule is "exact", still compare it with a brute-force sampling and treat any disagreement on
+  unambiguous cases as a rule bug, not a test to relax.
 - **Moonlit Mechanism rule kernel** (R02-G14-01, 2026-11-24). `swift test --package-path Packages/ExperiencesRound02
   --filter MoonlitMechanism` (41 tests, under 10 s): turns, alignment errors, casts and runs against an independent
   reference (a tooth-by-tooth walk, a brute-force cyclic distance, a separate rasterisation, a transcription of the run

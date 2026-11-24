@@ -820,3 +820,14 @@ tests `MMPlayUITests` and `MMReplayUITests` (serial chunk `w3`).
 Feature 440 (R02-G14-10) prepares Moonlit Mechanism's device campaign without touching a device:
 `docs/apps/moonlit-mechanism/device-rows.json` (rows MM-D1 … MM-D8, all pending), the written plan
 `docs/apps/moonlit-mechanism/device-campaign.md`, and the release step `device-rows-r02-g14`.
+
+## Voxel Origami (R02-G15, `r02-g15.voxel-origami`, free)
+
+`VoxelOrigamiCore` (feature 441, R02-G15-01) is the playable rule kernel: the cube lattice (`VoxelOrigamiVector`, the 24
+`VoxelOrigamiRotation`s), the hinge tree (`VoxelOrigamiCube`), poses computed from the root (`VoxelOrigamiLattice`:
+twist hinges about the parent–child line, idle hinges, the end-pose collision and the exact sweep, the canonical form,
+hash and covered count under `VoxelOrigamiOrientations`), `VoxelOrigamiLevel` (immutable, fingerprinted, JSON schema 1,
+with names in words), the play state `VoxelOrigamiPlay` with `VoxelOrigamiStage`, `VoxelOrigamiEvent`,
+`VoxelOrigamiFailure` and append-only `VoxelOrigamiRecord`s, and `VoxelOrigamiRules` for the R02-F23 puzzle contract.
+Refusals are `VoxelOrigamiError` with `r02-g15.*` codes. Rules:
+[docs/architecture/voxel-origami.md](../../docs/architecture/voxel-origami.md).
