@@ -36,7 +36,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
   effective-action trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start
   [1…100]" (`r02-g14.no-replay` without a verified traced result), "replay.step" (`r02-g14.replay-end` after the last
   or once ended), "replay.stop" (campaign at that level, the frontier when it is not open); every other play action in
-  replay refused with `r02-g14.replay` except `tutorial.dismiss` and `settings.sound`; replay never records; the
+  replay refused with `r02-g14.replay` except `tutorial.dismiss`, `frame.show` (presentation) and `settings.sound`; replay never records; the
   tutorial is done in replay; a restored replay whose records are not exactly the first actions of its level's verified
   trace (turns, re-seats, lamp steps and the run only, in order, no undo or redo) is refused as `damaged`; "settings.sound [0 … 1]" sets `soundOn`, snapshotted in schema 3 and not digested, off
   after migration), `Packages/ExperiencesRound02/MoonlitMechanism/Core/MoonlitMechanismScenarios.swift` and the regenerated `Packages/ExperiencesRound02/MoonlitMechanism/scenario-manifest.json`,
