@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-23 (R02-G13-04: Acoustic Constellator touch controls).
+Last updated: 2026-11-23 (R02-G13-05: Acoustic Constellator teaching and progression).
 
 ## 1. What is tested, and where
 
@@ -611,6 +611,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   byte for byte (regenerate only with `HARMONIC_BRIDGES_WRITE_WITNESSES=1`). A random generator left most candidates
   unsolvable in a Python prototype; the constructive one (a path whose strings can be bridges, k of them scrambled)
   reached each band's range in 37 … 60 of 60, so prototype the generator before writing ranges into the spec.
+- **Acoustic Constellator teaching and progression** (R02-G13-05, 2026-11-23). Host: exact hints win all 100 levels
+  at the witness's action count, 200 seeded states and 500 seeded failures, the catalog's byte-for-byte witness
+  regeneration after the solver gained `plan(_:links:phases:)`, progress, stars, 4,018 daily dates and the schema 1 → 2
+  migration (`swift test --package-path Packages/ExperiencesRound02 --filter AcousticConstellatorCoreTests`); simulator:
+  `AcousticConstellatorTeachingTests`. Lessons: planning from the current state through a derived level would have hit
+  the level's six-fixed-link limit, so the hint search takes links and phases directly; and an agent stopped by a network
+  error resumes with its context through a message, without starting over.
 - **Acoustic Constellator touch controls** (R02-G13-04, 2026-11-23). Host: the picker (500 seeded points at 3 sizes
   and 3 orbits against an independent pick), the orbit framing and star order, the gesture controller (500 seeded
   scripts applied through the adapter) and the panel win over all 100 levels (`swift test --package-path

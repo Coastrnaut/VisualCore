@@ -142,3 +142,29 @@ and refuses damaged, edited and newer forms (`r02-g13.malformed`, `.newer-schema
   presenter's refusal log, read with or without the engine's `action.rule.` prefix.
 - **Panel.** Every action stays on the panel, now with "Reset view"; all 100 certified levels are won through the panel
   alone in a host test.
+
+## Teaching and progression (feature 425, R02-G13-05)
+
+- **Hints.** `AcousticConstellatorSolver.plan(_:links:phases:)` runs the certifying search from the play's current links
+  and starting phases (no new level, so a play may hold more than the six links a level can fix); `plan(_:)` is that
+  entry at the level's fixed links and starting phases, and the catalog still regenerates all 100 witnesses byte for
+  byte. `AcousticConstellatorHints` turns the plan (missing pairs, then helper links, then nudges, then the listen) into
+  three levels: the kind, the stars, the exact action. A plan that does not fit the actions left reads "No way to win was
+  found in the moves left: undo the last action or retry the level."; following exact hints from every certified
+  opening wins at the witness's action count.
+- **Failures.** `AcousticConstellatorFailureExplanation` names the failing action (numbered from 1) and the kernel's
+  numbers — the missing pair, the tick and link where the symbol came apart, the longest coherent run against the hold
+  and window, or the move that spent the budget — followed by "Undo the last action or retry the level."
+- **Tutorial.** Levels 1 … 3 show three instructions in order (link a guided pair; complete the symbol, nudging where
+  the phases pull apart; listen); each advances when done, never moves back on undo, and `tutorial.dismiss` ends it.
+- **Progress and modes.** Stars count every accepted link, unlink, nudge and listen, undone ones included: 3 at the
+  witness's action count, 2 within + 2, else 1. Level 1 is open and a campaign win opens the next; `level.select` and
+  `level.next` refuse levels not yet open (`r02-g13.locked`, never a paywall). The daily level is (days from 2026-01-01
+  × 89) mod 100 + 1, the date arriving as `mode.daily [y, m, d]` (`r02-g13.date` for an impossible one); practice
+  replays the level with the budget 40 and never awards stars or opens levels.
+- **Schema.** The snapshot is schema 2, `{level, mode, progress, records, tutorial}`, with a migration from schema 1
+  (level 1 and the restored level open, campaign mode, tutorial from its first step); progress and mode enter the digest
+  ("r02-g13.acoustic-constellator.v2"), the tutorial step does not.
+- **Panel.** The presenter shows the tutorial, the hint revealed so far (searched off the main actor), the failure
+  explanation, the goal with the level's band and best stars, and Hint, Dismiss tutorial, Retry, the level picker,
+  Practice, Daily and Campaign.

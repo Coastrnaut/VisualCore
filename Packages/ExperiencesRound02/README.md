@@ -731,3 +731,10 @@ link or unlink, tap a link to inspect it, tap a gauge to listen, two-finger orbi
 filament, the presenter's pointer entry and "Reset view"; all 100 levels are won through the panel alone in a host
 test.
 
+Feature 425 (R02-G13-05) adds teaching and progression: the solver entry `plan(_:links:phases:)`,
+`AcousticConstellatorHints` (three hint levels, following exact hints wins every certified level),
+`AcousticConstellatorFailureExplanation`, `AcousticConstellatorProgress` (tutorial steps on levels 1 … 3, stars, the
+daily level × 89, practice with budget 40), the adapter's `level.select`, `mode.daily`, `mode.practice`, `mode.campaign`
+and `tutorial.dismiss` with snapshot schema 2 and a migration from 1, and the panel's tutorial, hint, failure, goal,
+stars and modes.
+
