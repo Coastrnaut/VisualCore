@@ -28,7 +28,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 - [ ] T-R02G1508-003 [US2] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiGolden.swift` (DEBUG or VISUALCORE_AUTOMATION; "16 frames:
   levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all of the witness's turns but the last (a
-  one-turn witness applies none), plus the hero frame of `scenario-manifest.json` at tier 0; at 1,152 × 768 with the
+  one-turn witness applies none) with hinge 1 chosen, plus the hero frame of `scenario-manifest.json` at tier 0; at 1,152 × 768 with the
   authored camera: every cube centre, every hinge mark centre, every target cell centre (index order), the first covered
   pip and the first moves bar, positions rounded to 1/8 px and a point behind the eye null; the counts of cubes, hinges,
   target cells, cubes in place, lit pips and lit and total moves bars; the night, ivory, ivory shade, target, target
