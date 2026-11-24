@@ -85,7 +85,7 @@ resize alone.
 
 - [X] T-R02G1504-006 Docs: `docs/architecture/voxel-origami.md` (gestures), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-24: 2026-11-24: architecture gestures section, ExperiencesRound02 README, testing doc (one lesson); round02-host exit 0 in 401 s (the next gate splits it by bundle)
   `docs/automatedtesting.md`; `--name round02-host` (split by test bundle if it nears 450 s)
-- [ ] T-R02G1504-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1504-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1504-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1504-009 Reference regression chunk 2 (`--name reference-2`)
