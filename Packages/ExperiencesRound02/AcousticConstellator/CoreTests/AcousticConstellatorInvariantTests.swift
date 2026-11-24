@@ -68,7 +68,9 @@ import VisualCoreSimulation
     /// Actions on the hand level that wander (star 2 nudged away and back) and then win.
     static let wanderThenWin: [Action] = [.nudge(2, 1), .nudge(2, -1), .link(1, 2), .listen]
 
-    /// The kernel sources the scans read (the Core directory next to this test directory).
+    /// The kernel sources the scans read (the Core directory next to this test directory). The presentation sources
+    /// (scene snapshot, geometry, shaders, scenarios and the experience adapter, feature 423) use Doubles for drawing
+    /// only and are deliberately not scanned.
     static let kernelFiles: [String] = ["AcousticConstellatorError.swift", "AcousticConstellatorDynamics.swift",
                                         "AcousticConstellatorLevel.swift", "AcousticConstellatorPlay.swift",
                                         "AcousticConstellatorRules.swift"]
