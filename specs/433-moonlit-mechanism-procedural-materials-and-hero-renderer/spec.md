@@ -58,10 +58,10 @@ an illuminated paper wall" and the geometry "involute-inspired approximated gear
   side 0.92 s; its target cells' outline (each target cell's border, 0.08 s wide, in the target colour) and, when the
   run report names it, missing target cells dotted and stray cells hatched; forbidden cells as crossed marks; then the
   gears back to front (the deepest first): gear i stands at z = −0.6 + 0.12 · depth with its centre at its centre
-  cell's position shifted down by height · depth cells (so it sits in front of its own shadow), its rim an extruded
+  cell's position (the lamp moves only its shadow, down by height · depth cells, as the kernel casts it), its rim an extruded
   toothed outline of radius 3.4 s with T teeth of height 0.35 s (each tooth a trapezoid, its segments by tier) rotated
   by phase · 360° / T (clockwise for direction +1, anticlockwise for −1), a tooth-zero notch and its solid blades as
-  translucent spokes along their slot rays; the lamp, a disc of radius 0.06 at x = 0, y = 1.32 + 0.06 · height, z =
+  translucent spokes along their slot rays; the lamp, a disc of radius 0.06 at x = 0, y = 1.30 + 0.03 · height, z =
   0.35, with a height ladder of `lampHeights` rungs beside it; the key-frame cards, one per key frame at y = −0.18,
   spread from x = −0.6 to 0.6, each lit in proportion to its covered fraction, a required card with a gold border and the
   shown card raised; the alignment pips, one per mesh at y = −0.30 from x = −0.3 to 0.3, lit when aligned; the moves

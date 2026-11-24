@@ -2,8 +2,9 @@
 
 - **R1 World mapping.** Decision: the wall is a vertical plane at z = −0.6 with cell size s = min(1.8 / W, 1.2 / H);
   cell (c, r) sits at x = (c − (W − 1)/2) · s, y = 0.65 − (r − (H − 1)/2) · s; a gear stands at z = −0.6 + 0.12 · depth
-  in front of its centre cell, shifted down by height · depth cells. Rationale: one camera fits every level; each drawn
-  shadow square is a kernel cast cell and stands right behind the gear that casts it. Alternatives: a perspective light
+  in front of its centre cell, and the lamp moves only its shadow (down by height · depth cells). Rationale: one camera
+  fits every level (centres lie in rows 2 … H − 5, rims within 3.4 cells, the lamp at most at y 1.44); each drawn shadow
+  square is a kernel cast cell. Alternatives: a perspective light
   projection drawn from polygons (rejected: the drawn shadow could differ from the judged one).
 - **R2 The drawn rotation is presentation only.** Decision: gears rotate by phase · 360° / T and the soft shadow edge
   fades in floating point; shadow cells, missing and stray cells and the outcome come from the kernel's run report only.
