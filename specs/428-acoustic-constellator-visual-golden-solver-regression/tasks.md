@@ -8,7 +8,7 @@ tests stay short (< 10 s each); no wall-clock assertion.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1308-001 Baselines after R02-G13-07 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1308-001 Baselines after R02-G13-07 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: 2026-11-24: baseline-host, baseline-timing, baseline-round02 exit 0 on the R02-G13-07 record (.autonomy/migration/checks/R02-G13-08.baseline-*.json)
   baseline-round02 -- swift test --package-path Packages/ExperiencesRound02`
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
