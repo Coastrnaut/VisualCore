@@ -37,7 +37,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/VoxelOrigami/CoreTests/VoxelOrigamiShaderSourceTests.swift` (version line, declared
   uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match); agent A; `--name
   host-2`
-- [ ] T-R02G1503-004 [P] [US1] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiSceneGeometry.swift`
+- [X] T-R02G1503-004 [P] [US1] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiSceneGeometry.swift` — Verified 2026-11-24: 2026-11-24: VoxelOrigamiSceneGeometry.swift (mapping, chamfered cubes, target wireframe, hinge bars, gauges, paint order, winding for back-face culling, glow shells, camera with a 6 % fit margin per side so every element keeps at least the 5 % margin, fallback parts) with 13 geometry tests; lead reran host-3 exit 0
   (clarification Q1: w(c) = (c − m) · s with m the centre of the bounding box of the occupied cells and the target cells
   at the best allowed alignment and s = 1.5 / (e + 1) for its largest extent e; the night backdrop; one wireframe cube
   of side 0.96 s per target cell with edges of the tier's width; chamfered cubes of side 0.9 s at w(cell) turned by their
