@@ -34,7 +34,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1510-005 Docs: `docs/architecture/voxel-origami.md` (device preparation),
+- [X] T-R02G1510-005 Docs: `docs/architecture/voxel-origami.md` (device preparation), — Verified 2026-11-24: 2026-11-24 round02-host-1/2/3 exit 0 (52 s, 45 s, 343 s; .autonomy/migration/checks/R02-G15-10.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3`
 - [ ] T-R02G1510-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full` (nothing in the app changes)

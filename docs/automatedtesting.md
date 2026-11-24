@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G15-09: Voxel Origami in-app integration).
+Last updated: 2026-11-24 (R02-G15-10: Voxel Origami device rows).
 
 ## 1. What is tested, and where
 
@@ -840,6 +840,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   23 s because each attempt hashes a fingerprint, so 8 walks are exhaustive and 192 sample 24 cells per step. Write
   fixtures' comments from the drawn ranges: energy 1 + 0 … 3 lets the known pulse end the level, which all four agents
   found; the tests now rely on both kinds of fixture.
+- **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
+  r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
+  definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15
+  rows and the open {device} tasks of features 441 … 449; nothing contacts a device. The definition was ported from
+  Moonlit Mechanism's and every row was then re-read against the voxel gestures (feature 444's tap, drag and double
+  tap thresholds) and a grep for the old game's words (gear, lamp, shadow, re-seat) ran empty before the commit.
 - **Moonlit Mechanism device rows** (R02-G14-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g14.moonlit-mechanism` (release step `device-rows-r02-g14`, tests `MoonlitMechanismDeviceRowsCheckTests`) checks
   the definition (rows MM-D1 … MM-D8, 12 device scenarios) against the scenario manifest, the ledger's

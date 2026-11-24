@@ -251,3 +251,15 @@ Levels are JSON schema 1 with sorted keys and a fingerprint, re-checked on decod
   X-R02-G15.
 - **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
 
+## Device preparation (feature 450, R02-G15-10)
+
+Nothing here touches a device. `docs/apps/voxel-origami/device-rows.json` defines the device scenario set (the 11
+standard and game scenarios and `fixture-level-1-solved`) and rows VO-D1 … VO-D8 for D1, D2 and D3 (the ledger's
+DEV1/2/3-R02-G15 rows): launch and first frame, frame pacing and frame time per tier, memory and thermal state with the
+round-two stress session, touch feel and latency (taps that choose a hinge, drags that turn it, double taps that turn
+it forward, orbit), sound and haptics, a non-gating VoiceOver walk-through, progress across a real termination and the
+panel journeys. Every row is "pending device campaign" and covers the open {device} tasks of features 443, 444 and
+446 … 449 and UA-F13's measurements; `scripts/check_device_rows.py --experience r02-g15.voxel-origami` (release step
+`device-rows-r02-g15`) keeps it true. The written plan is `docs/apps/voxel-origami/device-campaign.md`; D3 stays on
+iPadOS 26.5.
+

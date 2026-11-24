@@ -871,3 +871,7 @@ simulator golden-frame and memory tests, `scripts/voxel_origami_regression.py` a
 Feature 449 (R02-G15-09) adds the in-app integration: the pinned identifier list of the panel, the schema-1 and
 schema-2 examples (`VoxelOrigamiSchemaExamples`) stored by the app registration, app unit tests, and the interface
 tests `VOPlayUITests` and `VOReplayUITests` (serial chunk `x3`).
+
+Feature 450 (R02-G15-10) prepares Voxel Origami's device campaign without touching a device:
+`docs/apps/voxel-origami/device-rows.json` (rows VO-D1 … VO-D8, all pending), the written plan
+`docs/apps/voxel-origami/device-campaign.md`, and the release step `device-rows-r02-g15`.
