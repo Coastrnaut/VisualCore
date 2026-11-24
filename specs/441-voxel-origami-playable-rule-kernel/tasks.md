@@ -49,7 +49,7 @@ will consume).
 
 ## Phase 4: Stories 2 and 3 — failures, budget, undo, redo, replay (P1)
 
-- [ ] T-R02G1501-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiPlay.swift`
+- [X] T-R02G1501-004 [P] [US1] [US2] [US3] Create `Packages/ExperiencesRound02/VoxelOrigami/Core/VoxelOrigamiPlay.swift` — Verified 2026-11-24: 2026-11-24: agent B play (stages, validated turns, collision and sweep failures with the pose unchanged, match, budget, records, undo from failed with refund, redo, replay), 13 tests; lead retest host-3 exit 0 (.autonomy/migration/checks/R02-G15-01.host-3.json)
   (agent B: stages "loading, tutorial, playing, paused, won, failed, result"; turns at the level's start turns; `turn`
   validated in the order stage, previous fingerprint, action (unknown hinge, a step other than ±1, a hinge with nothing
   that would move); each spends 1 action; a collision or sweep fails the level on that turn with the pose unchanged; after
