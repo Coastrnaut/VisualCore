@@ -67,7 +67,7 @@ convergence lesson (a restored replay validated against its trace) taken into th
 
 - [X] T-R02G1307-006 Docs: `docs/architecture/acoustic-constellator.md` (persistence and replay), — Verified 2026-11-24: 2026-11-24: architecture persistence and replay section, ExperiencesRound02 README, testing doc (contract-first persistence tests, manifest regenerated with an encoding change); round02-host exit 0 (.autonomy/migration/checks/R02-G13-07.round02-host.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host`
-- [ ] T-R02G1307-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1307-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24: rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G13-07.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1307-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1307-009 Reference regression chunk 2 (`--name reference-2`)
