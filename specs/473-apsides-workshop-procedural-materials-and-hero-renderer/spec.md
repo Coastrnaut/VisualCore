@@ -187,8 +187,8 @@ it as available, and the experience package, registry, catalog and content check
   kernel's reason does.
 - **A won level:** every target mark is lit and the orbit loop glows fully; the frame checks use the same positions.
 - **Memory warning:** caches are released and rebuilt on the next frame.
-- **Reduce Motion:** nothing moves by itself (the shown tick never advances by time); Reduce Flashing caps the glow to
-  the shared limit.
+- **Reduce Motion:** nothing moves by itself (the star's glow stops pulsing and the shown tick never advances by time);
+  Reduce Flashing caps the glow to the shared limit.
 
 ## Requirements *(mandatory)*
 
@@ -218,7 +218,7 @@ it as available, and the experience package, registry, catalog and content check
 
 ### Key Entities
 
-- **Scene snapshot**: the orbit's positions for the current orbit, the orbiter's position at the shown tick, the sector
+- **Scene snapshot**: the current orbit's steps and positions, the orbiter's position at the shown tick, the sector
   shares, the apsis readings, the planets, the targets with their bands and deviations, the starting orbit's positions
   (its ghost loop), stage, failure, actions left, budget, level number, shown tick and presentation time.
 - **Compass geometry**: the star, the sector spokes and rim, the orbit loop, the swept-area wedges, the apsis markers,
