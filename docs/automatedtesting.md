@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G16-01: Starlit Cartouche rule kernel).
+Last updated: 2026-11-24 (R02-G16-02: Starlit Cartouche levels, solver and witness files).
 
 ## 1. What is tested, and where
 
@@ -847,6 +847,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   invariants. One lesson: a bound written to keep levels tidy (every window closing by the deadline) made one of the
   spec's failures unreachable; the chart tests tallied every outcome over the seeded levels and asserted each occurs,
   which exposed it. Tally outcomes in a seeded test and require each named failure to happen at least once.
+- **Starlit Cartouche levels and witness files** (R02-G16-02, 2026-11-24). `swift test --package-path
+  Packages/ExperiencesRound02 --filter StarlitCartouche`: the solver on hand levels with known minima and against an
+  independent depth-first enumeration without state merging; the generator against an independent redraw of the drawing
+  order; the witness round trip and every refusal; the catalog (pinned digest, progression, every witness winning, no
+  shorter win on the two smallest levels per band, files byte for byte; `STARLIT_CARTOUCHE_WRITE_WITNESSES=1` rewrites
+  them). Lesson: the catalog enumeration first took 8.3 s on one band-5 level because every leg went through the play,
+  which hashes its fingerprint two or three times per apply. Filtering each leg with the chart first (a refused or
+  failing leg can only end the play) and keeping the most legs left per explored state brought it to 1.2 s.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15

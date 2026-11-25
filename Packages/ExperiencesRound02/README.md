@@ -884,4 +884,9 @@ the level's range, `StarlitCartoucheHazard`), the exact leg rules (`StarlitCarto
 window, hazard, window, deadline and stroke in that order, the route report with missing and stray strokes, glyph
 mismatch and hazard clearance), `StarlitCartoucheLevel` (immutable, fingerprinted, JSON schema 1, with names in words),
 the play state `StarlitCartouchePlay` with stages, events, records, undo, redo and replay, and `StarlitCartoucheRules`
-(an R02-F23 `PuzzleRules`). See [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).
+(an R02-F23 `PuzzleRules`). Feature 452 (R02-G16-02) adds the content pipeline: `StarlitCartoucheManifest` (the 100
+planned levels), `StarlitCartoucheGenerator` (seeded candidates by band, the first whose minimal plan is in range),
+`StarlitCartoucheSolver` (a breadth-first search over star, beat and strokes with a counted minimality proof),
+`StarlitCartoucheDifficulty` and `StarlitCartoucheWitness`, with the 100 witness files in
+`docs/games/starlit-cartouche/levels/` and a pinned catalog digest. See
+[docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).
