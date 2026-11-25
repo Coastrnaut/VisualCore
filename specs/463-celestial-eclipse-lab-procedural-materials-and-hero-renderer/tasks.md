@@ -66,7 +66,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   eclipses under way; halos only for total and annular; gauges at 0, half and the budget; a won level in place; the glow
   mesh empty at level-2 and its shell counts per tier; the paint order sorted with the tie rule; each failure kind
   marked); agent B; `--name host-3`
-- [ ] T-R02G1703-005 [P] [US2] Create
+- [X] T-R02G1703-005 [P] [US2] Create — Verified 2026-11-25: 2026-11-25 adapter (seven actions, digest, schema 1, certified-candidate table) with its tests and 200-snapshot renderer purity pass, 17 tests (host-4 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabExperienceCore.swift` (controls "orbit.phase
   [body, offset], clock.run, play.undo, play.redo, level.next, orbit.choose [body], clock.show [tick]"; `orbit.choose`
   refuses a body the level lacks and `clock.show` a tick outside 0 … horizon − 1; digest "level number and play
