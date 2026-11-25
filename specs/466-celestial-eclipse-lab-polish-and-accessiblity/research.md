@@ -5,8 +5,10 @@
   plans only its outcome; a phase change never ends it.
 - **R2 Lights eased by the frame clock.** Decision: glow and won levels ease (0.15 s; 0.45 s under Reduce Flashing,
   finishing before turning back); the scene passes the won level as `u_won` and the glow level times the gain, and the
-  fallback parts' `wonLevel`. Rationale: the programs already take `u_won` as 0 … 1 and a glow gain, and the fallback a
-  won level, so only the presenter and the scene change. Alternatives: rebuilding meshes with fractional won flags every
+  fallback sky blends the colours of its not-won and won parts by the won level. Rationale: the programs already take
+  `u_won` as 0 … 1 and a glow gain; the fallback geometry takes a won flag (`wonLevel: Bool?`, found at implement) and
+  the won look moves no position, so blending the two parts' colours vertex by vertex fades it with only the presenter
+  and the scene changed. Alternatives: rebuilding meshes with fractional won flags every
   frame (rejected: per-frame rebuilds; the fallback is rebuilt only when the level moves by a tenth).
 - **R3 Reduce Motion and Reduce Flashing.** Decision: the scene asks `haloPulse(time:reduceMotion:)` with Reduce Motion
   or Reduce Flashing set, so the halos hold at 1 and the sky is still between actions under either. Rationale: the

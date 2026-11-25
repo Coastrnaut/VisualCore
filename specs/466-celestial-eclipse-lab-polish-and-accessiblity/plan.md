@@ -24,8 +24,10 @@ VisualCoreAudioDSP and its experience on VisualCoreAudioDSP and VisualCoreAudio 
 `CelestialEclipseLabCore` has neither, so the Core and its tests gain VisualCoreAudioDSP and the experience and its
 tests gain VisualCoreAudioDSP and VisualCoreAudio (iOS-conditioned); no new target. The shaders already scale the won
 look by `u_won` (0 … 1) and the glow by `u_glowGain` under `u_glowLimit`, the halo pulse comes from
-`CelestialEclipseLabShaders.haloPulse(time:reduceMotion:)` (1 when its flag is set) and the fallback parts take a
-`wonLevel`, so no shader or geometry change is needed. **Language/Version**: Swift 6. **Primary dependencies**: the
+`CelestialEclipseLabShaders.haloPulse(time:reduceMotion:)` (1 when its flag is set) and the fallback sky part takes a
+won flag (`wonLevel: Bool?`; the won look changes colours only), so the scene blends the not-won and won parts'
+colours by the eased level; no shader or geometry change is needed (corrected at implement, 2026-11-25: the
+fallback's won input is a flag, not a level). **Language/Version**: Swift 6. **Primary dependencies**: the
 Celestial Eclipse Lab Core of R02-G17-01 … 05, VisualCoreExperience (`AnnouncementKind`, `HapticKind`),
 VisualCoreAudioDSP (`AmbientLoopRecipe`), VisualCoreExperienceHost (`ExperienceFeedback`), VisualCoreAudio
 (`AmbientLoopPlayer`). No new package, GLSL change, Objective-C++ or VisualCore API. **Testing**: host `swift test

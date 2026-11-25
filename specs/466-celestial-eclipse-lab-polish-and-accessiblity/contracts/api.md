@@ -29,7 +29,7 @@ public enum CelestialEclipseLabSoundRecipe {
     public static func rootStep(actionsLeft: Int, budget: Int) -> Int        // 0 … 3
     public static func matchedQuarters(_ play: CelestialEclipseLabPlay) -> Int // 0 … 4
     public static func recipe(play: CelestialEclipseLabPlay) -> AmbientLoopRecipe }
-// The scene passes `lights.won` as `u_won`, multiplies the glow gain by `lights.glow`, gives the fallback parts
-// `wonLevel: lights.won` (rebuilt when it moves by a tenth or more), and asks the halo pulse with Reduce Motion or
-// Reduce Flashing set.
+// The scene passes `lights.won` as `u_won`, multiplies the glow gain by `lights.glow`, blends the fallback sky's
+// not-won and won colours by `lights.won` (`CelestialEclipseLabSkyScene.blendedColours(off:on:level:)`, rebuilt when
+// it moves by a tenth or more), and asks the halo pulse with Reduce Motion or Reduce Flashing set.
 ```
