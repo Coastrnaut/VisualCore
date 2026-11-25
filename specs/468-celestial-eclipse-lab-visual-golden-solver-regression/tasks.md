@@ -50,7 +50,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1708-005 [US2] [US3] Create
+- [X] T-R02G1708-005 [US2] [US3] Create — Verified 2026-11-25: 2026-11-25 sim-27 exit 0, 64 simulator tests incl. 3 golden-frame and 3 memory tests (.autonomy/migration/checks/R02-G17-08.sim-27.json); sim-27-memory alone with TEST_RUNNER_CELESTIAL_ECLIPSE_LAB_MEMORY_ISOLATED=1 exit 0 (.autonomy/migration/checks/R02-G17-08.sim-27-memory.json): 12 cycles from 28.47 MB within 0.5 MB, GPU objects released after each close and warning
   `Packages/ExperiencesRound02/CelestialEclipseLab/ExperienceTests/CelestialEclipseLabRegressionGoldenFrameTests.swift`
   and `Packages/ExperiencesRound02/CelestialEclipseLab/ExperienceTests/CelestialEclipseLabRegressionMemoryTests.swift`
   (agent C: the 16 frames rendered and checked against their descriptions with the feature-463 tolerances (an
