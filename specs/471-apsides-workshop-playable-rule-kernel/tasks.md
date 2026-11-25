@@ -89,7 +89,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 - [X] T-R02G1801-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-25: 2026-11-25 reference-1 exit 0
 - [X] T-R02G1801-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-25: 2026-11-25 reference-2 exit 0
 - [X] T-R02G1801-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-25: 2026-11-25 script-tests exit 0, run alone
-- [ ] T-R02G1801-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1801-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-25: 2026-11-25 /speckit-converge: converged (nothing appended, no implement round needed); README row, feature count 171 and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
