@@ -58,7 +58,7 @@ its replay catalog proof (its convergence round) taken into the first pass and r
   100 seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
   dropped and counted; FR-R02G1707-005: the same save restores to an equal digest twice and the daily level depends only
   on the date given); `--name host-3`
-- [ ] T-R02G1707-005 [P] [US3] Create
+- [X] T-R02G1707-005 [P] [US3] Create — Verified 2026-11-25: 2026-11-25 host-4 exit 0 (.autonomy/migration/checks/R02-G17-07.host-4.json): every certified level won then replayed against its witness fingerprints, progress unchanged
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabReplayCatalogTests.swift`: for each of
   the 100 certified levels (10 groups of 10, each under 10 s) win the level in campaign through the adapter with its
   certified changes and the run, then `replay.start [level]` and `replay.step` to the end, checking each step's play
