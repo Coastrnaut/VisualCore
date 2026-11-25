@@ -71,13 +71,13 @@ y −1.45 … 0.95, z −0.95 … 0.95, the ship at its star and nine wait pips 
   points or more while playing becomes a ship drag: the star under the finger (picked as above, not the ship's) becomes
   the pending destination and is previewed as the chosen leg would be; on release over such a star exactly one
   `route.fly [star, wait]` is sent; a release elsewhere, on the ship's star or outside playing clears the pending
-  destination and sends nothing (a star with no corridor is explained in words). Two fingers as feature 444: a second
-  finger cancels any one-finger gesture (nothing sent) and orbits — yaw ±60° about the vertical axis through the
-  authored box centre (90° per view width), pitch −20° … +35° (60° per view height); a third finger re-bases the
-  midpoint; a double tap on empty space or "Reset view" returns to orbit (0, 0); the camera refits so the authored box
-  stays inside the view with a 5 % margin at every orbit and aspect 0.4 … 2.5 and the eye stays outside the box; meshes
-  are rebuilt when the orbit changes; orbit is not saved (schema stays 1). Impact: FR-R02G1604-004, 006, 007;
-  SC-R02G1604-002, 003, 004.
+  destination — the presenter restores the destination chosen before the drag through `route.choose` — and sends nothing
+  (a star with no corridor is explained in words). Two fingers as feature 444: a second finger cancels any one-finger
+  gesture (nothing sent) and orbits — yaw ±60° about the vertical axis through the authored box centre (90° per view
+  width), pitch −20° … +35° (60° per view height); a third finger re-bases the midpoint; a double tap on empty space or
+  "Reset view" returns to orbit (0, 0); the camera refits so the authored box stays inside the view with a 5 % margin at
+  every orbit and aspect 0.4 … 2.5 and the eye stays outside the box; meshes are rebuilt when the orbit changes; orbit
+  is not saved (schema stays 1). Impact: FR-R02G1604-004, 006, 007; SC-R02G1604-002, 003, 004.
 - Q: How is it built and tested? → A: a Core gesture controller (`StarlitCartoucheGestureController`) with a picker
   (`StarlitCartouchePicker`) and an orbit (`StarlitCartoucheOrbit`, with `camera(_:aspect:orbit:)` equal to the
   authored camera at orbit 0) takes pointer events with the view size, the drawn snapshot and the orbit and returns

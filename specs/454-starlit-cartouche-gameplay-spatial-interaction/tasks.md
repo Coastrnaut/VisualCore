@@ -80,10 +80,11 @@ owns the snapshot fields, the preview geometry and its shader material (R02-G16-
 - [ ] T-R02G1604-005 [US4] Wire
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartouchePresenter.swift` (FR-R02G1604-001 … 009;
   `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot; fly sent through
-  `route.fly`, the choices and the preview's destination through `route.choose`; the pending leg in the description and
-  the panel; explain texts for the ship's own star, a missing corridor and a finished play ("The play is over: undo or
-  go to the next level"); a refused action shown in the mirror message and logged with its code, reading codes with or
-  without the engine's `action.rule.` prefix; `resetView()`),
+  `route.fly`, the choices and the preview's destination through `route.choose` (on `clearPreview` the destination
+  chosen before the ship drag is restored through `route.choose`); the pending leg in the description and the panel;
+  explain texts for the ship's own star, a missing corridor and a finished play ("The play is over: undo or go to the
+  next level"); a refused action shown in the mirror message and logged with its code, reading codes with or without the
+  engine's `action.rule.` prefix; `resetView()`),
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartoucheChartScene.swift` (the orbit's camera and
   meshes, rebuilt when the orbit changes) and
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartoucheControls.swift` ("Reset view", the pending
