@@ -97,15 +97,16 @@ spheres and motion-blurred polyline trails".
   #2F6BFF, wait unlit #283058, broken #FF6B4A, glow #FFF4E0. Impact: FR-R02G1603-006; SC-R02G1603-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
   `StarlitCartoucheSceneSnapshot` (the stars' positions at the beat, glyph points and windows; the corridors and travel;
-  the hazards and which are active; the flown legs with the positions at their departure and arrival; the drawn
-  strokes and the symbol; the ship's star and beat; the beacon; the deadline; the chosen destination and wait; the route
-  report; stage, failure, actions left, budget, level number and presentation time) made by the adapter; it never holds
-  the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the shared unlit
-  mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion stops the
-  firmament turning and the ship's glide; Reduce Flashing caps the glow gain. A failure draws the failing corridor in
-  the broken colour and marks what failed (the star whose window was missed, the hazard met, or the stray stroke; a
-  deadline or budget failure marks the beat track or the actions bars), and the failure text names it, as the kernel's
-  reason does. Impact: FR-R02G1603-003, 007; SC-R02G1603-002.
+  the hazards and which are active; the flown legs with the positions at their departure and arrival; the drawn strokes
+  and the symbol; the ship's star and beat; the beacon; the deadline; the chosen destination and wait; the route report;
+  stage, failure, actions left, budget, level number and presentation time) made by the adapter; it never holds the
+  kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the shared unlit mesh
+  renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion stops the
+  firmament turning and the ship's glide; Reduce Flashing caps the glow gain. A failure draws the failing leg
+  (recomputed through the chart from the last record's action, since a window or deadline failure names no corridor; the
+  ship stays at its star) in the broken colour and marks what failed (the star whose window was missed, the hazard met,
+  or the stray stroke; a deadline or budget failure marks the beat track or the actions bars), and the failure text
+  names it, as the kernel's reason does. Impact: FR-R02G1603-003, 007; SC-R02G1603-002.
 - Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
   `r02-g16.starlit-cartouche` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
   scenario manifest `Packages/ExperiencesRound02/StarlitCartouche/scenario-manifest.json`, no permissions, a summary of
