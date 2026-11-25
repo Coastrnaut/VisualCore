@@ -75,7 +75,7 @@ change (the shaders and reference of R02-G16-03 are unchanged and re-proven by t
 - [X] T-R02G1609-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-25: 2026-11-25 reference-2 exit 0
 - [ ] T-R02G1609-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G1609-006; feature 460
   prepares them)
-- [ ] T-R02G1609-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1609-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-25: 2026-11-25 converge round 1 appended nothing; README row, count 159 and gate list updated
   README row and gate list updated; after the record push, check its CI run with `gh run list`
 
 ## Dependencies and parallel work
