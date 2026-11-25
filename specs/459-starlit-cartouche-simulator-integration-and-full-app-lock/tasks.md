@@ -28,7 +28,7 @@ change (the shaders and reference of R02-G16-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1609-003 [US1] Edit
+- [X] T-R02G1609-003 [US1] Edit — Verified 2026-11-25: 2026-11-25 sim-27 exit 0 (66 tests incl. agent E's 4 identifier tests; 37 names pinned)
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartoucheControls.swift`: `identifierNames` lists the
   37 identifiers the panel already gives through `port.identifier` (spec Clarifications Q1: star, star-minus, star-plus,
   wait, wait-minus, wait-plus, fly, leg-detail, undo, redo, next-level, reset-view, dismiss-tutorial, hint,

@@ -23,6 +23,8 @@
 // identifier `replay-position`) with Step (identifier `replay-step`, value "Leg k of n") and Stop (identifier
 // `replay-stop`, value the trace's legs), each with a label; the Sound toggle saves the choice through
 // `settings.sound`; the mode's name includes "replay".
+// Feature 459 (R02-G16-09) T-R02G1609-003 (clarification Q1): the identifiers the panel gives through `port.identifier`
+// (`experience.r02-g16.starlit-cartouche.<name>`) are listed in ``identifierNames``, each once.
 #if os(iOS)
 import StarlitCartoucheCore
 import SwiftUI
@@ -41,6 +43,15 @@ struct StarlitCartoucheControls: View {
     /// Sends a control and shows a refusal in words (the presenter's `send`, feature 454); nil sends through the port
     /// directly.
     var sender: ((String, [Double]) -> Void)? = nil
+    /// Every identifier name the panel gives (clarification Q1 of feature 459), each once; the identifier is
+    /// `experience.r02-g16.starlit-cartouche.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "star", "star-minus", "star-plus", "wait", "wait-minus", "wait-plus", "fly", "leg-detail", "undo", "redo",
+        "next-level", "reset-view", "dismiss-tutorial", "hint", "failure-undo", "retry", "campaign", "daily", "practice",
+        "level-picker", "play-level", "replay", "replay-step", "replay-stop", "sound", "summary", "status", "actions",
+        "pending", "progress", "message", "failure", "explanation", "instruction", "hint-text", "goal",
+        "replay-position",
+    ]
     /// The text size: rows become columns at accessibility sizes (feature 456).
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 456).
