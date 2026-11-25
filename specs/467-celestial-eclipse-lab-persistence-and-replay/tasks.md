@@ -92,7 +92,7 @@ its replay catalog proof (its convergence round) taken into the first pass and r
 - [X] T-R02G1707-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-25: 2026-11-25 reference-2 exit 0 (.autonomy/migration/checks/R02-G17-07.reference-2.json)
 - [X] T-R02G1707-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-25: 2026-11-25 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G17-07.script-tests.json)
 - [ ] T-R02G1707-012 {device} After ImplementationLock-100: a save survives a real app termination on D1/D2/D3.
-- [ ] T-R02G1707-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1707-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-25: 2026-11-25 /speckit-converge: converged (nothing appended); README row, feature count 167 and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
