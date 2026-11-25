@@ -1,8 +1,8 @@
 // CELSupport — feature 469 (R02-G17-09) T-R02G1709-004, modelled on feature 459 (FR-R02G1709-002; SC-R02G1709-001;
 // clarifications Q1, Q2): helpers of the interface tests of Celestial Eclipse Lab (R02-G17) inside the one app, ported
-// from `SCSupport` (feature 459). The namespace is `CEL` (no other UI test uses `CEL`). Celestial Eclipse Lab stays a
-// candidate until X-R02-G17, so every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries
-// become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips
+// from `SCSupport` (feature 459). The namespace is `CEL` (no other UI test uses `CEL`). Celestial Eclipse Lab was a
+// candidate until X-R02-G17 (2026-11-25); every launch still carries `-vcCandidates` (DebugLaunch: the candidates'
+// catalog entries become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips
 // the welcome and opens the experience directly with `-openExperience r02-g17.celestial-eclipse-lab`; a relaunch
 // (`CEL.reopen`) backgrounds the app first (its save point, the lesson of feature 309), terminates it and starts again
 // without the reset, so the stored progress (solved levels, stars, the frontier, the verified winning trace) survives.

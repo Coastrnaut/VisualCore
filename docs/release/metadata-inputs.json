@@ -341,9 +341,17 @@
       "name": "Starlit Cartouche",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G17",
+      "id": "r02-g17.celestial-eclipse-lab",
+      "name": "Celestial Eclipse Lab",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "c362a061cce5cf4ecf2ac627bb7b39541f0379c19a94450f292b91ee9c0f2d0a",
+  "ledger_sha256": "8866e8e91eae5053089898d968f5bed193b732124b07c86bfbb541ca10551506",
   "privacy_answers": "unproven",
   "schema": 1
 }

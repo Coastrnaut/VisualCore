@@ -1543,7 +1543,7 @@
         "catalog_sha256": "c74bf277d3c1f0e5f6a8adad504ffe8922bde6964fe5f7e7c289034ef942c6e8",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g18.apsides-workshop",
