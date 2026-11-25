@@ -67,7 +67,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   trails at the legs' departure and arrival positions; gauges at 0, half and the budget; a won level brighter and in
   place; the glow mesh empty at level-2 and its shell counts per tier; only sphere detail, ghosts and glow differ
   between tiers; the paint order sorted with the tie rule; each failure kind marked); agent B; `--name host-3`
-- [ ] T-R02G1603-005 [P] [US2] Create
+- [X] T-R02G1603-005 [P] [US2] Create — Verified 2026-11-24: host-4 exit 0 (.autonomy/migration/checks/R02-G16-03.host-4.json); adapter (5 controls, refusal codes r02-g16.not-whole and r02-g16.choice, digest level+fingerprint, schema 1, certified table), 16 adapter and purity tests incl. 200 seeded snapshots
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheExperienceCore.swift` (controls "route.fly [star,
   wait], play.undo, play.redo, level.next, route.choose [star, wait]"; `route.choose` refuses a star the level lacks,
   the ship's own star or a wait outside 0 … 8; digest "level number and play fingerprint", never the choice; schema 1

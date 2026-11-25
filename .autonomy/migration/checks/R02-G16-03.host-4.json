@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "StarlitCartouche"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter StarlitCartouche",
+  "elapsed_seconds": 12.467,
+  "exit_code": 0,
+  "finished": "2026-11-25T00:47:01+00:00",
+  "gate": "R02-G16-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G16-03.host-4.log",
+  "log_sha256": "eb97d43e933d11aa8e3a454b46a87f5eb4e49351c0816a8e17767c6f855513b5",
+  "name": "host-4",
+  "started": "2026-11-25T00:46:49+00:00",
+  "timed_out": false
+}
