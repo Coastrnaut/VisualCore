@@ -22,7 +22,7 @@ check's forbidden-symbol list gains `CelestialEclipseLabGolden`. Research: [rese
 run, digests, fingerprints after begin, after the tutorial on tutorial levels and after each action, timeline,
 counterexample `depth` and `settings`); `CelestialEclipseLabSceneGeometry` has `camera`, `project`, `bodyCentre`,
 `shadowLens`, `hasHalo`, `playhead`, `actionsBar`, `litActions`, `paintOrder`, `referencePoints` and the palette
-(`CelestialEclipseLabPalette`, 22 colours); the sky scene's `release()` and `liveObjectCount` exist (feature 463); CI's
+(`CelestialEclipseLabPalette`, 21 colours); the sky scene's `release()` and `liveObjectCount` exist (feature 463); CI's
 `round02-host-tests` job has per-game regression steps (Starlit Cartouche's the latest).
 **Language/Version**: Swift 6 and Python 3. **Primary dependencies**: the Celestial Eclipse Lab Core,
 `StableHash.sha256Hex` of VisualCoreMath (no CryptoKit), VisualCoreDiagnostics (`ProcessMemory.footprint()`). No new

@@ -34,17 +34,17 @@ certifies a level by a search by number of phase changes from its starting phase
 changes), `settingsByDepth` (phase settings judged per number of changes) and `work`, within at most 5 changes
 (`maxChanges`) and 60,000 settings judged (`workBound`); the 100 witness files in
 `docs/games/celestial-eclipse-lab/levels/` hold the number, the level (bodies with their orbit points, radii and fixed
-flags, horizon, target eclipses with windows, starting phases, budget, tutorial, fingerprint), the actions (the plan's phase
-changes, then the run that wins), the per-action digests, the fingerprints after `begin`, after `dismissTutorial` on a
-tutorial level and after each action, the predicted timeline (intervals and matched count), the counterexample
+flags, horizon, target eclipses with windows, starting phases, budget, tutorial, fingerprint), the actions (the plan's
+phase changes, then the run that wins), the per-action digests, the fingerprints after `begin`, after `dismissTutorial`
+on a tutorial level and after each action, the predicted timeline (intervals and matched count), the counterexample
 (`depth` = size − 1 and `settings`), the difficulty and the skipped candidate count, byte-checked by
 `CelestialEclipseLabCatalogTests` with the catalog digest pinned; the simulator frame checks of feature 463 compare
-rendered frames with the CPU reference (a body's centre not covered at the shown tick brighter than the backdrop by
-0.25 in luminance, the first lit actions bar with red above blue by 0.08, the timeline strip's centre 0.1 from the
-backdrop, each point at least 6 px from what is drawn after it) at 1,152 × 768; the palette has 22 named colours;
-`CelestialEclipseLabSkyScene.release()` frees every renderer, the next draw rebuilds them and `liveObjectCount` counts
-them; `ProcessMemory.footprint()` reads the footprint; the CI job `round02-host-tests` has a named regression step per
-earlier round-two game (Starlit Cartouche's the latest).
+rendered frames with the CPU reference (a body's centre not covered at the shown tick brighter than the backdrop by 0.25
+in luminance, the first lit actions bar with red above blue by 0.08, the timeline strip's centre 0.1 from the backdrop,
+each point at least 6 px from what is drawn after it) at 1,152 × 768; the palette has 21 named colours (corrected at
+implement from 22: the 22nd constant is a hex list); `CelestialEclipseLabSkyScene.release()` frees every renderer, the
+next draw rebuilds them and `liveObjectCount` counts them; `ProcessMemory.footprint()` reads the footprint; the CI job
+`round02-host-tests` has a named regression step per earlier round-two game (Starlit Cartouche's the latest).
 
 - Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
   the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
@@ -64,7 +64,7 @@ earlier round-two game (Starlit Cartouche's the latest).
   body, the authored camera, plus the hero frame of the scenario manifest's hero scenario at tier 0: 16 frames) the
   Core computes, at 1,152 × 768, the projected pixel positions of every body at the shown tick, the centre of every
   shadow lens, every halo, the playhead and the first actions bar, rounded to 1/8 pixel, the counts of bodies, rings,
-  shadow lenses, halos, targets, matched targets, lit and total actions bars, and the 22 palette colours as 8-bit sRGB;
+  shadow lenses, halos, targets, matched targets, lit and total actions bars, and the 21 palette colours as 8-bit sRGB;
   serialized as JSON with sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
   `Packages/ExperiencesRound02/CelestialEclipseLab/golden-frames.json`; the host test recomputes each: an equal digest
   passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every count and colour

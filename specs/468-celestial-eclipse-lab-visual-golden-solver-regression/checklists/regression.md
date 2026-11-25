@@ -28,7 +28,7 @@ were corrected in the artifacts.
 
 - [x] CHK006 Are the 16 frames, their size and their contents (body centres at the shown tick, the shadow-lens centres,
   the halos, the playhead and the first actions bar after all of the witness's phase changes but not the run at time
-  0, the element counts, the 22 palette colours) specified? [Clarity, Spec §Clarifications Q3; Plan research R6]
+  0, the element counts, the 21 palette colours) specified? [Clarity, Spec §Clarifications Q3; Plan research R6]
 - [x] CHK007 Is the shown tick of a frame defined, including a timeline with no eclipse under way (tick 0), and the
   frame never won (the run not applied)? [Edge Case, Spec §Clarifications Q3; Plan research R6]
 - [x] CHK008 Are the digest, the one-quantum fallback and the self-check of pinned digests stated? [Consistency, Spec

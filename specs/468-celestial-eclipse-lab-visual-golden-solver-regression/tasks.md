@@ -36,7 +36,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
   `scenario-manifest.json` at tier 0; at 1,152 × 768 with the authored camera: every body centre at the shown tick
   (index order), the centre of every shadow lens, every halo, the playhead and the first actions bar, positions rounded
   to 1/8 px and a point behind the eye null; the counts of bodies, rings, shadow lenses, halos, targets, matched
-  targets and lit and total actions bars; the 22 palette colours 8-bit sRGB; JSON with sorted keys; SHA-256");
+  targets and lit and total actions bars; the 21 palette colours 8-bit sRGB; JSON with sorted keys; SHA-256");
   manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/CelestialEclipseLab/golden-frames.json` (schema 1) with
   `CELESTIAL_ECLIPSE_LAB_WRITE_GOLDEN=1`, and add `CelestialEclipseLabGolden` to `RELEASE_FORBIDDEN` in
