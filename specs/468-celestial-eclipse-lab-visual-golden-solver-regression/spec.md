@@ -33,8 +33,8 @@ Answered autonomously under the owner's standing delegation, safest well-support
 certifies a level by a search by number of phase changes from its starting phases, returning `actions` (the phase
 changes), `settingsByDepth` (phase settings judged per number of changes) and `work`, within at most 5 changes
 (`maxChanges`) and 60,000 settings judged (`workBound`); the 100 witness files in
-`docs/games/celestial-eclipse-lab/levels/` hold the number, the level (bodies with their orbit points, radii and fixed flags,
-horizon, target eclipses with windows, starting phases, budget, tutorial, fingerprint), the actions (the plan's phase
+`docs/games/celestial-eclipse-lab/levels/` hold the number, the level (bodies with their orbit points, radii and fixed
+flags, horizon, target eclipses with windows, starting phases, budget, tutorial, fingerprint), the actions (the plan's phase
 changes, then the run that wins), the per-action digests, the fingerprints after `begin`, after `dismissTutorial` on a
 tutorial level and after each action, the predicted timeline (intervals and matched count), the counterexample
 (`depth` = size − 1 and `settings`), the difficulty and the skipped candidate count, byte-checked by
