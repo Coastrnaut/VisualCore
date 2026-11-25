@@ -29,7 +29,7 @@ change (the shaders and reference of R02-G17-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1709-003 [US1] Edit
+- [X] T-R02G1709-003 [US1] Edit — Verified 2026-11-25: 2026-11-25 sim-27 exit 0, 68 simulator tests incl. 4 identifier tests (.autonomy/migration/checks/R02-G17-09.sim-27.json); identifierNames pins 41 names, each used once; the failure explanation has its own identifier explanation
   `Packages/ExperiencesRound02/CelestialEclipseLab/Experience/CelestialEclipseLabControls.swift`: the failure
   explanation's identifier becomes `explanation` (it shared `failure`), and `identifierNames` lists the 41 identifiers
   (spec Clarifications Q1: planet, planet-minus, planet-plus, planet-detail, phase, phase-minus, phase-plus, set-phase,

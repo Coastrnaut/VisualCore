@@ -40,6 +40,9 @@
 // n", identifier `replay-position`) with Step (identifier `replay-step`, value "Action k of n") and Stop (identifier
 // `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
 // `settings.sound`.
+// Feature 469 (R02-G17-09) T-R02G1709-003 (clarification Q1): the failure explanation has its own identifier
+// `explanation` (it shared `failure` with the short failure line), and the identifiers the panel gives through
+// `port.identifier` (`experience.r02-g17.celestial-eclipse-lab.<name>`) are listed in ``identifierNames``, each once.
 #if os(iOS)
 import CelestialEclipseLabCore
 import SwiftUI
@@ -60,6 +63,15 @@ struct CelestialEclipseLabControls: View {
     var sender: ((String, [Double]) -> Void)? = nil
     /// Redraws the last snapshot with the mirror's preview after the pending phase moved (feature 464).
     var redraw: () -> Void = {}
+    /// Every identifier name the panel gives (clarification Q1 of feature 469), each once; the identifier is
+    /// `experience.r02-g17.celestial-eclipse-lab.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "planet", "planet-minus", "planet-plus", "planet-detail", "phase", "phase-minus", "phase-plus", "set-phase",
+        "reset-view", "tick", "tick-minus", "tick-plus", "tick-detail", "run", "undo", "redo", "next-level",
+        "dismiss-tutorial", "hint", "campaign", "daily", "practice", "level-picker", "play-level", "replay",
+        "replay-step", "replay-stop", "sound", "actions", "status", "failure", "explanation", "progress", "summary",
+        "message", "tutorial", "hint-text", "band", "stars", "goal", "replay-position",
+    ]
     /// The text size: rows become columns at accessibility sizes (feature 466).
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 466).
@@ -219,7 +231,7 @@ struct CelestialEclipseLabControls: View {
         }
         if let explanation = mirror.explanation {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier(port.identifier("failure"))
+                .accessibilityIdentifier(port.identifier("explanation"))
         }
         row {
             Text(mirror.bandLabel).font(.footnote)
