@@ -64,14 +64,15 @@ brackets at y −1.05, and paints by kind (rings, bodies and shadow lenses by di
   a second finger clears the preview and sends nothing. A drag from a fixed body sends nothing and explains that it is
   fixed. The preview is presentation only (the snapshot gains `previewBody`, `previewOffset` and the preview timeline;
   none enters the digest). Impact: FR-R02G1704-001, 004, 007; SC-R02G1704-001, 003.
-- Q: How do the time dial and two fingers behave? → A: from touch-down on the dial, the tick is round(f · (horizon −
-  1)) for f the finger's position along the screen line through the projected strip ends, clamped to 0 … 1; every change
-  sends `clock.show [tick]` (never an undo step, never a kernel action). Two fingers as feature 454: a second finger
-  cancels any one-finger gesture (nothing sent) and orbits — yaw ±60° about the vertical axis through the authored box
-  centre (90° per view width), pitch −20° … +35° (60° per view height); a third finger re-bases the midpoint; a double
-  tap on empty space or "Reset view" returns to orbit (0, 0); the camera refits so the authored box stays inside the
-  view with a 5 % margin at every orbit and aspect 0.4 … 2.5 and the eye stays outside the box; meshes are rebuilt when
-  the orbit changes; orbit is not saved (schema stays 1). Impact: FR-R02G1704-003, 006; SC-R02G1704-002, 004.
+- Q: How do the time dial and two fingers behave? → A: from touch-down on the dial, the tick is the one whose projected
+  place on the strip is nearest to the finger, the lower on ties (implementation note, 2026-11-25: under perspective the
+  ticks are not evenly spaced on screen, so a linear fraction along the strip missed by one); every change sends
+  `clock.show [tick]` (never an undo step, never a kernel action). Two fingers as feature 454: a second finger cancels
+  any one-finger gesture (nothing sent) and orbits — yaw ±60° about the vertical axis through the authored box centre
+  (90° per view width), pitch −20° … +35° (60° per view height); a third finger re-bases the midpoint; a double tap on
+  empty space or "Reset view" returns to orbit (0, 0); the camera refits so the authored box stays inside the view with
+  a 5 % margin at every orbit and aspect 0.4 … 2.5 and the eye stays outside the box; meshes are rebuilt when the orbit
+  changes; orbit is not saved (schema stays 1). Impact: FR-R02G1704-003, 006; SC-R02G1704-002, 004.
 - Q: How is it built and tested? → A: a Core gesture controller (`CelestialEclipseLabGestureController`) with a picker
   (`CelestialEclipseLabPicker`) and an orbit (`CelestialEclipseLabOrbit`, with `camera(_:aspect:orbit:)` equal to the
   authored camera at orbit 0) takes pointer events with the view size, the drawn snapshot and the orbit and returns

@@ -14,7 +14,7 @@
 // the broken colour of a failure.
 //
 // Vertex streams (the geometry states the same contract): `a_uv.x` is the material code (the `material…` constants, 0 …
-// 16), `a_uv.y` the primary local coordinate and `a_normal` the sphere normal (bodies) or a secondary local coordinate.
+// 17), `a_uv.y` the primary local coordinate and `a_normal` the sphere normal (bodies) or a secondary local coordinate.
 // Per material: on the backdrop `a_uv.y` is the height h (0 at the bottom, 1 at the top) and `a_normal.x` the
 // horizontal coordinate s (-1 on the left edge, +1 on the right); on a strip (ring, notch, frame, halo, chosen ring,
 // timeline strip, bracket, playhead, broken) `a_uv.y` is the across coordinate d, -1 on one long side and +1 on the
@@ -54,6 +54,12 @@
 // u_pulse 1 each; the glow program 8: u_mvp 4, u_glowGain, u_glowLimit, u_won and u_pulse 1 each), no texture samplers,
 // no image assets, no `discard` and no loops. Output is premultiplied alpha. Palette constants are written with six
 // fixed decimals from `CelestialEclipseLabPalette`, so the shader colours equal the CPU's within 1e-6.
+//
+// Feature 464 (R02-G17-04) T-R02G1704-002 (FR-R02G1704-004; clarification Q3) adds material 17 ``materialGhost``: the
+// ghost of a phase drag, a dashed outline ring of the dragged body's disc at the previewed orbit position, a strip ring
+// like the chosen ring (`a_uv.y` the across coordinate d -1 … +1, `a_normal.x` the angle fraction 0 … 1, seam
+// duplicated with 1.0), in the chosen colour with ``ghostDashes`` dashes (``ghostDashCoverage(angle:)``) at alpha
+// ``ghostAlpha``.
 
 import Foundation
 
@@ -101,9 +107,12 @@ public enum CelestialEclipseLabShaders {
     /// An eclipse's shadow lens: the intersection of the front and back discs (a fan; `a_uv.y` 0 at the centroid and 1
     /// on the outline, `a_normal` zero), the crescent shadow with an ember rim, painted between the two bodies.
     public static let materialShadow: Float = 16
+    /// The ghost of a phase drag (feature 464): a dashed outline ring of the dragged body's disc at the previewed orbit
+    /// position (strip ring; `a_normal.x` angle fraction 0 … 1), in the chosen colour.
+    public static let materialGhost: Float = 17
 
     /// Every material as (Swift name, code, GLSL palette constant the sky vertex shader selects for it), in code
-    /// order 0 … 16.
+    /// order 0 … 17.
     public static let materials: [(name: String, code: Float, constant: String)] = [
         (name: "materialBackdrop", code: materialBackdrop, constant: "CE_INK"),
         (name: "materialRing", code: materialRing, constant: "CE_ORBIT"),
@@ -122,6 +131,7 @@ public enum CelestialEclipseLabShaders {
         (name: "materialBarUnlit", code: materialBarUnlit, constant: "CE_ACTIONS_UNLIT"),
         (name: "materialBroken", code: materialBroken, constant: "CE_BROKEN"),
         (name: "materialShadow", code: materialShadow, constant: "CE_SHADOW"),
+        (name: "materialGhost", code: materialGhost, constant: "CE_CHOSEN"),
     ]
 
     /// A glow-program vertex kind, encoded with the glow factor into `a_uv.x` as 2 · kind + factor.
@@ -276,6 +286,12 @@ public enum CelestialEclipseLabShaders {
     public static let chosenDashes: Double = 16
     /// The share of a chosen-ring dash period that is drawn, from its start.
     public static let chosenDuty: Double = 0.6
+    /// The dashes around a phase drag's ghost ring (feature 464).
+    public static let ghostDashes: Double = 24
+    /// The share of a ghost dash period that is drawn, from its start (feature 464).
+    public static let ghostDuty: Double = 0.5
+    /// The alpha of a ghost dash (feature 464).
+    public static let ghostAlpha: Double = 0.85
     /// How far a halo's centre line (d = 0) is lifted from corona gold toward the corona glow.
     public static let haloCore: Double = 0.6
     /// How far a won level flares a matched halo: its colour toward the corona glow and its alpha from the pulse
@@ -351,7 +367,7 @@ public enum CelestialEclipseLabShaders {
     const vec3 CE_ACTIONS_UNLIT = \(vec3Literal(CelestialEclipseLabPalette.actionsUnlit));
     const vec3 CE_BROKEN = \(vec3Literal(CelestialEclipseLabPalette.broken));
     const vec3 CE_SHADOW = \(vec3Literal(CelestialEclipseLabPalette.crescentShadow));
-    const float CE_MAX_MATERIAL = \(fixed(Double(materialShadow)));
+    const float CE_MAX_MATERIAL = \(fixed(Double(materialGhost)));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
@@ -375,6 +391,7 @@ public enum CelestialEclipseLabShaders {
         base = mix(base, CE_ACTIONS_UNLIT, isCode(m, 14.0));
         base = mix(base, CE_BROKEN, isCode(m, 15.0));
         base = mix(base, CE_SHADOW, isCode(m, 16.0));
+        base = mix(base, CE_CHOSEN, isCode(m, 17.0));
         v_base = base;
         v_aux = a_normal;
         v_material = m;
@@ -430,6 +447,9 @@ public enum CelestialEclipseLabShaders {
     const float CE_RING_ALPHA = \(fixed(ringAlpha));
     const float CE_CHOSEN_DASHES = \(fixed(chosenDashes));
     const float CE_CHOSEN_DUTY = \(fixed(chosenDuty));
+    const float CE_GHOST_DASHES = \(fixed(ghostDashes));
+    const float CE_GHOST_DUTY = \(fixed(ghostDuty));
+    const float CE_GHOST_ALPHA = \(fixed(ghostAlpha));
     const float CE_HALO_CORE = \(fixed(haloCore));
     const float CE_FLARE_LIFT = \(fixed(flareLift));
     const float CE_MARK_FEATHER = \(fixed(markFeather));
@@ -476,6 +496,7 @@ public enum CelestialEclipseLabShaders {
         disc = mix(disc, CE_CORONA_GLOW, CE_RIM_LIFT * pow(1.0 - mu, CE_RIM_POWER));
         float t = clamp(v_aux.x, 0.0, 1.0);
         float chosenDash = 1.0 - step(CE_CHOSEN_DUTY, fract(t * CE_CHOSEN_DASHES));
+        float ghostDash = 1.0 - step(CE_GHOST_DUTY, fract(t * CE_GHOST_DASHES));
         float matchedHalo = step(0.5, v_aux.x);
         float flare = CE_FLARE_LIFT * won * matchedHalo;
         vec3 halo = mix(CE_CORONA, CE_CORONA_GLOW, clamp(CE_HALO_CORE * (1.0 - d) + flare, 0.0, 1.0));
@@ -494,6 +515,7 @@ public enum CelestialEclipseLabShaders {
         float coverage = edge;
         coverage = coverage * mix(1.0, CE_RING_ALPHA, isCode(m, 1.0));
         coverage = coverage * mix(1.0, chosenDash, isCode(m, 6.0));
+        coverage = coverage * mix(1.0, ghostDash * CE_GHOST_ALPHA, isCode(m, 17.0));
         coverage = coverage * mix(1.0, mix(pulse, 1.0, flare), isCode(m, 5.0));
         coverage = mix(coverage, diamond, isDiamond);
         coverage = mix(coverage, crossMark, isCode(m, 10.0));
@@ -600,6 +622,13 @@ public enum CelestialEclipseLabShaders {
     public static func chosenDashCoverage(angle: Double) -> Double {
         let a: Double = angle.isFinite ? min(max(angle, 0), 1) : 0
         return fract(a * chosenDashes) < chosenDuty ? 1 : 0
+    }
+
+    /// The coverage of a ghost dash at angle fraction `angle` (clamped to 0 … 1; non-finite counts as 0) around a phase
+    /// drag's ghost ring (feature 464): ``ghostAlpha`` where fract(angle · ``ghostDashes``) < ``ghostDuty``, else 0.
+    public static func ghostDashCoverage(angle: Double) -> Double {
+        let a: Double = angle.isFinite ? min(max(angle, 0), 1) : 0
+        return fract(a * ghostDashes) < ghostDuty ? ghostAlpha : 0
     }
 
     /// The signed distance of mark-local point (`u`, `v`) to the diamond |u| + |v| ≤ 1, positive inside (non-finite

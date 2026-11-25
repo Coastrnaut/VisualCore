@@ -42,7 +42,7 @@
 //
 // Vertex streams (attributes a_position, a_normal, a_uv: the three streams of the shared custom-shader mesh renderer;
 // the contract of ``CelestialEclipseLabShaders``, whose material codes these are). Sky mesh: a_uv.x is the material
-// code (``materialBackdrop`` 0 … ``materialShadow`` 16). The backdrop: a_uv.y the height 0 (bottom) … 1 (top),
+// code (``materialBackdrop`` 0 … ``materialGhost`` 17). The backdrop: a_uv.y the height 0 (bottom) … 1 (top),
 // a_normal.x the horizontal coordinate −1 (left) … +1 (right). Strips (ribbons, notches, frames, legs, the playhead,
 // the end mark) and rings: a_uv.y the across coordinate −1 on one side (a ring's inner edge) and +1 on the other;
 // a_normal zero except on the chosen ring (a_normal.x the angle fraction 0 … 1, seam repeated with 1) and on a halo
@@ -60,6 +60,28 @@
 // counter-clockwise seen from outside its sphere or from the eye, and the index order is the painter's order. Tiers
 // change only the body sphere detail and the glow: every position named above is the same at every tier. Doubles are
 // used for drawing only; nothing here is consulted by the rules.
+//
+// Feature 464 (R02-G17-04) T-R02G1704-002 (FR-R02G1704-001, 004, 005, 006; SC-R02G1704-004; clarifications Q1, Q3,
+// Q4) adds the player's orbit (`CelestialEclipseLabOrbit`: yaw ±60° about the vertical axis through the authored box
+// centre (0, −0.25, 0), positive moving the eye from the front (+z) towards +x; pitch −20° … +35° about the authored
+// view's right axis, positive raising the eye; authored (0, 0)) and `camera(_:aspect:orbit:)`: the eye's offset from
+// the look-at point is pitched (its elevation changed, its length and horizontal direction kept), then the eye and the
+// look-at point are yawed together about that axis, and the field of view is refitted exactly as for the fixed camera,
+// so the authored box keeps ``CelestialEclipseLabSceneGeometry/fitMargin`` per side at every orbit and aspect
+// 0.4 … 2.5. The eye (about 3.44 from the look-at point, at least about 2.5 from the vertical axis through it) stays
+// outside the box. At the authored orbit `camera(_:aspect:)` (which calls it) is unchanged bit for bit. The phase
+// preview (clarification Q3): ``ringPosition(_:offset:_:)`` is w(orbit[(shown tick + offset) mod period]) of a body;
+// while a drag previews, ``ghostCentre(_:)`` is the previewed body's ring position at the previewed offset and the
+// ghost — a camera-facing dashed outline ring of material 17 (``materialGhost``, a_uv.y the across coordinate −1 … +1,
+// a_normal.x the angle fraction 0 … 1 with the seam repeated with 1) at the disc radius r · s, ``ghostWidth`` wide —
+// is drawn right after the bodies (after every element of kind body, before the halos); it is not an element, so the
+// paint order and the picking are unchanged. While a drag previews, the timeline (the marks, the end mark, the framed
+// bracket and the matched marks' glow) is drawn from the snapshot's preview timeline (`previewIntervals`,
+// `previewMatched`, `previewFailure`), which equals the predicted timeline without a preview, so without a preview
+// every mesh is R02-G17-03's. The camera-taking overloads `skyMesh(_:tier:camera:)`, `glowMesh(_:tier:camera:)`,
+// `skyPart(_:tier:wonLevel:camera:)` and `glowPart(_:tier:camera:)` build the backdrop, the billboards, the
+// camera-facing strips, the paint order and the glow lift for the given camera; the overloads without a camera use the
+// authored camera. The orbit is presentation only.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -208,8 +230,10 @@ public enum CelestialEclipseLabSceneGeometry {
     public static let materialBroken: Double = 15
     /// A crescent shadow (the overlap of an eclipse's discs).
     public static let materialShadow: Double = 16
-    /// The number of material codes (0 … 16, the codes of ``CelestialEclipseLabShaders``).
-    public static let materialCount: Int = 17
+    /// The ghost of a phase drag: a dashed outline ring at the previewed orbit position (feature 464).
+    public static let materialGhost: Double = 17
+    /// The number of material codes (0 … 17, the codes of ``CelestialEclipseLabShaders``).
+    public static let materialCount: Int = 18
 
     // MARK: Glow kinds (a_uv.x of the glow mesh is 2 · kind + factor)
 
@@ -253,6 +277,8 @@ public enum CelestialEclipseLabSceneGeometry {
     public static let outlineOffset: Double = 0.075
     /// A failure outline's (and a broken frame's) width.
     public static let outlineWidth: Double = 0.016
+    /// The ghost's outline width, centred on the disc radius r · s (feature 464).
+    public static let ghostWidth: Double = 0.014
     /// The segments of every ring and halo.
     public static let ringSegments: Int = 48
     /// The gauges' plane.
@@ -391,6 +417,25 @@ public enum CelestialEclipseLabSceneGeometry {
         return sum / Double(orbit.count)
     }
 
+    /// The world position of body `body` (clamped) at the shown tick with phase `offset`: w(orbit[(shown tick +
+    /// offset) mod period]) (feature 464; the origin without bodies). At the body's current phase it is
+    /// ``bodyCentre(_:_:)``.
+    public static func ringPosition(_ body: Int, offset: Int,
+                                    _ snapshot: CelestialEclipseLabSceneSnapshot) -> SIMD3<Double> {
+        guard !snapshot.bodies.isEmpty else { return SIMD3(0, 0, 0) }
+        let b: CelestialEclipseLabBody = snapshot.bodies[clamped(body, snapshot.bodies.count)]
+        guard !b.orbit.isEmpty else { return SIMD3(0, 0, 0) }
+        return world(b.position(at: snapshot.shownTick, phase: offset), snapshot)
+    }
+
+    /// The ghost's centre while a drag previews: the previewed body's ``ringPosition(_:offset:_:)`` at the previewed
+    /// offset; nil without a preview (feature 464).
+    public static func ghostCentre(_ snapshot: CelestialEclipseLabSceneSnapshot) -> SIMD3<Double>? {
+        guard let body = snapshot.previewBody, let offset = snapshot.previewOffset,
+              snapshot.bodies.indices.contains(body) else { return nil }
+        return ringPosition(body, offset: offset, snapshot)
+    }
+
     /// The crescent shadow of `eclipse` as a closed outline in world x and y, anticlockwise seen from +z (the last
     /// point is not repeated): the overlap of the front circle and the back circle (centres the world x and y of the
     /// two bodies' kernel positions at the shown tick, radii r · s). Total: the back circle in `segments` points;
@@ -515,39 +560,42 @@ public enum CelestialEclipseLabSceneGeometry {
         }
     }
 
-    /// The interval of the failing event of an unwanted or window failure: the first interval from the matched count
-    /// on with the failure's bodies and tick; nil otherwise.
+    /// The interval of the failing event of an unwanted or window failure of the drawn timeline (the preview's while a
+    /// drag previews, else the predicted one): the first interval from the matched count on with the failure's bodies
+    /// and tick; nil otherwise.
     public static func failingInterval(_ snapshot: CelestialEclipseLabSceneSnapshot) -> Int? {
         let wanted: (front: Int, back: Int, tick: Int)
-        switch snapshot.failure {
+        switch snapshot.previewFailure {
         case .unwanted(let front, let back, let tick), .window(let front, let back, let tick, _, _):
             wanted = (front, back, tick)
         default:
             return nil
         }
-        for j in snapshot.intervals.indices where j >= snapshot.matched {
-            let i: CelestialEclipseLabInterval = snapshot.intervals[j]
+        for j in snapshot.previewIntervals.indices where j >= snapshot.previewMatched {
+            let i: CelestialEclipseLabInterval = snapshot.previewIntervals[j]
             if i.front == wanted.front && i.back == wanted.back && i.first == wanted.tick { return j }
         }
         return nil
     }
 
-    /// Whether the failure is the horizon's (marked at the strip's end with the next target's bracket framed).
+    /// Whether the drawn timeline's failure (the preview's while a drag previews, else the snapshot's) is the
+    /// horizon's (marked at the strip's end with the next target's bracket framed).
     public static func isHorizonFailure(_ snapshot: CelestialEclipseLabSceneSnapshot) -> Bool {
-        if case .horizon = snapshot.failure { return true }
+        if case .horizon = snapshot.previewFailure { return true }
         return false
     }
 
-    /// The bracket a horizon failure frames: the next target (the matched count, clamped), nil otherwise.
+    /// The bracket a horizon failure of the drawn timeline frames: the next target (its matched count, clamped), nil
+    /// otherwise.
     public static func framedBracket(_ snapshot: CelestialEclipseLabSceneSnapshot) -> Int? {
         guard isHorizonFailure(snapshot), !snapshot.target.isEmpty else { return nil }
-        return clamped(snapshot.matched, snapshot.target.count)
+        return clamped(snapshot.previewMatched, snapshot.target.count)
     }
 
-    /// The material of interval `index`'s mark: a matched diamond before the matched count, the failing cross, else a
-    /// faint diamond.
+    /// The material of interval `index`'s mark of the drawn timeline (the preview's while a drag previews, else the
+    /// predicted one): a matched diamond before the matched count, the failing cross, else a faint diamond.
     public static func markMaterial(_ index: Int, _ snapshot: CelestialEclipseLabSceneSnapshot) -> Double {
-        if index < snapshot.matched { return materialDiamond }
+        if index < snapshot.previewMatched { return materialDiamond }
         if failingInterval(snapshot) == index { return materialCross }
         return materialFaint
     }
@@ -577,7 +625,8 @@ public enum CelestialEclipseLabSceneGeometry {
         return points
     }
 
-    /// The elements in painter's order seen from `eye`.
+    /// The elements in painter's order seen from `eye` (the marks those of the drawn timeline: the preview's while a
+    /// drag previews).
     static func elements(_ snapshot: CelestialEclipseLabSceneSnapshot,
                          eye: SIMD3<Double>) -> [CelestialEclipseLabElement] {
         var list: [CelestialEclipseLabElement] = []
@@ -603,11 +652,12 @@ public enum CelestialEclipseLabSceneGeometry {
             add(.halo, index, .halo, index, bodyCentre(snapshot.eclipses[index].front, snapshot))
         }
         let targets: Int = snapshot.target.count
-        let intervals: Int = snapshot.intervals.count
+        let drawn: [CelestialEclipseLabInterval] = snapshot.previewIntervals
+        let intervals: Int = drawn.count
         add(.gauge, 0, .strip, 0, timelineCentre())
         for k in 0..<targets { add(.gauge, 1 + k, .bracket, k, bracketCentre(k, snapshot)) }
         for j in 0..<intervals {
-            add(.gauge, 1 + targets + j, .mark, j, tickPosition(snapshot.intervals[j].first, snapshot))
+            add(.gauge, 1 + targets + j, .mark, j, tickPosition(drawn[j].first, snapshot))
         }
         if isHorizonFailure(snapshot) {
             add(.gauge, 1 + targets + intervals, .endMark, 0, tickPosition(snapshot.horizon - 1, snapshot))
@@ -638,43 +688,91 @@ public enum CelestialEclipseLabSceneGeometry {
         case materialBarUnlit: return P.actionsUnlit
         case materialFaint: return P.faintEvent
         case materialShadow: return P.crescentShadow
+        case materialGhost: return P.chosen
         default: return P.broken
         }
     }
 
     // MARK: Meshes
 
-    /// The sky mesh for the sky program, in painter's order (see the header).
+    /// The sky mesh for the sky program, in painter's order (see the header), seen from the authored camera.
     public static func skyMesh(_ snapshot: CelestialEclipseLabSceneSnapshot,
                                tier: CelestialEclipseLabTier) throws(MeshError) -> Mesh {
         try skyPart(snapshot, tier: tier).mesh
     }
 
-    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2.
+    /// The sky mesh seen from `camera` (feature 464): the backdrop, billboards, camera-facing strips and paint order
+    /// built for its eye and view (``skyPart(_:tier:wonLevel:camera:)`` without colours).
+    public static func skyMesh(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier,
+                               camera: CelestialEclipseLabCamera) throws(MeshError) -> Mesh {
+        try skyPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
+    /// The glow mesh for the glow program (`glowPart` without colours), seen from the authored camera; empty at
+    /// level-2.
     public static func glowMesh(_ snapshot: CelestialEclipseLabSceneSnapshot,
                                 tier: CelestialEclipseLabTier) throws(MeshError) -> Mesh {
         try glowPart(snapshot, tier: tier).mesh
     }
 
+    /// The glow mesh seen from `camera` (feature 464): bands facing its eye and lifted towards it
+    /// (``glowPart(_:tier:camera:)`` without colours); empty at level-2.
+    public static func glowMesh(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier,
+                                camera: CelestialEclipseLabCamera) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
     /// The whole sky with fallback colours (unlit palette colours; the backdrop from ink at its bottom to ink top at
     /// its top; on a won level the brackets in the matched colour) for the shared unlit renderer: the same mesh as
     /// ``skyMesh(_:tier:)`` (the shader lights the brackets from its won uniform). `wonLevel` overrides ``isWon(_:)``;
-    /// positions and streams never depend on it.
+    /// positions and streams never depend on it. Seen from the authored camera.
     public static func skyPart(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier,
                                wonLevel: Bool? = nil) throws(MeshError) -> CelestialEclipseLabColouredMesh {
-        var parts: Parts = Parts(eye: eye, basis: fixedBasis())
+        try sky(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(eye: eye, basis: fixedBasis()))
+    }
+
+    /// The whole sky with fallback colours seen from `camera` (feature 464): the backdrop, billboards, camera-facing
+    /// strips and paint order are built for its eye and view; otherwise as ``skyPart(_:tier:wonLevel:)``.
+    public static func skyPart(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier,
+                               wonLevel: Bool? = nil,
+                               camera: CelestialEclipseLabCamera) throws(MeshError) -> CelestialEclipseLabColouredMesh {
+        try sky(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(eye: camera.eye, basis: viewBasis(camera)))
+    }
+
+    /// Builds the sky into `parts` (empty, with the eye and view basis to face): the backdrop, then every element in
+    /// painter's order, the ghost right after the last element of kind body (see the header).
+    static func sky(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier, wonLevel: Bool?,
+                    parts start: Parts) throws(MeshError) -> CelestialEclipseLabColouredMesh {
+        var parts: Parts = start
         try backdrop(&parts)
         let won: Bool = wonLevel ?? isWon(snapshot)
-        for element in elements(snapshot, eye: eye) {
+        var ghostDrawn: Bool = false
+        for element in elements(snapshot, eye: parts.eye) {
+            if !ghostDrawn && element.kind.rawValue > CelestialEclipseLabElement.Kind.body.rawValue {
+                try ghost(&parts, snapshot)
+                ghostDrawn = true
+            }
             try draw(element, into: &parts, snapshot, tier: tier, won: won)
         }
+        if !ghostDrawn { try ghost(&parts, snapshot) }
         return parts.built()
+    }
+
+    /// Draws the ghost while a drag previews (nothing otherwise): a camera-facing dashed outline ring of
+    /// ``materialGhost`` from r · s − ``ghostWidth`` / 2 to r · s + ``ghostWidth`` / 2 around ``ghostCentre(_:)``
+    /// (a_normal.x the angle fraction).
+    static func ghost(_ parts: inout Parts, _ snapshot: CelestialEclipseLabSceneSnapshot) throws(MeshError) {
+        guard let centre = ghostCentre(snapshot), let body = snapshot.previewBody else { return }
+        let r: Double = bodyRadius(body, snapshot)
+        try parts.circle(centre: centre, inner: max(r - ghostWidth / 2, 0), outer: r + ghostWidth / 2,
+                         segments: ringSegments, code: materialGhost, angles: true)
     }
 
     /// Draws the backdrop: one large quad facing the eye behind the authored box.
     static func backdrop(_ parts: inout Parts) throws(MeshError) {
         typealias P = CelestialEclipseLabPalette
         let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = parts.basis
+        let eye: SIMD3<Double> = parts.eye
         var depth: Double = 0
         for index in 0..<8 { depth = max(depth, dot(corner(index) - eye, basis.forward)) }
         depth += 1
@@ -840,12 +938,27 @@ public enum CelestialEclipseLabSceneGeometry {
     /// ``glowMatchedHalo``), the chosen ring (from its outer edge, growth ``chosenGlowGrowth``, base
     /// ``CelestialEclipseLabPalette/chosen``, kind ``glowChosen``) and every matched mark (from ``markSize``, growth
     /// ``markGlowGrowth``, base ``CelestialEclipseLabPalette/glow``, kind ``glowMark``); each lifted 0.001 · k towards
-    /// the eye. a_normal is the base colour and a_uv.x ``glowCode(kind:factor:)``. Empty at level-2.
+    /// the eye. a_normal is the base colour and a_uv.x ``glowCode(kind:factor:)``. Empty at level-2. Seen from the
+    /// authored camera; the matched marks those of the drawn timeline (the preview's while a drag previews).
     public static func glowPart(_ snapshot: CelestialEclipseLabSceneSnapshot,
                                 tier: CelestialEclipseLabTier) throws(MeshError) -> CelestialEclipseLabColouredMesh {
+        try glow(snapshot, tier: tier, parts: Parts(eye: eye, basis: fixedBasis()))
+    }
+
+    /// The glow with fallback colours seen from `camera` (feature 464): bands facing its eye and lifted towards it;
+    /// otherwise as ``glowPart(_:tier:)``.
+    public static func glowPart(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier,
+                                camera: CelestialEclipseLabCamera)
+        throws(MeshError) -> CelestialEclipseLabColouredMesh {
+        try glow(snapshot, tier: tier, parts: Parts(eye: camera.eye, basis: viewBasis(camera)))
+    }
+
+    /// Builds the glow into `parts` (empty, with the eye and view basis to face; see ``glowPart(_:tier:)``).
+    static func glow(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier,
+                     parts start: Parts) throws(MeshError) -> CelestialEclipseLabColouredMesh {
         typealias P = CelestialEclipseLabPalette
-        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = fixedBasis()
-        var parts: Parts = Parts(eye: eye, basis: basis)
+        var parts: Parts = start
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = parts.basis
         let shells: Int = max(tier.glowShells, 0)
         guard shells > 0 else { return parts.built() }
         let towards: SIMD3<Double> = basis.forward * -1
@@ -866,8 +979,8 @@ public enum CelestialEclipseLabSceneGeometry {
                                    outer: inner + chosenGlowGrowth * Double(k), base: P.chosen,
                                    code: glowCode(kind: glowChosen, factor: factor), factor: factor)
             }
-            for j in snapshot.intervals.indices where j < snapshot.matched {
-                try parts.glowBand(centre: tickPosition(snapshot.intervals[j].first, snapshot) + lift,
+            for j in snapshot.previewIntervals.indices where j < snapshot.previewMatched {
+                try parts.glowBand(centre: tickPosition(snapshot.previewIntervals[j].first, snapshot) + lift,
                                    inner: markSize, outer: markSize + markGlowGrowth * Double(k), base: P.glow,
                                    code: glowCode(kind: glowMark, factor: factor), factor: factor)
             }
@@ -875,11 +988,12 @@ public enum CelestialEclipseLabSceneGeometry {
         return parts.built()
     }
 
-    /// The number of glow objects (halos, the chosen ring, matched marks); every shell draws one band per object.
+    /// The number of glow objects (halos, the chosen ring, the drawn timeline's matched marks); every shell draws one
+    /// band per object.
     public static func glowObjects(_ snapshot: CelestialEclipseLabSceneSnapshot) -> Int {
         var count: Int = snapshot.bodies.isEmpty ? 0 : 1
         for eclipse in snapshot.eclipses where hasHalo(eclipse) { count += 1 }
-        return count + min(max(snapshot.matched, 0), snapshot.intervals.count)
+        return count + min(max(snapshot.previewMatched, 0), snapshot.previewIntervals.count)
     }
 
     // MARK: Camera
@@ -929,12 +1043,57 @@ public enum CelestialEclipseLabSceneGeometry {
     /// view is the smallest that holds every corner of the box x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95 inside
     /// the view with ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it —
     /// every disc at every tick, the rings, the timeline and the bars — keeps a margin of at least 5 % for aspect
-    /// 0.4 … 2.5). Independent of the snapshot (accepted for parity), the tier and the time.
+    /// 0.4 … 2.5). Independent of the snapshot (accepted for parity), the tier and the time. Equals
+    /// ``camera(_:aspect:orbit:)`` at ``CelestialEclipseLabOrbit/authored`` bit for bit.
     public static func camera(_ snapshot: CelestialEclipseLabSceneSnapshot,
                               aspect: Double) -> CelestialEclipseLabCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The vertical axis the orbit yaws about passes through the authored box centre (0, −0.25, 0).
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `p` yawed by `yaw` radians about the vertical axis through ``orbitPivot`` (from +z towards +x).
+    static func yawed(_ p: SIMD3<Double>, _ yaw: Double) -> SIMD3<Double> {
+        let c: Double = cos(yaw)
+        let s: Double = sin(yaw)
+        let d: SIMD3<Double> = p - orbitPivot
+        return SIMD3(orbitPivot.x + d.x * c + d.z * s, p.y, orbitPivot.z - d.x * s + d.z * c)
+    }
+
+    /// The eye and the look-at point of `orbit` (clamped): the authored eye's offset from the look-at point,
+    /// (0.3, 0.45, 3.4), pitched about the authored view's right axis (its elevation above the horizontal raised by the
+    /// pitch, its length and horizontal direction kept) and added to the look-at point; then both points yawed about
+    /// the vertical axis through ``orbitPivot``. Exactly ``eye`` and ``lookAt`` at the authored orbit.
+    static func orbitView(_ orbit: CelestialEclipseLabOrbit) -> (eye: SIMD3<Double>, target: SIMD3<Double>) {
+        let o: CelestialEclipseLabOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return (eye: eye, target: lookAt) }
+        let e: SIMD3<Double> = eye - lookAt
+        let horizontal: Double = (e.x * e.x + e.z * e.z).squareRoot()
+        let length: Double = dot(e, e).squareRoot()
+        let elevation: Double = atan2(e.y, horizontal) + o.pitch
+        let across: Double = length * cos(elevation) / horizontal
+        let pitched: SIMD3<Double> = lookAt + SIMD3(e.x * across, length * sin(elevation), e.z * across)
+        return (eye: yawed(pitched, o.yaw), target: yawed(lookAt, o.yaw))
+    }
+
+    /// The camera for `orbit` (clamped, see ``CelestialEclipseLabOrbit/clamped()``) and `aspect` (feature 464,
+    /// T-R02G1704-002): from the orbit's eye looking at its look-at point (``orbitView(_:)``) with +y up (never
+    /// parallel: the view stays within about 43° of level); the vertical field of view is the smallest that holds every
+    /// corner of the box x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95 inside the view with ``fitMargin`` per side,
+    /// so everything inside the box keeps a margin of at least 5 % at every orbit and aspect 0.4 … 2.5. The eye stays
+    /// outside the box. Presentation only; independent of the snapshot (accepted for parity), the tier and the time.
+    public static func camera(_ snapshot: CelestialEclipseLabSceneSnapshot, aspect: Double,
+                              orbit: CelestialEclipseLabOrbit) -> CelestialEclipseLabCamera {
         _ = snapshot
         let a: Double = usableAspect(aspect)
-        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = fixedBasis()
+        let view0: (eye: SIMD3<Double>, target: SIMD3<Double>) = orbitView(orbit)
+        let eye: SIMD3<Double> = view0.eye
+        let lookAt: SIMD3<Double> = view0.target
+        let forward: SIMD3<Double> = unit(lookAt - eye)
+        let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) =
+            (forward, right, cross(right, forward))
         let limit: Double = 1 - 2 * fitMargin
         var tanHalf: Double = 0
         var nearest: Double = Double.infinity

@@ -3,13 +3,16 @@
 // declared uniform listed (equal to the uniform name constants the scene sets) and used in its stage, at most 16 vec4
 // uniform slots per program, no texture sampler, no `discard`, no loop, vertex outputs matching fragment inputs,
 // balanced braces, ASCII-only sources, the attribute names and locations (the `ShaderMeshRenderer` streams), the
-// material codes distinct, ordered 0 … 16 and each selected by the vertex shader with its palette colour, the GLSL
+// material codes distinct, ordered 0 … 17 and each selected by the vertex shader with its palette colour, the GLSL
 // palette constants parsing back to `CelestialEclipseLabPalette` within 1e-6, the layered body shading, the shadow lens
 // (dark inside, an ember rim, alpha bounds), the signed-distance references (edge, chosen-ring dashes, diamonds,
 // crosses), the backdrop gradient and its sparse specks (under 5 % of sampled pixels), the halo pulse rule (1 with
 // Reduce Motion, 0.85 … 1 otherwise, finite, 1 for a non-finite time), the won flare of matched halos, the glow gain
 // per tier (0 at level-2) and the Reduce Flashing cap, and, when `glslangValidator` is installed, a real front-end
 // compile of each source (skipped otherwise). Test data uses explicit types and plain loops (CI type-check rule).
+// Feature 464 (R02-G17-04) T-R02G1704-002: material 17 `ghost` (the phase drag's dashed outline ring in the chosen
+// colour) declared, distinct, selected by the vertex shader and dashed by the fragment shader; the material count and
+// the highest code grow from 16 to 17.
 import Foundation
 import Testing
 @testable import CelestialEclipseLabCore
@@ -376,7 +379,7 @@ import Testing
         #expect(fragment.contains("const vec3 CE_SHADOW = vec3(0.019608, 0.039216, 0.094118);"))
         let glowF: String = Shaders.glowFragment
         let floats: [(name: String, value: Double, source: String)] = [
-            (name: "CE_MAX_MATERIAL", value: 16, source: vertex),
+            (name: "CE_MAX_MATERIAL", value: 17, source: vertex),
             (name: "CE_EDGE_FEATHER", value: Shaders.edgeFeather, source: fragment),
             (name: "CE_CELLS_ACROSS", value: Shaders.cellsAcross, source: fragment),
             (name: "CE_CELLS_UP", value: Shaders.cellsUp, source: fragment),
@@ -421,6 +424,7 @@ import Testing
             (name: "materialBarUnlit", code: Shaders.materialBarUnlit),
             (name: "materialBroken", code: Shaders.materialBroken),
             (name: "materialShadow", code: Shaders.materialShadow),
+            (name: "materialGhost", code: Shaders.materialGhost),
         ]
         #expect(Shaders.materials.count == named.count)
         var codes: Set<Float> = []
@@ -789,6 +793,55 @@ import Testing
             #expect(process.terminationStatus == 0, "\(file.name): \(output)")
         }
         #endif
+    }
+
+    /// Feature 464 (T-R02G1704-002): material 17 `ghost` is declared, distinct from every other code, the highest code,
+    /// equal to the geometry's code, selected in the chosen colour and dashed by its angle fraction at its alpha; the
+    /// CPU reference of its dashes matches the source's rule.
+    @Test func ghostMaterialDeclaredDistinctAndDashed() throws {
+        typealias G = CelestialEclipseLabSceneGeometry
+        #expect(Shaders.materialGhost == 17)
+        #expect(Double(Shaders.materialGhost) == G.materialGhost)
+        #expect(G.materialCount == 18 && Shaders.materials.count == 18)
+        var others: Int = 0
+        for entry in Shaders.materials where entry.code == Shaders.materialGhost { others += 1 }
+        #expect(others == 1)
+        let last: (name: String, code: Float, constant: String) = try #require(Shaders.materials.last)
+        #expect(last.name == "materialGhost" && last.constant == "CE_CHOSEN")
+        #expect(G.colour(of: G.materialGhost) == Palette.chosen)
+        let vertex: String = Shaders.skyVertex
+        #expect(vertex.contains("base = mix(base, CE_CHOSEN, isCode(m, 17.0));"))
+        #expect(vertex.contains("const float CE_MAX_MATERIAL = 17.000000;"))
+        let fragment: String = Shaders.skyFragment
+        let lines: [String] = [
+            "float ghostDash = 1.0 - step(CE_GHOST_DUTY, fract(t * CE_GHOST_DASHES));",
+            "coverage = coverage * mix(1.0, ghostDash * CE_GHOST_ALPHA, isCode(m, 17.0));",
+        ]
+        for line in lines { #expect(fragment.contains(line), "\(line)") }
+        let floats: [(name: String, value: Double)] = [
+            (name: "CE_GHOST_DASHES", value: Shaders.ghostDashes),
+            (name: "CE_GHOST_DUTY", value: Shaders.ghostDuty),
+            (name: "CE_GHOST_ALPHA", value: Shaders.ghostAlpha),
+        ]
+        for entry in floats {
+            let parsed: Double = try #require(Self.scalarConstant("float", entry.name, in: fragment), "\(entry.name)")
+            #expect(abs(parsed - entry.value) <= 0.000001, "\(entry.name)")
+        }
+        // The CPU reference: drawn on the first share of every dash period at the ghost's alpha, else nothing.
+        #expect(Shaders.ghostDashCoverage(angle: 0) == Shaders.ghostAlpha)
+        #expect(Shaders.ghostDashCoverage(angle: 0.75 / Shaders.ghostDashes) == 0)
+        #expect(Shaders.ghostDashCoverage(angle: 0.25 / Shaders.ghostDashes) == Shaders.ghostAlpha)
+        #expect(Shaders.ghostDashCoverage(angle: Double.nan) == Shaders.ghostAlpha)
+        var drawn: Int = 0
+        let samples: Int = 960
+        for k in 0..<samples {
+            let angle: Double = (Double(k) + 0.5) / Double(samples)
+            let c: Double = Shaders.ghostDashCoverage(angle: angle)
+            #expect(c == 0 || c == Shaders.ghostAlpha)
+            if c > 0 { drawn += 1 }
+        }
+        #expect(abs(Double(drawn) / Double(samples) - Shaders.ghostDuty) < 0.01)
+        #expect(Shaders.ghostAlpha > 0 && Shaders.ghostAlpha <= 1 && Shaders.ghostDuty > 0 && Shaders.ghostDuty < 1)
     }
 
     /// A won level lights the window brackets matched gold on the shader path as the fallback colours do

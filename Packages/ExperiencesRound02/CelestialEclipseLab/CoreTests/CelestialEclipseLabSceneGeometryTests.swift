@@ -8,6 +8,12 @@
 // eclipses; gauges at 0, half and the full budget; a won level lit and in place; the glow empty at level-2 with its
 // shell counts per tier; the paint order sorted with the tie rule; each failure kind (unwanted, window, horizon)
 // marked. Seed 2_463; explicit types, plain loops; each test well under 10 s; no wall-clock asserts.
+// Feature 464 (R02-G17-04) T-R02G1704-002 (FR-R02G1704-001, 004, 006; SC-R02G1704-004): the orbit's bounds and
+// clamping; `camera(_:aspect:)` equal to `camera(_:aspect:orbit: .authored)` bit for bit; the eye outside the box and
+// the box within the fitted margin at the orbit corners; every element, every disc at every orbit position and a ghost
+// at every orbit position inside the view at the orbit corners and 7 aspects; the ghost (material 17 at the disc
+// radius, right after the bodies) and the preview timeline equal to the kernel's; without a preview (and with the
+// authored camera) the same meshes as before.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -724,5 +730,321 @@ struct CelestialEclipseLabSceneGeometryTests {
         for uv in part.mesh.uvs { #expect(codes.contains(uv.x)) }
         #expect(G.colour(of: G.materialBody) == CelestialEclipseLabPalette.disc)
         #expect(G.colour(of: G.materialBar) == CelestialEclipseLabPalette.actionsLit)
+    }
+
+    // MARK: Feature 464 (R02-G17-04) T-R02G1704-002
+
+    typealias Orbit = CelestialEclipseLabOrbit
+
+    /// The authored orbit and the four orbit corners.
+    static let orbitCorners: [Orbit] = {
+        var list: [Orbit] = [.authored]
+        for yaw in [-Orbit.yawLimit, Orbit.yawLimit] {
+            for pitch in [Orbit.pitchRange.lowerBound, Orbit.pitchRange.upperBound] {
+                list.append(Orbit(yaw: yaw, pitch: pitch))
+            }
+        }
+        return list
+    }()
+
+    /// A playing snapshot of `level` at `tick` (default choice).
+    static func playing(_ level: Level, tick: Int = 0) throws -> Snapshot {
+        snapshot(try started(level), tick: tick)
+    }
+
+    /// The first movable body of `level`.
+    static func movable(_ level: Level) -> Int {
+        for (index, body) in level.bodies.enumerated() where !body.fixed { return index }
+        return 0
+    }
+
+    /// The index in `mesh.indices` / 3 of every triangle whose first vertex has material `code`, in order.
+    static func triangleOrder(_ mesh: Mesh, _ code: Double) -> [Int] {
+        var found: [Int] = []
+        for t in stride(from: 0, to: mesh.indices.count, by: 3) where mesh.uvs[Int(mesh.indices[t])].x == code {
+            found.append(t / 3)
+        }
+        return found
+    }
+
+    @Test func orbitBoundsAndTheAuthoredCameraBitForBit() throws {
+        #expect(abs(Orbit.yawLimit - Double.pi / 3) < 1e-15)
+        #expect(abs(Orbit.pitchRange.lowerBound + Double.pi / 9) < 1e-15)
+        #expect(abs(Orbit.pitchRange.upperBound - 35 * Double.pi / 180) < 1e-15)
+        #expect(Orbit.authored == Orbit(yaw: 0, pitch: 0) && Orbit.authored.isWithinBounds)
+        #expect(Orbit(yaw: 3, pitch: 3).clamped() == Orbit(yaw: Orbit.yawLimit, pitch: Orbit.pitchRange.upperBound))
+        #expect(Orbit(yaw: -3, pitch: -3).clamped()
+                == Orbit(yaw: -Orbit.yawLimit, pitch: Orbit.pitchRange.lowerBound))
+        #expect(Orbit(yaw: .nan, pitch: .infinity).clamped() == .authored)
+        #expect(!Orbit(yaw: 3, pitch: 0).isWithinBounds && !Orbit(yaw: 0, pitch: .nan).isWithinBounds)
+        for orbit in Self.orbitCorners { #expect(orbit.isWithinBounds && orbit.clamped() == orbit) }
+        let snap: Snapshot = Self.snapshot(try Self.unwantedLevel())
+        var aspects: [Double] = Self.aspects
+        aspects.append(contentsOf: [Double.nan, 40, -1])
+        for aspect in aspects {
+            #expect(G.camera(snap, aspect: aspect) == G.camera(snap, aspect: aspect, orbit: .authored))
+            let unusable: Orbit = Orbit(yaw: .nan, pitch: .nan)
+            #expect(G.camera(snap, aspect: aspect) == G.camera(snap, aspect: aspect, orbit: unusable))
+        }
+        let authored: CelestialEclipseLabCamera = G.camera(snap, aspect: 1, orbit: .authored)
+        #expect(authored.eye == SIMD3(0.3, 0.2, 3.4) && authored.target == SIMD3(0, -0.25, 0))
+        #expect(G.camera(snap, aspect: 1, orbit: Orbit(yaw: 3, pitch: 3))
+                == G.camera(snap, aspect: 1, orbit: Orbit(yaw: Orbit.yawLimit, pitch: Orbit.pitchRange.upperBound)))
+        // An orbit keeps the eye's distance from the look-at point; yaw turns about the box centre's vertical axis.
+        let base: Double = Self.length(authored.eye - authored.target)
+        for orbit in Self.orbitCorners {
+            let camera: CelestialEclipseLabCamera = G.camera(snap, aspect: 1, orbit: orbit)
+            #expect(abs(Self.length(camera.eye - camera.target) - base) < 1e-12)
+            #expect(abs(camera.target.x) < 1e-12 && abs(camera.target.z) < 1e-12)
+            #expect(abs(camera.target.y + 0.25) < 1e-12)
+        }
+        let yawed: CelestialEclipseLabCamera = G.camera(snap, aspect: 1, orbit: Orbit(yaw: Orbit.yawLimit, pitch: 0))
+        #expect(abs(yawed.eye.y - authored.eye.y) < 1e-12 && yawed.eye.x > authored.eye.x)
+        let raised: CelestialEclipseLabCamera = G.camera(snap, aspect: 1, orbit: Orbit(yaw: 0, pitch: 0.3))
+        #expect(raised.eye.y > authored.eye.y)
+        // The eye outside the box and every box corner within the fitted margin at every orbit corner and aspect.
+        for orbit in Self.orbitCorners {
+            for aspect in Self.aspects {
+                let camera: CelestialEclipseLabCamera = G.camera(snap, aspect: aspect, orbit: orbit)
+                let e: SIMD3<Double> = camera.eye
+                let inBox: Bool = e.x >= G.boxLow.x && e.x <= G.boxHigh.x && e.y >= G.boxLow.y && e.y <= G.boxHigh.y
+                    && e.z >= G.boxLow.z && e.z <= G.boxHigh.z
+                #expect(!inBox, "\(orbit)")
+                #expect(camera.fovY.isFinite && camera.fovY > 0 && camera.fovY < Double.pi)
+                for index in 0..<8 {
+                    let q: SIMD2<Double> = try #require(G.project(G.corner(index), camera: camera))
+                    #expect(q.x >= 0.06 - 1e-9 && q.x <= 0.94 + 1e-9 && q.y >= 0.06 - 1e-9 && q.y <= 0.94 + 1e-9)
+                }
+            }
+        }
+    }
+
+    @Test func everyElementAndGhostInsideTheViewAtTheOrbitCorners() throws {
+        let levels: [Level] = Array(Self.catalogLevels.prefix(8))
+        #expect(levels.count == 8)
+        for level in levels {
+            let snap: Snapshot = try Self.playing(level)
+            let s: Double = G.scale(snap)
+            let body: Int = Self.movable(level)
+            var ghosts: [SIMD3<Double>] = []
+            for offset in 0..<level.bodies[body].period {
+                let preview: Snapshot = snap.previewing(body: body, offset: offset)
+                ghosts.append(try #require(G.ghostCentre(preview)))
+            }
+            for orbit in Self.orbitCorners {
+                for aspect in Self.aspects {
+                    let camera: CelestialEclipseLabCamera = G.camera(snap, aspect: aspect, orbit: orbit)
+                    let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = G.viewBasis(camera)
+                    let directions: [SIMD3<Double>] = [basis.right, basis.up, basis.right * -1, basis.up * -1]
+                    var outside: Int = 0
+                    for b in level.bodies {
+                        // Every orbit position is the body's place (and its ghost's) at some tick for some phase; the
+                        // reach covers the disc, the ghost, its notches, the chosen ring and a failure outline.
+                        let reach: Double = Double(b.radius) * s + G.outlineOffset + G.outlineWidth / 2
+                        for v in b.orbit {
+                            let c: SIMD3<Double> = G.world(v, snap)
+                            if !Self.inside(G.project(c, camera: camera)) { outside += 1 }
+                            for d in directions where !Self.inside(G.project(c + d * reach, camera: camera)) {
+                                outside += 1
+                            }
+                        }
+                    }
+                    let ghostReach: Double = G.bodyRadius(body, snap) + G.ghostWidth / 2
+                    for c in ghosts {
+                        for d in directions where !Self.inside(G.project(c + d * ghostReach, camera: camera)) {
+                            outside += 1
+                        }
+                    }
+                    for element in G.paintOrder(snap, camera: camera) {
+                        if !Self.inside(G.project(element.centre, camera: camera)) { outside += 1 }
+                    }
+                    var gauge: [SIMD3<Double>] = []
+                    let markReach: Double = G.markFrame + G.outlineWidth
+                    for sy in [-1.0, 1.0] {
+                        gauge.append(G.tickPosition(0, snap) + basis.up * markReach * sy)
+                        gauge.append(G.tickPosition(level.horizon - 1, snap) + basis.up * markReach * sy)
+                        gauge.append(SIMD3(G.gaugeStart, G.barsY + G.barHeight / 2 * sy, 0))
+                        gauge.append(SIMD3(G.gaugeEnd, G.barsY + G.barHeight / 2 * sy, 0))
+                    }
+                    gauge.append(G.tickPosition(0, snap) - basis.right * markReach)
+                    gauge.append(G.tickPosition(level.horizon - 1, snap) + basis.right * markReach)
+                    for k in level.target.indices { gauge.append(G.bracketCentre(k, snap) + basis.up * 0.04) }
+                    for p in gauge where !Self.inside(G.project(p, camera: camera)) { outside += 1 }
+                    #expect(outside == 0, "\(level.id) orbit \(orbit) aspect \(aspect)")
+                }
+            }
+            // The drawn ghost itself (every vertex of material 17) inside the view at the extreme aspects.
+            let next: Int = (snap.phases[body] + 1) % level.bodies[body].period
+            let preview: Snapshot = snap.previewing(body: body, offset: next)
+            for orbit in Self.orbitCorners {
+                for aspect in [0.4, 2.5] {
+                    let camera: CelestialEclipseLabCamera = G.camera(preview, aspect: aspect, orbit: orbit)
+                    let mesh: Mesh = try G.skyMesh(preview, tier: .of(2), camera: camera)
+                    let ghost: [Int] = Self.vertices(mesh, G.materialGhost)
+                    #expect(!ghost.isEmpty)
+                    var outside: Int = 0
+                    for index in ghost where !Self.inside(G.project(Self.point(mesh, index), camera: camera)) {
+                        outside += 1
+                    }
+                    #expect(outside == 0, "\(level.id) ghost orbit \(orbit) aspect \(aspect)")
+                }
+            }
+        }
+    }
+
+    @Test func ghostAndPreviewTimelineFollowTheKernel() throws {
+        var checked: Int = 0
+        for fixture in Self.fixtures.prefix(6) {
+            let level: Level = fixture.level
+            let snap: Snapshot = try Self.playing(level, tick: 1)
+            #expect(!snap.isPreviewing && snap.previewBody == nil && snap.previewOffset == nil)
+            #expect(snap.previewIntervals == snap.intervals && snap.previewMatched == snap.matched)
+            #expect(snap.previewFailure == snap.failure && snap.withoutPreview() == snap)
+            #expect(G.ghostCentre(snap) == nil)
+            let plain: Mesh = try G.skyMesh(snap, tier: .of(1))
+            #expect(Self.vertices(plain, G.materialGhost).isEmpty)
+            for body in level.bodies.indices {
+                let period: Int = level.bodies[body].period
+                if level.bodies[body].fixed {
+                    #expect(snap.previewing(body: body, offset: 1) == snap)
+                    continue
+                }
+                for offset in 0..<period {
+                    let preview: Snapshot = snap.previewing(body: body, offset: offset)
+                    var phases: [Int] = snap.phases
+                    phases[body] = offset
+                    let kernel: CelestialEclipseLabTimeline = CelestialEclipseLabSky.timeline(level, phases: phases)
+                    #expect(preview.isPreviewing && preview.previewBody == body && preview.previewOffset == offset)
+                    #expect(preview.previewIntervals == kernel.intervals && preview.previewMatched == kernel.matched)
+                    #expect(preview.previewFailure == kernel.failure)
+                    // Presentation only: the game state is unchanged.
+                    #expect(preview.phases == snap.phases && preview.positions == snap.positions)
+                    #expect(preview.intervals == snap.intervals && preview.matched == snap.matched)
+                    #expect(preview.failure == snap.failure && preview.eclipses == snap.eclipses)
+                    #expect(preview.withoutPreview() == snap)
+                    #expect(snap.previewing(body: body, offset: offset + period) == preview)
+                    #expect(snap.previewing(body: body, offset: offset - period) == preview)
+                    let centre: SIMD3<Double> = try #require(G.ghostCentre(preview))
+                    let expected: SIMD3<Double> = G.world(level.bodies[body].position(at: 1, phase: offset), snap)
+                    #expect(centre == expected && G.ringPosition(body, offset: offset, snap) == expected)
+                    checked += 1
+                }
+                #expect(G.ringPosition(body, offset: snap.phases[body], snap) == G.bodyCentre(body, snap))
+            }
+            #expect(snap.previewing(body: -1, offset: 0) == snap && snap.previewing(body: 9, offset: 0) == snap)
+        }
+        #expect(checked > 20)
+        // The ghost: 48 dashed quads of material 17 at the disc radius around the ghost centre, drawn right after the
+        // bodies and their shadows and before the halos and gauges; the marks drawn from the preview's timeline.
+        for fixture in Self.fixtures.prefix(6) {
+            let level: Level = fixture.level
+            let snap: Snapshot = try Self.playing(level)
+            var body: Int = Self.movable(level)
+            for index in level.bodies.indices where !level.bodies[index].fixed {
+                if fixture.winning[index] != snap.phases[index] { body = index }
+            }
+            let preview: Snapshot = snap.previewing(body: body, offset: fixture.winning[body])
+            let mesh: Mesh = try G.skyMesh(preview, tier: .of(0))
+            #expect(Self.triangles(mesh, G.materialGhost) == 2 * G.ringSegments)
+            let centre: SIMD3<Double> = try #require(G.ghostCentre(preview))
+            let r: Double = G.bodyRadius(body, preview)
+            for index in Self.vertices(mesh, G.materialGhost) {
+                let d: Double = Self.length(Self.point(mesh, index) - centre)
+                #expect(d >= r - G.ghostWidth / 2 - 1e-9 && d <= r + G.ghostWidth / 2 + 1e-9)
+                let a: Double = mesh.normals[index].x
+                #expect(a >= 0 && a <= 1 && abs(mesh.uvs[index].y) == 1)
+            }
+            let ghost: [Int] = Self.triangleOrder(mesh, G.materialGhost)
+            let bodies: [Int] = Self.triangleOrder(mesh, G.materialBody) + Self.triangleOrder(mesh, G.materialShadow)
+            let later: [Int] = Self.triangleOrder(mesh, G.materialHalo) + Self.triangleOrder(mesh, G.materialStrip)
+            let firstGhost: Int = try #require(ghost.first)
+            #expect(firstGhost > (bodies.max() ?? -1))
+            #expect((ghost.last ?? 0) < (later.min() ?? Int.max))
+            #expect(ghost.count == ghost.last! - firstGhost + 1)
+            // The marks follow the preview's timeline: matched diamonds, the failing cross, faint diamonds after.
+            var marks: [CelestialEclipseLabElement] = []
+            for element in G.paintOrder(preview, camera: G.camera(preview, aspect: 1)) where element.part == .mark {
+                marks.append(element)
+            }
+            #expect(marks.count == preview.previewIntervals.count)
+            for mark in marks {
+                #expect(mark.centre == G.tickPosition(preview.previewIntervals[mark.item].first, preview))
+                let material: Double = G.markMaterial(mark.item, preview)
+                let interval: CelestialEclipseLabInterval = preview.previewIntervals[mark.item]
+                var failing: Bool = false
+                switch preview.previewFailure {
+                case .unwanted(let front, let back, let tick), .window(let front, let back, let tick, _, _):
+                    failing = interval.front == front && interval.back == back && interval.first == tick
+                default:
+                    break
+                }
+                if mark.item < preview.previewMatched {
+                    #expect(material == G.materialDiamond)
+                } else if failing {
+                    #expect(material == G.materialCross)
+                } else {
+                    #expect(material == G.materialFaint)
+                }
+            }
+            var horizon: Bool = false
+            if case .horizon = preview.previewFailure { horizon = true }
+            #expect(G.isHorizonFailure(preview) == horizon)
+            #expect((G.framedBracket(preview) != nil) == horizon)
+            let glow: CelestialEclipseLabColouredMesh = try G.glowPart(preview, tier: .of(0))
+            #expect(glow.mesh.triangleCount == 2 * G.glowObjects(preview) * G.glowSides * 2)
+        }
+        // Previewing the current phase draws R02-G17-03's sky plus the ghost.
+        let snap: Snapshot = try Self.playing(Self.fixtures[0].level, tick: 2)
+        let body: Int = Self.movable(Self.fixtures[0].level)
+        let same: Snapshot = snap.previewing(body: body, offset: snap.phases[body])
+        #expect(same.previewIntervals == snap.intervals && same.previewMatched == snap.matched)
+        for tier in CelestialEclipseLabTier.all {
+            let plain: Mesh = try G.skyMesh(snap, tier: tier)
+            let ghosted: Mesh = try G.skyMesh(same, tier: tier)
+            #expect(Self.positions(ghosted, except: G.materialGhost) == Self.positions(plain, except: G.materialGhost))
+            #expect(ghosted.triangleCount == plain.triangleCount + 2 * G.ringSegments)
+            #expect(try G.glowMesh(same, tier: tier) == G.glowMesh(snap, tier: tier))
+        }
+    }
+
+    @Test func noPreviewAndAuthoredCameraDrawTheSameMeshes() throws {
+        var snapshots: [Snapshot] = []
+        for fixture in Self.fixtures.prefix(4) { snapshots.append(try Self.playing(fixture.level, tick: 3)) }
+        snapshots.append(Self.snapshot(try Self.horizonLevel(), tick: 0))
+        snapshots.append(Self.snapshot(try Self.unwantedLevel(), tick: 3))
+        for snap in snapshots {
+            for tier in CelestialEclipseLabTier.all {
+                let sky: CelestialEclipseLabColouredMesh = try G.skyPart(snap, tier: tier)
+                let glow: CelestialEclipseLabColouredMesh = try G.glowPart(snap, tier: tier)
+                #expect(try G.skyPart(snap.withoutPreview(), tier: tier) == sky)
+                for aspect in [0.4, 1.0, 2.5] {
+                    let camera: CelestialEclipseLabCamera = G.camera(snap, aspect: aspect)
+                    #expect(try G.skyPart(snap, tier: tier, camera: camera) == sky)
+                    #expect(try G.glowPart(snap, tier: tier, camera: camera) == glow)
+                    #expect(try G.skyMesh(snap, tier: tier, camera: camera) == sky.mesh)
+                    #expect(try G.glowMesh(snap, tier: tier, camera: camera) == glow.mesh)
+                }
+            }
+        }
+        // Another orbit builds the billboards for its eye: a level-2 disc faces that camera; the bodies stay put.
+        let snap: Snapshot = snapshots[0]
+        let camera: CelestialEclipseLabCamera = G.camera(snap, aspect: 1.2, orbit: Orbit(yaw: 0.7, pitch: 0.4))
+        let towards: SIMD3<Double> = G.viewBasis(camera).forward * -1
+        let mesh: Mesh = try G.skyMesh(snap, tier: .of(2), camera: camera)
+        let authored: Mesh = try G.skyMesh(snap, tier: .of(2))
+        #expect(mesh != authored)
+        let discs: [Int] = Self.vertices(mesh, G.materialBody, local: 0)
+        #expect(discs.count == snap.bodies.count)
+        for index in discs {
+            let n: Vec3 = mesh.normals[index]
+            #expect(abs(n.x - towards.x) < 1e-12 && abs(n.y - towards.y) < 1e-12 && abs(n.z - towards.z) < 1e-12)
+            var near: Bool = false
+            for body in snap.bodies.indices {
+                if Self.length(Self.point(mesh, index) - G.bodyCentre(body, snap)) < 1e-12 { near = true }
+            }
+            #expect(near)
+        }
+        let order: [CelestialEclipseLabElement] = G.paintOrder(snap, camera: camera)
+        for element in order { #expect(abs(element.distance - Self.length(element.centre - camera.eye)) < 1e-12) }
     }
 }

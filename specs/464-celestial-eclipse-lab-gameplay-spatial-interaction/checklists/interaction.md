@@ -34,8 +34,9 @@ phase", which commits it as one action, and the item passes.
 
 ## Time dial and phase preview
 
-- [x] CHK007 Is the dial's tick rule stated (round(f · (horizon − 1)) along the projected strip, clamped, every change a
-  `clock.show`)? [Clarity, Spec §Clarifications Q4]
+- [x] CHK007 Is the dial's tick rule stated (the nearest projected tick on the strip, lower on ties — corrected at
+  implementation from a linear fraction that missed by one under perspective; every change a `clock.show`)? [Clarity,
+  Spec §Clarifications Q4]
 - [x] CHK008 Is it stated that the preview and the shown tick are presentation only (never in the digest)?
   [Consistency, Spec §FR-R02G1704-004; SC-R02G1704-003]
 

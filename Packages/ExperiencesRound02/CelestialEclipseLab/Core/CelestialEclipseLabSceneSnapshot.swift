@@ -7,6 +7,14 @@
 // level number and the presentation time; plus the palette and the three quality tiers. The renderer never holds the
 // kernel, so no drawing result can change the game (renderer purity), and the drawn bodies sit at the kernel's
 // positions.
+//
+// Feature 464 (R02-G17-04) T-R02G1704-002 (FR-R02G1704-001, 004; clarification Q3) adds the phase preview of an
+// orbital-handle drag: ``CelestialEclipseLabSceneSnapshot/previewing(body:offset:)`` returns a copy whose
+// `previewBody` and `previewOffset` name the dragged body and its pending offset and whose `previewIntervals`,
+// `previewMatched` and `previewFailure` are the kernel's timeline (`CelestialEclipseLabSky.timeline`) of the current
+// phases with that body at that offset. Without a preview (`previewBody` and `previewOffset` nil) they equal
+// `intervals`, `matched` and `failure`. Presentation only: the preview never enters the digest, the game state or the
+// kernel; every other field of the copy is unchanged.
 import Foundation
 
 /// The palette of Celestial Eclipse Lab, as linear colours 0 … 1 (corona gold and muted ember on ink navy).
@@ -149,6 +157,22 @@ public struct CelestialEclipseLabSceneSnapshot: Sendable, Equatable {
     public let levelNumber: Int
     /// The presentation time in seconds (never negative or non-finite).
     public let time: Double
+    /// The previewed body of an orbital-handle drag; nil when no drag previews (presentation only; never part of the
+    /// digest).
+    public private(set) var previewBody: Int?
+    /// The previewed body's pending offset, 0 … period − 1; nil when no drag previews (presentation only).
+    public private(set) var previewOffset: Int?
+    /// The predicted eclipse intervals of the current phases with the previewed body at the previewed offset (the
+    /// kernel's timeline), in timeline order; equal to ``intervals`` when no drag previews (presentation only).
+    public private(set) var previewIntervals: [CelestialEclipseLabInterval]
+    /// How many target eclipses the preview's timeline matches; equal to ``matched`` when no drag previews
+    /// (presentation only).
+    public private(set) var previewMatched: Int
+    /// The failure a run of the previewed phases would end with (nil when it would win); equal to ``failure`` when no
+    /// drag previews (presentation only).
+    public private(set) var previewFailure: CelestialEclipseLabFailure?
+    /// The level the snapshot was taken from (the kernel's timeline of a preview is computed from it).
+    let level: CelestialEclipseLabLevel
 
     /// A snapshot of `play` with body `chosenBody` chosen and tick `shownTick` shown (a body the level does not have
     /// falls back to ``defaultChoice(_:)``; the tick is clamped to 0 … horizon − 1).
@@ -176,6 +200,49 @@ public struct CelestialEclipseLabSceneSnapshot: Sendable, Equatable {
         budget = level.budget
         self.levelNumber = levelNumber
         self.time = time.isFinite ? max(0, time) : 0
+        self.level = level
+        previewBody = nil
+        previewOffset = nil
+        previewIntervals = play.timeline.intervals
+        previewMatched = play.timeline.matched
+        previewFailure = play.failure ?? play.timeline.failure
+    }
+
+    /// Whether a drag previews a phase (``previewBody`` and ``previewOffset`` set).
+    public var isPreviewing: Bool { previewBody != nil && previewOffset != nil }
+
+    /// This snapshot with body `body` previewed at offset `offset` (wrapped into 0 … period − 1): ``previewBody`` and
+    /// ``previewOffset`` set and ``previewIntervals``, ``previewMatched`` and ``previewFailure`` the kernel's timeline
+    /// (`CelestialEclipseLabSky.timeline`) of the current phases with that body at that offset. A body the level does
+    /// not have, or a fixed body, gives the snapshot without a preview. Presentation only: nothing else changes and
+    /// nothing reaches the kernel or the digest.
+    public func previewing(body: Int, offset: Int) -> CelestialEclipseLabSceneSnapshot {
+        guard bodies.indices.contains(body), phases.indices.contains(body), !bodies[body].fixed,
+              bodies[body].period > 0 else { return withoutPreview() }
+        let period: Int = bodies[body].period
+        let wrapped: Int = ((offset % period) + period) % period
+        var previewed: [Int] = phases
+        previewed[body] = wrapped
+        let timeline: CelestialEclipseLabTimeline = CelestialEclipseLabSky.timeline(level, phases: previewed)
+        var copy: CelestialEclipseLabSceneSnapshot = self
+        copy.previewBody = body
+        copy.previewOffset = wrapped
+        copy.previewIntervals = timeline.intervals
+        copy.previewMatched = timeline.matched
+        copy.previewFailure = timeline.failure
+        return copy
+    }
+
+    /// This snapshot without a preview: ``previewBody`` and ``previewOffset`` nil and the preview's timeline equal to
+    /// ``intervals``, ``matched`` and ``failure`` (presentation only).
+    public func withoutPreview() -> CelestialEclipseLabSceneSnapshot {
+        var copy: CelestialEclipseLabSceneSnapshot = self
+        copy.previewBody = nil
+        copy.previewOffset = nil
+        copy.previewIntervals = intervals
+        copy.previewMatched = matched
+        copy.previewFailure = failure
+        return copy
     }
 
     /// Whether the play is won.

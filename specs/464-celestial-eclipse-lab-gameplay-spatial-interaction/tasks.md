@@ -17,7 +17,7 @@ shader material (the vertex-contract lesson of R02-G16-03 and R02-G17-03).
 
 ## Phase 2: Foundational — orbit, camera, phase preview and picking
 
-- [ ] T-R02G1704-002 [P] Add `previewBody`, `previewOffset` ("nil when no drag"), `previewIntervals` and
+- [X] T-R02G1704-002 [P] Add `previewBody`, `previewOffset` ("nil when no drag"), `previewIntervals` and — Verified 2026-11-25: 2026-11-25 orbit and camera(_:aspect:orbit:), phase preview in the snapshot, ghost (material 17) and preview timeline, camera-taking meshes, picker (pick, dial box, nearest-tick dial, ring offset); 154 CelestialEclipseLab host tests pass (host-2 exit 0); the dial rule corrected from a linear fraction (missed by one under perspective) to the nearest projected tick, spec, research, tasks and checklist updated
   `previewMatched` ("the kernel's timeline of the current phases with the previewed body at the previewed offset;
   presentation only; never in the digest") and `previewing(body:offset:)` to
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabSceneSnapshot.swift`; add
@@ -35,9 +35,10 @@ shader material (the vertex-contract lesson of R02-G16-03 and R02-G17-03).
   SC-R02G1704-001, 004; `CelestialEclipseLabPick` body(index), dial, empty; `viewPoint` projects a world point through
   the drawn camera into view points with the origin top-left, nil behind the eye; `pick`: the front-most body (painted
   last) whose projected disc radius r · s grown by 8 points holds the point, else the dial when inside the projected
-  strip-and-brackets box grown by 8 points, else empty; empty for unusable input; `dialTick`: round(f · (horizon − 1))
-  for the point's fraction f along the projected strip, clamped; `ringOffset`: the phase whose orbit position at the
-  shown tick projects nearest to the point, ties to the lower phase) with
+  strip-and-brackets box grown by 8 points, else empty; empty for unusable input; `dialTick`: the tick whose projected
+  place on the strip is nearest to the point (lower on ties; a linear fraction misses under perspective);
+  `ringOffset`: the phase whose orbit position at the shown tick projects nearest to the point, ties to the lower
+  phase) with
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabPickerTests.swift` (an independent pick,
   dial and ring rule written in the test on 500 seeded points over certified levels, 3 sizes and 3 orbits; the 8-point
   allowance at 7 and 9 points; the front-most body; unusable input) and in
