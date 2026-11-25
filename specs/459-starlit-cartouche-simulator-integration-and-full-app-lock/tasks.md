@@ -66,7 +66,7 @@ change (the shaders and reference of R02-G16-03 are unchanged and re-proven by t
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1609-007 Docs: `docs/architecture/starlit-cartouche.md` (in-app integration),
+- [X] T-R02G1609-007 Docs: `docs/architecture/starlit-cartouche.md` (in-app integration), — Verified 2026-11-25: 2026-11-25 round02-host-1, -2, -3c, -3e, -3f exit 0; script-tests exit 0, run alone; docs updated (architecture in-app integration, round-two README, automatedtesting)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`; `--name script-tests` (alone)
 - [ ] T-R02G1609-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

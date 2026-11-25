@@ -904,5 +904,7 @@ the replay mode (`replay.start`, `replay.step`, `replay.stop`), the saved sound 
 Feature 458 (R02-G16-08) adds the regression net: the solver regression over all 100 levels, the code-only golden set
 `StarlitCartoucheGolden` with `golden-frames.json`, the simulator frame and memory checks and
 `scripts/starlit_cartouche_regression.py`.
+Feature 459 (R02-G16-09) integrates it in the app as a candidate: the pinned identifier list, the stored schema-1
+and schema-2 examples, app unit tests and the interface tests `SCPlayUITests` and `SCReplayUITests` (chunk `y3`).
 See
 [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).

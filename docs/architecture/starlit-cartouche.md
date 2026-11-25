@@ -233,3 +233,23 @@ from the ship's star in index order, waits 0 … 8, flyable ones only) for the l
   close and memory warning.
 - **CI and local command.** The `round02-host-tests` job runs the host part as "Starlit Cartouche regression (host)";
   `python3 scripts/starlit_cartouche_regression.py` runs the host and simulator parts with one summary.
+
+## In-app integration (feature 459, R02-G16-09)
+
+- **Identifiers.** Every panel control and text element carries `experience.r02-g16.starlit-cartouche.<name>`
+  (`StarlitCartoucheControls.identifierNames`, 37 names: star, star-minus, star-plus, wait, wait-minus, wait-plus, fly,
+  leg-detail, undo, redo, next-level, reset-view, dismiss-tutorial, hint, failure-undo, retry, campaign, daily,
+  practice, level-picker, play-level, replay, replay-step, replay-stop, sound, summary, status, actions, pending,
+  progress, message, failure, explanation, instruction, hint-text, goal, replay-position); an experience test checks
+  each is listed once and used exactly once in the panel.
+- **Interface tests.** `SCPlayUITests` wins level 1 through the panel (its certified legs: star 4 after 1 beat, then
+  star 5 after 0 beats, each chosen with Star + or Star − and Wait + or Wait − by the controls' values, then Fly: "The
+  trail draws the symbol and the ship rests at the beacon.", "Stars: 3 of 3.", level 2 open) and keeps the progress
+  over a relaunch; `SCReplayUITests` replays the win (two legs) to its end and stops. They run as serial chunk `y3`
+  (94.5 s, 131.1 s with a relaunch and 80.7 s on 2026-11-25, each about 30 s of it the simulator's automation-session
+  setup per launch). Level 1's certified legs and the budget (9) are pinned in `SC` and checked against the Core by an
+  app unit test.
+- **Stored examples.** The registration stores schema-1 and schema-2 examples (`StarlitCartoucheSchemaExamples`, seed
+  7), which the app restores into schema 3; Starlit Cartouche stays a candidate (not available without
+  `-vcCandidates`) until X-R02-G16.
+- **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
