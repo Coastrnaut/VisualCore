@@ -14,7 +14,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1708-002 [P] [US1] Create
+- [X] T-R02G1708-002 [P] [US1] Create — Verified 2026-11-25: 2026-11-25 host exit 0, 14 tests (.autonomy/migration/checks/R02-G17-08.host.json): 100 witnesses replayed to a win on the final run with their fingerprints and digests, 100 re-plans equal to the witness changes and counterexample settings within the work bound, twelve alterations named
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabRegressionSolverTests.swift` (agent A:
   for every level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's
   actions replay on a fresh play to a win on exactly the final run and not before, within the budget, with its
