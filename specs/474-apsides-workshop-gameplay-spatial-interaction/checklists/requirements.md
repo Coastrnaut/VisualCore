@@ -32,5 +32,5 @@
 ## Notes
 
 - Package and file names appear only in the canonical overrides (packaging is an ADR-0009 constraint, as in feature
-  444); the requirements stay at the level of gestures and what they send. Exact thresholds, bounds and the slider
+  444); the requirements stay at the level of gestures and what they send. Exact thresholds, bounds and the handle
   geometry are settled by `/speckit-clarify`.

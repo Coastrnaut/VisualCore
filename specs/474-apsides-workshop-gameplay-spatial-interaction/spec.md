@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G18-04 (migration ledger, game feature of experience R02-G18) · ID namespace FR-R02G1804-###,
 SC-R02G1804-###, T-R02G1804-###
@@ -28,6 +28,68 @@ Canonical overrides:
   renderer of R02-G18-01 … 03.
 - **Model:** feature 464 (Celestial Eclipse Lab's gameplay spatial interaction) for the gesture controller, picker,
   orbit and panel, adapted to an orbit tuned by its periapsis knob and its size.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+464's answers where the games agree. Facts checked in code (read-only, 2026-11-25): the host's `PointerEvent` (id,
+phase began/moved/ended/cancelled, location in view points with the origin top-left, timestamp); feature 464's
+thresholds (tap below 10 points and 0.5 s, drag from 16 points, double tap within 0.35 s and 22 points, orbit 90° per
+view width and 60° per view height, yaw ±60°, pitch −20° … +35°). Apsides Workshop's adapter declares
+`orbit.periapsis` [k, d], `orbit.size` [a], `orbit.play`, `play.undo`, `play.redo`, `level.next` and `clock.show`
+[tick] (the last presentation only). The scene (`ApsidesWorkshopSceneGeometry`) maps sky units by s = 0.9 / 16 384 in
+the plane z = 0, draws the periapsis diamond (0.035 across) at P(0), the apoapsis square (0.03) at P(T/2), the orbiter
+(radius 0.03) at P(shown tick) and the orbit ribbon through every position, from eye (0, −0.3, 3.6) towards
+(0, −0.3, 0), fitted to x −1.0 … 1.0, y −1.65 … 1.0, in painter's order by kind (markers, planets, star, orbiter last).
+The R02-G18-03 panel sends one tuning per ± press, so stepping to a far orbit could cost more actions than the budget.
+
+- Q: How is a touch picked? → A: at touch-down the handles are projected through the drawn camera (orbit included) into
+  view points: the orbiter is hit within its projected radius grown by 8 points, the apoapsis square (the size handle)
+  and the periapsis diamond (the knob) within their projected half-size grown by 12 points (they are small); of several
+  hits the one drawn last wins (orbiter, then the size handle, then the knob). The orbit loop is hit within 10 points of
+  its projected chords. Anything else (planets, star, compass, wedges, gauges, bars, backdrop) is empty space. Tap,
+  drag and double-tap thresholds are feature 464's. Impact: FR-R02G1804-005; SC-R02G1804-001.
+- Q: What do taps do? → A: a tap on the orbiter or the orbit loop sends `clock.show [tick]` with the tick whose
+  projected position is nearest to the finger (lower on ties) in any stage; a tap on the knob or the size handle sends
+  nothing and explains in words that the handle is dragged; a tap on empty space changes nothing and two such taps
+  within 0.35 s and 22 points reset the view. On a won or failed play no kernel action is sent (the time crank still
+  shows ticks) and the description says the play is over (undo or next level). Impact: FR-R02G1804-003, 007;
+  SC-R02G1804-002.
+- Q: How do the knob and size drags map the finger to steps? → A: a press on a handle that moves 16 points or more while
+  playing becomes a drag; the finger is cast onto the sky plane z = 0 through the drawn camera. Knob: the direction step
+  is the nearest multiple of 15° of the point's angle around the star (d = round(angle / 15°) mod 24) and the
+  eccentricity step is k = round(20 − 20 r / a) clamped to 0 … 15, with r the point's distance in lattice units and a
+  the current size (the periapsis lies at a(20 − k)/20). Size handle: a = round(20 R / (20 + k)) clamped to 8 … 48, with
+  R the point's distance and k the current eccentricity step (the apoapsis lies at a(20 + k)/20). The pending orbit is
+  previewed when it is valid: the presenter draws its kernel positions as a dashed ghost and the gauges show its
+  readings (the snapshot gains `previewOrbit` and its positions and readings, none in the digest); an invalid pending
+  orbit shows no ghost and says why ("the periapsis would dip into the star" or "the apoapsis would leave the sky"). On
+  release exactly one `orbit.periapsis [k, d]` or `orbit.size [a]` is sent when the pending orbit is valid and differs
+  from the current one, otherwise nothing; a release outside playing, a cancel or a second finger clears the preview and
+  sends nothing. Impact: FR-R02G1804-001, 002, 004, 007; SC-R02G1804-001, 003.
+- Q: How do the time crank and two fingers behave? → A: from touch-down on the orbiter, every move sets the tick whose
+  projected position is nearest to the finger (lower on ties) and sends `clock.show [tick]` (never an undo step, never a
+  kernel action). Two fingers as feature 464: a second finger cancels any one-finger gesture (nothing sent) and orbits —
+  yaw ±60° about the vertical axis through the authored box centre (90° per view width), pitch −20° … +35° (60° per
+  view height); a third finger re-bases the midpoint; a double tap on empty space or "Reset view" returns to orbit
+  (0, 0); the camera refits so the authored box stays inside the view with a 5 % margin at every orbit and aspect 0.4 …
+  2.5 and the eye stays outside the box; meshes are rebuilt when the orbit changes; orbit is not saved (schema stays 1).
+  Impact: FR-R02G1804-003, 006; SC-R02G1804-002, 004.
+- Q: How is it built and tested, and how does the panel stay within the budget? → A: a Core gesture controller
+  (`ApsidesWorkshopGestureController`) with a picker (`ApsidesWorkshopPicker`) and a view orbit
+  (`ApsidesWorkshopViewOrbit`, with `camera(aspect:orbit:)` equal to the authored camera at orbit 0) takes pointer
+  events with the view size, the drawn snapshot and the orbit and returns gesture actions (tunePeriapsis, tuneSize,
+  showTick, preview, clearPreview, resetView, explain) and the orbit; the geometry draws the ghost; host tests feed 500
+  seeded taps, knob drags, size drags and crank drags on certified levels at several sizes and orbits against an
+  independent pick in the test; simulator tests send touches through the experience's pointer entry. The panel's
+  eccentricity, direction and size − and + no longer send a tuning each: they move a pending orbit (the same
+  presentation-only preview as a drag; the direction wraps, the other steps clamp to their ranges), and new "Set
+  periapsis" and "Set size" buttons send exactly one `orbit.periapsis [k, d]` or `orbit.size [a]` with the pending steps
+  when they differ from the current orbit and the result is valid; a host test wins all 100 certified levels through
+  panel actions alone (pending steps, the Set buttons, Play), each within its budget. Impact: FR-R02G1804-005, 008, 009;
+  SC-R02G1804-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -76,7 +138,8 @@ changes.
 ### User Story 5 - Every move without gestures (Priority: P1)
 
 A player who cannot touch precisely can do everything through the labelled panel (eccentricity, direction and size − and
-+, tick − and +, play, undo, redo, next level, "Reset view"), including winning every certified level.
++ with "Set periapsis" and "Set size", tick − and +, play, undo, redo, next level, "Reset view"), including winning
+every certified level.
 
 **Independent Test**: all 100 certified witnesses are replayed through panel actions on the host and win.
 
@@ -116,7 +179,8 @@ A player who cannot touch precisely can do everything through the labelled panel
   a 5 % margin at every aspect 0.4 … 2.5 and never enter the digest, the snapshot's game state or the kernel; a double
   tap on empty space or "Reset view" returns to the authored view.
 - **FR-R02G1804-007**: Gestures on a finished play, cancelled touches and second fingers MUST send no kernel action.
-- **FR-R02G1804-008**: The panel MUST keep every action available without gestures and gain "Reset view"; every
+- **FR-R02G1804-008**: The panel MUST keep every action available without gestures and gain "Reset view", "Set
+  periapsis" and "Set size" (the − and + buttons move a pending orbit; each Set button commits it as one action); every
   certified witness MUST be replayable through panel actions within its budget.
 - **FR-R02G1804-009**: Gestures MUST be tested on the host by scripted pointer sequences and on the simulator through
   the experience's pointer entry; existing tests pass; every new public name is documented; refusals are logged with
