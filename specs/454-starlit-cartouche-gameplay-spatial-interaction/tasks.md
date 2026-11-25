@@ -69,7 +69,7 @@ owns the snapshot fields, the preview geometry and its shader material (R02-G16-
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G1604-004 [P] [US5] Create
+- [X] T-R02G1604-004 [P] [US5] Create — Verified 2026-11-24: host-4 exit 0 (.autonomy/migration/checks/R02-G16-04.host-4.json); all 100 certified levels won through panel actions (route.choose stepping, route.fly), undo/redo digests
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartouchePanelWinTests.swift`: all 100 certified levels
   won through panel actions only (FR-R02G1604-008; SC-R02G1604-005; star − and + and wait − and + through
   `route.choose` to each witness leg's destination and wait, then fly), split so each test is under 10 s, plus panel
