@@ -135,6 +135,6 @@ FR-009 → 007 … 011.
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G1703-014 Light the window brackets from `u_won` in the sky fragment shader of
+- [X] T-R02G1703-014 Light the window brackets from `u_won` in the sky fragment shader of — Verified 2026-11-25: 2026-11-25 the sky vertex stage mixes the bracket material to matched gold by u_won; source test aWonLevelLightsTheBracketsGold; host-7 141 tests exit 0 (host-6 failed only on an over-long doc comment, rewrapped); sim-27b 26 tests exit 0
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabShaders.swift` (as the fallback colours do),
   with a source test, per Spec Edge Cases "a won level" (partial)

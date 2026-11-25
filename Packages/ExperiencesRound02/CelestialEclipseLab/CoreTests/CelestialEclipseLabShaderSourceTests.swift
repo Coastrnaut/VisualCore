@@ -790,4 +790,20 @@ import Testing
         }
         #endif
     }
+
+    /// A won level lights the window brackets matched gold on the shader path as the fallback colours do
+    /// (T-R02G1703-014, spec edge case "a won level"): the sky vertex stage mixes the bracket material toward
+    /// `CE_MATCHED` by `u_won`, after selecting `CE_WINDOW`.
+    @Test func aWonLevelLightsTheBracketsGold() {
+        let source: String = CelestialEclipseLabShaders.skyVertex
+        let window: String = "base = mix(base, CE_WINDOW, isCode(m, 8.0));"
+        let lit: String = "base = mix(base, CE_MATCHED, isCode(m, 8.0) * clamp(u_won, 0.0, 1.0));"
+        #expect(source.contains(window))
+        #expect(source.contains(lit))
+        if let a = source.range(of: window), let b = source.range(of: lit) {
+            #expect(a.upperBound <= b.lowerBound)
+        }
+        #expect(CelestialEclipseLabSceneGeometry.colour(of: CelestialEclipseLabSceneGeometry.materialBracket)
+                == CelestialEclipseLabPalette.window)
+    }
 }

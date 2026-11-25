@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "CelestialEclipseLab"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter CelestialEclipseLab",
+  "elapsed_seconds": 9.987,
+  "exit_code": 0,
+  "finished": "2026-11-25T14:21:23+00:00",
+  "gate": "R02-G17-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G17-03.host-7.log",
+  "log_sha256": "cc5a652d330b2b732a858a5c7a8c69d921e25600030516ea99fc6b7309c8bb92",
+  "name": "host-7",
+  "started": "2026-11-25T14:21:13+00:00",
+  "timed_out": false
+}

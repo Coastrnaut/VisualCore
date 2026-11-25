@@ -171,8 +171,9 @@ public enum CelestialEclipseLabShaders {
 
     /// `mat4`: projection x view x model (both programs, vertex stage; model = identity, positions in world space).
     public static let mvpUniform = "u_mvp"
-    /// `float`: the won level's light, 0 … 1 (sky vertex stage: flares the matched halos; glow fragment stage: raises
-    /// the matched halo shells' rest to 1); 0 on a level not won.
+    /// `float`: the won level's light, 0 … 1 (sky vertex stage: lights the window brackets matched gold, as the
+    /// fallback colours do (feature 463 T-R02G1703-014), and flares the matched halos; glow fragment stage: raises the
+    /// matched halo shells' rest to 1); 0 on a level not won.
     public static let wonUniform = "u_won"
     /// `float`: the halo pulse, 0.85 … 1 (sky and glow fragment stages): ``haloPulse(time:reduceMotion:)``.
     public static let pulseUniform = "u_pulse"
@@ -365,6 +366,7 @@ public enum CelestialEclipseLabShaders {
         base = mix(base, CE_CHOSEN, isCode(m, 6.0));
         base = mix(base, CE_ORBIT, isCode(m, 7.0));
         base = mix(base, CE_WINDOW, isCode(m, 8.0));
+        base = mix(base, CE_MATCHED, isCode(m, 8.0) * clamp(u_won, 0.0, 1.0));
         base = mix(base, CE_MATCHED, isCode(m, 9.0));
         base = mix(base, CE_UNWANTED, isCode(m, 10.0));
         base = mix(base, CE_FAINT_EVENT, isCode(m, 11.0));
