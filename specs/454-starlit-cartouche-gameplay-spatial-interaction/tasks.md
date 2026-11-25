@@ -11,7 +11,7 @@ owns the snapshot fields, the preview geometry and its shader material (R02-G16-
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1604-001 Baselines on the committed tree after R02-G16-03 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1604-001 Baselines on the committed tree after R02-G16-03 is recorded: `--name baseline-host`, `--name — Verified 2026-11-24: baseline-host, baseline-timing, baseline-round02-1..3 exit 0 (.autonomy/migration/checks/R02-G16-04.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1 … 3` (the three round-two filters of feature 446); the rendering
   baseline is R02-G16-03's rendering runs (exit 0)
 
