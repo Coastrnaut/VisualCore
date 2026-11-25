@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G18-01 (migration ledger, game feature of experience R02-G18) · ID namespace FR-R02G1801-###,
 SC-R02G1801-###, T-R02G1801-###
@@ -32,6 +32,67 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract,
   so R02-G18-02 can certify levels).
 - **Model:** feature 461 (Celestial Eclipse Lab's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+461's answers where the games agree (stages, stored form, records, refusal codes, puzzle contract). Facts checked in
+code (read-only, 2026-11-25): Celestial Eclipse Lab's kernel (`CelestialEclipseLabLevel`, `CelestialEclipseLabPlay`,
+`CelestialEclipseLabError` with codes `r02-g17.level`, `.action`, `.budget`, `.stage`, `.stale`, `.newer-schema`,
+`.malformed`) keeps every limit as an integer range, fingerprints levels with SHA-256 of a canonical text and
+implements R02-F23's `PuzzleRules` (`VisualCoreSimulation`).
+
+- Q: What exactly is an orbit, and how is Kepler's equation solved so every device agrees? → A: the star sits at the
+  origin of a sky of lattice units (one lattice unit = 256 sky units; sky bound 64 lattice units; star radius 2).
+  An orbit is a size a of 8 … 48 lattice units, an eccentricity step k of 0 … 15 (e = k/20, so 0 … 0.75) and a
+  periapsis direction step d of 0 … 23 (15° each, counterclockwise from +x). It is valid when its periapsis distance
+  a(20 − k)/20 is at least 3 lattice units and its apoapsis distance a(20 + k)/20 at most 64, tested exactly as
+  a(20 − k) ≥ 60 and a(20 + k) ≤ 1280. The period is T ticks (even, 16 … 96); at tick t the mean anomaly is
+  M = 2πt/T. All anomalies and trigonometric values are integers in fixed point with 2^30 as one, computed by integer
+  sine, cosine and square root only. Newton's iteration starts at E = M + e·sin M and takes at most 8 steps, stopping
+  when the residual |M − (E − e·sin E)| is at most 2^−24; if it has not stopped, or leaves the bracket [M − e, M + e],
+  48 bisection steps on that bracket decide E. Every tick's residual MUST be at most 2^−22. The position is
+  (a(cos E − e), a·√(1 − e²)·sin E) turned by 15d° and rounded to whole sky units (half away from zero); its distance
+  r = a(1 − e·cos E) is reported. Periapsis is tick 0 and apoapsis tick T/2. Impact: FR-R02G1801-002, 003, 014;
+  SC-R02G1801-003.
+- Q: What are the sectors and the swept shares? → A: 8 sectors of 45°, sector s covering the directions from 45s°
+  (included) to 45(s + 1)° (excluded), counterclockwise from +x; a point's sector is decided exactly from the signs of
+  x and y and the comparison of |x| with |y|. The quadrature is one triangle per tick, star → P(t) → P(t + 1) (with
+  P(T) = P(0)), whose doubled area is the integer cross product; each triangle counts for the sector of P(t). A sector's
+  share is its area over the whole orbit's area in tenths of a percent, rounded down (0 … 1000). The periapsis lies in
+  sector ⌊d/3⌋ at the distance a(20 − k) in twentieths of a lattice unit; the apoapsis in sector ⌊(d + 12)/3⌋ mod 8 at
+  a(20 + k). Impact: FR-R02G1801-001, 004.
+- Q: How are the targets ordered and judged, and what counts as contact? → A: a level has 1 … 6 targets, each a sweep
+  (sector, lowest and highest share 0 … 1000, both included) or an apsis target (periapsis or apoapsis, sector, nearest
+  and farthest distance in twentieths, both included). Each target has an event tick: a sweep, the first tick whose
+  P(t) lies in its sector (T if none); periapsis 0; apoapsis T/2. Contact: a planet (centre −64 … 64 lattice units on
+  each axis, radius 1 … 8, never overlapping the star) is struck when its centre's closest distance to a segment
+  P(t) → P(t + 1) is strictly smaller than its radius, decided exactly in integers. Playing first walks the ticks: the
+  first contact (lowest tick, then lowest planet) fails `contact`; otherwise it walks the targets in order: a target with an
+  event tick earlier than the previous target's fails `order`; a sweep outside its band fails `share`; an apsis in
+  another sector fails `apsis-sector`, at a distance outside its range `apsis-distance`; all met wins. A failure names
+  the planet or target and its tick. Impact: FR-R02G1801-005; SC-R02G1801-004.
+- Q: Which actions exist and how does a level live and how is it stored? → A: `periapsis(k, d)` sets the eccentricity
+  and direction steps (at least one different) and `size(a)` the size; each spends one action and is refused
+  `r02-g18.action` when out of range, unchanged or making the orbit invalid, `r02-g18.budget` when no action is left.
+  `play` spends nothing and ends the level (won or failed); undo and redo restore tunings and, from failed, undo returns
+  to playing with the orbit before the play. The budget is 1 … 24. As feature 461: stages loading → tutorial → playing
+  ⇄ paused → won or failed → result; begin, dismissTutorial, pause and resume are their own record kinds; each record
+  carries the schema, the level seed, an index, the kind, the action and the fingerprints before and after, and replay
+  refuses a record of another level or a broken chain (`r02-g18.malformed`); `.stage` and `.stale` as there. The stored
+  form is JSON schema 1 with sorted keys (id, seed, difficulty 1 … 5, period, planets, targets, starting orbit, budget,
+  tutorial, fingerprint = SHA-256 of a canonical text); a damaged or edited form is refused `r02-g18.malformed`, a newer
+  one `r02-g18.newer-schema`, an invalid level `r02-g18.level`. Impact: FR-R02G1801-006, 007, 008, 009, 011.
+- Q: What does the kernel report after every action, and what is the puzzle contract? → A: the orbit report: the
+  positions by tick, the share of every sector, the periapsis and apoapsis readings (sector, distance), the largest
+  Kepler residual, every target's deviation (a share's distance outside its band, 0 inside; an apsis's sector match and
+  distance outside its range), the first contact, the first unmet target and the predicted outcome of a play now, with
+  words for each ("sector 3 swept 18.4 %, needs 15.0 to 20.0 %", "periapsis in sector 2 at 6.5 units"); the play's
+  position words name the orbit, actions left and the next target. The puzzle contract (R02-F23): the position is the
+  orbit (a, k, d), the moves are the tunings legal from it, the goal test is that the predicted play wins; certifying
+  levels (R02-G18-02) searches orbits. Impact: FR-R02G1801-010, 013, 014.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -81,6 +142,7 @@ refused.
 - **A tuning equal to the current orbit, or outside its ranges:** refused without cost.
 - **An orbit that only grazes an exclusion planet (the closest distance exactly equal to its radius):** no contact;
   contact needs a strictly smaller distance.
+- **A sector the orbit never enters:** its share is 0 and its event tick is the end of the revolution (T).
 - **A swept share exactly on a tolerance bound:** inside the tolerance.
 - **A point exactly on a sector boundary:** it belongs to the sector that begins at that boundary, by a fixed rule.
 - **A circular orbit (eccentricity zero):** its periapsis direction is defined by the knob's direction, so apsis
