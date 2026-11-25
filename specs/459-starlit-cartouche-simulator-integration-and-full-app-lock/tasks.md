@@ -39,7 +39,7 @@ change (the shaders and reference of R02-G16-03 are unchanged and re-proven by t
   name of Q1 is listed once, has the prefix `experience.r02-g16.starlit-cartouche.`, and the panel source uses each
   exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing StarlitCartoucheExperienceTests`
-- [ ] T-R02G1609-004 [US1] Create `Apps/VisualCore/Tests/UI/StarlitCartouche/SCSupport.swift`, `SCPlayUITests.swift`,
+- [X] T-R02G1609-004 [US1] Create `Apps/VisualCore/Tests/UI/StarlitCartouche/SCSupport.swift`, `SCPlayUITests.swift`, — Verified 2026-11-25: 2026-11-25 app-ui exit 0: chunk y3 ran SCPlayUITests (94.5 s, relaunch 131.1 s) and SCReplayUITests (80.7 s) by agent C, passing unedited (launch setup about 30 s per launch); y3 serial, key unique (script test); xcodegen regenerated
   `SCReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified legs (to star 4 after 1 beat, then to
   star 5 after 0 beats) and the budget (9) pinned in `SC`; each leg's destination and wait chosen with Star + or Star −
   and Wait + or Wait − by their controls' values, Fly tapped, each press counted only when the actions-left count of the

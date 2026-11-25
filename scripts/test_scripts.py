@@ -1273,6 +1273,25 @@ class ReleaseCheckTests(unittest.TestCase):
         start = argv.index("--only-testing") + 1
         self.assertEqual(argv[start:start + 2],
                          ["VisualCoreUITests/VOPlayUITests", "VisualCoreUITests/VOReplayUITests"])
+
+    def test_starlit_cartouche_ui_chunk(self):
+        """Feature 459 R02-G16-09 (T-R02G1609-004): the serial chunk `y3` runs the Starlit Cartouche interface
+        journeys; its key appears once in the `UI_CHUNKS` literal and its classes in no other chunk."""
+        self.assertEqual(relcheck.UI_CHUNKS["y3"], ["SCPlayUITests", "SCReplayUITests"])
+        self.assertIn("y3", relcheck.SERIAL_CHUNKS)
+        source = Path(relcheck.__file__).read_text(encoding="utf-8")
+        self.assertEqual(source.count('"y3": ['), 1)
+        for name, chunk in relcheck.UI_CHUNKS.items():
+            if name != "y3":
+                self.assertNotIn("SCPlayUITests", chunk, name)
+                self.assertNotIn("SCReplayUITests", chunk, name)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-y3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2],
+                         ["VisualCoreUITests/SCPlayUITests", "VisualCoreUITests/SCReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""
