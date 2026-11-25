@@ -27,7 +27,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G1610-004 [P] [US2] Create `docs/apps/starlit-cartouche/device-campaign.md` (agent B, modelled on
+- [X] T-R02G1610-004 [P] [US2] Create `docs/apps/starlit-cartouche/device-campaign.md` (agent B, modelled on — Verified 2026-11-25: 2026-11-25 docs exit 0 (validate_docs); written plan by agent B, read against device-rows.json and the gestures of feature 454 by the lead, one rule sentence corrected
   `docs/apps/voxel-origami/device-campaign.md`, read against the gestures of feature 454: devices and order, D3 on
   iPadOS 26.5, owner actions as BLOCKED_OWNER_ACTION, every row SC-D1 … SC-D8 with devices, procedure, pass condition
   and "pending device campaign", no number claimed, the stress session only in the device campaign); `--name docs --
