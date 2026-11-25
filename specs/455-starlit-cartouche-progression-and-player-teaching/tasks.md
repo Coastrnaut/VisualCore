@@ -38,7 +38,7 @@ by filter.
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1605-003 [P] [US1] [US4] Create
+- [X] T-R02G1605-003 [P] [US1] [US4] Create — Verified 2026-11-24: host-3 exit 0 (.autonomy/migration/checks/R02-G16-05.host-3.json); tutorial steps, progress and stars, daily × 37 over 2026–2036, modes, Codable; 16 tests
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheProgress.swift` (`StarlitCartoucheTutorialStep`
   fly → symbol → recover → done with the texts of clarification Q2, advanced by an accepted leg (fly → symbol, symbol
   → recover) or the level's end (→ done), never moved back by undo — an undo passes `afterLeg: false` and the play's
