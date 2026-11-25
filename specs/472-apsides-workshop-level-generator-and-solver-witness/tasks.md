@@ -65,7 +65,7 @@ fewer tunings wins.
 **Independent test**: band means of the witness length do not fall; the 100 witness files match byte for byte and an
 edited file is refused.
 
-- [ ] T-R02G1802-005 [P] [US4] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopWitness.swift`
+- [X] T-R02G1802-005 [P] [US4] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopWitness.swift` — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopWitness and ApsidesWorkshopWitnessTests pass (host-4 exit 0)
   (agent B: schema 1 sorted-key JSON; state digests "16 hex characters of the SHA-256 of the orbit and the actions
   spent" after each action; play fingerprints after begin (and dismissTutorial) and each action; terminal report (the
   eight shares, periapsis and apoapsis sector and distance, largest Kepler residual, deviations, met); counterexample
