@@ -15,7 +15,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1702-002 Add `generation(Int)` ("r02-g17.generation") and `witness(String)` ("r02-g17.witness") to
+- [X] T-R02G1702-002 Add `generation(Int)` ("r02-g17.generation") and `witness(String)` ("r02-g17.witness") to — Verified 2026-11-25: 2026-11-25 generation and witness refusals, the 100-entry manifest and the difficulty; all 83 CelestialEclipseLab tests pass (host exit 0); feature 461's 200-walk rules test split into four quarters of 50 walks (it took 12 s alone on this host)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabError.swift`; create
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabManifest.swift` (the 100 entries "number 1 …
   100, planned seed, band 1 … 5, budget 8 … 19, emphasis" copied from `python3 scripts/planning_index.py levels

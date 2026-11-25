@@ -1,9 +1,9 @@
 // CelestialEclipseLabRulesTests — feature 461 (R02-G17-01) T-R02G1701-005 (FR-R02G1701-010). The rules as an R02-F23
 // puzzle contract: the rules id and start position; the exact move order on a hand level (each movable body in index
 // order, then offsets 0 … period − 1 other than the current phase) and its refusals (the run, fixed and unknown bodies,
-// offsets outside the period or equal to the current one, no action left); the agreement with
-// `CelestialEclipseLabPlay` step by step on 200 seeded random walks (seed 2_461, fixture levels): on the first 20 walks
-// every candidate (phase changes of bodies −1 … n to offsets −1 … the longest period) is tried with
+// offsets outside the period or equal to the current one, no action left); the agreement with `CelestialEclipseLabPlay`
+// step by step on 200 seeded random walks (seed 2_461, fixture levels; four tests of 50 walks each, feature 462): on
+// the first 20 walks every candidate (phase changes of bodies −1 … n to offsets −1 … the longest period) is tried with
 // `apply(_:expecting:)` on a copy of the play with its current fingerprint and the accepted candidates are exactly the
 // legal moves in order; on the others every legal move and 8 sampled candidates are tried; applying the chosen move
 // gives the same phases and actions spent as the play; at every step the goal equals the outcome of the play's run (on
@@ -122,12 +122,17 @@ struct CelestialEclipseLabRulesTests {
         }
     }
 
-    @Test func agreesWithThePlayOnSeededWalks() throws {
-        var random: SeededRandom = SeededRandom(seed: Self.walkSeed)
+    /// The walks of quarter `quarter` (walks 50·quarter … 50·quarter + 49 of the 200), with the random stream
+    /// `SeedDerivation.derive(walkSeed, index: quarter)`; four tests so each stays well under 10 s (feature 462 split
+    /// the single 200-walk test, which took 12 s alone on the slower host of 2026-11-25).
+    @Test(arguments: [0, 1, 2, 3])
+    func agreesWithThePlayOnSeededWalks(quarter: Int) throws {
+        var random: SeededRandom = SeededRandom(seed: SeedDerivation.derive(Self.walkSeed, index: UInt64(quarter)))
         let fixtures: [CelestialEclipseLabFixture] = Self.fixtures
+        let perQuarter: Int = Self.walkCount / 4
         var wins: Int = 0
         var steps: Int = 0
-        for walk in 0..<Self.walkCount {
+        for walk in (perQuarter * quarter)..<(perQuarter * (quarter + 1)) {
             let fixture: CelestialEclipseLabFixture = fixtures[walk % fixtures.count]
             let level: CelestialEclipseLabLevel = fixture.level
             let rules: Rules = Rules(level: level)
@@ -185,6 +190,6 @@ struct CelestialEclipseLabRulesTests {
             }
         }
         #expect(wins > 0)
-        #expect(steps > Self.walkCount)
+        #expect(steps > perQuarter)
     }
 }
