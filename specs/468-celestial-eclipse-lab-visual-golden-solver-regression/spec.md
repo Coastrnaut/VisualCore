@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G17-08 (migration ledger, game feature of experience R02-G17) · ID namespace FR-R02G1708-###,
 SC-R02G1708-###, T-R02G1708-###
@@ -23,6 +23,68 @@ Canonical overrides:
   memory on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 458 (Starlit Cartouche's visual golden and solver regression), adapted to phase changes, the
   clock run, the eclipse lenses and the corona halos.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+458's answers where the games agree. Facts checked in code (read-only, 2026-11-25): `CelestialEclipseLabSolver.plan`
+certifies a level by a search by number of phase changes from its starting phases, returning `actions` (the phase
+changes), `settingsByDepth` (phase settings judged per number of changes) and `work`, within at most 5 changes
+(`maxChanges`) and 60,000 settings judged (`workBound`); the 100 witness files in
+`docs/games/celestial-eclipse-lab/levels/` hold the number, the level (bodies on orbits with periods and fixed flags,
+horizon, target eclipses with windows, starting phases, budget, tutorial, fingerprint), the actions (the plan's phase
+changes, then the run that wins), the per-action digests, the fingerprints after `begin`, after `dismissTutorial` on a
+tutorial level and after each action, the predicted timeline (intervals and matched count), the counterexample
+(`depth` = size − 1 and `settings`), the difficulty and the skipped candidate count, byte-checked by
+`CelestialEclipseLabCatalogTests` with the catalog digest pinned; the simulator frame checks of feature 463 compare
+rendered frames with the CPU reference (a body's centre not covered at the shown tick brighter than the backdrop by
+0.25 in luminance, the first lit actions bar with red above blue by 0.08, the timeline strip's centre 0.1 from the
+backdrop, each point at least 6 px from what is drawn after it) at 1,152 × 768; the palette has 22 named colours;
+`CelestialEclipseLabSkyScene.release()` frees every renderer, the next draw rebuilds them and `liveObjectCount` counts
+them; `ProcessMemory.footprint()` reads the footprint; the CI job `round02-host-tests` has a named regression step per
+earlier round-two game (Starlit Cartouche's the latest).
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win on exactly the final run and not before, within the budget, with exactly its per-action fingerprints
+  and digests; and `plan` returns exactly the witness's phase changes with `settingsByDepth[size − 1]` equal to the
+  counterexample's `settings` at depth size − 1; `work` is at most `workBound` (counted, never timed). The run is split
+  into tests of 10 levels (10 tests), each well under 10 s. Impact: FR-R02G1708-001; SC-R02G1708-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a body's period, a body's radius or depth, a body's
+  fixed flag, a starting phase, a target's bodies, a target's window, the horizon, the budget; a plan phase change; a
+  witness action, a per-action fingerprint or digest; the counterexample's settings count. Impact: FR-R02G1708-002;
+  SC-R02G1708-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after all of the witness's phase changes but before the run,
+  so actions are spent from the actions bars and the level is not yet won, shown at the first tick of the predicted
+  timeline at which an eclipse is under way (tick 0 when there is none), at presentation time 0, the default chosen
+  body, the authored camera, plus the hero frame of the scenario manifest's hero scenario at tier 0: 16 frames) the
+  Core computes, at 1,152 × 768, the projected pixel positions of every body at the shown tick, the centre of every
+  shadow lens, every halo, the playhead and the first actions bar, rounded to 1/8 pixel, the counts of bodies, rings,
+  shadow lenses, halos, targets, matched targets, lit and total actions bars, and the 22 palette colours as 8-bit sRGB;
+  serialized as JSON with sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
+  `Packages/ExperiencesRound02/CelestialEclipseLab/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every count and colour
+  must be equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal
+  the digest of its pinned description. The file is rewritten only when `CELESTIAL_ECLIPSE_LAB_WRITE_GOLDEN=1` is set.
+  The simulator test renders the 16 frames and checks them against the same descriptions with the feature-463
+  tolerances. Impact: FR-R02G1708-003, 004; SC-R02G1708-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_CELESTIAL_ECLIPSE_LAB_MEMORY_ISOLATED=1`; in the
+  full parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU
+  objects of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a
+  named reason. Impact: FR-R02G1708-005; SC-R02G1708-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's `round02-host-tests` job keeps running all
+  round-two host tests and adds a named step "Celestial Eclipse Lab regression (host)" that runs the Celestial Eclipse
+  Lab regression filter alone. The local command `python3 scripts/celestial_eclipse_lab_regression.py` runs the host
+  regression filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`, and
+  prints one summary line per part with pass or fail and the first failing name; its exit code is non-zero on any
+  failure. Nothing is timed against the wall clock. Impact: FR-R02G1708-006, 007; SC-R02G1708-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -151,7 +213,7 @@ simulator parts and reports one summary.
 
 - **SC-R02G1708-001**: All 100 levels replay their witnesses and re-plan to their certified phase changes within the
   search's work bound; 100 of 100.
-- **SC-R02G1708-002**: Each kind of alteration listed in the clarifications is detected and named.
+- **SC-R02G1708-002**: Each of the twelve kinds of alteration listed in the clarifications is detected and named.
 - **SC-R02G1708-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry.
 - **SC-R02G1708-004**: Over 12 open-draw-warn-close cycles, every footprint reading of cycles 2 … 12 stays within 16 MB
