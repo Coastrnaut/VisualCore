@@ -28,7 +28,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 **Independent test**: each catalog level's witness, replayed and played, wins within the budget; no orbit reachable with
 fewer tunings wins.
 
-- [ ] T-R02G1802-003 [US1] Implement `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopSolver.swift`
+- [X] T-R02G1802-003 [US1] Implement `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopSolver.swift` — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopSolver and ApsidesWorkshopSolverTests pass (host-2 exit 0): hand minima incl. knob-first order, orbit lists equal an independent enumeration (423 and 13 880 at most), apsis shortcut agrees with the full report
   (lead: depth 1 "every valid knob setting (eccentricity 0 … 15, then direction 0 … 23, the start's pair excluded) at
   the start's size, then every valid size 8 … 48 (the start's excluded) at the start's knob"; depth 2 "every valid orbit
   with both a different size and a different knob, size outermost, then eccentricity, then direction"; each orbit judged
