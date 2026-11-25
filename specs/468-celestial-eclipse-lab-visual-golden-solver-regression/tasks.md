@@ -28,7 +28,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1708-003 [US2] Create
+- [X] T-R02G1708-003 [US2] Create — Verified 2026-11-25: 2026-11-25 CelestialEclipseLabGolden (16 frames, 21 colours) and golden-frames.json generated with CELESTIAL_ECLIPSE_LAB_WRITE_GOLDEN=1, checked by host-2 exit 0 (.autonomy/migration/checks/R02-G17-08.host-2.json); CelestialEclipseLabGolden added to RELEASE_FORBIDDEN
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabGolden.swift` (DEBUG or
   VISUALCORE_AUTOMATION; "16 frames: levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all of the
   witness's phase changes but not the run, with the default chosen body, shown at the first tick of the predicted

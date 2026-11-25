@@ -358,7 +358,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 448 (R02-G15-08): Voxel Origami's golden frames, test builds only.
                      "VoxelOrigamiGolden",
                      # Feature 458 (R02-G16-08): Starlit Cartouche's golden frames, test builds only.
-                     "StarlitCartoucheGolden"]
+                     "StarlitCartoucheGolden",
+                     # Feature 468 (R02-G17-08): Celestial Eclipse Lab's golden frames, test builds only.
+                     "CelestialEclipseLabGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:
