@@ -10,7 +10,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1606-001 Baselines after R02-G16-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1606-001 Baselines after R02-G16-05 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-24: baseline-host, baseline-timing, baseline-round02-1..3 exit 0 (.autonomy/migration/checks/R02-G16-06.baseline-*.json)
   baseline-round02-1 … 3` (the three round-two filters of feature 446); the rendering baseline is R02-G16-05's rendering
   runs (exit 0)
 - [ ] T-R02G1606-002 Edit `Packages/ExperiencesRound02/Package.swift` (`StarlitCartoucheCore` and its tests gain
