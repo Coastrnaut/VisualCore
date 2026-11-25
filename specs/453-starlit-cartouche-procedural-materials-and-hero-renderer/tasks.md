@@ -120,7 +120,7 @@ pass.
 - [X] T-R02G1603-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G16-03.*.json)
   `--name host-full`, `--name app-unit`
 - [X] T-R02G1603-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-24: reference-1 exit 0 (.autonomy/migration/checks/R02-G16-03.reference-1.json)
-- [ ] T-R02G1603-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G1603-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-24: reference-2 exit 0 (.autonomy/migration/checks/R02-G16-03.reference-2.json)
 - [ ] T-R02G1603-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1603-012 {device} After ImplementationLock-100: frame time per tier on D1/D2/D3 (SC-R02G1603-006)
 - [ ] T-R02G1603-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
