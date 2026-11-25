@@ -62,7 +62,7 @@ change (the shaders and reference of R02-G17-03 are unchanged and re-proven by t
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G1709-006 [US3] Release build and symbols (`CelestialEclipseLabGolden`, `acceptanceScenarios`
+- [X] T-R02G1709-006 [US3] Release build and symbols (`CelestialEclipseLabGolden`, `acceptanceScenarios` — Verified 2026-11-25: 2026-11-25 release exit 0: app-release-build and app-release-symbols pass (.autonomy/migration/checks/R02-G17-09.release.json); regression exit 0: host and simulator parts pass, 100 of 100 levels (.autonomy/migration/checks/R02-G17-09.regression.json)
   already forbidden): `--name release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`;
   `--name regression -- python3 scripts/celestial_eclipse_lab_regression.py` (100 of 100 levels, SC-R02G1709-004)
 
