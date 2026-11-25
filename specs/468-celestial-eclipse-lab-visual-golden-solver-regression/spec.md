@@ -33,7 +33,7 @@ Answered autonomously under the owner's standing delegation, safest well-support
 certifies a level by a search by number of phase changes from its starting phases, returning `actions` (the phase
 changes), `settingsByDepth` (phase settings judged per number of changes) and `work`, within at most 5 changes
 (`maxChanges`) and 60,000 settings judged (`workBound`); the 100 witness files in
-`docs/games/celestial-eclipse-lab/levels/` hold the number, the level (bodies on orbits with periods and fixed flags,
+`docs/games/celestial-eclipse-lab/levels/` hold the number, the level (bodies with their orbit points, radii and fixed flags,
 horizon, target eclipses with windows, starting phases, budget, tutorial, fingerprint), the actions (the plan's phase
 changes, then the run that wins), the per-action digests, the fingerprints after `begin`, after `dismissTutorial` on a
 tutorial level and after each action, the predicted timeline (intervals and matched count), the counterexample
@@ -53,7 +53,7 @@ earlier round-two game (Starlit Cartouche's the latest).
   counterexample's `settings` at depth size − 1; `work` is at most `workBound` (counted, never timed). The run is split
   into tests of 10 levels (10 tests), each well under 10 s. Impact: FR-R02G1708-001; SC-R02G1708-001.
 - Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
-  each producing a failure message naming the level and the part: a body's period, a body's radius or depth, a body's
+  each producing a failure message naming the level and the part: a body's orbit point, a body's radius, a body's
   fixed flag, a starting phase, a target's bodies, a target's window, the horizon, the budget; a plan phase change; a
   witness action, a per-action fingerprint or digest; the counterexample's settings count. Impact: FR-R02G1708-002;
   SC-R02G1708-002.
