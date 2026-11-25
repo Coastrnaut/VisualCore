@@ -89,7 +89,8 @@ of R02-G17-04's CHK013).
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopCompassScene.swift` (the orbit's camera and
   meshes, rebuilt when the orbit changes) and
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopControls.swift` (− and + move the pending orbit
-  and preview it; "Set periapsis", "Set size" and "Reset view"; the pending line); agent E writes
+  and preview it; the pending orbit follows the current orbit after any accepted action and a drag's preview replaces
+  it; "Set periapsis", "Set size" and "Reset view"; the pending line); agent E writes
   `Packages/ExperiencesRound02/ApsidesWorkshop/ExperienceTests/ApsidesWorkshopGestureWiringTests.swift` (touches through
   the pointer entry tune the knob and the size by drags, turn the crank; orbit and reset change no digest; a refused
   tuning is shown; a drag on a won play sends nothing and says the play is over; the panel's Set buttons), given the

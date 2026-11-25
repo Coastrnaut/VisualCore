@@ -88,9 +88,10 @@ The R02-G18-03 panel sends one tuning per ± press, so stepping to a far orbit c
   eccentricity, direction and size − and + no longer send a tuning each: they move a pending orbit (the same
   presentation-only preview as a drag; the direction wraps, the other steps clamp to their ranges), and new "Set
   periapsis" and "Set size" buttons send exactly one `orbit.periapsis [k, d]` or `orbit.size [a]` with the pending steps
-  when they differ from the current orbit and the result is valid; a host test wins all 100 certified levels through
-  panel actions alone (pending steps, the Set buttons, Play), each within its budget. Impact: FR-R02G1804-005, 008, 009;
-  SC-R02G1804-001 … 005.
+  when they differ from the current orbit and the result is valid (the pending orbit follows the current orbit after any
+  accepted action — a tuning, undo, redo, play or level change — and a drag's preview replaces it); a host test wins all
+  100 certified levels through panel actions alone (pending steps, the Set buttons, Play), each within its budget.
+  Impact: FR-R02G1804-005, 008, 009; SC-R02G1804-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
