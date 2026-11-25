@@ -23,8 +23,8 @@ but CHK010 passed at first reading.
 - [x] CHK003 Are orbit validity (a(20 − k) ≥ 60, a(20 + k) ≤ 1280), the fixed-point Kepler inversion (start value,
   Newton step limit, stopping residual, bisection bracket and steps), the residual bound and the rounding of positions
   defined so two readers compute the same values? [Measurability, Spec §FR-R02G1801-002, 003; Clarifications Q1]
-- [x] CHK004 Are the sectors and their boundary rule, the quadrature (one triangle per tick, counted for P(t)), the share
-  unit and its rounding, and the apsis readings defined without ambiguity at their boundaries? [Clarity, Spec
+- [x] CHK004 Are the sectors and their boundary rule, the quadrature (one triangle per tick, counted for P(t)), the
+  share unit and its rounding, and the apsis readings defined without ambiguity at their boundaries? [Clarity, Spec
   §FR-R02G1801-004; Clarifications Q2]
 - [x] CHK005 Is the truth metric (largest Kepler residual, deviation of every target, first contact, first unmet target,
   predicted outcome) required after every action and excluded from deciding on its own? [Measurability, Spec
