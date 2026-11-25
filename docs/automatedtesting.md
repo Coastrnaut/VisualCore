@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G17-01: Celestial Eclipse Lab rule kernel).
+Last updated: 2026-11-25 (R02-G17-02: Celestial Eclipse Lab content pipeline).
 
 ## 1. What is tested, and where
 
@@ -927,6 +927,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   every refusal in order), the puzzle contract and the nine source invariants. Lesson: the hand-written sample level's
   starting phases already won, which the level correctly refused; a fixture's comment must be checked against the
   judge, not assumed.
+- **Celestial Eclipse Lab content pipeline** (R02-G17-02, 2026-11-25). `swift test --package-path
+  Packages/ExperiencesRound02 --filter CelestialEclipseLab` (83 tests in nine suites): the solver on hand levels with
+  known minima and against a brute-force enumeration through the kernel's whole-sky timeline, its pair-interval table
+  against the kernel's intervals on seeded settings; the generator's drawing order re-drawn independently; witnesses
+  (round trip, refusals); the catalog (100 witness files byte for byte, pinned digest, progression, neighbours differ,
+  the whole-sky enumeration on two levels per band). Regenerate with `CELESTIAL_ECLIPSE_LAB_WRITE_WITNESSES=1 swift test
+  --no-parallel --filter CelestialEclipseLabCatalogTests/witnessFilesMatchByteForByte` (each group reads the level the
+  group before it wrote). Lessons: judging each setting with the kernel's whole-sky timeline took 27 s for 20 band-5
+  levels on a debug build, so the solver merges a per-pair table instead (7 s) and the tests check the table against
+  the kernel; feature 461's 200-walk rules test took 12 s alone on this host, so it now runs as four tests of 50 walks.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15

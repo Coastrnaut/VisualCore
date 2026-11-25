@@ -32,3 +32,24 @@ later features.
   next fingerprints replay a play exactly; the level's stored form is JSON schema 1 with a SHA-256 fingerprint,
   re-checked on decode (damaged, edited, newer and older forms refused). The rules are an R02-F23 `PuzzleRules` over
   phase vectors.
+
+## Content pipeline (feature 462, R02-G17-02)
+
+- **Manifest.** `CelestialEclipseLabManifest` holds the 100 planned levels of the archived design (number, planned seed,
+  band 1 … 5, moves budget 8 … 19, control emphasis), 20 per band.
+- **Generator.** Candidate c of an entry draws from `SeededRandom(seed: SeedDerivation.derive(seed, index: c))`: the
+  body count, a depth rank per body (a Fisher–Yates shuffle), each body's period 4 … 8, centre, semi-axes, direction
+  and tilt — its orbit positions read from a fixed integer table of cos and sin × 1000, so no floating point enters a
+  rule — and radius 1 … 4 (body 0 fixed); the horizon; winning phases; the target as the first eclipse events of the
+  winning timeline with windows of 0 … 2 ticks either side; then some movable bodies moved away. A candidate is kept
+  when the level rules accept it, its target sequence differs from the previous level's and the solver certifies a
+  minimal plan in its band's range (1 … 2, 2 … 3, 3 … 4, 3 … 4, 4 … 5 phase changes); at most 256 candidates.
+- **Solver.** A later phase change of a body overrides an earlier one, so the settings reachable with d changes are the
+  phase vectors differing from the start on d movable bodies; the solver tries them by depth (subsets, then phases, in
+  lexicographic order), judging each with a pair-interval table built once per level (every pair's intervals for every
+  pair of phases, merged in timeline order and walked by the kernel's judge). The first win is minimal; the settings
+  judged at each smaller depth are the counted proof; work is bounded at 60 000 settings.
+- **Witnesses and catalog.** `docs/games/celestial-eclipse-lab/levels/NNN.witness.json` (schema 1, sorted keys): the
+  level, the actions and the run, a state digest after every action, the play fingerprints, the terminal timeline with
+  visibility classes, the counterexample, the difficulty and the candidates skipped; decoding re-checks everything by
+  replay. The catalog digest over the 100 fingerprints is pinned; the progression rule holds and band means never fall.

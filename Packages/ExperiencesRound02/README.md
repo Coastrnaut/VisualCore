@@ -919,5 +919,9 @@ eclipses by the strict integer disc test, visibility classes total, annular and 
 `CelestialEclipseLabSky`), the judge (match, `window`, `unwanted`, `horizon`), `CelestialEclipseLabLevel` (immutable,
 depth-ordered pairs, fingerprinted, JSON schema 1, with names in words), the play state `CelestialEclipseLabPlay` with
 stages, phase changes and the run, records, undo and redo, and `CelestialEclipseLabRules` (an R02-F23 `PuzzleRules`
-over phase vectors). See
+over phase vectors). Feature 462 (R02-G17-02) adds the content pipeline: `CelestialEclipseLabManifest` (the 100
+planned levels), `CelestialEclipseLabGenerator` (seeded candidates by band on integer orbits, the neighbour rule),
+`CelestialEclipseLabSolver` (a phase search by number of changes over a pair-interval table, with a counted minimality
+proof), `CelestialEclipseLabDifficulty` and `CelestialEclipseLabWitness`, with the 100 witness files in
+`docs/games/celestial-eclipse-lab/levels/`. See
 [docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).
