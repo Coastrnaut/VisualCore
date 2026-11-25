@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G17-02 (migration ledger, game feature of experience R02-G17) · ID namespace FR-R02G1702-###,
 SC-R02G1702-###, T-R02G1702-###
@@ -28,6 +28,80 @@ Canonical overrides:
   earlier round-two games.
 - **Model:** feature 452 (Starlit Cartouche's content pipeline) for manifest, generator, solver, witness files, digest
   and progression, adapted to the eclipse rules of feature 461: a move is a phase change, and the run ends the level.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+452's answers where the games agree. Facts checked (read-only, 2026-11-25): R02-G17-01's `CelestialEclipseLabLevel` (2 …
+6 bodies, orbits of 4 … 24 positions, coordinates −32 … 32, radius 1 … 8, depth-ordered pairs, horizon 8 … 96, target
+1 … 6, budget 1 … 24, starting phases that must not win), `CelestialEclipseLabSky` (exact overlap, visibility,
+intervals, judge), `CelestialEclipseLabPlay` and `CelestialEclipseLabRules`; R02-F24's
+`PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most 1, jump at most 3);
+`SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (bands 1 … 5 × 20, moves
+budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19 by band, five control emphases, 20 each); every manifest budget lies
+inside the kernel's 1 … 24, so the kernel needs no change. The ranges below were measured before they were written
+down: a prototype of this generator and solver on the real kernel, run over the real 100 manifest entries (release
+build), certified every entry within candidate index 4, with at most 10 291 settings judged per candidate, in 0.57 s
+for all 100; witness lengths by band averaged 1.65, 2.15, 3.25, 3.40 and 4.40 (ranges 1 … 2, 2 … 3, 3 … 4, 3 … 4,
+4 … 5) with no progression drop or jump; one entry's first certified candidate repeated the previous level's target sequence (hence
+the neighbour rule). A debug build judged 20 band-5 entries in 7.0 s with the pair-interval table below (27 s with the
+kernel's whole-sky timeline per setting).
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, budget, control
+  emphasis) are a table in `CelestialEclipseLabManifest` with their provenance. Candidate c of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: c))`, in this order: the body count (band profile); a
+  depth rank per body (a Fisher–Yates shuffle of 0 … count − 1, from the last index down); for each body its period
+  (4 … 8), centre x and y (−8 … 8 each), semi-axes a and b (3 … 10 each), direction (forward or backward) and tilt
+  (−1 … 1), its orbit positions being (cx + round(a·cos), cy + round(b·sin), 4·rank − 12 + round(tilt·sin)) from a fixed
+  integer table of cos and sin × 1000 for each period (rounded half away from zero; no floating point), then its
+  radius (1 … 4); body 0 is fixed, the others movable; the horizon (band profile); the winning phases (one per body,
+  0 … period − 1); the target count (band profile), the target being the first that many eclipse events of the winning
+  phases' timeline, each with window open = first − 0 … 2 (at least 0) and close = first + 0 … 2 (at most horizon − 1);
+  the number of bodies to move away (band profile, at most the movable count), each a drawn movable body given a drawn
+  different phase. Band profiles (bodies, targets, horizon, moved, plan range): band 1 (3, 1 … 2, 24 … 32, 2, 1 … 2),
+  band 2 (3 … 4, 2 … 3, 28 … 36, 3, 2 … 3), band 3 (4 … 5, 2 … 3, 32 … 40, 4, 3 … 4), band 4 (5 … 6, 3 … 4, 36 … 44, 4,
+  3 … 4), band 5 (6, 3 … 4, 40 … 48, 5, 4 … 5). Budget = the manifest's; ids `celestial-eclipse-lab-NNN`; tutorial on
+  levels 1 … 3; difficulty = band. A candidate is skipped when the level rules refuse it (including starting phases
+  that already win), when the winning timeline has fewer events than the target count, when its target sequence of
+  (front, back) pairs equals the previous level's (FR-R02G1702-007), or when the solver does not certify a minimal plan
+  inside its band's plan range within its work bound; at most 256 candidates, then `generation(n)`. The catalog is
+  therefore built in manifest order. Impact: FR-R02G1702-001, 007; SC-R02G1702-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing shorter wins? → A: a later phase change of the
+  same body overrides an earlier one, so the settings reachable with at most d phase changes are exactly the phase
+  vectors that differ from the start on at most d movable bodies; the solver searches them by depth d = 1, 2, … (the
+  start itself does not win): at each depth, the subsets of d movable bodies in lexicographic order of body numbers,
+  and within a subset the new phases in lexicographic order (each 0 … period − 1 except the starting phase). Each
+  setting is judged with a pair-interval table built once per level: for every pair and every pair of phases, the
+  pair's eclipse intervals over the horizon by the kernel's exact overlap and visibility rules; a setting's intervals
+  are the merge of its pairs' lists in timeline order (first tick, front, back), walked by the kernel's judge. The
+  first winning setting ends the search; the plan is its phase changes in body order, then `run`, replayed through the
+  kernel's play, whose timeline must agree. Work = settings judged, counted and bounded at 60 000; over the bound, or
+  past the band's upper plan length, the candidate is skipped. The minimality proof is the count of settings at each
+  smaller depth, every one judged and none winning. Impact: FR-R02G1702-002; SC-R02G1702-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `CelestialEclipseLabDifficulty` holds the
+  witness length (phase changes), the bodies, the movable bodies, the target eclipses, the eclipse events of the
+  winning timeline, the settings judged at smaller depths and the solver work. The catalog in manifest order keeps
+  R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on the witness length; band means must not fall
+  (measured above). Impact: FR-R02G1702-003, 005; SC-R02G1702-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/celestial-eclipse-lab/levels/NNN.witness.json`,
+  JSON schema 1 with sorted keys: number, the level's stored form, the actions (the phase changes, then `run`), the
+  state digest after every action (16 hex characters of the SHA-256 of the phases and the actions spent), the play
+  fingerprints after `begin` (and `dismissTutorial` when the level has one) and after each action, the terminal
+  timeline (each interval's front, back, first and last tick and visibility class, and the matched count), the
+  counterexample (the depth one below the plan and the number of settings at that depth, none winning), the difficulty
+  and the candidates skipped. A test rebuilds every witness and compares bytes; it writes the files only with
+  `CELESTIAL_ECLIPSE_LAB_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. Impact: FR-R02G1702-004; SC-R02G1702-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<CelestialEclipseLabRules>.digest(id: "celestial-eclipse-lab", identities:)` over the 100 level
+  fingerprints in manifest order, pinned in a test. Certification tests are split into groups of 10 levels so each runs
+  under 10 seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per
+  process. New refusals: `generation(Int)` (`r02-g17.generation`) and `witness(String)` (`r02-g17.witness`). The
+  independent check of SC-R02G1702-002 judges, with the kernel's own whole-sky timeline (no pair table), every setting
+  with fewer phase changes than the plan on the two levels with the fewest bodies in each band: none wins. Impact:
+  FR-R02G1702-006; SC-R02G1702-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -103,6 +177,7 @@ file is refused.
   (bounded) and records how many it skipped; no candidate within the bound is a named refusal.
 - **A candidate whose starting phases already win:** never emitted (the kernel refuses it).
 - **More than one minimal setting:** allowed; the witness is the one the solver finds in its fixed order.
+- **Adjacent levels with the same target sequence:** the later candidate is skipped (FR-R02G1702-007).
 - **A plan needing more phase changes than the budget:** not emitted.
 - **A search over its work bound:** the candidate is skipped (counted work, never timed).
 - **Touching discs or an eclipse on a window's edge:** decided exactly by the kernel's integer rules; the generator
@@ -162,9 +237,9 @@ file is refused.
   artifact"); they are regenerated only by a test run with an explicit opt-in and checked byte for byte on every other
   run.
 - "Analytical circle/ellipse overlap interval enumeration and phase search" is read as: the kernel's exact integer
-  overlap test enumerates the eclipse intervals of a setting, and the solver searches phase settings by the number of
-  phase changes from the start, so the first win found is minimal. Orbits are lattice positions, so "ellipse" means an
-  orbit's shape, not a continuous curve.
+  overlap test enumerates each pair's eclipse intervals for every pair of phases, and the solver searches phase settings
+  by the number of phase changes from the start, so the first win found is minimal. Orbits are lattice positions, so
+  "ellipse" means an orbit's shape, not a continuous curve.
 - Levels are presented, hinted and played through later features (R02-G17-03 … 07); this feature draws nothing.
 - The manifest's numbers, seeds, bands and budgets are copied from the project's own archived design; no third-party
   content is used.
