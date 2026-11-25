@@ -193,6 +193,10 @@ jobs:
         # Feature 448 (R02-G15-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/voxel_origami_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter VoxelOrigamiRegression
+      - name: Starlit Cartouche regression (host)
+        # Feature 458 (R02-G16-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/starlit_cartouche_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter StarlitCartoucheRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase

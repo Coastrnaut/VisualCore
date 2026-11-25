@@ -64,7 +64,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1608-006 [P] [US4] Create `scripts/starlit_cartouche_regression.py` and its test in
+- [X] T-R02G1608-006 [P] [US4] Create `scripts/starlit_cartouche_regression.py` and its test in — Verified 2026-11-25: 2026-11-25 regression exit 0 (host PASS, simulator PASS; isolated memory 28.61-29.11 MB); script test 5/5 (agent D, retested by the lead); CI step added
   `scripts/test_scripts.py` (agent D: host filter `StarlitCartoucheRegression`, then the simulator classes through
   `xcodebuild_package.py --only-testing` with the isolation variable, one summary line per part with pass or fail and
   the first failing name, a non-zero exit on any failure), and add the named step "Starlit Cartouche regression (host)"
