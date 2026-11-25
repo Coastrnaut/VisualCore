@@ -771,7 +771,12 @@ let package = Package(
         // Feature 471 (R02-G18-01): Apsides Workshop's pure rule kernel.
         .target(name: "ApsidesWorkshopCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 473 (R02-G18-03): the adapter, snapshot, geometry and scenarios.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "ApsidesWorkshop/Core"),
         .testTarget(name: "ApsidesWorkshopCoreTests",
                     dependencies: ["ApsidesWorkshopCore",

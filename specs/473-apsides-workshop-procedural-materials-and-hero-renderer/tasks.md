@@ -12,7 +12,7 @@ R02-G17-03 (`git show <R02-G17-03 record commit>:<path>`).
 - [X] T-R02G1803-001 Baselines on the committed tree after R02-G18-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host, baseline-timing and round02-1, -2, -3c, -3e, -3f exit 0 on the committed R02-G18-02 record; rendering baseline is R02-G18-02's rendering runs (exit 0)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G18-02's
   rendering runs (exit 0)
-- [ ] T-R02G1803-002 Edit `Packages/ExperiencesRound02/Package.swift` (`ApsidesWorkshopCore` gains VisualCoreScenes,
+- [X] T-R02G1803-002 Edit `Packages/ExperiencesRound02/Package.swift` (`ApsidesWorkshopCore` gains VisualCoreScenes, — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopCore gains Scenes, Experience, Diagnostics and Persistence; ApsidesWorkshopSceneSnapshot (palette, tiers, gauges, snapshot); all ApsidesWorkshop tests pass (host exit 0); the invariant scans read only their explicit kernel file list
   VisualCoreExperience, VisualCoreDiagnostics and VisualCorePersistence; `ApsidesWorkshopExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); the renderer-purity and time
   scans of `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopInvariantTests.swift` read only the
