@@ -54,6 +54,8 @@ let package = Package(
         .library(name: "StarlitCartoucheExperience", targets: ["StarlitCartoucheExperience"]),
         // Feature 461 (R02-G17-01): Celestial Eclipse Lab's rule kernel, a candidate until X-R02-G17.
         .library(name: "CelestialEclipseLabCore", targets: ["CelestialEclipseLabCore"]),
+        // Feature 463 (R02-G17-03): Celestial Eclipse Lab's experience (iOS only; a registered candidate until X-R02-G17).
+        .library(name: "CelestialEclipseLabExperience", targets: ["CelestialEclipseLabExperience"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -759,6 +761,27 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreMath", package: visualCore)],
                     path: "CelestialEclipseLab/CoreTests"),
+        // Feature 463 (R02-G17-03): Celestial Eclipse Lab's experience (presenter, scene, controls).
+        .target(name: "CelestialEclipseLabExperience",
+                dependencies: ["CelestialEclipseLabCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "CelestialEclipseLab/Experience"),
+        // Feature 463 (R02-G17-03): the simulator tests of Celestial Eclipse Lab's experience.
+        .testTarget(name: "CelestialEclipseLabExperienceTests",
+                    dependencies: ["CelestialEclipseLabExperience", "CelestialEclipseLabCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "CelestialEclipseLab/ExperienceTests"),
         // Feature 453 (R02-G16-03): Starlit Cartouche's experience (presenter, scene, controls).
         .target(name: "StarlitCartoucheExperience",
                 dependencies: ["StarlitCartoucheCore",

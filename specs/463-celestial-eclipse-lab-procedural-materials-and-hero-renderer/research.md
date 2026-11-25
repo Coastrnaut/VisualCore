@@ -16,8 +16,11 @@
   (rejected: painter's order without a depth buffer and perspective would disagree with the strict integer overlap near
   touching discs).
 - **R3 Painter's order by camera distance.** Decision: with depth testing off (the shared mesh renderer's path),
-  elements are drawn back to front by their centres' distance from the eye, ties by kind then index. Rationale: nearer
-  bodies (greater z) are drawn after farther ones, as the eclipse order says.
+  elements are drawn by kind (rings, bodies with their shadow lenses, halos, gauges); bodies and halos back to front by
+  their centres' distance from the eye, ties by index; rings and the flat gauges by index. Rationale: nearer bodies
+  (greater z) are drawn after farther ones, as the eclipse order says; rings lie in the bodies' layers and the gauges
+  share one plane, so ordering them by distance painted a ring over its body's centre and the strip over its marks
+  (found by the simulator test agent, 2026-11-25).
 - **R4 Layered and signed-distance shading.** Decision: body spheres shaded in layers (core, limb darkening, rim light)
   from the normal; rings, notches, frames, brackets, marks and the playhead are generated quads shaded by signed
   distance from per-vertex local coordinates; halos are thin rings with an emissive falloff. Rationale: a luminous look

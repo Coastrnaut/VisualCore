@@ -597,7 +597,11 @@ struct CelestialEclipseLabSceneGeometryTests {
             let order: [CelestialEclipseLabElement] = G.paintOrder(snap, camera: G.camera(snap, aspect: 1.3))
             for k in 1..<order.count {
                 #expect(!CelestialEclipseLabElement.paintsBefore(order[k], order[k - 1]))
-                #expect(order[k].distance <= order[k - 1].distance)
+                #expect(order[k].kind.rawValue >= order[k - 1].kind.rawValue)
+                let byDistance: Bool = order[k].kind == .body || order[k].kind == .halo
+                if byDistance && order[k].kind == order[k - 1].kind {
+                    #expect(order[k].distance <= order[k - 1].distance)
+                }
             }
             var keys: Set<Int> = []
             for element in order { keys.insert(element.kind.rawValue * 100_000 + element.index) }
@@ -616,7 +620,12 @@ struct CelestialEclipseLabSceneGeometryTests {
         #expect(E.paintsBefore(body, halo))
         #expect(E.paintsBefore(halo, gauge))
         #expect(E.paintsBefore(low, body) && !E.paintsBefore(body, low))
-        #expect(E.paintsBefore(far, ring))
+        // The kind comes first: a farther gauge still paints after a nearer ring; flat gauges go by index alone.
+        #expect(E.paintsBefore(ring, far) && !E.paintsBefore(far, ring))
+        let nearStrip: E = E(kind: .gauge, index: 0, part: .strip, item: 0, centre: c, distance: 1)
+        #expect(E.paintsBefore(nearStrip, far))
+        let farBody: E = E(kind: .body, index: 5, part: .body, item: 5, centre: c, distance: 3)
+        #expect(E.paintsBefore(farBody, low))
         // In the hand level at tick 0 the chosen ring (body 1), body 1 and its halo share a centre.
         let snap: Snapshot = Self.snapshot(try Self.horizonLevel(), tick: 0)
         let order: [CelestialEclipseLabElement] = G.paintOrder(snap, camera: G.camera(snap, aspect: 1))

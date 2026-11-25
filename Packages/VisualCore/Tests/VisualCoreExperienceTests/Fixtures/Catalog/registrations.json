@@ -1054,6 +1054,34 @@
       "manifest": "Packages/ExperiencesRound02/StarlitCartouche/scenario-manifest.json",
       "permissions": [],
       "summary": "Fly a sapphire ship between drifting stars, waiting for each to come in range, so its meteor-gold trail draws the ancient symbol and reaches the beacon in time, past hazard tubes and star windows. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g17.celestial-eclipse-lab": {
+      "capabilities": [
+        "Phase orbits to order the eclipses",
+        "Predict every eclipse on a timeline",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#0B1530",
+        "#F2C14E",
+        "#C8553D",
+        "#E9E1CF",
+        "#16224A"
+      ],
+      "content": {
+        "catalog_sha256": "c74bf277d3c1f0e5f6a8adad504ffe8922bde6964fe5f7e7c289034ef942c6e8",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/CelestialEclipseLab/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Turn miniature planets on their orbits so their eclipses come in the target order, each inside its window, with no other eclipse first: precise shadow crescents and corona halos. 100 certified levels. Drawn in code; offline."
     }
   }
 }

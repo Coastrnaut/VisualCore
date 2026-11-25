@@ -1,0 +1,7142 @@
+{
+  "controls" : [
+    "orbit.phase",
+    "clock.run",
+    "play.undo",
+    "play.redo",
+    "level.next",
+    "orbit.choose",
+    "clock.show"
+  ],
+  "experience" : "r02-g17.celestial-eclipse-lab",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58e4dde97d33461270815f3a199b8000e734cc6c4ce74f534ba02af08ca00d92",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              24
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              96
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              29
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g17.choice",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58e4dde97d33461270815f3a199b8000e734cc6c4ce74f534ba02af08ca00d92",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "292c21a2840034a0e77e9382c643000e12ebd95f85c3eb95c8d99c2e94bfdc53",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0e87866889f8ecb2d419f26085ad567137a0ce771b8fa2e5cd8a85ed16d24161",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8d2f2f3554cc73098622d05681d2fa6ea71c7f25226c0a8377d053387e501932",
+        "initialDigest" : "ff5325fca0a15417651468663f334ba227176c09b9b5dc875981dc5483d7b65d"
+      },
+      "name" : "acceptance-001",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a0a19cf70bfb1ee885acf7ad477618f8a93fd4ff777b294288d6600fb134fdf0",
+        "initialDigest" : "1971d0424d52428364f2ffbeb8e18af10b6093b5c3dff4cf2228ce44a04a130b"
+      },
+      "name" : "acceptance-002",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g17.choice",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf292f494c5b673dfe6653d6f91bb4aba33b5f5c9d11b4c0c197da07dd8e054f",
+        "initialDigest" : "cf292f494c5b673dfe6653d6f91bb4aba33b5f5c9d11b4c0c197da07dd8e054f"
+      },
+      "name" : "acceptance-003",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9dc1957f922682094cad72e95681fd68ce16876758f330ac1a7925770ff79251",
+        "initialDigest" : "cf9d52a6080327ca919b26cffd4e99ee0fcdbee1a5a5090f104780c6499e61e1"
+      },
+      "name" : "acceptance-004",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              46
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e9756ba44952ae1813abf3f51eed547d3dfd1be7ecd1670ee7e664bd77876a25",
+        "initialDigest" : "4e5da717ed97edd84e62d004dabaffac08644b6aa346971968d008a9fd265f77"
+      },
+      "name" : "acceptance-005",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ebed43cb0327a7bce142ed5feade01b70dc8f313287e6f8cfe7c7cefde5e3b47",
+        "initialDigest" : "9171345bea3e3c79352081e47a01fd98afb76ba6e415dfa94853518ba3afd973"
+      },
+      "name" : "acceptance-006",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              8
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58e4dde97d33461270815f3a199b8000e734cc6c4ce74f534ba02af08ca00d92",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+      },
+      "name" : "acceptance-007",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g17.choice",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9983feba9228a26e3583c8535ee64305aff3a7ce8988b19651030ea331603590",
+        "initialDigest" : "9983feba9228a26e3583c8535ee64305aff3a7ce8988b19651030ea331603590"
+      },
+      "name" : "acceptance-008",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cce9b0361660b2cd4c510f1de1724895f78335cfdaf5ba85bfeb8eccf09126eb",
+        "initialDigest" : "14d23ba0d8c969972c316c90760f9392ecec9e97d3783aacaeb33abecfb94123"
+      },
+      "name" : "acceptance-009",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              36
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "19a753d0466a263a0be23397a22693e7c42e600d80463e297cf4fa693a64c243",
+        "initialDigest" : "16db9f6a817a74f3caad4a503938e660dcbd437a7d788245929eaa5afb396e8c"
+      },
+      "name" : "acceptance-010",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9c06b1ca4091f9cdd15005a49f24c8f913ea74dcb756f46917ad287a91946eb2",
+        "initialDigest" : "ee8603395925421f35e321dc57afe0ff95f867cc75f3439d507639d7b93670f5",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-011",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0fa208d952e99eb09b3aa2e8a44650b7e9e3794a8a37fff4ae25a84a280f12d7",
+        "initialDigest" : "54fd223a51a3899c07cf07629b1c54f0846f9818c2ce427fbeabe712cd6e0c0b",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-012",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6d3a0f93bc1fde55ea135ccbb64bfe1ec667455760ed89533b66f94b057aa445",
+        "initialDigest" : "83cf9c54032d04289a6b8c88fcbfb4e594640c08b4cfc11b5d49141c1ba46c4d",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-013",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1ae2f5522183ab1458b59eb2bf6f8cf829af72ee741eee9dac716941fedb78fc",
+        "initialDigest" : "2eec4424b785580bfcea875b77b69821ca00f2d7fd24c66c09bb7af4283ffd12",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-014",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0db31982e47bd20fff5b652b39ece98f9239ac421d009c7ce34458b3c1a70479",
+        "initialDigest" : "6cc79bd613a86bb27b2752443be2d97228538cefceebd03b49be6bf5dbbaa261",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-015",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "545e414295624d04c4f508ab136bee7d3dbb937586b48237f3b8986b3fe03a02",
+        "initialDigest" : "29dc39fe1d2723d55dbf2b1210bfd8c79baefd5dc9e21f1ab8ec9ce61b99a5da",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-016",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b4fc2d222cf7ee8316bea8f3da44301523dba712d77b02f8e224cfbebdf346a2",
+        "initialDigest" : "a7dbdfb8d9fc9cc67d5c2da506b0d2c339b53eb40e7491dd1dd216a00f50fdb3",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-017",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8ab2a7f949a591e8a8a62c27431454b77a905bfaf42b7ab583716828f2957d01",
+        "initialDigest" : "6d8b1d9b216205fe4a4236eec3158205b928969d346515634492ecb0235d82e0",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-018",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e24a7960cb79731412fc9dc5e9d575801a7ddc1fd9966f98525a6a9b40e03fc2",
+        "initialDigest" : "21a95bd19ca7c8c8b438856b506f73d880b5a1b9722776bec072e891aad228aa",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-019",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b832f25feecc501bc6eb2b61462339b747964800764cefdec79fdc6eacbb1abc",
+        "initialDigest" : "f63dd9b5063e4a959ef9af08509cd9580c89f5cfd3cf91dcdd23f905285d52a4",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-020",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              39
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              24
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              40
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "16625b3887460802b493108193783a3e96a4d8b8ed891e93c3bb4bcc6c91fe52",
+        "initialDigest" : "16625b3887460802b493108193783a3e96a4d8b8ed891e93c3bb4bcc6c91fe52"
+      },
+      "name" : "acceptance-021",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              26
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              27
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "949a3d80401690c4c5c18ceb7b671d49be14df6f02c013bf2cc9d857701f58aa",
+        "initialDigest" : "949a3d80401690c4c5c18ceb7b671d49be14df6f02c013bf2cc9d857701f58aa"
+      },
+      "name" : "acceptance-022",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              29
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              24
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8bc035c167eaf420cac9e5b301ec4897f0b84bc8316eeeb3a1ee3dc98fb832fa",
+        "initialDigest" : "8bc035c167eaf420cac9e5b301ec4897f0b84bc8316eeeb3a1ee3dc98fb832fa"
+      },
+      "name" : "acceptance-023",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              31
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "08a39416477250d5e90597ea38fd987862cf6c6bb38f6cfe86ea37ce80d92f3d",
+        "initialDigest" : "08a39416477250d5e90597ea38fd987862cf6c6bb38f6cfe86ea37ce80d92f3d"
+      },
+      "name" : "acceptance-024",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              35
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              24
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              36
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1c875f5c04413302d20b27fd49a02ec7a9df8c316027754d9bd9182ed19a243a",
+        "initialDigest" : "1c875f5c04413302d20b27fd49a02ec7a9df8c316027754d9bd9182ed19a243a"
+      },
+      "name" : "acceptance-025",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              27
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              28
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6a02d9c9c22f1aaa1ecc895267de43f7e2b703c0d0cfeedad1537703d6876592",
+        "initialDigest" : "6a02d9c9c22f1aaa1ecc895267de43f7e2b703c0d0cfeedad1537703d6876592"
+      },
+      "name" : "acceptance-026",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              34
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              24
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              35
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "59659405a604390d1dbe1df284b9ff72412ceb29bfe605d2e0373cf7272f9a2b",
+        "initialDigest" : "59659405a604390d1dbe1df284b9ff72412ceb29bfe605d2e0373cf7272f9a2b"
+      },
+      "name" : "acceptance-027",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              31
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              32
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ad11fb40b811609596e3201846973fc5994ca92e6edc6ff95180e68af1668aef",
+        "initialDigest" : "ad11fb40b811609596e3201846973fc5994ca92e6edc6ff95180e68af1668aef"
+      },
+      "name" : "acceptance-028",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              32
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              24
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              33
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6dce6826bd9a4cfb3ac123949f519c2a055d53d46189fe651128f4fe5f337a4e",
+        "initialDigest" : "6dce6826bd9a4cfb3ac123949f519c2a055d53d46189fe651128f4fe5f337a4e"
+      },
+      "name" : "acceptance-029",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              43
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g17.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              44
+            ]
+          },
+          "result" : "action.rule.r02-g17.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d8662f4b3ed2c8bd7605a96da177a7ddab11760a51a868d1b416f25ff01dcfe9",
+        "initialDigest" : "d8662f4b3ed2c8bd7605a96da177a7ddab11760a51a868d1b416f25ff01dcfe9"
+      },
+      "name" : "acceptance-030",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              20
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cd37c11fb636d8279d05d1c0a7659d852bef8c88301e454912a9de6f6bdeb7ab",
+        "initialDigest" : "283e6522dd6db9f97cfdf929f6d2493512211b5f3b0d5169ad27d274caec2d7c"
+      },
+      "name" : "acceptance-031",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              19
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "711b629500503a641b2a88e5c285278a81d723b3c3aee1650857e0ee13c67190",
+        "initialDigest" : "ee6d0281d9b66814fb580fe2e5abf02c173fa72fbecb49e9a3ac58e6cfeba807"
+      },
+      "name" : "acceptance-032",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7b98a04a5efe6d9963ed3eacbfe2c64524516fa49e681d8d322e369d514a3179",
+        "initialDigest" : "b286314178d6d618238c566aa2f8c4bfea74d55e721105318c6a003bfbe25303"
+      },
+      "name" : "acceptance-033",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              21
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "abab93baddecb9480a6e45960c463652959c847ee136daa5ad67259a03ffabdd",
+        "initialDigest" : "26416d010de46a64f1aeb9ba8469c3a7faad7825825e4f2de3eec1a3e36bd67f"
+      },
+      "name" : "acceptance-034",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              24
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4c1883c8ec4cf5f34e477675cb18a8baec2d6eda3e4b5a21a5ce259711ca78a5",
+        "initialDigest" : "3f531a9f850877c1bba783c7cec6b485a7fcc268a292b9be919d77aefc9b8b9d"
+      },
+      "name" : "acceptance-035",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7f3e6af9f19f363e4c24d4c2bbf2411b3712efea7f8d716c408f1c10b48e6fa6",
+        "initialDigest" : "e59f97c5952442435698086e0978879ac538ee2a9f67ed74f1a3db0d211c6677"
+      },
+      "name" : "acceptance-036",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b0945ec88636365a2e806931369a0a817e02490e507a85ecb495002bbe254a3c",
+        "initialDigest" : "c26557be4ab2ca05971cb3306c233d5c02e5a0ef8cae6a49cbc9f44c997ad97a"
+      },
+      "name" : "acceptance-037",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              14
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "813e7d2d33674b7120e69a95f662c99fd767fe817c7f69a7d93ddfa549f2a61d",
+        "initialDigest" : "b592ee87aef1c1339cf8d7323e44828c19a0f39817746be2d66fce0e1fe71a2b"
+      },
+      "name" : "acceptance-038",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              16
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bf22ff3bb47dc4d0336e8ae62325c21adf5698747713dd84b81f07b2e4d56742",
+        "initialDigest" : "01713ca099fee1f7c134d954ebe818379b7e2747f96d9f8aa3131aee9d28db41"
+      },
+      "name" : "acceptance-039",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.choose",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              16
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6921864a13fc7c3b89205b087a377d4f65d6e99313a4573d2ba56e02c6dc68e4",
+        "initialDigest" : "c7c5267ee46307815a27593f16d9cdb4255575476c3c82c7c06dc365542d41e5"
+      },
+      "name" : "acceptance-040",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58718c94c550e0e334dc95c79a8d1b2aecaa8851a2ae9a384013bea9716c65c7",
+        "initialDigest" : "6aa74d47c1d8ae8fde628601b9df27778308f6d01304ebd40426171105efed73",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-041",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0a67f6034a1df6ae1c334168903685dad66cc9d38cc69fdfeccf5dda13650afe",
+        "initialDigest" : "97c111d041421f450f65c202b71467818654e3a52e326ffa82bb63d347f4a1a0",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-042",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "33a9a6f07fac78de2df6e610f3c09f706e93fb0260ffba8bfbe164ffa64fd1fb",
+        "initialDigest" : "8d6b61ee048d600ab72148a762b1469269131f8618ea1533751f06135622e4de",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-043",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3692f80d57937d3645c2a1e61143994ae2d912211eb47d323e529e07eed22b30",
+        "initialDigest" : "79ad73cf99d08b0236aa17e1d09e49f57b0f64c2662f53b432158ee6ff7299d9",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-044",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "136dd1ca56e6a38843cf67e10bcb558d673122c9f91a13f3705b6f008a545fef",
+        "initialDigest" : "01a874f921781d611268ad833310c6b937bf064310c2199aea4effb8c92ebe08",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-045",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f3b7e972f59e7a8eeda53d6be9a7ed58a8e86a7b834c373de5870ad5d61c4b49",
+        "initialDigest" : "49263ca5e0010eb9e2c11598626b70ff1d322b9d3850b6e3a61449108f524780",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-046",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e3b6de7b548e6609140b0c0679504fbce8e53769cde51d027f83a2f44ea29a1a",
+        "initialDigest" : "d4610d78879d96b7c1f0baf94b4a10daa7451c2da0e1863022f3937de941caef",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-047",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2a9dc19fa538fa07c7c340e5a874ec9e15b4b99c821b43d8a6e8998c698b2632",
+        "initialDigest" : "fe4c4aebc70f33589793728cf9aedd85de2987823542f0929dab135b27806816",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-048",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "99fa944a066a8ec5034376c2b98172273cedeb0f86540b8598a59b1c1941536d",
+        "initialDigest" : "3e315c2ab36641ac1975d36eb98f2dde88049bffa8735cf8c97785c5967ffdea",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-049",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "14b7ab564ecadf8d41b07542cb305e4925bd3ccd1330575df94bef39b032f0ca",
+        "initialDigest" : "a8ef6a7d070455b7d27775fa805210211ba488b2e759315752ab99d4e0ed227f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-050",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "99fe4d77edc7798745c06711408e574c74cd806cb4599faf24db607d0bd786bd",
+        "initialDigest" : "97ad7fe6dbe83e44826b8f089c0cbe188b8dd1927503e780093de96612240e6c"
+      },
+      "name" : "acceptance-051",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "49e20db5ca6f539d170696f63395b9c6d5de0226e28910da0ce8c70bb721ae9e",
+        "initialDigest" : "49e20db5ca6f539d170696f63395b9c6d5de0226e28910da0ce8c70bb721ae9e"
+      },
+      "name" : "acceptance-052",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "67256e0994ae7809b3a983ce5d23e21a830bbdab0def76bf7d65e874f26e77a3",
+        "initialDigest" : "67256e0994ae7809b3a983ce5d23e21a830bbdab0def76bf7d65e874f26e77a3"
+      },
+      "name" : "acceptance-053",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0e8828a192506fa6540577fd9c3483e94844ce537ad896ab4bea7b3385161d46",
+        "initialDigest" : "8b364f50ce1328328818570c8c3c1f16d27a9a851134de75613a7f66edd246b9"
+      },
+      "name" : "acceptance-054",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3cf193d2450140c7fac73d0a01df167ea55a9ba7678242c6ee5b12f236a432fe",
+        "initialDigest" : "3cf193d2450140c7fac73d0a01df167ea55a9ba7678242c6ee5b12f236a432fe"
+      },
+      "name" : "acceptance-055",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "205f45aafeef2d4e4011d59a094cc0c42f6a5e7bebb8ab6c47b578cc432b92dc",
+        "initialDigest" : "205f45aafeef2d4e4011d59a094cc0c42f6a5e7bebb8ab6c47b578cc432b92dc"
+      },
+      "name" : "acceptance-056",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3fca8e4f01bb02b0cb9e6861a2ec0d5778972a42eef78dc5e9d18687a2e145a5",
+        "initialDigest" : "3fca8e4f01bb02b0cb9e6861a2ec0d5778972a42eef78dc5e9d18687a2e145a5"
+      },
+      "name" : "acceptance-057",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7a9ff9736a2eed5d43784c11ec3d601fe692186fdbf54dcb288fef4f8c44bfa1",
+        "initialDigest" : "7a9ff9736a2eed5d43784c11ec3d601fe692186fdbf54dcb288fef4f8c44bfa1"
+      },
+      "name" : "acceptance-058",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9296d781ada0a48e45fc5dad1094953d8f0bf7fa8b85440059614a7de871c386",
+        "initialDigest" : "9296d781ada0a48e45fc5dad1094953d8f0bf7fa8b85440059614a7de871c386"
+      },
+      "name" : "acceptance-059",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "424df77f0de323e6647de4755f1b44c9a57450bc3f3a9c1ec73358ae4f0de1b3",
+        "initialDigest" : "424df77f0de323e6647de4755f1b44c9a57450bc3f3a9c1ec73358ae4f0de1b3"
+      },
+      "name" : "acceptance-060",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e07130cac9d8dbeda9f8d4b02527bd86c9aa4ce197b9a95a4db1b0a0c735c008",
+        "initialDigest" : "488adc12d25239045f17423dc5b3d3dfd75e5518cdd7dbf3e04a3a9547c82121",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-061",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e126a760e89b09994eff33a6f30bb5f59c1900277dd2b2aaf16de129404d4b55",
+        "initialDigest" : "da4264f3c6141f402cf9e1c29d40ad8c03e82da29a7b5f29d39de94dd982a056",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-062",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6adf8b4f12f068ca5fc7f03068e7865703f54ab95dd3cff023f53c75cb6d2959",
+        "initialDigest" : "2e5018345b6025db286928022e0ae9b9c235c3f4ece912891c84aa1789dbf215",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-063",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1edae5f5bc8eba3516787be5bf13a879b987b0908acf56d655d04b14de416fa8",
+        "initialDigest" : "f34e3c919d73d6761680d9f56a526e16afb03b125dacb47c5b8de50dc83b237a",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-064",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bd35798c38b02e8a080cafa95846c7226b735b55aba3dee4741306791b051bf0",
+        "initialDigest" : "13b8bd3d9eba7cb2c8e0c629ba095ae0eed90b9f77ef726231763c7ac84c3199",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-065",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6643224b113cae1875bfce5846751d528f149edb631fcbe65f5d98fe2a7401eb",
+        "initialDigest" : "62ef6a5c63c20b45562726f07548c8e30a6551cb1f42b4d5001e1dd63ddb99d9",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-066",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "53c3fc2a887c8d172a5e739ee68c353ac88d777123a392f757cb7cf2a01ed851",
+        "initialDigest" : "7561856a9ee755741efdf999260cf91e52839458e52b3de91bc41dc0e4421aa2",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-067",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b7c99a26a0fcb0ea01b88444fc8551f877231ed4fe1151f2283ad7a0448f8d5a",
+        "initialDigest" : "8d95d61564cdfb73339848ca0ff83a49c47d1de4f8b1f8d9d2095ab1ef87e6a2",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-068",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9d682a5171420c84a3aac4609f451d5d75ed6cbc4c5124313535133559fc6110",
+        "initialDigest" : "76753a5c40b97984921e678bc309bd058fffd8f46d35567cf3b2c9face9aef2c",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-069",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e77edfb11be4212b292142de47d5789e7c9f9fc29552d95c694b9d599db84202",
+        "initialDigest" : "0cda0014a7b926e52dfc9272eb7f05e30f3001b6170ce0669783fdfb9d0785af",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-070",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2eec4424b785580bfcea875b77b69821ca00f2d7fd24c66c09bb7af4283ffd12",
+        "initialDigest" : "63f75d12dbbeef8208a3a75ad9d89bff32c2d6dd5d52d0c6c66568c12f948a34"
+      },
+      "name" : "acceptance-071",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6cc79bd613a86bb27b2752443be2d97228538cefceebd03b49be6bf5dbbaa261",
+        "initialDigest" : "5495988b9019b77fd350f908d8ab6567e9ecf6f945a3a08fb72315c4e56980d7"
+      },
+      "name" : "acceptance-072",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "29dc39fe1d2723d55dbf2b1210bfd8c79baefd5dc9e21f1ab8ec9ce61b99a5da",
+        "initialDigest" : "807ef0d8de0436add6bebd9cc54938f8d7655ff81e3411f4ed998dd7563a1e3b"
+      },
+      "name" : "acceptance-073",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a7dbdfb8d9fc9cc67d5c2da506b0d2c339b53eb40e7491dd1dd216a00f50fdb3",
+        "initialDigest" : "546b9f2d67d7491275b95b95b5d86e7d8132137364ba2c2452054d347d04e75a"
+      },
+      "name" : "acceptance-074",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6d8b1d9b216205fe4a4236eec3158205b928969d346515634492ecb0235d82e0",
+        "initialDigest" : "eab44000478126915aa856df47536b3678f8cf16e3d2d85b30484ebe709d8ef6"
+      },
+      "name" : "acceptance-075",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "21a95bd19ca7c8c8b438856b506f73d880b5a1b9722776bec072e891aad228aa",
+        "initialDigest" : "826eb587d0e0db414aa9053016e5ab359f23ee8491236a9f6d849eebebd17c7d"
+      },
+      "name" : "acceptance-076",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f63dd9b5063e4a959ef9af08509cd9580c89f5cfd3cf91dcdd23f905285d52a4",
+        "initialDigest" : "eff5e8d52a16d07c94817bcd158fa48995792094d9c407964f1fc50ab22faeb4"
+      },
+      "name" : "acceptance-077",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "16625b3887460802b493108193783a3e96a4d8b8ed891e93c3bb4bcc6c91fe52",
+        "initialDigest" : "c3622009f3f6c85f4169154f35ad0689a6d9094bc63746b83cb2f65515e168ae"
+      },
+      "name" : "acceptance-078",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "949a3d80401690c4c5c18ceb7b671d49be14df6f02c013bf2cc9d857701f58aa",
+        "initialDigest" : "ed4630b3e62dcfc50c06306b95bb46125a13347a112030431570f3d421882f9f"
+      },
+      "name" : "acceptance-079",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g17.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8bc035c167eaf420cac9e5b301ec4897f0b84bc8316eeeb3a1ee3dc98fb832fa",
+        "initialDigest" : "cdae157929fc2710e22afd8667032604c99caf60d1af7f7203b2ac48729a3c42"
+      },
+      "name" : "acceptance-080",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "90d4d0fce47480e11a7847e51f545bf66de83408cae17cc1ef0951ed75b1f36c",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5d9427a6d9164d680a6c5e51d3110427ed330fbc1ee5cfeaf22fa8a2b72d74db",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-run-fails",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "58e4dde97d33461270815f3a199b8000e734cc6c4ce74f534ba02af08ca00d92",
+        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

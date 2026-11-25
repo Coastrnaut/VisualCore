@@ -1593,7 +1593,10 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "VoxelOrigamiCore", "VoxelOrigamiExperience",
                                     # Feature 453 (R02-G16-03): Starlit Cartouche, a registered candidate until
                                     # X-R02-G16.
-                                    "StarlitCartoucheCore", "StarlitCartoucheExperience"])
+                                    "StarlitCartoucheCore", "StarlitCartoucheExperience",
+                                    # Feature 463 (R02-G17-03): Celestial Eclipse Lab, a registered candidate until
+                                    # X-R02-G17.
+                                    "CelestialEclipseLabCore", "CelestialEclipseLabExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

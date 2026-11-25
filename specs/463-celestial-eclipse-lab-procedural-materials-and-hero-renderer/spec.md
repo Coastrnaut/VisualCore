@@ -57,8 +57,10 @@ corona halos" and the geometry "analytic orbital rings, signed circle masks and 
   that body's radius in x and y (so no disc leaves the frame at any tick) and s = 1.5 / (e + 1) with e the box's largest
   extent; y is up and +z (nearer in the
   rules) is toward the camera, so the picture is seen from the side the rules project onto. Bodies are drawn at
-  w(position(at: shown tick, phase)) for the current phases. Drawn back to front by distance from the eye (depth
-  testing off, the shared mesh renderer's path; ties broken by kind — rings, bodies, halos, gauges — then by index):
+  w(position(at: shown tick, phase)) for the current phases. Drawn by kind — rings, bodies (with their shadow lenses),
+  halos, gauges — with depth testing off (the shared mesh renderer's path): bodies and halos back to front by distance
+  from the eye (ties by index), the rings and the flat gauges by index alone (implementation note, 2026-11-25: a
+  distance order painted a body's own ring over its centre and the timeline strip over its marks):
   the sky backdrop (a large quad; a vertical gradient from ink #0B1530 at the bottom to ink top #16224A at the top with
   sparse procedural specks covering under 5 % of its pixels); the orbital rings, a closed ribbon 0.012 wide through w
   of every orbit position in order, orbit blue, with (index mod 6) + 1 notches at the body's position and a square

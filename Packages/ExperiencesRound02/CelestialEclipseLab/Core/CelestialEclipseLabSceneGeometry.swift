@@ -7,8 +7,9 @@
 //
 // Draw order (clarification Q1; depth testing off, so the sky mesh is in painter's order):
 //   1. the backdrop, one large quad facing the eye behind the authored box (its gradient and specks are the shader's);
-//   2. the elements (``CelestialEclipseLabElement``) back to front by the distance of their centres from the eye
-//      (farthest first; ties by kind — rings, bodies, halos, gauges — then by index):
+//   2. the elements (``CelestialEclipseLabElement``) by kind — rings, bodies, halos, gauges — the bodies (with their
+//      shadow lenses) and halos back to front by the distance of their centres from the eye (ties by index), the rings
+//      and the flat gauges by index alone (``CelestialEclipseLabElement/paintsBefore(_:_:)``):
 //      - ring i (kind ring, index i): a camera-facing closed ribbon 0.012 wide through w of every orbit position of
 //        body i in order, orbit blue; around body i's current centre (index mod 6) + 1 radial notches from r · s +
 //        0.018 to r · s + 0.034, the first straight up and the rest evenly spaced anticlockwise; a fixed body also a
@@ -149,10 +150,13 @@ public struct CelestialEclipseLabElement: Sendable, Equatable {
         self.distance = distance
     }
 
-    /// Whether `a` is painted before `b`: farther first, then the lower kind, then the lower index.
+    /// Whether `a` is painted before `b`: by kind first (rings, bodies, halos, gauges); bodies (with their shadow
+    /// lenses) and halos farther first, then by index; rings and the flat gauges by index alone (the rings lie in the
+    /// bodies' layers and the gauges share one plane, so a distance order would paint a ribbon over a body's centre or
+    /// the timeline strip over its marks).
     public static func paintsBefore(_ a: CelestialEclipseLabElement, _ b: CelestialEclipseLabElement) -> Bool {
-        if a.distance != b.distance { return a.distance > b.distance }
         if a.kind != b.kind { return a.kind.rawValue < b.kind.rawValue }
+        if a.kind == .body || a.kind == .halo, a.distance != b.distance { return a.distance > b.distance }
         return a.index < b.index
     }
 }
@@ -551,8 +555,8 @@ public enum CelestialEclipseLabSceneGeometry {
     /// The notch count of body `index`'s ring: (index mod 6) + 1.
     public static func notchCount(_ index: Int) -> Int { ((index % 6) + 6) % 6 + 1 }
 
-    /// Every element with its centre and distance from `camera`'s eye, in painter's order: farthest first, ties by
-    /// kind (rings, bodies, halos, gauges) then index (clarification Q1).
+    /// Every element with its centre and distance from `camera`'s eye, in painter's order (by kind; bodies and halos
+    /// farthest first; rings and gauges by index; clarification Q1).
     public static func paintOrder(_ snapshot: CelestialEclipseLabSceneSnapshot,
                                   camera: CelestialEclipseLabCamera) -> [CelestialEclipseLabElement] {
         elements(snapshot, eye: camera.eye)

@@ -52,9 +52,9 @@ tests stay short (< 10 s each). No {owner} tasks.
   s + 0.04; the timeline strip at y = −1.15 from x = −0.9 to 0.9 over ticks 0 … horizon − 1, window brackets at y =
   −1.05 with the target index in notches, event marks (matched diamonds, the failing cross, faint after the last match)
   and the playhead at the shown tick; actions bars of `budget` at y = −1.35 from x = −0.9 to 0.9, each 1.8 / budget wide
-  with a fifth as gap, 0.04 tall, lit for the actions left; painter's order back to front by camera distance, ties by
-  kind (rings, bodies, halos, gauges) then index; a failure outlines its two bodies and marks the failing event (a
-  horizon failure at the strip's end with the next target's bracket) in the broken colour; a won level lights every
+  with a fifth as gap, 0.04 tall, lit for the actions left; painter's order by kind (rings, bodies, halos,
+  gauges), bodies and halos back to front by distance, rings and gauges by index; a failure outlines its two bodies
+  and marks the failing event (a horizon failure at the strip's end with the next target's bracket) in the broken colour; a won level lights every
   target mark without moving any position; `glowMesh` per tier (2, 1, 0 shells); camera from eye (0.3, 0.2, 3.4) to (0,
   −0.25, 0) fitted to x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95 with a 5 % margin for aspect 0.4 … 2.5; `project`;
   the CPU reference points (body centres, the timeline centre, brackets, the playhead, the first actions bar) in paint
@@ -86,7 +86,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G1703-006 [US3] [US4] Create
+- [X] T-R02G1703-006 [US3] [US4] Create — Verified 2026-11-25: 2026-11-25 experience (presenter, sky scene, controls), scenarios (94, with 80 acceptance rows) and scenario-manifest.json, candidate registration (registrations, catalog, registry, project.yml, AppModelTests to r02-g18.apsides-workshop, test_scripts); sim-27 26 tests exit 0; packages-2 exit 0 (first run lacked the test target); catalog-search-2 exit 0 (first run listed the candidate as available, corrected); paint order by kind with rings and gauges by index (host-5, 140 tests, exit 0); spec, research and tasks corrected
   `Packages/ExperiencesRound02/CelestialEclipseLab/Experience/CelestialEclipseLabExperience.swift`, `…Presenter.swift`,
   `…SkyScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; the halo pulse from presentation time;
   Reduce Motion and Reduce Flashing; the presenter declares `probes(_:)` — two backdrop corners, as the round-two X
