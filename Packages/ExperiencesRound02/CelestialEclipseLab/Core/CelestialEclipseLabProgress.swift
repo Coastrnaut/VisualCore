@@ -10,6 +10,13 @@
 // from 2026-01-01 × 29) mod 100 + 1, negative day counts wrapped, in integer arithmetic on the proleptic Gregorian
 // calendar. Every type is Codable with a stable, explicit form. Modelled on feature 455's StarlitCartoucheProgress.
 // Integers only; no clock, no random source.
+// Feature 467 (R02-G17-07) T-R02G1707-002 (contracts/api.md; research R2, R3, R6, R7; clarifications Q1 … Q3): each
+// result also keeps the trace of its win (the effective phase changes, each `.phase(body, offset)` as the kernel
+// applied it, an undone change left out unless redone, then the closing `.run`) and whether it is verified (a win
+// recorded with a trace); `drop(level:)` removes a result that failed reconciliation
+// (``CelestialEclipseLabReconciliation``); the replay mode (a saved trace played back with the campaign budget) awards
+// nothing and opens nothing. Encodings without trace or verified (snapshot schema 1 and 2) decode as unverified
+// results with an empty trace. Modelled on feature 457's StarlitCartoucheProgress.
 import Foundation
 
 /// The step of the Celestial Eclipse Lab tutorial (levels 1 … 3, the levels whose ``CelestialEclipseLabLevel/tutorial``
@@ -92,34 +99,43 @@ public enum CelestialEclipseLabMode: Sendable, Equatable, Hashable, Codable {
     /// The daily level `level` (1 … 100) of ``CelestialEclipseLabProgress/dailyLevel(year:month:day:)``: campaign
     /// rules (a win records the level's best result and stars), but a win never opens a level.
     case daily(level: Int)
+    /// The replay of the saved verified trace of level `level` (1 … 100): the campaign budget; never awards stars or
+    /// opens levels.
+    case replay(level: Int)
 
     /// The budget of practice mode: the kernel's maximum, 24 (``CelestialEclipseLabLevel/budgets``).
     public static let practiceBudget: Int = CelestialEclipseLabLevel.budgets.upperBound
 
     /// The budget a level with budget `base` is played with: ``practiceBudget`` in practice, `base` otherwise
-    /// (campaign and daily).
+    /// (campaign, daily and replay).
     public func budget(base: Int) -> Int {
         self == .practice ? Self.practiceBudget : base
     }
 
-    /// Whether a win in this mode records a result and stars: campaign and daily (never practice).
-    public var awardsStars: Bool { self != .practice }
+    /// Whether a win in this mode records a result and stars: campaign and daily (never practice or replay).
+    public var awardsStars: Bool {
+        switch self {
+        case .campaign, .daily: true
+        case .practice, .replay: false
+        }
+    }
 
     /// Whether a win in this mode opens the next level: campaign only.
     public var opensLevels: Bool { self == .campaign }
 
     /// The keys of the encoded mode.
     private enum CodingKeys: String, CodingKey {
-        /// The mode name: `campaign`, `practice` or `daily`.
+        /// The mode name: `campaign`, `practice`, `daily` or `replay`.
         case mode
-        /// The daily level, 1 … 100 (daily only).
+        /// The daily or replayed level, 1 … 100 (daily and replay only).
         case level
     }
 
-    /// Decodes `{"mode": "campaign"}`, `{"mode": "practice"}` or `{"mode": "daily", "level": n}`.
+    /// Decodes `{"mode": "campaign"}`, `{"mode": "practice"}`, `{"mode": "daily", "level": n}` or
+    /// `{"mode": "replay", "level": n}`.
     ///
-    /// - Throws: `DecodingError.dataCorrupted` for an unknown mode name or a daily level outside 1 … 100;
-    ///   `DecodingError.keyNotFound` for a daily mode without a level.
+    /// - Throws: `DecodingError.dataCorrupted` for an unknown mode name or a daily or replay level outside 1 … 100;
+    ///   `DecodingError.keyNotFound` for a daily or replay mode without a level.
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let name: String = try container.decode(String.self, forKey: .mode)
@@ -133,13 +149,20 @@ public enum CelestialEclipseLabMode: Sendable, Equatable, Hashable, Codable {
                                                        debugDescription: "daily level outside 1 … 100")
             }
             self = .daily(level: level)
+        case "replay":
+            let level: Int = try container.decode(Int.self, forKey: .level)
+            guard level >= 1 && level <= CelestialEclipseLabProgress.levelCount else {
+                throw DecodingError.dataCorruptedError(forKey: .level, in: container,
+                                                       debugDescription: "replay level outside 1 … 100")
+            }
+            self = .replay(level: level)
         default:
             throw DecodingError.dataCorruptedError(forKey: .mode, in: container,
                                                    debugDescription: "unknown mode \(name)")
         }
     }
 
-    /// Encodes the mode as `{"mode": <name>}`, with `"level"` for `daily`.
+    /// Encodes the mode as `{"mode": <name>}`, with `"level"` for `daily` and `replay`.
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
@@ -148,14 +171,18 @@ public enum CelestialEclipseLabMode: Sendable, Equatable, Hashable, Codable {
         case .daily(let level):
             try container.encode("daily", forKey: .mode)
             try container.encode(level, forKey: .level)
+        case .replay(let level):
+            try container.encode("replay", forKey: .mode)
+            try container.encode(level, forKey: .level)
         }
     }
 }
 
 /// The campaign progress of Celestial Eclipse Lab: the won levels with their best results and the open frontier.
 ///
-/// Encoded as `{"frontier": n, "solved": [{"actionsSpent": a, "level": l, "stars": s}, …]}` with the won levels as an
-/// array sorted by level, so equal progress gives equal JSON (``encoded()`` also sorts the keys).
+/// Encoded as `{"frontier": n, "solved": [{"actionsSpent": a, "level": l, "stars": s, "trace": [...], "verified": v},
+/// …]}` with the won levels as an array sorted by level, so equal progress gives equal JSON (``encoded()`` also sorts
+/// the keys). An entry without `trace` or `verified` (snapshot schema 1 and 2) decodes with an empty trace, unverified.
 public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codable {
     /// The best result of one won level.
     public struct Result: Sendable, Equatable, Hashable, Codable {
@@ -164,11 +191,54 @@ public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codabl
         public let actionsSpent: Int
         /// The stars of that best result, 1 … 3.
         public let stars: Int
+        /// The effective actions of the winning play (``CelestialEclipseLabReconciliation/netTrace(_:)``): each
+        /// `.phase(body, offset)` as the kernel applied it (an undone change left out unless redone), then the closing
+        /// `.run`; no undo or redo; empty for a result recorded without a trace.
+        public let trace: [CelestialEclipseLabAction]
+        /// Whether the result was recorded with a trace (reconciliation replays it on restore).
+        public let verified: Bool
+
+        /// A result of the given values without a trace, unverified (not checked).
+        public init(actionsSpent: Int, stars: Int) {
+            self.init(actionsSpent: actionsSpent, stars: stars, trace: [], verified: false)
+        }
 
         /// A result of the given values (not checked).
-        public init(actionsSpent: Int, stars: Int) {
+        public init(actionsSpent: Int, stars: Int, trace: [CelestialEclipseLabAction], verified: Bool) {
             self.actionsSpent = actionsSpent
             self.stars = stars
+            self.trace = trace
+            self.verified = verified
+        }
+
+        /// The keys of an encoded result.
+        private enum CodingKeys: String, CodingKey {
+            /// The least actions spent.
+            case actionsSpent
+            /// The stars.
+            case stars
+            /// The effective actions of the win.
+            case trace
+            /// Whether the result was recorded with a trace.
+            case verified
+        }
+
+        /// Decodes a result; a missing `trace` is empty and a missing `verified` is false.
+        public init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            actionsSpent = try container.decode(Int.self, forKey: .actionsSpent)
+            stars = try container.decode(Int.self, forKey: .stars)
+            trace = try container.decodeIfPresent([CelestialEclipseLabAction].self, forKey: .trace) ?? []
+            verified = try container.decodeIfPresent(Bool.self, forKey: .verified) ?? false
+        }
+
+        /// Encodes every field, the trace and the verified flag included.
+        public func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(actionsSpent, forKey: .actionsSpent)
+            try container.encode(stars, forKey: .stars)
+            try container.encode(trace, forKey: .trace)
+            try container.encode(verified, forKey: .verified)
         }
     }
 
@@ -245,17 +315,63 @@ public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codabl
 
     /// Records a win of `level` that spent `actionsSpent` actions (certified witness of `certified` phase changes).
     ///
-    /// The caller records only campaign and daily wins (never practice). The new result replaces a stored one only
-    /// when it is better (fewer actions spent, then more stars); a worse or equal result keeps the stored one. When
-    /// `opensNext` is true (a campaign win, the default) the frontier rises to `level + 1` (at most 100); it never
-    /// falls; a daily win passes false and opens nothing. A level outside 1 … 100 is ignored.
+    /// The result has no trace and is unverified. The caller records only campaign and daily wins (never practice or
+    /// replay). The new result replaces a stored one only when it is better (fewer actions spent, then more stars); a
+    /// worse or equal result keeps the stored one. When `opensNext` is true (a campaign win, the default) the frontier
+    /// rises to `level + 1` (at most 100); it never falls; a daily win passes false and opens nothing. A level outside
+    /// 1 … 100 is ignored.
     ///
     /// - Returns: whether the stored result of `level` changed (a first or a better result).
     @discardableResult
     public mutating func record(level: Int, actionsSpent: Int, certified: Int, opensNext: Bool = true) -> Bool {
-        guard level >= 1 && level <= Self.levelCount else { return false }
         let result: Result = Result(actionsSpent: actionsSpent,
                                     stars: Self.stars(actionsSpent: actionsSpent, certified: certified))
+        return store(result, level: level, opensNext: opensNext)
+    }
+
+    /// Records a win of `level` in `mode` under the rules of ``record(level:actionsSpent:certified:opensNext:)``:
+    /// practice and replay record nothing, campaign opens the next level, daily opens nothing. The result has no trace
+    /// and is unverified.
+    ///
+    /// - Returns: whether the stored result of `level` changed.
+    @discardableResult
+    public mutating func record(level: Int, actionsSpent: Int, certified: Int, mode: CelestialEclipseLabMode) -> Bool {
+        guard mode.awardsStars else { return false }
+        return record(level: level, actionsSpent: actionsSpent, certified: certified, opensNext: mode.opensLevels)
+    }
+
+    /// Records a verified win of `level` that spent `actionsSpent` actions (certified witness of `certified` phase
+    /// changes) in `mode`, with `trace`, the effective actions of the winning play
+    /// (``CelestialEclipseLabReconciliation/netTrace(_:)``: its phase changes, then the run).
+    ///
+    /// The rules of ``record(level:actionsSpent:certified:mode:)`` apply: practice and replay record nothing; the
+    /// result replaces a stored one only when it is better (fewer actions spent, then more stars), so a tie keeps the
+    /// earlier result and its trace; a campaign win raises the frontier; a daily win opens nothing; a level outside
+    /// 1 … 100 is ignored.
+    ///
+    /// - Returns: whether the stored result of `level` changed (a first or a better result).
+    @discardableResult
+    public mutating func record(level: Int, actionsSpent: Int, certified: Int,
+                                mode: CelestialEclipseLabMode = .campaign,
+                                trace: [CelestialEclipseLabAction]) -> Bool {
+        guard mode.awardsStars else { return false }
+        let result: Result = Result(actionsSpent: actionsSpent,
+                                    stars: Self.stars(actionsSpent: actionsSpent, certified: certified),
+                                    trace: trace, verified: true)
+        return store(result, level: level, opensNext: mode.opensLevels)
+    }
+
+    /// Removes the result of `level` (reconciliation drops a result whose trace does not replay); the frontier is
+    /// unchanged. Nothing happens when `level` has no result.
+    public mutating func drop(level: Int) {
+        solved[level] = nil
+    }
+
+    /// Stores `result` for `level` under the rules of ``record(level:actionsSpent:certified:opensNext:)``.
+    ///
+    /// - Returns: whether the stored result of `level` changed.
+    private mutating func store(_ result: Result, level: Int, opensNext: Bool) -> Bool {
+        guard level >= 1 && level <= Self.levelCount else { return false }
         var improved: Bool = false
         if let old = solved[level] {
             let fewer: Bool = result.actionsSpent < old.actionsSpent
@@ -270,16 +386,6 @@ public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codabl
         }
         if opensNext { frontier = max(frontier, min(level + 1, Self.levelCount)) }
         return improved
-    }
-
-    /// Records a win of `level` in `mode` under the rules of ``record(level:actionsSpent:certified:opensNext:)``:
-    /// practice records nothing, campaign opens the next level, daily opens nothing.
-    ///
-    /// - Returns: whether the stored result of `level` changed.
-    @discardableResult
-    public mutating func record(level: Int, actionsSpent: Int, certified: Int, mode: CelestialEclipseLabMode) -> Bool {
-        guard mode.awardsStars else { return false }
-        return record(level: level, actionsSpent: actionsSpent, certified: certified, opensNext: mode.opensLevels)
     }
 
     /// The daily level (1 … 100) of a calendar day: (d × 29) mod 100 + 1, where d is the days from 2026-01-01 to the
@@ -328,7 +434,7 @@ public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codabl
         return try encoder.encode(self)
     }
 
-    /// One won level as encoded.
+    /// One won level as encoded; `trace` and `verified` are absent in snapshot schema 1 and 2 encodings.
     private struct Entry: Codable {
         /// The level, 1 … 100.
         let level: Int
@@ -336,6 +442,10 @@ public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codabl
         let actionsSpent: Int
         /// The stars, 1 … 3.
         let stars: Int
+        /// The effective actions of the win (absent before snapshot schema 3).
+        let trace: [CelestialEclipseLabAction]?
+        /// Whether the result was recorded with a trace (absent before snapshot schema 3).
+        let verified: Bool?
     }
 
     /// The keys of the encoded progress.
@@ -346,7 +456,8 @@ public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codabl
         case frontier
     }
 
-    /// Decodes progress; the won levels are an array of `{level, actionsSpent, stars}`.
+    /// Decodes progress; the won levels are an array of `{level, actionsSpent, stars, trace, verified}`, where a
+    /// missing trace is empty and a missing verified flag is false.
     ///
     /// - Throws: `DecodingError.dataCorrupted` for a frontier outside 1 … 100, a level outside 1 … 100 or repeated,
     ///   stars outside 1 … 3 or actions spent below 0.
@@ -365,7 +476,8 @@ public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codabl
                 throw DecodingError.dataCorruptedError(forKey: .solved, in: container,
                                                        debugDescription: "invalid won level \(entry.level)")
             }
-            solved[entry.level] = Result(actionsSpent: entry.actionsSpent, stars: entry.stars)
+            solved[entry.level] = Result(actionsSpent: entry.actionsSpent, stars: entry.stars,
+                                         trace: entry.trace ?? [], verified: entry.verified ?? false)
         }
         self.solved = solved
         self.frontier = frontier
@@ -378,7 +490,8 @@ public struct CelestialEclipseLabProgress: Sendable, Equatable, Hashable, Codabl
         var entries: [Entry] = []
         for level in solved.keys.sorted() {
             guard let result = solved[level] else { continue }
-            entries.append(Entry(level: level, actionsSpent: result.actionsSpent, stars: result.stars))
+            entries.append(Entry(level: level, actionsSpent: result.actionsSpent, stars: result.stars,
+                                 trace: result.trace, verified: result.verified))
         }
         try container.encode(entries, forKey: .solved)
     }

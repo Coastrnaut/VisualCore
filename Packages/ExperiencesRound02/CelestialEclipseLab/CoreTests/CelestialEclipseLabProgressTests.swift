@@ -421,12 +421,14 @@ private let progressWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
         #expect(decoded == progress)
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
-        #expect(text == "{\"frontier\":4,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3},"
-            + "{\"actionsSpent\":5,\"level\":3,\"stars\":2}]}")
+        // Since feature 467 every result also writes its trace and whether it is verified.
+        #expect(text == "{\"frontier\":4,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3,\"trace\":[],"
+            + "\"verified\":false},{\"actionsSpent\":5,\"level\":3,\"stars\":2,\"trace\":[],\"verified\":false}]}")
         let empty: Progress = try decoder.decode(Progress.self, from: try Progress().encoded())
         #expect(empty == Progress())
 
-        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 29), .daily(level: 100)]
+        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 29), .daily(level: 100),
+                             .replay(level: 1), .replay(level: 100)]
         for mode in modes {
             let modeData: Data = try encoder.encode(mode)
             #expect(try decoder.decode(Mode.self, from: modeData) == mode)
@@ -456,7 +458,9 @@ private let progressWitnessDirectory: URL = URL(fileURLWithPath: #filePath)
             #expect(throws: (any Error).self) { try decoder.decode(Progress.self, from: Data(text.utf8)) }
         }
         let badModes: [String] = [
-            "{\"mode\":\"replay\",\"level\":1}",
+            "{\"mode\":\"replay\"}",   // since feature 467 replay is a mode, but it needs a level in 1 … 100
+            "{\"mode\":\"replay\",\"level\":101}",
+            "{\"mode\":\"rewind\",\"level\":1}",
             "{\"mode\":\"daily\"}",
             "{\"mode\":\"daily\",\"level\":0}",
             "{\"mode\":\"daily\",\"level\":101}"

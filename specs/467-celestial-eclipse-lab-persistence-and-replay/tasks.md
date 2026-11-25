@@ -14,7 +14,7 @@ its replay catalog proof (its convergence round) taken into the first pass and r
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1707-002 [P] [US2] Edit
+- [X] T-R02G1707-002 [P] [US2] Edit — Verified 2026-11-25: 2026-11-25 host-1b exit 0, 232 core tests (.autonomy/migration/checks/R02-G17-07.host-1b.json; host-1 failed only on the scenario manifest, which digests the progress now written with traces; regenerated); results carry trace and verified, replay mode, reconciliation with every certified witness trace verifying
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabProgress.swift` (Result gains "trace:
   [CelestialEclipseLabAction]" (effective `.phase(body, offset)` changes, then `.run`) and "verified: Bool";
   `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing only when better (ties keep the

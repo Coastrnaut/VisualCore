@@ -154,6 +154,7 @@ public struct CelestialEclipseLabFeedbackPlan: Sendable, Equatable {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"   // feature 467
         }
     }
 

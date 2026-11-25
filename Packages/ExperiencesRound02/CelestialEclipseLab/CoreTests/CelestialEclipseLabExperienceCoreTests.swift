@@ -1004,7 +1004,7 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
         let certified: Int = try Self.plan(1).count
         let progressText: String = "\"progress\":{\"frontier\":2,"
-            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3}]}"
+            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3,\"trace\":[],\"verified\":false}]}"
         #expect(campaignText.contains(progressText))
         #expect(campaignText.hasPrefix("{\"level\":2,\"mode\":{\"mode\":\"campaign\"},"))
         #expect(campaignText.hasSuffix(",\"tutorial\":\"phase\"}"))
