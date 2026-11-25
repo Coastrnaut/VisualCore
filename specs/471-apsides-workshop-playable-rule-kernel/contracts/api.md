@@ -27,7 +27,8 @@ public enum ApsidesWorkshopFailure: Sendable, Hashable, Codable {
     public var code: String }
 public struct ApsidesWorkshopReport: Sendable, Equatable { public let positions: [ApsidesWorkshopPoint]
     public let shares: [Int]; public let largestResidual: Int64; public let eventTicks: [Int]
-    public let deviations: [Int]; public let failure: ApsidesWorkshopFailure?; public var wins: Bool { get } }
+    public let deviations: [Int]; public let met: Int; public let failure: ApsidesWorkshopFailure?
+    public var wins: Bool { get } }
 public enum ApsidesWorkshopSky {
     public static func positions(_ orbit: ApsidesWorkshopOrbit, period: Int) -> (points: [ApsidesWorkshopPoint],
         largestResidual: Int64)
@@ -40,7 +41,7 @@ public struct ApsidesWorkshopLevel: Sendable, Equatable, Codable { /* fields per
     throws(ApsidesWorkshopError); encoded() -> Data; static func decode(_:) throws(ApsidesWorkshopError) -> Self;
     fingerprint */
     public func sectorName(_ index: Int) -> String                      // "sector 3"
-    public func targetDescription(_ index: Int, report: ApsidesWorkshopReport) -> String
+    public func targetDescription(_ index: Int, report: ApsidesWorkshopReport, orbit: ApsidesWorkshopOrbit) -> String
         // "sector 3 swept 18.4 %, needs 15.0 to 20.0 %"
     public func progressDescription(report: ApsidesWorkshopReport, orbit: ApsidesWorkshopOrbit, actionsLeft: Int)
         -> String }
