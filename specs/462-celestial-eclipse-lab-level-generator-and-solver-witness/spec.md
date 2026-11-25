@@ -45,9 +45,9 @@ inside the kernel's 1 … 24, so the kernel needs no change. The ranges below we
 down: a prototype of this generator and solver on the real kernel, run over the real 100 manifest entries (release
 build), certified every entry within candidate index 4, with at most 10 291 settings judged per candidate, in 0.57 s
 for all 100; witness lengths by band averaged 1.65, 2.15, 3.25, 3.40 and 4.40 (ranges 1 … 2, 2 … 3, 3 … 4, 3 … 4,
-4 … 5) with no progression drop or jump; one entry's first certified candidate repeated the previous level's target sequence (hence
-the neighbour rule). A debug build judged 20 band-5 entries in 7.0 s with the pair-interval table below (27 s with the
-kernel's whole-sky timeline per setting).
+4 … 5) with no progression drop or jump; one entry's first certified candidate repeated the previous level's target
+sequence (hence the neighbour rule). A debug build judged 20 band-5 entries in 7.0 s with the pair-interval table below
+(27 s with the kernel's whole-sky timeline per setting).
 
 - Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, budget, control
   emphasis) are a table in `CelestialEclipseLabManifest` with their provenance. Candidate c of entry n draws from
