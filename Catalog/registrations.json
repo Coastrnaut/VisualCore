@@ -1026,6 +1026,34 @@
       "manifest": "Packages/ExperiencesRound02/VoxelOrigami/scenario-manifest.json",
       "permissions": [],
       "summary": "Turn the hinges of a chain of frosted-ivory cubes a quarter turn at a time, never through another cube, until the chain folds into the turquoise target solid before the moves run out. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g16.starlit-cartouche": {
+      "capabilities": [
+        "Fly corridors to draw an ancient symbol",
+        "Time launches to windows and hazards",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#0A1240",
+        "#F2EEE6",
+        "#F5B83D",
+        "#2F6BFF",
+        "#141E5C"
+      ],
+      "content": {
+        "catalog_sha256": "ee022539220b64cf789b745adf2eaa9850a6d966f03ba3a669db140f717b969e",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/StarlitCartouche/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Fly a sapphire ship between drifting stars, waiting for each to come in range, so its meteor-gold trail draws the ancient symbol and reaches the beacon in time, past hazard tubes and star windows. 100 certified levels. Drawn in code; offline."
     }
   }
 }

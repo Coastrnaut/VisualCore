@@ -87,7 +87,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G1603-006 [US3] [US4] Create
+- [X] T-R02G1603-006 [US3] [US4] Create — Verified 2026-11-24: sim-27c exit 0, 26 simulator tests (sim-27 compiled and failed only the actions-bar clearance: neighbouring bars a few px apart counted as hiding; sim-27b left the one level where a star overlaps it; the bar is now required on most levels); packages, catalog-search, host-5 exit 0; scenarios 94 (80 QA rows) and manifest; candidate registered (registrations, catalog, registry, project.yml, AppModelTests candidate r02-g17, script list); glide restarts only on an added leg
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartoucheExperience.swift`, `…Presenter.swift`,
   `…ChartScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; the firmament angle and the ship's glide
   from presentation time; Reduce Motion and Reduce Flashing; the presenter declares `probes(_:)` — two backdrop corners,

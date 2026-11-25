@@ -175,7 +175,9 @@ enum CatalogFixture {
                                // Feature 433 (R02-G14-03); integrated at X-R02-G14.
                                "r02-g14.moonlit-mechanism",
                                // Feature 443 (R02-G15-03); integrated at X-R02-G15.
-                               "r02-g15.voxel-origami"],
+                               "r02-g15.voxel-origami",
+                               // Feature 453 (R02-G16-03); a registered candidate until X-R02-G16.
+                               "r02-g16.starlit-cartouche"],
                 "the registrations of Catalog/registrations.json")
     }
 

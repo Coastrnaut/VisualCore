@@ -1471,7 +1471,7 @@
       "id": "r02-g16.starlit-cartouche",
       "code": "R02-G16",
       "title": "Starlit Cartouche",
-      "summary": "Connect a moving starship route into a prescribed ancient symbol",
+      "summary": "Fly a sapphire ship between drifting stars, waiting for each to come in range, so its meteor-gold trail draws the ancient symbol and reaches the beacon in time, past hazard tubes and star windows. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1480,11 +1480,30 @@
         "celestial-exploration"
       ],
       "order": 41,
-      "palette": [],
+      "palette": [
+        "#0A1240",
+        "#F2EEE6",
+        "#F5B83D",
+        "#2F6BFF",
+        "#141E5C"
+      ],
       "tile_seed": 1927898377,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Fly corridors to draw an ancient symbol",
+        "Time launches to windows and hazards",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "ee022539220b64cf789b745adf2eaa9850a6d966f03ba3a669db140f717b969e",
+        "levels": 100
+      },
       "available": false
     },
     {

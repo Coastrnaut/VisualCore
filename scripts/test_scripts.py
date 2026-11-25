@@ -1571,7 +1571,10 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "MoonlitMechanismCore", "MoonlitMechanismExperience",
                                     # Feature 443 (R02-G15-03): Voxel Origami, a registered candidate until
                                     # X-R02-G15.
-                                    "VoxelOrigamiCore", "VoxelOrigamiExperience"])
+                                    "VoxelOrigamiCore", "VoxelOrigamiExperience",
+                                    # Feature 453 (R02-G16-03): Starlit Cartouche, a registered candidate until
+                                    # X-R02-G16.
+                                    "StarlitCartoucheCore", "StarlitCartoucheExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
