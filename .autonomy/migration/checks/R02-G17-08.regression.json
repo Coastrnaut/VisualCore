@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/celestial_eclipse_lab_regression.py"
+  ],
+  "command": "python3 scripts/celestial_eclipse_lab_regression.py",
+  "elapsed_seconds": 15.44,
+  "exit_code": 0,
+  "finished": "2026-11-25T18:35:46+00:00",
+  "gate": "R02-G17-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G17-08.regression.log",
+  "log_sha256": "21067b36246ada0b961d51130712bc5ac21a6e882f6b10b1797870d508566dab",
+  "name": "regression",
+  "started": "2026-11-25T18:35:31+00:00",
+  "timed_out": false
+}

@@ -65,7 +65,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1708-006 [P] [US4] Create `scripts/celestial_eclipse_lab_regression.py` and its test in
+- [X] T-R02G1708-006 [P] [US4] Create `scripts/celestial_eclipse_lab_regression.py` and its test in — Verified 2026-11-25: 2026-11-25 regression exit 0 (.autonomy/migration/checks/R02-G17-08.regression.json): host PASS, simulator PASS, one summary; CelestialEclipseLabRegressionTests (5) in scripts/test_scripts.py pass; CI step Celestial Eclipse Lab regression (host) added
   `scripts/test_scripts.py` (agent D: host filter `CelestialEclipseLabRegression`, then the simulator classes through
   `xcodebuild_package.py --only-testing` with the isolation variable, one summary line per part with pass or fail and
   the first failing name, a non-zero exit on any failure), and add the named step "Celestial Eclipse Lab regression
