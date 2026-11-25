@@ -10,6 +10,8 @@
 // rad/s, 0 with Reduce Motion, finite for any input), the won flare and seal, the glow gain per tier (0 at level-2) and
 // the Reduce Flashing cap, and, when `glslangValidator` is installed, a real front-end compile of each source (skipped
 // otherwise). Test data uses explicit types and plain loops (CI type-check rule).
+// Feature 454 (R02-G16-04) T-R02G1604-002: material 22 `preview` (the launch preview), selected by the vertex shader
+// with the ship colour, a strip with the distance along, dashed by the fragment shader like an undrawn symbol corridor.
 import Foundation
 import Testing
 @testable import StarlitCartoucheCore
@@ -384,7 +386,7 @@ import Testing
         #expect(fragment.contains("const vec3 SC_NIGHT_TOP = vec3(0.078431, 0.117647, 0.360784);"))
         let glowF: String = Shaders.glowFragment
         let floats: [(name: String, value: Double, source: String)] = [
-            (name: "SC_MAX_MATERIAL", value: 21, source: vertex),
+            (name: "SC_MAX_MATERIAL", value: 22, source: vertex),
             (name: "SC_EDGE_FEATHER", value: Shaders.edgeFeather, source: fragment),
             (name: "SC_TAU", value: Shaders.tau, source: fragment),
             (name: "SC_SKY_SPAN", value: Shaders.skySpan, source: fragment),
@@ -426,7 +428,7 @@ import Testing
         let expectedNames: [String] = [
             "firmament", "corridor", "symbolDash", "hazardActive", "hazardIdle", "trail", "trailGhost", "starCore",
             "starNotches", "ship", "beaconRing", "chosenRing", "cartoucheGrid", "strokeUndrawn", "strokeDrawn",
-            "actionsLit", "actionsUnlit", "beatTrack", "beatTrackRest", "waitLit", "waitUnlit", "broken",
+            "actionsLit", "actionsUnlit", "beatTrack", "beatTrackRest", "waitLit", "waitUnlit", "broken", "preview",
         ]
         #expect(names == expectedNames)
         #expect(Set(codes).count == codes.count)
@@ -471,6 +473,8 @@ import Testing
         #expect(Material.ship.localCoordinate == .arrow)
         #expect(Material.corridor.localCoordinate == .strip)
         #expect(Material.actionsLit.localCoordinate == .fan)
+        #expect(Material.preview.localCoordinate == .stripAlong)
+        #expect(Material.preview.rawValue == 22 && Material.preview.colour == Palette.ship)
         // The fragment shader treats exactly the firmament as opaque and the ship by its dart.
         let fragment: String = Shaders.chartFragment
         #expect(fragment.contains("coverage = mix(coverage, 1.0, sky);"))
@@ -590,10 +594,31 @@ import Testing
             "float notch = 1.0 - step(SC_NOTCH_DUTY * 0.5, abs(fract(t * count) - 0.5));",
             "float ringDash = 1.0 - step(SC_RING_DASH_DUTY, fract(t * SC_RING_DASHES));",
             "float arrow = smoothstep(-SC_ARROW_FEATHER, SC_ARROW_FEATHER, arrowDistance(v_aux.xy));",
-            "coverage = coverage * mix(1.0, dash, isCode(m, 2.0) + isCode(m, 13.0));",
+            "coverage = coverage * mix(1.0, dash, isCode(m, 2.0) + isCode(m, 13.0) + isCode(m, 22.0));",
             "coverage = coverage * mix(1.0, SC_GHOST_ALPHA * fade * t, isCode(m, 6.0));",
         ]
         for line in lines { #expect(fragment.contains(line), "\(line)") }
+    }
+
+    @Test func previewMaterialIsADashedShipColouredRibbon() {
+        let vertex: String = Shaders.chartVertex
+        #expect(vertex.contains("base = mix(base, SC_SHIP, isCode(m, 22.0));"))
+        #expect(vertex.contains("const float SC_MAX_MATERIAL = 22.000000;"))
+        let fragment: String = Shaders.chartFragment
+        #expect(fragment.contains("isCode(m, 22.0)"))
+        #expect(!fragment.contains("isCode(m, 23.0)"))
+        #expect(Material.preview.code == 22)
+        #expect(Material.preview.colour == Palette.ship)
+        #expect(!Material.preview.isSolid)
+        // The preview's dashes keep the dash duty along a ribbon of the longest preview's length.
+        var dashes: Int = 0
+        let samples: Int = 2600
+        for step in 0..<samples {
+            dashes += Int(Shaders.dashCoverage(along: 2.6 * (Double(step) + 0.5) / Double(samples)))
+        }
+        #expect(abs(Double(dashes) / Double(samples) - Shaders.dashDuty) < 0.02)
+        // Sapphire: blue well above red, as the ship.
+        #expect(Material.preview.colour.z - Material.preview.colour.x >= 0.5)
     }
 
     @Test func trailGhostsFadeWithFallingAlpha() {

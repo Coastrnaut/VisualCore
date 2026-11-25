@@ -722,6 +722,12 @@ enum StarlitCartoucheTest {
         case .waitPip:
             f.hulls.append(billboardHull(element.centre, half: SIMD2<Double>(pipHalf, pipHalf), cam, width: width,
                                          height: height))
+        case .preview:
+            // Feature 454 (R02-G16-04): the launch preview ribbon, 0.03 wide.
+            if let ends = Geometry.previewEnds(snapshot),
+               let s = strip(ends.start, ends.end, half: 0.015, cam, width: width, height: height) {
+                f.capsules.append(s)
+            }
         }
         return f
     }
@@ -776,7 +782,7 @@ enum StarlitCartoucheTest {
     nonisolated static func starHides(_ element: StarlitCartoucheElement, _ snapshot: Snapshot) -> Bool {
         switch element.kind {
         case .corridor: !isDashed(element.index, snapshot)
-        case .hazard, .cartouche, .actionsBar, .beatTrack, .waitPip: true
+        case .hazard, .cartouche, .actionsBar, .beatTrack, .waitPip, .preview: true
         case .trail, .failedLeg, .star, .ship, .beacon, .chosen: false
         }
     }
@@ -785,7 +791,7 @@ enum StarlitCartoucheTest {
     nonisolated static func shipHides(_ element: StarlitCartoucheElement, _ snapshot: Snapshot) -> Bool {
         switch element.kind {
         case .corridor: isDashed(element.index, snapshot)
-        case .chosen, .ship: false
+        case .chosen, .ship, .preview: false
         case .hazard, .trail, .failedLeg, .star, .beacon, .cartouche, .actionsBar, .beatTrack, .waitPip: true
         }
     }

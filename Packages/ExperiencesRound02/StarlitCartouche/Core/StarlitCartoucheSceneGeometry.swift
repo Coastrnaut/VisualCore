@@ -59,15 +59,68 @@
 // sphere or from the eye, and the index order is the painter's order. Tiers change only the star sphere detail, the
 // ghosts and the glow: every position named above is the same at every tier. Doubles are used for drawing only;
 // nothing here is consulted by the rules.
+//
+// Feature 454 (R02-G16-04) T-R02G1604-002 (FR-R02G1604-002, 003, 005; SC-R02G1604-004; clarifications Q1, Q3, Q4) adds
+// the player's orbit (`StarlitCartoucheOrbit`: yaw ±60° about the vertical axis through the authored box centre
+// (0, −0.25, 0), positive moving the eye from the front (+z) towards +x; pitch −20° … +35° about the authored view's
+// right axis, positive raising the eye; authored (0, 0)) and `camera(_:aspect:orbit:)`: the eye's offset from the
+// look-at point is pitched (its elevation changed, its length and horizontal direction kept), then the eye and the
+// look-at point are yawed together about that axis, and the field of view is refitted exactly as for the fixed camera,
+// so the authored box keeps ``StarlitCartoucheSceneGeometry/fitMargin`` per side at every orbit and aspect 0.4 … 2.5.
+// The eye (about 3.3 from the look-at point and about 1.8 or more from the vertical axis through it) stays outside the
+// box. At the authored orbit `camera(_:aspect:)` (which calls it) is unchanged bit for bit. The launch preview
+// (clarification Q3): every star, its ring, the corridors and hazards between the stars, the ship at rest (and
+// the end of its glide), the beacon ring and the chosen ring are drawn at the launch positions, w(position(at: L)) with
+// L = beat + chosen wait (``launchCentre(_:_:)``); trails and the failed leg stay where they were flown; at wait 0
+// everything is R02-G16-03's geometry. While playing, and when a corridor joins the ship's star and the chosen star,
+// element `preview` (``StarlitCartoucheElement/Kind/preview``) is a camera-facing ribbon 0.03 wide of material 22
+// (`preview`, a_normal.x the distance along in world units) from the ship's star at L to the destination at L +
+// travel (``previewEnds(_:)``). The camera-taking overloads `chartMesh(_:tier:glide:camera:)`,
+// `glowMesh(_:tier:glide:camera:)`, `chartPart(_:tier:glide:wonLevel:camera:)` and `glowPart(_:tier:glide:camera:)`
+// build the firmament, the billboards, the camera-facing strips, the paint order and the glow lift for the given
+// camera; the overloads without a camera use the authored camera. The orbit is presentation only.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
 
-/// The camera of one frame: eye, target, lens and the matrices built from them.
+/// The player's view of the chart: a yaw about the vertical axis through the authored box centre and a pitch about the
+/// authored view's right axis, both in radians (feature 454, R02-G16-04). Presentation only: never saved, never read by
+/// the rules.
+public struct StarlitCartoucheOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians about the authored view's right axis: positive raises the eye (the chart seen more from
+    /// above), negative lowers it; allowed ``pitchRange`` (−20° … +35°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 0, the fixed camera of R02-G16-03.
+    public static let authored = StarlitCartoucheOrbit(yaw: 0, pitch: 0)
+    /// The largest yaw either way, 60° in radians.
+    public static let yawLimit: Double = 60.0 * Double.pi / 180
+    /// The allowed pitches, −20° … +35° in radians.
+    public static let pitchRange: ClosedRange<Double> = (-20.0 * Double.pi / 180)...(35.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −60° … 60° and pitch to −20° … 35°; a non-finite angle becomes 0.
+    public func clamped() -> StarlitCartoucheOrbit {
+        let y: Double = yaw.isFinite ? yaw : 0
+        let p: Double = pitch.isFinite ? pitch : 0
+        return StarlitCartoucheOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                     pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+}
+
+/// The camera of one frame: eye, target, lens and the matrices built from them (the authored camera at the authored
+/// orbit).
 public struct StarlitCartoucheCamera: Sendable, Equatable {
-    /// The eye position in world units, (1.2, 1.0, 2.8).
+    /// The eye position in world units, (1.2, 1.0, 2.8) at the authored orbit.
     public let eye: SIMD3<Double>
-    /// The point looked at, (0, −0.2, 0).
+    /// The point looked at, (0, −0.2, 0) at the authored orbit.
     public let target: SIMD3<Double>
     /// The vertical field of view in radians (fitted to the authored box at `aspect`).
     public let fovY: Double
@@ -113,11 +166,15 @@ public struct StarlitCartoucheElement: Sendable, Equatable {
         case beatTrack = 10
         /// A wait pip.
         case waitPip = 11
+        /// The launch preview's dashed ribbon (feature 454; drawn only while playing and when a corridor joins the
+        /// ship's star and the chosen star).
+        case preview = 12
     }
 
     /// The kind.
     public let kind: Kind
-    /// The index within its kind: corridor, hazard, leg, star, bar or pip (0 for the single elements).
+    /// The index within its kind: corridor, hazard, leg, star, bar or pip (0 for the single elements and the
+    /// preview).
     public let index: Int
     /// The element's centre in world units.
     public let centre: SIMD3<Double>
@@ -185,6 +242,8 @@ public enum StarlitCartoucheSceneGeometry {
     public static let beaconRadius: Double = 0.12
     /// The chosen destination ring's radius.
     public static let chosenRadius: Double = 0.1
+    /// The launch preview ribbon's width (feature 454).
+    public static let previewWidth: Double = 0.03
     /// The beacon and chosen rings' width.
     public static let ringWidth: Double = 0.012
     /// A failure ring's radius around a marked star.
@@ -304,6 +363,33 @@ public enum StarlitCartoucheSceneGeometry {
         return world(snapshot.positions[clamped(index, snapshot.positions.count)], snapshot)
     }
 
+    /// The centre of star `index` (clamped) at the launch beat L = beat + chosen wait: w(launchPositions[index])
+    /// (feature 454, clarification Q3); equal to ``starCentre(_:_:)`` at wait 0. Every star, its ring, the corridors
+    /// and hazards, the ship at rest, the beacon ring and the chosen ring are drawn there.
+    public static func launchCentre(_ index: Int, _ snapshot: StarlitCartoucheSceneSnapshot) -> SIMD3<Double> {
+        guard !snapshot.launchPositions.isEmpty else { return starCentre(index, snapshot) }
+        return world(snapshot.launchPositions[clamped(index, snapshot.launchPositions.count)], snapshot)
+    }
+
+    /// The ends of the launch preview (feature 454, clarification Q3): from the ship's star at the launch beat L
+    /// (``launchCentre(_:_:)``) to w of the chosen star's position at L + travel, travel that of the lowest-index
+    /// corridor joining the ship's star and the chosen star. Nil unless the stage is playing and such a corridor
+    /// exists.
+    public static func previewEnds(_ snapshot: StarlitCartoucheSceneSnapshot)
+        -> (start: SIMD3<Double>, end: SIMD3<Double>)? {
+        guard snapshot.stage == .playing else { return nil }
+        let count: Int = snapshot.stars.count
+        let from: Int = snapshot.star
+        let to: Int = snapshot.chosenStar
+        guard from >= 0, from < count, to >= 0, to < count, from != to else { return nil }
+        for corridor in snapshot.corridors where (corridor.a == from && corridor.b == to)
+            || (corridor.a == to && corridor.b == from) {
+            let arrival: StarlitCartoucheVector = snapshot.stars[to].position(at: snapshot.launchBeat + corridor.travel)
+            return (launchCentre(from, snapshot), world(arrival, snapshot))
+        }
+        return nil
+    }
+
     /// The world start (w of the from-star's position at departure) and end (w of the to-star's position at arrival)
     /// of trail `leg` (clamped); the ship's star twice when no leg was flown.
     public static func trailEnds(_ leg: Int, _ snapshot: StarlitCartoucheSceneSnapshot)
@@ -326,15 +412,16 @@ public enum StarlitCartoucheSceneGeometry {
     /// `glide` made usable: clamped to 0 … 1, 1 when not finite.
     static func usableGlide(_ glide: Double) -> Double { glide.isFinite ? min(max(glide, 0), 1) : 1 }
 
-    /// The ship's place for `glide` (0 … 1): along its last trail from its start (0) to its end (1), which is the
-    /// ship's star at the snapshot's beat; the ship's star before the first leg.
+    /// The ship's place for `glide` (0 … 1): from its last trail's start (0) to its star at the launch beat (1;
+    /// ``launchCentre(_:_:)``, the trail's end at wait 0); the ship's star at the launch beat before the first leg.
     public static func shipPlace(_ snapshot: StarlitCartoucheSceneSnapshot, glide: Double) -> SIMD3<Double> {
-        guard !snapshot.legs.isEmpty else { return starCentre(snapshot.star, snapshot) }
+        let rest: SIMD3<Double> = launchCentre(snapshot.star, snapshot)
+        guard !snapshot.legs.isEmpty else { return rest }
         let ends: (start: SIMD3<Double>, end: SIMD3<Double>) = trailEnds(snapshot.legs.count - 1, snapshot)
-        return mix(ends.start, ends.end, usableGlide(glide))
+        return mix(ends.start, rest, usableGlide(glide))
     }
 
-    /// The ship's centre at rest (glide 1): its star's centre.
+    /// The ship's centre at rest (glide 1): its star's centre at the launch beat.
     public static func shipCentre(_ snapshot: StarlitCartoucheSceneSnapshot) -> SIMD3<Double> {
         shipPlace(snapshot, glide: 1)
     }
@@ -442,7 +529,9 @@ public enum StarlitCartoucheSceneGeometry {
 
     /// Every element with its centre and distance from `camera`'s eye, in painter's order: farthest first, ties by
     /// kind (corridor, hazard, trail, failed leg, star, ship, beacon, chosen, cartouche, actions bar, beat track, wait
-    /// pip) then index (clarification Q1). The ship is at rest (glide 1).
+    /// pip, preview) then index (clarification Q1). The ship is at rest (glide 1); stars, corridors, hazards, the ship,
+    /// the beacon and the chosen ring at the launch positions; the preview (at the midpoint of ``previewEnds(_:)``)
+    /// only when it is drawn.
     public static func paintOrder(_ snapshot: StarlitCartoucheSceneSnapshot,
                                   camera: StarlitCartoucheCamera) -> [StarlitCartoucheElement] {
         elements(snapshot, eye: camera.eye, glide: 1)
@@ -476,25 +565,26 @@ public enum StarlitCartoucheSceneGeometry {
         for index in snapshot.corridors.indices {
             let c: StarlitCartoucheCorridor = snapshot.corridors[index]
             guard c.a >= 0, c.b < count else { continue }
-            add(.corridor, index, (starCentre(c.a, snapshot) + starCentre(c.b, snapshot)) / 2)
+            add(.corridor, index, (launchCentre(c.a, snapshot) + launchCentre(c.b, snapshot)) / 2)
         }
         for index in snapshot.hazards.indices {
             let h: StarlitCartoucheHazard = snapshot.hazards[index]
             guard h.corridor >= 0, h.corridor < snapshot.corridors.count else { continue }
             let c: StarlitCartoucheCorridor = snapshot.corridors[h.corridor]
             guard c.a >= 0, c.b < count else { continue }
-            add(.hazard, index, (starCentre(c.a, snapshot) + starCentre(c.b, snapshot)) / 2)
+            add(.hazard, index, (launchCentre(c.a, snapshot) + launchCentre(c.b, snapshot)) / 2)
         }
         if snapshot.departures.count == snapshot.legs.count, snapshot.arrivals.count == snapshot.legs.count {
             for index in snapshot.legs.indices { add(.trail, index, trailMidpoint(index, snapshot)) }
         }
         if let ends = failedLegEnds(snapshot) { add(.failedLeg, 0, (ends.start + ends.end) / 2) }
-        for index in 0..<count { add(.star, index, starCentre(index, snapshot)) }
+        for index in 0..<count { add(.star, index, launchCentre(index, snapshot)) }
         if count > 0 {
             add(.ship, 0, shipPlace(snapshot, glide: glide))
-            add(.beacon, 0, starCentre(snapshot.beacon, snapshot))
-            add(.chosen, 0, starCentre(snapshot.chosenStar, snapshot))
+            add(.beacon, 0, launchCentre(snapshot.beacon, snapshot))
+            add(.chosen, 0, launchCentre(snapshot.chosenStar, snapshot))
         }
+        if let ends = previewEnds(snapshot) { add(.preview, 0, (ends.start + ends.end) / 2) }
         add(.cartouche, 0, cartoucheCentre())
         for index in 0..<max(snapshot.budget, 0) { add(.actionsBar, index, actionsBar(index, snapshot)) }
         add(.beatTrack, 0, beatTrackCentre())
@@ -515,27 +605,51 @@ public enum StarlitCartoucheSceneGeometry {
 
     // MARK: Meshes
 
-    /// The chart mesh for the chart program, in painter's order (see the header), the ship placed by `glide` 0 … 1.
+    /// The chart mesh for the chart program, in painter's order (see the header), the ship placed by `glide` 0 … 1,
+    /// seen from the authored camera.
     public static func chartMesh(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier,
                                  glide: Double) throws(MeshError) -> Mesh {
         try chartPart(snapshot, tier: tier, glide: glide).mesh
     }
 
-    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2.
+    /// The chart mesh seen from `camera` (feature 454): the firmament, billboards, camera-facing strips and paint
+    /// order built for its eye and view (``chartPart(_:tier:glide:wonLevel:camera:)`` without colours).
+    public static func chartMesh(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier, glide: Double,
+                                 camera: StarlitCartoucheCamera) throws(MeshError) -> Mesh {
+        try chartPart(snapshot, tier: tier, glide: glide, camera: camera).mesh
+    }
+
+    /// The glow mesh for the glow program (`glowPart` without colours), seen from the authored camera; empty at
+    /// level-2.
     public static func glowMesh(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier,
                                 glide: Double = 1) throws(MeshError) -> Mesh {
         try glowPart(snapshot, tier: tier, glide: glide).mesh
     }
 
+    /// The glow mesh seen from `camera` (feature 454): bands facing its eye and lifted towards it
+    /// (``glowPart(_:tier:glide:camera:)`` without colours); empty at level-2.
+    public static func glowMesh(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier,
+                                glide: Double = 1, camera: StarlitCartoucheCamera) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, glide: glide, camera: camera).mesh
+    }
+
     /// The chart with fallback colours (unlit palette colours; the firmament from night at its bottom to night top at
     /// its top; on a won level the trails and drawn strokes towards the trail glow and the stars towards white) for the
     /// shared unlit renderer: the same mesh as ``chartMesh(_:tier:glide:)``. `wonLevel` (0 … 1) scales the won look;
-    /// nil uses ``wonFlag(_:)``. Positions never depend on it.
+    /// nil uses ``wonFlag(_:)``. Positions never depend on it. Seen from the authored camera.
     public static func chartPart(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier,
                                  glide: Double = 1,
                                  wonLevel: Double? = nil) throws(MeshError) -> StarlitCartoucheColouredMesh {
+        try chartPart(snapshot, tier: tier, glide: glide, wonLevel: wonLevel, camera: camera(snapshot, aspect: 1))
+    }
+
+    /// The chart with fallback colours seen from `camera` (feature 454): the firmament, billboards, camera-facing
+    /// strips and paint order are built for its eye and view; otherwise as ``chartPart(_:tier:glide:wonLevel:)``.
+    public static func chartPart(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier,
+                                 glide: Double = 1, wonLevel: Double? = nil,
+                                 camera view: StarlitCartoucheCamera)
+        throws(MeshError) -> StarlitCartoucheColouredMesh {
         typealias P = StarlitCartouchePalette
-        let view: StarlitCartoucheCamera = camera(snapshot, aspect: 1)
         let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis(view)
         var parts: Parts = Parts(eye: view.eye, basis: basis)
         let won: Double = wonLevel.map { $0.isFinite ? min(max($0, 0), 1) : 0 } ?? wonFlag(snapshot)
@@ -562,8 +676,8 @@ public enum StarlitCartoucheSceneGeometry {
             switch element.kind {
             case .corridor:
                 let c: StarlitCartoucheCorridor = snapshot.corridors[i]
-                let a: SIMD3<Double> = starCentre(c.a, snapshot)
-                let b: SIMD3<Double> = starCentre(c.b, snapshot)
+                let a: SIMD3<Double> = launchCentre(c.a, snapshot)
+                let b: SIMD3<Double> = launchCentre(c.b, snapshot)
                 if symbol.contains(i) && !drawn.contains(i) {
                     try parts.alongStrip(a, b, width: corridorWidth, material: .symbolDash)
                 } else {
@@ -575,11 +689,11 @@ public enum StarlitCartoucheSceneGeometry {
                 let active: Bool = i < snapshot.active.count && snapshot.active[i]
                 let material: Material = markedHazard(snapshot) == i ? .broken : (active ? .hazardActive : .hazardIdle)
                 if material == .broken {
-                    try parts.facingStrip(starCentre(c.a, snapshot), starCentre(c.b, snapshot), width: hazardWidth,
-                                          material: material)
+                    try parts.facingStrip(launchCentre(c.a, snapshot), launchCentre(c.b, snapshot),
+                                          width: hazardWidth, material: material)
                 } else {
-                    try parts.alongStrip(starCentre(c.a, snapshot), starCentre(c.b, snapshot), width: hazardWidth,
-                                         material: material)
+                    try parts.alongStrip(launchCentre(c.a, snapshot), launchCentre(c.b, snapshot),
+                                         width: hazardWidth, material: material)
                 }
             case .trail:
                 let ends: (start: SIMD3<Double>, end: SIMD3<Double>) = trailEnds(i, snapshot)
@@ -658,6 +772,10 @@ public enum StarlitCartoucheSceneGeometry {
             case .waitPip:
                 try parts.rectangle(centre: element.centre, half: SIMD2(pipSide / 2, pipSide / 2),
                                     material: i < litPips(snapshot) ? .waitLit : .waitUnlit)
+            case .preview:
+                if let ends = previewEnds(snapshot) {
+                    try parts.alongStrip(ends.start, ends.end, width: previewWidth, material: .preview)
+                }
             }
         }
         return parts.built()
@@ -707,11 +825,18 @@ public enum StarlitCartoucheSceneGeometry {
     /// ``shipGlowGrowth``, base ``StarlitCartouchePalette/shipGlow``) and every trail (a band on each side from its
     /// half width, growth ``trailGlowGrowth``, base ``StarlitCartouchePalette/trailGlow``); each lifted 0.001 · k
     /// towards the eye. a_normal is the base colour and a_uv.x ``StarlitCartoucheShaders/GlowKind/code(factor:)``.
-    /// Empty at level-2.
+    /// Empty at level-2. Seen from the authored camera; the stars at the launch positions.
     public static func glowPart(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier,
                                 glide: Double = 1) throws(MeshError) -> StarlitCartoucheColouredMesh {
+        try glowPart(snapshot, tier: tier, glide: glide, camera: camera(snapshot, aspect: 1))
+    }
+
+    /// The glow with fallback colours seen from `camera` (feature 454): bands facing its eye and lifted towards it;
+    /// otherwise as ``glowPart(_:tier:glide:)``.
+    public static func glowPart(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier,
+                                glide: Double = 1, camera view: StarlitCartoucheCamera)
+        throws(MeshError) -> StarlitCartoucheColouredMesh {
         typealias P = StarlitCartouchePalette
-        let view: StarlitCartoucheCamera = camera(snapshot, aspect: 1)
         let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis(view)
         var parts: Parts = Parts(eye: view.eye, basis: basis)
         let shells: Int = max(tier.glowShells, 0)
@@ -723,7 +848,7 @@ public enum StarlitCartoucheSceneGeometry {
             let factor: Double = pow(glowWeight, Double(k))
             let lift: SIMD3<Double> = towards * (glowLift * Double(k))
             for index in snapshot.stars.indices {
-                try parts.glowBand(centre: starCentre(index, snapshot) + lift, inner: starRadius,
+                try parts.glowBand(centre: launchCentre(index, snapshot) + lift, inner: starRadius,
                                    outer: starRadius + starGlowGrowth * Double(k), base: P.glow,
                                    code: StarlitCartoucheShaders.GlowKind.star.code(factor: factor), factor: factor)
             }
@@ -785,10 +910,52 @@ public enum StarlitCartoucheSceneGeometry {
     /// view is the smallest that holds every corner of the box x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95 inside
     /// the view with ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it —
     /// every star at every beat, the rings, the cartouche, bars, track and pips — keeps a margin of at least 5 % for
-    /// aspect 0.4 … 2.5). Independent of the snapshot (accepted for parity), the tier and the time.
+    /// aspect 0.4 … 2.5). Independent of the snapshot (accepted for parity), the tier and the time. Equals
+    /// ``camera(_:aspect:orbit:)`` at ``StarlitCartoucheOrbit/authored`` bit for bit.
     public static func camera(_ snapshot: StarlitCartoucheSceneSnapshot, aspect: Double) -> StarlitCartoucheCamera {
+        camera(snapshot, aspect: aspect, orbit: .authored)
+    }
+
+    /// The vertical axis the orbit yaws about passes through the authored box centre (0, −0.25, 0).
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `p` yawed by `yaw` radians about the vertical axis through ``orbitPivot`` (from +z towards +x).
+    static func yawed(_ p: SIMD3<Double>, _ yaw: Double) -> SIMD3<Double> {
+        let c: Double = cos(yaw)
+        let s: Double = sin(yaw)
+        let d: SIMD3<Double> = p - orbitPivot
+        return SIMD3(orbitPivot.x + d.x * c + d.z * s, p.y, orbitPivot.z - d.x * s + d.z * c)
+    }
+
+    /// The eye and the look-at point of `orbit` (clamped): the authored eye's offset from the look-at point,
+    /// (1.2, 1.2, 2.8), pitched about the authored view's right axis (its elevation above the horizontal raised by the
+    /// pitch, its length and horizontal direction kept) and added to the look-at point; then both points yawed about
+    /// the vertical axis through ``orbitPivot``. Exactly ``eye`` and ``lookAt`` at the authored orbit.
+    static func orbitView(_ orbit: StarlitCartoucheOrbit) -> (eye: SIMD3<Double>, target: SIMD3<Double>) {
+        let o: StarlitCartoucheOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return (eye: eye, target: lookAt) }
+        let e: SIMD3<Double> = eye - lookAt
+        let horizontal: Double = (e.x * e.x + e.z * e.z).squareRoot()
+        let length: Double = dot(e, e).squareRoot()
+        let elevation: Double = atan2(e.y, horizontal) + o.pitch
+        let across: Double = length * cos(elevation) / horizontal
+        let pitched: SIMD3<Double> = lookAt + SIMD3(e.x * across, length * sin(elevation), e.z * across)
+        return (eye: yawed(pitched, o.yaw), target: yawed(lookAt, o.yaw))
+    }
+
+    /// The camera for `orbit` (clamped, see ``StarlitCartoucheOrbit/clamped()``) and `aspect` (feature 454,
+    /// T-R02G1604-002): from the orbit's eye looking at its look-at point (``orbitView(_:)``) with +y up (never
+    /// parallel: the view stays within 60° of level); the vertical field of view is the smallest that holds every
+    /// corner of the box x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95 inside the view with ``fitMargin`` per side, so
+    /// everything inside the box keeps a margin of at least 5 % at every orbit and aspect 0.4 … 2.5. The eye stays
+    /// outside the box. Presentation only; independent of the snapshot (accepted for parity), the tier and the time.
+    public static func camera(_ snapshot: StarlitCartoucheSceneSnapshot, aspect: Double,
+                              orbit: StarlitCartoucheOrbit) -> StarlitCartoucheCamera {
         _ = snapshot
         let a: Double = usableAspect(aspect)
+        let view0: (eye: SIMD3<Double>, target: SIMD3<Double>) = orbitView(orbit)
+        let eye: SIMD3<Double> = view0.eye
+        let lookAt: SIMD3<Double> = view0.target
         let forward: SIMD3<Double> = unit(lookAt - eye)
         let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
         let up: SIMD3<Double> = cross(right, forward)

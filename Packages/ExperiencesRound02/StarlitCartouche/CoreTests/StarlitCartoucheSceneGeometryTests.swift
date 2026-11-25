@@ -9,6 +9,11 @@
 // budget) marked; the vertex streams follow `StarlitCartoucheShaders.Material/localCoordinate` and the fallback
 // colours equal the shader's material colours. Explicit types, plain loops; each test well under 10 s; no wall-clock
 // asserts.
+// Feature 454 (R02-G16-04) T-R02G1604-002 (FR-R02G1604-002, 003; SC-R02G1604-004; clarifications Q3, Q4): every
+// element inside the view with a 5 % margin at the orbit corners, waits 0 … 8 and 7 aspects (the eye outside the box);
+// `camera(_:aspect:)` equal to the authored orbit bit for bit; the stars, rings, ship, beacon and chosen ring at the
+// launch positions with the trails where flown; the preview ribbon's ends, its distance along and its absence without a
+// corridor or outside playing; wait 0 identical to R02-G16-03's places; the camera-taking meshes face the given eye.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -553,7 +558,7 @@ struct StarlitCartoucheSceneGeometryTests {
             let order: [StarlitCartoucheElement] = G.paintOrder(snap, camera: camera)
             let failed: Int = snap.failedLeg == nil ? 0 : 1
             #expect(order.count == snap.corridors.count + snap.hazards.count + snap.legs.count + failed
-                    + snap.stars.count + 3 + 1 + snap.budget + 1 + 9)
+                    + snap.stars.count + 3 + 1 + snap.budget + 1 + 9 + (G.previewEnds(snap) == nil ? 0 : 1))
             for k in 1..<order.count {
                 let a: StarlitCartoucheElement = order[k - 1]
                 let b: StarlitCartoucheElement = order[k]
@@ -689,7 +694,8 @@ struct StarlitCartoucheSceneGeometryTests {
                     case .strip:
                         #expect(abs(local) == 1 && n == SIMD3(0, 0, 0), "\(material)")
                     case .stripAlong:
-                        #expect(abs(local) == 1 && n.x >= 0 && n.x <= 2 && n.y == 0 && n.z == 0, "\(material)")
+                        let longest: Double = material == .preview ? 2.7 : 2
+                        #expect(abs(local) == 1 && n.x >= 0 && n.x <= longest && n.y == 0 && n.z == 0, "\(material)")
                     case .trail:
                         #expect(abs(local) == 1 && (n.x == 0 || n.x == 1) && n.y == 0 && n.z == 0)
                     case .ghost:
@@ -738,8 +744,313 @@ struct StarlitCartoucheSceneGeometryTests {
         for vertex in Self.vertices(mesh, .symbolDash) { farthest = max(farthest, mesh.normals[vertex].x) }
         let corridor0: Double = Self.length(G.starCentre(1, snap) - G.starCentre(0, snap))
         #expect(abs(farthest - max(corridor0, Self.length(G.starCentre(2, snap) - G.starCentre(1, snap)))) < 1e-12)
-        var expected: Set<Int> = Set(0...21)
+        var expected: Set<Int> = Set(0...22)
         expected.subtract([Material.strokeDrawn.rawValue, Material.waitUnlit.rawValue])
         #expect(seen.isSuperset(of: expected), "\(expected.subtracting(seen).sorted())")
+    }
+
+    // MARK: Feature 454 (R02-G16-04)
+
+    /// The orbit corners and the authored orbit.
+    static let orbitCorners: [StarlitCartoucheOrbit] = {
+        typealias O = StarlitCartoucheOrbit
+        var list: [O] = [.authored]
+        for yaw in [-O.yawLimit, O.yawLimit] {
+            for pitch in [O.pitchRange.lowerBound, O.pitchRange.upperBound] { list.append(O(yaw: yaw, pitch: pitch)) }
+        }
+        return list
+    }()
+
+    /// A playing snapshot of `level` with wait `wait` (default destination).
+    static func playing(_ level: StarlitCartoucheLevel, wait: Int) throws -> Snapshot {
+        snapshot(try started(level), wait: wait)
+    }
+
+    @Test func everythingInsideTheViewAtTheOrbitCornersAndEveryWait() throws {
+        var levels: [StarlitCartoucheLevel] = Array(Self.catalogLevels().prefix(6))
+        levels.append(contentsOf: try Self.extremeLevels())
+        for level in levels {
+            let start: StarlitCartouchePlay = try Self.started(level)
+            for wait in 0...8 {
+                let snap: Snapshot = Self.snapshot(start, wait: wait)
+                for orbit in Self.orbitCorners {
+                    for aspect in Self.aspects {
+                        let camera: StarlitCartoucheCamera = G.camera(snap, aspect: aspect, orbit: orbit)
+                        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) =
+                            G.viewBasis(camera)
+                        var outside: Int = 0
+                        for index in snap.stars.indices {
+                            let c: SIMD3<Double> = G.launchCentre(index, snap)
+                            for corner in [SIMD3<Double>(0, 0, 0), basis.right, basis.up * -1, basis.right * -1,
+                                           basis.up] {
+                                if !Self.inside(G.project(c + corner * G.markRadius, camera: camera)) { outside += 1 }
+                            }
+                        }
+                        for element in G.paintOrder(snap, camera: camera) {
+                            if !Self.inside(G.project(element.centre, camera: camera)) { outside += 1 }
+                        }
+                        if let ends = G.previewEnds(snap) {
+                            if !Self.inside(G.project(ends.start, camera: camera)) { outside += 1 }
+                            if !Self.inside(G.project(ends.end, camera: camera)) { outside += 1 }
+                        }
+                        let c: SIMD3<Double> = G.cartoucheCentre()
+                        for sx in [-1.0, 1.0] {
+                            for sy in [-1.0, 1.0] {
+                                let gauge: [SIMD3<Double>] = [
+                                    c + basis.right * (0.25 * sx) + basis.up * (0.25 * sy),
+                                    G.beatTrackCentre() + basis.right * (0.45 * sx) + basis.up * (0.015 * sy),
+                                    G.waitPip(sx < 0 ? 0 : 8) + basis.right * (0.02 * sx) + basis.up * (0.02 * sy),
+                                    SIMD3(sx < 0 ? 0 : 0.9, -1.05, 0) + basis.up * (0.02 * sy),
+                                ]
+                                for p in gauge where !Self.inside(G.project(p, camera: camera)) { outside += 1 }
+                            }
+                        }
+                        #expect(outside == 0, "\(level.id) wait \(wait) orbit \(orbit) aspect \(aspect)")
+                    }
+                }
+            }
+        }
+        // The eye outside the box and every box corner within the fitted margin at every orbit corner and aspect.
+        let snap: Snapshot = Self.snapshot(levels[0])
+        for orbit in Self.orbitCorners {
+            for aspect in Self.aspects {
+                let camera: StarlitCartoucheCamera = G.camera(snap, aspect: aspect, orbit: orbit)
+                let e: SIMD3<Double> = camera.eye
+                let inBox: Bool = e.x >= G.boxLow.x && e.x <= G.boxHigh.x && e.y >= G.boxLow.y && e.y <= G.boxHigh.y
+                    && e.z >= G.boxLow.z && e.z <= G.boxHigh.z
+                #expect(!inBox, "\(orbit)")
+                #expect(camera.fovY.isFinite && camera.fovY > 0 && camera.fovY < Double.pi)
+                for index in 0..<8 {
+                    let q: SIMD2<Double> = try #require(G.project(G.corner(index), camera: camera))
+                    #expect(q.x >= 0.06 - 1e-9 && q.x <= 0.94 + 1e-9 && q.y >= 0.06 - 1e-9 && q.y <= 0.94 + 1e-9)
+                }
+            }
+        }
+    }
+
+    @Test func authoredCameraIsTheAuthoredOrbitBitForBit() throws {
+        typealias O = StarlitCartoucheOrbit
+        let snap: Snapshot = Self.snapshot(Self.catalogLevels()[0])
+        var aspects: [Double] = Self.aspects
+        aspects.append(contentsOf: [Double.nan, 40, -1])
+        for aspect in aspects {
+            #expect(G.camera(snap, aspect: aspect) == G.camera(snap, aspect: aspect, orbit: .authored))
+            #expect(G.camera(snap, aspect: aspect) == G.camera(snap, aspect: aspect, orbit: O(yaw: .nan, pitch: .nan)))
+        }
+        let authored: StarlitCartoucheCamera = G.camera(snap, aspect: 1, orbit: .authored)
+        #expect(authored.eye == SIMD3(1.2, 1.0, 2.8) && authored.target == SIMD3(0, -0.2, 0))
+        // Clamping: beyond the limits equals the limits.
+        #expect(O(yaw: 3, pitch: 3).clamped() == O(yaw: O.yawLimit, pitch: O.pitchRange.upperBound))
+        #expect(O(yaw: -3, pitch: -3).clamped() == O(yaw: -O.yawLimit, pitch: O.pitchRange.lowerBound))
+        #expect(G.camera(snap, aspect: 1, orbit: O(yaw: 3, pitch: 3))
+                == G.camera(snap, aspect: 1, orbit: O(yaw: O.yawLimit, pitch: O.pitchRange.upperBound)))
+        #expect(abs(O.yawLimit - Double.pi / 3) < 1e-15)
+        #expect(abs(O.pitchRange.lowerBound + Double.pi / 9) < 1e-15)
+        #expect(abs(O.pitchRange.upperBound - 35 * Double.pi / 180) < 1e-15)
+        // An orbit keeps the eye's distance from the look-at point; yaw turns about the box centre's vertical axis.
+        let base: Double = Self.length(authored.eye - authored.target)
+        for orbit in Self.orbitCorners {
+            let camera: StarlitCartoucheCamera = G.camera(snap, aspect: 1, orbit: orbit)
+            #expect(abs(Self.length(camera.eye - camera.target) - base) < 1e-12)
+            #expect(abs(camera.target.x) < 1e-12 && abs(camera.target.z) < 1e-12)
+        }
+        let yawed: StarlitCartoucheCamera = G.camera(snap, aspect: 1, orbit: O(yaw: O.yawLimit, pitch: 0))
+        #expect(abs(yawed.eye.y - authored.eye.y) < 1e-12)
+        #expect(yawed.eye.x > authored.eye.x)
+        let raised: StarlitCartoucheCamera = G.camera(snap, aspect: 1, orbit: O(yaw: 0, pitch: 0.3))
+        #expect(raised.eye.y > authored.eye.y)
+    }
+
+    @Test func starsShipAndRingsAtTheLaunchPositionsTrailsWhereFlown() throws {
+        for play in try Self.playsWithLegs() {
+            let plain: Snapshot = Self.snapshot(play, wait: 0)
+            for wait in 0...8 {
+                let snap: Snapshot = Self.snapshot(play, wait: wait)
+                #expect(snap.launchBeat == play.beat + wait)
+                #expect(snap.positions == plain.positions)
+                for index in play.level.stars.indices {
+                    let v: V = play.level.stars[index].position(at: play.beat + wait)
+                    #expect(snap.launchPositions[index] == v)
+                    #expect(G.launchCentre(index, snap) == G.world(v, snap))
+                }
+                #expect(Self.length(G.shipCentre(snap) - G.launchCentre(play.star, snap)) < 1e-12)
+                for leg in snap.legs.indices {
+                    #expect(G.trailEnds(leg, snap).start == G.trailEnds(leg, plain).start)
+                    #expect(G.trailEnds(leg, snap).end == G.trailEnds(leg, plain).end)
+                }
+                if !snap.legs.isEmpty {
+                    #expect(G.shipPlace(snap, glide: 0) == G.trailEnds(snap.legs.count - 1, snap).start)
+                }
+                let camera: StarlitCartoucheCamera = G.camera(snap, aspect: 1)
+                for element in G.paintOrder(snap, camera: camera) {
+                    switch element.kind {
+                    case .star: #expect(element.centre == G.launchCentre(element.index, snap))
+                    case .beacon: #expect(element.centre == G.launchCentre(snap.beacon, snap))
+                    case .chosen: #expect(element.centre == G.launchCentre(snap.chosenStar, snap))
+                    case .ship: #expect(Self.length(element.centre - G.launchCentre(snap.star, snap)) < 1e-12)
+                    case .trail: #expect(element.centre == G.trailMidpoint(element.index, plain))
+                    default: break
+                    }
+                }
+                // Level-2 disc centres sit at the launch centres.
+                let flat: Mesh = try G.chartMesh(snap, tier: .of(2), glide: 1)
+                for vertex in Self.vertices(flat, .starCore, local: 0) {
+                    var near: Bool = false
+                    for index in snap.stars.indices where Self.length(Self.point(flat, vertex)
+                                                                      - G.launchCentre(index, snap)) < 1e-9 {
+                        near = true
+                    }
+                    #expect(near)
+                }
+            }
+        }
+    }
+
+    @Test func previewRibbonEndsAndAbsence() throws {
+        var drawn: Int = 0
+        for play in try Self.playsWithLegs() where play.stage == .playing {
+            for wait in [0, 3, 8] {
+                let snap: Snapshot = Self.snapshot(play, wait: wait)
+                var travel: Int? = nil
+                for c in snap.corridors where travel == nil && ((c.a == snap.star && c.b == snap.chosenStar)
+                                                               || (c.b == snap.star && c.a == snap.chosenStar)) {
+                    travel = c.travel
+                }
+                let ends: (start: SIMD3<Double>, end: SIMD3<Double>)? = G.previewEnds(snap)
+                guard let t = travel else {
+                    #expect(ends == nil)
+                    continue
+                }
+                let e: (start: SIMD3<Double>, end: SIMD3<Double>) = try #require(ends)
+                let arrival: V = play.level.stars[snap.chosenStar].position(at: play.beat + wait + t)
+                #expect(e.start == G.launchCentre(snap.star, snap))
+                #expect(e.end == G.world(arrival, snap))
+                // The ribbon: material 22, 0.03 wide, a_normal.x from 0 to its length.
+                let mesh: Mesh = try G.chartMesh(snap, tier: .of(1), glide: 1)
+                let vertices: [Int] = Self.vertices(mesh, .preview)
+                let length: Double = Self.length(e.end - e.start)
+                if length > 0 {
+                    #expect(vertices.count == 4)
+                    #expect(Self.triangles(mesh, .preview) == 2)
+                    var along: [Double] = []
+                    for vertex in vertices {
+                        along.append(mesh.normals[vertex].x)
+                        let p: SIMD3<Double> = Self.point(mesh, vertex)
+                        let end: SIMD3<Double> = mesh.normals[vertex].x == 0 ? e.start : e.end
+                        #expect(abs(Self.length(p - end) - G.previewWidth / 2) < 1e-9)
+                    }
+                    #expect(along.min() == 0 && abs((along.max() ?? 0) - length) < 1e-12)
+                    drawn += 1
+                }
+                // Another destination without a corridor from the ship's star: no preview.
+                var joined: Set<Int> = [snap.star]
+                for c in snap.corridors where c.a == snap.star || c.b == snap.star {
+                    joined.insert(c.a == snap.star ? c.b : c.a)
+                }
+                for index in snap.stars.indices where !joined.contains(index) {
+                    let other: Snapshot = Snapshot(play: play, chosenStar: index, chosenWait: wait, levelNumber: 1,
+                                                   time: 0)
+                    #expect(other.chosenStar == index)
+                    #expect(G.previewEnds(other) == nil)
+                    #expect(Self.vertices(try G.chartMesh(other, tier: .of(2), glide: 1), .preview).isEmpty)
+                }
+            }
+        }
+        #expect(drawn > 10)
+        // Outside playing: a fresh play (loading), a failed play and a won play draw no preview.
+        let level: StarlitCartoucheLevel = try Self.failureLevel(budget: 2)
+        let fresh: Snapshot = Self.snapshot(StarlitCartouchePlay(level: level))
+        #expect(fresh.stage != .playing && G.previewEnds(fresh) == nil)
+        let failed: Snapshot = Self.snapshot(try Self.flown(try Self.started(level), [.leg(2, 0)]), wait: 2)
+        #expect(failed.stage == .failed && G.previewEnds(failed) == nil)
+        let won: Snapshot = Self.snapshot(try Self.flown(try Self.started(level), [.leg(1, 0), .leg(2, 0)]))
+        #expect(won.stage != .playing && G.previewEnds(won) == nil)
+        #expect(Self.vertices(try G.chartMesh(failed, tier: .of(0), glide: 1), .preview).isEmpty)
+        // While playing the default choice (corridor 0–1) is previewed.
+        let playing: Snapshot = try Self.playing(level, wait: 1)
+        #expect(G.previewEnds(playing) != nil)
+    }
+
+    @Test func waitZeroKeepsTheEarlierPlaces() throws {
+        for play in try Self.playsWithLegs() {
+            let snap: Snapshot = Self.snapshot(play, wait: 0)
+            #expect(snap.launchBeat == snap.beat && snap.launchPositions == snap.positions)
+            let camera: StarlitCartoucheCamera = G.camera(snap, aspect: 1)
+            for element in G.paintOrder(snap, camera: camera) {
+                // R02-G16-03's places, written out here from the current positions.
+                var expected: SIMD3<Double>? = nil
+                switch element.kind {
+                case .corridor:
+                    let c: StarlitCartoucheCorridor = snap.corridors[element.index]
+                    expected = (G.starCentre(c.a, snap) + G.starCentre(c.b, snap)) / 2
+                case .hazard:
+                    let c: StarlitCartoucheCorridor = snap.corridors[snap.hazards[element.index].corridor]
+                    expected = (G.starCentre(c.a, snap) + G.starCentre(c.b, snap)) / 2
+                case .star: expected = G.starCentre(element.index, snap)
+                case .beacon: expected = G.starCentre(snap.beacon, snap)
+                case .chosen: expected = G.starCentre(snap.chosenStar, snap)
+                case .ship:
+                    if snap.legs.isEmpty {
+                        expected = G.starCentre(snap.star, snap)
+                    } else {
+                        let ends: (start: SIMD3<Double>, end: SIMD3<Double>) = G.trailEnds(snap.legs.count - 1, snap)
+                        expected = ends.start + (ends.end - ends.start) * 1.0
+                    }
+                case .preview: expected = nil
+                default: expected = element.centre
+                }
+                if let x = expected { #expect(element.centre == x, "\(element.kind)") }
+            }
+            for glide in [0.0, 0.25, 0.5, 1.0] where !snap.legs.isEmpty {
+                let ends: (start: SIMD3<Double>, end: SIMD3<Double>) = G.trailEnds(snap.legs.count - 1, snap)
+                #expect(G.shipPlace(snap, glide: glide) == ends.start + (ends.end - ends.start) * glide)
+            }
+            // The mesh differs from the earlier one only by the preview ribbon (4 vertices, 2 triangles).
+            let mesh: Mesh = try G.chartMesh(snap, tier: .of(1), glide: 1)
+            let previewVertices: Int = Self.vertices(mesh, .preview).count
+            var ribbon: Int = 0
+            if let ends = G.previewEnds(snap), Self.length(ends.end - ends.start) > 0 { ribbon = 4 }
+            #expect(previewVertices == ribbon)
+            // The camera-taking overloads at the authored camera equal the plain ones.
+            #expect(try G.chartPart(snap, tier: .of(1), glide: 1, camera: camera)
+                    == G.chartPart(snap, tier: .of(1), glide: 1))
+            #expect(try G.glowPart(snap, tier: .of(0), camera: camera) == G.glowPart(snap, tier: .of(0)))
+        }
+    }
+
+    @Test func cameraTakingMeshesFaceTheGivenEye() throws {
+        typealias O = StarlitCartoucheOrbit
+        let play: StarlitCartouchePlay = try Self.playsWithLegs()[0]
+        let snap: Snapshot = Self.snapshot(play, wait: 2)
+        let camera: StarlitCartoucheCamera = G.camera(snap, aspect: 1.5, orbit: O(yaw: 0.8, pitch: 0.4))
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = G.viewBasis(camera)
+        let mesh: Mesh = try G.chartMesh(snap, tier: .of(2), glide: 1, camera: camera)
+        let plain: Mesh = try G.chartMesh(snap, tier: .of(2), glide: 1)
+        #expect(mesh.positions != plain.positions)
+        #expect(mesh.uvs[Int(mesh.indices[0])].x == Double(Material.firmament.code))
+        // Every triangle of the camera-facing pieces winds counter-clockwise seen from the eye.
+        var facing: Int = 0
+        for t in stride(from: 0, to: mesh.indices.count, by: 3) {
+            let code: Double = mesh.uvs[Int(mesh.indices[t])].x
+            guard code == Double(Material.waitLit.code) || code == Double(Material.starCore.code)
+                || code == Double(Material.preview.code) else { continue }
+            let a: SIMD3<Double> = Self.point(mesh, Int(mesh.indices[t]))
+            let b: SIMD3<Double> = Self.point(mesh, Int(mesh.indices[t + 1]))
+            let c: SIMD3<Double> = Self.point(mesh, Int(mesh.indices[t + 2]))
+            let n: SIMD3<Double> = G.cross(b - a, c - a)
+            #expect(G.dot(n, camera.eye - (a + b + c) / 3) > 0)
+            facing += 1
+        }
+        #expect(facing > 0)
+        // A wait pip's square lies on the given view's right and up axes.
+        let pips: [Int] = Self.vertices(mesh, .waitLit, local: 1)
+        #expect(!pips.isEmpty)
+        for vertex in pips {
+            let d: SIMD3<Double> = Self.point(mesh, vertex) - G.waitPip(0)
+            if Self.length(d) < 0.05 { #expect(abs(G.dot(d, basis.forward)) < 1e-12) }
+        }
+        let glow: Mesh = try G.glowMesh(snap, tier: .of(0), camera: camera)
+        #expect(glow.triangleCount == (try G.glowMesh(snap, tier: .of(0))).triangleCount)
+        #expect(glow.positions != (try G.glowMesh(snap, tier: .of(0))).positions)
     }
 }

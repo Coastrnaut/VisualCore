@@ -10,7 +10,7 @@
 // arrow, the beacon ring, the chosen destination's dashed ring, the cartouche grid and strokes (dashed pearl until
 // drawn, solid gold once drawn), the actions bars, the beat track, the wait pips and the broken colour of a failure.
 // Vertex streams (the geometry states the same contract): `a_uv.x` is the material code (``Material``, raw values 0 …
-// 21 in declaration order), `a_uv.y` the primary local coordinate and `a_normal` either the sphere normal (stars) or a
+// 22 in declaration order), `a_uv.y` the primary local coordinate and `a_normal` either the sphere normal (stars) or a
 // secondary local coordinate; ``Material/localCoordinate`` states per material what the geometry writes: on the
 // firmament `a_uv.y` is the height h (0 at the bottom, 1 at the top) and `a_normal.x` the horizontal coordinate s (-1
 // on the left edge, +1 on the right); on a strip (a ribbon or ring) `a_uv.y` is the across coordinate d, -1 on one long
@@ -51,6 +51,10 @@
 // each; the glow program 7: u_mvp 4, u_glowGain, u_glowLimit and u_won 1 each), no texture samplers, no image assets,
 // no `discard` and no loops. Output is premultiplied alpha. Palette constants are written with six fixed decimals from
 // `StarlitCartouchePalette`, so the shader colours equal the CPU's within 1e-6.
+//
+// Feature 454 (R02-G16-04) T-R02G1604-002 (FR-R02G1604-003; clarification Q3) adds material 22 `preview`: the launch
+// preview's dashed sapphire ribbon (the ship colour; a strip with `a_normal.x` the distance along in world units,
+// dashed like an undrawn symbol corridor by ``dashCoverage(along:)``).
 
 import Foundation
 
@@ -59,7 +63,7 @@ import Foundation
 /// 002, 004).
 public enum StarlitCartoucheShaders {
     /// A chart-program material code, written into `a_uv.x` of a chart vertex (shared with
-    /// `StarlitCartoucheSceneGeometry`; raw values 0 … 21 in declaration order).
+    /// `StarlitCartoucheSceneGeometry`; raw values 0 … 22 in declaration order).
     public enum Material: Int, Sendable, CaseIterable, Hashable {
         /// The firmament backdrop quad (opaque; `a_uv.y` height, `a_normal.x` horizontal coordinate).
         case firmament = 0
@@ -107,6 +111,9 @@ public enum StarlitCartoucheShaders {
         /// What a failure names: the failing leg, the missed star's ring, the hazard met, the stray stroke or the gauge
         /// a deadline or budget failure marks (strip).
         case broken = 21
+        /// The launch preview (feature 454): a dashed ribbon in the ship colour from the ship's star at the launch beat
+        /// to the destination at arrival (strip; `a_normal.x` distance along).
+        case preview = 22
 
         /// How the geometry fills `a_uv.y` and `a_normal` for a material.
         public enum LocalCoordinate: Sendable, Hashable {
@@ -157,6 +164,7 @@ public enum StarlitCartoucheShaders {
             case .waitLit: StarlitCartouchePalette.waitLit
             case .waitUnlit: StarlitCartouchePalette.waitUnlit
             case .broken: StarlitCartouchePalette.broken
+            case .preview: StarlitCartouchePalette.ship
             }
         }
 
@@ -167,7 +175,7 @@ public enum StarlitCartoucheShaders {
         public var localCoordinate: LocalCoordinate {
             switch self {
             case .firmament: .firmament
-            case .symbolDash, .hazardActive, .hazardIdle, .strokeUndrawn: .stripAlong
+            case .symbolDash, .hazardActive, .hazardIdle, .strokeUndrawn, .preview: .stripAlong
             case .trail: .trail
             case .trailGhost: .ghost
             case .starCore: .sphere
@@ -444,6 +452,7 @@ public enum StarlitCartoucheShaders {
         base = mix(base, SC_WAIT_LIT, isCode(m, 19.0));
         base = mix(base, SC_WAIT_UNLIT, isCode(m, 20.0));
         base = mix(base, SC_BROKEN, isCode(m, 21.0));
+        base = mix(base, SC_SHIP, isCode(m, 22.0));
         v_base = base;
         v_aux = a_normal;
         v_material = m;
@@ -577,7 +586,7 @@ public enum StarlitCartoucheShaders {
         rgb = mix(rgb, SC_SHIP_GLOW, keel * isCode(m, 9.0));
         rgb = mix(rgb, SC_TRAIL, SC_SEAL_LIFT * won * isCode(m, 12.0));
         float coverage = edge;
-        coverage = coverage * mix(1.0, dash, isCode(m, 2.0) + isCode(m, 13.0));
+        coverage = coverage * mix(1.0, dash, isCode(m, 2.0) + isCode(m, 13.0) + isCode(m, 22.0));
         coverage = coverage * mix(1.0, SC_GHOST_ALPHA * fade * t, isCode(m, 6.0));
         coverage = coverage * mix(1.0, mix(SC_RING_REST, 1.0, notch), isCode(m, 8.0));
         coverage = coverage * mix(1.0, ringDash, isCode(m, 11.0));
@@ -672,7 +681,8 @@ public enum StarlitCartoucheShaders {
         return 1 - smoothstep(1 - edgeFeather, 1, min(abs(local), 1))
     }
 
-    /// The dash at distance `along` (world units) of an undrawn symbol corridor or cartouche stroke: 1 where
+    /// The dash at distance `along` (world units) of an undrawn symbol corridor, cartouche stroke or the launch preview
+    /// (feature 454): 1 where
     /// fract(along / ``dashPeriod``) < ``dashDuty``, else 0 (non-finite counts as 0, a dash start).
     public static func dashCoverage(along: Double) -> Double {
         let a: Double = along.isFinite ? along : 0

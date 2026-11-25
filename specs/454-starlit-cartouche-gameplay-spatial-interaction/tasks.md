@@ -17,7 +17,7 @@ owns the snapshot fields, the preview geometry and its shader material (R02-G16-
 
 ## Phase 2: Foundational — orbit, camera, launch preview and picking
 
-- [ ] T-R02G1604-002 [P] Add `launchBeat` ("beat + chosen wait") and `launchPositions` ("every star at the launch beat;
+- [X] T-R02G1604-002 [P] Add `launchBeat` ("beat + chosen wait") and `launchPositions` ("every star at the launch beat; — Verified 2026-11-24: host-2 exit 0 (.autonomy/migration/checks/R02-G16-04.host-2.json); snapshot launch beat and positions, orbit and orbiting camera (authored bit-identical), launch preview ribbon and material 22, camera-taking meshes, picker with 500-point independent test; sim test support gains the preview element kind
   presentation only; never in the digest; at wait 0 equal to the current positions") to
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheSceneSnapshot.swift`; add `StarlitCartoucheOrbit`
   ("yaw ±60°, pitch −20° … +35°; authored (0, 0); presentation only", `clamped()`), `camera(_:aspect:orbit:)` (yaw about

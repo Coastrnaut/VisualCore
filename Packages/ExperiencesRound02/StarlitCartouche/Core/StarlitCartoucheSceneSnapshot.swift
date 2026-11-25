@@ -7,6 +7,9 @@
 // the actions left and the budget, the level number and the presentation time; plus the palette and the three quality
 // tiers. The renderer never holds the kernel, so no drawing result can change the game (renderer purity), and the drawn
 // stars sit at the kernel's positions.
+// Feature 454 (R02-G16-04) T-R02G1604-002 (FR-R02G1604-002, 003; clarification Q3) adds the launch beat L = beat +
+// chosen wait and every star's lattice position at L (the launch preview; presentation only, never in the digest; at
+// wait 0 equal to the current positions).
 import Foundation
 
 /// The palette of Starlit Cartouche, as linear colours 0 … 1 (pearl and meteor gold on deep ultramarine).
@@ -137,6 +140,12 @@ public struct StarlitCartoucheSceneSnapshot: Sendable, Equatable {
     public let chosenStar: Int
     /// The chosen wait, 0 … 8 (presentation only; never part of the digest).
     public let chosenWait: Int
+    /// The launch beat L = beat + chosen wait (feature 454, clarification Q3; presentation only, never part of the
+    /// digest).
+    public let launchBeat: Int
+    /// Every star's lattice position at the launch beat, `position(at: launchBeat)` (feature 454, clarification Q3;
+    /// presentation only, never part of the digest); equal to ``positions`` at wait 0.
+    public let launchPositions: [StarlitCartoucheVector]
     /// The kernel's route report.
     public let report: StarlitCartoucheRouteReport
     /// The stage.
@@ -185,6 +194,10 @@ public struct StarlitCartoucheSceneSnapshot: Sendable, Equatable {
         let valid: Bool = (0..<level.stars.count).contains(chosenStar) && chosenStar != play.star
         self.chosenStar = valid ? chosenStar : Self.defaultChoice(level, star: play.star)
         self.chosenWait = min(max(chosenWait, 0), 8)
+        launchBeat = play.beat + self.chosenWait
+        var launchPositions: [StarlitCartoucheVector] = []
+        for star in level.stars { launchPositions.append(star.position(at: launchBeat)) }
+        self.launchPositions = launchPositions
         report = play.report
         stage = play.stage
         failure = play.failure
