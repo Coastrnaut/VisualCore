@@ -66,7 +66,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 - [X] T-R02G1602-007 Docs: `docs/architecture/starlit-cartouche.md` (content pipeline), — Verified 2026-11-24: round02-host-1..3 exit 0 (.autonomy/migration/checks/R02-G16-02.round02-host-*.json; chunk 3 342 s); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3`
-- [ ] T-R02G1602-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1602-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G16-02.*.json)
   `--name host-full`
 - [ ] T-R02G1602-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1602-010 Reference regression chunk 2 (`--name reference-2`)
