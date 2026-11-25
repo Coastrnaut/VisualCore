@@ -158,7 +158,8 @@ refused.
 - **FR-R02G1801-001**: A level MUST define the sky (its sectors around the star and its bound), the orbiter's period in
   ticks, the exclusion planets (each a centre and a radius), the ordered targets (sector sweeps with a share tolerance
   and apsis targets with a sector and a distance range), the starting orbit, the action budget and whether it shows a
-  tutorial.
+  tutorial. A level is refused when a value is out of range, a share band or distance range is reversed, a planet
+  overlaps the star, the starting orbit is invalid or already wins, or two targets are identical.
 - **FR-R02G1801-002**: An orbit MUST be given by its size, its eccentricity and the direction of its periapsis, each
   chosen from fixed steps; an orbit whose closest point would enter the star or whose farthest point would leave the
   sky is invalid and never accepted.
