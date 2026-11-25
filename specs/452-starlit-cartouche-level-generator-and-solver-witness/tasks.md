@@ -38,7 +38,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
-- [ ] T-R02G1602-004 [US2] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheGenerator.swift`
+- [X] T-R02G1602-004 [US2] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheGenerator.swift` — Verified 2026-11-24: host-3 exit 0 (.autonomy/migration/checks/R02-G16-02.host-3.json); StarlitCartoucheGeneratorTests 11 tests incl. independent redraw of the Q1 order; all 100 entries certify, at most 2 skipped
   (lead: band profiles "band b: stars b + 4 … b + 5, route b + 1 … b + 2, decoys b + 1, plan range b + 1 … b + 2";
   candidates from `SeedDerivation.derive(plannedSeed, index: c)` in the drawing order of clarification Q1 (up to 8
   draws per route leg); at most 256 candidates then `generation(n)`; level ids `starlit-cartouche-NNN`; tutorial on
