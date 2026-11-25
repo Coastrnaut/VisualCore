@@ -50,7 +50,7 @@ its convergence lesson (a restored replay validated against its trace) taken int
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheExperienceCoreTests.swift` updates (schema 3,
   migrations 1 → 3 and 2 → 3, reconciliation on restore, replay rules and codes, a replay saved mid-way restores while a
   changed, reordered or undo-carrying replay is refused `damaged`, sound setting); `--name host-2`
-- [ ] T-R02G1607-004 [P] [US1] [US2] Create
+- [X] T-R02G1607-004 [P] [US1] [US2] Create — Verified 2026-11-24: 2026-11-24 host-3 exit 0 (agent B's persistence tests, 8 tests 28 cases, retested by the lead)
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartouchePersistenceTests.swift` (agent B: 500 seeded
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
