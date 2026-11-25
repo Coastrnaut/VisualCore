@@ -32,11 +32,11 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 - [ ] T-R02G1703-003 [P] [US1] Create
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabShaders.swift` (sky and glow sources, GLSL ES
-  3.00; layered body shading (core, limb darkening, rim light) from the normal; the crescent: a back body's fragment
-  darkened to the crescent shadow inside each nearer disc's circle passed as per-vertex attributes (at most 5, unrolled,
-  the signed distance with a one-pixel smooth edge); signed-distance shading of rings, notches, frames, the chosen
-  dashed ring, brackets, diamonds, crosses, the playhead and bars from per-vertex local coordinates; the backdrop
-  gradient with sparse procedural specks under 5 % of its pixels; halos as thin emissive rings pulsed by
+  3.00; layered body shading (core, limb darkening, rim light) from the normal; the crescent: the shadow lens (material
+  16, a fan from its centroid) shaded in crescent shadow with a thin ember rim (the shared renderer binds only position,
+  normal and uv, so the lens is geometry, not per-vertex mask attributes); signed-distance shading of rings, notches,
+  frames, the chosen dashed ring, brackets, diamonds, crosses, the playhead and bars from per-vertex local coordinates;
+  the backdrop gradient with sparse procedural specks under 5 % of its pixels; halos as thin emissive rings pulsed by
   `haloPulse(time: reduceMotion:)` (1 with Reduce Motion); the glow program shades halos, the chosen ring and lit marks;
   a won level flares the matched halos; uniform names; glow gain cap; palette constants equal to the CPU's) with
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabShaderSourceTests.swift` (version line,

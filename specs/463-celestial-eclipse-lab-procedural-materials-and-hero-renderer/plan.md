@@ -10,7 +10,7 @@ snapshot (the bodies' positions at the shown tick for the current phases, radii 
 eclipses under way at the shown tick with their classes; the target and windows; the predicted intervals and matched
 count; the shown tick and horizon; the chosen body; stage, failure, actions left, budget, level number, presentation
 time); the sky geometry (the ink-navy backdrop with sparse specks, orbital ring ribbons with notches and fixed frames,
-ivory body spheres with layered shading, the signed-circle crescent mask cut by each nearer disc, corona-gold halos for
+ivory body spheres with layered shading, the shadow lens cut by each nearer disc, corona-gold halos for
 total and annular eclipses, the chosen ring, the timeline strip with window brackets, event marks and the playhead, and
 the actions bars) mapped from the kernel's lattice positions by w(v) = (v − m) · s, with a fixed authored camera, a
 painter's order by camera distance and a CPU reference of the projection and palette; GLSL ES 3.00 sky and glow
@@ -39,7 +39,7 @@ synthetic unregistered candidate to `r02-g18.apsides-workshop`; `scripts/test_sc
 follow; `xcodegen generate` after `project.yml` changes.
 **Seeds**: level (seed mod 100) + 1; tests use seed 2_463 and the catalog's levels 1, 21, 41, 61, 81.
 **Exact to float**: the snapshot keeps the kernel's integer positions, ticks, intervals and timeline; world positions
-are computed once from the lattice positions (s = 1.5 / (e + 1)); the crescent mask uses the kernel's x and y scaled by
+are computed once from the lattice positions (s = 1.5 / (e + 1)); the shadow lens uses the kernel's x and y scaled by
 s, so the crescent drawn is the overlap judged; the glow and halo pulse are presentation only; no rule is evaluated on
 Doubles.
 **Testing**: host `swift test --package-path Packages/ExperiencesRound02`; simulator `xcodebuild_package.py …
@@ -48,8 +48,8 @@ Doubles.
 15 halos, the timeline (up to 6 brackets and the predicted events) and up to 19 bars: the largest scene stays under
 8,000 triangles plus two glow shells; geometry is rebuilt only when the phases, the shown tick, the chosen body, the
 stage or the tier change. Device budgets are `{device}` tasks after ImplementationLock-100.
-**Shader limits**: one uniform block of at most 16 vec4s per program; the crescent mask's front circles are per-vertex
-attributes of each back body's mesh (at most 5 nearer discs, unrolled); no texture samplers; no unbounded loops.
+**Shader limits**: one uniform block of at most 16 vec4s per program; the crescent is a generated shadow lens (the
+renderer binds only position, normal and uv); no texture samplers; no unbounded loops.
 **Constraints**: additive; denylisted names (ProjectM, PresetLibrary, MilkDrop …) avoided; no `import MetalKit` text in
 any file (compliance scan); scenarios only under `#if DEBUG || VISUALCORE_AUTOMATION`; the presenter declares frame
 probes (round-two X gate rule); the Core declares its quality tiers (X gate rule).

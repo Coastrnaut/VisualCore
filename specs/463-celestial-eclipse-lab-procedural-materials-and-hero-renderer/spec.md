@@ -64,8 +64,11 @@ corona halos" and the geometry "analytic orbital rings, signed circle masks and 
   of every orbit position in order, orbit blue, with (index mod 6) + 1 notches at the body's position and a square
   frame for a fixed body; the bodies, spheres of radius r · s at their positions, disc ivory with layered limb shading;
   the eclipse crescents: every back body of an eclipse under way at the shown tick (the kernel's strict overlap) is
-  darkened inside the front body's projected circle (centre and radius r · s from the kernel's x and y, a signed circle
-  mask in the disc shader), so the crescent seen is the overlap judged; the corona halos, a thin ring at the front
+  darkened inside the front body's projected circle (centre and radius r · s from the kernel's x and y): a shadow lens,
+  the exact intersection of the two circles computed in code (the back disc for a total eclipse, the front disc for an
+  annular one), drawn in crescent shadow right after the back body and before the front body, so the crescent seen is
+  the overlap judged (implementation note, 2026-11-25: the shared mesh renderer binds only position, normal and uv, so
+  the circle mask is geometry rather than per-vertex shader attributes); the corona halos, a thin ring at the front
   body's rim, corona gold, when the eclipse's class at the shown tick is total or annular; the chosen body's dashed ring
   of radius r · s + 0.04; the gauges in screen-facing world space below the sky: the timeline strip at y = −1.15 from
   x = −0.9 to 0.9 mapping ticks 0 … horizon − 1, each target window a bracket above it at y = −1.05 with the target's
@@ -81,7 +84,7 @@ corona halos" and the geometry "analytic orbital rings, signed circle masks and 
 - Q: What do the three quality tiers change? → A: `level-0` (richest): body spheres of 24 × 16 segments with layered
   shading (core, limb darkening and rim light) and 2 glow shells around the halos and the chosen ring; `level-1`:
   16 × 12 segments, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): flat screen-facing 20-sided body discs,
-  no glow. Rings, crescents (the signed circle mask is drawn at every tier), halos, the timeline, gauges, colours and
+  no glow. Rings, crescents (the shadow lens is drawn at every tier), halos, the timeline, gauges, colours and
   positions are the same at every tier. Levels are ordered richest first; the presenter logs each tier change with its
   reason. Impact: FR-R02G1703-004; SC-R02G1703-001.
 - Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects through the same
@@ -226,7 +229,7 @@ it as available, and the experience package, registry, catalog and content check
   the eclipses under way at the shown tick with their visibility classes, the target with windows, the predicted
   timeline and matched count, the shown tick and horizon, the chosen planet, stage, failure, actions left, budget, level
   number and presentation time.
-- **Sky geometry**: the planet spheres, orbital rings, crescent masks, corona halos, the timeline and the gauges.
+- **Sky geometry**: the planet spheres, orbital rings, shadow lenses, corona halos, the timeline and the gauges.
 - **Quality tier**: 0, 1 or 2, with its planet shading detail and glow.
 - **Candidate registration**: catalog entry, quality tier names, palette, capabilities, content facts, scenario manifest
   and app link.
@@ -256,7 +259,7 @@ it as available, and the experience package, registry, catalog and content check
   exercised on the simulator.
 - The visual design is the project's own archived design; all geometry and shading are original code. "Analytic orbital
   rings, signed circle masks and eclipse glow shaders" are generated rings through the kernel's exact orbit positions, a
-  crescent mask computed from the nearer disc's projected circle, and an emissive halo pass; the eclipse drawn is always
+  shadow lens computed from the two discs' projected circles, and an emissive halo pass; the eclipse drawn is always
   the eclipse judged.
 - Like Starlit Cartouche, the candidate's scenario manifest has the standard scenarios, `full-playthrough`, `hero`,
   fixtures and the 80 acceptance scenarios of the archived matrix (R2-G17-QA-001 … 080), and its registration carries

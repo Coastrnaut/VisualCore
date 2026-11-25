@@ -7,11 +7,14 @@
   (rejected: the sky would rescale after every phase change); a fixed scale (rejected: wide orbits would leave the
   frame).
 - **R2 The crescent drawn is the overlap judged.** Decision: a back body is darkened inside every nearer body's
-  projected circle computed from the kernel's x, y and radius scaled by s (a signed circle mask in the fragment shader,
-  the circles passed as per-vertex attributes), and only for the eclipses the kernel reports under way at the shown
-  tick. Rationale: the camera is close to the projection axis but perspective would shift a purely visual overlap; the
-  mask keeps the picture exact to the rules. Alternative: rely on sphere occlusion (rejected: painter's order without a
-  depth buffer and perspective would disagree with the strict integer overlap near touching discs).
+  projected circle computed from the kernel's x, y and radius scaled by s: a shadow lens, the exact intersection of the
+  two circles generated as geometry and drawn between the back and the front body, only for the eclipses the kernel
+  reports under way at the shown tick. Rationale: the camera is close to the projection axis but perspective would shift
+  a purely visual overlap; the lens keeps the picture exact to the rules. Alternative: a signed circle mask in the
+  fragment shader with the circles as per-vertex attributes (rejected at implementation: the shared mesh renderer binds
+  only position, normal and uv, and widening it would change the VisualCore API). Alternative: rely on sphere occlusion
+  (rejected: painter's order without a depth buffer and perspective would disagree with the strict integer overlap near
+  touching discs).
 - **R3 Painter's order by camera distance.** Decision: with depth testing off (the shared mesh renderer's path),
   elements are drawn back to front by their centres' distance from the eye, ties by kind then index. Rationale: nearer
   bodies (greater z) are drawn after farther ones, as the eclipse order says.
