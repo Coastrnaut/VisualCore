@@ -77,7 +77,7 @@ shader material (the vertex-contract lesson of R02-G16-03 and R02-G17-03).
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter, panel
 
-- [ ] T-R02G1704-005 [US4] Wire
+- [X] T-R02G1704-005 [US4] Wire — Verified 2026-11-25: 2026-11-25 presenter pointer entry through the gesture controller, preview and pending offset drawn, refusals shown and logged, scene on the orbit camera rebuilt on orbit and preview changes, panel phase -/+ pending with Set phase and Reset view; sim-27b 34 tests incl. 8 wiring tests exit 0 (sim-27 failed only on a missing import VisualCoreScenes)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Experience/CelestialEclipseLabPresenter.swift` (FR-R02G1704-001 …
   009; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot; setPhase sent through
   `orbit.phase`, the choices through `orbit.choose` and `clock.show`; the preview kept as presentation state and drawn;

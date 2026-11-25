@@ -13,6 +13,13 @@
 // falls back to the level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, the geometry's fallback
 // colours, the won brackets included) and keeps the reason; nothing here can reach the kernel. A zero-sized drawable
 // is cleared and nothing else is drawn.
+//
+// Feature 464 (R02-G17-04) T-R02G1704-005 (FR-R02G1704-004, 006; clarifications Q3, Q4): the camera follows the
+// gesture controller's orbit (`orbit`, presentation only) through `CelestialEclipseLabSceneGeometry.camera(_:aspect:
+// orbit:)`, and the meshes are built with the camera-taking overloads (the backdrop, billboards, camera-facing strips
+// and paint order face the drawn eye). The eye and view basis do not depend on the aspect, so an orbit change or a
+// preview change (the previewed body and offset, which draw the ghost and the preview timeline) rebuilds the meshes,
+// a resize alone does not.
 #if os(iOS)
 import CelestialEclipseLabCore
 import Foundation
@@ -37,8 +44,12 @@ final class CelestialEclipseLabSkyScene {
     private(set) var glowBuilds = 0
     /// The halo pulse passed as `u_pulse` on the last draw (tests).
     private(set) var lastPulse: Double = 1
+    /// The orbit the camera is drawn at (feature 464, presentation only; the gesture controller's). The meshes are
+    /// built for the drawn eye, so a new orbit rebuilds them.
+    var orbit = CelestialEclipseLabOrbit.authored
 
-    /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the fallback.
+    /// What the meshes depend on: everything of the snapshot that the geometry reads (the preview included), the
+    /// orbit, the tier and the fallback.
     private struct GeometryKey: Equatable {
         let levelNumber: Int
         let phases: [Int]
@@ -48,6 +59,9 @@ final class CelestialEclipseLabSkyScene {
         let failure: CelestialEclipseLabFailure?
         let matched: Int
         let actionsLeft: Int
+        let previewBody: Int?
+        let previewOffset: Int?
+        let orbit: CelestialEclipseLabOrbit
         let tier: Int
         let fallback: Bool
     }
@@ -65,12 +79,10 @@ final class CelestialEclipseLabSkyScene {
         resize(context)
     }
 
-    /// Records the new aspect; the camera follows on the next draw. The meshes face the authored camera, so they are
-    /// rebuilt only when the aspect really changed.
+    /// Records the new aspect; the camera follows on the next draw. The meshes face the drawn eye, which does not
+    /// depend on the aspect, so a resize alone rebuilds nothing.
     func resize(_ context: RenderContext) {
-        let next: Double = Double(max(1, context.pixelWidth)) / Double(max(1, context.pixelHeight))
-        if next != aspect { geometryKey = nil }
-        aspect = next
+        aspect = Double(max(1, context.pixelWidth)) / Double(max(1, context.pixelHeight))
     }
 
     /// Releases every GPU object; the next draw rebuilds them (memory warning, teardown).
@@ -105,9 +117,9 @@ final class CelestialEclipseLabSkyScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = CelestialEclipseLabSceneGeometry.camera(snapshot, aspect: aspect)
+        let camera = CelestialEclipseLabSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
         let next: GeometryKey = key(snapshot, tier: tier)
-        if next != geometryKey { try rebuild(snapshot, tier: tier) }
+        if next != geometryKey { try rebuild(snapshot, tier: tier, camera: camera) }
         geometryKey = key(snapshot, tier: tier)
         if fallbackReason != nil {
             try drawFallback(camera)
@@ -127,23 +139,25 @@ final class CelestialEclipseLabSkyScene {
     private func key(_ s: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, phases: s.phases, shownTick: s.shownTick, chosenBody: s.chosenBody,
                     stage: s.stage, failure: s.failure, matched: s.matched, actionsLeft: s.actionsLeft,
-                    tier: tier.index, fallback: fallbackReason != nil)
+                    previewBody: s.previewBody, previewOffset: s.previewOffset, orbit: orbit, tier: tier.index,
+                    fallback: fallbackReason != nil)
     }
 
-    /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
-    private func rebuild(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier) throws {
+    /// Rebuilds the GPU objects for `snapshot` at `tier` seen from `camera`: the two programs, or the unlit fallback.
+    private func rebuild(_ snapshot: CelestialEclipseLabSceneSnapshot, tier: CelestialEclipseLabTier,
+                         camera: CelestialEclipseLabCamera) throws {
         guard let registry else { return }
         let keepFallback = fallbackReason
         release()
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let sky = try CelestialEclipseLabSceneGeometry.skyMesh(snapshot, tier: tier)
+                let sky = try CelestialEclipseLabSceneGeometry.skyMesh(snapshot, tier: tier, camera: camera)
                 skyRenderer = try Self.renderer(sky, vertex: CelestialEclipseLabShaders.skyVertex,
                                                 fragment: skyFragment, name: "celestial-eclipse-lab-sky",
                                                 registry: registry)
                 skyBuilds += 1
-                let glow = try CelestialEclipseLabSceneGeometry.glowMesh(snapshot, tier: tier)
+                let glow = try CelestialEclipseLabSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera)
                 glowBuilds += 1
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: CelestialEclipseLabShaders.glowVertex,
@@ -161,8 +175,8 @@ final class CelestialEclipseLabSkyScene {
         let minimal = CelestialEclipseLabTier.of(CelestialEclipseLabTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [CelestialEclipseLabColouredMesh] = [
-            try CelestialEclipseLabSceneGeometry.skyPart(snapshot, tier: minimal),
-            try CelestialEclipseLabSceneGeometry.glowPart(snapshot, tier: minimal),
+            try CelestialEclipseLabSceneGeometry.skyPart(snapshot, tier: minimal, camera: camera),
+            try CelestialEclipseLabSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

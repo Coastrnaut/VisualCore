@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "CelestialEclipseLabExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing CelestialEclipseLabExperienceTests",
+  "elapsed_seconds": 12.537,
+  "exit_code": 0,
+  "finished": "2026-11-25T15:14:37+00:00",
+  "gate": "R02-G17-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G17-04.sim-27b.log",
+  "log_sha256": "45ddde9a673a0374bf1fcb863c3b8e279b8a38c84986746bae71fe95093365ee",
+  "name": "sim-27b",
+  "started": "2026-11-25T15:14:24+00:00",
+  "timed_out": false
+}

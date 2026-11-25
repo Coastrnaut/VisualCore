@@ -8,6 +8,14 @@
 // left of the budget, the status (stage, or the failure in words), the progress description, the tutorial on levels
 // that have one, the failure in words and a refused action in words. Tapping planets on the canvas, dragging the
 // timeline and full accessibility come in later features of R02-G17.
+//
+// Feature 464 (R02-G17-04) T-R02G1704-005 (FR-R02G1704-008; clarification Q5): phase − and + no longer send a phase
+// change each (every change costs an action, so stepping to a far orbit position could exceed the budget); they move
+// the chosen planet's pending phase (`mirror.pendingOffset`, presentation only, wrapping 0 … period − 1), drawn as the
+// same preview as a drag, and the phase line reads "phase P → Q" while one is pending. "Set phase" sends exactly one
+// `orbit.phase [body, pending]` when the pending phase differs from the current one (disabled otherwise), and "Reset
+// view" returns the camera to the authored orbit. Every button sends through the presenter's `send` (refusals shown
+// in words and logged with their codes); everything else is unchanged.
 #if os(iOS)
 import CelestialEclipseLabCore
 import SwiftUI
@@ -19,6 +27,13 @@ struct CelestialEclipseLabControls: View {
     let port: ExperienceActionPort
     /// What the panel shows.
     let mirror: CelestialEclipseLabMirror
+    /// Returns the camera to the authored view (feature 464; presentation only).
+    var resetView: () -> Void = {}
+    /// Sends a control and shows a refusal in words (the presenter's `send`, feature 464); nil sends through the port
+    /// directly.
+    var sender: ((String, [Double]) -> Void)? = nil
+    /// Redraws the last snapshot with the mirror's preview after the pending phase moved (feature 464).
+    var redraw: () -> Void = {}
 
     /// The panel.
     var body: some View {
@@ -76,20 +91,37 @@ struct CelestialEclipseLabControls: View {
             .accessibilityIdentifier(port.identifier("planet-detail"))
     }
 
-    /// Move the chosen planet's phase back or forward by one (one action).
+    /// Move the chosen planet's pending phase back or forward by one (presentation only) and set it (one action).
     @ViewBuilder private var phaseRow: some View {
         HStack(spacing: 16) {
-            Button("Phase −") { setPhase(step: -1) }
-                .accessibilityLabel("Move the chosen planet's phase back by one")
-                .accessibilityValue(mirror.bodyLabel)
+            Button("Phase −") { movePending(step: -1) }
+                .accessibilityLabel("Move the pending phase back by one")
+                .accessibilityValue(phaseLabel)
                 .accessibilityIdentifier(port.identifier("phase-minus"))
-            Text("phase \(mirror.chosenPhase)")
+            Text(phaseLabel)
                 .accessibilityIdentifier(port.identifier("phase"))
-            Button("Phase +") { setPhase(step: 1) }
-                .accessibilityLabel("Move the chosen planet's phase forward by one")
-                .accessibilityValue(mirror.bodyLabel)
+            Button("Phase +") { movePending(step: 1) }
+                .accessibilityLabel("Move the pending phase forward by one")
+                .accessibilityValue(phaseLabel)
                 .accessibilityIdentifier(port.identifier("phase-plus"))
         }
+        HStack(spacing: 16) {
+            Button("Set phase") { setPhase() }
+                .disabled(!mirror.pendingDiffers)
+                .accessibilityLabel("Set the chosen planet's phase to the pending one")
+                .accessibilityValue(phaseLabel)
+                .accessibilityIdentifier(port.identifier("set-phase"))
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue("presentation only")
+                .accessibilityIdentifier(port.identifier("reset-view"))
+        }
+    }
+
+    /// The phase line: "phase P", or "phase P → Q" while a phase Q is pending.
+    private var phaseLabel: String {
+        guard let pending = mirror.pendingOffset else { return "phase \(mirror.chosenPhase)" }
+        return "phase \(mirror.chosenPhase) → \(pending)"
     }
 
     /// Show an earlier or later tick of the predicted sky, and run the clock.
@@ -129,9 +161,21 @@ struct CelestialEclipseLabControls: View {
         }
     }
 
-    /// Sets the chosen planet's phase to its current phase moved by `step` (±1) modulo its period.
-    private func setPhase(step: Int) {
-        send("orbit.phase", [Double(mirror.chosenBody), Double(mirror.steppedPhase(step))])
+    /// Moves the chosen planet's pending phase by `step` (±1) modulo its period and redraws the preview; a fixed
+    /// planet says why nothing moves.
+    private func movePending(step: Int) {
+        if mirror.chosenFixed {
+            mirror.message = CelestialEclipseLabGestureController.fixedReason
+            return
+        }
+        mirror.pendingOffset = mirror.steppedPending(step)
+        redraw()
+    }
+
+    /// Sets the chosen planet's phase to the pending one (one action) when it differs from the current phase.
+    private func setPhase() {
+        guard let pending = mirror.pendingOffset, mirror.pendingDiffers else { return }
+        send("orbit.phase", [Double(mirror.chosenBody), Double(pending)])
     }
 
     /// Shows tick `tick` (clamped to 0 … horizon − 1).
@@ -139,11 +183,14 @@ struct CelestialEclipseLabControls: View {
         send("clock.show", [Double(mirror.clampedTick(tick))])
     }
 
-    /// Sends `control` and shows a refusal in words.
+    /// Sends `control` through the presenter (or the port when no sender is set) and shows a refusal in words.
     private func send(_ control: String, _ values: [Double] = []) {
+        if let sender {
+            sender(control, values)
+            return
+        }
         let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(CelestialEclipseLabMirror.refusalText(code: result.code))."
+        mirror.record(control, values, accepted: result.isAccepted, code: result.code)
     }
 }
 #endif

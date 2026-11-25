@@ -8,6 +8,17 @@
 // kernel stage. A refused action is shown in words. A memory warning releases the GPU objects; the next frame
 // rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the kernel (renderer purity). Its
 // probes (two backdrop corners) let the verification runner check a frame.
+//
+// Feature 464 (R02-G17-04) T-R02G1704-005 (FR-R02G1704-001 … 009; clarifications Q1 … Q5) wires touch: a canvas touch
+// goes through the presenter's `CelestialEclipseLabGestureController` with the drawn snapshot (`pointer`); a tap on a
+// planet sends `orbit.choose [body]`, the time dial `clock.show [tick]` (both presentation only, in any stage), a phase
+// drag previews its pending offset (the ghost and the predicted timeline of
+// `CelestialEclipseLabSceneSnapshot.previewing(body:offset:)`, presentation state kept in the mirror) and its release
+// sends one `orbit.phase [body, offset]`; a drag on a fixed planet or a finished play explains why nothing happens;
+// two fingers orbit the camera and a double tap on empty space or "Reset view" (`resetView()`) returns it (the orbit
+// is presentation only and rebuilds the meshes). The panel's phase − and + move a pending offset of the chosen planet,
+// drawn as the same preview, and "Set phase" commits it as one action. A refused action is shown in words and its
+// code logged (`refusalLog`), read with or without the engine's `action.rule.` prefix.
 #if os(iOS)
 import CelestialEclipseLabCore
 import Foundation
@@ -16,6 +27,15 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
+
+/// A previewed phase: planet `body` drawn at offset `offset` (feature 464; presentation only, never sent).
+struct CelestialEclipseLabPreview: Equatable {
+    /// The previewed planet.
+    let body: Int
+    /// The previewed offset, 0 … period − 1.
+    let offset: Int
+}
 
 /// What the controls show: the latest state the presenter described and the chosen body and shown tick.
 @MainActor
@@ -43,8 +63,13 @@ final class CelestialEclipseLabMirror {
     var shownTick = 0
     /// The play followed (a copy; never sent anywhere).
     var play: CelestialEclipseLabPlay?
-    /// The text of the last refused change, if any.
+    /// The text of the last refused change, or why a gesture did nothing, if any.
     var message: String?
+    /// The panel's pending phase of the chosen planet (feature 464; presentation only), nil when none is pending. It
+    /// is dropped when the chosen planet changes, after any applied kernel action and on the next level.
+    var pendingOffset: Int?
+    /// The phase drag's preview (feature 464; presentation only), nil when no drag previews.
+    var preview: CelestialEclipseLabPreview?
 
     /// The number of bodies of the followed level (1 while no play is followed).
     var bodyCount: Int { max(play?.level.bodies.count ?? 1, 1) }
@@ -85,6 +110,29 @@ final class CelestialEclipseLabMirror {
         return ((chosenPhase + step) % period + period) % period
     }
 
+    /// The pending phase of the chosen planet, or its current phase when none is pending (feature 464).
+    var pendingPhase: Int { pendingOffset ?? chosenPhase }
+
+    /// Whether a pending phase differs from the chosen planet's current phase ("Set phase" is enabled).
+    var pendingDiffers: Bool {
+        guard let pendingOffset else { return false }
+        return pendingOffset != chosenPhase
+    }
+
+    /// The pending phase moved by `step` (±1) modulo the chosen planet's period (feature 464).
+    func steppedPending(_ step: Int) -> Int {
+        let period: Int = chosenPeriod
+        return ((pendingPhase + step) % period + period) % period
+    }
+
+    /// The preview drawn: the drag's preview first, else the pending phase of the chosen planet when it is movable;
+    /// nil without either.
+    var drawnPreview: CelestialEclipseLabPreview? {
+        if let preview { return preview }
+        guard let pendingOffset, play != nil, !chosenFixed else { return nil }
+        return CelestialEclipseLabPreview(body: chosenBody, offset: pendingOffset)
+    }
+
     /// `value` clamped to the ticks 0 … horizon − 1.
     func clampedTick(_ value: Int) -> Int { min(max(value, 0), horizon - 1) }
 
@@ -113,8 +161,10 @@ final class CelestialEclipseLabMirror {
         return text
     }
 
-    /// Takes the new `play` and presentation.
+    /// Takes the new `play` and presentation; a changed play (an applied kernel action, the next level) or a newly
+    /// chosen planet drops the pending phase.
     func follow(_ play: CelestialEclipseLabPlay, chosenBody: Int, shownTick: Int) {
+        if self.play != play || self.chosenBody != chosenBody { pendingOffset = nil }
         self.play = play
         self.chosenBody = chosenBody
         self.shownTick = shownTick
@@ -135,9 +185,40 @@ final class CelestialEclipseLabMirror {
         }
     }
 
-    /// A refused action's reason code in words.
+    /// The engine's prefix on a kernel refusal's code (`action.rule.` before the kernel's `r02-g17.*` code).
+    static let rulePrefix = "action.rule."
+
+    /// `code` without the engine's ``rulePrefix`` (feature 464: codes are read with or without it).
+    static func bareCode(_ code: String) -> String {
+        code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+    }
+
+    /// The panel line of a refusal: "That change was refused: " and the reason in words.
+    static func refusalMessage(code: String) -> String {
+        "That change was refused: \(refusalText(code: code))."
+    }
+
+    /// Records the result of sending `control` with `values` (feature 464): a refusal is shown in words; an accepted
+    /// kernel action drops the pending phase, and so does choosing another planet.
+    func record(_ control: String, _ values: [Double], accepted: Bool, code: String) {
+        guard accepted else {
+            message = Self.refusalMessage(code: code)
+            return
+        }
+        message = nil
+        switch control {
+        case "clock.show":
+            break
+        case "orbit.choose":
+            if let first = values.first, Int(exactly: first) != chosenBody { pendingOffset = nil }
+        default:
+            pendingOffset = nil
+        }
+    }
+
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
     static func refusalText(code: String) -> String {
-        switch code {
+        switch bareCode(code) {
         case "r02-g17.stage": "the play is over: undo a failed run or go to the next level"
         case "r02-g17.action": "that phase cannot be set, or there is nothing to undo or redo"
         case "r02-g17.budget": "no actions are left: run the clock or undo a change"
@@ -179,8 +260,15 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
     let scene = CelestialEclipseLabSkyScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G1703-004).
     private(set) var tierLog: [CelestialEclipseLabTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot drawn (tests, the description and the gestures), with the drawn preview applied.
     private(set) var lastSnapshot: CelestialEclipseLabSceneSnapshot?
+    /// The gesture controller (feature 464): planet taps and drags, the time dial, double taps and the orbit.
+    private(set) var gestures = CelestialEclipseLabGestureController()
+    /// The reason codes of refused actions without the engine's prefix, oldest first, at most ``refusalLogLimit``
+    /// (observability, feature 464).
+    private(set) var refusalLog: [String] = []
+    /// How many refusal codes ``refusalLog`` keeps.
+    static let refusalLogLimit = 64
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -232,8 +320,9 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         }
         follow(core)
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
-        let snapshot = core.snapshot(time: time)
+        let snapshot = presented(core.snapshot(time: time))
         lastSnapshot = snapshot
+        scene.orbit = gestures.orbit
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
 
@@ -272,6 +361,7 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         mirror.measureLabel = measure
         var text = "Celestial Eclipse Lab level \(core.levelNumber). "
         text += measure + ". "
+        text += previewText(level)
         switch play.stage {
         case .won, .result where play.failure == nil:
             text += "Every target eclipse came in order inside its window."
@@ -289,12 +379,128 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
             mirror.status = played ? "Playing" : "Ready"
             mirror.failureText = nil
         }
+        if play.stage == .won || play.stage == .failed || play.stage == .result {
+            text += " " + Self.finishedMessage + "."
+        }
         return text
     }
 
-    /// The control panel.
+    /// The drag's preview or the pending phase in words (feature 464), each followed by ". "; empty without either.
+    private func previewText(_ level: CelestialEclipseLabLevel) -> String {
+        var text: String = ""
+        if let preview = mirror.preview {
+            text += "Previewing \(level.bodyName(preview.body)) at phase \(preview.offset)"
+            if let snapshot = lastSnapshot, snapshot.isPreviewing {
+                text += ": \(snapshot.previewMatched) of \(snapshot.target.count) target eclipses in order"
+            }
+            text += ". "
+        }
+        if let pending = mirror.pendingOffset {
+            text += "Pending phase \(pending) for \(level.bodyName(mirror.chosenBody)), now \(mirror.chosenPhase)"
+            text += mirror.pendingDiffers ? ": Set phase applies it. " : ". "
+        }
+        return text
+    }
+
+    /// `snapshot` with the mirror's drawn preview applied (the drag's preview first, else the pending phase of the
+    /// chosen movable planet); without a preview when neither exists.
+    private func presented(_ snapshot: CelestialEclipseLabSceneSnapshot) -> CelestialEclipseLabSceneSnapshot {
+        guard let preview = mirror.drawnPreview else { return snapshot.withoutPreview() }
+        return snapshot.previewing(body: preview.body, offset: preview.offset)
+    }
+
+    /// Redraws the last snapshot with the mirror's current preview (the next frame draws the same).
+    private func refreshPreview() {
+        guard let snapshot = lastSnapshot else { return }
+        lastSnapshot = presented(snapshot)
+    }
+
+    /// The control panel: "Reset view" returns to the authored orbit; every button sends through ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(CelestialEclipseLabControls(port: port, mirror: mirror))
+        AnyView(CelestialEclipseLabControls(port: port, mirror: mirror,
+                                            resetView: { [weak self] in self?.resetView() },
+                                            sender: { [weak self] control, values in
+                                                self?.send(control, values, port: port)
+                                            },
+                                            redraw: { [weak self] in self?.refreshPreview() }))
+    }
+
+    // MARK: Touch controls (feature 464, R02-G17-04)
+
+    /// What a finished play says when a one-finger gesture sent nothing.
+    static let finishedMessage = CelestialEclipseLabGestureController.finishedReason
+
+    /// The camera's orbit (presentation only; the gesture controller's).
+    var orbit: CelestialEclipseLabOrbit { gestures.orbit }
+
+    /// The canvas gestures set phases, choose planets and show ticks; the preview and the orbit are presentation
+    /// state.
+    var gestureActions: Set<String> { ["orbit.phase", "orbit.choose", "clock.show"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(Core.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
+    /// order: a planet through `orbit.choose`, a tick through `clock.show` (presentation only), a phase through
+    /// `orbit.phase` (one undo step; the preview is dropped), a preview kept in the mirror and drawn, a reset view
+    /// (the controller is already at the authored orbit), and an explanation to the mirror's message.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let drawn = lastSnapshot else { return }
+        let actions: [CelestialEclipseLabGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: drawn)
+        for action in actions {
+            switch action {
+            case let .choosePlanet(body):
+                send("orbit.choose", [Double(body)], port: port)
+            case let .showTick(tick):
+                send("clock.show", [Double(tick)], port: port)
+            case let .setPhase(body, offset):
+                mirror.preview = nil
+                send("orbit.phase", [Double(body), Double(offset)], port: port)
+            case let .preview(body, offset):
+                mirror.preview = CelestialEclipseLabPreview(body: body, offset: offset)
+            case .clearPreview:
+                mirror.preview = nil
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            case let .explain(reason):
+                mirror.message = reason
+            }
+        }
+        if event.phase == .ended || event.phase == .cancelled || gestures.state == .orbiting
+            || gestures.state == .cancelled {
+            mirror.preview = nil
+        }
+        scene.orbit = gestures.orbit
+        refreshPreview()
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the preview disappears.
+    func cancelPointers() {
+        gestures.cancel()
+        mirror.preview = nil
+        refreshPreview()
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its code (read with or without
+    /// the engine's `action.rule.` prefix) in ``refusalLog``; an accepted kernel action drops the pending phase.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        mirror.record(control, values, accepted: result.isAccepted, code: result.code)
+        if !result.isAccepted {
+            refusalLog.append(CelestialEclipseLabMirror.bareCode(result.code))
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        refreshPreview()
+        return result
     }
 }
 #endif
