@@ -20,11 +20,11 @@ import VisualCoreExperienceHost
         #expect(StarlitCartoucheExperienceCore.experienceID == "r02-g16.starlit-cartouche")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 2 (feature 455), three tiers.
+    /// The registration's content facts: 100 certified levels, schema 3 (feature 457), three tiers.
     @Test func theRegistrationFactsHold() {
         #expect(StarlitCartoucheExperienceCore.levelNumbers == 1...100)
         #expect(StarlitCartoucheExperienceCore.certifiedCandidates.count == 100)
-        #expect(StarlitCartoucheExperienceCore.schemaVersion == 2)
+        #expect(StarlitCartoucheExperienceCore.schemaVersion == 3)
         var names: [String] = []
         for level in StarlitCartoucheExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -37,7 +37,8 @@ import VisualCoreExperienceHost
         for control in StarlitCartoucheExperienceCore.controls { ids.append(control.id) }
         #expect(ids == StarlitCartoucheExperienceCore.actionIDs)
         #expect(ids == ["route.fly", "play.undo", "play.redo", "level.next", "route.choose", "level.select",
-                        "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
+                        "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "replay.start",
+                        "replay.step", "replay.stop", "settings.sound"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers`, named as the tiers.

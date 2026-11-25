@@ -59,7 +59,7 @@ its convergence lesson (a restored replay validated against its trace) taken int
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1607-005 [US3] Edit
+- [X] T-R02G1607-005 [US3] Edit — Verified 2026-11-24: 2026-11-24 sim-27 exit 0 (56 tests, the 4 replay tests by agent C included and passing unedited)
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartouchePresenter.swift` and
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartoucheControls.swift` (Replay for a verified solved
   level, Step and Stop with labels and values, the replay position; the Sound toggle sends `settings.sound` and the

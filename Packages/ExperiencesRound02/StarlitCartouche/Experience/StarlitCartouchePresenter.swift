@@ -34,6 +34,16 @@
 // another destination (the play unchanged) plays its audition (`StarlitCartoucheAudition.of(_:star:)`) when the sound
 // is on, on screen and active; choosing a wait plays none. The mirror carries the summary element's text
 // (`StarlitCartoucheFeedbackPlan.summaryText(core:destination:wait:)`) and the sound choice (off by default).
+// Feature 457 (R02-G16-07) T-R02G1607-005 (FR-R02G1607-003, 004; clarifications Q2, Q4, Q5): the mirror carries whether
+// a verified replay exists for the level (`replayAvailable`: a verified result with a trace, outside replay), whether a
+// replay runs and its position (`replaying`, `replayPosition` = the legs played, `replayLength` = the trace's legs);
+// `startReplay`, `stepReplay` and `stopReplay` send `replay.start [level]`, `replay.step` and `replay.stop` (a refusal,
+// `r02-g16.no-replay`, `r02-g16.replay-end` or `r02-g16.replay`, is shown and announced in the plan's words); Retry
+// during replay starts the replay again; the Sound toggle saves the choice through `settings.sound [0/1]`
+// (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied when the experience opens (the first
+// described state) and whenever it changes; the results a restore dropped (`core.reconciliationDropped`) are announced
+// once per presenter as `state` ("n saved results could not be checked and were removed.", "1 saved result could not
+// be checked and was removed.").
 // Presentation only.
 #if os(iOS)
 import Foundation
@@ -96,8 +106,16 @@ final class StarlitCartoucheMirror {
     /// The summary element's text (feature 456): `StarlitCartoucheFeedbackPlan.summaryText(core:destination:wait:)` of
     /// the latest core and the chosen leg.
     var summary = ""
-    /// Whether the sound is on (feature 456; off by default; presentation only).
+    /// Whether the sound is on (feature 456; off by default; since feature 457 the core's saved choice, `soundOn`).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 457).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 457).
+    var replaying = false
+    /// The legs of the running replay played so far (0 when no replay runs; feature 457).
+    var replayPosition = 0
+    /// The legs of the running replay's trace (0 when no replay runs; feature 457).
+    var replayLength = 0
 
     /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 455).
     var goalLabel: String {
@@ -373,6 +391,18 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
             // The first described state offers its recipe, so the sound never holds a placeholder.
             sound.offer(Self.recipe(core))
         }
+        // Feature 457: the saved sound choice is applied when it first appears (the experience opens) or changes.
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(StarlitCartoucheFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                               haptic: nil))
+        }
+        absorbReplay(core)
         absorbProgress(core)
         mirror.summary = StarlitCartoucheFeedbackPlan.summaryText(core: core, destination: core.chosenStar,
                                                                   wait: core.chosenWait)
@@ -617,13 +647,15 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
     }
 
     /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
-    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign, `replay.start` of the level in
+    /// replay (feature 457).
     func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
         guard let core = latestCore else { return ("mode.campaign", []) }
         switch core.mode {
         case .practice: return ("mode.practice", [])
         case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
         case .campaign: return ("level.select", [Double(core.levelNumber)])
+        case .replay(let level): return ("replay.start", [Double(level)])
         }
     }
 
@@ -674,6 +706,67 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
         mirror.soundOn = on
+    }
+
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 457); the described change turns the loop on or off
+    /// (`describe` applies `core.soundOn`).
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    // MARK: Replay (feature 457, R02-G16-07)
+
+    /// Starts the replay of the current level's verified stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Flies the next leg of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 457).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 457).
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 457).
+    static func isReplay(_ mode: StarlitCartoucheMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
+    /// Takes the replay state of `core` into the mirror: Replay is offered for a level with a verified result that has
+    /// a trace (outside replay); during replay the position is the legs played of the trace's legs.
+    private func absorbReplay(_ core: StarlitCartoucheExperienceCore) {
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = core.play.records.count
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
     }
 
     /// The controls view appeared (the loop may play).

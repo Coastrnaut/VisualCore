@@ -167,7 +167,8 @@ enum StarlitCartoucheA11y {
     static let controlNames: [String] = ["summary", "dismiss-tutorial", "hint", "failure-undo", "retry", "star-minus",
                                          "star", "star-plus", "wait-minus", "wait", "wait-plus", "fly", "undo",
                                          "redo", "next-level", "reset-view", "campaign", "daily", "practice",
-                                         "level-picker", "play-level", "sound"]
+                                         "level-picker", "play-level", "sound", "replay", "replay-step",
+                                         "replay-stop"]
     /// The adjustable elements (increment and decrement).
     static let adjustableNames: [String] = ["star", "wait"]
 
