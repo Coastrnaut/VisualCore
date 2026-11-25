@@ -94,15 +94,15 @@ epicycles" and the geometry "adaptive analytic ellipse tessellation".
   hazard #C2456E, star #FFF4D6, met #C2456E, unmet #E8F1FF, actions lit #C2456E, actions unlit #262A4E, broken #E0533A,
   glow #F4F8FF. Impact: FR-R02G1803-006; SC-R02G1803-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
-  `ApsidesWorkshopSceneSnapshot` (the current orbit's positions, the starting orbit's positions, the orbiter's position
-  at the shown tick, the shares, the apsis readings, the planets, the targets with their bands, readings, deviations and
-  met flags, stage, failure, actions left, budget, level number, shown tick and presentation time) made by the adapter;
-  it never holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the
-  shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion
-  stops the star's glow pulsing; Reduce Flashing caps the glow gain. A failure marks the failing element in the broken
-  colour (a contact: the struck planet's hazard ring and the segment from its tick; an order, share or apsis failure:
-  that target's gauge track) and the failure text names it, as the kernel's reason does. Impact: FR-R02G1803-003, 007;
-  SC-R02G1803-002.
+  `ApsidesWorkshopSceneSnapshot` (the current orbit's steps and positions, the starting orbit's positions, the orbiter's
+  position at the shown tick, the shares, the apsis readings, the planets, the targets with their bands, readings,
+  deviations and met flags, stage, failure, actions left, budget, level number, shown tick and presentation time) made
+  by the adapter; it never holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry
+  unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`.
+  Reduce Motion stops the star's glow pulsing; Reduce Flashing caps the glow gain. A failure marks the failing element
+  in the broken colour (a contact: the struck planet's hazard ring and the segment from its tick; an order, share or
+  apsis failure: that target's gauge track) and the failure text names it, as the kernel's reason does. Impact:
+  FR-R02G1803-003, 007; SC-R02G1803-002.
 - Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
   `r02-g18.apsides-workshop` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette #0A0B1F,
   #E8F1FF, #C2456E, #8C93B8, #1A1438, the scenario manifest `Packages/ExperiencesRound02/ApsidesWorkshop/

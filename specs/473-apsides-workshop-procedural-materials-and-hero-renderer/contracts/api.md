@@ -13,6 +13,7 @@ public struct ApsidesWorkshopTier: Sendable, Equatable { public let name: String
 public struct ApsidesWorkshopGauge: Sendable, Equatable { public let target: ApsidesWorkshopTarget
     public let reading: Int; public let deviation: Int; public let met: Bool }
 public struct ApsidesWorkshopSceneSnapshot: Sendable, Equatable {
+    public let orbit: ApsidesWorkshopOrbit
     public let positions: [ApsidesWorkshopPoint]; public let ghost: [ApsidesWorkshopPoint]
     public let orbiter: ApsidesWorkshopPoint; public let shares: [Int]
     public let periapsisSector: Int; public let periapsisDistance: Int
@@ -31,7 +32,7 @@ public enum ApsidesWorkshopSceneGeometry {
     public static func planetCentre(_ index: Int, _ snapshot: ApsidesWorkshopSceneSnapshot) -> SIMD3<Double>
     public static func gaugeCentre(_ index: Int) -> SIMD3<Double>
     public static func actionsBar(_ index: Int, _ snapshot: ApsidesWorkshopSceneSnapshot) -> SIMD3<Double>
-    public static func refinement(_ snapshot: ApsidesWorkshopSceneSnapshot, orbit: ApsidesWorkshopOrbit,
+    public static func refinement(_ snapshot: ApsidesWorkshopSceneSnapshot,
                                   tier: ApsidesWorkshopTier) -> [SIMD3<Double>]   // the ribbon's points, ticks included
     public static func compassMesh(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier) throws -> Mesh
     public static func glowMesh(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier) throws -> Mesh
