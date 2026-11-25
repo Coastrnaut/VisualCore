@@ -1,11 +1,11 @@
-// ApsidesWorkshopSceneSnapshot — feature 473 (R02-G18-03) T-R02G1803-002 (FR-R02G1803-002, 003, 004;
-// clarifications Q1–Q5). What the renderer may read: an immutable copy of the kernel's state — the current orbit's steps
-// and its integer positions per tick, the starting orbit's positions (the ghost loop), the orbiter's position at the
-// shown tick, the eight sector shares, the periapsis and apoapsis readings, the planets, a gauge per target (its band,
+// ApsidesWorkshopSceneSnapshot — feature 473 (R02-G18-03) T-R02G1803-002 (FR-R02G1803-002, 003, 004; clarifications
+// Q1–Q5). What the renderer may read: an immutable copy of the kernel's state — the current orbit's steps and its
+// integer positions per tick, the starting orbit's positions (the ghost loop), the orbiter's position at the shown
+// tick, the eight sector shares, the periapsis and apoapsis readings, the planets, a gauge per target (its band,
 // reading, deviation and whether it is met in order), the failure, the shown tick and period, the stage, the actions
 // left and the budget, the level number and the presentation time; plus the palette and the three quality tiers. The
-// renderer never holds the kernel, so no drawing result can change the game (renderer purity), and the drawn orbit passes
-// through the kernel's positions.
+// renderer never holds the kernel, so no drawing result can change the game (renderer purity), and the drawn orbit
+// passes through the kernel's positions.
 import Foundation
 
 /// The palette of Apsides Workshop, as linear colours 0 … 1 (glacial white and deep rose on midnight).
