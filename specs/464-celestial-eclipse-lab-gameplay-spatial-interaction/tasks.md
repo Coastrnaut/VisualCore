@@ -50,7 +50,7 @@ shader material (the vertex-contract lesson of R02-G16-03 and R02-G17-03).
 
 ## Phase 3: Stories 1, 2 and 3 — phase drags, taps and the time dial (P1) 🎯
 
-- [ ] T-R02G1704-003 [US1] [US2] [US3] Create
+- [X] T-R02G1704-003 [US1] [US2] [US3] Create — Verified 2026-11-25: 2026-11-25 gesture controller (taps choose, phase drags preview and set one phase, dial shows ticks, empty double tap resets, two-finger orbit, cancels and finished plays send no kernel action); 5 tests incl. 500 seeded scripts pass (host-3 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabGestureController.swift` (FR-R02G1704-001 …
   004, 006, 007; SC-R02G1704-001 … 003; `CelestialEclipseLabGestureAction` choosePlanet(body), showTick(tick),
   setPhase(body, offset), preview(body, offset), clearPreview, resetView, explain(reason); states idle, planetPress,
