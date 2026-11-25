@@ -15,7 +15,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1602-002 Add `generation(Int)` ("r02-g16.generation") and `witness(String)` ("r02-g16.witness") to
+- [X] T-R02G1602-002 Add `generation(Int)` ("r02-g16.generation") and `witness(String)` ("r02-g16.witness") to — Verified 2026-11-24: host-r2 exit 0 (.autonomy/migration/checks/R02-G16-02.host-r2.json; first host attempt failed on the 451 budget-17 refusal, moved to 25); solver source lands here because Difficulty uses its plan
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheError.swift`; widen the budget bound to "1 … 24"
   in `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheLevel.swift`; create
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheManifest.swift` (the 100 entries "number 1 … 100,

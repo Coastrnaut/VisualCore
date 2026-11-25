@@ -114,7 +114,7 @@ import Testing
                                                    symbol: [1, 0], budget: 4) } == "symbol")
         #expect(refusal { try StarlitCartoucheLevel(id: "a", seed: 1, difficulty: 1, stars: s, range: 2,
                                                    corridors: c, hazards: [], start: 0, beacon: 2, deadline: 20,
-                                                   symbol: [0, 1], budget: 17) } == "budget")
+                                                   symbol: [0, 1], budget: 25) } == "budget")
         #expect(refusal { try StarlitCartoucheLevel(id: "a", seed: 1, difficulty: 1, stars: s, range: 2,
                                                    corridors: c, hazards: [], start: 0, beacon: 2, deadline: 65,
                                                    symbol: [0, 1], budget: 4) } == "deadline")

@@ -5,10 +5,11 @@
 // deadline); a range 1 … 12; at most 24 undirected corridors (no star joined to itself, no corridor twice, travel
 // 1 … 3); at most 8 hazard tubes (a corridor and a closed interval from ≤ to, from ≥ 0); the start star (its window
 // contains beat 0) and the beacon star; a deadline 1 … 64; the symbol, 1 … 12 distinct corridor indices (sorted); an
-// action budget 1 … 16; a difficulty 1 … 5 and whether a tutorial precedes play. Its fingerprint is the SHA-256 hex of
-// its canonical JSON (schema 1, sorted keys, fingerprint excluded); the stored form is re-checked on decode. Stars,
-// corridors and progress are named in words (FR-R02G1601-013); star numbers are their indices. Modelled on
-// `VoxelOrigamiLevel` (feature 441).
+// action budget 1 … 24 (widened from 1 … 16 by feature 452 (R02-G16-02) T-R02G1602-002 for the manifest's budgets
+// 8 … 19); a difficulty 1 … 5 and whether a tutorial precedes play. Its fingerprint is the SHA-256 hex of its canonical
+// JSON (schema 1, sorted keys, fingerprint excluded); the stored form is re-checked on decode. Stars, corridors and
+// progress are named in words (FR-R02G1601-013); star numbers are their indices. Modelled on `VoxelOrigamiLevel`
+// (feature 441).
 import Foundation
 import VisualCoreMath
 
@@ -39,7 +40,7 @@ public struct StarlitCartoucheLevel: Sendable, Equatable {
     /// The symbol's stroke count range.
     public static let strokeCounts: ClosedRange<Int> = 1...12
     /// The budget range.
-    public static let budgets: ClosedRange<Int> = 1...16
+    public static let budgets: ClosedRange<Int> = 1...24
 
     /// The level id, a lowercase slug.
     public let id: String
@@ -63,7 +64,7 @@ public struct StarlitCartoucheLevel: Sendable, Equatable {
     public let deadline: Int
     /// The symbol's strokes: sorted, distinct corridor indices.
     public let symbol: [Int]
-    /// The action budget, 1 … 16.
+    /// The action budget, 1 … 24 (1 … 16 until feature 452 widened it for the manifest's budgets 8 … 19).
     public let budget: Int
     /// Whether a tutorial precedes play.
     public let tutorial: Bool
