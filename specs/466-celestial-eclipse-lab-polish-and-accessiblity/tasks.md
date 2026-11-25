@@ -76,7 +76,7 @@ tests updated with the panel's new refusal words) and round02-host in five chunk
 - [X] T-R02G1706-006 Docs: `docs/architecture/celestial-eclipse-lab.md` (polish and accessibility), — Verified 2026-11-25: 2026-11-25 round02-host-1, -2, -3c (with CelestialEclipseLab), -3e, -3f exit 0 (.autonomy/migration/checks/R02-G17-06.round02-host-*.json); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the five round-two filters)
-- [ ] T-R02G1706-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1706-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G17-06.*.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1706-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1706-009 Reference regression chunk 2 (`--name reference-2`)
