@@ -16,7 +16,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1701-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `CelestialEclipseLabCore`,
+- [X] T-R02G1701-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `CelestialEclipseLabCore`, — Verified 2026-11-25: 2026-11-25 Package.swift gains CelestialEclipseLabCore and its tests; Error, Level, fixtures and CelestialEclipseLabLevelTests pass (host, host-1b exit 0)
   `CelestialEclipseLabCoreTests`, product); create
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabError.swift` (codes "r02-g17.level, .action,
   .budget, .stage, .stale, .newer-schema, .malformed"),

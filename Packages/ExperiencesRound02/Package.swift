@@ -52,6 +52,8 @@ let package = Package(
         // Feature 451 (R02-G16-01): Starlit Cartouche's rule kernel, a candidate until X-R02-G16.
         .library(name: "StarlitCartoucheCore", targets: ["StarlitCartoucheCore"]),
         .library(name: "StarlitCartoucheExperience", targets: ["StarlitCartoucheExperience"]),
+        // Feature 461 (R02-G17-01): Celestial Eclipse Lab's rule kernel, a candidate until X-R02-G17.
+        .library(name: "CelestialEclipseLabCore", targets: ["CelestialEclipseLabCore"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -742,6 +744,16 @@ let package = Package(
                                    .product(name: "VisualCorePersistence", package: visualCore),
                                    .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "StarlitCartouche/CoreTests"),
+        // Feature 461 (R02-G17-01): Celestial Eclipse Lab's pure rule kernel.
+        .target(name: "CelestialEclipseLabCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "CelestialEclipseLab/Core"),
+        .testTarget(name: "CelestialEclipseLabCoreTests",
+                    dependencies: ["CelestialEclipseLabCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "CelestialEclipseLab/CoreTests"),
         // Feature 453 (R02-G16-03): Starlit Cartouche's experience (presenter, scene, controls).
         .target(name: "StarlitCartoucheExperience",
                 dependencies: ["StarlitCartoucheCore",
