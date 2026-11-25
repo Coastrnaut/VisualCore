@@ -72,8 +72,8 @@ least 8 lattice units out), and the item passes.
 
 ## Simulator proof and future device evidence
 
-- [x] CHK017 Are the frame-check thresholds (star and orbiter luminance 0.25, actions bar red over blue 0.08, gauge track
-  0.1, backdrop 0.06), the shown tick of the check frames and the 5 levels × 3 tiers stated? [Measurability, Spec
+- [x] CHK017 Are the frame-check thresholds (star and orbiter luminance 0.25, actions bar red over blue 0.08, gauge
+  track 0.1, backdrop 0.06), the shown tick of the check frames and the 5 levels × 3 tiers stated? [Measurability, Spec
   §Clarifications Q3; SC-R02G1803-001]
 - [x] CHK018 Are device frame-time measurements deferred to after ImplementationLock-100 and marked `{device}`?
   [Consistency, Spec §SC-R02G1803-006]
