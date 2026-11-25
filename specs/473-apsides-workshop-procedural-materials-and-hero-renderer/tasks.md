@@ -43,7 +43,7 @@ R02-G17-03 (`git show <R02-G17-03 record commit>:<path>`).
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopShaderSourceTests.swift` (version line, declared
   uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match, the pulse rule);
   agent A; `--name host-2`
-- [ ] T-R02G1803-004 [P] [US1] Create
+- [X] T-R02G1803-004 [P] [US1] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopSceneGeometry (fixed compass scale, painter order by kind, ribbon through every kernel position, tiers, camera, CPU reference, fallback parts) and ApsidesWorkshopSceneGeometryTests (12) pass (host-3 exit 0)
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopSceneGeometry.swift` (clarification Q1: world = sky
   units × s with s = 0.9 / 16 384; the backdrop quad; wedges star → P(t) → P(t + 1) at depth −0.04 tinted for target
   sectors; 8 spokes from radius 0.06 to 0.92, 0.006 wide; the rim at 0.92, 0.012 wide, with s + 1 notches at the middle
