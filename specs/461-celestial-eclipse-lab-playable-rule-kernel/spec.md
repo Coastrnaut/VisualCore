@@ -43,12 +43,11 @@ every limit as an integer range, fingerprints levels with SHA-256 of a canonical
 `PuzzleRules` (`VisualCoreSimulation`).
 
 - Q: What exactly are a body, its orbit and an eclipse, in integers? → A: a level has 2 … 6 bodies, numbered from 0;
-  each
-  has an orbit of 4 … 24 lattice positions (x, y, z each −32 … 32), one per tick of its period, a disc radius 1 … 8 and
-  a flag "fixed"; at least one body is movable. With phase p, body b is at tick t at orbit position (t + p) mod period.
-  The projection drops z; the depth is z, a greater z being nearer the viewer. Every pair of bodies keeps one depth
-  order at every tick: the smallest z of the front body is greater than the largest z of the back body (checked when
-  the level is built, `r02-g17.level` otherwise). Bodies a and b eclipse at tick t when (xa − xb)² + (ya − yb)² <
+  each has an orbit of 4 … 24 lattice positions (x, y, z each −32 … 32), one per tick of its period, a disc radius 1 … 8
+  and a flag "fixed"; at least one body is movable. With phase p, body b is at tick t at orbit position (t + p) mod
+  period. The projection drops z; the depth is z, a greater z being nearer the viewer. Every pair of bodies keeps one
+  depth order at every tick: the smallest z of the front body is greater than the largest z of the back body (checked
+  when the level is built, `r02-g17.level` otherwise). Bodies a and b eclipse at tick t when (xa − xb)² + (ya − yb)² <
   (ra + rb)²; the front body occults the back one. The visibility class of an eclipse tick is total when the front
   radius is at least the back radius and the squared distance is at most (rf − rb)², annular when the front radius is
   smaller and the squared distance is at most (rb − rf)², partial otherwise; an interval's class is the deepest class
