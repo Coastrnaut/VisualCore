@@ -928,5 +928,7 @@ proof), `CelestialEclipseLabDifficulty` and `CelestialEclipseLabWitness`, with t
 `CelestialEclipseLabShaders`), the adapter `CelestialEclipseLabExperienceCore`, the scenarios and the iOS target `CelestialEclipseLabExperience`,
 registered as a candidate until X-R02-G17. Feature 464 (R02-G17-04) adds `CelestialEclipseLabPicker`,
 `CelestialEclipseLabGestureController`, `CelestialEclipseLabOrbit`, the orbital-handle phase drag with its ghost
-preview, the time dial and the panel's "Set phase". See
+preview, the time dial and the panel's "Set phase". Feature 465 (R02-G17-05) adds `CelestialEclipseLabHints`
+(three hint levels from a solver entry at the current phases), `CelestialEclipseLabFailureExplanation`,
+`CelestialEclipseLabProgress` (tutorial, stars, daily × 29, practice) and snapshot schema 2. See
 [docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).

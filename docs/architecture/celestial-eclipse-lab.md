@@ -92,3 +92,18 @@ later features.
 - **Panel parity.** Phase − and + move a previewed pending offset (no action spent) and "Set phase" commits it as one
   action, so every certified level can be won through the panel within its budget; a host test wins all 100.
 
+## Teaching and progression (feature 465, R02-G17-05)
+
+- **Hints.** From the current phases the solver searches the fewest phase changes that win within the actions left
+  (`plan(_:from:)`; the certifying search is the same entry at the starting phases). The hint escalates from the planet
+  ("Move planet b next") to the way and distance ("… k steps forward", the shorter way round, forward on a tie) to the
+  exact phase ("Set planet b to phase p"); already-ordered phases say "run the clock"; no plan says so and suggests undo
+  or retry. Following exact hints from every opening and then running wins all 100 levels within their budgets.
+- **Failure text.** The run's failure is put in words with the planets, the target (numbered from 1) and the ticks: an
+  unwanted eclipse first, a target outside its window, or the horizon reached before the sequence was complete.
+- **Tutorial.** Levels 1 … 3 show three instructions (move a planet along its orbit; make the targets happen in order
+  and run; what fails a run), each advancing when done; dismissible; undo never moves it back.
+- **Progress.** Stars by actions spent against the certified plan (3 at most, 2 within two more, else 1), level 1 open
+  and a campaign win opening the next, five bands of 20; the daily level is (days since 2026-01-01 × 29) mod 100 + 1;
+  practice raises the budget to 24 without stars or unlocks. The snapshot is schema 2 with a migration from schema 1.
+

@@ -86,7 +86,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G1705-006 Docs: `docs/architecture/celestial-eclipse-lab.md` (teaching and progression),
+- [X] T-R02G1705-006 Docs: `docs/architecture/celestial-eclipse-lab.md` (teaching and progression), — Verified 2026-11-25: 2026-11-25 architecture teaching section, round-two README, automatedtesting entry; round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G17-05.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G1705-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

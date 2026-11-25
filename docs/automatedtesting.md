@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G17-04: Celestial Eclipse Lab gestures).
+Last updated: 2026-11-25 (R02-G17-05: Celestial Eclipse Lab teaching and progression).
 
 ## 1. What is tested, and where
 
@@ -958,6 +958,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   rather than a linear fraction (the picker test caught it); the checklist caught that panel steps costing one action
   each could exceed a budget, so phase − and + now move a pending offset; the presenter needed `import VisualCoreScenes`
   for `PointerEvent`, which only the simulator build showed.
+- **Celestial Eclipse Lab teaching and progression** (R02-G17-05, 2026-11-25). Host: `CelestialEclipseLabHintsTests`
+  (exact hints from every opening, then the run, win all 100 levels within their budgets; 200 seeded states get accepted
+  hints; 500 seeded failures explained against an independent judge over the kernel's intervals),
+  `CelestialEclipseLabProgressTests` (tutorial steps, stars and frontier, every date 2026 … 2036 mapped by the × 29
+  daily rule) and the adapter's schema 2 and migration tests. Simulator: `CelestialEclipseLabTeachingTests` (8 tests
+  through the presenter: tutorial, three hint levels searched off the main actor, failure text, band, goal, stars, modes
+  and worded refusals). Lessons: the drafting agents wrote every file during the baselines without building and the
+  merged suites passed on the first run; only the identity test still pinned the old control list.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15
