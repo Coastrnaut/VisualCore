@@ -2,7 +2,7 @@
 // The experience's id is the catalog id; the registry's factory (`make(id:storage:reduceMotion:reduceFlashing:)`,
 // which does not depend on the registration) builds a shell around the presenter with the accessibility settings
 // passed through, as does the tests' factory; the controls are the seven declared actions in order; the registration
-// facts hold (100 certified levels, schema 1, the tiers level-0 … level-2); the presenter's quality levels equal the
+// facts hold (100 certified levels, schema 2 since feature 465, the tiers level-0 … level-2); the presenter's quality levels equal the
 // Core's `qualityTiers`; the presenter holds no GPU object and no snapshot before setup; and it declares its two frame
 // probes (the backdrop corners) once a frame was drawn. iOS only, as the target.
 #if os(iOS)
@@ -21,11 +21,11 @@ import VisualCoreExperienceHost
         #expect(CelestialEclipseLabExperienceCore.experienceID == "r02-g17.celestial-eclipse-lab")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 1, three tiers.
+    /// The registration's content facts: 100 certified levels, schema 2 (feature 465), three tiers.
     @Test func theRegistrationFactsHold() {
         #expect(CelestialEclipseLabExperienceCore.levelNumbers == 1...100)
         #expect(CelestialEclipseLabExperienceCore.certifiedCandidates.count == 100)
-        #expect(CelestialEclipseLabExperienceCore.schemaVersion == 1)
+        #expect(CelestialEclipseLabExperienceCore.schemaVersion == 2)
         var names: [String] = []
         for level in CelestialEclipseLabExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -38,7 +38,8 @@ import VisualCoreExperienceHost
         for control in CelestialEclipseLabExperienceCore.controls { ids.append(control.id) }
         #expect(ids == CelestialEclipseLabExperienceCore.actionIDs)
         #expect(ids == ["orbit.phase", "clock.run", "play.undo", "play.redo", "level.next", "orbit.choose",
-                        "clock.show"])
+                        "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers`, named as the tiers.

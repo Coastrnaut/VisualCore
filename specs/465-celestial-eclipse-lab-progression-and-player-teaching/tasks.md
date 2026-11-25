@@ -70,7 +70,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
   `Packages/ExperiencesRound02/CelestialEclipseLab/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); update
   `CelestialEclipseLabPanelWinTests`, the gesture wiring tests and other suites whose `level.next` expectation changes;
   lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter CelestialEclipseLab`
-- [ ] T-R02G1705-005 Edit
+- [X] T-R02G1705-005 Edit — Verified 2026-11-25: 2026-11-25 presenter tutorial, three hint levels searched off the main actor with a generation guard, failure explanation, band, goal and stars; panel Hint, Dismiss tutorial, level picker, Practice, Daily, Campaign; teaching tests; identity test and registry comment updated for schema 2; sim-27 42 tests exit 0 (sim-27a failed only on the identity test's old control list)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Experience/CelestialEclipseLabPresenter.swift` (the tutorial
   instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it, the search
   off the main actor and a stale search never owning the hint state — and the failure explanation as panel text, with

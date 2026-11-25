@@ -19,6 +19,18 @@
 // is presentation only and rebuilds the meshes). The panel's phase − and + move a pending offset of the chosen planet,
 // drawn as the same preview, and "Set phase" commits it as one action. A refused action is shown in words and its
 // code logged (`refusalLog`), read with or without the engine's `action.rule.` prefix.
+//
+// Feature 465 (R02-G17-05) T-R02G1705-005 (FR-R02G1705-001 … 005, 007; clarifications Q1 … Q5) adds teaching and
+// progression to the panel: the tutorial instruction (`core.tutorial.text` until the step is `done`), the hint at its
+// current level (`showHint()`: each press raises the level 1 → 2 → 3; any change of the play hides it, so the next
+// press shows level 1; one search per play through `CelestialEclipseLabHints.hint(level:play:)`, run off the main actor
+// in a detached task, with a generation counter so that a stale search never owns the hint state; hints never send an
+// action), the failure explanation (`CelestialEclipseLabFailureExplanation(play:)`, while `failureText` stays the short
+// status line), the mode, the open levels, the level's band (of the five bands of 20), its goal (the target eclipses in
+// words and the certified phase-change count) and its best stars (`core.progress.stars(of:)`). The description includes
+// them. The daily level is asked for with today's local calendar date read here (`playDaily(port:date:)`); the core
+// never reads a clock. A refused `level.select` or `level.next` (`r02-g17.locked`) and an impossible date
+// (`r02-g17.date`) read in words.
 #if os(iOS)
 import CelestialEclipseLabCore
 import Foundation
@@ -55,7 +67,7 @@ final class CelestialEclipseLabMirror {
     var measureLabel = ""
     /// The level in words.
     var targetLabel = ""
-    /// The tutorial in words on levels that have one; nil otherwise.
+    /// The tutorial instruction of the current step (`core.tutorial.text`, feature 465); nil once the step is `done`.
     var tutorialText: String?
     /// The chosen body, the adapter's.
     var chosenBody = 0
@@ -70,6 +82,70 @@ final class CelestialEclipseLabMirror {
     var pendingOffset: Int?
     /// The phase drag's preview (feature 464; presentation only), nil when no drag previews.
     var preview: CelestialEclipseLabPreview?
+    /// The hint level shown, 1 … 3; 0 while no hint is shown (feature 465; presentation only).
+    var hintLevel = 0
+    /// The hint shown at ``hintLevel``, ``CelestialEclipseLabPresenter/searchingText`` while its search runs, or
+    /// ``CelestialEclipseLabPresenter/noHintText`` when the play has no hint; nil while no hint is shown (feature 465).
+    var hintText: String?
+    /// The failure explanation (`CelestialEclipseLabFailureExplanation`: what went wrong, then the advice), nil without
+    /// a failure (feature 465).
+    var explanation: String?
+    /// The mode (feature 465).
+    var mode: CelestialEclipseLabMode = .campaign
+    /// The highest open level (feature 465).
+    var frontier = 1
+    /// The level's difficulty band, 1 … 5 (the five bands of 20; feature 465).
+    var band = 1
+    /// The best stars of the current level, 0 … 3 (0 while it has not been won; feature 465).
+    var bestStars = 0
+    /// The stars of each won level, by level number (the level picker; feature 465).
+    var stars: [Int: Int] = [:]
+    /// The goal in words: the target eclipses in order and the certified phase-change count (feature 465).
+    var goalLabel = ""
+    /// The level the picker holds, 1 … ``frontier`` (presentation only; feature 465).
+    var pickedLevel = 1
+
+    /// "Band b of 5" (feature 465).
+    var bandLabel: String { "Band \(band) of 5" }
+
+    /// "Best: s of 3 stars", or "Best: not won yet" while the level has not been won (feature 465).
+    var starsLabel: String {
+        bestStars > 0 ? "Best: \(bestStars) of 3 stars" : "Best: not won yet"
+    }
+
+    /// "Mode: campaign", "Mode: practice" or "Mode: daily" (feature 465).
+    var modeLabel: String { "Mode: " + Self.modeName(mode) }
+
+    /// The mode's name: campaign, practice or daily (feature 465).
+    static func modeName(_ mode: CelestialEclipseLabMode) -> String {
+        switch mode {
+        case .campaign: "campaign"
+        case .practice: "practice"
+        case .daily: "daily"
+        }
+    }
+
+    /// The picker's line for level `level`: "Level n, band b", with ", s of 3 stars" once it has been won
+    /// (feature 465).
+    func levelLabel(_ level: Int) -> String {
+        let band: Int = CelestialEclipseLabProgress.band(of: level)
+        if let won = stars[level] { return "Level \(level), band \(band), \(won) of 3 stars" }
+        return "Level \(level), band \(band)"
+    }
+
+    /// The goal of `level` with `certified` phase changes in the certified witness (feature 465): "Goal: target 1,
+    /// planet f in front of planet b in ticks o … c; target 2, …; in order, then run the clock. 3 stars within C
+    /// actions" ("1 action" singular).
+    static func goalText(_ level: CelestialEclipseLabLevel, certified: Int) -> String {
+        var parts: [String] = []
+        for (index, target) in level.target.enumerated() {
+            parts.append("target \(index + 1), planet \(target.front) in front of planet \(target.back) in ticks "
+                         + "\(target.open) … \(target.close)")
+        }
+        let unit: String = certified == 1 ? "action" : "actions"
+        return "Goal: " + parts.joined(separator: "; ") + "; in order, then run the clock. 3 stars within "
+            + "\(certified) \(unit)"
+    }
 
     /// The number of bodies of the followed level (1 while no play is followed).
     var bodyCount: Int { max(play?.level.bodies.count ?? 1, 1) }
@@ -224,6 +300,8 @@ final class CelestialEclipseLabMirror {
         case "r02-g17.budget": "no actions are left: run the clock or undo a change"
         case "r02-g17.stale": "the play changed before the action arrived"
         case "r02-g17.level": "the next level could not be made"
+        case CelestialEclipseLabExperienceRule.locked: "that level is not open yet"
+        case CelestialEclipseLabExperienceRule.date: "that is not a calendar date"
         case CelestialEclipseLabExperienceRule.notWhole: "a body, phase and tick must be whole numbers"
         case CelestialEclipseLabExperienceRule.choice: "that body cannot be chosen"
         case CelestialEclipseLabExperienceRule.tick: "that tick is past the horizon"
@@ -246,10 +324,6 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
     /// The pure core this presenter draws.
     typealias Core = CelestialEclipseLabExperienceCore
 
-    /// The tutorial shown on levels that have one (presentation, not a kernel stage).
-    static let tutorial = "Set each planet's phase so the eclipses come in the target order, each inside its window "
-        + "on the timeline, then run the clock."
-
     /// Whether the halos are still (Reduce Motion).
     let reduceMotion: Bool
     /// Whether the glow gain is capped (Reduce Flashing).
@@ -269,6 +343,22 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// How many refusal codes ``refusalLog`` keeps.
     static let refusalLogLimit = 64
+    /// The latest core seen (feature 465): hints, the daily date and the progress lines read it.
+    private(set) var latestCore: CelestialEclipseLabExperienceCore?
+    /// The play the shown hint belongs to; nil while no hint is shown (feature 465).
+    private var hintPlay: CelestialEclipseLabPlay?
+    /// The hint texts of levels 1 … 3 searched for a play (nil texts: the play has no hint), one search per play
+    /// (feature 465).
+    private var hintCache: (play: CelestialEclipseLabPlay, texts: [String]?)?
+    /// The search under way, off the main actor, for ``hintPlay`` (feature 465); tests may await its value.
+    private(set) var hintSearch: Task<Void, Never>?
+    /// The hint generation (feature 465): raised by every new search and every hidden hint; a search whose generation
+    /// is no longer current owns nothing.
+    private(set) var hintGeneration = 0
+    /// What the hint line shows while the search runs (feature 465).
+    static let searchingText = "Finding a hint…"
+    /// What the hint line shows when the play has no hint (won, or not under way; feature 465).
+    static let noHintText = "No hint now: the level is not being played."
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -319,6 +409,7 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
             tierLog.append(CelestialEclipseLabTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
+        if latestCore != core { absorbProgress(core) }
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         let snapshot = presented(core.snapshot(time: time))
         lastSnapshot = snapshot
@@ -351,10 +442,10 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbProgress(core)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
-        mirror.tutorialText = level.tutorial ? Self.tutorial : nil
         mirror.targetLabel = "Level: \(level.target.count) target eclipses in order among \(level.bodies.count) "
             + "bodies over \(level.horizon) ticks"
         let measure: String = level.progressDescription(timeline: play.timeline, actionsLeft: play.actionsLeft)
@@ -370,6 +461,8 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         case .failed, .result:
             let reason: String = CelestialEclipseLabMirror.failureText(play.failure) ?? "The run failed."
             text += reason
+            // Since feature 465 the failure explanation too (what went wrong, then the advice).
+            if let explanation = mirror.explanation { text += " " + explanation }
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         default:
@@ -382,7 +475,23 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         if play.stage == .won || play.stage == .failed || play.stage == .result {
             text += " " + Self.finishedMessage + "."
         }
+        text += " " + teachingText()
         return text
+    }
+
+    /// The teaching and progress sentences of the description (feature 465): the mode, the band, the goal, the best
+    /// stars, then the tutorial instruction and the hint when shown; each ends in a full stop, joined by spaces.
+    private func teachingText() -> String {
+        var parts: [String] = [mirror.modeLabel, mirror.bandLabel, mirror.goalLabel, mirror.starsLabel]
+        if let tutorial = mirror.tutorialText { parts.append("Tutorial: " + tutorial) }
+        if let hint = mirror.hintText {
+            parts.append((mirror.hintLevel > 0 ? "Hint \(mirror.hintLevel) of 3: " : "Hint: ") + hint)
+        }
+        var sentences: [String] = []
+        for part in parts {
+            sentences.append(part.hasSuffix(".") || part.hasSuffix("…") ? part : part + ".")
+        }
+        return sentences.joined(separator: " ")
     }
 
     /// The drag's preview or the pending phase in words (feature 464), each followed by ". "; empty without either.
@@ -417,7 +526,7 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
 
     /// The control panel: "Reset view" returns to the authored orbit; every button sends through ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(CelestialEclipseLabControls(port: port, mirror: mirror,
+        AnyView(CelestialEclipseLabControls(port: port, mirror: mirror, presenter: self,
                                             resetView: { [weak self] in self?.resetView() },
                                             sender: { [weak self] control, values in
                                                 self?.send(control, values, port: port)
@@ -501,6 +610,147 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         }
         refreshPreview()
         return result
+    }
+
+    // MARK: Teaching and progression (feature 465, R02-G17-05)
+
+    /// Takes the core's teaching and progress state into the mirror (feature 465): the tutorial instruction, the
+    /// failure explanation, the mode, the open levels with their stars, the band, the goal and the best stars; a change
+    /// of the play hides the hint (the next press shows level 1).
+    private func absorbProgress(_ core: CelestialEclipseLabExperienceCore) {
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let shown = hintPlay, shown != core.play { clearHint() }
+        mirror.tutorialText = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.explanation = CelestialEclipseLabFailureExplanation(play: core.play)?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        mirror.pickedLevel = min(max(mirror.pickedLevel, 1), core.progress.frontier)
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.band = core.band
+        mirror.bestStars = core.progress.stars(of: core.levelNumber)
+        mirror.goalLabel = CelestialEclipseLabMirror.goalText(core.play.level, certified: core.certifiedChanges)
+    }
+
+    /// Hides the hint shown and drops a search under way; the generation is raised so that search owns nothing.
+    private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hintGeneration += 1
+        hintPlay = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// The hint texts of levels 1 … 3 of `play` from one search (`CelestialEclipseLabHints.hint(level:play:)` at level
+    /// 1): a phase-change hint gives each level's text (`CelestialEclipseLabHint.changeText`); a run or stuck hint
+    /// reads the same at every level; nil when the play has no hint (won, or not under way). Runs off the main actor.
+    nonisolated static func hintTexts(_ play: CelestialEclipseLabPlay) -> [String]? {
+        guard let first = CelestialEclipseLabHints.hint(level: 1, play: play) else { return nil }
+        guard first.kind == .change, case .phase(let body, let offset)? = first.action,
+              play.level.bodies.indices.contains(body), play.phases.indices.contains(body) else {
+            return [first.text, first.text, first.text]
+        }
+        let period: Int = play.level.bodies[body].period
+        var texts: [String] = []
+        for level in 1...3 {
+            texts.append(CelestialEclipseLabHint.changeText(level: level, body: body, from: play.phases[body],
+                                                            to: offset, period: period))
+        }
+        return texts
+    }
+
+    /// Shows the next hint level (1 → 2 → 3, then 3 again) for the current play; never sends an action. The search
+    /// runs once per play in a detached task, never on the frame: meanwhile the hint line reads ``searchingText`` (a
+    /// press during the search raises the level it will show); the result is shown only when its generation is still
+    /// current, and later levels come from the cache.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let play: CelestialEclipseLabPlay = core.play
+        let next: Int = hintPlay == play ? min(mirror.hintLevel + 1, 3) : 1
+        if let cached = hintCache, cached.play == play {
+            reveal(cached.texts, level: next, play: play)
+            return
+        }
+        if hintSearch != nil, hintPlay == play {
+            mirror.hintLevel = next   // the search for this play is running; it shows this level
+            return
+        }
+        hintSearch?.cancel()
+        hintGeneration += 1
+        let generation: Int = hintGeneration
+        hintPlay = play
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            let texts: [String]? = CelestialEclipseLabPresenter.hintTexts(play)
+            await self?.finishSearch(texts, play: play, generation: generation)
+        }
+    }
+
+    /// Takes the hint texts searched for `play` by the search of `generation`: cached and shown when that generation
+    /// is still current (a stale search changes nothing, not even the handle of a newer search).
+    private func finishSearch(_ texts: [String]?, play: CelestialEclipseLabPlay, generation: Int) {
+        guard generation == hintGeneration, hintPlay == play else { return }
+        hintSearch = nil
+        hintCache = (play, texts)
+        reveal(texts, level: mirror.hintLevel, play: play)
+    }
+
+    /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
+    private func reveal(_ texts: [String]?, level: Int, play: CelestialEclipseLabPlay) {
+        hintPlay = play
+        guard let texts, texts.indices.contains(level - 1) else {
+            mirror.hintLevel = 0
+            mirror.hintText = Self.noHintText
+            return
+        }
+        mirror.hintLevel = level
+        mirror.hintText = texts[level - 1]
+    }
+
+    /// Ends the tutorial of the current level (`tutorial.dismiss`).
+    @discardableResult
+    func dismissTutorial(port: ExperienceActionPort) -> ActionResult {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Plays open level `level` in campaign mode (`level.select [level]`; a closed level is refused in words).
+    @discardableResult
+    func selectLevel(_ level: Int, port: ExperienceActionPort) -> ActionResult {
+        send("level.select", [Double(level)], port: port)
+    }
+
+    /// Plays the daily level of `date` (`mode.daily [year, month, day]`; the local calendar date by default; the core
+    /// never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = CelestialEclipseLabPresenter.today()) -> ActionResult {
+        send("mode.daily", Self.dateValues(date), port: port)
+    }
+
+    /// Replays the current level with the practice budget (`mode.practice`).
+    @discardableResult
+    func playPractice(port: ExperienceActionPort) -> ActionResult {
+        send("mode.practice", [], port: port)
+    }
+
+    /// Returns to the campaign (`mode.campaign`).
+    @discardableResult
+    func playCampaign(port: ExperienceActionPort) -> ActionResult {
+        send("mode.campaign", [], port: port)
+    }
+
+    /// The local calendar date now: Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the core refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
 }
 #endif
