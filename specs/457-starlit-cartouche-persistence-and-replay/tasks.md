@@ -77,7 +77,7 @@ its convergence lesson (a restored replay validated against its trace) taken int
 - [X] T-R02G1607-006 Docs: `docs/architecture/starlit-cartouche.md` (persistence and replay), — Verified 2026-11-25: 2026-11-25 round02-host-1, -2, -3c, -3e, -3f exit 0 (chunk 3 split in three: the machine ran about 3x slower and the single chunk timed out at 600 s); docs updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3` (the three filters of
   feature 446)
-- [ ] T-R02G1607-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1607-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1607-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1607-009 Reference regression chunk 2 (`--name reference-2`)
