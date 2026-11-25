@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--audits"
+  ],
+  "command": "python3 scripts/verify_experiences.py --audits",
+  "elapsed_seconds": 15.129,
+  "exit_code": 0,
+  "finished": "2026-11-25T10:06:00+00:00",
+  "gate": "X-R02-G16",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G16.audits.log",
+  "log_sha256": "1fcc0385195aa5b7a62c07ba7a722d6328c61d4b21ba422efd2b13fe8e499c9d",
+  "name": "audits",
+  "started": "2026-11-25T10:05:45+00:00",
+  "timed_out": false
+}

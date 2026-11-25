@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g16.starlit-cartouche",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g16.starlit-cartouche --runtime 26",
+  "elapsed_seconds": 365.394,
+  "exit_code": 0,
+  "finished": "2026-11-25T09:42:07+00:00",
+  "gate": "X-R02-G16",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G16.sim26.log",
+  "log_sha256": "3e03846c4322be01e9b759ed40b056ade653cf39d3edbd58f74290aaa3297dcc",
+  "name": "sim26",
+  "started": "2026-11-25T09:36:02+00:00",
+  "timed_out": false
+}
