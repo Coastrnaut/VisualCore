@@ -170,6 +170,9 @@ file is refused.
 - "Keep angle wrap outside the admissible zone" is read as: the targets never straddle the sector numbering's wrap in a
   way the order rule cannot express; event ticks start at periapsis.
 - Levels are presented, hinted and played through later features (R02-G18-03 … 07); this feature draws nothing.
+- Accessibility and observability: every generated level is named in words by feature 471's kernel (sectors, shares,
+  distances, planets, targets), so no level depends on colour; the witness files and the difficulty metrics are the
+  content pipeline's observable record, and skipped candidates are counted, not hidden.
 - The manifest's numbers, seeds, bands and budgets are copied from the project's own archived design; no third-party
   content is used.
 
