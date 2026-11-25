@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G18-02 (migration ledger, game feature of experience R02-G18) · ID namespace FR-R02G1802-###,
 SC-R02G1802-###, T-R02G1802-###
@@ -27,6 +27,83 @@ Canonical overrides:
 - **Model:** feature 462 (Celestial Eclipse Lab's content pipeline) for manifest, generator, solver, witness files,
   digest and progression, adapted to the orbit rules of feature 471: a move is a tuning of the periapsis knob or of the
   size, and the play ends the level.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+462's answers where the games agree. Facts checked (read-only, 2026-11-25): R02-G18-01's `ApsidesWorkshopLevel` (period
+16 … 96 even, 0 … 6 planets clear of the star, 1 … 6 targets, no two identical, budget 1 … 24, a starting orbit that is
+valid and must not win), `ApsidesWorkshopSky` (fixed-point Kepler positions, octant shares, contact, the judge),
+`ApsidesWorkshopPlay` and `ApsidesWorkshopRules`; R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard
+`ProgressionRule` (drop at most 1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical
+manifest's 100 entries (bands 1 … 5 × 20, moves budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19 by band, five
+control emphases, 20 each); every budget lies inside the kernel's 1 … 24, so the kernel needs no change. The ranges
+below were measured before they were written down: a prototype of this generator and solver on the real kernel, run
+over the real 100 manifest entries, certified every entry within candidate index 8, with at most 13 731 orbits judged
+per level and 3 346 full orbit reports for the whole catalog (0.2 s in a debug build); witness lengths by band averaged
+1.0, 1.0, 1.1, 2.0 and 2.0 with no progression drop or jump.
+
+- Q: How is a level built from its manifest entry? → A: the 100 entries (number, planned seed, band, budget, control
+  emphasis) are a table in `ApsidesWorkshopManifest` with their provenance. Candidate c of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: c))`, in this order: the period (band profile); the
+  winning orbit (size 8 … 48, eccentricity step 0 … 15, direction step 0 … 23, redrawn until valid); the target count
+  and the apsis-target count (band profile, the latter at most the former); the sweep sectors (drawn from the sectors
+  with a share above 0, distinct, until the sweep count or the visited sectors run out), each with a band of its winning
+  share ± a drawn half-width (band profile, clipped to 0 … 1000); the apsis targets (with two, periapsis then apoapsis;
+  with one, a drawn kind), each with its winning sector and a range of its winning distance ± a drawn half-width (band
+  profile, clipped to 0 … 1280); the targets ordered by event tick (ties keep their drawing order); the planets (band
+  profile count; each try draws a tick, a radius 1 … 3, a gap of radius + 1 … 4 lattice units and a side, and places the
+  centre that far from the winning position along its radial line, rounded to lattice units; a centre outside −64 … 64,
+  over the star or struck by the winning orbit is rejected; at most 60 tries); the levers to move (band profile: 1 or 2)
+  and, with one, which lever; the starting orbit (the winning one with the knob redrawn, the size redrawn, or both).
+  Band profiles (periods, targets, apsis targets, sweep half-width, apsis half-width, planets, levers, plan range): band
+  1 ({24}, 1 … 2, 0, 60 … 90, 40 … 60, 0, 1, 1), band 2 ({24, 32}, 2, 0 … 1, 45 … 70, 40 … 60, 0 … 1, 1, 1), band 3
+  ({32}, 2 … 3, 1, 35 … 55, 25 … 45, 1, 1 … 2, 1 … 2), band 4 ({32, 48}, 3, 1, 25 … 40, 20 … 35, 1 … 2, 2, 2), band 5
+  ({48}, 3 … 4, 1 … 2, 18 … 30, 15 … 25, 2 … 3, 2, 2). Budget = the manifest's; ids `apsides-workshop-NNN`; tutorial on
+  levels 1 … 3; difficulty = band. A candidate is skipped when the planets cannot all be placed, when the starting orbit
+  is invalid or equals the winning one, when the level rules refuse it (including a starting orbit that already wins),
+  when its targets equal the previous level's (FR-R02G1802-007), or when the solver does not certify a minimal plan
+  inside its band's plan range within its work bound; at most 256 candidates, then `generation(n)`. Impact:
+  FR-R02G1802-001, 007; SC-R02G1802-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing shorter wins? → A: a later tuning of the same
+  lever overrides an earlier one, so the orbits reachable with at most d tunings are exactly the valid orbits that
+  differ from the start in at most d levers (the knob is one lever: eccentricity and direction together; the size the
+  other); two tunings can always be ordered so the orbit in between is valid (size first when the winning eccentricity
+  is not lower than the start's, the knob first otherwise). The solver searches by depth: depth 1 is every valid knob
+  setting (eccentricity 0 … 15, then direction 0 … 23, the start's pair excluded) at the start's size, then every valid
+  size 8 … 48 (the start's excluded) at the start's knob; depth 2 is every valid orbit with both a different size and a
+  different knob, size outermost, then eccentricity, then direction. Each orbit is judged by the kernel's report, the
+  apsis targets checked first from the orbit's steps alone (an orbit failing one cannot win, so its positions are not
+  computed). The first winning orbit ends the search; the plan is its tunings in the valid order, then `play`, replayed
+  through the kernel's play, whose report must agree. Work = orbits judged, counted and bounded at 16 000 (the largest
+  depth-2 space is 13 880 orbits, plus at most 423 at depth 1); over the bound, or outside the band's plan range, the
+  candidate is skipped. The minimality proof is the count of orbits at each smaller depth (the start alone for a
+  one-tuning plan; the start and every depth-1 orbit for a two-tuning plan), every one judged and none winning. Impact:
+  FR-R02G1802-002; SC-R02G1802-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `ApsidesWorkshopDifficulty` holds the
+  witness length (tunings), the targets, the apsis targets, the planets, the narrowest share band and the narrowest
+  distance range (0 when the level has none), the orbits judged at smaller depths and the solver work. The catalog in
+  manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on the witness length; band
+  means must not fall (measured above). Impact: FR-R02G1802-003, 005; SC-R02G1802-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/apsides-workshop/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form, the actions (the tunings, then `play`), the state digest
+  after every action (16 hex characters of the SHA-256 of the orbit and the actions spent), the play fingerprints after
+  `begin` (and `dismissTutorial` when the level has one) and after each action, the terminal report (the eight shares,
+  the periapsis and apoapsis sector and distance, the largest Kepler residual, each target's deviation and the met
+  count), the counterexample (the depth one below the plan and the number of orbits at that depth, none winning), the
+  difficulty and the candidates skipped. A test rebuilds every witness and compares bytes; it writes the files only with
+  `APSIDES_WORKSHOP_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. Impact: FR-R02G1802-004; SC-R02G1802-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<ApsidesWorkshopRules>.digest(id: "apsides-workshop", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split into groups of 10 levels so each runs under 10 seconds
+  on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New refusals:
+  `generation(Int)` (`r02-g18.generation`) and `witness(String)` (`r02-g18.witness`). The independent check of
+  SC-R02G1802-002 judges, with the kernel's own report and no apsis shortcut, every orbit reachable with fewer tunings
+  than the plan on the two levels with the fewest planets in each band: none wins. Impact: FR-R02G1802-006;
+  SC-R02G1802-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
