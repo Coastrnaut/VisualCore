@@ -8,7 +8,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1608-001 Baselines after R02-G16-07 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1608-001 Baselines after R02-G16-07 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host and round02-1, -2, -3c, -3e, -3f exit 0; baseline-timing printed bounds above its asserts (mesh about 2.5 s vs 0.70 s, the process tree at background priority PRI 4, VisualCore unchanged), host scheduling, not code
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the round-two chunks of feature 457: `--filter VoxelOrigami`,
   `--filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges'`, then chunk 3 in three `--filter` parts:
   `'AuroraLoom|LissajousLabyrinth|HueCompass|WaveKnotKeeper|ChronoConstellator|AmethystEscape'`,
