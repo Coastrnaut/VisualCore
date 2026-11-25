@@ -37,7 +37,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1705-003 [P] [US1] [US4] Create
+- [X] T-R02G1705-003 [P] [US1] [US4] Create — Verified 2026-11-25: 2026-11-25 tutorial steps, progress with stars and frontier, daily level x 29, modes; 16 progress tests pass (host-3 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabProgress.swift`
   (`CelestialEclipseLabTutorialStep` phase → order → recover → done with the texts of clarification Q2, advanced by an
   accepted phase change (phase → order, order → recover) or the level's end (→ done), never moved back by undo — an undo
