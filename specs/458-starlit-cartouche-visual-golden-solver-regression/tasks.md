@@ -29,7 +29,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1608-003 [US2] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheGolden.swift`
+- [X] T-R02G1608-003 [US2] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheGolden.swift` — Verified 2026-11-25: 2026-11-25 StarlitCartoucheGolden and golden-frames.json (16 frames) generated with STARLIT_CARTOUCHE_WRITE_GOLDEN=1; RELEASE_FORBIDDEN gains StarlitCartoucheGolden; host-2 exit 0
   (DEBUG or VISUALCORE_AUTOMATION; "16 frames: levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all
   of the witness's legs but the last (a one-leg witness applies none) with the default choice, plus the hero frame of
   `scenario-manifest.json` at tier 0; at 1,152 × 768 with the authored camera: every star centre at the current beat
