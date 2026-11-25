@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1705-002 [P] [US2] [US3] Add `plan(_:from:maxChanges:workBound:)` to
+- [X] T-R02G1705-002 [P] [US2] [US3] Add `plan(_:from:maxChanges:workBound:)` to — Verified 2026-11-25: 2026-11-25 solver plan(_:from:) from given phases, hints (three levels, run, stuck, failed) and failure explanations (unwanted, window, horizon); hint tests pass incl. exact hints winning all 100 levels, 200 seeded states, 500 seeded failures (host-2 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabSolver.swift` (the search of
   `plan(_:maxChanges:workBound:)` from the given phases — subsets of movable bodies, then phases, in lexicographic
   order, each phase differing from the given one; `plan(_:)` unchanged and equal to `plan(level, from: level.phases)`; a

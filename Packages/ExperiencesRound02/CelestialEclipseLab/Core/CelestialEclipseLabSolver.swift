@@ -11,7 +11,9 @@
 // event fails; events after the last match are ignored; targets left at the end fail). The first winning setting ends
 // the search; the plan is its phase changes in body order. Work = settings judged (the start included), counted and
 // bounded; over the bound, or past the most changes asked for, there is no plan. The minimality proof is the count of
-// settings at each smaller depth, every one judged and none winning. Nothing here reads a clock.
+// settings at each smaller depth, every one judged and none winning. Feature 465 (R02-G17-05) T-R02G1705-002 adds
+// the same search from any phase vector (`plan(_:from:)`, the hints' entry); the certifying `plan(_:)` is that entry
+// at the level's starting phases. Nothing here reads a clock.
 
 /// A minimal plan of a level: its phase changes in body order, the settings judged at each smaller depth and the work.
 public struct CelestialEclipseLabPlan: Sendable, Equatable, Codable {
@@ -146,12 +148,30 @@ public enum CelestialEclipseLabSolver {
         }
     }
 
-    /// The minimal plan of `level` within `maxChanges` phase changes and `workBound` settings judged, or nil.
+    /// The minimal plan of `level` within `maxChanges` phase changes and `workBound` settings judged, or nil: the
+    /// search of ``plan(_:from:maxChanges:workBound:)`` from the level's starting phases.
     public static func plan(_ level: CelestialEclipseLabLevel, maxChanges: Int = maxChanges,
                             workBound: Int = workBound) -> CelestialEclipseLabPlan? {
+        plan(level, from: level.phases, maxChanges: maxChanges, workBound: workBound)
+    }
+
+    /// The minimal plan of `level` from the phase vector `start` (feature 465, R02-G17-05, T-R02G1705-002) within
+    /// `maxChanges` phase changes and `workBound` settings judged: the search of the file header with `start` in place
+    /// of the level's starting phases (depth d = 1, 2, …; the subsets of d movable bodies in lexicographic order, then
+    /// the new phases in lexicographic order, each different from the body's phase in `start`). A plan of no changes
+    /// (no settings by depth, work 1) when `start` already wins; its actions are the changes from `start`, in body
+    /// order. Nil when `start` has another length than the level's bodies or a phase outside its body's period, and
+    /// when no plan is found within `maxChanges` changes or the work bound is exceeded. At the level's starting phases
+    /// this is exactly ``plan(_:maxChanges:workBound:)``.
+    public static func plan(_ level: CelestialEclipseLabLevel, from start: [Int], maxChanges: Int = maxChanges,
+                            workBound: Int = workBound) -> CelestialEclipseLabPlan? {
+        guard start.count == level.bodies.count else { return nil }
+        for body in level.bodies.indices where start[body] < 0 || start[body] >= level.bodies[body].period {
+            return nil
+        }
         let table = Table(level)
         let movable: [Int] = level.bodies.indices.filter { !level.bodies[$0].fixed }
-        var phases: [Int] = level.phases
+        var phases: [Int] = start
         var work: Int = 1
         if table.wins(level, phases) { return CelestialEclipseLabPlan(actions: [], settingsByDepth: [], work: work) }
         var settingsByDepth: [Int] = [1]
@@ -176,13 +196,13 @@ public enum CelestialEclipseLabSolver {
                     return
                 }
                 let body: Int = chosen[position]
-                let start: Int = level.phases[body]
-                for offset in 0..<level.bodies[body].period where offset != start {
+                let given: Int = start[body]
+                for offset in 0..<level.bodies[body].period where offset != given {
                     phases[body] = offset
                     assign(position + 1)
                     if found != nil || over { break }
                 }
-                phases[body] = start
+                phases[body] = given
             }
 
             func subsets(_ from: Int) {
@@ -205,7 +225,7 @@ public enum CelestialEclipseLabSolver {
             if over { return nil }
             if let winning = found {
                 var actions: [CelestialEclipseLabAction] = []
-                for body in level.bodies.indices where winning[body] != level.phases[body] {
+                for body in level.bodies.indices where winning[body] != start[body] {
                     actions.append(.phase(body, winning[body]))
                 }
                 return CelestialEclipseLabPlan(actions: actions, settingsByDepth: settingsByDepth, work: work)
