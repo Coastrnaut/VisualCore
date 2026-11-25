@@ -21,8 +21,8 @@ Quickstart: [quickstart.md](quickstart.md).
 undo, redo and the tutorial dismissal; the kernel's actions are `CelestialEclipseLabAction.phase(body, offset)` and
 `.run`; `CelestialEclipseLabProgress` already has `record(level:actionsSpent:certified:mode:)`,
 `stars(actionsSpent:certified:)` and `actionsSpent(_:)`, and the adapter `certifiedChanges` (re-checked in the plan
-skill run, 2026-11-25); the shared `SavedStateStore` (VisualCorePersistence) writes atomically and refuses newer schemas; no new target
-is needed. Prerequisite: R02-G17-06 (the feedback plan `CelestialEclipseLabFeedbackPlan` and the presenter's sound
+skill run, 2026-11-25); the shared `SavedStateStore` (VisualCorePersistence) writes atomically and refuses newer
+schemas; no new target is needed. Prerequisite: R02-G17-06 (the feedback plan `CelestialEclipseLabFeedbackPlan` and the presenter's sound
 choice) is recorded first, as the ledger's gate order requires. **Language/Version**: Swift 6. **Primary
 dependencies**: the Celestial Eclipse Lab Core (play, records, progress, generator), VisualCoreExperience
 (`MigrationChain`, snapshots), VisualCorePersistence (the shared store). No new package, target, GLSL or VisualCore API;
