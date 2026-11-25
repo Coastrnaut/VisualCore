@@ -69,7 +69,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
   left"; goal "the predicted run wins") with
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabRulesTests.swift` (agreement with the
   play on 200 walks); `--name host-4`
-- [ ] T-R02G1701-006 [P] Create
+- [X] T-R02G1701-006 [P] Create — Verified 2026-11-25: 2026-11-25 CelestialEclipseLabInvariantTests pass (host-5 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabInvariantTests.swift` (agent D:
   `testCelestialEclipseLabTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
