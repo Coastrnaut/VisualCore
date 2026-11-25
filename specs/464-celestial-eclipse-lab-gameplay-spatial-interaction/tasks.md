@@ -105,7 +105,7 @@ shader material (the vertex-contract lesson of R02-G16-03 and R02-G17-03).
 - [X] T-R02G1704-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-25: 2026-11-25 reference-2 exit 0
 - [X] T-R02G1704-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-25: 2026-11-25 script-tests exit 0, run alone
 - [ ] T-R02G1704-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G1704-007)
-- [ ] T-R02G1704-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1704-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-25: 2026-11-25 /speckit-converge: converged (nothing appended); README row, feature count and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
