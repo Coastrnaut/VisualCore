@@ -901,5 +901,8 @@ Feature 456 (R02-G16-06) adds `StarlitCartoucheFeedbackPlan` (announcements and 
 support in the panel.
 Feature 457 (R02-G16-07) adds `StarlitCartoucheReconciliation` (winning traces, replayed and checked on restore),
 the replay mode (`replay.start`, `replay.step`, `replay.stop`), the saved sound setting and snapshot schema 3.
+Feature 458 (R02-G16-08) adds the regression net: the solver regression over all 100 levels, the code-only golden set
+`StarlitCartoucheGolden` with `golden-frames.json`, the simulator frame and memory checks and
+`scripts/starlit_cartouche_regression.py`.
 See
 [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).

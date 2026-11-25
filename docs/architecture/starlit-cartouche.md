@@ -207,3 +207,29 @@ from the ship's star in index order, waits 0 … 8, flyable ones only) for the l
   checks each step's fingerprint against the witness file (`StarlitCartoucheReplayCatalogTests`).
 - **Sound setting.** `settings.sound [0 … 1]` stores the sound choice in the snapshot (never the digest); the panel's
   Sound toggle sends it and the presenter applies the restored choice when the experience opens.
+
+## Regression net (feature 458, R02-G16-08)
+
+- **Solver regression.** For every one of the 100 certified levels the host tests check that the generated level equals
+  its witness's level, that the witness replays on a fresh play to a win on its last leg and not before, within the
+  budget, with its per-action fingerprints and digests, and that the breadth-first search re-plans exactly the
+  witness's legs with the same count of states one leg short (`statesByDepth[size − 1]`, the counterexample's
+  `states`), its work counted within the bound (never timed). The checks run in 10 groups of 10 levels (certifying a
+  level takes milliseconds). Thirteen kinds of alteration (a star's orbit or window, a corridor's ends, a hazard, the
+  range, the beacon, the deadline, a symbol stroke, the budget, a plan leg, a witness action, a per-action fingerprint
+  or digest, the counterexample's state count) are each detected and named with the level and the part
+  (`StarlitCartoucheRegressionSolverTests`).
+- **Golden frames.** `StarlitCartoucheGolden` (test builds only; excluded from Release) computes the code-only
+  description of 16 frames — levels 1, 21, 41, 61 and 81 at the three tiers after all of the witness's legs but the last
+  with the default choice, plus the hero frame — at 1,152 × 768: the choice, projected star centres at the current beat,
+  the ship, the beacon, every flown leg's trail midpoint and the first actions bar to 1/8 pixel (null when a point does
+  not project inside the frame), the element counts and the 22 palette colours, hashed with SHA-256 and pinned in
+  `golden-frames.json`. A changed description fails until the file is rewritten on purpose with
+  `STARLIT_CARTOUCHE_WRITE_GOLDEN=1`; the simulator renders the 16 frames and checks them against the descriptions with
+  the feature-453 tolerances. A frame may show the whole symbol drawn while the level is still open (level 41 draws its
+  three strokes before the leg to the beacon).
+- **Memory.** Twelve open-draw-warn-close cycles stay within 16 MB of the first (asserted when the class runs alone;
+  28.61 MB to 29.11 MB on the iOS 27.2 simulator on 2026-11-25), and the chart scene holds no GPU objects after each
+  close and memory warning.
+- **CI and local command.** The `round02-host-tests` job runs the host part as "Starlit Cartouche regression (host)";
+  `python3 scripts/starlit_cartouche_regression.py` runs the host and simulator parts with one summary.
