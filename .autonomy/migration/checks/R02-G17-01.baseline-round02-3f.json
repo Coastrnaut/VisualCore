@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "EchoCartographer|ColorfallCanyons|StarlitCartouche"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'EchoCartographer|ColorfallCanyons|StarlitCartouche'",
+  "elapsed_seconds": 363.281,
+  "exit_code": 0,
+  "finished": "2026-11-25T11:17:59+00:00",
+  "gate": "R02-G17-01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G17-01.baseline-round02-3f.log",
+  "log_sha256": "39960f725b1c602b745f84f89417de2375c6a4026f05c030bffd7a36a19cee28",
+  "name": "baseline-round02-3f",
+  "started": "2026-11-25T11:11:55+00:00",
+  "timed_out": false
+}
