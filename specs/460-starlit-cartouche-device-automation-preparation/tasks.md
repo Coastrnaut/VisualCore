@@ -8,7 +8,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1610-001 Baselines after R02-G16-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1610-001 Baselines after R02-G16-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host and round02-1, -2, -3c, -3e, -3f exit 0; baseline-timing printed bounds above its asserts (process tree at background priority PRI 4, VisualCore unchanged), host scheduling, not code; rendering baseline is R02-G16-09's runs
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the round-two chunks of feature 457; no Swift changes follow; the
   rendering baseline is R02-G16-09's runs)
 
