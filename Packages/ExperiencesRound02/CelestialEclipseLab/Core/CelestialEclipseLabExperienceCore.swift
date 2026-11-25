@@ -27,7 +27,8 @@
 //                            else `failed` with its failure;
 //   play.undo, play.redo     the kernel's exact undo and redo (`r02-g17.action` when there is nothing to undo or redo;
 //                            undo works in a failed play and returns it to playing; a won play is final);
-//   level.next               the next certified level (100 wraps to 1) with a fresh play;
+//   level.next               the next certified level with a fresh play (since feature 465 the next open level; see
+//                            below);
 //   orbit.choose [0…5]       chooses the shown body (presentation only; accepted in every stage); a body the level
 //                            lacks is refused `r02-g17.choice` without touching the kernel;
 //   clock.show [0…95]        shows the sky at a tick (presentation only; accepted in every stage); a tick outside
@@ -40,10 +41,10 @@
 // refusal (`CelestialEclipseLabError`) becomes `.rule(code: error.reasonCode)`. A refused action changes nothing, the
 // chosen body and the shown tick included.
 //
-// Digest ("r02-g17.celestial-eclipse-lab.v1"): the level number and the play's fingerprint (not its record history, so
-// undo restores the earlier digest exactly); never the chosen body, the shown tick, the quality tier or a time.
-// Snapshot schema 1: the JSON object `{"level", "records"}` with sorted keys; restoring replays the records on a fresh
-// play of that level (`CelestialEclipseLabPlay.replay`), resets the presentation state and throws
+// Digest ("r02-g17.celestial-eclipse-lab.v1" until feature 465): the level number and the play's fingerprint (not its
+// record history, so undo restores the earlier digest exactly); never the chosen body, the shown tick, the quality tier
+// or a time. Snapshot schema 1: the JSON object `{"level", "records"}` with sorted keys; restoring replays the records
+// on a fresh play of that level (`CelestialEclipseLabPlay.replay`), resets the presentation state and throws
 // `CelestialEclipseLabRestoreRefusal` for a damaged payload, a level number outside 1 … 100 or a trace the kernel
 // refuses (a record of a newer schema or of another level's seed among them). An envelope of a newer schema is refused
 // by the engine before the core sees it.
@@ -52,13 +53,41 @@
 // may rise). Host tier `t` draws `CelestialEclipseLabTier.of(t)`: level-0 = body spheres of 24 × 16 segments, 2 glow
 // shells; level-1 = 16 × 12 segments, 1 glow shell; level-2 = flat 20-sided discs, no glow. Outcome: `won` or `failed`
 // while the play is in that stage, else nil. Rules use integers only.
+//
+// Feature 465 (R02-G17-05) T-R02G1705-004 (FR-R02G1705-001, 004 … 006; clarifications Q3–Q5): the core also holds the
+// player's progress (`CelestialEclipseLabProgress`: won levels with the least actions spent and stars, the open
+// frontier), the mode (campaign, practice with the budget raised to the kernel's maximum 24, daily) and the tutorial
+// step (`CelestialEclipseLabTutorialStep`). No level is ever gated by payment: a locked level is one not yet unlocked
+// (FR-R02G1705-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g17.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g17.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 24 (a copy of the level);
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing a level or a mode drops the left level's records (the play starts fresh with the default presentation).
+// `level.next` moves to the next open level in campaign mode and is refused with `r02-g17.locked` when there is none
+// (100 does not wrap). A win (the play reaching `won` on an accepted run or redo) records
+// `progress.record(level:actionsSpent:certified:mode:)` with the actions spent (`CelestialEclipseLabProgress
+// .actionsSpent`: every phase-change record, undone ones included) against the certified witness's phase-change count
+// (`certifiedChanges`, the certified plan's size): campaign opens the next level, daily records the level's best result
+// and stars and opens nothing, practice records nothing. The tutorial starts at
+// `CelestialEclipseLabTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and is advanced after
+// every accepted phase change, run, undo and redo by `advanced(afterChange:ended:)` (afterChange for a phase change;
+// ended when the play is won or failed — an undo never ends it, a redo only when it restores a won or failed moment),
+// never back; `orbit.choose` and `clock.show` never move it. The chosen body and the shown tick stay presentation.
+// Digest "r02-g17.celestial-eclipse-lab.v2": level, play fingerprint, progress and mode (never the tutorial step, the
+// chosen body or the shown tick). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}` with
+// sorted keys; schema-1 payloads migrate (no won levels, level 1 open plus the levels up to the restored level,
+// campaign mode, the tutorial at its first step — `phase` on the tutorial levels, else `done`); an envelope of a newer
+// schema is refused.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCorePersistence
 
-/// The rule codes of Celestial Eclipse Lab's adapter refusals (feature 463).
+/// The rule codes of Celestial Eclipse Lab's adapter refusals (feature 463; `locked` and `date` since feature 465).
 public enum CelestialEclipseLabExperienceRule {
     /// A value that must be a whole number (a body, an offset or a tick) and is not.
     public static let notWhole = "r02-g17.not-whole"
@@ -66,11 +95,16 @@ public enum CelestialEclipseLabExperienceRule {
     public static let choice = "r02-g17.choice"
     /// A shown tick outside 0 … horizon − 1 of the level (`clock.show`).
     public static let tick = "r02-g17.tick"
+    /// A level that is not open yet, or no next open level (feature 465). Never a payment gate.
+    public static let locked = "r02-g17.locked"
+    /// An impossible calendar date (`mode.daily`, feature 465).
+    public static let date = "r02-g17.date"
 }
 
 /// Why a saved Celestial Eclipse Lab state was refused on restore (feature 463). A refused restore changes nothing.
 public enum CelestialEclipseLabRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress, the mode or the
+    /// tutorial step is invalid (feature 465).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -78,17 +112,20 @@ public enum CelestialEclipseLabRestoreRefusal: Error, Equatable, Sendable {
     case kernel(CelestialEclipseLabError)
 }
 
-/// The state of Celestial Eclipse Lab as an experience (see the file header). Snapshot schema 1.
+/// The state of Celestial Eclipse Lab as an experience (see the file header). Snapshot schema 2.
 public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g17.celestial-eclipse-lab"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g17.celestial-eclipse-lab.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g17.celestial-eclipse-lab.v2"
     /// The action ids in declaration order.
     public static let actionIDs = ["orbit.phase", "clock.run", "play.undo", "play.redo", "level.next", "orbit.choose",
-                                   "clock.show"]
+                                   "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                                   "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`CelestialEclipseLabMode.practiceBudget`, 24).
+    public static let practiceBudget: Int = CelestialEclipseLabMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a body: the most bodies any level has (`CelestialEclipseLabLevel.bodyCounts`, 0 … 5).
@@ -106,30 +143,61 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: CelestialEclipseLabPlay
+    /// The player's progress (feature 465): in the digest and the snapshot.
+    public private(set) var progress: CelestialEclipseLabProgress
+    /// The mode (feature 465): in the digest and the snapshot.
+    public private(set) var mode: CelestialEclipseLabMode
+    /// The tutorial step (feature 465): in the snapshot and `==`, not in the digest.
+    public private(set) var tutorial: CelestialEclipseLabTutorialStep
+    /// The certified witness's phase-change count of the current level (its certified plan's size), against which a
+    /// win's stars are counted. Derived from the level number.
+    public private(set) var certifiedChanges: Int
     /// The chosen body, one the level has; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var chosenBody: Int
     /// The shown tick, 0 … horizon − 1; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var shownTick: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: CelestialEclipseLabPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber` with the default presentation (the default body, tick 0), whose
-    /// reset returns to `openingPlay` of `openingNumber`.
-    init(levelNumber: Int, play: CelestialEclipseLabPlay, openingNumber: Int, openingPlay: CelestialEclipseLabPlay) {
+    /// What a reset restores (feature 465).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: CelestialEclipseLabPlay
+        /// The opening progress: level 1 open plus the levels up to the opening level, none won.
+        let progress: CelestialEclipseLabProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: CelestialEclipseLabTutorialStep
+        /// The opening level's certified witness phase-change count.
+        let certifiedChanges: Int
+    }
+
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial` and the default
+    /// presentation (the default body, tick 0), whose reset returns to `opening` of `openingNumber`.
+    init(levelNumber: Int, play: CelestialEclipseLabPlay, progress: CelestialEclipseLabProgress,
+         mode: CelestialEclipseLabMode, tutorial: CelestialEclipseLabTutorialStep, certifiedChanges: Int,
+         openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedChanges = certifiedChanges
         self.chosenBody = CelestialEclipseLabSceneSnapshot.defaultChoice(play.level)
         self.shownTick = 0
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
+
+    /// The difficulty band (1 … 5) of the current level: 20 levels per band, the certified difficulty bands
+    /// (`CelestialEclipseLabProgress.band(of:)`; feature 465).
+    public var band: Int { CelestialEclipseLabProgress.band(of: levelNumber) }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
     public static func levelNumber(forSeed seed: UInt64) -> Int {
@@ -216,14 +284,42 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
         return play
     }
 
-    /// The opening state of manifest number `number`: a play begun and past its tutorial, ready to accept actions,
-    /// with the default body chosen and tick 0 shown.
+    /// The practice copy of `level` (feature 465): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: CelestialEclipseLabLevel)
+        throws(CelestialEclipseLabError) -> CelestialEclipseLabLevel {
+        try CelestialEclipseLabLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, bodies: level.bodies,
+                                     horizon: level.horizon, target: level.target, phases: level.phases,
+                                     budget: CelestialEclipseLabMode.practice.budget(base: level.budget),
+                                     tutorial: level.tutorial)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: CelestialEclipseLabGenerated, mode: CelestialEclipseLabMode)
+        throws(CelestialEclipseLabError) -> CelestialEclipseLabLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
+    /// accept actions, with the default body chosen and tick 0 shown; campaign mode, level 1 open plus the levels up to
+    /// `number`, none won, the tutorial at its first step (feature 465).
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(CelestialEclipseLabError) -> CelestialEclipseLabExperienceCore {
-        let play: CelestialEclipseLabPlay = try freshPlay(of: try level(number: number))
-        return CelestialEclipseLabExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                                 openingPlay: play)
+        let certified: CelestialEclipseLabGenerated = try generated(number: number)
+        let play: CelestialEclipseLabPlay = try freshPlay(of: certified.level)
+        var progress: CelestialEclipseLabProgress = CelestialEclipseLabProgress()
+        progress.open(through: number)
+        let tutorial: CelestialEclipseLabTutorialStep = CelestialEclipseLabTutorialStep.initial(level: number)
+        let changes: Int = certified.plan.size
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial, certifiedChanges: changes)
+        return CelestialEclipseLabExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                                 tutorial: tutorial, certifiedChanges: changes, openingNumber: number,
+                                                 opening: opening)
     }
 
     /// Sets the presentation to the default: the lowest-numbered movable body
@@ -278,16 +374,44 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the chosen body, the shown tick, the quality tier or the
-    /// opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the chosen body,
+    /// the shown tick, the quality tier or the opening level).
     public static func == (lhs: CelestialEclipseLabExperienceCore, rhs: CelestialEclipseLabExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 465): no won levels with level 1 open
+    /// plus the levels up to the restored level, campaign mode, no tutorial key (restore starts the tutorial at its
+    /// first step: `phase` on the tutorial levels 1 … 3, else `done`).
+    ///
+    /// - Throws: ``CelestialEclipseLabRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw CelestialEclipseLabRestoreRefusal.damaged
+        }
+        var progress: CelestialEclipseLabProgress = CelestialEclipseLabProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(CelestialEclipseLabMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the ranges of the file header as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -298,6 +422,11 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "level.next"),
         ExperienceControl(id: "orbit.choose", ranges: [declared(bodyRange)]),
         ExperienceControl(id: "clock.show", ranges: [declared(tickRange)]),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(CelestialEclipseLabProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -305,7 +434,8 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The seven controls with their declared ranges (see the file header); run, undo, redo and next take no values.
+    /// The twelve controls with their declared ranges (see the file header); `clock.run`, `play.undo`, `play.redo`,
+    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with the default presentation; no clock is read.
@@ -343,12 +473,18 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
             case "orbit.phase":
                 // The chosen body and the shown tick stay (presentation of the same level).
                 try play.apply(.phase(values[0], values[1]), expecting: play.fingerprint)
+                advanceTutorial(afterChange: true)
             case "clock.run":
                 try play.apply(.run, expecting: play.fingerprint)
+                advanceTutorial(afterChange: false)
+                recordIfWon()
             case "play.undo":
                 try play.undo()
+                advanceTutorial(afterChange: false)
             case "play.redo":
                 try play.redo()
+                advanceTutorial(afterChange: false)
+                recordIfWon()
             case "orbit.choose":
                 // Presentation only: the play and the digest do not change, and the kernel is not consulted.
                 guard values[0] < play.level.bodies.count else {
@@ -361,12 +497,28 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
                     return .rejected(.rule(code: CelestialEclipseLabExperienceRule.tick))
                 }
                 shownTick = values[0]
-            default:   // level.next
-                let next: Int = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh: CelestialEclipseLabPlay = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
-                resetPresentation()
+            case "level.next":
+                guard let next = progress.nextOpen(after: levelNumber) else {
+                    return .rejected(.rule(code: CelestialEclipseLabExperienceRule.locked))
+                }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(values[0]) else {
+                    return .rejected(.rule(code: CelestialEclipseLabExperienceRule.locked))
+                }
+                try open(number: values[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = CelestialEclipseLabProgress.dailyLevel(year: values[0], month: values[1],
+                                                                         day: values[2]) else {
+                    return .rejected(.rule(code: CelestialEclipseLabExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            default:   // tutorial.dismiss
+                tutorial = tutorial.dismissed()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
@@ -380,11 +532,49 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose with the default presentation; the quality tier, which is
-    /// not state, is kept.
+    /// Advances the tutorial step after an accepted phase change, run, undo or redo
+    /// (`CelestialEclipseLabTutorialStep.advanced(afterChange:ended:)`): `afterChange` for a phase change, ended when
+    /// the play is won or failed (never after an undo, which always lands on a moment before the end; after a redo only
+    /// when it restores a won or failed moment). Never back.
+    private mutating func advanceTutorial(afterChange: Bool) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterChange: afterChange, ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's first
+    /// tutorial step and the default presentation; the records of the level left are dropped. Changes nothing when the
+    /// kernel refuses.
+    private mutating func open(number: Int, mode: CelestialEclipseLabMode) throws(CelestialEclipseLabError) {
+        let certified: CelestialEclipseLabGenerated = try Self.generated(number: number)
+        let fresh: CelestialEclipseLabPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedChanges = certified.plan.size
+        tutorial = CelestialEclipseLabTutorialStep.initial(level: number)
+        resetPresentation()
+    }
+
+    /// After an accepted action that won the play: records the actions spent
+    /// (`CelestialEclipseLabProgress.actionsSpent(_:)`) against the certified witness's phase-change count in the
+    /// current mode (campaign opens the next level; daily records the best result and stars and opens nothing;
+    /// practice records nothing). A won play is final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        _ = progress.record(level: levelNumber, actionsSpent: CelestialEclipseLabProgress.actionsSpent(play),
+                            certified: certifiedChanges, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode, the default presentation); the
+    /// quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedChanges = opening.certifiedChanges
         resetPresentation()
     }
 
@@ -397,37 +587,48 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g17.celestial-eclipse-lab.v1", then the level number and the play's fingerprint (actions spent, failure,
-    /// level, phases, stage).
+    /// "r02-g17.celestial-eclipse-lab.v2", then the level number, the play's fingerprint (actions spent, failure,
+    /// level, phases, stage), the progress and the mode (their sorted JSON); never the tutorial step, the chosen body
+    /// or the shown tick.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly; never the
-        // chosen body or the shown tick (presentation).
+        // chosen body or the shown tick (presentation) or the tutorial step.
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: CelestialEclipseLabMode
+        /// The progress.
+        var progress: CelestialEclipseLabProgress
         /// The play's records.
         var records: [CelestialEclipseLabRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: CelestialEclipseLabTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level, with the default presentation;
-    /// a reset returns to the level `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), with the default
+    /// presentation; a reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``CelestialEclipseLabRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level
+    /// - Throws: ``CelestialEclipseLabRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or
+    ///   tutorial step, or a daily mode naming another level among them), a level number outside 1 … 100 or a level
     ///   or trace the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> CelestialEclipseLabExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
@@ -436,16 +637,21 @@ public struct CelestialEclipseLabExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw CelestialEclipseLabRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw CelestialEclipseLabRestoreRefusal.damaged
+        }
         do throws(CelestialEclipseLabError) {
-            let saved: CelestialEclipseLabLevel = try level(number: decoded.level)
-            let play: CelestialEclipseLabPlay = try CelestialEclipseLabPlay.replay(level: saved,
-                                                                                   records: decoded.records)
-            let openingNumber: Int = levelNumber(forSeed: seed)
-            let openingPlay: CelestialEclipseLabPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
+            let certified: CelestialEclipseLabGenerated = try generated(number: decoded.level)
+            let play: CelestialEclipseLabPlay = try CelestialEclipseLabPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: CelestialEclipseLabTutorialStep = decoded.tutorial
+                ?? CelestialEclipseLabTutorialStep.initial(level: decoded.level)
+            let openingCore: CelestialEclipseLabExperienceCore = try opening(number: levelNumber(forSeed: seed))
             return CelestialEclipseLabExperienceCore(levelNumber: decoded.level, play: play,
-                                                     openingNumber: openingNumber, openingPlay: openingPlay)
+                                                     progress: decoded.progress, mode: decoded.mode,
+                                                     tutorial: tutorial, certifiedChanges: certified.plan.size,
+                                                     openingNumber: openingCore.openingNumber,
+                                                     opening: openingCore.opening)
         } catch {
             throw CelestialEclipseLabRestoreRefusal.kernel(error)
         }

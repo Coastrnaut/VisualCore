@@ -9,18 +9,25 @@
 // one and nothing to undo or redo, `r02-g17.budget` and `r02-g17.stage`; `stale` cannot arise because every action
 // names the current fingerprint); undo restores the earlier digest exactly and redo the later one; `orbit.choose` and
 // `clock.show` change the snapshot but never the digest, the play or the payload, a phase change, the run, undo and
-// redo keep them, and `level.next`, reset and restore return them to the default; the certified plan of level 1 wins
-// through the adapter and a run from the opening fails, undo returning the failed play to playing; `level.next` wraps
-// 100 to 1 and reset returns; the snapshot round trip and refused payloads (damaged, level out of range, a trace of
-// another level, a record of a newer schema, an edited trace, an envelope of a newer schema); the certified-candidate
-// table equals the generator's search for three levels and the 100 stored witnesses' `skipped`; `snapshot(time:)`
-// copies the play. Levels are certified once per process, so the run stays short. Explicit types, plain loops,
-// single-literal comments.
+// redo keep them, and a new opening (a mode or a level), reset and restore return them to the default; the certified
+// plan of level 1 wins through the adapter and a run from the opening fails, undo returning the failed play to playing;
+// `level.next` needs an open level (no wrap) and reset returns; the snapshot round trip and refused payloads (damaged,
+// level out of range, a trace of another level, a record of a newer schema, an edited trace, an envelope of a newer
+// schema); the certified-candidate table equals the generator's search for three levels and the 100 stored witnesses'
+// `skipped`; `snapshot(time:)` copies the play. Levels are certified once per process, so the run stays short.
+// Explicit types, plain loops, single-literal comments.
+// Feature 465 (R02-G17-05) T-R02G1705-004: schema 2 and digest v2, twelve controls, `level.next` to the next open level
+// (no wrap; `r02-g17.locked` when none), and `CelestialEclipseLabProgressionCoreTests` below: the progression controls
+// and their refusals, campaign stars and unlocks, practice (budget 24, no stars, no unlocks), a locked daily level
+// played without opening it, progress and mode digested but never the tutorial step or the presentation, the tutorial
+// steps after changes, runs, undo, redo and dismissal, the schema-2 round trip, the migration of a schema-1 payload
+// and the refusal of a newer schema.
 import Foundation
 import Testing
 @testable import CelestialEclipseLabCore
 import VisualCoreDiagnostics
 import VisualCoreExperience
+import VisualCorePersistence
 import VisualCoreSimulation
 
 /// The repository's witness directory, found from this file (five levels up: CoreTests, CelestialEclipseLab, the
@@ -76,13 +83,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
 
     @Test func conformance() async throws {
         let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
-        // Levels 1 and 3 (then 2 and 4). Level 1's certified plan starts with body 1 to offset 2; the run from the
-        // starting phases fails and is undone.
+        // Levels 1 and 3. Level 1's certified plan starts with body 1 to offset 2; the run from the starting phases
+        // fails and is undone; practice reopens the level with the budget raised to 24 (feature 465: `level.next`
+        // needs the next level open).
         let actions: [ScriptedAction] = [ScriptedAction("orbit.phase", [1, 2]), ScriptedAction("play.undo"),
                                          ScriptedAction("play.redo"), ScriptedAction("orbit.choose", [2]),
                                          ScriptedAction("clock.show", [10]), ScriptedAction("play.undo"),
                                          ScriptedAction("clock.run"), ScriptedAction("play.undo"),
-                                         ScriptedAction("level.next"), ScriptedAction("orbit.choose", [0]),
+                                         ScriptedAction("mode.practice"), ScriptedAction("orbit.choose", [0]),
                                          ScriptedAction("clock.show", [5]), ScriptedAction("orbit.phase", [1, 0]),
                                          ScriptedAction("play.undo")]
         // Refused on the openings of levels 1 and 3 (3 bodies, body 0 fixed, body 1 at phase 3 with period 8 or 4,
@@ -113,7 +121,13 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
                                           ScriptedAction("clock.show"),
                                           ScriptedAction("play.undo"), ScriptedAction("play.redo"),
                                           ScriptedAction("clock.run", [1]), ScriptedAction("level.next", [1]),
-                                          ScriptedAction("bogus")]
+                                          ScriptedAction("level.next"), ScriptedAction("level.select", [4]),
+                                          ScriptedAction("level.select", [0]), ScriptedAction("level.select"),
+                                          ScriptedAction("mode.daily", [2026, 2, 30]),
+                                          ScriptedAction("mode.daily", [2026, 13, 1]),
+                                          ScriptedAction("mode.daily", [2026, 1]),
+                                          ScriptedAction("mode.practice", [1]), ScriptedAction("mode.campaign", [1]),
+                                          ScriptedAction("tutorial.dismiss", [1]), ScriptedAction("bogus")]
         let plan = ConformancePlan(seeds: [0, 2], stepsPerSegment: 2, actions: actions, rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
         #expect(report.entries.count == ConformanceCheck.allCases.count)
@@ -124,19 +138,22 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g17.celestial-eclipse-lab" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g17.celestial-eclipse-lab.v1")
+        #expect(Core.experienceID == "r02-g17.celestial-eclipse-lab" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g17.celestial-eclipse-lab.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["orbit.phase", "clock.run", "play.undo", "play.redo", "level.next", "orbit.choose",
-                             "clock.show"]
+                             "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                             "tutorial.dismiss"]
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [0...5, 0...23])
         #expect(Core.controls[5].ranges == [0...5])
         #expect(Core.controls[6].ranges == [0...95])
-        let plainIndices: [Int] = [1, 2, 3, 4]
+        #expect(Core.controls[7].ranges == [1...100])
+        #expect(Core.controls[8].ranges == [1...9999, 1...12, 1...31])
+        let plainIndices: [Int] = [1, 2, 3, 4, 9, 10, 11]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == CelestialEclipseLabTier.all.count)
-        #expect(Core.migrations.currentVersion == 1)
+        #expect(Core.migrations.currentVersion == 2)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == CelestialEclipseLabTier.all.map(\.name))
@@ -151,6 +168,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(CelestialEclipseLabExperienceRule.notWhole == "r02-g17.not-whole")
         #expect(CelestialEclipseLabExperienceRule.choice == "r02-g17.choice")
         #expect(CelestialEclipseLabExperienceRule.tick == "r02-g17.tick")
+        #expect(CelestialEclipseLabExperienceRule.locked == "r02-g17.locked")
+        #expect(CelestialEclipseLabExperienceRule.date == "r02-g17.date")
+        #expect(Core.practiceBudget == 24)
         #expect(Core.wonCode == "won" && Core.failedCode == "failed")
     }
 
@@ -172,6 +192,11 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
             #expect(first.play.records.count == opening && !first.play.canUndo)
             #expect(first.play.actionsLeft == expected.budget && first.qualityTier == 0)
             #expect(Self.holdsDefault(first) && !expected.bodies[first.chosenBody].fixed)
+            // Feature 465: campaign mode, level 1 open plus the levels up to the opening one, none won.
+            #expect(first.mode == .campaign && first.progress.frontier == numbers[index])
+            let certified: Int = try Core.generated(number: numbers[index]).plan.size
+            #expect(first.progress.solved.isEmpty && first.certifiedChanges == certified)
+            #expect(first.tutorial == CelestialEclipseLabTutorialStep.initial(level: numbers[index]))
         }
         // Level 1: body 0 is fixed, so body 1 is chosen.
         let one: Core = try await Core.prepare(seed: 0)
@@ -367,8 +392,11 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         // A refused phase change keeps the presentation.
         #expect(probe.apply(Self.act("orbit.phase", [1, 2])) == action)
         #expect(probe.chosenBody == 2 && probe.shownTick == 7)
-        #expect(probe.apply(Self.act("level.next")) == .accepted && probe.levelNumber == 2)
-        #expect(probe.play.stage == .playing && probe.play.actionsLeft == probe.play.level.budget)
+        // Feature 465: `level.next` needs the next level open; level 2 is not open until level 1 is won.
+        #expect(probe.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g17.locked")))
+        #expect(probe.chosenBody == 2 && probe.shownTick == 7 && probe.levelNumber == 1)
+        #expect(probe.apply(Self.act("mode.practice")) == .accepted && probe.levelNumber == 1)
+        #expect(probe.play.stage == .playing && probe.play.actionsLeft == Core.practiceBudget)
         #expect(Self.holdsDefault(probe))
     }
 
@@ -442,7 +470,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(core.apply(Self.act("orbit.choose", [4])) == .rejected(.rule(code: "r02-g17.choice")))
         #expect(core.apply(Self.act("clock.show", [40])) == .rejected(.rule(code: "r02-g17.tick")))
         #expect(core.chosenBody == chosen.body && core.snapshot(time: 1).shownTick == chosen.tick)
-        // Reset, restore and level.next return to the default.
+        // Reset, restore and a new opening (here practice; since feature 465 `level.next` needs the next level open)
+        // return to the default.
         var reset: Core = core
         reset.reset()
         let opened: Core = try Core.opening(number: 1)
@@ -450,16 +479,25 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
         #expect(restored == core && Self.holdsDefault(restored))
         var next: Core = core
-        #expect(next.apply(Self.act("level.next")) == .accepted)
+        #expect(next.apply(Self.act("mode.practice")) == .accepted)
         #expect(Self.holdsDefault(next))
     }
 
-    @Test func levelNextWrapsAndResetReturns() async throws {
+    @Test func levelNextNeedsAnOpenLevelAndResetReturns() async throws {
         var core: Core = try await Core.prepare(seed: 99)
         #expect(core.levelNumber == 100)
-        let first: CelestialEclipseLabAction = try #require(try Core.generated(number: 100).plan.actions.first)
+        let hundred: CelestialEclipseLabGenerated = try Core.generated(number: 100)
+        let first: CelestialEclipseLabAction = try #require(hundred.plan.actions.first)
         #expect(core.apply(Self.act(first)) == .accepted)
-        #expect(core.apply(Self.act("level.next")) == .accepted)
+        // Feature 465: no wrap; after winning level 100, `level.next` is still refused and level 1 is chosen with
+        // `level.select`.
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g17.locked")))
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for step in hundred.plan.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.apply(Self.act("clock.run")) == .accepted)
+        #expect(core.play.stage == .won && core.progress.solved[100] != nil && core.progress.frontier == 100)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g17.locked")))
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         #expect(core.levelNumber == 1 && core.play.stage == .playing && !core.play.canUndo)
         #expect(core.play.level == (try Core.level(number: 1)))
         #expect(Self.holdsDefault(core))
@@ -485,7 +523,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let savedDigest: StateDigest = try Self.digest(core)
         let payload: Data = try core.snapshotPayload()
         let text: String = String(decoding: payload, as: UTF8.self)
-        #expect(text.hasPrefix("{\"level\":21,\"records\":["))
+        let prefix: String = "{\"level\":21,\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":21,"
+        #expect(text.hasPrefix(prefix))
         let restored: Core = try Core.restore(payload: payload, seed: 20)
         let restoredDigest: StateDigest = try Self.digest(restored)
         #expect(restored == core && restoredDigest == savedDigest)
@@ -516,11 +555,17 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(throws: CelestialEclipseLabRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":\"21\",\"records\":[]}".utf8), seed: 20)
         }
+        // A schema-1 object is no schema-2 payload (the engine migrates it first).
+        #expect(throws: CelestialEclipseLabRestoreRefusal.damaged) {
+            try Core.restore(payload: Data("{\"level\":21,\"records\":[]}".utf8), seed: 20)
+        }
+        let rest: String = ",\"mode\":{\"mode\":\"campaign\"},"
+            + "\"progress\":{\"frontier\":1,\"solved\":[]},\"records\":[]}"
         #expect(throws: CelestialEclipseLabRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":0" + rest).utf8), seed: 20)
         }
         #expect(throws: CelestialEclipseLabRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":101" + rest).utf8), seed: 20)
         }
         // A trace of level 21 restored as level 22 (another seed).
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "{\"level\":21,", with: "{\"level\":22,").utf8)
@@ -551,14 +596,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "orbit.phase", values: [1, 2]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -591,5 +636,513 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(snapshot.horizon == level.horizon && snapshot.shownTick == 9 && snapshot.chosenBody == 3)
         #expect(snapshot.levelNumber == 41 && snapshot.time == 2.5)
         #expect(core.renderTier == CelestialEclipseLabTier.of(0))
+    }
+}
+
+/// Feature 465 (R02-G17-05) T-R02G1705-004 (FR-R02G1705-001, 004 … 006; clarifications Q3–Q5): the adapter's teaching
+/// and progression, modelled on feature 455's Starlit Cartouche adapter tests. Level facts used: level 1's certified
+/// plan is body 1 to offset 2 then body 2 to offset 0, followed by the run (budget 9); the run from any opening fails
+/// (a valid level never wins without a phase change); levels 1 … 3 carry the tutorial; the daily level of 2026-11-18 is
+/// level 10 and of 2026-01-01 level 1. Explicit types, plain loops, no wall-clock asserts.
+@Suite struct CelestialEclipseLabProgressionCoreTests {
+    typealias Core = CelestialEclipseLabExperienceCore
+
+    /// The digest of `core` as the engine computes it.
+    static func digest(_ core: Core) throws -> StateDigest {
+        var builder = DigestBuilder(domain: Core.experienceID)
+        try core.writeDigest(into: &builder)
+        return builder.finish()
+    }
+
+    /// An action of `control` with `values`.
+    static func act(_ control: String, _ values: [Double] = []) -> ExperienceAction {
+        ExperienceAction(control: control, values: values, step: 0)
+    }
+
+    /// The adapter action of a kernel action.
+    static func act(_ action: CelestialEclipseLabAction) -> ExperienceAction {
+        switch action {
+        case let .phase(body, offset): act("orbit.phase", [Double(body), Double(offset)])
+        case .run: act("clock.run")
+        }
+    }
+
+    /// The certified plan's phase changes of level `number` (the run not included).
+    static func plan(_ number: Int) throws -> [CelestialEclipseLabAction] {
+        try Core.generated(number: number).plan.actions
+    }
+
+    /// Applies the certified plan of `core`'s level and the run; whether every action was accepted.
+    static func win(_ core: inout Core) throws -> Bool {
+        var accepted: Bool = true
+        for step in try plan(core.levelNumber) + [.run] {
+            accepted = accepted && core.apply(act(step)) == .accepted
+        }
+        return accepted && core.play.stage == .won
+    }
+
+    /// A daily date of 2026 whose daily level is not a tutorial level (4 … 100) and not open on a fresh opening of
+    /// level 1, with that level; the level is computed with `CelestialEclipseLabProgress.dailyLevel`.
+    static func plainDaily() throws -> (date: [Double], level: Int) {
+        let date: [Double] = [2026, 11, 18]
+        let level: Int = try #require(CelestialEclipseLabProgress.dailyLevel(year: 2026, month: 11, day: 18))
+        try #require(level > CelestialEclipseLabTutorialStep.tutorialLevels.upperBound)
+        return (date, level)
+    }
+
+    /// The schema-1 object `{"level", "records"}` of `core`.
+    static func schemaOne(_ core: Core) throws -> [String: Any] {
+        let records: Data = try Core.payloadEncoder().encode(core.play.records)
+        let recordsObject: Any = try JSONSerialization.jsonObject(with: records)
+        return ["level": core.levelNumber, "records": recordsObject]
+    }
+
+    @Test func theProgressionControlsRefuseWhatTheyMust() async throws {
+        let core: Core = try await Core.prepare(seed: 0)
+        let opening: StateDigest = try Self.digest(core)
+        let locked: ActionResult = .rejected(.rule(code: CelestialEclipseLabExperienceRule.locked))
+        let date: ActionResult = .rejected(.rule(code: CelestialEclipseLabExperienceRule.date))
+        let notWhole: ActionResult = .rejected(.rule(code: CelestialEclipseLabExperienceRule.notWhole))
+        #expect(locked == .rejected(.rule(code: "r02-g17.locked")) && date == .rejected(.rule(code: "r02-g17.date")))
+        let actions: [ExperienceAction] = [
+            Self.act("level.select", [2]), Self.act("level.select", [100]), Self.act("level.select", [0]),
+            Self.act("level.select", [101]), Self.act("level.select", [1.5]), Self.act("level.select", []),
+            Self.act("mode.daily", [0, 1, 1]), Self.act("mode.daily", [2026, 13, 1]),
+            Self.act("mode.daily", [2026, 1, 32]), Self.act("mode.daily", [2026, 2, 30]),
+            Self.act("mode.daily", [2025, 2, 29]), Self.act("mode.daily", [2026, 4, 31]),
+            Self.act("mode.daily", [2026, 1.5, 1]), Self.act("mode.daily", [2026, 1]),
+            Self.act("mode.practice", [1]), Self.act("mode.campaign", [1]), Self.act("tutorial.dismiss", [1]),
+            Self.act("level.next"),
+        ]
+        let expected: [ActionResult] = [
+            locked, locked, .rejected(.outOfRange(index: 0)),
+            .rejected(.outOfRange(index: 0)), notWhole, .rejected(.wrongValueCount(expected: 1, found: 0)),
+            .rejected(.outOfRange(index: 0)), .rejected(.outOfRange(index: 1)),
+            .rejected(.outOfRange(index: 2)), date,
+            date, date,
+            notWhole, .rejected(.wrongValueCount(expected: 3, found: 2)),
+            .rejected(.wrongValueCount(expected: 0, found: 1)), .rejected(.wrongValueCount(expected: 0, found: 1)),
+            .rejected(.wrongValueCount(expected: 0, found: 1)),
+            locked,
+        ]
+        #expect(actions.count == expected.count)
+        for index in actions.indices {
+            var copy: Core = core
+            #expect(copy.apply(actions[index]) == expected[index], "\(actions[index].control) \(actions[index].values)")
+            let after: StateDigest = try Self.digest(copy)
+            #expect(copy == core && after == opening, "\(actions[index].control) \(actions[index].values)")
+            #expect(copy.chosenBody == core.chosenBody && copy.shownTick == core.shownTick)
+            #expect(copy.tutorial == core.tutorial)
+        }
+        // A leap year's 29 February is a date.
+        var leap: Core = core
+        #expect(leap.apply(Self.act("mode.daily", [2028, 2, 29])) == .accepted)
+        let leapLevel: Int = try #require(CelestialEclipseLabProgress.dailyLevel(year: 2028, month: 2, day: 29))
+        #expect(leap.mode == .daily(level: leapLevel) && leap.levelNumber == leapLevel)
+        #expect(!leap.play.canUndo && leap.play.stage == .playing && leap.progress == core.progress)
+    }
+
+    @Test func campaignWinsRecordStarsAndOpenTheNextLevel() async throws {
+        let actions: [CelestialEclipseLabAction] = try Self.plan(1)
+        let certified: Int = actions.count
+        #expect(certified == 2 && actions == [.phase(1, 2), .phase(2, 0)])
+        // A win that spent one undone phase change more than the plan: 2 stars, level 2 opened.
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.certifiedChanges == certified && core.mode == .campaign && core.progress.frontier == 1)
+        #expect(core.band == 1)
+        #expect(core.apply(Self.act(actions[0])) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for step in actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        // The phase changes alone record nothing: only the winning run does.
+        #expect(core.progress.solved.isEmpty && core.progress.frontier == 1)
+        #expect(core.apply(Self.act("clock.run")) == .accepted)
+        #expect(core.play.stage == .won && CelestialEclipseLabProgress.actionsSpent(core.play) == certified + 1)
+        let twoStars: Int = CelestialEclipseLabProgress.stars(actionsSpent: certified + 1, certified: certified)
+        #expect(twoStars == 2)
+        let twoStarResult = CelestialEclipseLabProgress.Result(actionsSpent: certified + 1, stars: twoStars)
+        #expect(core.progress.solved[1] == twoStarResult)
+        #expect(core.progress.frontier == 2 && core.progress.isOpen(2) && !core.progress.isOpen(3))
+        // level.next goes to the newly opened level 2, fresh, with its tutorial.
+        var next: Core = core
+        #expect(next.apply(Self.act("level.next")) == .accepted)
+        #expect(next.levelNumber == 2 && !next.play.canUndo && next.mode == .campaign)
+        let secondChanges: Int = try Self.plan(2).count
+        #expect(next.tutorial == .phase && next.certifiedChanges == secondChanges)
+        // A better result replaces it: the plan alone, 3 stars.
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
+        #expect(core.levelNumber == 1 && !core.play.canUndo && core.mode == .campaign)
+        #expect(try Self.win(&core))
+        let best: CelestialEclipseLabProgress.Result = CelestialEclipseLabProgress.Result(actionsSpent: certified,
+                                                                                          stars: 3)
+        #expect(core.progress.solved[1] == best)
+        // A worse result keeps the best one: four undone phase changes more than the plan (1 star) change nothing.
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
+        for _ in 0..<4 {
+            #expect(core.apply(Self.act(actions[0])) == .accepted)
+            #expect(core.apply(Self.act("play.undo")) == .accepted)
+        }
+        #expect(try Self.win(&core))
+        #expect(CelestialEclipseLabProgress.actionsSpent(core.play) == certified + 4)
+        #expect(CelestialEclipseLabProgress.stars(actionsSpent: certified + 4, certified: certified) == 1)
+        #expect(core.progress.solved[1] == best && core.progress.frontier == 2)
+        // A failed run records nothing.
+        var failed: Core = try Core.opening(number: 1)
+        #expect(failed.apply(Self.act("clock.run")) == .accepted && failed.play.stage == .failed)
+        #expect(failed.progress.solved.isEmpty && failed.progress.frontier == 1)
+        // The frontier: level 2 can be chosen, level 3 cannot.
+        #expect(core.apply(Self.act("level.select", [3])) == .rejected(.rule(code: "r02-g17.locked")))
+        #expect(core.apply(Self.act("level.select", [2])) == .accepted)
+        #expect(core.levelNumber == 2 && core.play.stage == .playing && core.tutorial == .phase)
+        // level.next from the frontier is refused: no next open level.
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g17.locked")))
+        #expect(core.levelNumber == 2)
+    }
+
+    @Test func onlyAWinningRunRecordsAWin() async throws {
+        // A won play is final: the winning run cannot be undone, so it is recorded once.
+        var core: Core = try await Core.prepare(seed: 0)
+        let actions: [CelestialEclipseLabAction] = try Self.plan(1)
+        #expect(try Self.win(&core))
+        let recorded: CelestialEclipseLabProgress = core.progress
+        #expect(core.apply(Self.act("play.undo")) == .rejected(.rule(code: "r02-g17.stage")))
+        #expect(core.apply(Self.act("clock.run")) == .rejected(.rule(code: "r02-g17.stage")))
+        #expect(core.progress == recorded)
+        // A failing run undone and redone: the redo restores the failed moment and records nothing.
+        var broken: Core = try Core.opening(number: 1)
+        #expect(broken.apply(Self.act("clock.run")) == .accepted)
+        #expect(broken.apply(Self.act("play.undo")) == .accepted && broken.play.stage == .playing)
+        #expect(broken.apply(Self.act("play.redo")) == .accepted && broken.play.stage == .failed)
+        #expect(broken.progress.solved.isEmpty && broken.progress.frontier == 1)
+        // The winning phases redone without the run are no win: only the run ends a level.
+        var plain: Core = try Core.opening(number: 1)
+        for step in actions { #expect(plain.apply(Self.act(step)) == .accepted) }
+        #expect(plain.apply(Self.act("play.undo")) == .accepted)
+        #expect(plain.apply(Self.act("play.redo")) == .accepted && plain.play.stage == .playing)
+        #expect(plain.play.timeline.wins && plain.progress.solved.isEmpty)
+    }
+
+    @Test func practiceAndDailyFollowTheirRules() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        let certified: CelestialEclipseLabLevel = try Core.level(number: 1)
+        // Practice: a copy of the level with the budget raised to 24; a win records nothing and opens nothing.
+        #expect(core.apply(Self.act("orbit.choose", [2])) == .accepted)
+        #expect(core.apply(Self.act("clock.show", [5])) == .accepted)
+        #expect(core.apply(Self.act("mode.practice")) == .accepted)
+        #expect(core.mode == .practice && core.levelNumber == 1 && !core.play.canUndo)
+        #expect(core.play.level.budget == 24 && core.play.actionsLeft == 24 && core.tutorial == .phase)
+        #expect(core.chosenBody == 1 && core.shownTick == 0)
+        #expect(Core.practiceBudget == 24 && certified.budget != 24)
+        #expect(core.play.level.bodies == certified.bodies && core.play.level.target == certified.target)
+        #expect(core.play.level.phases == certified.phases && core.play.level.horizon == certified.horizon)
+        #expect(core.play.level.seed == certified.seed && core.play.level.tutorial == certified.tutorial)
+        #expect(core.play.level.id == certified.id && core.play.level.difficulty == certified.difficulty)
+        #expect(try Core.practiceLevel(of: certified) == core.play.level)
+        let before: CelestialEclipseLabProgress = core.progress
+        #expect(try Self.win(&core))
+        #expect(core.progress == before && core.progress.solved.isEmpty && core.progress.frontier == 1)
+        // Campaign returns to the current level when it is open, fresh, with the certified budget.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1 && !core.play.canUndo)
+        #expect(core.play.level == certified && core.play.actionsLeft == certified.budget)
+        // Daily: the date's level, playable while still locked; level.next from it is refused; a win records the
+        // level's best result and stars and opens nothing.
+        let (dailyDate, daily): ([Double], Int) = try Self.plainDaily()
+        #expect(daily == 10 && !core.progress.isOpen(daily))
+        #expect(core.apply(Self.act("mode.daily", dailyDate)) == .accepted)
+        #expect(core.mode == .daily(level: daily) && core.levelNumber == daily && core.tutorial == .done)
+        let dailyCertified: CelestialEclipseLabLevel = try Core.level(number: daily)
+        #expect(core.play.level == dailyCertified && !core.progress.isOpen(daily))
+        #expect(core.band == CelestialEclipseLabProgress.band(of: daily))
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g17.locked")))
+        let dailyActions: [CelestialEclipseLabAction] = try Self.plan(daily)
+        #expect(core.certifiedChanges == dailyActions.count)
+        #expect(try Self.win(&core))
+        #expect(core.progress.frontier == 1 && !core.progress.isOpen(daily))
+        let result: CelestialEclipseLabProgress.Result = try #require(core.progress.solved[daily])
+        #expect(result == CelestialEclipseLabProgress.Result(actionsSpent: dailyActions.count, stars: 3))
+        // Campaign from a level that is not open goes to the frontier.
+        #expect(core.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1)
+        // A daily tutorial level carries the tutorial: 2026-01-01 is level 1.
+        #expect(CelestialEclipseLabProgress.dailyLevel(year: 2026, month: 1, day: 1) == 1)
+        #expect(core.apply(Self.act("mode.daily", [2026, 1, 1])) == .accepted)
+        #expect(core.mode == .daily(level: 1) && core.levelNumber == 1 && core.tutorial == .phase)
+    }
+
+    @Test func progressAndModeAreDigestedButNotTheStepOrThePresentation() async throws {
+        // The same fresh play in another mode digests differently.
+        var campaign: Core = try await Core.prepare(seed: 0)
+        var practice: Core = campaign
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        #expect(campaign.apply(Self.act("mode.campaign")) == .accepted)
+        #expect(try Self.digest(practice) != (try Self.digest(campaign)))
+        var dailyOne: Core = campaign
+        #expect(dailyOne.apply(Self.act("mode.daily", [2026, 1, 1])) == .accepted)
+        #expect(dailyOne.play == campaign.play && dailyOne.levelNumber == campaign.levelNumber)
+        #expect(try Self.digest(dailyOne) != (try Self.digest(campaign)))
+        // The same fresh play after a campaign win: only the progress differs, and the digest with it.
+        var won: Core = campaign
+        #expect(try Self.win(&won))
+        #expect(won.apply(Self.act("level.select", [1])) == .accepted)
+        #expect(won.play == campaign.play && won.mode == campaign.mode && won.progress != campaign.progress)
+        #expect(try Self.digest(won) != (try Self.digest(campaign)))
+        // Neither the chosen body, the shown tick nor the tutorial step is digested.
+        var chosen: Core = campaign
+        #expect(chosen.apply(Self.act("orbit.choose", [2])) == .accepted)
+        #expect(chosen.apply(Self.act("clock.show", [9])) == .accepted)
+        let campaignDigest: StateDigest = try Self.digest(campaign)
+        #expect(chosen == campaign)
+        #expect(try Self.digest(chosen) == campaignDigest)
+        var dismissed: Core = campaign
+        #expect(dismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(dismissed != campaign)
+        #expect(try Self.digest(dismissed) == campaignDigest)
+    }
+
+    @Test func theTutorialAdvancesInOrderAndIsNotDigested() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(core.tutorial == .phase && core.tutorial.text.hasPrefix("Drag a planet along its orbit"))
+        // Dismissing ends it; the step is state (==) and saved, but never digested.
+        let digest: StateDigest = try Self.digest(core)
+        var dismissed: Core = core
+        #expect(dismissed.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(dismissed.tutorial == .done && dismissed != core && dismissed.play == core.play)
+        #expect(try Self.digest(dismissed) == digest)
+        #expect(try dismissed.snapshotPayload() != (try core.snapshotPayload()))
+        #expect(dismissed.apply(Self.act("tutorial.dismiss")) == .accepted && dismissed.tutorial == .done)
+        // Choosing a body and showing a tick are no phase change: phase stays.
+        var chosen: Core = core
+        #expect(chosen.apply(Self.act("orbit.choose", [2])) == .accepted && chosen.tutorial == .phase)
+        #expect(chosen.apply(Self.act("clock.show", [3])) == .accepted && chosen.tutorial == .phase)
+        // A refused phase change moves nothing.
+        #expect(chosen.apply(Self.act("orbit.phase", [0, 0])) == .rejected(.rule(code: "r02-g17.action")))
+        #expect(chosen.tutorial == .phase)
+        // A phase change: phase → order; an undo does not move it back, nor a redo forward.
+        let plan: [CelestialEclipseLabAction] = try Self.plan(1)
+        #expect(core.apply(Self.act(plan[0])) == .accepted)
+        #expect(core.play.stage == .playing && core.tutorial == .order)
+        #expect(core.apply(Self.act("play.undo")) == .accepted && core.tutorial == .order)
+        #expect(core.apply(Self.act("play.redo")) == .accepted && core.tutorial == .order)
+        // A second phase change: order → recover; recover lasts through more changes and undo.
+        #expect(core.apply(Self.act(plan[1])) == .accepted)
+        #expect(core.play.stage == .playing && core.tutorial == .recover)
+        #expect(core.apply(Self.act("play.undo")) == .accepted && core.tutorial == .recover)
+        #expect(core.apply(Self.act("play.redo")) == .accepted && core.tutorial == .recover)
+        // The end of the level ends it: the winning run.
+        #expect(core.apply(Self.act("clock.run")) == .accepted)
+        #expect(core.play.stage == .won && core.tutorial == .done)
+        // A run moves any step straight to done: the failing run from a fresh opening goes phase → done; the undo
+        // that retries does not bring it back; a redo that restores the failed play ends a step restored as phase.
+        var broken: Core = try Core.opening(number: 1)
+        #expect(broken.apply(Self.act("clock.run")) == .accepted)
+        #expect(broken.play.stage == .failed && broken.tutorial == .done)
+        #expect(broken.progress.solved.isEmpty && broken.progress.frontier == 1)
+        #expect(broken.apply(Self.act("play.undo")) == .accepted)
+        #expect(broken.play.stage == .playing && broken.tutorial == .done)
+        let brokenText: String = String(decoding: try broken.snapshotPayload(), as: UTF8.self)
+        let phaseText: String = brokenText.replacingOccurrences(of: "\"tutorial\":\"done\"",
+                                                                with: "\"tutorial\":\"phase\"")
+        #expect(phaseText != brokenText)
+        var redone: Core = try Core.restore(payload: Data(phaseText.utf8), seed: 0)
+        #expect(redone.tutorial == .phase && redone.play == broken.play && redone.play.canRedo)
+        #expect(redone.apply(Self.act("play.redo")) == .accepted)
+        #expect(redone.play.stage == .failed && redone.tutorial == .done)
+        // Choosing a level or a mode restarts the step of that level; a level without the tutorial starts done.
+        #expect(broken.apply(Self.act("mode.practice")) == .accepted)
+        #expect(broken.tutorial == CelestialEclipseLabTutorialStep.initial(level: broken.levelNumber))
+        #expect(broken.tutorial == .phase)
+        for number in 1...6 {
+            let opening: Core = try Core.opening(number: number)
+            let expected: CelestialEclipseLabTutorialStep = number <= 3 ? .phase : .done
+            #expect(opening.tutorial == expected && CelestialEclipseLabTutorialStep.initial(level: number) == expected)
+            #expect(opening.play.level.tutorial == (number <= 3))
+        }
+        var plain: Core = try Core.opening(number: 4)
+        let plainFirst: CelestialEclipseLabAction = try #require(try Self.plan(4).first)
+        #expect(plain.apply(Self.act(plainFirst)) == .accepted && plain.tutorial == .done)
+        // The step is saved and restored.
+        var saved: Core = try await Core.prepare(seed: 0)
+        #expect(saved.apply(Self.act(plan[0])) == .accepted)
+        let payload: Data = try saved.snapshotPayload()
+        #expect(String(decoding: payload, as: UTF8.self).hasSuffix(",\"tutorial\":\"order\"}"))
+        let restored: Core = try Core.restore(payload: payload, seed: 0)
+        #expect(restored == saved && restored.tutorial == .order)
+    }
+
+    @Test func theSchemaTwoPayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
+        // Campaign with progress: level 1 won, level 2 reached with level.next.
+        var campaign: Core = try await Core.prepare(seed: 0)
+        #expect(try Self.win(&campaign))
+        #expect(campaign.apply(Self.act("level.next")) == .accepted)
+        #expect(campaign.levelNumber == 2 && campaign.tutorial == .phase)
+        // Practice: a phase change on the practice copy.
+        var practice: Core = try await Core.prepare(seed: 0)
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        #expect(practice.apply(Self.act("orbit.phase", [1, 2])) == .accepted)
+        // Daily: the first certified phase change of the date's level.
+        let (dailyDate, dailyLevel): ([Double], Int) = try Self.plainDaily()
+        var daily: Core = try await Core.prepare(seed: 0)
+        #expect(daily.apply(Self.act("mode.daily", dailyDate)) == .accepted)
+        let dailyFirst: CelestialEclipseLabAction = try #require(try Self.plan(dailyLevel).first)
+        #expect(daily.apply(Self.act(dailyFirst)) == .accepted)
+        let cores: [Core] = [campaign, practice, daily]
+        for core in cores {
+            let payload: Data = try core.snapshotPayload()
+            #expect(try core.snapshotPayload() == payload)
+            let restored: Core = try Core.restore(payload: payload, seed: 0)
+            let restoredDigest: StateDigest = try Self.digest(restored)
+            let savedDigest: StateDigest = try Self.digest(core)
+            #expect(restored == core && restoredDigest == savedDigest, "\(core.mode)")
+            #expect(restored.certifiedChanges == core.certifiedChanges && restored.openingNumber == 1)
+            var reset: Core = restored
+            reset.reset()
+            #expect(reset == (try Core.opening(number: 1)))
+        }
+        #expect(practice.play.level.budget == 24)
+        let restoredPractice: Core = try Core.restore(payload: try practice.snapshotPayload(), seed: 0)
+        #expect(restoredPractice.play.level.budget == 24 && restoredPractice.mode == .practice)
+        let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
+        let certified: Int = try Self.plan(1).count
+        let progressText: String = "\"progress\":{\"frontier\":2,"
+            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3}]}"
+        #expect(campaignText.contains(progressText))
+        #expect(campaignText.hasPrefix("{\"level\":2,\"mode\":{\"mode\":\"campaign\"},"))
+        #expect(campaignText.hasSuffix(",\"tutorial\":\"phase\"}"))
+        let dailyText: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
+        let dailyPrefix: String = "{\"level\":\(dailyLevel),\"mode\":{\"level\":\(dailyLevel)"
+        #expect(dailyText.hasPrefix(dailyPrefix + ",\"mode\":\"daily\"},"))
+        // Damaged: a daily mode naming another level, an unknown mode, an invalid frontier, invalid stars, an unknown
+        // tutorial step.
+        let otherPrefix: String = "{\"level\":\(dailyLevel),\"mode\":{\"level\":\(dailyLevel - 1)"
+        let otherDaily: Data = Data(dailyText.replacingOccurrences(of: dailyPrefix, with: otherPrefix).utf8)
+        let unknownMode: Data = Data(campaignText.replacingOccurrences(of: "\"mode\":\"campaign\"",
+                                                                       with: "\"mode\":\"arcade\"").utf8)
+        let badFrontier: Data = Data(campaignText.replacingOccurrences(of: "\"frontier\":2",
+                                                                       with: "\"frontier\":0").utf8)
+        let badStars: Data = Data(campaignText.replacingOccurrences(of: "\"stars\":3", with: "\"stars\":4").utf8)
+        let badStep: Data = Data(campaignText.replacingOccurrences(of: "\"tutorial\":\"phase\"",
+                                                                   with: "\"tutorial\":\"later\"").utf8)
+        let damaged: [Data] = [otherDaily, unknownMode, badFrontier, badStars, badStep]
+        let campaignPayload: Data = try campaign.snapshotPayload()
+        let dailyPayload: Data = try daily.snapshotPayload()
+        for payload in damaged {
+            #expect(payload != campaignPayload && payload != dailyPayload)
+            #expect(throws: CelestialEclipseLabRestoreRefusal.damaged) { try Core.restore(payload: payload, seed: 0) }
+        }
+        // A payload without the tutorial key starts the tutorial at the level's first step.
+        let noStep: Data = Data(campaignText.replacingOccurrences(of: ",\"tutorial\":\"phase\"", with: "").utf8)
+        #expect(noStep != campaignPayload)
+        let restoredNoStep: Core = try Core.restore(payload: noStep, seed: 0)
+        #expect(restoredNoStep == campaign)
+    }
+
+    @Test func aSchemaOnePayloadMigratesAndANewerSchemaIsRefused() async throws {
+        // Level 3 after its first certified phase change: the tutorial has advanced, which schema 1 did not save.
+        var core: Core = try await Core.prepare(seed: 2)
+        #expect(core.levelNumber == 3)
+        let plan: [CelestialEclipseLabAction] = try Self.plan(3)
+        try #require(!plan.isEmpty)
+        #expect(core.apply(Self.act(plan[0])) == .accepted)
+        #expect(core.tutorial == .order)
+        let schemaOne: [String: Any] = try Self.schemaOne(core)
+        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        let chained: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
+        let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
+        let chainedData: Data = try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])
+        #expect(data == chainedData)
+        let restored: Core = try Core.restore(payload: data, seed: 2)
+        #expect(restored.levelNumber == 3 && restored.play == core.play && restored.mode == .campaign)
+        #expect(restored.progress.frontier == 3 && restored.progress.solved.isEmpty)
+        #expect(restored.progress.isOpen(1) && restored.progress.isOpen(3) && !restored.progress.isOpen(4))
+        #expect(restored.tutorial == .phase && restored.tutorial == CelestialEclipseLabTutorialStep.initial(level: 3))
+        // The tutorial step is not digested, so the migrated state digests as the saved one.
+        #expect(try Self.digest(restored) == Self.digest(core))
+        // A level without the tutorial migrates with it done: the fresh opening of level 7.
+        let sevenOpening: Core = try Core.opening(number: 7)
+        let seven: [String: Any] = try Core.migratedToSchemaTwo(try Self.schemaOne(sevenOpening))
+        let sevenData: Data = try JSONSerialization.data(withJSONObject: seven, options: [.sortedKeys])
+        let sevenCore: Core = try Core.restore(payload: sevenData, seed: 6)
+        #expect(sevenCore == sevenOpening && sevenCore.tutorial == .done)
+        // A schema-1 object that is not one is refused.
+        #expect(throws: CelestialEclipseLabRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "3"]) }
+        #expect(throws: CelestialEclipseLabRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
+        // A newer schema is refused by the chain.
+        #expect(Core.schemaVersion == 2)
+        #expect(throws: MigrationError.newerVersion(3)) { try Core.migrations.migrate(schemaOne, from: 3) }
+    }
+
+    @Test func theEngineMigratesASchemaOneEnvelopeAndRefusesANewerOne() async throws {
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        var engine = ExperienceEngine<Core>(id: id)
+        try await engine.prepare(seed: 2)
+        try engine.activate()
+        // Level 3: its first certified phase change.
+        let first: CelestialEclipseLabAction = try #require(try Self.plan(3).first)
+        guard case let .phase(body, offset) = first else { return }
+        #expect(engine.handle(control: "orbit.phase", values: [Double(body), Double(offset)]) == .accepted)
+        let played: Core = try #require(engine.core)
+        let saved: ExperienceSnapshot = try engine.snapshot()
+        let schemaOne: [String: Any] = try Self.schemaOne(played)
+        let schemaOneData: Data = try JSONSerialization.data(withJSONObject: schemaOne, options: [.sortedKeys])
+        let old = try ExperienceSnapshot(experience: id, schemaVersion: 1, seed: saved.seed,
+                                         stepIndex: saved.stepIndex, digest: saved.digest, payload: schemaOneData)
+        try engine.restore(old)
+        let migrated: Core = try #require(engine.core)
+        #expect(migrated.levelNumber == 3 && migrated.play == played.play && migrated.mode == .campaign)
+        #expect(migrated.progress.frontier == 3 && migrated.progress.solved.isEmpty)
+        #expect(migrated.tutorial == .phase && played.tutorial == .order)
+        #expect(try engine.digest() == saved.digest)
+        // An envelope of schema 3 is refused and changes nothing.
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+                                           stepIndex: saved.stepIndex, digest: saved.digest,
+                                           payload: Data(saved.payload.utf8))
+        var refused: Bool = false
+        do {
+            try engine.restore(newer)
+        } catch {
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+        }
+        #expect(refused)
+        #expect(engine.core == migrated)
+    }
+
+    @Test func noLevelIsGatedByAnythingButBeingOpened() async throws {
+        // Opening through wins: levels 1 → 2 → 3 by their certified plans, the run and level.next.
+        var core: Core = try await Core.prepare(seed: 0)
+        for number in 1...3 {
+            #expect(core.levelNumber == number)
+            #expect(try Self.win(&core))
+            #expect(core.progress.frontier == number + 1)
+            #expect(core.apply(Self.act("level.next")) == .accepted)
+        }
+        #expect(core.levelNumber == 4)
+        // Opening through `open(through:)`: a saved progress with every level open makes every level selectable.
+        var progress: CelestialEclipseLabProgress = CelestialEclipseLabProgress()
+        progress.open(through: 100)
+        #expect(progress.frontier == 100)
+        let fresh: Core = try await Core.prepare(seed: 0)
+        let text: String = String(decoding: try fresh.snapshotPayload(), as: UTF8.self)
+        let progressJSON: String = String(decoding: try Core.payloadEncoder().encode(progress), as: UTF8.self)
+        let allOpenText: String = text.replacingOccurrences(of: "\"progress\":{\"frontier\":1,\"solved\":[]}",
+                                                            with: "\"progress\":" + progressJSON)
+        #expect(allOpenText != text)
+        let allOpen: Core = try Core.restore(payload: Data(allOpenText.utf8), seed: 0)
+        #expect(allOpen.progress == progress)
+        for number in 1...100 {
+            #expect(allOpen.progress.isOpen(number))
+            #expect(allOpen.progress.nextOpen(after: number) == (number < 100 ? number + 1 : nil))
+        }
+        // Selecting through the adapter: the last level of every band (the only refusal of `level.select` in range is
+        // `progress.isOpen`).
+        let samples: [Int] = [20, 40, 60, 80, 100]
+        let refused: ActionResult = .rejected(.rule(code: "r02-g17.locked"))
+        for number in samples {
+            var copy: Core = allOpen
+            #expect(copy.apply(Self.act("level.select", [Double(number)])) == .accepted, "level \(number)")
+            #expect(copy.levelNumber == number && copy.mode == .campaign && copy.play.stage == .playing)
+            #expect(copy.band == number / 20)
+            var locked: Core = fresh
+            #expect(locked.apply(Self.act("level.select", [Double(number)])) == refused)
+        }
     }
 }

@@ -6,7 +6,12 @@
     "play.redo",
     "level.next",
     "orbit.choose",
-    "clock.show"
+    "clock.show",
+    "level.select",
+    "mode.daily",
+    "mode.practice",
+    "mode.campaign",
+    "tutorial.dismiss"
   ],
   "experience" : "r02-g17.celestial-eclipse-lab",
   "kind" : "game",
@@ -17,7 +22,7 @@
 
       ],
       "expect" : {
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e"
       },
       "name" : "launch-first-frame",
       "seed" : "0"
@@ -58,8 +63,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "58e4dde97d33461270815f3a199b8000e734cc6c4ce74f534ba02af08ca00d92",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+        "finalDigest" : "f0c5e239ddb9f088675ac9f99afca381b6da3b39d92ce6cd886df97d215d6b05",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e"
       },
       "name" : "input-response",
       "seed" : "0"
@@ -430,11 +435,62 @@
           },
           "result" : "action.wrong-value-count",
           "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.select",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.daily",
+            "values" : [
+              2026,
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.practice",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "mode.campaign",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "tutorial.dismiss",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
         }
       ],
       "expect" : {
-        "finalDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+        "finalDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e"
       },
       "name" : "rejection",
       "seed" : "0"
@@ -475,8 +531,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "58e4dde97d33461270815f3a199b8000e734cc6c4ce74f534ba02af08ca00d92",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+        "finalDigest" : "f0c5e239ddb9f088675ac9f99afca381b6da3b39d92ce6cd886df97d215d6b05",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e"
       },
       "name" : "save-restore",
       "seed" : "0"
@@ -517,7 +573,7 @@
         }
       ],
       "expect" : {
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e",
         "resetDigest" : true
       },
       "name" : "reset",
@@ -663,8 +719,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "292c21a2840034a0e77e9382c643000e12ebd95f85c3eb95c8d99c2e94bfdc53",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "finalDigest" : "533b0c4b3208bf2fd6d596bb53755502231d21b526342424fc8124f3ea1cb06c",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e",
         "outcome" : "won"
       },
       "name" : "full-playthrough",
@@ -716,8 +772,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0e87866889f8ecb2d419f26085ad567137a0ce771b8fa2e5cd8a85ed16d24161",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+        "finalDigest" : "dfc806c94e9e90e5d984db6ecc4f3bd7192a1df5b5c4bc6644f987f423687ca4",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e"
       },
       "name" : "hero",
       "seed" : "0"
@@ -748,8 +804,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8d2f2f3554cc73098622d05681d2fa6ea71c7f25226c0a8377d053387e501932",
-        "initialDigest" : "ff5325fca0a15417651468663f334ba227176c09b9b5dc875981dc5483d7b65d"
+        "finalDigest" : "7771ef745c0feff8dce268b7a78da801e5675d694e70af46b2af61b80242f928",
+        "initialDigest" : "bad0e300ea3aa801807531c105a67f47a5b5c4579f9d6d365e5a0af28b9ad34b"
       },
       "name" : "acceptance-001",
       "seed" : "58"
@@ -780,8 +836,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a0a19cf70bfb1ee885acf7ad477618f8a93fd4ff777b294288d6600fb134fdf0",
-        "initialDigest" : "1971d0424d52428364f2ffbeb8e18af10b6093b5c3dff4cf2228ce44a04a130b"
+        "finalDigest" : "3c512fd5eaae60ff5f3600ea78d417ea0c2c05bff4707a781d76a7edba0dc600",
+        "initialDigest" : "c54edee955ab34afe4746f382c0ed53799d4aa2546c7fb40e61d91cc62d9e486"
       },
       "name" : "acceptance-002",
       "seed" : "65"
@@ -810,8 +866,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cf292f494c5b673dfe6653d6f91bb4aba33b5f5c9d11b4c0c197da07dd8e054f",
-        "initialDigest" : "cf292f494c5b673dfe6653d6f91bb4aba33b5f5c9d11b4c0c197da07dd8e054f"
+        "finalDigest" : "b0692a8940fac4e13bef58852d168e44167a815b4a3316af46b7fad273fadef6",
+        "initialDigest" : "b0692a8940fac4e13bef58852d168e44167a815b4a3316af46b7fad273fadef6"
       },
       "name" : "acceptance-003",
       "seed" : "72"
@@ -842,8 +898,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "9dc1957f922682094cad72e95681fd68ce16876758f330ac1a7925770ff79251",
-        "initialDigest" : "cf9d52a6080327ca919b26cffd4e99ee0fcdbee1a5a5090f104780c6499e61e1"
+        "finalDigest" : "dcefc281ef33cb051748fbe3c0313738fbcb44b280556330c784625d9da8938b",
+        "initialDigest" : "07fa40779a9aaf54c21d8ec87bc1b2a8cd7e43dd813637b37d762ad8a6c220fe"
       },
       "name" : "acceptance-004",
       "seed" : "79"
@@ -873,8 +929,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e9756ba44952ae1813abf3f51eed547d3dfd1be7ecd1670ee7e664bd77876a25",
-        "initialDigest" : "4e5da717ed97edd84e62d004dabaffac08644b6aa346971968d008a9fd265f77"
+        "finalDigest" : "9baf31ad631ca5958601c3e3436c4bc997feefddbdbdcad74d668d4888f7fd3d",
+        "initialDigest" : "f91add831eb54aad9dda4b674f686cc2116e8f1d2c737be89e90c1d37f2fe369"
       },
       "name" : "acceptance-005",
       "seed" : "86"
@@ -905,8 +961,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ebed43cb0327a7bce142ed5feade01b70dc8f313287e6f8cfe7c7cefde5e3b47",
-        "initialDigest" : "9171345bea3e3c79352081e47a01fd98afb76ba6e415dfa94853518ba3afd973"
+        "finalDigest" : "360eeaf04db4c634677fbac797158eba9b0432f54a5e2002efe5ca6466bd06fa",
+        "initialDigest" : "be40e59b6710258662b1f4682cabbdd75b2a5defc5413acf0304550fc0aa3866"
       },
       "name" : "acceptance-006",
       "seed" : "93"
@@ -937,8 +993,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "58e4dde97d33461270815f3a199b8000e734cc6c4ce74f534ba02af08ca00d92",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+        "finalDigest" : "f0c5e239ddb9f088675ac9f99afca381b6da3b39d92ce6cd886df97d215d6b05",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e"
       },
       "name" : "acceptance-007",
       "seed" : "0"
@@ -967,8 +1023,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "9983feba9228a26e3583c8535ee64305aff3a7ce8988b19651030ea331603590",
-        "initialDigest" : "9983feba9228a26e3583c8535ee64305aff3a7ce8988b19651030ea331603590"
+        "finalDigest" : "3b323470a6b2d403a3bb59090edf620a5f9119efa72f4b23e80681f538664220",
+        "initialDigest" : "3b323470a6b2d403a3bb59090edf620a5f9119efa72f4b23e80681f538664220"
       },
       "name" : "acceptance-008",
       "seed" : "7"
@@ -999,8 +1055,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cce9b0361660b2cd4c510f1de1724895f78335cfdaf5ba85bfeb8eccf09126eb",
-        "initialDigest" : "14d23ba0d8c969972c316c90760f9392ecec9e97d3783aacaeb33abecfb94123"
+        "finalDigest" : "7243d6e448dc49c6d284d47f68865536b97071f574be7f59130528e24e76c0c6",
+        "initialDigest" : "8a9dc95356340873e7752ff81f2d5f1887a086213af1bcae76cba4afa5f01bcc"
       },
       "name" : "acceptance-009",
       "seed" : "14"
@@ -1030,8 +1086,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "19a753d0466a263a0be23397a22693e7c42e600d80463e297cf4fa693a64c243",
-        "initialDigest" : "16db9f6a817a74f3caad4a503938e660dcbd437a7d788245929eaa5afb396e8c"
+        "finalDigest" : "fff823e7ea2448914ba15df3b101355f95d70fd1215e8b32f63693acdc09c6ea",
+        "initialDigest" : "6f4448d5640448f072a1f49dbfd3b3c33a5bab26851fd9cca5bec136546d8411"
       },
       "name" : "acceptance-010",
       "seed" : "21"
@@ -1113,8 +1169,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "9c06b1ca4091f9cdd15005a49f24c8f913ea74dcb756f46917ad287a91946eb2",
-        "initialDigest" : "ee8603395925421f35e321dc57afe0ff95f867cc75f3439d507639d7b93670f5",
+        "finalDigest" : "efec106061a8acbd8d610a95e553d8e4f868faaf01e5ed72d6ba607f19472e76",
+        "initialDigest" : "50044c07c18b16704693a5a25cc6ae7b6644d6d3ae97b5a7bb7455f1a7bd572f",
         "outcome" : "won"
       },
       "name" : "acceptance-011",
@@ -1266,8 +1322,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0fa208d952e99eb09b3aa2e8a44650b7e9e3794a8a37fff4ae25a84a280f12d7",
-        "initialDigest" : "54fd223a51a3899c07cf07629b1c54f0846f9818c2ce427fbeabe712cd6e0c0b",
+        "finalDigest" : "599f59dbdc9c130ffd632c71b559124d99e1ebee0092875d404ee9fd6ed2d613",
+        "initialDigest" : "f1aeba892939e79cdf5ce268364e703f2a1a83df2993ebf9675429a1e2989a94",
         "outcome" : "failed"
       },
       "name" : "acceptance-012",
@@ -1372,8 +1428,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6d3a0f93bc1fde55ea135ccbb64bfe1ec667455760ed89533b66f94b057aa445",
-        "initialDigest" : "83cf9c54032d04289a6b8c88fcbfb4e594640c08b4cfc11b5d49141c1ba46c4d",
+        "finalDigest" : "55b5472139c9dac544d586ed96438b8ae6de70167c3f164b7c5f1db0af6268c1",
+        "initialDigest" : "650ed0ba1ad30e7d9e7a09e2a0c41f05025b2582644909c6a545dd9a7d3c1b03",
         "outcome" : "won"
       },
       "name" : "acceptance-013",
@@ -1569,8 +1625,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1ae2f5522183ab1458b59eb2bf6f8cf829af72ee741eee9dac716941fedb78fc",
-        "initialDigest" : "2eec4424b785580bfcea875b77b69821ca00f2d7fd24c66c09bb7af4283ffd12",
+        "finalDigest" : "2b63e83844d2155ddd8ee2e4cd753c784747471390a356b11d60e110bc67432c",
+        "initialDigest" : "6bec32e7fb9d0c2cd25281aa47e65459ca3779e123e01b35778e7333bc840b4f",
         "outcome" : "failed"
       },
       "name" : "acceptance-014",
@@ -1664,8 +1720,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0db31982e47bd20fff5b652b39ece98f9239ac421d009c7ce34458b3c1a70479",
-        "initialDigest" : "6cc79bd613a86bb27b2752443be2d97228538cefceebd03b49be6bf5dbbaa261",
+        "finalDigest" : "8338554b1f664d2a22e699a1353a25b19e30d5f3025f1d7e85d956d6ece8b0d0",
+        "initialDigest" : "b6722aab6d2af6c898b3b16f63f5700e9e92998dd7ca74037fe36851b37ce8fd",
         "outcome" : "won"
       },
       "name" : "acceptance-015",
@@ -1861,8 +1917,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "545e414295624d04c4f508ab136bee7d3dbb937586b48237f3b8986b3fe03a02",
-        "initialDigest" : "29dc39fe1d2723d55dbf2b1210bfd8c79baefd5dc9e21f1ab8ec9ce61b99a5da",
+        "finalDigest" : "7ea5e9d7a8f415fee8dfa5a1ee926de913ec3dfbb87d4b06b1008b85c012a54c",
+        "initialDigest" : "590f7f0d03562b1f177fbc80f1671711757da645da8fdf8d77dfb1ca36905353",
         "outcome" : "failed"
       },
       "name" : "acceptance-016",
@@ -1967,8 +2023,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b4fc2d222cf7ee8316bea8f3da44301523dba712d77b02f8e224cfbebdf346a2",
-        "initialDigest" : "a7dbdfb8d9fc9cc67d5c2da506b0d2c339b53eb40e7491dd1dd216a00f50fdb3",
+        "finalDigest" : "5186c761704eb2fd38c42e6526009e744a7898c6dbdda90d5be96aac30a3f7be",
+        "initialDigest" : "f1ca9cfd1b81ceaeb4c3e1ef00d2be5057756881ec915488141705ee12023e4c",
         "outcome" : "won"
       },
       "name" : "acceptance-017",
@@ -2186,8 +2242,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8ab2a7f949a591e8a8a62c27431454b77a905bfaf42b7ab583716828f2957d01",
-        "initialDigest" : "6d8b1d9b216205fe4a4236eec3158205b928969d346515634492ecb0235d82e0",
+        "finalDigest" : "af8b0d1728e41ff2c696d1839ff4dd1366e2abd960d185e1435aed4922b27705",
+        "initialDigest" : "2e6dfcd33233bbce59e7d5b4c20404bffed8816e720fd92006e9227f8039ee37",
         "outcome" : "failed"
       },
       "name" : "acceptance-018",
@@ -2292,8 +2348,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e24a7960cb79731412fc9dc5e9d575801a7ddc1fd9966f98525a6a9b40e03fc2",
-        "initialDigest" : "21a95bd19ca7c8c8b438856b506f73d880b5a1b9722776bec072e891aad228aa",
+        "finalDigest" : "9ef8f12f51e3c3362cca6893fbd00244a198de5c363eacfb07eb03fffa24ccfd",
+        "initialDigest" : "4d34401db43ea78ed2f1db9183c6672a0fb93868df3b150e0603cc0e92615b9b",
         "outcome" : "won"
       },
       "name" : "acceptance-019",
@@ -2511,8 +2567,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b832f25feecc501bc6eb2b61462339b747964800764cefdec79fdc6eacbb1abc",
-        "initialDigest" : "f63dd9b5063e4a959ef9af08509cd9580c89f5cfd3cf91dcdd23f905285d52a4",
+        "finalDigest" : "a52cfd9c4743347089cf966ea76521572b2e69b115852da50d94dfb9a6b55113",
+        "initialDigest" : "e27cf557014e2fa6d113799bbf09ab422287141508996a7e789b1d23fb1eee9d",
         "outcome" : "failed"
       },
       "name" : "acceptance-020",
@@ -2637,8 +2693,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "16625b3887460802b493108193783a3e96a4d8b8ed891e93c3bb4bcc6c91fe52",
-        "initialDigest" : "16625b3887460802b493108193783a3e96a4d8b8ed891e93c3bb4bcc6c91fe52"
+        "finalDigest" : "1f4d358a57b64327d4b7ac123864763aead1ba79263a15922a1d25f82f7acf7a",
+        "initialDigest" : "1f4d358a57b64327d4b7ac123864763aead1ba79263a15922a1d25f82f7acf7a"
       },
       "name" : "acceptance-021",
       "seed" : "98"
@@ -2773,8 +2829,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "949a3d80401690c4c5c18ceb7b671d49be14df6f02c013bf2cc9d857701f58aa",
-        "initialDigest" : "949a3d80401690c4c5c18ceb7b671d49be14df6f02c013bf2cc9d857701f58aa"
+        "finalDigest" : "46ec0c22e12f693eadbfe4407df86ac03f26f0fb4825d5640f58154489661ddd",
+        "initialDigest" : "46ec0c22e12f693eadbfe4407df86ac03f26f0fb4825d5640f58154489661ddd"
       },
       "name" : "acceptance-022",
       "seed" : "5"
@@ -2909,8 +2965,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8bc035c167eaf420cac9e5b301ec4897f0b84bc8316eeeb3a1ee3dc98fb832fa",
-        "initialDigest" : "8bc035c167eaf420cac9e5b301ec4897f0b84bc8316eeeb3a1ee3dc98fb832fa"
+        "finalDigest" : "360ec7e58d0682842ad5db440615df872aa153fc03fb57f3de5a10264c8fc89a",
+        "initialDigest" : "360ec7e58d0682842ad5db440615df872aa153fc03fb57f3de5a10264c8fc89a"
       },
       "name" : "acceptance-023",
       "seed" : "12"
@@ -3045,8 +3101,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "08a39416477250d5e90597ea38fd987862cf6c6bb38f6cfe86ea37ce80d92f3d",
-        "initialDigest" : "08a39416477250d5e90597ea38fd987862cf6c6bb38f6cfe86ea37ce80d92f3d"
+        "finalDigest" : "7d14c0bb8cd14a944ba98e2c118625ac65d4dd4d4c5baee12d1c507594377384",
+        "initialDigest" : "7d14c0bb8cd14a944ba98e2c118625ac65d4dd4d4c5baee12d1c507594377384"
       },
       "name" : "acceptance-024",
       "seed" : "19"
@@ -3181,8 +3237,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1c875f5c04413302d20b27fd49a02ec7a9df8c316027754d9bd9182ed19a243a",
-        "initialDigest" : "1c875f5c04413302d20b27fd49a02ec7a9df8c316027754d9bd9182ed19a243a"
+        "finalDigest" : "bcdae8a864c613cf9b39d8998f8538909faa59ceda6be30a63bce8abfa254ce9",
+        "initialDigest" : "bcdae8a864c613cf9b39d8998f8538909faa59ceda6be30a63bce8abfa254ce9"
       },
       "name" : "acceptance-025",
       "seed" : "26"
@@ -3317,8 +3373,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6a02d9c9c22f1aaa1ecc895267de43f7e2b703c0d0cfeedad1537703d6876592",
-        "initialDigest" : "6a02d9c9c22f1aaa1ecc895267de43f7e2b703c0d0cfeedad1537703d6876592"
+        "finalDigest" : "f21c78797c63246f0f0c128b4593e73ac4042998f73029207f06600380b43100",
+        "initialDigest" : "f21c78797c63246f0f0c128b4593e73ac4042998f73029207f06600380b43100"
       },
       "name" : "acceptance-026",
       "seed" : "33"
@@ -3453,8 +3509,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "59659405a604390d1dbe1df284b9ff72412ceb29bfe605d2e0373cf7272f9a2b",
-        "initialDigest" : "59659405a604390d1dbe1df284b9ff72412ceb29bfe605d2e0373cf7272f9a2b"
+        "finalDigest" : "4434ae01b9a7e9e57b50354c3f824b6278d502cb467afdb92b0cfd455697f089",
+        "initialDigest" : "4434ae01b9a7e9e57b50354c3f824b6278d502cb467afdb92b0cfd455697f089"
       },
       "name" : "acceptance-027",
       "seed" : "40"
@@ -3589,8 +3645,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "ad11fb40b811609596e3201846973fc5994ca92e6edc6ff95180e68af1668aef",
-        "initialDigest" : "ad11fb40b811609596e3201846973fc5994ca92e6edc6ff95180e68af1668aef"
+        "finalDigest" : "fc0c61933d68c997d4248af929f03424b82de2dc42b24554fb7be211541934c8",
+        "initialDigest" : "fc0c61933d68c997d4248af929f03424b82de2dc42b24554fb7be211541934c8"
       },
       "name" : "acceptance-028",
       "seed" : "47"
@@ -3725,8 +3781,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6dce6826bd9a4cfb3ac123949f519c2a055d53d46189fe651128f4fe5f337a4e",
-        "initialDigest" : "6dce6826bd9a4cfb3ac123949f519c2a055d53d46189fe651128f4fe5f337a4e"
+        "finalDigest" : "8835ac3a10a2d2d117699fa24caee7b03274b5505c9868fa163402704bc81f5a",
+        "initialDigest" : "8835ac3a10a2d2d117699fa24caee7b03274b5505c9868fa163402704bc81f5a"
       },
       "name" : "acceptance-029",
       "seed" : "54"
@@ -3861,8 +3917,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "d8662f4b3ed2c8bd7605a96da177a7ddab11760a51a868d1b416f25ff01dcfe9",
-        "initialDigest" : "d8662f4b3ed2c8bd7605a96da177a7ddab11760a51a868d1b416f25ff01dcfe9"
+        "finalDigest" : "72bccffecea213c8d8b6e1d7e650ca2047f3ca3c6a49c11369ee557266ae261a",
+        "initialDigest" : "72bccffecea213c8d8b6e1d7e650ca2047f3ca3c6a49c11369ee557266ae261a"
       },
       "name" : "acceptance-030",
       "seed" : "61"
@@ -3932,8 +3988,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "cd37c11fb636d8279d05d1c0a7659d852bef8c88301e454912a9de6f6bdeb7ab",
-        "initialDigest" : "283e6522dd6db9f97cfdf929f6d2493512211b5f3b0d5169ad27d274caec2d7c"
+        "finalDigest" : "84473915d9c5e9f54a55a13121bc6d94a29108428598570363f11b0e5873509c",
+        "initialDigest" : "27cb53a2f47ca62db737f5d3f8449f674f3cefd0b7c86110567f9b56648d9a5c"
       },
       "name" : "acceptance-031",
       "seed" : "68"
@@ -4003,8 +4059,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "711b629500503a641b2a88e5c285278a81d723b3c3aee1650857e0ee13c67190",
-        "initialDigest" : "ee6d0281d9b66814fb580fe2e5abf02c173fa72fbecb49e9a3ac58e6cfeba807"
+        "finalDigest" : "24010a58b4223c4dd11086322dd071b15b6a399765a2f1d4de10cc13469e41a6",
+        "initialDigest" : "582cd1973f561bd1b14707ef8247ca837d4eac9327c9de1bbdce4a22cba65103"
       },
       "name" : "acceptance-032",
       "seed" : "75"
@@ -4074,8 +4130,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7b98a04a5efe6d9963ed3eacbfe2c64524516fa49e681d8d322e369d514a3179",
-        "initialDigest" : "b286314178d6d618238c566aa2f8c4bfea74d55e721105318c6a003bfbe25303"
+        "finalDigest" : "bfe99fdc47984260d8121be3c7e3975b7c0a8e46d71240d36ab29a90b4030496",
+        "initialDigest" : "06cc5980cb5caa2b7014f49f0a4997d08a4c914556e7481b086397d39404ce9b"
       },
       "name" : "acceptance-033",
       "seed" : "82"
@@ -4145,8 +4201,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "abab93baddecb9480a6e45960c463652959c847ee136daa5ad67259a03ffabdd",
-        "initialDigest" : "26416d010de46a64f1aeb9ba8469c3a7faad7825825e4f2de3eec1a3e36bd67f"
+        "finalDigest" : "095ba6be96ea6ee3fcf86b039813beba34727481e7fc1a541bdc5a89487cc4ff",
+        "initialDigest" : "869b44d33e1509f02844d83cf3f7d4b13d0def553dff65edb96461f28c7e7203"
       },
       "name" : "acceptance-034",
       "seed" : "89"
@@ -4216,8 +4272,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "4c1883c8ec4cf5f34e477675cb18a8baec2d6eda3e4b5a21a5ce259711ca78a5",
-        "initialDigest" : "3f531a9f850877c1bba783c7cec6b485a7fcc268a292b9be919d77aefc9b8b9d"
+        "finalDigest" : "ccc22726c2bf15bfda2ef0a2d4c0763258b72a362310abc60aa8d914354855e0",
+        "initialDigest" : "f0f00aa3ee75531aa4ef4fb1bf1c6286a14bc333420aed501610f08210c34f1a"
       },
       "name" : "acceptance-035",
       "seed" : "96"
@@ -4287,8 +4343,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7f3e6af9f19f363e4c24d4c2bbf2411b3712efea7f8d716c408f1c10b48e6fa6",
-        "initialDigest" : "e59f97c5952442435698086e0978879ac538ee2a9f67ed74f1a3db0d211c6677"
+        "finalDigest" : "0398ca028553b0145eb7df1a69ccee592f7fe656c05330763a646615bd955ff1",
+        "initialDigest" : "39ca0533287734edaf304da2733a1a19e6b233f1adf74bee78a3305f0e2d49e6"
       },
       "name" : "acceptance-036",
       "seed" : "3"
@@ -4358,8 +4414,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b0945ec88636365a2e806931369a0a817e02490e507a85ecb495002bbe254a3c",
-        "initialDigest" : "c26557be4ab2ca05971cb3306c233d5c02e5a0ef8cae6a49cbc9f44c997ad97a"
+        "finalDigest" : "3b7f92e2d0e4c9294af3ce88f5f9267df8c71e6b0c5c2c03d6d072af83669f83",
+        "initialDigest" : "e1943ed6802f0d148a4a8e5a767ac654573b9089c81b7672672d60d0652eb60e"
       },
       "name" : "acceptance-037",
       "seed" : "10"
@@ -4429,8 +4485,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "813e7d2d33674b7120e69a95f662c99fd767fe817c7f69a7d93ddfa549f2a61d",
-        "initialDigest" : "b592ee87aef1c1339cf8d7323e44828c19a0f39817746be2d66fce0e1fe71a2b"
+        "finalDigest" : "b183be3b1a45ca7e75dbd40b3c631adf307cef79c8a00403ba3a40aeeaa22fd3",
+        "initialDigest" : "715bb9eafdd1970a38ac249b17fd116bbac5ab22e8b58472ca33618da5ab0027"
       },
       "name" : "acceptance-038",
       "seed" : "17"
@@ -4500,8 +4556,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bf22ff3bb47dc4d0336e8ae62325c21adf5698747713dd84b81f07b2e4d56742",
-        "initialDigest" : "01713ca099fee1f7c134d954ebe818379b7e2747f96d9f8aa3131aee9d28db41"
+        "finalDigest" : "be9f2d23cc53c142f92b21baae214a7cd7d09d6e5e54ab8d8c844c5ee8f538f1",
+        "initialDigest" : "2fa2a6c55bc3c7f848683199687ab9fd61901de82f3120cbf6dad1338ba50d1d"
       },
       "name" : "acceptance-039",
       "seed" : "24"
@@ -4571,8 +4627,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6921864a13fc7c3b89205b087a377d4f65d6e99313a4573d2ba56e02c6dc68e4",
-        "initialDigest" : "c7c5267ee46307815a27593f16d9cdb4255575476c3c82c7c06dc365542d41e5"
+        "finalDigest" : "354142ab1bc9da7514303c5fbb00869424ac0d6b44ca9f98bf36ee02c52402cd",
+        "initialDigest" : "87a55958742e1a709def4c5f7f3693e236c5a61e5adbb2043d86960843c7834a"
       },
       "name" : "acceptance-040",
       "seed" : "31"
@@ -4634,8 +4690,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "58718c94c550e0e334dc95c79a8d1b2aecaa8851a2ae9a384013bea9716c65c7",
-        "initialDigest" : "6aa74d47c1d8ae8fde628601b9df27778308f6d01304ebd40426171105efed73",
+        "finalDigest" : "dfc9fd68675226cad1f679809042cc7396432e5b12aeb085f84c2b9ae1c97e8f",
+        "initialDigest" : "5436a190a6851de553b602691d6e537184f1bbba85439fe995e7dd85dae34dff",
         "outcome" : "won"
       },
       "name" : "acceptance-041",
@@ -4698,8 +4754,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0a67f6034a1df6ae1c334168903685dad66cc9d38cc69fdfeccf5dda13650afe",
-        "initialDigest" : "97c111d041421f450f65c202b71467818654e3a52e326ffa82bb63d347f4a1a0",
+        "finalDigest" : "3e4ab71d62538c82097fea39ae0a1ee346e738ff68b56b47e45c69abf34c00d1",
+        "initialDigest" : "52b644fdc3a4a7fd1c7ec5d59152831d7b64c2bdbd55ff2f743861e1ea8ddf17",
         "outcome" : "won"
       },
       "name" : "acceptance-042",
@@ -4762,8 +4818,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "33a9a6f07fac78de2df6e610f3c09f706e93fb0260ffba8bfbe164ffa64fd1fb",
-        "initialDigest" : "8d6b61ee048d600ab72148a762b1469269131f8618ea1533751f06135622e4de",
+        "finalDigest" : "96af9a66438f4aba2338cdab22b3c5845b837f66ea7061ceff7e6383b64eda73",
+        "initialDigest" : "70b4c2ecf1d2d7e05d72e894b2dfa65bce950ecc22b3ede6f5a16d18276caab8",
         "outcome" : "won"
       },
       "name" : "acceptance-043",
@@ -4826,8 +4882,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3692f80d57937d3645c2a1e61143994ae2d912211eb47d323e529e07eed22b30",
-        "initialDigest" : "79ad73cf99d08b0236aa17e1d09e49f57b0f64c2662f53b432158ee6ff7299d9",
+        "finalDigest" : "835c402db15739942d7e56d32c6ca95b6afc94273c2d3881fce4552a1703c93c",
+        "initialDigest" : "8302bc181d271b261172044d94d99a81ade03785347841e351f8ecc02a89fd35",
         "outcome" : "won"
       },
       "name" : "acceptance-044",
@@ -4890,8 +4946,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "136dd1ca56e6a38843cf67e10bcb558d673122c9f91a13f3705b6f008a545fef",
-        "initialDigest" : "01a874f921781d611268ad833310c6b937bf064310c2199aea4effb8c92ebe08",
+        "finalDigest" : "31f348b5c858874a916f1961f2b2dd95f150da87e8dec4fd1d3b243c50bd2fbe",
+        "initialDigest" : "f507451843f292cc991c10b689cd2de440e05446cc307bf7aa8b9190f1db28e4",
         "outcome" : "won"
       },
       "name" : "acceptance-045",
@@ -4965,8 +5021,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f3b7e972f59e7a8eeda53d6be9a7ed58a8e86a7b834c373de5870ad5d61c4b49",
-        "initialDigest" : "49263ca5e0010eb9e2c11598626b70ff1d322b9d3850b6e3a61449108f524780",
+        "finalDigest" : "68348dae8ea8566d89b6ba05503bfc2961b74806ed50a99e9f5ff1243119307f",
+        "initialDigest" : "d90b65061f9783501206d9e3809d50f3893d04697459a4d2f954f19e1da3e68c",
         "outcome" : "won"
       },
       "name" : "acceptance-046",
@@ -5040,8 +5096,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e3b6de7b548e6609140b0c0679504fbce8e53769cde51d027f83a2f44ea29a1a",
-        "initialDigest" : "d4610d78879d96b7c1f0baf94b4a10daa7451c2da0e1863022f3937de941caef",
+        "finalDigest" : "5fb24b6e6486899115ff802f38ff52fb7b1eeaac46705a03de42a28cdab33987",
+        "initialDigest" : "12e0748dd0880471d3b7c69db6ff7bb45fadfef10d266e43856e66e799d39591",
         "outcome" : "won"
       },
       "name" : "acceptance-047",
@@ -5126,8 +5182,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2a9dc19fa538fa07c7c340e5a874ec9e15b4b99c821b43d8a6e8998c698b2632",
-        "initialDigest" : "fe4c4aebc70f33589793728cf9aedd85de2987823542f0929dab135b27806816",
+        "finalDigest" : "3fe03bd9dd62a80ce141a837d842df1c2888f01f8dca550daa7286726379ef7d",
+        "initialDigest" : "b39091f9ff9aa5422779df63b3efb7b2e3f1df418dd6c2c574b0c8faea5ea3b7",
         "outcome" : "won"
       },
       "name" : "acceptance-048",
@@ -5212,8 +5268,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "99fa944a066a8ec5034376c2b98172273cedeb0f86540b8598a59b1c1941536d",
-        "initialDigest" : "3e315c2ab36641ac1975d36eb98f2dde88049bffa8735cf8c97785c5967ffdea",
+        "finalDigest" : "73814d02deee5a06b548449e1b867045201605bd2f291f7c556920e9d4190940",
+        "initialDigest" : "66cb50266bfac1e1ad2bfe4d5065b18bbbc31364a202094df20b2ac92246e639",
         "outcome" : "won"
       },
       "name" : "acceptance-049",
@@ -5254,8 +5310,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "14b7ab564ecadf8d41b07542cb305e4925bd3ccd1330575df94bef39b032f0ca",
-        "initialDigest" : "a8ef6a7d070455b7d27775fa805210211ba488b2e759315752ab99d4e0ed227f",
+        "finalDigest" : "0ce975695bc05aa722dc68bf48a50ad31dd8c76c137bfe7ee82717225c056427",
+        "initialDigest" : "4d5bfe6c10bb5f6f3f0908cf2d38cd46c6cf8c8e69f14abac7ab409fff8a36b1",
         "outcome" : "won"
       },
       "name" : "acceptance-050",
@@ -5296,8 +5352,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "99fe4d77edc7798745c06711408e574c74cd806cb4599faf24db607d0bd786bd",
-        "initialDigest" : "97ad7fe6dbe83e44826b8f089c0cbe188b8dd1927503e780093de96612240e6c"
+        "finalDigest" : "e89f1fcc4fb5e31daf397e57f642ce56cc02fffd67ee6b1e7b2611bc8ab8f434",
+        "initialDigest" : "601e4caa8df5024b994caa46181765962a37881ad8e4adde70b4ce15a34bc06b"
       },
       "name" : "acceptance-051",
       "seed" : "8"
@@ -5326,8 +5382,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "49e20db5ca6f539d170696f63395b9c6d5de0226e28910da0ce8c70bb721ae9e",
-        "initialDigest" : "49e20db5ca6f539d170696f63395b9c6d5de0226e28910da0ce8c70bb721ae9e"
+        "finalDigest" : "4c0a5abe57e521b0c86a678fdac4bad92bb611207acabb8024980e95ad8d9e6d",
+        "initialDigest" : "4c0a5abe57e521b0c86a678fdac4bad92bb611207acabb8024980e95ad8d9e6d"
       },
       "name" : "acceptance-052",
       "seed" : "15"
@@ -5356,8 +5412,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "67256e0994ae7809b3a983ce5d23e21a830bbdab0def76bf7d65e874f26e77a3",
-        "initialDigest" : "67256e0994ae7809b3a983ce5d23e21a830bbdab0def76bf7d65e874f26e77a3"
+        "finalDigest" : "331001606c4eaba782a1d224811d100f39fcb9250193a5e973bff089b4b5e202",
+        "initialDigest" : "331001606c4eaba782a1d224811d100f39fcb9250193a5e973bff089b4b5e202"
       },
       "name" : "acceptance-053",
       "seed" : "22"
@@ -5397,8 +5453,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "0e8828a192506fa6540577fd9c3483e94844ce537ad896ab4bea7b3385161d46",
-        "initialDigest" : "8b364f50ce1328328818570c8c3c1f16d27a9a851134de75613a7f66edd246b9"
+        "finalDigest" : "e489a423153da081ecd3e6685282bfa4434bf403bed0dd7ad7cd4f8469da823b",
+        "initialDigest" : "cf9d738ada929f841065f103cee1b1b46c9914ab5bec1b65660cc4aa1d4612c1"
       },
       "name" : "acceptance-054",
       "seed" : "29"
@@ -5427,8 +5483,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3cf193d2450140c7fac73d0a01df167ea55a9ba7678242c6ee5b12f236a432fe",
-        "initialDigest" : "3cf193d2450140c7fac73d0a01df167ea55a9ba7678242c6ee5b12f236a432fe"
+        "finalDigest" : "c324c3e666cdcfba647530261c32f6413c210d257375636513789d3eb87c3cf7",
+        "initialDigest" : "c324c3e666cdcfba647530261c32f6413c210d257375636513789d3eb87c3cf7"
       },
       "name" : "acceptance-055",
       "seed" : "36"
@@ -5457,8 +5513,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "205f45aafeef2d4e4011d59a094cc0c42f6a5e7bebb8ab6c47b578cc432b92dc",
-        "initialDigest" : "205f45aafeef2d4e4011d59a094cc0c42f6a5e7bebb8ab6c47b578cc432b92dc"
+        "finalDigest" : "eeb429e366ebff070dbb6aaac21eaeb12503fd8a92b22be01002f6d038cb73de",
+        "initialDigest" : "eeb429e366ebff070dbb6aaac21eaeb12503fd8a92b22be01002f6d038cb73de"
       },
       "name" : "acceptance-056",
       "seed" : "43"
@@ -5487,8 +5543,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "3fca8e4f01bb02b0cb9e6861a2ec0d5778972a42eef78dc5e9d18687a2e145a5",
-        "initialDigest" : "3fca8e4f01bb02b0cb9e6861a2ec0d5778972a42eef78dc5e9d18687a2e145a5"
+        "finalDigest" : "9cf4bac3466774061e868df6b3f9be30e277a8c02f6ad02fcf52c6227ac50928",
+        "initialDigest" : "9cf4bac3466774061e868df6b3f9be30e277a8c02f6ad02fcf52c6227ac50928"
       },
       "name" : "acceptance-057",
       "seed" : "50"
@@ -5517,8 +5573,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "7a9ff9736a2eed5d43784c11ec3d601fe692186fdbf54dcb288fef4f8c44bfa1",
-        "initialDigest" : "7a9ff9736a2eed5d43784c11ec3d601fe692186fdbf54dcb288fef4f8c44bfa1"
+        "finalDigest" : "ac6ac2fa61f8de901d50dd7c1b1c7185b760063f353dde10d9cd45172c692473",
+        "initialDigest" : "ac6ac2fa61f8de901d50dd7c1b1c7185b760063f353dde10d9cd45172c692473"
       },
       "name" : "acceptance-058",
       "seed" : "57"
@@ -5547,8 +5603,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "9296d781ada0a48e45fc5dad1094953d8f0bf7fa8b85440059614a7de871c386",
-        "initialDigest" : "9296d781ada0a48e45fc5dad1094953d8f0bf7fa8b85440059614a7de871c386"
+        "finalDigest" : "35589351ed00344744074087d9af4f9ddafc448f3be8a3df831612434b080d27",
+        "initialDigest" : "35589351ed00344744074087d9af4f9ddafc448f3be8a3df831612434b080d27"
       },
       "name" : "acceptance-059",
       "seed" : "64"
@@ -5577,8 +5633,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "424df77f0de323e6647de4755f1b44c9a57450bc3f3a9c1ec73358ae4f0de1b3",
-        "initialDigest" : "424df77f0de323e6647de4755f1b44c9a57450bc3f3a9c1ec73358ae4f0de1b3"
+        "finalDigest" : "d816af04d064274e839375845705ac103bcb339088ab750de2d28d0663ec814d",
+        "initialDigest" : "d816af04d064274e839375845705ac103bcb339088ab750de2d28d0663ec814d"
       },
       "name" : "acceptance-060",
       "seed" : "71"
@@ -5682,8 +5738,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e07130cac9d8dbeda9f8d4b02527bd86c9aa4ce197b9a95a4db1b0a0c735c008",
-        "initialDigest" : "488adc12d25239045f17423dc5b3d3dfd75e5518cdd7dbf3e04a3a9547c82121",
+        "finalDigest" : "6a47325d0b4c18842741a7e79ace42d1699e86953a313868728bf1e45c7277c1",
+        "initialDigest" : "c946190fb4f6ae4596ff2c5bd12972ec2058ae5ccf75c8a81854a565a838b0b1",
         "outcome" : "won"
       },
       "name" : "acceptance-061",
@@ -5788,8 +5844,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e126a760e89b09994eff33a6f30bb5f59c1900277dd2b2aaf16de129404d4b55",
-        "initialDigest" : "da4264f3c6141f402cf9e1c29d40ad8c03e82da29a7b5f29d39de94dd982a056",
+        "finalDigest" : "575dd3cc3fffb1c1022c939381f4e4cbd2834b04d364533d8a886bf2323393bf",
+        "initialDigest" : "f6bbb60735a3d561d0ebaa00e86a1f42552e1273aff1dc2936544d5876eec62b",
         "outcome" : "won"
       },
       "name" : "acceptance-062",
@@ -5894,8 +5950,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6adf8b4f12f068ca5fc7f03068e7865703f54ab95dd3cff023f53c75cb6d2959",
-        "initialDigest" : "2e5018345b6025db286928022e0ae9b9c235c3f4ece912891c84aa1789dbf215",
+        "finalDigest" : "3ef812f082249536a3a7f6629f1b38d4b03f28f486fa5c51d6ee505248f6bcca",
+        "initialDigest" : "bd1fc3c30e8f9088a6d24c1eece3a39115f76d8bb8f07685935054a0058ed69e",
         "outcome" : "won"
       },
       "name" : "acceptance-063",
@@ -6000,8 +6056,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "1edae5f5bc8eba3516787be5bf13a879b987b0908acf56d655d04b14de416fa8",
-        "initialDigest" : "f34e3c919d73d6761680d9f56a526e16afb03b125dacb47c5b8de50dc83b237a",
+        "finalDigest" : "a8aaca53653a493cb8ee8d2f35a26f75d4a2740892f273db7cfed62c49f7c2b0",
+        "initialDigest" : "098226c702fc479a920d39b4ae24f2b726b8beb00708cf1c7fdd38d1bac5884d",
         "outcome" : "won"
       },
       "name" : "acceptance-064",
@@ -6084,8 +6140,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "bd35798c38b02e8a080cafa95846c7226b735b55aba3dee4741306791b051bf0",
-        "initialDigest" : "13b8bd3d9eba7cb2c8e0c629ba095ae0eed90b9f77ef726231763c7ac84c3199",
+        "finalDigest" : "dbf568452a798240967cec3b0e0db239039343155621246148e58456e0406a6a",
+        "initialDigest" : "eac0e38de8ebd826a356cd8018d6eee1b89e99b14a565510086307353ea86d7e",
         "outcome" : "won"
       },
       "name" : "acceptance-065",
@@ -6168,8 +6224,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6643224b113cae1875bfce5846751d528f149edb631fcbe65f5d98fe2a7401eb",
-        "initialDigest" : "62ef6a5c63c20b45562726f07548c8e30a6551cb1f42b4d5001e1dd63ddb99d9",
+        "finalDigest" : "747a22f726114d01d356a1cbd18653914f0169c3845b2c05e674d7e06879f5d9",
+        "initialDigest" : "5043daeea9c85c2e28f011de04c18f85b912dd3cc86767d0ed8a06aa860932e4",
         "outcome" : "won"
       },
       "name" : "acceptance-066",
@@ -6252,8 +6308,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "53c3fc2a887c8d172a5e739ee68c353ac88d777123a392f757cb7cf2a01ed851",
-        "initialDigest" : "7561856a9ee755741efdf999260cf91e52839458e52b3de91bc41dc0e4421aa2",
+        "finalDigest" : "bea60e4d380171a5d8913ff972aa6924b284b484e170ed24ffa55616c920812c",
+        "initialDigest" : "7dadb69bf0a08e615d0ef7dc82169b3acdbfce435c43776590913306eab89d1e",
         "outcome" : "won"
       },
       "name" : "acceptance-067",
@@ -6336,8 +6392,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "b7c99a26a0fcb0ea01b88444fc8551f877231ed4fe1151f2283ad7a0448f8d5a",
-        "initialDigest" : "8d95d61564cdfb73339848ca0ff83a49c47d1de4f8b1f8d9d2095ab1ef87e6a2",
+        "finalDigest" : "a2d8c89c20351ca526ae845339aaa42804bd7d789bc53fa52f066e4d7d4690c3",
+        "initialDigest" : "cd41f638de9184bd1f175e58042d36ead31aa73422e8fe66f5928cf7706ebed2",
         "outcome" : "won"
       },
       "name" : "acceptance-068",
@@ -6420,8 +6476,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "9d682a5171420c84a3aac4609f451d5d75ed6cbc4c5124313535133559fc6110",
-        "initialDigest" : "76753a5c40b97984921e678bc309bd058fffd8f46d35567cf3b2c9face9aef2c",
+        "finalDigest" : "a4b38ce28160a6d811e31cfb98cb852936f5f412e83db4ca6eb1a7cf8224248b",
+        "initialDigest" : "581753618361ffa6f1946dda344478a3b5780e1f78d06a2216aa12f63c0c495b",
         "outcome" : "won"
       },
       "name" : "acceptance-069",
@@ -6515,8 +6571,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "e77edfb11be4212b292142de47d5789e7c9f9fc29552d95c694b9d599db84202",
-        "initialDigest" : "0cda0014a7b926e52dfc9272eb7f05e30f3001b6170ce0669783fdfb9d0785af",
+        "finalDigest" : "96a6555e4e3897ab5cb4152af5aa496fce310ae3149e8602cbd7f6b626e7f995",
+        "initialDigest" : "f4ae9610d2eb4bb539a528ba5494a03bf8a408fd54122bf0acbd84bfd6a71996",
         "outcome" : "won"
       },
       "name" : "acceptance-070",
@@ -6526,6 +6582,60 @@
       "entries" : [
         {
           "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
             "control" : "level.next",
             "values" : [
 
@@ -6567,8 +6677,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "2eec4424b785580bfcea875b77b69821ca00f2d7fd24c66c09bb7af4283ffd12",
-        "initialDigest" : "63f75d12dbbeef8208a3a75ad9d89bff32c2d6dd5d52d0c6c66568c12f948a34"
+        "finalDigest" : "cc116b9f466f792dfd6370363ce8cd2dbd649235e338cd22d660169cfd3b8494",
+        "initialDigest" : "760da564f3e43e9feb1a7c1b1505d3631001f310c786d5ddc727501c56ea22c6"
       },
       "name" : "acceptance-071",
       "seed" : "48"
@@ -6577,6 +6687,60 @@
       "entries" : [
         {
           "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
             "control" : "level.next",
             "values" : [
 
@@ -6618,8 +6782,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6cc79bd613a86bb27b2752443be2d97228538cefceebd03b49be6bf5dbbaa261",
-        "initialDigest" : "5495988b9019b77fd350f908d8ab6567e9ecf6f945a3a08fb72315c4e56980d7"
+        "finalDigest" : "b1e268bf6ec6667bfe2e3033387fb413351a5651ae7e92e63da42be69e4a698b",
+        "initialDigest" : "99188d629bf530fec4b36dc7daeeea2db046f8c02fa0b4090ae5e8280f2ae6c4"
       },
       "name" : "acceptance-072",
       "seed" : "55"
@@ -6628,6 +6792,49 @@
       "entries" : [
         {
           "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
             "control" : "level.next",
             "values" : [
 
@@ -6669,8 +6876,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "29dc39fe1d2723d55dbf2b1210bfd8c79baefd5dc9e21f1ab8ec9ce61b99a5da",
-        "initialDigest" : "807ef0d8de0436add6bebd9cc54938f8d7655ff81e3411f4ed998dd7563a1e3b"
+        "finalDigest" : "91325070ddfadffcab43b745e75b04c459c1af16eae99f0e3ac58d6828bc2ccf",
+        "initialDigest" : "ad7c931c03e1e5b306dc05403975de68a924f621ebafe05e52527118beeb44ce"
       },
       "name" : "acceptance-073",
       "seed" : "62"
@@ -6679,6 +6886,49 @@
       "entries" : [
         {
           "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
             "control" : "level.next",
             "values" : [
 
@@ -6720,14 +6970,57 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "a7dbdfb8d9fc9cc67d5c2da506b0d2c339b53eb40e7491dd1dd216a00f50fdb3",
-        "initialDigest" : "546b9f2d67d7491275b95b95b5d86e7d8132137364ba2c2452054d347d04e75a"
+        "finalDigest" : "b2cf8de795e290e10a6c1fa6b29f30fca93a48ecf3acbeb200be5b2171773098",
+        "initialDigest" : "829abb42dd9ad690e1ed0388d691608f49a79a309e7f7ae4360bcde0a028a03c"
       },
       "name" : "acceptance-074",
       "seed" : "69"
     },
     {
       "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
         {
           "action" : {
             "control" : "level.next",
@@ -6771,14 +7064,79 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "6d8b1d9b216205fe4a4236eec3158205b928969d346515634492ecb0235d82e0",
-        "initialDigest" : "eab44000478126915aa856df47536b3678f8cf16e3d2d85b30484ebe709d8ef6"
+        "finalDigest" : "4c15d17a7ca1c06db0b39bfe5f80775703e0289a81d95e7f3d6b0c4f5553c7dc",
+        "initialDigest" : "bb94619b00ce20b5bd3fd0ed7962dc0b8a06b85da793dcb1e002f983fd53b873"
       },
       "name" : "acceptance-075",
       "seed" : "76"
     },
     {
       "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
         {
           "action" : {
             "control" : "level.next",
@@ -6822,14 +7180,68 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "21a95bd19ca7c8c8b438856b506f73d880b5a1b9722776bec072e891aad228aa",
-        "initialDigest" : "826eb587d0e0db414aa9053016e5ab359f23ee8491236a9f6d849eebebd17c7d"
+        "finalDigest" : "5b89be8a67c72e062fe31382f6cd5a796add0743c95a4a4429847f13242aa010",
+        "initialDigest" : "d079ab14a5adfad24bf777355da358b9981661723d874c74c0178427fd9b5117"
       },
       "name" : "acceptance-076",
       "seed" : "83"
     },
     {
       "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
         {
           "action" : {
             "control" : "level.next",
@@ -6873,14 +7285,79 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "f63dd9b5063e4a959ef9af08509cd9580c89f5cfd3cf91dcdd23f905285d52a4",
-        "initialDigest" : "eff5e8d52a16d07c94817bcd158fa48995792094d9c407964f1fc50ab22faeb4"
+        "finalDigest" : "c6269091ceae0480baf92bf0b89b732a358ef83da5e5d3731994d4f62181f357",
+        "initialDigest" : "b1224e7c474f68672031c0c28c1fdf4ba162feb930ddfa019aa13b52a5bcc1d8"
       },
       "name" : "acceptance-077",
       "seed" : "90"
     },
     {
       "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
         {
           "action" : {
             "control" : "level.next",
@@ -6924,14 +7401,35 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "16625b3887460802b493108193783a3e96a4d8b8ed891e93c3bb4bcc6c91fe52",
-        "initialDigest" : "c3622009f3f6c85f4169154f35ad0689a6d9094bc63746b83cb2f65515e168ae"
+        "finalDigest" : "c0d81170f8be63dc643658a1cc5761e690a948ad4780d1a1516b328060135542",
+        "initialDigest" : "45c49f5ab977890274933d051a2d55e10927a4fb080fafd60fc1ef77a7e5c604"
       },
       "name" : "acceptance-078",
       "seed" : "97"
     },
     {
       "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
         {
           "action" : {
             "control" : "level.next",
@@ -6975,14 +7473,46 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "949a3d80401690c4c5c18ceb7b671d49be14df6f02c013bf2cc9d857701f58aa",
-        "initialDigest" : "ed4630b3e62dcfc50c06306b95bb46125a13347a112030431570f3d421882f9f"
+        "finalDigest" : "da83728a8a2c573a039ce2a89d1d9369a5a9ae6f2961ea1f7084f880853c9985",
+        "initialDigest" : "fe13324c7814c367d103f59517fce32dcc7f073f008e06b641448a96ea314e91"
       },
       "name" : "acceptance-079",
       "seed" : "4"
     },
     {
       "entries" : [
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "orbit.phase",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
         {
           "action" : {
             "control" : "level.next",
@@ -7026,8 +7556,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "8bc035c167eaf420cac9e5b301ec4897f0b84bc8316eeeb3a1ee3dc98fb832fa",
-        "initialDigest" : "cdae157929fc2710e22afd8667032604c99caf60d1af7f7203b2ac48729a3c42"
+        "finalDigest" : "019881b069d5329d2ccbeea6972a244234078ccba2dccb05b090e953f971e379",
+        "initialDigest" : "b6eba0902f24f92dbc87624646d327be050657e7bba2b35af547e364d0174f48"
       },
       "name" : "acceptance-080",
       "seed" : "11"
@@ -7068,8 +7598,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "90d4d0fce47480e11a7847e51f545bf66de83408cae17cc1ef0951ed75b1f36c",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "finalDigest" : "4d47c9b0f7f086dcd53f29c4ee6cc56027f66bc831ac142588df875d90e7b0b2",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e",
         "outcome" : "won"
       },
       "name" : "fixture-level-1-solved",
@@ -7089,8 +7619,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "5d9427a6d9164d680a6c5e51d3110427ed330fbc1ee5cfeaf22fa8a2b72d74db",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504",
+        "finalDigest" : "22f482a62840e9516844e056ac9024ed8bc0cd8e9a2fcd6d5f4f677b2c4cce64",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e",
         "outcome" : "failed"
       },
       "name" : "fixture-run-fails",
@@ -7131,8 +7661,8 @@
         }
       ],
       "expect" : {
-        "finalDigest" : "58e4dde97d33461270815f3a199b8000e734cc6c4ce74f534ba02af08ca00d92",
-        "initialDigest" : "224cf1bed62b19846a3c6ab1c91c7f277aadd3bc1299f187118115401899d504"
+        "finalDigest" : "f0c5e239ddb9f088675ac9f99afca381b6da3b39d92ce6cd886df97d215d6b05",
+        "initialDigest" : "6ce78e25cd1ee68b9446ed810f3d37a811706ecbe1ccdf5dfe0dbc39bbc2813e"
       },
       "name" : "fixture-undo-redo",
       "seed" : "0"

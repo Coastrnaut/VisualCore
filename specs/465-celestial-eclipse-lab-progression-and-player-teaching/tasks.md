@@ -53,7 +53,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1705-004 Edit `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabExperienceCore.swift`
+- [X] T-R02G1705-004 Edit `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabExperienceCore.swift` — Verified 2026-11-25: 2026-11-25 adapter controls level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss; codes r02-g17.locked and r02-g17.date; practice budget 24; progress and mode digested; snapshot schema 2 with migration from 1; level.next to the next open level; scenarios updated and manifest regenerated; 192 CelestialEclipseLab host tests pass (host-4 exit 0)
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g17.locked`, `r02-g17.date`; practice budget 24 on a copy of the level, no stars, no
   unlocks; the daily level is playable even while still locked in the campaign, and a daily win records the level's best

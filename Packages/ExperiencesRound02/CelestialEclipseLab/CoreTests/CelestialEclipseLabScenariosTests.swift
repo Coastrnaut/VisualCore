@@ -7,8 +7,10 @@
 // in the state of its family (a refusal with the kernel's or the adapter's code, a perturbed plan recovered, an
 // exhausted budget refused further changes, a won plan whose digest no quality tier changes, undo and redo restoring
 // digests, a chosen body and shown tick that leave the digest alone, a failing run undone — `unwanted` and `window`
-// both reached — the next level's opening digest); and the committed `scenario-manifest.json` equal to the Swift
-// manifest (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run (`swift test`); explicit types, plain loops.
+// both reached — the won level recorded and the next level's fresh play); and the committed `scenario-manifest.json`
+// equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run (`swift test`); explicit types,
+// plain loops. Feature 465 (R02-G17-05) T-R02G1705-004: the integration rows win their level before `level.next` (the
+// next open level).
 #if DEBUG || VISUALCORE_AUTOMATION
 @testable import CelestialEclipseLabCore
 import Foundation
@@ -326,12 +328,28 @@ private func digest(of core: CelestialEclipseLabExperienceCore) throws -> String
                 let restoredDigest: String = try digest(of: restored)
                 #expect(restored == core && restoredDigest == played.final, "\(name)")
             case .integration:
+                // Feature 465: `level.next` needs the next level open, so the row first wins its level's plan; on
+                // level 100 `level.next` is refused `r02-g17.locked` (no wrap) and level 1 is chosen instead.
                 let next: Int = Core.nextLevel(after: level)
                 #expect(core.levelNumber == next && core.play.stage == .playing, "\(name)")
-                let nextOpening: String = try #require(Core.expectedDigest(for: scenarioID, seed: UInt64(next - 1),
-                                                                           entries: []))
-                #expect(played.final == nextOpening, "\(name)")
-                #expect(played.results == ["accepted", "accepted", "accepted", Core.kernelActionCode], "\(name)")
+                #expect(Self.kinds(core) == [.phase, .undo] && core.play.actionsSpent == 0, "\(name)")
+                #expect(core.mode == .campaign && core.progress.solved[level] != nil, "\(name)")
+                var won: [ScenarioStep] = Core.winningEntries(level)
+                won += Core.integrationMoveEntries(level)
+                let nextFresh: String = try #require(Core.expectedDigest(for: scenarioID, seed: spec.seed,
+                                                                         entries: won))
+                #expect(played.final == nextFresh, "\(name)")
+                var results: [String] = []
+                for _ in 0...actions.count { results.append("accepted") }
+                if level == Core.levelNumbers.upperBound {
+                    #expect(core.progress.frontier == Core.levelNumbers.upperBound, "\(name)")
+                    results += [Core.lockedCode, "accepted"]
+                } else {
+                    #expect(core.progress.frontier == next, "\(name)")
+                    results.append("accepted")
+                }
+                results += ["accepted", "accepted", Core.kernelActionCode]
+                #expect(played.results == results, "\(name)")
             }
         }
         // The runs fail with an unwanted eclipse and with a target outside its window; no scripted run of these
