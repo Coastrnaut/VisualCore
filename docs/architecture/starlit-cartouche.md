@@ -181,3 +181,29 @@ from the ship's star in index order, waits 0 … 8, flyable ones only) for the l
   wait adjustable with VoiceOver, a value in words on every control, rows that become columns at accessibility text
   sizes and a 520-point readable width on iPad.
 
+
+## Persistence and replay (feature 457, R02-G16-07)
+
+- **Traces.** A campaign or daily win stores its result with the winning trace: the play's effective legs in order,
+  each `.leg(star, wait)` as the kernel applied it (`StarlitCartoucheReconciliation.netTrace`: an undone leg is left out
+  unless redone; at most 64 legs), marked verified. Actions spent still count undone legs, so they are at least the
+  trace's legs; a better result replaces a worse one, a tie keeps the earlier trace; practice and replay record nothing.
+- **Reconciliation.** On restore every traced result is replayed on a fresh play of its certified level (the campaign
+  budget) and kept only if every leg is accepted, none fails, the play ends won, it spends at most its recorded actions
+  and its stars match the stars rule against the certified witness's leg count; otherwise it is dropped and counted
+  (`reconciliationDropped`, never digested), and the presenter announces the count once ("1 saved result could not be
+  checked and was removed."). A result marked verified without a trace is an edited save and is dropped too. Untraced
+  results from schema 1 or 2 are kept, unverified. The frontier is restored as saved.
+- **Schema 3.** The digest ("r02-g16.starlit-cartouche.v3") keeps v2's parts with the traces in the progress; the
+  payload gains `sound`, migrating 1 → 2 → 3 (2 → 3: empty traces, unverified, sound off). A saved replay restores only
+  when its records are exactly the first legs of its level's verified trace (no undo or redo); otherwise the payload is
+  damaged. A saved replay whose result did not survive reconciliation returns to the campaign at that level.
+- **Replay.** `replay.start [level]` replays a verified trace from a fresh play (tutorial done, the campaign budget),
+  `replay.step` flies the next leg (`r02-g16.replay-end` after the last), `replay.stop` returns to the campaign at that
+  level (the frontier when it is not open); every other play control is refused (`r02-g16.replay`, "Stop the replay
+  first.") except dismissing the tutorial, choosing a destination and wait (presentation) and the sound setting. A
+  replayed win claims no stars. The panel offers "Replay best solution" with Step and Stop and the position ("Replay:
+  leg k of n"). For every one of the 100 certified levels a host test wins the level through the adapter, replays it and
+  checks each step's fingerprint against the witness file (`StarlitCartoucheReplayCatalogTests`).
+- **Sound setting.** `settings.sound [0 … 1]` stores the sound choice in the snapshot (never the digest); the panel's
+  Sound toggle sends it and the presenter applies the restored choice when the experience opens.

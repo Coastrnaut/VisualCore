@@ -899,5 +899,7 @@ schema 2.
 Feature 456 (R02-G16-06) adds `StarlitCartoucheFeedbackPlan` (announcements and haptics), `StarlitCartoucheLights`
 (eased glow and won look) and `StarlitCartoucheSoundRecipe` (the audition and the ambient loop), with VoiceOver
 support in the panel.
+Feature 457 (R02-G16-07) adds `StarlitCartoucheReconciliation` (winning traces, replayed and checked on restore),
+the replay mode (`replay.start`, `replay.step`, `replay.stop`), the saved sound setting and snapshot schema 3.
 See
 [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).

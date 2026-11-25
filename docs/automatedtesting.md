@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G16-06: Starlit Cartouche polish and accessibility).
+Last updated: 2026-11-24 (R02-G16-07: Starlit Cartouche persistence and replay).
 
 ## 1. What is tested, and where
 
@@ -884,6 +884,17 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   adversarial flicker patterns sampled at 60 Hz; the audition and ambient recipes as pure functions. Simulator: labels
   and values, the adjustable destination and wait, level 1 won through accessibility actions, recorded feedback, the
   sound state table and the Reduce Motion and Reduce Flashing frames.
+- **Starlit Cartouche persistence and replay** (R02-G16-07, 2026-11-24). Host: `StarlitCartoucheReconciliationTests`
+  (every certified witness as a trace verifies; edited stars, actions spent, legs, illegal, failing and overlong traces
+  dropped and counted; netTrace over undo and redo), `StarlitCartoucheReplayCoreTests` (traces stored, replay rules and
+  codes, a replay saved mid-way restored, altered replays damaged, migrations 1 → 3 and 2 → 3, the sound setting never
+  digested), `StarlitCartouchePersistenceTests` (seeded round trips, migrations, honest and edited saves) and
+  `StarlitCartoucheReplayCatalogTests` (all 100 levels won and replayed through the adapter against the witness
+  fingerprints). Simulator: `StarlitCartoucheReplayTests` (replay through the port, refusals, the dropped announcement
+  once, the saved sound choice). Lesson: the next gate's adapter edits were started in the repository while the
+  previous gate's chain still ran; its app-unit step compiled the half-done tree and failed. The edits were set aside,
+  the check rerun on the committed tree, and the next gate's code is now written in an isolated copy until the chain
+  prints DONE.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15
