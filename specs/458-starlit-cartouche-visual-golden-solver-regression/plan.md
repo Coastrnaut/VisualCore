@@ -8,7 +8,7 @@
 Add Starlit Cartouche's regression net on Voxel Origami's feature-448 pattern: a host solver regression over all 100
 levels (exact witness replay with per-action fingerprints and digests, a win on exactly the last leg, exact re-plan to
 the witness's legs with `statesByDepth[size − 1]` equal to the counterexample's states and `work` at most
-`workBound`, twelve named alterations); a code-only golden set of 16 frame descriptions (`StarlitCartoucheGolden`,
+`workBound`, thirteen named alterations); a code-only golden set of 16 frame descriptions (`StarlitCartoucheGolden`,
 DEBUG or VISUALCORE_AUTOMATION only, pinned in `golden-frames.json` with SHA-256 digests, 1/8-pixel quantum fallback
 and a self-check); simulator tests that render the 16 frames against their descriptions and bound memory over 12
 open–draw–warn–close cycles; a named CI step and a local command. The release check's forbidden-symbol list gains

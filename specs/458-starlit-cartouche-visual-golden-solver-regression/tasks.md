@@ -20,23 +20,23 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheRegressionSolverTests.swift` (agent A: for
   every level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's legs
   replay on a fresh play to a win on exactly the last leg and not before, within the budget, with its per-action
-  fingerprints (after begin, after the tutorial on a tutorial level, then one per leg) and digests; plan returns
-  exactly the witness's legs with statesByDepth[size − 1] equal to the counterexample's states at depth size − 1, with
-  work ≤ workBound"; twelve named alterations of clarification Q2 (a star's orbit, a corridor's ends, a hazard, the
-  range, the beacon, the deadline, a symbol stroke, the budget; a plan leg; a witness action, a per-action fingerprint
-  or digest; the counterexample's state count) each fail naming the level and the part); `--name host -- swift test
-  --package-path Packages/ExperiencesRound02 --filter StarlitCartoucheRegressionSolverTests`
+  fingerprints (after begin, after the tutorial on a tutorial level, then one per leg) and digests; plan returns exactly
+  the witness's legs with statesByDepth[size − 1] equal to the counterexample's states at depth size − 1, with work ≤
+  workBound"; thirteen named alterations of clarification Q2 (a star's orbit, a star's window, a corridor's ends, a
+  hazard, the range, the beacon, the deadline, a symbol stroke, the budget; a plan leg; a witness action, a per-action
+  fingerprint or digest; the counterexample's state count) each fail naming the level and the part); `--name host --
+  swift test --package-path Packages/ExperiencesRound02 --filter StarlitCartoucheRegressionSolverTests`
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1608-003 [US2] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheGolden.swift` (DEBUG
-  or VISUALCORE_AUTOMATION; "16 frames: levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all of the
-  witness's legs but the last (a one-leg witness applies none) with the default choice, plus the hero frame of
+- [ ] T-R02G1608-003 [US2] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheGolden.swift`
+  (DEBUG or VISUALCORE_AUTOMATION; "16 frames: levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all
+  of the witness's legs but the last (a one-leg witness applies none) with the default choice, plus the hero frame of
   `scenario-manifest.json` at tier 0; at 1,152 × 768 with the authored camera: every star centre at the current beat
-  (index order), the ship, the beacon, every drawn stroke's midpoint and the first actions bar, positions rounded to
-  1/8 px and a point behind the eye null; the counts of stars, corridors, hazards, active hazards, symbol strokes, drawn
-  strokes and lit and total actions bars; the 22 palette colours 8-bit sRGB; JSON with sorted keys; SHA-256";
-  manifest; compare with the one-quantum fallback and the pinned-digest self-check), generate
+  (index order), the ship, the beacon, every drawn stroke's midpoint and the first actions bar, positions rounded to 1/8
+  px and a point behind the eye null; the counts of stars, corridors, hazards, active hazards, symbol strokes, drawn
+  strokes and lit and total actions bars; the 22 palette colours 8-bit sRGB; JSON with sorted keys; SHA-256"; manifest;
+  compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/StarlitCartouche/golden-frames.json` (schema 1) with `STARLIT_CARTOUCHE_WRITE_GOLDEN=1`,
   and add `StarlitCartoucheGolden` to `RELEASE_FORBIDDEN` in `scripts/release_check.py`
 - [ ] T-R02G1608-004 [P] [US2] Create
@@ -53,7 +53,8 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
   `Packages/ExperiencesRound02/StarlitCartouche/ExperienceTests/StarlitCartoucheRegressionMemoryTests.swift` (agent C:
   the 16 frames rendered and checked against their descriptions with the feature-453 tolerances (a star's centre 0.25
   brighter than the backdrop in luminance, the ship's centre with blue above red by 0.08, the first actions bar 0.1
-  from the backdrop, each point at least 6 px from what is drawn after it; points on screen where the description puts
+  from the backdrop, the median of every 9 × 9 backdrop patch within 0.06 of the firmament gradient, each point at
+  least 6 px from what is drawn after it; points on screen where the description puts
   them); 12 open-draw-warn-close cycles (prepare a level, 3 frames at tier 0, a memory warning, 1 frame, teardown) with
   `ProcessMemory.footprint()`, cycles 2 … 12 within 16 MB of cycle 1 when
   `TEST_RUNNER_STARLIT_CARTOUCHE_MEMORY_ISOLATED=1`, readings printed otherwise; the chart scene's `liveObjectCount` 0
@@ -63,11 +64,11 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1608-006 [P] [US4] Create `scripts/starlit_cartouche_regression.py` and its test in `scripts/test_scripts.py`
-  (agent D: host filter `StarlitCartoucheRegression`, then the simulator classes through `xcodebuild_package.py
-  --only-testing` with the isolation variable, one summary line per part with pass or fail and the first failing name,
-  a non-zero exit on any failure), and add the named step "Starlit Cartouche regression (host)" to the
-  `round02-host-tests` job of `.github/workflows/ci.yml`; `--name regression -- python3
+- [ ] T-R02G1608-006 [P] [US4] Create `scripts/starlit_cartouche_regression.py` and its test in
+  `scripts/test_scripts.py` (agent D: host filter `StarlitCartoucheRegression`, then the simulator classes through
+  `xcodebuild_package.py --only-testing` with the isolation variable, one summary line per part with pass or fail and
+  the first failing name, a non-zero exit on any failure), and add the named step "Starlit Cartouche regression (host)"
+  to the `round02-host-tests` job of `.github/workflows/ci.yml`; `--name regression -- python3
   scripts/starlit_cartouche_regression.py`
 
 ## Phase 6: Regression, documentation and close
@@ -80,8 +81,8 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 - [ ] T-R02G1608-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1608-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G1608-011 Script tests, run alone (`--name script-tests`)
-- [ ] T-R02G1608-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden levels.
-  Not run before the lock.
+- [ ] T-R02G1608-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden
+  levels. Not run before the lock.
 - [ ] T-R02G1608-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
 

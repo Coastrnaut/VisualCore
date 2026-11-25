@@ -51,10 +51,10 @@ named regression step per earlier round-two game (Voxel Origami's the latest).
   digests; and `plan` returns exactly the witness's legs with `statesByDepth[size − 1]` equal to the counterexample's
   `states` at depth size − 1; `work` is at most `workBound` (counted, never timed). The run is split into tests of 10
   levels (10 tests), each well under 10 s. Impact: FR-R02G1608-001; SC-R02G1608-001.
-- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
-  each producing a failure message naming the level and the part: a star's orbit, a corridor's ends, a hazard, the
-  range, the beacon, the deadline, a symbol stroke, the budget; a plan leg; a witness action, a per-action fingerprint
-  or digest; the counterexample's state count. Impact: FR-R02G1608-002; SC-R02G1608-002.
+- Q: Which alterations must the regression detect and how is each named? → A: thirteen kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a star's orbit, a star's window, a corridor's ends, a
+  hazard, the range, the beacon, the deadline, a symbol stroke, the budget; a plan leg; a witness action, a per-action
+  fingerprint or digest; the counterexample's state count. Impact: FR-R02G1608-002; SC-R02G1608-002.
 - Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
   frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after all of the witness's legs but the last, so the symbol is
   part drawn, at least one action is spent from the actions bars and the level is not yet won, at presentation time 0,
@@ -209,7 +209,7 @@ simulator parts and reports one summary.
 
 - **SC-R02G1608-001**: All 100 levels replay their witnesses and re-plan to their certified legs within the search's
   work bound; 100 of 100.
-- **SC-R02G1608-002**: Each of the twelve kinds of alteration listed in the clarifications is detected and named.
+- **SC-R02G1608-002**: Each of the thirteen kinds of alteration listed in the clarifications is detected and named.
 - **SC-R02G1608-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry.
 - **SC-R02G1608-004**: Over 12 open-draw-warn-close cycles, every footprint reading of cycles 2 … 12 stays within 16 MB

@@ -1,7 +1,7 @@
 # Quickstart: R02-G16-08
 
 1. Host: `swift test --package-path Packages/ExperiencesRound02 --filter StarlitCartoucheRegression` — 100 witness
-   replays, 100 re-plans to the witness's legs and counterexample states, twelve alterations named, 16 golden digests
+   replays, 100 re-plans to the witness's legs and counterexample states, thirteen alterations named, 16 golden digests
    match their pinned descriptions; each test < 10 s.
 2. `python3 scripts/starlit_cartouche_regression.py` — host part, then the simulator golden-frame and memory classes;
    one summary line per part; non-zero exit on any failure.

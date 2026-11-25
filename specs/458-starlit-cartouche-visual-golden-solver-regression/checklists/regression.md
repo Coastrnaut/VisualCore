@@ -17,7 +17,7 @@ were corrected in the artifacts.
   one leg short) enumerated? [Completeness, Spec §Clarifications Q1]
 - [x] CHK002 Is the work check counted (work at most the search's work bound), never timed? [Clarity, Spec
   §Clarifications Q1; Plan research R1]
-- [x] CHK003 Are all twelve alteration kinds named with the naming rule for failures? [Completeness, Spec
+- [x] CHK003 Are all thirteen alteration kinds named with the naming rule for failures? [Completeness, Spec
   §Clarifications Q2]
 - [x] CHK004 Is the split into tests of 10 levels stated with its reason so each test stays short? [Non-Functional, Spec
   §Clarifications Q1; Plan research R7; FR-R02G1608-007]
