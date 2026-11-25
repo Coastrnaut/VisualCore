@@ -8,7 +8,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1708-001 Baselines on the committed tree after R02-G17-07 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1708-001 Baselines on the committed tree after R02-G17-07 is recorded: `--name baseline-host`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 on the committed tree (.autonomy/migration/checks/R02-G17-08.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters, chunk 3c with
   `CelestialEclipseLab`)
 

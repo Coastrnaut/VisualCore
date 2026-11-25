@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "AuroraLoom|LissajousLabyrinth|HueCompass|WaveKnotKeeper|ChronoConstellator|AmethystEscape|CelestialEclipseLab"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'AuroraLoom|LissajousLabyrinth|HueCompass|WaveKnotKeeper|ChronoConstellator|AmethystEscape|CelestialEclipseLab'",
+  "elapsed_seconds": 133.021,
+  "exit_code": 0,
+  "finished": "2026-11-25T18:27:59+00:00",
+  "gate": "R02-G17-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G17-08.baseline-round02-3c.log",
+  "log_sha256": "19fb188818b30b0656961559cc6c7204abde01d29fdb2d24bcd120e64683f005",
+  "name": "baseline-round02-3c",
+  "started": "2026-11-25T18:25:46+00:00",
+  "timed_out": false
+}
