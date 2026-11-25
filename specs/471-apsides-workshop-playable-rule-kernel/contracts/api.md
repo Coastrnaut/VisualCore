@@ -16,10 +16,10 @@ public struct ApsidesWorkshopOrbit: Sendable, Hashable, Codable { public let siz
 public struct ApsidesWorkshopPoint: Sendable, Hashable, Codable { public let x: Int; public let y: Int }
 public struct ApsidesWorkshopPlanet: Sendable, Hashable, Codable { public let x: Int; public let y: Int
     public let radius: Int }
-public enum ApsidesWorkshopApsis: String, Sendable, Codable, CaseIterable { case periapsis, apoapsis }
-public enum ApsidesWorkshopTarget: Sendable, Hashable, Codable {
-    case sweep(sector: Int, low: Int, high: Int)
-    case apsis(ApsidesWorkshopApsis, sector: Int, near: Int, far: Int) }
+public enum ApsidesWorkshopTargetKind: String, Sendable, Codable, CaseIterable { case sweep, periapsis, apoapsis }
+public struct ApsidesWorkshopTarget: Sendable, Hashable, Codable { public let kind: ApsidesWorkshopTargetKind
+    public let sector: Int; public let low: Int; public let high: Int    // share band (sweep) or distance range
+    public static func sweep(sector: Int, low: Int, high: Int) -> Self }
 public enum ApsidesWorkshopFailure: Sendable, Hashable, Codable {
     case contact(planet: Int, tick: Int); case order(target: Int, tick: Int)
     case share(target: Int, tick: Int, share: Int)
