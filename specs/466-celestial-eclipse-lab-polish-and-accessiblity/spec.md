@@ -54,8 +54,8 @@ Flashing); the refusal codes are `r02-g17.level`, `action`, `budget`, `stage`, `
   `r02-g17.not-whole` "That value must be a whole number.", `r02-g17.choice` "That body is not in this level.",
   `r02-g17.tick` "That tick is outside the timeline.", any other code "That action was refused." (the engine's
   `action.rule.` prefix read as the bare code). A revealed hint is announced (`state`) with its text. Choosing a body,
-  pending phase texts, the shown tick and orbit are not announced. Texts are a pure function of the old and new core (and
-  the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact: FR-R02G1706-002;
+  pending phase texts, the shown tick and orbit are not announced. Texts are a pure function of the old and new core
+  (and the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact: FR-R02G1706-002;
   SC-R02G1706-002.
 - Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted phase change, undo or redo;
   `success` for a won run; `warning` for a failed run; `error` for a refusal; choosing a body, the pending texts, the
@@ -180,8 +180,8 @@ ambient recipes are pure functions of the state they are made from; sound plays 
 - **FR-R02G1706-003**: Haptics MUST map selection → accepted phase change, undo or redo, success → win, warning →
   failure, error → refused action, through the shared route and the person's switch; they never change state.
 - **FR-R02G1706-004**: Reduce Flashing MUST cap the glow and turn every brightness change of the glow and of the won
-  look into fades of at least 0.4 s, with every periodic motion below 3 cycles per second; Reduce Motion and Reduce Flashing
-  MUST keep the sky still between actions (the halo pulse held); neither changes the state or its digest.
+  look into fades of at least 0.4 s, with every periodic motion below 3 cycles per second; Reduce Motion and Reduce
+  Flashing MUST keep the sky still between actions (the halo pulse held); neither changes the state or its digest.
 - **FR-R02G1706-005**: The panel MUST support Dynamic Type up to the largest accessibility size and Increase Contrast on
   iPhone and iPad, scrolling instead of clipping.
 - **FR-R02G1706-006**: A planet's audition and an optional ambient sound MUST be synthesized in code — the audition from
