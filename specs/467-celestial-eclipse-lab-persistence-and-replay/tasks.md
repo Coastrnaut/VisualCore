@@ -83,7 +83,7 @@ its replay catalog proof (its convergence round) taken into the first pass and r
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G1707-007 Docs: `docs/architecture/celestial-eclipse-lab.md` (persistence and replay),
+- [X] T-R02G1707-007 Docs: `docs/architecture/celestial-eclipse-lab.md` (persistence and replay), — Verified 2026-11-25: 2026-11-25 round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G17-07.round02-host-*.json); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the five round-two filters)
 - [ ] T-R02G1707-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

@@ -129,3 +129,21 @@ later features.
   planet and its pending phase adjustable with VoiceOver, a value in words on every control, refusals in the feedback
   plan's words, rows that become columns at accessibility text sizes and a 520-point readable width on iPad.
 
+## Persistence and replay (feature 467, R02-G17-07)
+
+- **Saves.** The one app's shared saved-state store writes the snapshot atomically; schema 3 is `{"level", "mode",
+  "progress", "records", "sound", "tutorial"}` and migrates from schema 1 and 2 (2 → 3: every result an empty trace,
+  unverified, sound off). The chosen planet, the shown tick, a pending phase and the camera are presentation and are
+  not saved.
+- **Reconcilable scores.** A campaign or daily win stores the winning trace — the effective phase changes in order
+  (an undone change left out unless redone), then the run — with the result. On restore
+  `CelestialEclipseLabReconciliation` replays every trace on a fresh play of its certified level and keeps the result
+  only when it wins, spends at most the recorded actions and its stars match the stars rule; the frontier is restored
+  as saved. Dropped results are counted (`reconciliationDropped`, never digested) and announced once.
+- **Replay.** `replay.start [level]` opens mode `replay(level)` for a level with a verified trace, `replay.step`
+  applies the next action (a phase change, finally the run), `replay.stop` returns to the campaign; other play actions
+  are refused (`r02-g17.replay`), nothing is recorded and no stars are claimed. A save taken mid-replay restores only
+  when its records are the start of that trace.
+- **Settings.** The sound choice is saved through `settings.sound [0 … 1]`, snapshotted but never digested, and
+  applied when the experience opens.
+

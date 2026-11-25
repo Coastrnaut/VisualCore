@@ -932,5 +932,7 @@ preview, the time dial and the panel's "Set phase". Feature 465 (R02-G17-05) add
 (three hint levels from a solver entry at the current phases), `CelestialEclipseLabFailureExplanation`,
 `CelestialEclipseLabProgress` (tutorial, stars, daily × 29, practice) and snapshot schema 2. Feature 466 (R02-G17-06)
 adds `CelestialEclipseLabFeedbackPlan` (announcements and haptics), `CelestialEclipseLabLights` (eased glow and won
-look) and `CelestialEclipseLabSoundRecipe` (the audition and the ambient loop), with VoiceOver support in the panel. See
+look) and `CelestialEclipseLabSoundRecipe` (the audition and the ambient loop), with VoiceOver support in the panel.
+Feature 467 (R02-G17-07) adds `CelestialEclipseLabReconciliation` (winning traces replayed on restore), snapshot schema
+3, the replay mode and the saved sound choice. See
 [docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).
