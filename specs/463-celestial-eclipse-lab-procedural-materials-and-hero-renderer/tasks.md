@@ -30,7 +30,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1703-003 [P] [US1] Create
+- [X] T-R02G1703-003 [P] [US1] Create — Verified 2026-11-25: 2026-11-25 sky and glow GLSL ES 3.00 sources, shadow lens material 16, halo pulse; 17 shader source tests pass (host-2 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabShaders.swift` (sky and glow sources, GLSL ES
   3.00; layered body shading (core, limb darkening, rim light) from the normal; the crescent: the shadow lens (material
   16, a fan from its centroid) shaded in crescent shadow with a thin ember rim (the shared renderer binds only position,
