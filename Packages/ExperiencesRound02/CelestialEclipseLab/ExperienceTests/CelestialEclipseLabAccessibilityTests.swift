@@ -167,12 +167,13 @@ enum CelestialEclipseLabA11y {
     static let stillHeight: Int = 64
 
     /// The controls of the panel by identifier name: each needs a label and a value (clarification Q5). The plain
-    /// texts (actions, status, progress, tick, band, stars, goal, the detail lines) are read as text, not controls.
+    /// texts (actions, status, progress, tick, band, stars, goal, the detail lines, the replay position) are read as
+    /// text, not controls; since feature 467 the replay controls (Replay, Step, Stop) are listed too.
     static let controlNames: [String] = ["sound", "summary", "dismiss-tutorial", "hint", "campaign", "daily",
                                          "practice", "level-picker", "play-level", "planet-minus", "planet",
                                          "planet-plus", "phase-minus", "phase", "phase-plus", "set-phase",
                                          "reset-view", "tick-minus", "tick-plus", "run", "undo", "redo",
-                                         "next-level"]
+                                         "next-level", "replay", "replay-step", "replay-stop"]
     /// The adjustable elements (increment and decrement).
     static let adjustableNames: [String] = ["planet", "phase"]
 

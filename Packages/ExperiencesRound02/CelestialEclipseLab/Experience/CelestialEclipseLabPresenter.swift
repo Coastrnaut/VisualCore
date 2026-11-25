@@ -46,6 +46,17 @@
 // its audition (`CelestialEclipseLabAudition.of(_:body:)`) when the sound is on, on screen and active. The mirror
 // carries the summary element's text (`CelestialEclipseLabFeedbackPlan.summaryText(core:body:phase:)`) and the sound
 // choice (off by default). Presentation only.
+//
+// Feature 467 (R02-G17-07) T-R02G1707-006 (FR-R02G1707-003, 004, 007; clarifications Q2, Q4, Q5): the mirror carries
+// whether a verified replay exists for the level (`replayAvailable`: a verified result with a trace, outside replay),
+// whether a replay runs and its position (`replaying`, `replayPosition` = the trace actions played, `replayLength` =
+// the trace's actions, the run included); `startReplay`, `stepReplay` and `stopReplay` send `replay.start [level]`,
+// `replay.step` and `replay.stop` (a refusal, `r02-g17.no-replay`, `r02-g17.replay-end` or `r02-g17.replay`, is shown
+// and announced in the plan's words); the Sound toggle saves the choice through `settings.sound [0/1]`
+// (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied when the experience opens (the first
+// core taken in) and whenever it changes; the results a restore dropped (`core.reconciliationDropped`) are announced
+// once per presenter as `state` ("n saved results could not be checked and were removed.", "1 saved result could not
+// be checked and was removed.").
 #if os(iOS)
 import CelestialEclipseLabCore
 import Foundation
@@ -108,8 +119,16 @@ final class CelestialEclipseLabMirror {
     var explanation: String?
     /// The latest core taken in, for the summary element (feature 466); nil before the first.
     var summaryCore: CelestialEclipseLabExperienceCore?
-    /// Whether the sound is on (feature 466; off by default; presentation only).
+    /// Whether the sound is on (feature 466; off by default; since feature 467 the core's saved choice, `soundOn`).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 467).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 467).
+    var replaying = false
+    /// The trace actions of the running replay played so far (0 when no replay runs; feature 467).
+    var replayPosition = 0
+    /// The actions of the running replay's trace, the run included (0 when no replay runs; feature 467).
+    var replayLength = 0
     /// The summary element's text (feature 466): `CelestialEclipseLabFeedbackPlan.summaryText(core:body:phase:)` of
     /// the latest core, the chosen body and its pending phase (the current one when no change is pending).
     var summary: String {
@@ -663,6 +682,8 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
     private func absorbProgress(_ core: CelestialEclipseLabExperienceCore) {
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
         absorbFeedback(core)
+        absorbSaved(core)
+        absorbReplay(core)
         latestCore = core
         mirror.summaryCore = core
         if let shown = hintPlay, shown != core.play { clearHint() }
@@ -842,6 +863,90 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
         mirror.soundOn = on
+    }
+
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 467); the change taken in turns the loop on or
+    /// off (`absorbSaved(_:)` applies `core.soundOn`).
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    // MARK: Persistence and replay (feature 467, R02-G17-07)
+
+    /// Starts the replay of the current level's verified stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Applies the next action of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 467).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 467).
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 467).
+    static func isReplay(_ mode: CelestialEclipseLabMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
+    /// The trace actions a play applied: its phase-change and run records (feature 467; a fresh play also holds its
+    /// begin and tutorial records).
+    static func appliedActions(_ play: CelestialEclipseLabPlay) -> Int {
+        var count: Int = 0
+        for record in play.records where record.kind == .phase || record.kind == .run { count += 1 }
+        return count
+    }
+
+    /// Takes the saved parts of `core` in (feature 467): the restored sound choice when it first appears (the
+    /// experience opens) or changes, and the dropped results announced once.
+    private func absorbSaved(_ core: CelestialEclipseLabExperienceCore) {
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(CelestialEclipseLabFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                                  haptic: nil))
+        }
+    }
+
+    /// Takes the replay state of `core` into the mirror: Replay is offered for a level with a verified result that has
+    /// a trace (outside replay); during replay the position is the trace actions played of the trace's actions.
+    private func absorbReplay(_ core: CelestialEclipseLabExperienceCore) {
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = Self.appliedActions(core.play)
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
     }
 
     /// The controls view appeared (the loop may play).

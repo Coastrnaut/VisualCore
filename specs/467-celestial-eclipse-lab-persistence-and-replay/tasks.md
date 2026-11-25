@@ -68,7 +68,7 @@ its replay catalog proof (its convergence round) taken into the first pass and r
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1707-006 [US3] Edit
+- [X] T-R02G1707-006 [US3] Edit — Verified 2026-11-25: 2026-11-25 sim-27 exit 0, 58 simulator tests incl. 4 replay tests (.autonomy/migration/checks/R02-G17-07.sim-27.json); Replay, Step and Stop with labels and values, replay position, the Sound toggle saved through settings.sound and applied on open, dropped results announced once; identity tests take schema 3 and sixteen controls
   `Packages/ExperiencesRound02/CelestialEclipseLab/Experience/CelestialEclipseLabPresenter.swift` and
   `Packages/ExperiencesRound02/CelestialEclipseLab/Experience/CelestialEclipseLabControls.swift` (Replay for a verified
   solved level, Step and Stop with labels and values, the replay position; the Sound toggle sends `settings.sound` and

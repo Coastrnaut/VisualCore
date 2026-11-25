@@ -21,11 +21,11 @@ import VisualCoreExperienceHost
         #expect(CelestialEclipseLabExperienceCore.experienceID == "r02-g17.celestial-eclipse-lab")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 2 (feature 465), three tiers.
+    /// The registration's content facts: 100 certified levels, schema 3 (feature 467), three tiers.
     @Test func theRegistrationFactsHold() {
         #expect(CelestialEclipseLabExperienceCore.levelNumbers == 1...100)
         #expect(CelestialEclipseLabExperienceCore.certifiedCandidates.count == 100)
-        #expect(CelestialEclipseLabExperienceCore.schemaVersion == 2)
+        #expect(CelestialEclipseLabExperienceCore.schemaVersion == 3)
         var names: [String] = []
         for level in CelestialEclipseLabExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -39,7 +39,7 @@ import VisualCoreExperienceHost
         #expect(ids == CelestialEclipseLabExperienceCore.actionIDs)
         #expect(ids == ["orbit.phase", "clock.run", "play.undo", "play.redo", "level.next", "orbit.choose",
                         "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                        "tutorial.dismiss"])
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers`, named as the tiers.
