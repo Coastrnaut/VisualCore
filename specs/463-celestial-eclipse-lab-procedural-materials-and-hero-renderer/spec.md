@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G17-03 (migration ledger, game feature of experience R02-G17) · ID namespace FR-R02G1703-###,
 SC-R02G1703-###, T-R02G1703-###
@@ -31,6 +31,94 @@ Canonical overrides:
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G17-01 and -02.
 - **Model:** feature 453 (Starlit Cartouche's hero renderer and experience).
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+453's answers where the games agree. Facts checked in code (read-only, 2026-11-25): Starlit Cartouche's experience
+(R02-G16-03 … 10) is the pattern in this package — a Core adapter with a table of certified candidates, an immutable
+scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+(`…Experience.swift`, presenter, scene, controls), a scenario manifest with 80 acceptance scenarios, a registration with
+content facts in `Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Celestial Eclipse Lab kernel
+provides the level (2 … 6 bodies on lattice orbits with radii, fixed flags and depth order; the horizon; the target
+with windows; the starting phases and budget), a body's position at a tick for a phase, the eclipse intervals with
+their visibility classes, the timeline (intervals, matched count, failure: unwanted, window or horizon), the play
+(phase, run, undo, redo, stages) and the certified catalog of R02-G17-02 (3 … 6 bodies, coordinates within −18 … 18,
+depth layers −13 … 9, radii 1 … 4, horizons 24 … 48, digest c74bf277…); `AppModelTests` uses
+`r02-g17.celestial-eclipse-lab` as its synthetic unregistered candidate and the next round-two game is
+`r02-g18.apsides-workshop`; the archived matrix has 80 acceptance rows R2-G17-QA-001 … 080; the catalog's design gives
+the palette "corona gold, ink navy and muted ember", the hero "glowing planetary crescents eclipsing into razor-edge
+corona halos" and the geometry "analytic orbital rings, signed circle masks and eclipse glow shaders".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: lattice positions map to world space
+  by w(v) = (v − m) · s, where m is the centre of the bounding box of every orbit position of every body (so no body
+  leaves the frame at any tick) and s = 1.5 / (e + 1) with e the box's largest extent; y is up and +z (nearer in the
+  rules) is toward the camera, so the picture is seen from the side the rules project onto. Bodies are drawn at
+  w(position(at: shown tick, phase)) for the current phases. Drawn back to front by distance from the eye (depth
+  testing off, the shared mesh renderer's path; ties broken by kind — rings, bodies, halos, gauges — then by index):
+  the sky backdrop (a large quad; a vertical gradient from ink #0B1530 at the bottom to ink top #16224A at the top with
+  sparse procedural specks covering under 5 % of its pixels); the orbital rings, a closed ribbon 0.012 wide through w
+  of every orbit position in order, orbit blue, with (index mod 6) + 1 notches at the body's position and a square
+  frame for a fixed body; the bodies, spheres of radius r · s at their positions, disc ivory with layered limb shading;
+  the eclipse crescents: every back body of an eclipse under way at the shown tick (the kernel's strict overlap) is
+  darkened inside the front body's projected circle (centre and radius r · s from the kernel's x and y, a signed circle
+  mask in the disc shader), so the crescent seen is the overlap judged; the corona halos, a thin ring at the front
+  body's rim, corona gold, when the eclipse's class at the shown tick is total or annular; the chosen body's dashed ring
+  of radius r · s + 0.04; the gauges in screen-facing world space below the sky: the timeline strip at y = −1.15 from
+  x = −0.9 to 0.9 mapping ticks 0 … horizon − 1, each target window a bracket above it at y = −1.05 with the target's
+  index in notches, each predicted event a mark at its first tick (a filled diamond, corona gold, for a matched event; a
+  cross, ember, for the failing event; faint for events after the last match), and the playhead, a vertical line at
+  the shown tick; the actions bars, `budget` bars at y = −1.35 from x = −0.9 to 0.9 (each 1.8 / budget wide with a gap
+  of a fifth, 0.04 tall), lit for the actions left. The glow is additive and drawn last. The chosen body and the shown
+  tick are presentation state of the adapter (`orbit.choose [body]`, `clock.show [tick]`, never in the digest), at
+  opening the lowest-numbered movable body and tick 0; the shown tick is never advanced by time. The camera is a fixed
+  authored perspective (eye (0.3, 0.2, 3.4) looking at (0, −0.25, 0)) fitted to the box x −0.95 … 0.95, y −1.45 …
+  0.95, z −0.95 … 0.95 with a 5 % margin for aspect 0.4 … 2.5. Nothing drawn is consulted by the rules. Impact:
+  FR-R02G1703-001, 002, 003, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): body spheres of 24 × 16 segments with layered
+  shading (core, limb darkening and rim light) and 2 glow shells around the halos and the chosen ring; `level-1`:
+  16 × 12 segments, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): flat screen-facing 20-sided body discs,
+  no glow. Rings, crescents (the signed circle mask is drawn at every tier), halos, the timeline, gauges, colours and
+  positions are the same at every tier. Levels are ordered richest first; the presenter logs each tier change with its
+  reason. Impact: FR-R02G1703-004; SC-R02G1703-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects through the same
+  camera every body's centre, the timeline strip's centre, each target bracket, the playhead and the first actions bar,
+  orders them by camera distance as the painter does, and gives the palette. Simulator tests render offscreen at
+  1,152 × 768 at the shown tick 0 and check, at points at least 6 pixels from every element drawn after them, that the
+  centre of a body not covered at tick 0 is brighter than the backdrop by at least 0.25 in luminance; that the first
+  actions bar (lit) has red above blue by at least 0.08 (corona gold); that the timeline strip's centre differs from
+  the backdrop by at least 0.1; and that the median of a 9 × 9 pixel patch of backdrop away from geometry matches the
+  gradient colour at its height within 0.06 (the median ignores the sparse specks). Palette: ink #0B1530, ink top
+  #16224A, speck #C9D2FF, disc #E9E1CF, disc shade #7A829A, orbit #33406E, fixed frame #8A93B0, chosen #F2C14E, corona
+  #F2C14E, corona glow #FFE7A3, crescent shadow #050A18, ember #C8553D, window #E8E2D0, matched #F2C14E, unwanted
+  #C8553D, faint event #5A6488, playhead #FFE7A3, actions lit #F2C14E, actions unlit #24305A, broken #E0533A, glow
+  #FFF1D0. Impact: FR-R02G1703-006; SC-R02G1703-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `CelestialEclipseLabSceneSnapshot` (the bodies' positions at the shown tick for the current phases, radii and fixed
+  flags; the orbits; the eclipses under way at the shown tick with their classes; the target and windows; the predicted
+  intervals and matched count; the shown tick and horizon; the chosen body; stage, failure, actions left, budget, level
+  number and presentation time) made by the adapter; it never holds the kernel. If a program fails to compile or link,
+  the scene draws the level-2 geometry unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps
+  running; tier changes go to its `tierLog`. Reduce Motion stops the halos pulsing; Reduce Flashing caps the glow gain.
+  A failure marks the failing event on the timeline in the broken colour (an unwanted or out-of-window event at its
+  tick; a horizon failure at the strip's end with the next target's bracket outlined) and outlines its two bodies; the
+  failure text names it, as the kernel's reason does. Impact: FR-R02G1703-003, 007; SC-R02G1703-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g17.celestial-eclipse-lab` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/CelestialEclipseLab/scenario-manifest.json`, no permissions, a summary
+  of at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's
+  experience registry link `CelestialEclipseLabExperience` as a candidate (`available: false` until X-R02-G17), opening
+  at seed 0 (level 1); `AppModelTests` switches its synthetic unregistered candidate to the next round-two game
+  (`r02-g18.apsides-workshop`). The adapter (`CelestialEclipseLabExperienceCore`) prepares certified level (seed mod
+  100) + 1 from its table of certified candidate indices (the whole catalog only if that candidate no longer certifies)
+  and accepts `orbit.phase [body, offset]`, `clock.run`, `play.undo`, `play.redo`, `level.next`, `orbit.choose [body]`
+  and `clock.show [tick]` (whole numbers only); the kernel refuses everything out of range or out of stage,
+  `orbit.choose` refuses a body the level does not have and `clock.show` a tick outside 0 … horizon − 1; its digest is
+  the level number and the play's fingerprint (never the record history, the chosen body or the shown tick, so undo
+  restores the earlier digest); snapshot schema 1 `{level, records}`. Impact: FR-R02G1703-005, 008, 009;
+  SC-R02G1703-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -101,8 +189,8 @@ it as available, and the experience package, registry, catalog and content check
 - **A won level:** every target mark is lit and the corona halos of the matched eclipses flare; the frame checks use the
   same positions.
 - **Memory warning:** caches are released and rebuilt on the next frame.
-- **Reduce Motion:** the shown tick does not auto-advance and halos do not pulse; Reduce Flashing caps the glow to the
-  shared limit.
+- **Reduce Motion:** the halos do not pulse (the shown tick never advances by itself); Reduce Flashing caps the glow to
+  the shared limit.
 
 ## Requirements *(mandatory)*
 
