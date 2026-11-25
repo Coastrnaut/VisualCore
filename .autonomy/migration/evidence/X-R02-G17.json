@@ -1,0 +1,117 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [],
+  "gate": "X-R02-G17",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/verify_experiences.py --audits",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:58:02+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.audits.log",
+      "log_sha256": "20a82207963f5bd6cf81b09bd99bf0b076288ea1e688c1c70aa1b2cc604224ec",
+      "name": "audits"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g17-host-1 --only-testing AuroraLoomCoreTests AuroraLoomExperienceTests LissajousLabyrinthCoreTests LissajousLabyrinthExperienceTests HueCompassCoreTests HueCompassExperienceTests WaveKnotKeeperCoreTests WaveKnotKeeperExperienceTests ColorfallCanyonsCoreTests ColorfallCanyonsExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:48:11+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.host-1.log",
+      "log_sha256": "9ad0e65a0166838313e4635ec645d6c6803888877539005c0b614a65386c34a7",
+      "name": "host-1"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g17-host-2 --only-testing ChronoConstellatorCoreTests ChronoConstellatorExperienceTests AmethystEscapeCoreTests AmethystEscapeExperienceTests FacetedForgeCoreTests FacetedForgeExperienceTests NocturneGardenCoreTests NocturneGardenExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:51:50+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.host-2.log",
+      "log_sha256": "da16284f08077f13e6c35af5ee67e216e8b40bdc3883d8eb651b899a0138b42e",
+      "name": "host-2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g17-host-3 --only-testing BackwardsAuroraCoreTests BackwardsAuroraExperienceTests EchoCartographerCoreTests EchoCartographerExperienceTests HarmonicBridgesCoreTests HarmonicBridgesExperienceTests AcousticConstellatorCoreTests AcousticConstellatorExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:53:33+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.host-3.log",
+      "log_sha256": "05503d0aef93cbe613d048d823507fcddc18d1bc2f86f7ad800a85b6ddd237aa",
+      "name": "host-3"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g17-host-4 --only-testing MoonlitMechanismCoreTests MoonlitMechanismExperienceTests VoxelOrigamiCoreTests VoxelOrigamiExperienceTests StarlitCartoucheCoreTests StarlitCartoucheExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:55:38+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.host-4.log",
+      "log_sha256": "6a263af803c4af2781ec794c540bb6ae22ae9fad5dc8241661c93f212f62b751",
+      "name": "host-4"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g17-host-5 --only-testing CelestialEclipseLabCoreTests CelestialEclipseLabExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:56:32+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.host-5.log",
+      "log_sha256": "55499a5b7f2a197f21dc9c299b9147721b629d9cb7468493897a4ce9c9b38ebe",
+      "name": "host-5"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:58:25+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.reference-1.log",
+      "log_sha256": "2d4c882209a5f30aaa45a83a7fffc8516fd819e53d6211a0d45726de509f8f70",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:58:48+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.reference-2.log",
+      "log_sha256": "195bac4991af58009110db8f910e255fad4690ae6f3ad44bc3ea8842a73ec850",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only r02-g17.celestial-eclipse-lab --runtime 26",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:36:14+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.sim26.log",
+      "log_sha256": "0e76d32f7d8e99e26046e49a4b7229b1801b5e82744c11c080092b7956e3807b",
+      "name": "sim26"
+    },
+    {
+      "command": "python3 scripts/verify_experiences.py --only r02-g17.celestial-eclipse-lab --runtime 27",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:30:28+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.sim27.log",
+      "log_sha256": "f7781302c02256ebe351a2914efc35f74f569bc02d87b2fdb71c0ca7fb2cbf82",
+      "name": "sim27"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-z3",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:42:05+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.ui-z3.log",
+      "log_sha256": "0a29c1e426429ef2b1a9a9ec2516e05219bdadc1f576cb3ff7d3d4d1baef2b3e",
+      "name": "ui-z3"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:57:09+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.visualcore-host.log",
+      "log_sha256": "7c9ec61428a2d000f0dd4162e3ab51f0c3c11353c100de48d383ebddc161b097",
+      "name": "visualcore-host"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xr02g17-rendering",
+      "exit_code": 0,
+      "finished": "2026-11-25T20:57:56+00:00",
+      "log": ".autonomy/logs/migration/X-R02-G17.visualcore-rendering.log",
+      "log_sha256": "2fee798d016551870e2fe5854117d2f16d5109ece2766778468ab0802782245a",
+      "name": "visualcore-rendering"
+    }
+  ],
+  "revision": "98def378faf23ac33515bcd15b3fee281a07fceb",
+  "revision_number": 1,
+  "sealed": "2026-11-25T20:59:02+00:00"
+}
