@@ -2,9 +2,10 @@
 
 - **R1 Projected-marker picking.** Decision: the orbiter, the apoapsis square and the periapsis diamond are projected
   through the drawn camera; the orbiter is hit within its projected radius grown by 8 points, the markers within their
-  projected half-size grown by 12 points (they are small); the one drawn last wins; the orbit loop is a band of 10 points
-  around its projected chords. Rationale: the player touches what they see; view points give every handle the same
-  allowance at every orbit. Alternatives: rays against world shapes (rejected: a world tolerance varies with depth).
+  projected half-size grown by 12 points (they are small); the one drawn last wins; the orbit loop is a band of 10
+  points around its projected chords. Rationale: the player touches what they see; view points give every handle the
+  same allowance at every orbit. Alternatives: rays against world shapes (rejected: a world tolerance varies with
+  depth).
 - **R2 The knob and the handle are the apsides.** Decision: the periapsis marker is the knob (its direction and
   distance set the direction and eccentricity steps at the current size); the apoapsis marker is the size handle (its
   distance sets the size at the current eccentricity). The finger is cast onto the sky plane z = 0 through the drawn
