@@ -61,3 +61,28 @@ in deterministic integer fixed point and every rule is then decided exactly on i
   the play, a state digest after every action, the play fingerprints, the terminal report (shares, apsides, the largest
   Kepler residual, deviations) and the counterexample; the tests rebuild all 100 byte for byte and pin the catalog
   digest. Witness lengths average 1.0, 1.0, 1.25, 2.0 and 2.0 by band, under R02-F24's progression rule.
+
+## Hero renderer and experience (feature 473, R02-G18-03)
+
+- **Snapshot.** `ApsidesWorkshopSceneSnapshot` is all the renderer reads: the current orbit's steps and integer
+  positions, the starting orbit's positions (the ghost loop), the orbiter at the shown tick, the shares, the apsis
+  readings, the planets, a gauge per target (band, reading, deviation, met) and the stage, failure, actions and level.
+- **The compass.** One fixed scale for every level (s = 0.9 / 16 384, the sky bound at radius 0.9), so tuning never
+  rescales the picture. In painter's order with depth testing off: the midnight backdrop with sparse star specks, the
+  swept-area wedges (one triangle per tick, deep rose in target sectors), the compass of eight spokes and a notched rim
+  with target brackets, the ghost loop, the glacial orbit loop through every kernel position (refined between ticks on
+  the analytic ellipse at the richer tiers, presentation only), the periapsis diamond and apoapsis square, hatched
+  planets, the star, the orbiter, the target gauges and the actions bars; the glow is additive and last.
+- **Tiers.** `level-0`: 24 × 16 spheres, 4 refinement points per tick, 2 glow shells; `level-1`: 16 × 12, 2 points, 1
+  shell; `level-2`: flat discs, chords only, no glow. Everything else is identical at every tier.
+- **Shaders.** GLSL ES 3.00 compass and glow programs with material codes in the uv stream (the shared mesh renderer
+  binds only position, normal and uv); a won level brightens the orbit loop and lights every gauge mark; Reduce Motion
+  holds the star's pulse at 1 and Reduce Flashing caps the glow.
+- **Adapter.** `ApsidesWorkshopExperienceCore` opens certified level (seed mod 100) + 1, accepts `orbit.periapsis`,
+  `orbit.size`, `orbit.play`, `play.undo`, `play.redo`, `level.next` and `clock.show`; its digest is the level number
+  and the play's fingerprint (never the shown tick); snapshot schema 1.
+- **Experience.** The presenter draws with the fixed camera, logs tier changes, falls back to the unlit level-2
+  geometry when a program fails, and declares two backdrop probes; the minimal control panel steps the eccentricity,
+  direction, size and shown tick and plays, undoes, redoes and moves to the next level. The candidate is registered in
+  the one app (not available until X-R02-G18) with its scenario manifest (standard scenarios, fixtures and the 80
+  acceptance rows R2-G18-QA-001 … 080).

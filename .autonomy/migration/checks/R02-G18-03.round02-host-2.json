@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MoonlitMechanism|AcousticConstellator|HarmonicBridges"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges'",
+  "elapsed_seconds": 45.168,
+  "exit_code": 0,
+  "finished": "2026-11-25T23:10:59+00:00",
+  "gate": "R02-G18-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G18-03.round02-host-2.log",
+  "log_sha256": "df483f04641acbbeddac8243022d2098bec53dbe990f80ea5597992266b3f749",
+  "name": "round02-host-2",
+  "started": "2026-11-25T23:10:14+00:00",
+  "timed_out": false
+}

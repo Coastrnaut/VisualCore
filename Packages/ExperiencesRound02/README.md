@@ -955,3 +955,7 @@ tunings and the play, records, undo and redo, and `ApsidesWorkshopRules` (an R02
 Feature 472 (R02-G18-02) adds the content pipeline: `ApsidesWorkshopManifest` (100 planned levels), the generator, the
 depth-search solver with its minimality proof, difficulty metrics and the witness files in
 `docs/games/apsides-workshop/levels/`.
+Feature 473 (R02-G18-03) adds the hero renderer and the experience target `ApsidesWorkshopExperience`: the scene
+snapshot, the compass geometry with its CPU reference, the GLSL compass and glow programs, three tiers, the adapter
+`ApsidesWorkshopExperienceCore`, the presenter, scene and minimal controls, the scenario manifest and the candidate
+registration in the one app.

@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G18-02: Apsides Workshop content pipeline).
+Last updated: 2026-11-25 (R02-G18-03: Apsides Workshop hero renderer).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop hero renderer** (R02-G18-03, 2026-11-25). Host: shader sources (17), scene geometry (12), adapter
+  and renderer purity (17) and scenarios (6, the 94-scenario manifest regenerated with `UPDATE_SCENARIO_MANIFEST=1`).
+  Simulator (`--only-testing ApsidesWorkshopExperienceTests`, 26 tests): frames of levels 1, 21, 41, 61, 81 at three
+  tiers against the CPU reference at the shown tick T/2 (the apoapsis, so the orbiter never covers the star's check
+  point), fallback, resize, memory warning, Reduce Motion and Flashing, a failure marked broken, a won level lit,
+  identity. Lesson: an engine refusal reaches the shell as `action.rule.<code>`, so a test comparing the bare rule code
+  fails; compare with the prefix, as the other games' simulator tests do.
 - **Apsides Workshop content pipeline** (R02-G18-02, 2026-11-25). The `ApsidesWorkshop` filter now runs 87 tests in
   about 3 s: the solver's orbit lists against an independent enumeration and hand minima (including a two-tuning plan
   that must go knob first), the generator's draws and band profiles, the witness round trip and refusals, and the
