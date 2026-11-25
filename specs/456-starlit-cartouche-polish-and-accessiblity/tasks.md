@@ -20,7 +20,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G1606-003 [P] [US1] [US3] Create
+- [X] T-R02G1606-003 [P] [US1] [US3] Create — Verified 2026-11-24: host-2 exit 0 (.autonomy/migration/checks/R02-G16-06.host-2.json); feedback plan with Q1 texts, Q2 haptics, refusals bare and prefixed, summary text; 7 tests incl. every leg failure kind and a budget-out
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheFeedbackPlan.swift` (texts and kinds of
   clarification Q1 word for word, the engine's `action.rule.` prefix read as the bare code, a revealed hint as `state`
   (`hint(text:)`); haptics of Q2 — a leg that ends the level plans only the outcome; `after(old:new:)`,
