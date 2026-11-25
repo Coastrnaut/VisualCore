@@ -10,7 +10,7 @@ tests updated with the panel's new refusal words) and round02-host in five chunk
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1706-001 Baselines on the committed tree after R02-G17-05 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1706-001 Baselines on the committed tree after R02-G17-05 is recorded: `--name baseline-host`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 on the committed tree (.autonomy/migration/checks/R02-G17-06.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters); the rendering
   baseline is R02-G17-05's rendering runs (exit 0)
 - [ ] T-R02G1706-002 Edit `Packages/ExperiencesRound02/Package.swift` (`CelestialEclipseLabCore` and its tests gain
