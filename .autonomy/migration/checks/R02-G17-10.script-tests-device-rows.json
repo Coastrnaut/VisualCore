@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "-m",
+    "unittest",
+    "scripts.test_scripts.CelestialEclipseLabDeviceRowsCheckTests"
+  ],
+  "command": "python3 -m unittest scripts.test_scripts.CelestialEclipseLabDeviceRowsCheckTests",
+  "elapsed_seconds": 0.288,
+  "exit_code": 0,
+  "finished": "2026-11-25T19:54:28+00:00",
+  "gate": "R02-G17-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G17-10.script-tests-device-rows.log",
+  "log_sha256": "e72193929faaeac1643c7ce1fa12b0a34eda5c527e2259da0482969cb8333485",
+  "name": "script-tests-device-rows",
+  "started": "2026-11-25T19:54:27+00:00",
+  "timed_out": false
+}
