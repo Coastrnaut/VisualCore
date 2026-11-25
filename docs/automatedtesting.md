@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G17-10: Celestial Eclipse Lab device rows).
+Last updated: 2026-11-25 (R02-G18-01: Apsides Workshop rule kernel).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop rule kernel** (R02-G18-01, 2026-11-25). `swift test --package-path Packages/ExperiencesRound02
+  --filter ApsidesWorkshop` (40 tests in five suites, about 3 s): level checks and the stored form, the fixed-point
+  Kepler orbit against an independent `Double` solution within 2 sky units on 500 seeded orbits, every residual within
+  2^−22, sectors on every boundary ray, shares, apsis readings, contact one sky unit either side and grazing, the judge
+  recomputed independently, the play (500 seeded traces replayed, undo and redo by fingerprint, every refusal in
+  order), the puzzle contract and the nine source invariants. Lesson: two agents independently found that the
+  fixtures' known actions could pass through an invalid orbit (knob before size); the order is now size first when the
+  winning eccentricity is not lower, so the orbit in between always keeps the lower eccentricity. Newton's first step
+  often leaves the bracket at high eccentricity, so the bisection fallback decides E about 4 % of the time; the bound
+  holds either way.
 - **Celestial Eclipse Lab device rows** (R02-G17-10, 2026-11-25). `python3 scripts/check_device_rows.py --experience
   r02-g17.celestial-eclipse-lab` (release step `device-rows-r02-g17`, tests `CelestialEclipseLabDeviceRowsCheckTests`)
   checks the definition (rows CEL-D1 … CEL-D8, 12 device scenarios) against the scenario manifest, the ledger's

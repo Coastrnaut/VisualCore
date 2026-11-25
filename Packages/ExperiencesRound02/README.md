@@ -941,3 +941,14 @@ stored schema examples, the app's interface tests (`CEL`, chunk `z3`) and app un
 adds its device-row definition and written campaign plan (`docs/apps/celestial-eclipse-lab/`), checked by
 `scripts/check_device_rows.py`; no device is contacted. See
 [docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).
+
+## Apsides Workshop (R02-G18, `r02-g18.apsides-workshop`, free)
+
+`ApsidesWorkshopCore` (feature 471, R02-G18-01) is the playable rule kernel: Kepler's equation in deterministic integer
+fixed point (`ApsidesWorkshopFixed`: integer sine, cosine and square root, bounded Newton with a bisection fallback),
+the exact sky (`ApsidesWorkshopOrbit` with its size, eccentricity and periapsis direction steps, positions rounded to sky
+units, octant sectors, triangle-quadrature shares, apsis readings and strict planet contact in `ApsidesWorkshopSky`),
+the judge (`contact`, `order`, `share`, `apsis-sector`, `apsis-distance`), `ApsidesWorkshopLevel` (immutable,
+fingerprinted, JSON schema 1, with names in words), the play state `ApsidesWorkshopPlay` with stages, tunings and the
+play, records, undo and redo, and `ApsidesWorkshopRules` (an R02-F23 `PuzzleRules` over orbits). See
+[docs/architecture/apsides-workshop.md](../../docs/architecture/apsides-workshop.md).
