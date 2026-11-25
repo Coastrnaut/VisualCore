@@ -754,12 +754,17 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               // Feature 466 (R02-G17-06): the ambient sound recipe.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
                 path: "CelestialEclipseLab/Core"),
         .testTarget(name: "CelestialEclipseLabCoreTests",
                     dependencies: ["CelestialEclipseLabCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   // Feature 466 (R02-G17-06): feedback kinds and the ambient recipe in tests.
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "CelestialEclipseLab/CoreTests"),
         // Feature 463 (R02-G17-03): Celestial Eclipse Lab's experience (presenter, scene, controls).
         .target(name: "CelestialEclipseLabExperience",
@@ -769,7 +774,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 466 (R02-G17-06): the ambient loop and the audition.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "CelestialEclipseLab/Experience"),
         // Feature 463 (R02-G17-03): the simulator tests of Celestial Eclipse Lab's experience.
         .testTarget(name: "CelestialEclipseLabExperienceTests",
@@ -780,7 +788,9 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore),
+                                   .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "CelestialEclipseLab/ExperienceTests"),
         // Feature 453 (R02-G16-03): Starlit Cartouche's experience (presenter, scene, controls).
         .target(name: "StarlitCartoucheExperience",
