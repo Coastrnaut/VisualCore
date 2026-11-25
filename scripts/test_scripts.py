@@ -1292,6 +1292,24 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(argv[start:start + 2],
                          ["VisualCoreUITests/SCPlayUITests", "VisualCoreUITests/SCReplayUITests"])
 
+    def test_celestial_eclipse_lab_ui_chunk(self):
+        """Feature 469 R02-G17-09 (T-R02G1709-004): the serial chunk `z3` runs the Celestial Eclipse Lab interface
+        journeys; its key appears once in the `UI_CHUNKS` literal and its classes in no other chunk."""
+        self.assertEqual(relcheck.UI_CHUNKS["z3"], ["CELPlayUITests", "CELReplayUITests"])
+        self.assertIn("z3", relcheck.SERIAL_CHUNKS)
+        source = Path(relcheck.__file__).read_text(encoding="utf-8")
+        self.assertEqual(source.count('"z3": ['), 1)
+        for name, chunk in relcheck.UI_CHUNKS.items():
+            if name != "z3":
+                self.assertNotIn("CELPlayUITests", chunk, name)
+                self.assertNotIn("CELReplayUITests", chunk, name)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-z3"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2],
+                         ["VisualCoreUITests/CELPlayUITests", "VisualCoreUITests/CELReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""

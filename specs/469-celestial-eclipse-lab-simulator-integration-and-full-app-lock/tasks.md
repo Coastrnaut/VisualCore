@@ -41,7 +41,7 @@ change (the shaders and reference of R02-G17-03 are unchanged and re-proven by t
   uses each exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02
   --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing
   CelestialEclipseLabExperienceTests`
-- [ ] T-R02G1709-004 [US1] Create `Apps/VisualCore/Tests/UI/CelestialEclipseLab/CELSupport.swift`,
+- [X] T-R02G1709-004 [US1] Create `Apps/VisualCore/Tests/UI/CelestialEclipseLab/CELSupport.swift`, — Verified 2026-11-25: 2026-11-25 app-ui exit 0 (.autonomy/migration/checks/R02-G17-09.app-ui.json): CELPlayUITests (level 1 won through the panel with 3 of 3 stars, progress kept over a relaunch) and CELReplayUITests (replay to a win, Stop back to campaign), 3 tests in 321 s including four app launches (replay class 86 s); chunk z3 serial and unique; xcodegen regenerated
   `CELPlayUITests.swift`, `CELReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified plan (body 1
   to phase 2, then body 2 to phase 0) and the budget (9) pinned in `CEL`; each body chosen with Planet + or Planet −
   by the planet control's value, its pending phase moved with Phase + or Phase − by the phase control's value, Set
