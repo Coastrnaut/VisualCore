@@ -75,6 +75,27 @@
 // "progress", "records", "tutorial"}` with sorted keys; schema-1 payloads migrate (no won levels, level 1 open plus the
 // levels up to the restored level, campaign mode, the tutorial at its first step — `fly` on the tutorial levels, else
 // `done`); an envelope of a newer schema is refused.
+//
+// Feature 457 (R02-G16-07) T-R02G1607-003 (FR-R02G1607-001 … 007; clarifications Q1–Q5): a campaign or daily win
+// records its winning trace (`StarlitCartoucheReconciliation.netTrace` of the play's records: the effective legs, an
+// undone leg left out unless redone) as a verified result; restore reconciles every result
+// (`StarlitCartoucheReconciliation.reconcile`, the frontier as saved) and exposes `reconciliationDropped` (not digested,
+// not in `==`); the replay mode `replay(level)` plays a verified trace leg by leg:
+//   replay.start [1…100]  a fresh play of that level in mode `replay(level)` (campaign budget) with the tutorial done
+//                         (`r02-g16.no-replay` without a verified result with a trace); during a replay it restarts it;
+//   replay.step           the next leg of the trace (`r02-g16.replay-end` after the last or once the play ended;
+//                         `r02-g16.no-replay` outside replay);
+//   replay.stop           campaign at that level, the frontier when it is not open (`r02-g16.no-replay` outside
+//                         replay);
+//   settings.sound [0…1]  the sound choice: 1 on, 0 off; whole; allowed in every mode.
+// In replay every other action except `tutorial.dismiss`, `route.choose` (presentation) and `settings.sound` is refused
+// with `r02-g16.replay`, and nothing is recorded. A restored replay whose records are not exactly the first legs of its
+// level's verified trace (legs only, in order, no undo or redo) is refused as `damaged`; a restored replay whose result
+// did not survive reconciliation, or was never verified, returns to campaign at that level (the frontier when it is not
+// open). Digest "r02-g16.starlit-cartouche.v3" (the same parts as v2, the progress now with traces; never the sound
+// choice or the dropped count); snapshot schema 3 `{"level", "mode", "progress", "records", "sound", "tutorial"}`
+// (results carry `trace` and `verified`), migrating 1 → 2 → 3 (2 → 3: every result an empty trace and `verified` false,
+// sound off).
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -91,6 +112,12 @@ public enum StarlitCartoucheExperienceRule {
     public static let locked = "r02-g16.locked"
     /// An impossible calendar date (`mode.daily`, feature 455).
     public static let date = "r02-g16.date"
+    /// No verified result with a trace to replay, or a replay control outside replay (feature 457).
+    public static let noReplay = "r02-g16.no-replay"
+    /// The replay has no further leg: the trace is over or the play ended (feature 457).
+    public static let replayEnd = "r02-g16.replay-end"
+    /// An action that is not allowed during replay (feature 457).
+    public static let replay = "r02-g16.replay"
 }
 
 /// Why a saved Starlit Cartouche state was refused on restore (feature 453). A refused restore changes nothing.
@@ -104,17 +131,20 @@ public enum StarlitCartoucheRestoreRefusal: Error, Equatable, Sendable {
     case kernel(StarlitCartoucheError)
 }
 
-/// The state of Starlit Cartouche as an experience (see the file header). Snapshot schema 2.
+/// The state of Starlit Cartouche as an experience (see the file header). Snapshot schema 3.
 public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g16.starlit-cartouche"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g16.starlit-cartouche.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g16.starlit-cartouche.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["route.fly", "play.undo", "play.redo", "level.next", "route.choose",
-                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                                   "replay.start", "replay.step", "replay.stop", "settings.sound"]
+    /// The declared range of `settings.sound`: 0 off, 1 on (feature 457).
+    public static let soundRange: ClosedRange<Int> = 0...1
     /// The budget of a practice play: the kernel's maximum (`StarlitCartoucheMode.practiceBudget`, 24).
     public static let practiceBudget: Int = StarlitCartoucheMode.practiceBudget
     /// The level numbers of the catalog.
@@ -141,6 +171,12 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
     /// The certified witness's leg count of the current level, against which a win's stars are counted. Derived from
     /// the level number.
     public private(set) var certifiedLegs: Int
+    /// How many saved results the last restore dropped because they did not verify (feature 457); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
+    /// The player's sound choice (feature 457), set by `settings.sound`: in the snapshot (key `"sound"`) and `==`, never
+    /// in the digest; off at an opening, after a reset and in a migrated save.
+    public private(set) var soundOn = false
     /// The chosen destination star, never the ship's own star; presentation only — not in the digest, the snapshot
     /// payload or `==`.
     public private(set) var chosenStar: Int
@@ -346,18 +382,45 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the choice, the
-    /// quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode, the tutorial step and the sound choice (not
+    /// the choice, the quality tier, the dropped count or the opening level).
     public static func == (lhs: StarlitCartoucheExperienceCore, rhs: StarlitCartoucheExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial && lhs.soundOn == rhs.soundOn
     }
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object (feature 457): every won result gains an empty `trace` and `verified`
+    /// false, and the sound choice is off.
+    ///
+    /// - Throws: ``StarlitCartoucheRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw StarlitCartoucheRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated: [String: Any] = object
+        migrated["progress"] = progress
+        migrated["sound"] = false
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 455): no won levels with level 1 open
@@ -397,6 +460,10 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
+        ExperienceControl(id: "settings.sound", ranges: [declared(soundRange)]),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -404,8 +471,8 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The ten controls with their declared ranges (see the file header); `play.undo`, `play.redo`, `level.next`,
-    /// `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
+    /// The fourteen controls with their declared ranges (see the file header); `play.undo`, `play.redo`, `level.next`,
+    /// `mode.practice`, `mode.campaign`, `tutorial.dismiss`, `replay.step` and `replay.stop` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with the default choice; no clock is read.
@@ -430,6 +497,9 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
         if let refusal = ExperienceInput.validate(control: action.control, values: action.values,
                                                   controls: Self.declaredControls) {
             return .rejected(refusal)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: StarlitCartoucheExperienceRule.replay))
         }
         var values: [Int] = []
         for value in action.values {
@@ -482,6 +552,30 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
                 try open(number: levelNumber, mode: .practice)
             case "mode.campaign":
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            case "replay.start":
+                guard let result = progress.solved[values[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: StarlitCartoucheExperienceRule.noReplay))
+                }
+                try open(number: values[0], mode: .replay(level: values[0]))
+                tutorial = .done
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: StarlitCartoucheExperienceRule.noReplay))
+                }
+                // Replay never undoes, so each trace leg made exactly one record.
+                let index: Int = play.records.count
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: StarlitCartoucheExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+                resetChoice()
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: StarlitCartoucheExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
+            case "settings.sound":
+                soundOn = values[0] == 1
             default:   // tutorial.dismiss
                 tutorial = tutorial.dismissed()
             }
@@ -527,12 +621,21 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
     /// nothing). A won play is final, so a win is recorded once.
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
+        if case .replay = mode { return }
         _ = progress.record(level: levelNumber, actionsSpent: StarlitCartoucheProgress.actionsSpent(play),
-                            certified: certifiedLegs, mode: mode)
+                            certified: certifiedLegs, mode: mode, trace: winningTrace)
     }
 
-    /// Back to the opening state the seed chose (progress included, campaign mode, the default choice); the quality
-    /// tier, which is not state, is kept.
+    /// The controls accepted during replay (feature 457).
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "route.choose", "settings.sound"]
+
+    /// The winning trace of the current play (feature 457): its effective legs in order
+    /// (``StarlitCartoucheReconciliation/netTrace(_:)``), never an undo or a redo.
+    var winningTrace: [StarlitCartoucheAction] { StarlitCartoucheReconciliation.netTrace(play.records) }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode, the default choice, sound off); the
+    /// quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
         play = opening.play
@@ -540,6 +643,7 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
         mode = .campaign
         tutorial = opening.tutorial
         certifiedLegs = opening.certifiedLegs
+        soundOn = false
         resetChoice()
     }
 
@@ -552,9 +656,9 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g16.starlit-cartouche.v2", then the level number, the play's fingerprint (actions spent, beat, drawn
-    /// strokes, failure, legs, level, stage, star), the progress and the mode (their sorted JSON); never the tutorial
-    /// step or the choice.
+    /// "r02-g16.starlit-cartouche.v3", then the level number, the play's fingerprint (actions spent, beat, drawn
+    /// strokes, failure, legs, level, stage, star), the progress (with its traces) and the mode (their sorted JSON);
+    /// never the tutorial step, the choice, the sound choice or the dropped count.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
@@ -568,7 +672,7 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
@@ -580,17 +684,21 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
         var records: [StarlitCartoucheRecord]
         /// The tutorial step; nil in a migrated schema-1 payload.
         var tutorial: StarlitCartoucheTutorialStep?
+        /// The sound choice; nil (off) in a payload written before schema 3.
+        var sound: Bool?
     }
 
-    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "sound", "tutorial"}` with sorted keys and unescaped
+    /// slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
-                                                 records: play.records, tutorial: tutorial))
+                                                 records: play.records, tutorial: tutorial, sound: soundOn))
     }
 
-    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
-    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), with the default
-    /// choice; a reset returns to the opening state `seed` chooses.
+    /// The core of `payload` (schema 3): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress (reconciled: a result whose trace does not verify is dropped and counted
+    /// in ``reconciliationDropped``), mode, tutorial step (the first step when absent) and sound choice (off when
+    /// absent), with the default choice; a reset returns to the opening state `seed` chooses.
     ///
     /// - Throws: ``StarlitCartoucheRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or
     ///   tutorial step, or a daily mode naming another level among them), a level number outside 1 … 100 or a level or
@@ -605,6 +713,23 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw StarlitCartoucheRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw StarlitCartoucheRestoreRefusal.damaged
+        }
+        // Feature 457: a saved replay's records are exactly the first legs of its level's saved trace — legs only, in
+        // order, no undo or redo — or the payload is damaged.
+        if case .replay(let replayed) = decoded.mode, let saved = decoded.progress.solved[replayed], saved.verified {
+            var applied: [StarlitCartoucheAction] = []
+            for record in decoded.records {
+                guard record.kind == .leg, let action = record.action else {
+                    throw StarlitCartoucheRestoreRefusal.damaged
+                }
+                applied.append(action)
+            }
+            guard applied.count <= saved.trace.count, Array(saved.trace.prefix(applied.count)) == applied else {
+                throw StarlitCartoucheRestoreRefusal.damaged
+            }
+        }
         do throws(StarlitCartoucheError) {
             let certified: StarlitCartoucheGenerated = try generated(number: decoded.level)
             let play: StarlitCartouchePlay = try StarlitCartouchePlay.replay(
@@ -612,11 +737,19 @@ public struct StarlitCartoucheExperienceCore: ExperienceCore, Equatable {
             let tutorial: StarlitCartoucheTutorialStep = decoded.tutorial
                 ?? StarlitCartoucheTutorialStep.initial(level: decoded.level)
             let openingCore: StarlitCartoucheExperienceCore = try opening(number: levelNumber(forSeed: seed))
-            return StarlitCartoucheExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                                  mode: decoded.mode, tutorial: tutorial,
-                                                  certifiedLegs: certified.plan.size,
-                                                  openingNumber: openingCore.openingNumber,
-                                                  opening: openingCore.opening)
+            // Feature 457: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = StarlitCartoucheReconciliation.reconcile(decoded.progress)
+            var core: StarlitCartoucheExperienceCore = StarlitCartoucheExperienceCore(
+                levelNumber: decoded.level, play: play, progress: reconciled.progress, mode: decoded.mode,
+                tutorial: tutorial, certifiedLegs: certified.plan.size, openingNumber: openingCore.openingNumber,
+                opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            core.soundOn = decoded.sound ?? false
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw StarlitCartoucheRestoreRefusal.kernel(error)
         }

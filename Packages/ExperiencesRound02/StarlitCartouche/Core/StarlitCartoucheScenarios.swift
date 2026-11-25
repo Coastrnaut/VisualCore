@@ -67,7 +67,9 @@
 // integration rows (71 … 80) therefore first win their level's certified plan (a campaign win opens the next level)
 // before `level.next`; rejection also refuses the progression controls' wrong value counts (`level.select`,
 // `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`); the manifest was regenerated
-// (`UPDATE_SCENARIO_MANIFEST=1`).
+// (`UPDATE_SCENARIO_MANIFEST=1`). Feature 457 (R02-G16-07) T-R02G1607-003: digests are schema 3's ("…v3"), wins store
+// their traces, and rejection also refuses the replay and sound controls' wrong value counts (`replay.start`,
+// `replay.step`, `replay.stop`, `settings.sound`); the manifest was regenerated.
 // The expected digests and outcomes are derived by playing the entries on a core exactly as the engine plays them; the
 // tests replay every scenario through `ExperienceEngine` and check each family's kernel state. No clock, no random
 // source.
@@ -435,6 +437,10 @@ extension StarlitCartoucheExperienceCore {
             refusedEntry("mode.practice", [1], wrongCountCode),
             refusedEntry("mode.campaign", [1], wrongCountCode),
             refusedEntry("tutorial.dismiss", [1], wrongCountCode),
+            refusedEntry("replay.start", [], wrongCountCode),
+            refusedEntry("replay.step", [1], wrongCountCode),
+            refusedEntry("replay.stop", [1], wrongCountCode),
+            refusedEntry("settings.sound", [], wrongCountCode),
         ]
         return entries
     }

@@ -19,6 +19,11 @@
 // and their refusals, campaign stars and unlocks, practice (budget 24, no stars, no unlocks), a locked daily level
 // played without opening it, progress and mode digested but never the tutorial step or the choice, the tutorial steps,
 // the schema-2 round trip, the migration of a schema-1 payload and the refusal of a newer schema.
+// Feature 457 (R02-G16-07) T-R02G1607-003: schema 3 and digest v3, fourteen controls, and
+// `StarlitCartoucheReplayCoreTests` below: a win stores its effective-leg trace (an undone leg left out), practice
+// stores nothing, the replay rules and codes, a replay reproducing the campaign fingerprints and recording nothing, a
+// replay saved mid-way restoring while a changed or undo-carrying replay is refused `damaged`, reconciliation on restore,
+// the migrations 2 → 3 and 1 → 3, and the sound setting (snapshotted, never digested, off after a reset).
 import Foundation
 import Testing
 @testable import StarlitCartoucheCore
@@ -134,20 +139,22 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g16.starlit-cartouche" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g16.starlit-cartouche.v2")
+        #expect(Core.experienceID == "r02-g16.starlit-cartouche" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g16.starlit-cartouche.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["route.fly", "play.undo", "play.redo", "level.next", "route.choose", "level.select",
-                             "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                             "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "replay.start",
+                             "replay.step", "replay.stop", "settings.sound"]
         #expect(Core.actionIDs == ids)
+        #expect(Core.controls[10].ranges == [1...100] && Core.controls[13].ranges == [0...1])
         #expect(Core.controls[0].ranges == [0...11, 0...8])
         #expect(Core.controls[4].ranges == [0...11, 0...8])
         #expect(Core.controls[5].ranges == [1...100])
         #expect(Core.controls[6].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [1, 2, 3, 7, 8, 9]
+        let plainIndices: [Int] = [1, 2, 3, 7, 8, 9, 11, 12]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == StarlitCartoucheTier.all.count)
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == StarlitCartoucheTier.all.map(\.name))
@@ -520,14 +527,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "route.fly", values: [4, 1]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -669,7 +676,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(core.play.stage == .won && StarlitCartoucheProgress.actionsSpent(core.play) == certified + 1)
         let twoStars: Int = StarlitCartoucheProgress.stars(actionsSpent: certified + 1, certified: certified)
         #expect(twoStars == 2)
-        let twoStarResult = StarlitCartoucheProgress.Result(actionsSpent: certified + 1, stars: twoStars)
+        // Feature 457: the result carries the winning trace (the undone leg left out), verified.
+        let twoStarResult = StarlitCartoucheProgress.Result(actionsSpent: certified + 1, stars: twoStars,
+                                                            trace: actions, verified: true)
         #expect(core.progress.solved[1] == twoStarResult)
         #expect(core.progress.frontier == 2 && core.progress.isOpen(2) && !core.progress.isOpen(3))
         // level.next goes to the newly opened level 2, fresh, with its tutorial.
@@ -682,7 +691,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         #expect(core.levelNumber == 1 && core.play.records.isEmpty && core.mode == .campaign)
         for step in actions { #expect(core.apply(Self.act(step)) == .accepted) }
-        let best: StarlitCartoucheProgress.Result = StarlitCartoucheProgress.Result(actionsSpent: certified, stars: 3)
+        let best: StarlitCartoucheProgress.Result = StarlitCartoucheProgress.Result(actionsSpent: certified, stars: 3,
+                                                                                    trace: actions, verified: true)
         #expect(core.progress.solved[1] == best)
         // A worse result keeps the best one: four undone legs more than the plan (1 star) change nothing.
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
@@ -742,7 +752,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         for step in dailyActions { #expect(core.apply(Self.act(step)) == .accepted) }
         #expect(core.play.stage == .won && core.progress.frontier == 1 && !core.progress.isOpen(daily))
         let result: StarlitCartoucheProgress.Result = try #require(core.progress.solved[daily])
-        #expect(result == StarlitCartoucheProgress.Result(actionsSpent: dailyActions.count, stars: 3))
+        #expect(result == StarlitCartoucheProgress.Result(actionsSpent: dailyActions.count, stars: 3,
+                                                          trace: dailyActions, verified: true))
         // Campaign from a level that is not open goes to the frontier.
         #expect(core.apply(Self.act("mode.campaign")) == .accepted)
         #expect(core.mode == .campaign && core.levelNumber == 1)
@@ -856,7 +867,7 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(restored == saved && restored.tutorial == .symbol)
     }
 
-    @Test func theSchemaTwoPayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
+    @Test func theSchemaThreePayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
         // Campaign with progress: level 1 won, level 2 reached with level.next.
         var campaign: Core = try await Core.prepare(seed: 0)
         for step in try Self.plan(1) { #expect(campaign.apply(Self.act(step)) == .accepted) }
@@ -890,9 +901,10 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(restoredPractice.play.level.budget == 24 && restoredPractice.mode == .practice)
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
         let certified: Int = try Self.plan(1).count
+        // Feature 457: each result carries its trace and whether it is verified.
         let progressText: String = "\"progress\":{\"frontier\":2,"
-            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3}]}"
-        #expect(campaignText.contains(progressText))
+            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3,\"trace\":["
+        #expect(campaignText.contains(progressText) && campaignText.contains("\"verified\":true}]}"))
         #expect(campaignText.hasPrefix("{\"level\":2,\"mode\":{\"mode\":\"campaign\"},"))
         #expect(campaignText.hasSuffix(",\"tutorial\":\"fly\"}"))
         let dailyText: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
@@ -934,7 +946,7 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let records: Data = try Core.payloadEncoder().encode(core.play.records)
         let recordsObject: Any = try JSONSerialization.jsonObject(with: records)
         let schemaOne: [String: Any] = ["level": 3, "records": recordsObject]
-        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(schemaOne))
         let chained: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
         let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
         let chainedData: Data = try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])
@@ -955,8 +967,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(throws: StarlitCartoucheRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "3"]) }
         #expect(throws: StarlitCartoucheRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
         // A newer schema is refused by the chain.
-        #expect(Core.schemaVersion == 2)
-        #expect(throws: MigrationError.newerVersion(3)) { try Core.migrations.migrate(schemaOne, from: 3) }
+        #expect(Core.schemaVersion == 3)
+        #expect(throws: MigrationError.newerVersion(4)) { try Core.migrations.migrate(schemaOne, from: 4) }
     }
 
     @Test func theEngineMigratesASchemaOneEnvelopeAndRefusesANewerOne() async throws {
@@ -982,15 +994,15 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(migrated.progress.frontier == 3 && migrated.progress.solved.isEmpty)
         #expect(migrated.tutorial == .fly && played.tutorial == .symbol)
         #expect(try engine.digest() == saved.digest)
-        // An envelope of schema 3 is refused and changes nothing.
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        // An envelope of schema 4 is refused and changes nothing.
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(engine.core == migrated)
@@ -1034,5 +1046,267 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
             var locked: Core = fresh
             #expect(locked.apply(Self.act("level.select", [Double(number)])) == refused)
         }
+    }
+}
+
+@Suite struct StarlitCartoucheReplayCoreTests {
+    typealias Core = StarlitCartoucheExperienceCore
+
+    /// The digest of `core` as the engine computes it.
+    static func digest(_ core: Core) throws -> StateDigest {
+        var builder = DigestBuilder(domain: Core.experienceID)
+        try core.writeDigest(into: &builder)
+        return builder.finish()
+    }
+
+    /// An action of `control` with `values`.
+    static func act(_ control: String, _ values: [Double] = []) -> ExperienceAction {
+        ExperienceAction(control: control, values: values, step: 0)
+    }
+
+    /// The adapter action of a kernel action.
+    static func act(_ action: StarlitCartoucheAction) -> ExperienceAction {
+        switch action {
+        case let .leg(star, wait): act("route.fly", [Double(star), Double(wait)])
+        }
+    }
+
+    /// The certified plan of level `number`.
+    static func plan(_ number: Int) throws -> [StarlitCartoucheAction] {
+        try Core.generated(number: number).plan.legs
+    }
+
+    /// The refusal of rule code `code`.
+    static func refusal(_ code: String) -> ActionResult { .rejected(.rule(code: code)) }
+
+    /// Level 1 won in campaign by its certified plan, from seed 0.
+    static func wonLevelOne() async throws -> Core {
+        var core: Core = try await Core.prepare(seed: 0)
+        for step in try plan(1) { #expect(core.apply(act(step)) == .accepted) }
+        #expect(core.play.stage == .won)
+        return core
+    }
+
+    /// A leg from `core`'s opening that the kernel accepts, leaves the play playing and differs from `other`.
+    static func otherLeg(from core: Core, than other: StarlitCartoucheAction) -> StarlitCartoucheAction? {
+        for star in 0..<core.play.level.stars.count where star != core.play.star {
+            for wait in Core.waitRange {
+                let leg: StarlitCartoucheAction = .leg(star, wait)
+                guard leg != other else { continue }
+                var trial: Core = core
+                guard trial.apply(act(leg)) == .accepted, trial.play.stage == .playing else { continue }
+                return leg
+            }
+        }
+        return nil
+    }
+
+    /// `payload` as a JSON object.
+    static func object(_ payload: Data) throws -> [String: Any] {
+        try #require(try JSONSerialization.jsonObject(with: payload) as? [String: Any])
+    }
+
+    /// `object` as sorted JSON data.
+    static func data(_ object: [String: Any]) throws -> Data {
+        try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+    }
+
+    @Test func aWinStoresItsTraceAndPracticeStoresNothing() async throws {
+        let won: Core = try await Self.wonLevelOne()
+        let result: StarlitCartoucheProgress.Result = try #require(won.progress.solved[1])
+        let certified: [StarlitCartoucheAction] = try Self.plan(1)
+        #expect(result.verified && result.trace == certified)
+        #expect(won.progress.frontier == 2)
+        // An undone probe leg is left out of the trace (but spent: the stars count it).
+        var core: Core = try await Core.prepare(seed: 0)
+        let plan: [StarlitCartoucheAction] = try Self.plan(1)
+        let probe: StarlitCartoucheAction = try #require(Self.otherLeg(from: core, than: plan[0]))
+        #expect(core.apply(Self.act(probe)) == .accepted)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for step in plan { #expect(core.apply(Self.act(step)) == .accepted) }
+        let undone: StarlitCartoucheProgress.Result = try #require(core.progress.solved[1])
+        #expect(undone.trace == plan && undone.verified && undone.actionsSpent == plan.count + 1)
+        // Practice stores nothing.
+        var practice: Core = try await Core.prepare(seed: 0)
+        #expect(practice.apply(Self.act("mode.practice")) == .accepted)
+        for step in plan { #expect(practice.apply(Self.act(step)) == .accepted) }
+        #expect(practice.play.stage == .won && practice.progress.solved.isEmpty)
+    }
+
+    @Test func aReplayReproducesTheCampaignAndRecordsNothing() async throws {
+        let won: Core = try await Self.wonLevelOne()
+        let plan: [StarlitCartoucheAction] = try Self.plan(1)
+        // The campaign fingerprints after each leg.
+        var campaign: Core = try await Core.prepare(seed: 0)
+        var fingerprints: [String] = []
+        for step in plan {
+            #expect(campaign.apply(Self.act(step)) == .accepted)
+            fingerprints.append(campaign.play.fingerprint)
+        }
+        var replay: Core = won
+        #expect(replay.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(replay.mode == .replay(level: 1) && replay.tutorial == .done && replay.play.records.isEmpty)
+        for index in 0..<plan.count {
+            #expect(replay.apply(Self.act("replay.step")) == .accepted)
+            #expect(replay.play.fingerprint == fingerprints[index], "step \(index)")
+        }
+        #expect(replay.play.stage == .won && replay.progress == won.progress)
+        #expect(replay.apply(Self.act("replay.step")) == Self.refusal(StarlitCartoucheExperienceRule.replayEnd))
+        // replay.start during a replay restarts it.
+        #expect(replay.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(replay.play.records.isEmpty && replay.mode == .replay(level: 1))
+        #expect(replay.apply(Self.act("replay.stop")) == .accepted)
+        #expect(replay.mode == .campaign && replay.levelNumber == 1 && replay.progress == won.progress)
+    }
+
+    @Test func theReplayRulesAndCodes() async throws {
+        let fresh: Core = try await Core.prepare(seed: 0)
+        let noReplay: ActionResult = Self.refusal(StarlitCartoucheExperienceRule.noReplay)
+        var none: Core = fresh
+        #expect(none.apply(Self.act("replay.start", [1])) == noReplay)
+        #expect(none.apply(Self.act("replay.step")) == noReplay)
+        #expect(none.apply(Self.act("replay.stop")) == noReplay)
+        #expect(none == fresh)
+        let won: Core = try await Self.wonLevelOne()
+        var replay: Core = won
+        #expect(replay.apply(Self.act("replay.start", [2])) == noReplay)
+        #expect(replay.apply(Self.act("replay.start", [1])) == .accepted)
+        let inReplay: Core = replay
+        let refused: ActionResult = Self.refusal(StarlitCartoucheExperienceRule.replay)
+        let plan: [StarlitCartoucheAction] = try Self.plan(1)
+        let blocked: [ExperienceAction] = [Self.act(plan[0]), Self.act("play.undo"), Self.act("play.redo"),
+                                           Self.act("level.next"), Self.act("level.select", [1]),
+                                           Self.act("mode.daily", [2026, 1, 1]), Self.act("mode.practice"),
+                                           Self.act("mode.campaign")]
+        for action in blocked {
+            #expect(replay.apply(action) == refused, "\(action.control)")
+            #expect(replay == inReplay)
+        }
+        // Presentation, the tutorial and the sound stay allowed.
+        let choice: Int = StarlitCartoucheSceneSnapshot.defaultChoice(replay.play.level, star: replay.play.star)
+        #expect(replay.apply(Self.act("route.choose", [Double(choice), 2])) == .accepted)
+        #expect(replay.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(replay.apply(Self.act("settings.sound", [1])) == .accepted && replay.soundOn)
+        // A replayed win claims no stars.
+        while replay.play.stage == .playing { #expect(replay.apply(Self.act("replay.step")) == .accepted) }
+        let words: String = StarlitCartoucheFeedbackPlan.outcomePlan(replay).text ?? ""
+        #expect(!words.contains("stars") && words.hasPrefix(StarlitCartoucheFeedbackPlan.wonText))
+        #expect(StarlitCartoucheFeedbackPlan.refusalText(code: StarlitCartoucheExperienceRule.noReplay)
+                    == "There is no saved solution to replay for this level.")
+        #expect(StarlitCartoucheFeedbackPlan.refusalText(code: StarlitCartoucheExperienceRule.replayEnd)
+                    == "The replay is over.")
+        #expect(StarlitCartoucheFeedbackPlan.refusalText(code: "action.rule." + StarlitCartoucheExperienceRule.replay)
+                    == "Stop the replay first.")
+    }
+
+    @Test func aReplaySavedMidwayRestoresAndAChangedOneIsDamaged() async throws {
+        let won: Core = try await Self.wonLevelOne()
+        let plan: [StarlitCartoucheAction] = try Self.plan(1)
+        try #require(plan.count >= 2)
+        var replay: Core = won
+        #expect(replay.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(replay.apply(Self.act("replay.step")) == .accepted)
+        let payload: Data = try replay.snapshotPayload()
+        let restored: Core = try Core.restore(payload: payload, seed: 0)
+        #expect(restored == replay && restored.reconciliationDropped == 0)
+        #expect(try Self.digest(restored) == Self.digest(replay))
+        // Records of a campaign play that undid and redid the first leg: legs only are allowed.
+        var undoing: Core = try await Core.prepare(seed: 0)
+        #expect(undoing.apply(Self.act(plan[0])) == .accepted)
+        #expect(undoing.apply(Self.act("play.undo")) == .accepted)
+        #expect(undoing.apply(Self.act("play.redo")) == .accepted)
+        // Records of a campaign play whose first leg is not the trace's.
+        var other: Core = try await Core.prepare(seed: 0)
+        let stray: StarlitCartoucheAction = try #require(Self.otherLeg(from: other, than: plan[0]))
+        #expect(other.apply(Self.act(stray)) == .accepted)
+        for records in [undoing.play.records, other.play.records] {
+            var edited: [String: Any] = try Self.object(payload)
+            edited["records"] = try JSONSerialization.jsonObject(with: try Core.payloadEncoder().encode(records))
+            #expect(throws: StarlitCartoucheRestoreRefusal.damaged) {
+                try Core.restore(payload: try Self.data(edited), seed: 0)
+            }
+        }
+        // A replay whose result is not verified returns to campaign at that level.
+        var unverified: [String: Any] = try Self.object(payload)
+        var progress: [String: Any] = try #require(unverified["progress"] as? [String: Any])
+        var solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+        solved[0]["trace"] = [Any]()
+        solved[0]["verified"] = false
+        progress["solved"] = solved
+        unverified["progress"] = progress
+        unverified["records"] = [Any]()
+        let back: Core = try Core.restore(payload: try Self.data(unverified), seed: 0)
+        #expect(back.mode == .campaign && back.levelNumber == 1 && back.progress.solved[1]?.verified == false)
+    }
+
+    @Test func restoreReconcilesTheSavedResults() async throws {
+        let won: Core = try await Self.wonLevelOne()
+        let payload: Data = try won.snapshotPayload()
+        let honest: Core = try Core.restore(payload: payload, seed: 0)
+        #expect(honest == won && honest.reconciliationDropped == 0)
+        // Edited stars and edited actions spent are dropped and counted; the frontier stays.
+        let stars: Int = try #require(won.progress.solved[1]?.stars)
+        let edits: [(String, Any)] = [("stars", stars == 1 ? 2 : 1), ("actionsSpent", 0)]
+        for (key, value) in edits {
+            var edited: [String: Any] = try Self.object(payload)
+            var progress: [String: Any] = try #require(edited["progress"] as? [String: Any])
+            var solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+            solved[0][key] = value
+            progress["solved"] = solved
+            edited["progress"] = progress
+            let restored: Core = try Core.restore(payload: try Self.data(edited), seed: 0)
+            #expect(restored.reconciliationDropped == 1 && restored.progress.solved[1] == nil, "\(key)")
+            #expect(restored.progress.frontier == won.progress.frontier)
+            // The dropped count is not in ==: the restored state equals a won-and-dropped one.
+            var dropped: StarlitCartoucheProgress = won.progress
+            dropped.drop(level: 1)
+            #expect(restored.progress == dropped)
+        }
+    }
+
+    @Test func schemaTwoAndOnePayloadsMigrateToThree() async throws {
+        let won: Core = try await Self.wonLevelOne()
+        // A schema-2 object: no sound, results without trace or verified.
+        var schemaTwo: [String: Any] = try Self.object(try won.snapshotPayload())
+        schemaTwo.removeValue(forKey: "sound")
+        var progress: [String: Any] = try #require(schemaTwo["progress"] as? [String: Any])
+        var solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+        solved[0].removeValue(forKey: "trace")
+        solved[0].removeValue(forKey: "verified")
+        progress["solved"] = solved
+        schemaTwo["progress"] = progress
+        let three: [String: Any] = try Core.migratedToSchemaThree(schemaTwo)
+        let chained: [String: Any] = try Core.migrations.migrate(schemaTwo, from: 2)
+        #expect(try Self.data(three) == Self.data(chained))
+        #expect(three["sound"] as? Bool == false)
+        let restored: Core = try Core.restore(payload: try Self.data(three), seed: 0)
+        let result: StarlitCartoucheProgress.Result = try #require(restored.progress.solved[1])
+        #expect(!result.verified && result.trace.isEmpty && result.actionsSpent == won.progress.solved[1]?.actionsSpent)
+        #expect(restored.reconciliationDropped == 0 && !restored.soundOn && restored.progress.frontier == 2)
+        var copy: Core = restored
+        #expect(copy.apply(Self.act("replay.start", [1])) == Self.refusal(StarlitCartoucheExperienceRule.noReplay))
+        #expect(throws: StarlitCartoucheRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 1]) }
+        // Schema 1 → 3: no won levels, sound off.
+        let one: [String: Any] = try Core.migrations.migrate(["level": 3, "records": [Any]()], from: 1)
+        let fromOne: Core = try Core.restore(payload: try Self.data(one), seed: 2)
+        #expect(fromOne.progress.solved.isEmpty && fromOne.progress.frontier == 3 && !fromOne.soundOn)
+    }
+
+    @Test func theSoundSettingIsSavedButNotDigested() async throws {
+        var core: Core = try await Core.prepare(seed: 0)
+        #expect(!core.soundOn)
+        let before: StateDigest = try Self.digest(core)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        #expect(try Self.digest(core) == before)
+        let text: String = String(decoding: try core.snapshotPayload(), as: UTF8.self)
+        #expect(text.contains("\"sound\":true"))
+        let restored: Core = try Core.restore(payload: Data(text.utf8), seed: 0)
+        #expect(restored.soundOn && restored == core)
+        #expect(core.apply(Self.act("settings.sound", [0.5])) == Self.refusal(StarlitCartoucheExperienceRule.notWhole))
+        #expect(core.apply(Self.act("settings.sound", [2])) != .accepted && core.soundOn)
+        #expect(core.apply(Self.act("settings.sound", [0])) == .accepted && !core.soundOn)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted)
+        core.reset()
+        #expect(!core.soundOn)
     }
 }

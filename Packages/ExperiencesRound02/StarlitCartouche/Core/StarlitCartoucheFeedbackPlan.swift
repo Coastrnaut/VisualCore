@@ -4,6 +4,8 @@
 // reason code, or of a revealed hint's text), and the words of the panel's summary element. The presenter only routes
 // the plan through the shared feedback route (the person's haptics switch, the shared planners' rate limits); a plan
 // never changes state. Modelled on feature 446's `VoxelOrigamiFeedbackPlan`.
+// Feature 457 (R02-G16-07): the mode `replay` is named "replay"; a replay step is a leg record, announced like the leg
+// it applies; a replayed win claims no stars (replay awards none); the three replay refusals have their own words.
 //
 // Words: stars and corridors as the level words them (`StarlitCartoucheLevel.starName(_:)`, "star j";
 // `corridorName(_:)`, "the corridor between star a and star b"), actions from 1. The progress that follows every
@@ -99,7 +101,9 @@ public struct StarlitCartoucheFeedbackPlan: Sendable, Equatable {
     /// engine's ``rulePrefix`` is read as the bare code: "That level is not open yet." (`r02-g16.locked`), "That date
     /// cannot be used." (`r02-g16.date`), "No corridor can be flown there now." (`r02-g16.action`), "The level has
     /// ended." (`r02-g16.stage`), "That value must be a whole number." (`r02-g16.not-whole`), "That destination or
-    /// wait cannot be chosen." (`r02-g16.choice`); any other code (`r02-g16.stale`, `r02-g16.level`, the engine's own
+    /// wait cannot be chosen." (`r02-g16.choice`), "There is no saved solution to replay for this level."
+    /// (`r02-g16.no-replay`), "The replay is over." (`r02-g16.replay-end`), "Stop the replay first." (`r02-g16.replay`,
+    /// feature 457); any other code (`r02-g16.stale`, `r02-g16.level`, the engine's own
     /// codes such as `action.out-of-range`) "That action was refused.".
     public static func refusalText(code: String) -> String {
         let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
@@ -110,6 +114,10 @@ public struct StarlitCartoucheFeedbackPlan: Sendable, Equatable {
         case StarlitCartoucheError.stage.reasonCode: return "The level has ended."
         case StarlitCartoucheExperienceRule.notWhole: return "That value must be a whole number."
         case StarlitCartoucheExperienceRule.choice: return "That destination or wait cannot be chosen."
+        // Feature 457: the replay refusals.
+        case StarlitCartoucheExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case StarlitCartoucheExperienceRule.replayEnd: return "The replay is over."
+        case StarlitCartoucheExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }
@@ -143,12 +151,13 @@ public struct StarlitCartoucheFeedbackPlan: Sendable, Equatable {
             + level.starName(level.beacon) + " by beat \(level.deadline); a budget of " + actionsWords(level.budget)
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay" (feature 457).
     public static func modeName(_ mode: StarlitCartoucheMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 
@@ -204,7 +213,7 @@ public struct StarlitCartoucheFeedbackPlan: Sendable, Equatable {
     }
 
     /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars in campaign and daily;
-    /// never in practice), haptic `success`; or the failure explanation, haptic `warning`.
+    /// never in practice or replay, feature 457), haptic `success`; or the failure explanation, haptic `warning`.
     static func outcomePlan(_ core: StarlitCartoucheExperienceCore) -> StarlitCartoucheFeedbackPlan {
         let play: StarlitCartouchePlay = core.play
         if play.stage == .won {
