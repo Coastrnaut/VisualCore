@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G16-05 (migration ledger, game feature of experience R02-G16) · ID namespace FR-R02G1605-###,
 SC-R02G1605-###, T-R02G1605-###
@@ -26,6 +26,67 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G16-01 … 04.
 - **Model:** feature 445 (Voxel Origami's progression and teaching) for hints, tutorial, failure text, progress, daily
   and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+445's answers where the games agree. Facts checked in code (read-only, 2026-11-24): `StarlitCartoucheSolver.plan`
+certifies a level by a breadth-first search over (star, beat, strokes drawn) states from the start star at beat 0,
+corridors by index from the ship's star then waits 0 … 8, filtering each leg through the chart, for at most 7 legs and
+300,000 legs tried; a plan is its list of `.leg(star, wait)` actions; every leg spends 1 action and the play is won the
+moment every stroke of the symbol is drawn with the ship at the beacon; a leg fails `departure(star, beat, close)`,
+`hazard(corridor, hazard, from, to)`, `arrival(star, beat, open, close)`, `deadline(beat, deadline)` or
+`stroke(corridor)`, and the last action spent without a win fails `budget(spent)`; undo works in playing and failed
+plays, a won play is final; levels 1 … 3 carry the tutorial flag; budgets are 8 … 19 in the catalog (1 … 24 allowed);
+the adapter prepares level (seed mod 100) + 1, keeps the chosen destination and wait outside the play and snapshots
+`{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily multipliers are 31, 41,
+43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89 and 97.
+
+- Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
+  failed play's hint is "Undo the last action or retry the level." While playing: the solver's plan is computed from the
+  current star, beat and drawn strokes through a solver entry that starts from them (`plan(_:from:)`, the certifying
+  `plan(_:)` being that entry at the start star, beat 0 and no strokes); its first leg (j, w) is the hint; the whole
+  plan must fit the actions left, or else, as when the work bound is exceeded or no plan exists: "No way to win was
+  found in the actions left: undo the last action or retry the level." Level 1 names the stroke ("The next leg flies
+  corridor c, between star a and star b"), level 2 the destination ("Fly to star j"), level 3 the exact leg ("Fly to
+  star j after waiting w beats"). Hints never change the state, are unlimited, do not affect stars and reset to level 1
+  after any change of the play. Impact: FR-R02G1605-002; SC-R02G1605-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
+  instructions in order: (1) "Tap a star to choose where to fly, set the wait on the slider (or Wait − and +) so the
+  star is in range at launch, then double-tap it (or press Fly): the trail draws a stroke of the symbol" — it advances
+  once a leg has been accepted; (2) "Draw every stroke of the symbol and end at the beacon ring before the deadline — a
+  hint shows which leg is next" — it advances once a second leg has been accepted or the level ends (a leg that wins
+  ends the level); (3) "A leg that misses a star's window, crosses an active hazard tube, arrives after the deadline or
+  flies a corridor outside the symbol fails the level: undo and choose another star or wait" — until the level ends.
+  `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G1605-001; SC-R02G1605-001.
+- Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted leg record, undone
+  ones included: 3 when at most the certified witness's leg count, 2 when at most that + 2, else 1; per level the best
+  (least) actions spent of a won campaign play and its stars, a better result replacing a worse one; level 1 open; a
+  campaign win opens the next; `level.select [n]` opens any open level and refuses others (`r02-g16.locked`);
+  `level.next` moves to the next open level (refused when none, `r02-g16.locked`); the five bands of 20 are the
+  certified difficulty bands. Impact: FR-R02G1605-004; SC-R02G1605-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 37) mod 100 + 1, negative day counts wrapped into 0 … 99 (37 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g16.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the budget raised to the kernel's
+  maximum (24); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G1605-005;
+  SC-R02G1605-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 445: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the chosen destination and wait stay
+  presentation; the snapshot payload becomes schema 2 (`{level, mode, progress, records, tutorial}`) with a migration
+  from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its first step on tutorial levels). A
+  failure is explained from the failing action, actions numbered from 1, stars, corridors and hazards by index: a
+  departure — "Action m (a leg to star j after w beats) leaves star i at beat t, after its window closed at beat c."; a
+  hazard — "Action m (a leg to star j after w beats) flies corridor k through hazard h, active from beat a to beat b.";
+  an arrival — "Action m (a leg to star j after w beats) reaches star j at beat t, outside its window from beat o to
+  beat c."; the deadline — "Action m (a leg to star j after w beats) arrives at beat t, after the deadline at beat d.";
+  a stray stroke — "Action m (a leg to star j after w beats) flies corridor k, which is not part of the symbol."; the
+  budget — "Action m (a leg to star j after w beats) spent the last action without completing the symbol at the beacon."
+  — each followed by "Undo the last action or retry the level." Impact: FR-R02G1605-003, 007; SC-R02G1605-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
