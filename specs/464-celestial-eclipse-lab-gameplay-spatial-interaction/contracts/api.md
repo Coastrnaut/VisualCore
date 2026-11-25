@@ -40,5 +40,6 @@ public struct CelestialEclipseLabGestureController: Sendable {
     public func camera(viewSize: Vec2, snapshot: CelestialEclipseLabSceneSnapshot) -> CelestialEclipseLabCamera?
     public mutating func cancel(); public mutating func resetView() }
 // Presenter: pointer(_:viewSize:port:), resetView(); the scene draws with the controller's orbit and the preview; the
-// panel gains "Reset view". setPhase is sent only while playing; choose and show in any stage.
+// panel gains "Reset view" and "Set phase" (phase − and + move the previewed pending offset; "Set phase" sends one
+// orbit.phase). setPhase is sent only while playing; choose and show in any stage.
 ```

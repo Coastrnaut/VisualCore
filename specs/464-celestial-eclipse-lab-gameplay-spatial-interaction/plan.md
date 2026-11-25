@@ -10,13 +10,14 @@ orbiting camera (`CelestialEclipseLabOrbit`, `camera(_:aspect:orbit:)`, the mesh
 preview (the snapshot gains `previewBody`, `previewOffset` and the predicted timeline of the previewed phases; the
 geometry draws the dragged body's ghost, a dashed copy of its disc, at the previewed orbit position, and the timeline
 shows the preview's events); an analytic picker (`CelestialEclipseLabPicker`: each body's projected disc radius grown by
-8 points, the front-most first; the time dial as the projected strip and brackets' box grown by 8 points); a
-host-tested gesture controller (`CelestialEclipseLabGestureController`: taps that choose a planet, phase drags along the
-ring that set the phase on release, dial taps and drags that show a tick, empty double taps that reset the view,
-two-finger orbit, cancellation, no kernel action on a finished play); the presenter's pointer entry, the pending text
-and "Reset view"; and tests: 500 seeded gestures against an independent pick, all 100 certified levels won through
-panel actions, and simulator wiring tests. Research: [research.md](research.md). Data: [data-model.md](data-model.md).
-API: [contracts/api.md](contracts/api.md). Quickstart: [quickstart.md](quickstart.md).
+8 points, the front-most first; the time dial as the projected strip and brackets' box grown by 8 points); a host-tested
+gesture controller (`CelestialEclipseLabGestureController`: taps that choose a planet, phase drags along the ring that
+set the phase on release, dial taps and drags that show a tick, empty double taps that reset the view, two-finger orbit,
+cancellation, no kernel action on a finished play); the presenter's pointer entry, the pending text, "Reset view" and
+the panel's "Set phase" (phase − and + move a previewed pending offset, committed as one action); and tests: 500 seeded
+gestures against an independent pick, all 100 certified levels won through panel actions, and simulator wiring tests.
+Research: [research.md](research.md). Data: [data-model.md](data-model.md). API: [contracts/api.md](contracts/api.md).
+Quickstart: [quickstart.md](quickstart.md).
 
 ## Technical Context
 
