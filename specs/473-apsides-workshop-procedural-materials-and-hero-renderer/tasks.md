@@ -65,7 +65,7 @@ R02-G17-03 (`git show <R02-G17-03 record commit>:<path>`).
   positions at every tier; the orbit ribbon through every kernel position; gauges at 0, half and the budget; a won
   level in place; the glow mesh empty at level-2 and its shell counts per tier; each failure kind marked); agent B;
   `--name host-3`
-- [ ] T-R02G1803-005 [P] [US2] Create
+- [X] T-R02G1803-005 [P] [US2] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopExperienceCore, ApsidesWorkshopExperienceCoreTests and ApsidesWorkshopRendererPurityTests pass (host-4 exit 0); candidate table from the 100 witnesses' skipped values
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopExperienceCore.swift` (controls "orbit.periapsis
   [k, d], orbit.size [a], orbit.play, play.undo, play.redo, level.next, clock.show [tick]"; `clock.show` refuses a tick
   outside 0 … period − 1; digest "level number and play fingerprint", never the shown tick; schema 1 `{level,
