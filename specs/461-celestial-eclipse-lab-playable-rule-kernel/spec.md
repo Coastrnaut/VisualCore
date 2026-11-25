@@ -143,7 +143,8 @@ refused.
   and whether its phase is fixed), the horizon of the clock, the target sequence of eclipses (each a front body, a back
   body and a window of ticks), the action budget and whether it shows a tutorial.
 - **FR-R02G1701-002**: Each body's depth MUST keep one front-to-back order for every pair of bodies at every tick, so
-  every eclipse names its front and back body without ambiguity; a level breaking this is refused.
+  every eclipse names its front and back body without ambiguity; a level breaking this, or a target eclipse whose
+  front body is the back one of its pair, is refused.
 - **FR-R02G1701-003**: A phase change MUST set a movable body's starting offset along its orbit and spend one action;
   the predicted eclipse timeline MUST be recomputed exactly after it.
 - **FR-R02G1701-004**: Two bodies MUST eclipse at a tick exactly when the squared distance between their projected
