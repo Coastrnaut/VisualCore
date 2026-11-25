@@ -18,7 +18,7 @@ public struct ApsidesWorkshopPlan: Sendable, Equatable, Codable { public let act
 public enum ApsidesWorkshopSolver {
     public static let workBound: Int        // 16 000 orbits judged
     public static func plan(_ level: ApsidesWorkshopLevel, workBound: Int = workBound) -> ApsidesWorkshopPlan?
-    public static func orbits(from start: ApsidesWorkshopOrbit, depth: Int) -> [ApsidesWorkshopOrbit]  // in search order
+    public static func orbits(from start: ApsidesWorkshopOrbit, depth: Int) -> [ApsidesWorkshopOrbit] // search order
     public static func tunings(from start: ApsidesWorkshopOrbit, to target: ApsidesWorkshopOrbit)
         -> [ApsidesWorkshopAction]                                      // a valid order
     public static func wins(_ level: ApsidesWorkshopLevel, orbit: ApsidesWorkshopOrbit) -> Bool
