@@ -32,7 +32,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1603-003 [P] [US1] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheShaders.swift`
+- [X] T-R02G1603-003 [P] [US1] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheShaders.swift` — Verified 2026-11-24: host-2 exit 0 (.autonomy/migration/checks/R02-G16-03.host-2.json); chart and glow GLSL ES 3.00, 22 material codes, palette constants, firmament angle rule, glow gain/limit; 17 shader-source tests (glslangValidator absent, compile check skipped; real compile proven in the sim run of T-006)
   (chart and glow sources, GLSL ES 3.00; layered star shading (core, limb, corona) from the normal; signed-distance
   shading of dashes, stripes, notches, rings, the ship arrow, the cartouche grid and strokes, bars, track and pips from
   per-vertex local coordinates; the firmament gradient with sparse procedural specks under 5 % of its pixels, turned by
