@@ -48,7 +48,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1608-005 [US2] [US3] Create
+- [X] T-R02G1608-005 [US2] [US3] Create — Verified 2026-11-25: 2026-11-25 sim-27 exit 0 (62 tests incl. the golden-frame and memory classes by agent C, passing unedited; 12 cycles 29.91-33.22 MB)
   `Packages/ExperiencesRound02/StarlitCartouche/ExperienceTests/StarlitCartoucheRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/StarlitCartouche/ExperienceTests/StarlitCartoucheRegressionMemoryTests.swift` (agent C:
   the 16 frames rendered and checked against their descriptions with the feature-453 tolerances (a star's centre 0.25
