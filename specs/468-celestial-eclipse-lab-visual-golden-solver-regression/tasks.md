@@ -41,7 +41,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
   `Packages/ExperiencesRound02/CelestialEclipseLab/golden-frames.json` (schema 1) with
   `CELESTIAL_ECLIPSE_LAB_WRITE_GOLDEN=1`, and add `CelestialEclipseLabGolden` to `RELEASE_FORBIDDEN` in
   `scripts/release_check.py`
-- [ ] T-R02G1708-004 [P] [US2] Create
+- [X] T-R02G1708-004 [P] [US2] Create — Verified 2026-11-25: 2026-11-25 host-2 exit 0, 12 golden tests (.autonomy/migration/checks/R02-G17-08.host-2.json): pinned descriptions and digests match, alterations of position, colour, count, frame set, schema and hand edits are named, writing only with the switch
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabRegressionGoldenTests.swift` (agent B:
   every frame's recomputed description matches its pinned one; each pinned digest equals the digest of its pinned
   description; a moved position beyond a quantum, a changed colour or count, a missing frame, an unknown frame, schema
