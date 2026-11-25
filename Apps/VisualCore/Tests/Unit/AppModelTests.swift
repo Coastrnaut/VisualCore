@@ -16,6 +16,7 @@ import HueCompassCore
 import LissajousLabyrinthCore
 import MoonlitMechanismCore
 import NocturneGardenCore
+import StarlitCartoucheCore
 import SwiftUI
 import VisualCoreDiagnostics
 import VisualCoreExperience
@@ -3206,6 +3207,154 @@ final class AppModelTests: XCTestCase {
                           "hinge \(turn.hinge) can turn at the opening")
         }
         XCTAssertEqual(VoxelOrigamiExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Starlit Cartouche in the app (feature 459, R02-G16-09; T-R02G1609-005, FR-R02G1609-003, 006;
+    // SC-R02G1609-002)
+
+    /// Starlit Cartouche's registration: a candidate until X-R02-G16.
+    private func starlitCartoucheRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(StarlitCartoucheExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Starlit Cartouche is a candidate")
+    }
+
+    /// FR-R02G1609-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheStarlitCartoucheRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try starlitCartoucheRegistration()
+        XCTAssertEqual(StarlitCartoucheExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(StarlitCartoucheExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(StarlitCartoucheExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1609-006: without `-vcCandidates` Starlit Cartouche is a candidate only: in `candidates`, outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testStarlitCartoucheIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(StarlitCartoucheExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g16.starlit-cartouche")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1609-003, SC-R02G1609-002: with `-vcCandidates` Starlit Cartouche is shown, opens through the registry
+    /// and engine with seed 0 (level 1), and level 1 is won by its certified legs
+    /// (`StarlitCartoucheExperienceCore.generated(number: 1).plan.legs`) sent as `route.fly [star, wait]` with three
+    /// stars (the opening play is already past the kernel's tutorial stage; the tutorial step is presentation and
+    /// blocks no action, so no `tutorial.dismiss` is needed); the win is recorded verified with its trace, opens
+    /// level 2, and `level.next` plays it.
+    func testStarlitCartoucheOpensAsACandidateAndLevelOneIsWonByItsCertifiedLegs() async throws {
+        let registration = try starlitCartoucheRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["route.fly", "play.undo", "play.redo", "level.next", "route.choose", "level.select",
+                        "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss", "replay.start",
+                        "replay.step", "replay.stop", "settings.sound"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(StarlitCartoucheExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<StarlitCartoucheExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, StarlitCartoucheStage.playing, "the opening play accepts actions")
+        let certified = try StarlitCartoucheExperienceCore.generated(number: 1)
+        let legs: [StarlitCartoucheAction] = certified.plan.legs
+        XCTAssertEqual(legs, [.leg(4, 1), .leg(5, 0)], "level 1's certified legs")
+        for leg in legs {
+            switch leg {
+            case .leg(let star, let wait):
+                let values: [Double] = [Double(star), Double(wait)]
+                XCTAssertEqual(engine.handle(control: "route.fly", values: values), .accepted, "leg \(values)")
+            }
+        }
+        XCTAssertEqual(engine.outcome?.code, StarlitCartoucheExperienceCore.wonCode)
+        XCTAssertEqual(StarlitCartoucheExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, StarlitCartoucheStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified legs earn three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.trace, legs, "the trace is the certified legs")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `SC` (their own literals in
+    /// Tests/UI/StarlitCartouche/SCSupport.swift, which this target cannot import); the same literals equal the Core's
+    /// certified level 1: a leg to star 4 after 1 beat, then a leg to star 5 after 0 beats (a star with its wait); the
+    /// budget is 9; each star is one of the level's stars and each wait lies in the wait range. Seed 0 opens level 1.
+    func testStarlitCartoucheLevelOnePinsInSCEqualTheCore() throws {
+        // The same literals as `SC.levelOneLegs` and `SC.levelOneBudget` in SCSupport.swift.
+        let levelOneLegs: [(star: Int, wait: Int)] = [(4, 1), (5, 0)]
+        let levelOneBudget = 9
+
+        let certified = try StarlitCartoucheExperienceCore.generated(number: 1)
+        let certifiedLegs: [StarlitCartoucheAction] = certified.plan.legs
+        XCTAssertEqual(StarlitCartoucheExperienceCore.certifiedActions(1), certifiedLegs, "the certified plan's legs")
+        XCTAssertEqual(certifiedLegs, [.leg(4, 1), .leg(5, 0)], "level 1's certified legs")
+        var coreStars: [Int] = []
+        var coreWaits: [Int] = []
+        for leg in certifiedLegs {
+            switch leg {
+            case .leg(let star, let wait):
+                coreStars.append(star)
+                coreWaits.append(wait)
+            }
+        }
+        let pinnedStars: [Int] = levelOneLegs.map { $0.star }
+        let pinnedWaits: [Int] = levelOneLegs.map { $0.wait }
+        XCTAssertEqual(coreStars, pinnedStars, "level 1 certified leg stars")
+        XCTAssertEqual(coreWaits, pinnedWaits, "level 1 certified leg waits")
+
+        let level: StarlitCartoucheLevel = certified.level
+        XCTAssertEqual(level.budget, levelOneBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, certifiedLegs.count, "the witness fits the budget")
+        XCTAssertEqual(levelOneLegs.last?.star, level.beacon, "the last leg ends at the beacon")
+        for leg in levelOneLegs {
+            XCTAssertTrue((0..<level.stars.count).contains(leg.star), "one of the level's stars \(leg)")
+            XCTAssertTrue(StarlitCartoucheExperienceCore.starRange.contains(leg.star), "a declared star \(leg)")
+            XCTAssertTrue(StarlitCartoucheExperienceCore.waitRange.contains(leg.wait), "a declared wait \(leg)")
+        }
+
+        let opening = try StarlitCartoucheExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, levelOneBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, StarlitCartoucheStage.playing, "the opening accepts actions")
+        XCTAssertEqual(opening.certifiedLegs, certifiedLegs.count, "stars are counted against the witness")
+        XCTAssertEqual(StarlitCartoucheExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }

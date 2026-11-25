@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "scripts/release_check.py",
+    "--only",
+    "app-build-for-testing-ios27",
+    "app-unit-ios27"
+  ],
+  "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+  "elapsed_seconds": 121.594,
+  "exit_code": 0,
+  "finished": "2026-11-25T07:43:44+00:00",
+  "gate": "R02-G16-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G16-09.app-unit.log",
+  "log_sha256": "dd3dd66fb478e4c2219342df0602b564bfae6bc58257e030f5d576e7b8ba7c9d",
+  "name": "app-unit",
+  "started": "2026-11-25T07:41:43+00:00",
+  "timed_out": false
+}
