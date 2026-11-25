@@ -70,7 +70,7 @@ by filter.
   `Packages/ExperiencesRound02/StarlitCartouche/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); update
   `StarlitCartouchePanelWinTests`, the gesture wiring tests and other suites whose `level.next` expectation changes;
   lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter StarlitCartouche`
-- [ ] T-R02G1605-005 Edit `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartouchePresenter.swift` (the
+- [X] T-R02G1605-005 Edit `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartouchePresenter.swift` (the — Verified 2026-11-24: sim-27 exit 0, 41 simulator tests incl. 6 teaching tests (.autonomy/migration/checks/R02-G16-05.sim-27.json; sim-27a exit 0 before them); presenter tutorial, hints off the main actor, failure explanation, goal, stars, modes, retry and daily from the local date; panel rows
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it,
   the search off the main actor and a stale search never owning the hint state — and the failure explanation as panel
   text, with the level's difficulty band (of the five bands of 20), its goal and its best stars (FR-R02G1605-004); the

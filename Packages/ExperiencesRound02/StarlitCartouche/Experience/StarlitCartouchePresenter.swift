@@ -13,6 +13,14 @@
 // ship drag previews its destination (restored when the drag is cleared), two fingers orbit the camera (presentation
 // only), and refused actions are shown and logged with their codes, read with or without the engine's `action.rule.`
 // prefix.
+// Feature 455 (R02-G16-05) T-R02G1605-005 (FR-R02G1605-001 … 005; clarifications Q1–Q5): the mirror carries the
+// tutorial instruction, the hint revealed so far (`showHint()` reveals the next of three levels; the bounded search
+// runs off the main actor, a stale search owns nothing, and any change of the play hides it), the failure explanation
+// (`explanation`; `failureText` stays the short status line), the mode, the open levels with their bands and stars and
+// the goal (the certified witness's leg count); `retry` starts the level again in its mode, `undoAction` takes back the
+// last leg, and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`), never by
+// the core. A refused `level.next` before a win (`r02-g16.locked`) and an impossible date (`r02-g16.date`) read in
+// words.
 #if os(iOS)
 import Foundation
 import StarlitCartoucheCore
@@ -51,6 +59,34 @@ final class StarlitCartoucheMirror {
     var message: String?
     /// The pending leg of a ship drag in words (feature 454), nil when no drag is pending.
     var pending: String?
+    /// The tutorial instruction; nil when the tutorial is done (feature 455).
+    var instruction: String?
+    /// The hint level revealed (0 … 3; 0 while no hint is shown) (feature 455).
+    var hintLevel = 0
+    /// The text of the hint revealed, or ``StarlitCartouchePresenter/searchingText`` while its search runs
+    /// (feature 455).
+    var hintText: String?
+    /// The failure explanation (the failing leg, its cause and the advice), nil without a failure (feature 455).
+    var explanation: String?
+    /// The mode (feature 455).
+    var mode: StarlitCartoucheMode = .campaign
+    /// The highest open level (feature 455).
+    var frontier = 1
+    /// The stars of each won level, by level number (feature 455).
+    var stars: [Int: Int] = [:]
+    /// The certified witness's leg count of the current level (the goal, feature 455).
+    var certifiedLegs = 0
+    /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen) (feature 455).
+    var pickedLevel = 1
+
+    /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 455).
+    var goalLabel: String {
+        let band: Int = StarlitCartoucheProgress.band(of: levelNumber)
+        let unit: String = certifiedLegs == 1 ? "leg" : "legs"
+        var text = "Goal: draw the symbol in \(certifiedLegs) \(unit); band \(band) of 5"
+        if let best = stars[levelNumber] { text += "; best \(best) of 3 stars" }
+        return text
+    }
 
     /// The number of stars of the followed level (2 while no play is followed).
     var starCount: Int { max(play?.level.stars.count ?? 2, 2) }
@@ -122,6 +158,8 @@ final class StarlitCartoucheMirror {
         case "r02-g16.level": "the next level could not be made"
         case StarlitCartoucheExperienceRule.notWhole: "a star and a wait must be whole numbers"
         case StarlitCartoucheExperienceRule.choice: "that destination or wait cannot be chosen"
+        case StarlitCartoucheExperienceRule.locked: "that level is not open yet: win the level before it first"
+        case StarlitCartoucheExperienceRule.date: "that date is not a calendar date"
         default: "that action is not available now"
         }
     }
@@ -166,6 +204,18 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
     static let refusalLogLimit = 64
     /// The destination chosen before a ship drag began previewing another, restored when the preview is cleared.
     private var previewRestore: Int?
+    /// The latest core described (feature 455): hints and retry read it.
+    private(set) var latestCore: StarlitCartoucheExperienceCore?
+    /// The play the shown hint belongs to (level, mode and fingerprint); nil when no hint is shown (feature 455).
+    private var hintKey: String?
+    /// The hints searched for a play, by that play's key: one search per play, every level from it (feature 455).
+    private var hintCache: (key: String, hints: [StarlitCartoucheHint?])?
+    /// The search under way, off the main actor, for the play of ``hintKey`` (feature 455).
+    private(set) var hintSearch: Task<Void, Never>?
+    /// What the hint line shows while the search runs (feature 455).
+    static let searchingText = "Finding a hint…"
+    /// The date whose daily level is being played, so Retry restarts that level after midnight too (feature 455).
+    private(set) var dailyDate: DateComponents?
 
     /// The level and the number of flown legs last seen, and the frame time of the newest leg (the glide starts
     /// there).
@@ -276,6 +326,7 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
             + "stars and reach \(level.starName(level.beacon)) by beat \(level.deadline)"
         let measure: String = level.progressDescription(report: play.report, actionsLeft: play.actionsLeft)
         mirror.measureLabel = measure
+        absorbProgress(core)
         var text = "Starlit Cartouche level \(core.levelNumber). "
         text += measure + ". "
         if let pending = mirror.pending { text += pending + ". " }
@@ -287,6 +338,8 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
         case .failed, .result:
             let reason: String = StarlitCartoucheMirror.failureText(play.failure) ?? "The play failed."
             text += reason
+            // Since feature 455 the failure explanation too (the failing leg, its cause and the advice).
+            if let explanation = mirror.explanation { text += " " + explanation }
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         default:
@@ -296,12 +349,16 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
         if play.stage == .won || play.stage == .failed || play.stage == .result {
             text += " " + Self.finishedMessage + "."
         }
+        if play.stage == .won, let stars = mirror.stars[core.levelNumber] { text += " Stars: \(stars) of 3." }
+        text += " " + mirror.goalLabel + "."
+        if let instruction = mirror.instruction { text += " Tutorial: " + instruction }
+        if let hint = mirror.hintText { text += " Hint: " + hint }
         return text
     }
 
     /// The control panel: "Reset view" returns to the authored orbit; every button sends through ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(StarlitCartoucheControls(port: port, mirror: mirror,
+        AnyView(StarlitCartoucheControls(port: port, mirror: mirror, presenter: self,
                                          resetView: { [weak self] in self?.resetView() },
                                          sender: { [weak self] control, values in
                                              self?.send(control, values, port: port)
@@ -395,6 +452,153 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
             }
         }
         return result
+    }
+
+    // MARK: Teaching and progression (feature 455, R02-G16-05)
+
+    /// Takes the core's teaching and progress state into the mirror: the tutorial instruction, the failure
+    /// explanation, the mode, the open levels with their stars and the goal; a change of the play hides the hint.
+    private func absorbProgress(_ core: StarlitCartoucheExperienceCore) {
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let key = hintKey, key != Self.hintKey(core) { clearHint() }
+        mirror.instruction = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.explanation = StarlitCartoucheFailureExplanation(play: core.play)?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.certifiedLegs = core.certifiedLegs
+    }
+
+    /// The key of the play a hint belongs to: level, mode and fingerprint.
+    private static func hintKey(_ core: StarlitCartoucheExperienceCore) -> String {
+        "\(core.levelNumber)/\(core.mode)/\(core.play.fingerprint)"
+    }
+
+    /// Hides the hint shown and drops a search under way.
+    private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hintKey = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// The three hint levels of `play` from one search: the exact hint's leg gives every level's text
+    /// (`StarlitCartoucheHint.legText(level:star:wait:corridor:a:b:)`, the corridor joining the ship's star and the
+    /// destination); a stuck or failed hint reads the same at every level; nil at every level for a play without a hint
+    /// (won).
+    nonisolated static func hintLevels(_ play: StarlitCartouchePlay) -> [StarlitCartoucheHint?] {
+        guard let exact = StarlitCartoucheHints.hint(level: 3, play: play) else { return [nil, nil, nil] }
+        guard exact.kind == .leg, case .leg(let star, let wait)? = exact.action,
+              let corridor = StarlitCartoucheChart.corridor(play.level, joining: play.star, star) else {
+            return [exact, exact, exact]
+        }
+        let joined: StarlitCartoucheCorridor = play.level.corridors[corridor]
+        var hints: [StarlitCartoucheHint?] = []
+        for level in 1...3 {
+            var hint: StarlitCartoucheHint = exact
+            hint.text = StarlitCartoucheHint.legText(level: level, star: star, wait: wait, corridor: corridor,
+                                                     a: joined.a, b: joined.b)
+            hints.append(hint)
+        }
+        return hints
+    }
+
+    /// Reveals the next hint level (up to 3) for the current play; the hint is hidden when the play has none (won).
+    /// Hints never change the state: no action is sent. The bounded search runs once per play in a detached task,
+    /// never on the frame: meanwhile the panel reads "Finding a hint…", and the result is shown only if the play it
+    /// belongs to is still the current one; later levels come from the cache.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let key: String = Self.hintKey(core)
+        let next: Int = hintKey == key ? min(mirror.hintLevel + 1, 3) : 1
+        if let cached = hintCache, cached.key == key {
+            reveal(cached.hints, level: next, key: key)
+            return
+        }
+        guard hintSearch == nil || hintKey != key else { return }   // the search for this play is running
+        hintKey = key
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        let play: StarlitCartouchePlay = core.play
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            let hints: [StarlitCartoucheHint?] = StarlitCartouchePresenter.hintLevels(play)
+            await self?.finishSearch(hints, key: key)
+        }
+    }
+
+    /// Takes the three hint levels searched for the play of `key`: cached, and shown when that play is still current.
+    private func finishSearch(_ hints: [StarlitCartoucheHint?], key: String) {
+        // A search for a play that is no longer the hinted one (hidden or replaced since) owns nothing: it must not
+        // clear a newer search's handle or overwrite the cache.
+        guard hintKey == key else { return }
+        hintSearch = nil
+        hintCache = (key, hints)
+        guard let core = latestCore, Self.hintKey(core) == key else { return }
+        reveal(hints, level: mirror.hintLevel, key: key)
+    }
+
+    /// Shows `hints`' level `level` for the play of `key`, or hides the hint when the play has none.
+    private func reveal(_ hints: [StarlitCartoucheHint?], level: Int, key: String) {
+        guard hints.indices.contains(level - 1), let hint = hints[level - 1] else {
+            clearHint()
+            return
+        }
+        hintKey = key
+        mirror.hintLevel = level
+        mirror.hintText = hint.text
+    }
+
+    /// Ends the tutorial of the current level (`tutorial.dismiss`).
+    func dismissTutorial(port: ExperienceActionPort) {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Takes back the last leg (`play.undo`); after a failure this returns the play to playing.
+    @discardableResult
+    func undoAction(port: ExperienceActionPort) -> ActionResult {
+        send("play.undo", [], port: port)
+    }
+
+    /// The action and values that start the current level again in its mode: `mode.practice` in practice, the daily
+    /// date's `mode.daily` in daily mode, `level.select` of the level in campaign.
+    func retryAction(date: DateComponents) -> (control: String, values: [Double]) {
+        guard let core = latestCore else { return ("mode.campaign", []) }
+        switch core.mode {
+        case .practice: return ("mode.practice", [])
+        case .daily: return ("mode.daily", Self.dateValues(dailyDate ?? date))
+        case .campaign: return ("level.select", [Double(core.levelNumber)])
+        }
+    }
+
+    /// Starts the current level again in its mode; in daily mode with the date that opened it (today's local date
+    /// when none is known).
+    @discardableResult
+    func retry(port: ExperienceActionPort, date: DateComponents = StarlitCartouchePresenter.today()) -> ActionResult {
+        let action = retryAction(date: date)
+        return send(action.control, action.values, port: port)
+    }
+
+    /// Plays the daily level of `date` (the local calendar date by default; the core never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = StarlitCartouchePresenter.today()) -> ActionResult {
+        let result = send("mode.daily", Self.dateValues(date), port: port)
+        if result.isAccepted { dailyDate = date }
+        return result
+    }
+
+    /// The local calendar date now, as Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the engine refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
 }
 #endif

@@ -1,9 +1,9 @@
 // StarlitCartoucheExperienceIdentityTests — feature 453 (R02-G16-03) T-R02G1603-006 (FR-R02G1603-005, 007, 008). The
 // experience's id is the catalog id, the factory builds a shell around the presenter with the accessibility settings
-// passed through, the controls are the ten declared actions in order (feature 455), the registration facts hold (100 certified
-// levels, schema 1, the tiers level-0 … level-2), the presenter's quality levels equal the Core's `qualityTiers`, the
-// presenter holds no GPU object and no snapshot before setup, and it declares its two frame probes once a frame was
-// drawn. iOS only, as the target.
+// passed through, the controls are the ten declared actions in order (feature 455), the registration facts hold (100
+// certified levels, schema 1, the tiers level-0 … level-2), the presenter's quality levels equal the Core's
+// `qualityTiers`, the presenter holds no GPU object and no snapshot before setup, and it declares its two frame probes
+// once a frame was drawn. iOS only, as the target.
 #if os(iOS)
 import Foundation
 import StarlitCartoucheCore
