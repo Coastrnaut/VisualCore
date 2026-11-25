@@ -15,7 +15,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1802-002 Add `generation(Int)` ("r02-g18.generation") and `witness(String)` ("r02-g18.witness") to
+- [X] T-R02G1802-002 Add `generation(Int)` ("r02-g18.generation") and `witness(String)` ("r02-g18.witness") to — Verified 2026-11-25: 2026-11-25 generation and witness refusals, the 100-entry manifest and the difficulty; all 87 ApsidesWorkshop tests pass (host exit 0)
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopError.swift`; create
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopManifest.swift` (the 100 entries "number 1 … 100,
   planned seed, band 1 … 5, budget 8 … 19, emphasis" copied from `python3 scripts/planning_index.py levels --experience

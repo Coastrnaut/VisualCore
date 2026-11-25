@@ -1,6 +1,7 @@
 // ApsidesWorkshopError — feature 471 (R02-G18-01) T-R02G1801-002 (FR-R02G1801-006, 009, 011; clarification Q4). The
 // refusals of Apsides Workshop's rule kernel, each with a stable reason code `r02-g18.*` that the experience logs with
 // the level id and the action. Modelled on `CelestialEclipseLabError` (feature 461).
+// Feature 472 (R02-G18-02) T-R02G1802-002 (FR-R02G1802-006; clarification Q5) adds `generation` and `witness`.
 
 /// A refusal of an Apsides Workshop level, action or event.
 public enum ApsidesWorkshopError: Error, Equatable, Sendable {
@@ -19,6 +20,10 @@ public enum ApsidesWorkshopError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of manifest entry `number` qualified within the generator's candidate bound.
+    case generation(Int)
+    /// A witness file is damaged, newer than its schema or no longer replays; the payload describes it.
+    case witness(String)
 
     /// The stable reason code, `r02-g18.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +35,8 @@ public enum ApsidesWorkshopError: Error, Equatable, Sendable {
         case .stale: "r02-g18.stale"
         case .newerSchema: "r02-g18.newer-schema"
         case .malformed: "r02-g18.malformed"
+        case .generation: "r02-g18.generation"
+        case .witness: "r02-g18.witness"
         }
     }
 }
