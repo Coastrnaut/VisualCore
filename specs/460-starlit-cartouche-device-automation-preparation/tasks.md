@@ -20,7 +20,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   only for SC-D6), covers, owner_steps, status "pending device campaign"; no result field); edit
   `scripts/release_check.py` (step `device-rows-r02-g16`); `--name device-rows -- python3 scripts/check_device_rows.py
   --experience r02-g16.starlit-cartouche`
-- [ ] T-R02G1610-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Starlit Cartouche definition passes; a
+- [X] T-R02G1610-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Starlit Cartouche definition passes; a — Verified 2026-11-25: 2026-11-25 script-tests exit 0, run alone (StarlitCartoucheDeviceRowsCheckTests: the real definition passes; a removed scenario, a removed pass field and two dropped covered tasks fail by name; the release step runs the check)
   copy with a scenario removed, a copy with SC-D1's `pass` field removed and a copy with T-R02G1609-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g16` runs the check for
   `r02-g16.starlit-cartouche`); `--name script-tests` (alone)
