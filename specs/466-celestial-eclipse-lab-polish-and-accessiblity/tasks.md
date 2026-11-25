@@ -20,7 +20,7 @@ tests updated with the panel's new refusal words) and round02-host in five chunk
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G1706-003 [P] [US1] [US3] Create
+- [X] T-R02G1706-003 [P] [US1] [US3] Create — Verified 2026-11-25: 2026-11-25 host-2 exit 0 (.autonomy/migration/checks/R02-G17-06.host-2.json); feedback plan with Q1 texts, Q2 haptics, refusals bare and prefixed, summary; 9 tests incl. every failure kind and practice and daily wins
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabFeedbackPlan.swift` (texts and kinds of
   clarification Q1 word for word, the engine's `action.rule.` prefix read as the bare code, a revealed hint as `state`
   (`hint(text:)`); haptics of Q2 — the run plans only its outcome; `after(old:new:)`, `refused(code:)`,
