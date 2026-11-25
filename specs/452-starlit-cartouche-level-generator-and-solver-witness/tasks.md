@@ -55,7 +55,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
   depth one below and the count of states reached at it); difficulty; skipped; decode refuses newer, damaged and
   non-replaying files) with `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheWitnessTests.swift`;
   `--name host-4`
-- [ ] T-R02G1602-006 [US2] [US3] [US4] Create
+- [X] T-R02G1602-006 [US2] [US3] [US4] Create — Verified 2026-11-24: host-5 exit 0 (.autonomy/migration/checks/R02-G16-02.host-5.json); StarlitCartoucheCatalogTests 8 tests, digest ee022539…969e pinned, 100 witness files written with STARLIT_CARTOUCHE_WRITE_WITNESSES=1
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the budget, and no shorter sequence wins; the depth-first
   enumeration on the two levels with the fewest stars in each band; pinned digest; progression rule and band means;

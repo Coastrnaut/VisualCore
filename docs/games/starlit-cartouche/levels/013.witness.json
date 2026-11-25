@@ -1,0 +1,204 @@
+{
+  "actions" : [
+    {
+      "leg" : {
+        "_0" : 4,
+        "_1" : 0
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 3,
+        "_1" : 0
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "states" : 9
+  },
+  "difficulty" : {
+    "corridors" : 3,
+    "hazards" : 0,
+    "legs" : 2,
+    "stars" : 6,
+    "statesSearched" : 10,
+    "strokes" : 1,
+    "work" : 19
+  },
+  "digests" : [
+    "973877236d1bf6ed",
+    "1930297f283ae261"
+  ],
+  "fingerprints" : [
+    "a040025d1c9a3bea7c6de08b604df486d9b3e0043f7aaf875ecac5214e9ae05c",
+    "236be592563ae2b83323c5cb708b714e561d78a0b181f940ab6766a5dff43a30",
+    "0d967a7d42ac179adb66ef33b6479f4a0963f8bb5769a764beb48a6855648ecd"
+  ],
+  "level" : {
+    "beacon" : 3,
+    "budget" : 9,
+    "corridors" : [
+      {
+        "a" : 3,
+        "b" : 4,
+        "travel" : 3
+      },
+      {
+        "a" : 3,
+        "b" : 5,
+        "travel" : 1
+      },
+      {
+        "a" : 0,
+        "b" : 2,
+        "travel" : 2
+      }
+    ],
+    "deadline" : 12,
+    "difficulty" : 1,
+    "fingerprint" : "0479887e90ca7fa98099e8a134b15247c2b1c6e354671ae7a17cc943a2f71c4c",
+    "hazards" : [
+
+    ],
+    "id" : "starlit-cartouche-013",
+    "range" : 8,
+    "schema" : 1,
+    "seed" : 4107201728623205370,
+    "stars" : [
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 2,
+          "y" : 1
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : -1,
+            "y" : 3,
+            "z" : 1
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 3,
+          "y" : 2
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : 4,
+            "y" : 3,
+            "z" : -5
+          },
+          {
+            "x" : 4,
+            "y" : 0,
+            "z" : 5
+          },
+          {
+            "x" : -4,
+            "y" : 0,
+            "z" : -1
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 2,
+          "y" : 4
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : 5,
+            "y" : -2,
+            "z" : 4
+          },
+          {
+            "x" : 2,
+            "y" : 2,
+            "z" : 1
+          },
+          {
+            "x" : -5,
+            "y" : 0,
+            "z" : -1
+          }
+        ]
+      },
+      {
+        "close" : 10,
+        "glyph" : {
+          "x" : 1,
+          "y" : 2
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : -3,
+            "y" : -4,
+            "z" : -3
+          },
+          {
+            "x" : -4,
+            "y" : 2,
+            "z" : -2
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 0,
+          "y" : 1
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : -4,
+            "y" : -2,
+            "z" : -2
+          },
+          {
+            "x" : 3,
+            "y" : 4,
+            "z" : -2
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 0,
+          "y" : 0
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : -1,
+            "y" : 4,
+            "z" : 0
+          },
+          {
+            "x" : 5,
+            "y" : 0,
+            "z" : -5
+          }
+        ]
+      }
+    ],
+    "start" : 3,
+    "symbol" : [
+      0
+    ],
+    "tutorial" : false
+  },
+  "number" : 13,
+  "schema" : 1,
+  "skipped" : 0
+}

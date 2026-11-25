@@ -1,0 +1,359 @@
+{
+  "actions" : [
+    {
+      "leg" : {
+        "_0" : 4,
+        "_1" : 0
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 1,
+        "_1" : 0
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 0,
+        "_1" : 2
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 1,
+        "_1" : 0
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 3,
+        "_1" : 0
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 7,
+        "_1" : 2
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 5,
+    "states" : 103
+  },
+  "difficulty" : {
+    "corridors" : 9,
+    "hazards" : 6,
+    "legs" : 6,
+    "stars" : 8,
+    "statesSearched" : 286,
+    "strokes" : 5,
+    "work" : 7212
+  },
+  "digests" : [
+    "2c1d5cf12f14959c",
+    "eec31528fd32d869",
+    "9034a7421d606a49",
+    "9b47e7af72d8d847",
+    "bc7d10762645e0ad",
+    "e41e1f817573258e"
+  ],
+  "fingerprints" : [
+    "91c8763bd66cc9a8994432f5e8f6ff241e13c4fa53e5611cfb0f0ad1fc9ca9b7",
+    "7752aa6f27a9aea82923810c1c70807b577385b8de33dcb35aa62bd4d1b2ec67",
+    "973c5a37ec6939e3dd6b52b39888c2e5f563a2dc34c99998ea750261eab5044b",
+    "9764bfc092bd7ac32f616cbebb2bb094bfc9adeafc1c54ce5ecb2f271607a97a",
+    "84ea552c891a8183ca911d5c2e2e158e4ff8f3b3041076cb15f33d407024ee74",
+    "6a2a333f301ff8b01511039648f4e276a44a68d76e2325650dd936b87727f44b",
+    "1f69065b9deda2188448969b559829601bc0af0070e6463131cbdf98a80ce810"
+  ],
+  "level" : {
+    "beacon" : 7,
+    "budget" : 14,
+    "corridors" : [
+      {
+        "a" : 4,
+        "b" : 7,
+        "travel" : 1
+      },
+      {
+        "a" : 1,
+        "b" : 4,
+        "travel" : 1
+      },
+      {
+        "a" : 0,
+        "b" : 1,
+        "travel" : 3
+      },
+      {
+        "a" : 1,
+        "b" : 3,
+        "travel" : 2
+      },
+      {
+        "a" : 3,
+        "b" : 7,
+        "travel" : 2
+      },
+      {
+        "a" : 1,
+        "b" : 7,
+        "travel" : 3
+      },
+      {
+        "a" : 3,
+        "b" : 4,
+        "travel" : 1
+      },
+      {
+        "a" : 6,
+        "b" : 7,
+        "travel" : 2
+      },
+      {
+        "a" : 0,
+        "b" : 7,
+        "travel" : 2
+      }
+    ],
+    "deadline" : 23,
+    "difficulty" : 4,
+    "fingerprint" : "7e387d97496c3b4b9e9d3aa8eb0e0b651a8290c5a6ed4c21fc4414c2cede67a3",
+    "hazards" : [
+      {
+        "corridor" : 7,
+        "from" : 17,
+        "to" : 20
+      },
+      {
+        "corridor" : 0,
+        "from" : 4,
+        "to" : 7
+      },
+      {
+        "corridor" : 7,
+        "from" : 0,
+        "to" : 3
+      },
+      {
+        "corridor" : 5,
+        "from" : 12,
+        "to" : 15
+      },
+      {
+        "corridor" : 6,
+        "from" : 11,
+        "to" : 14
+      },
+      {
+        "corridor" : 5,
+        "from" : 23,
+        "to" : 24
+      }
+    ],
+    "id" : "starlit-cartouche-076",
+    "range" : 8,
+    "schema" : 1,
+    "seed" : 10816710102280707031,
+    "stars" : [
+      {
+        "close" : 12,
+        "glyph" : {
+          "x" : 4,
+          "y" : 4
+        },
+        "open" : 7,
+        "orbit" : [
+          {
+            "x" : 4,
+            "y" : 0,
+            "z" : 5
+          },
+          {
+            "x" : 3,
+            "y" : -3,
+            "z" : 3
+          },
+          {
+            "x" : -5,
+            "y" : 1,
+            "z" : 5
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 4,
+          "y" : 2
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : 1,
+            "y" : -1,
+            "z" : 1
+          },
+          {
+            "x" : 2,
+            "y" : -4,
+            "z" : 5
+          },
+          {
+            "x" : 4,
+            "y" : -4,
+            "z" : -3
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 2,
+          "y" : 0
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : 0,
+            "y" : 2,
+            "z" : 1
+          },
+          {
+            "x" : 3,
+            "y" : -5,
+            "z" : -3
+          },
+          {
+            "x" : 4,
+            "y" : 2,
+            "z" : -3
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 3,
+          "y" : 0
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : -5,
+            "y" : 5,
+            "z" : -1
+          },
+          {
+            "x" : -4,
+            "y" : -2,
+            "z" : 2
+          },
+          {
+            "x" : -1,
+            "y" : -4,
+            "z" : -2
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 0,
+          "y" : 2
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : 3,
+            "y" : -3,
+            "z" : 2
+          },
+          {
+            "x" : -2,
+            "y" : 0,
+            "z" : 3
+          },
+          {
+            "x" : -4,
+            "y" : 0,
+            "z" : 2
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 1,
+          "y" : 3
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : -4,
+            "y" : 3,
+            "z" : 2
+          },
+          {
+            "x" : 1,
+            "y" : -1,
+            "z" : -4
+          },
+          {
+            "x" : -3,
+            "y" : -3,
+            "z" : 4
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 1,
+          "y" : 0
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : 2,
+            "y" : 5,
+            "z" : 4
+          }
+        ]
+      },
+      {
+        "close" : 24,
+        "glyph" : {
+          "x" : 2,
+          "y" : 4
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : 5,
+            "y" : -4,
+            "z" : 2
+          },
+          {
+            "x" : 4,
+            "y" : 1,
+            "z" : 3
+          }
+        ]
+      }
+    ],
+    "start" : 7,
+    "symbol" : [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "tutorial" : false
+  },
+  "number" : 76,
+  "schema" : 1,
+  "skipped" : 0
+}

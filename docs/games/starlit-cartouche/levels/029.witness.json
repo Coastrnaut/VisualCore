@@ -1,0 +1,227 @@
+{
+  "actions" : [
+    {
+      "leg" : {
+        "_0" : 5,
+        "_1" : 0
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 3,
+        "_1" : 0
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 0,
+        "_1" : 1
+      }
+    },
+    {
+      "leg" : {
+        "_0" : 5,
+        "_1" : 0
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 3,
+    "states" : 13
+  },
+  "difficulty" : {
+    "corridors" : 5,
+    "hazards" : 1,
+    "legs" : 4,
+    "stars" : 6,
+    "statesSearched" : 28,
+    "strokes" : 4,
+    "work" : 478
+  },
+  "digests" : [
+    "de0e6a41625da6ad",
+    "48ce4a05bb572081",
+    "6a7e4be4cb6920df",
+    "d27fe2a9e3fe10a2"
+  ],
+  "fingerprints" : [
+    "51c93383e550410d7cc488a3b6ac6947dcd8d00532e1dbdc53b6442831198c4d",
+    "457cd5f9fda40666fa5ca7225b6dede9b1575337cdfdf1c26b5adbe7fd13a6f4",
+    "6f9b354b366564df472ead9478fbc51d337d7b7aa314986d3d1bc9c19ba68fdd",
+    "1d2090f7c526c7283ff04ba0daec0b523fda0a758fad054757abc45728870145",
+    "b3e3de7ee9e7aa8821779e6f82877deb5167b2871de2437c74f9b2e18e249e61"
+  ],
+  "level" : {
+    "beacon" : 5,
+    "budget" : 11,
+    "corridors" : [
+      {
+        "a" : 1,
+        "b" : 5,
+        "travel" : 3
+      },
+      {
+        "a" : 3,
+        "b" : 5,
+        "travel" : 2
+      },
+      {
+        "a" : 0,
+        "b" : 3,
+        "travel" : 2
+      },
+      {
+        "a" : 0,
+        "b" : 5,
+        "travel" : 1
+      },
+      {
+        "a" : 1,
+        "b" : 4,
+        "travel" : 1
+      }
+    ],
+    "deadline" : 15,
+    "difficulty" : 2,
+    "fingerprint" : "602699e207a01ac978179978cdc69125025afe3ed38cbd0d6c6fb2f478535550",
+    "hazards" : [
+      {
+        "corridor" : 3,
+        "from" : 14,
+        "to" : 15
+      }
+    ],
+    "id" : "starlit-cartouche-029",
+    "range" : 8,
+    "schema" : 1,
+    "seed" : 15246407367903305715,
+    "stars" : [
+      {
+        "close" : 13,
+        "glyph" : {
+          "x" : 4,
+          "y" : 1
+        },
+        "open" : 8,
+        "orbit" : [
+          {
+            "x" : 4,
+            "y" : 3,
+            "z" : -4
+          }
+        ]
+      },
+      {
+        "close" : 3,
+        "glyph" : {
+          "x" : 4,
+          "y" : 0
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : 2,
+            "y" : -3,
+            "z" : 0
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 1,
+          "y" : 4
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : -3,
+            "y" : 5,
+            "z" : -2
+          },
+          {
+            "x" : 4,
+            "y" : -2,
+            "z" : -3
+          },
+          {
+            "x" : 1,
+            "y" : 4,
+            "z" : -4
+          }
+        ]
+      },
+      {
+        "close" : 10,
+        "glyph" : {
+          "x" : 1,
+          "y" : 2
+        },
+        "open" : 4,
+        "orbit" : [
+          {
+            "x" : 0,
+            "y" : 2,
+            "z" : 2
+          }
+        ]
+      },
+      {
+        "close" : 64,
+        "glyph" : {
+          "x" : 3,
+          "y" : 1
+        },
+        "open" : 0,
+        "orbit" : [
+          {
+            "x" : -3,
+            "y" : 1,
+            "z" : 2
+          },
+          {
+            "x" : 2,
+            "y" : -5,
+            "z" : -4
+          }
+        ]
+      },
+      {
+        "close" : 12,
+        "glyph" : {
+          "x" : 1,
+          "y" : 0
+        },
+        "open" : 2,
+        "orbit" : [
+          {
+            "x" : -1,
+            "y" : 2,
+            "z" : -1
+          },
+          {
+            "x" : -3,
+            "y" : -1,
+            "z" : 1
+          },
+          {
+            "x" : -2,
+            "y" : 1,
+            "z" : -1
+          }
+        ]
+      }
+    ],
+    "start" : 1,
+    "symbol" : [
+      0,
+      1,
+      2,
+      3
+    ],
+    "tutorial" : false
+  },
+  "number" : 29,
+  "schema" : 1,
+  "skipped" : 2
+}
