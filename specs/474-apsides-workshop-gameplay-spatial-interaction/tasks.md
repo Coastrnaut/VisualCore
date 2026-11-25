@@ -71,7 +71,7 @@ of R02-G17-04's CHK013).
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G1804-004 [P] [US5] Create
+- [X] T-R02G1804-004 [P] [US5] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopPanelWinTests pass (host-4 exit 0): all 100 certified levels won through the modelled panel (pending orbit, Set periapsis, Set size, Play) within their budgets; undo and redo restore the digests
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopPanelWinTests.swift`: all 100 certified levels
   won through panel actions only (FR-R02G1804-008; SC-R02G1804-005; eccentricity, direction and size − and + moving the
   pending orbit, "Set periapsis" sending one `orbit.periapsis` and "Set size" one `orbit.size`, in the witness's valid
