@@ -48,7 +48,7 @@ owns the snapshot fields, the preview geometry and its shader material (R02-G16-
 
 ## Phase 3: Stories 1, 2 and 3 — taps, the slider and ship drags (P1) 🎯
 
-- [ ] T-R02G1604-003 [US1] [US2] [US3] Create
+- [X] T-R02G1604-003 [US1] [US2] [US3] Create — Verified 2026-11-24: host-3 exit 0 (.autonomy/migration/checks/R02-G16-04.host-3.json); gesture controller (taps, double taps, slider and ship drags, orbit, cancellation), 500 seeded scripts against an independent expectation, run with the real picker (agent's stand-in discarded)
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheGestureController.swift` (FR-R02G1604-001, 002,
   004, 006, 007; SC-R02G1604-001 … 003; `StarlitCartoucheGestureAction` chooseDestination(star), chooseWait(wait),
   fly(star, wait), preview(star), clearPreview, resetView, explain(reason); states idle, starPress, shipPress, shipDrag,
