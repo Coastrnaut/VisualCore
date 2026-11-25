@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G17-01 (migration ledger, game feature of experience R02-G17) · ID namespace FR-R02G1701-###,
 SC-R02G1701-###, T-R02G1701-###
@@ -30,6 +30,56 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract,
   so R02-G17-02 can certify levels).
 - **Model:** feature 451 (Starlit Cartouche's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+451's answers where the games agree (stages, stored form, records, refusal codes, puzzle contract). Facts checked in
+code (read-only, 2026-11-25): Starlit Cartouche's kernel (`StarlitCartoucheLevel`, `StarlitCartouchePlay`,
+`StarlitCartoucheError` with codes `r02-g16.level`, `.action`, `.stage`, `.stale`, `.newer-schema`, `.malformed`) keeps
+every limit as an integer range, fingerprints levels with SHA-256 of a canonical text and implements R02-F23's
+`PuzzleRules` (`VisualCoreSimulation`).
+
+- Q: What exactly are a body, its orbit and an eclipse, in integers? → A: a level has 2 … 6 bodies, numbered from 0; each
+  has an orbit of 4 … 24 lattice positions (x, y, z each −32 … 32), one per tick of its period, a disc radius 1 … 8 and
+  a flag "fixed"; at least one body is movable. With phase p, body b is at tick t at orbit position (t + p) mod period.
+  The projection drops z; the depth is z, a greater z being nearer the viewer. Every pair of bodies keeps one depth
+  order at every tick: the smallest z of the front body is greater than the largest z of the back body (checked when
+  the level is built, `r02-g17.level` otherwise). Bodies a and b eclipse at tick t when (xa − xb)² + (ya − yb)² <
+  (ra + rb)²; the front body occults the back one. The visibility class of an eclipse tick is total when the front
+  radius is at least the back radius and the squared distance is at most (rf − rb)², annular when the front radius is
+  smaller and the squared distance is at most (rb − rf)², partial otherwise; an interval's class is the deepest class
+  over its ticks (total or annular before partial). The horizon is 8 … 96 ticks (ticks 0 … horizon − 1). Impact:
+  FR-R02G1701-001, 002, 004, 014.
+- Q: Which actions exist and what do they cost? → A: `phase(body, offset)` sets a movable body's phase to an offset 0 …
+  period − 1 different from its current one and spends one action (refused `r02-g17.action` for an unknown or fixed
+  body, an offset outside the period or equal to the current one; `r02-g17.budget` when no action is left); `run`
+  spends nothing and ends the level (won or failed); undo and redo restore phase changes and, from failed, undo returns
+  to playing with the phases before the run. The budget is 1 … 24 actions; a level's starting phases are part of the
+  level. Impact: FR-R02G1701-003, 005, 006.
+- Q: How is the timeline ordered and matched against the target? → A: eclipse events are ordered by their first tick,
+  ties by front body then back body ascending. The target is 1 … 6 eclipses (front, back, window open … close within the
+  horizon). Walking the events: when every target eclipse is matched the run is won (later events are ignored); an event
+  equal to the next target inside its window matches it; equal to the next target outside its window fails `window`; any
+  other event fails `unwanted`; running out of events with target eclipses left fails `horizon` at tick horizon − 1.
+  The failure names the event (front, back, tick) or, for `horizon`, the next target eclipse. Impact: FR-R02G1701-005;
+  SC-R02G1701-004.
+- Q: How does a level live and how is it stored? → A: as feature 451: stages loading → tutorial (levels with the
+  tutorial flag) → playing ⇄ paused → won or failed → result; begin, dismissTutorial, pause and resume are their own
+  record kinds; each record carries the schema, the level seed, an index, the kind, the action and the fingerprints
+  before and after, and replay refuses a record of another level or a broken chain (`r02-g17.malformed`). The level's
+  stored form is JSON schema 1 with sorted keys (id, seed, difficulty 1 … 5, bodies, horizon, target, starting phases,
+  budget, tutorial, fingerprint = SHA-256 of a canonical text); a damaged or edited form is refused
+  `r02-g17.malformed`, a newer one `r02-g17.newer-schema`. Impact: FR-R02G1701-007, 008, 009, 011.
+- Q: What does the kernel report after every action, and what is the puzzle contract? → A: the timeline report: the
+  eclipse intervals in order (front, back, first and last tick, class), the matched prefix of the target, the first
+  offending event with its reason and the predicted outcome of a run now (would win, or would fail with the reason),
+  plus words for each ("body 2 in front of body 4 from tick 7 to tick 9, total"); the play's position words name the
+  phases, actions left and the next target eclipse with its window. The puzzle contract (R02-F23): the position is the
+  phase vector, the moves are the phase changes legal from it, the goal test is that the predicted run wins; certifying
+  levels (R02-G17-02) searches phase vectors. Impact: FR-R02G1701-010, 013, 014.
 
 ## User Scenarios & Testing *(mandatory)*
 
