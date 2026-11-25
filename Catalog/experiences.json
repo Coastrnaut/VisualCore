@@ -1504,7 +1504,7 @@
         "catalog_sha256": "ee022539220b64cf789b745adf2eaa9850a6d966f03ba3a669db140f717b969e",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g17.celestial-eclipse-lab",

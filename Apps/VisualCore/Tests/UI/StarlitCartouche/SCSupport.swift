@@ -1,8 +1,8 @@
 // SCSupport — feature 459 (R02-G16-09) T-R02G1609-004, modelled on feature 449 (FR-R02G1609-002; SC-R02G1609-001;
 // clarifications Q1, Q2): helpers of the interface tests of Starlit Cartouche (R02-G16) inside the one app, modelled on
-// `VOSupport` (feature 449). The namespace is `SC` (no other UI test uses `SC`). Starlit Cartouche is a candidate until
-// X-R02-G16; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and
-// are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens
+// `VOSupport` (feature 449). The namespace is `SC` (no other UI test uses `SC`). Starlit Cartouche was a candidate
+// until X-R02-G16 (2026-11-25); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog
+// entries become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens
 // the experience directly with `-openExperience r02-g16.starlit-cartouche`; a relaunch (`SC.reopen`) backgrounds the
 // app first (its save point, the lesson of feature 309), terminates it and starts again without the reset, so the
 // stored progress (solved levels, stars, the frontier, the verified winning trace) survives.

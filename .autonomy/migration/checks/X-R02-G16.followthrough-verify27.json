@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g16.starlit-cartouche",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g16.starlit-cartouche --runtime 27",
+  "elapsed_seconds": 403.912,
+  "exit_code": 0,
+  "finished": "2026-11-25T10:41:57+00:00",
+  "gate": "X-R02-G16",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G16.followthrough-verify27.log",
+  "log_sha256": "6f34fb2d9b60885e2afce11db19db03be9cd400ca1786097e849f12c2ac76766",
+  "name": "followthrough-verify27",
+  "started": "2026-11-25T10:35:13+00:00",
+  "timed_out": false
+}

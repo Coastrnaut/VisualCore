@@ -333,9 +333,17 @@
       "name": "Voxel Origami",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G16",
+      "id": "r02-g16.starlit-cartouche",
+      "name": "Starlit Cartouche",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "7e08c10f1abfc591340d6cf1ebd97a773cc20f08fe9b982d6939807373d7f010",
+  "ledger_sha256": "c362a061cce5cf4ecf2ac627bb7b39541f0379c19a94450f292b91ee9c0f2d0a",
   "privacy_answers": "unproven",
   "schema": 1
 }

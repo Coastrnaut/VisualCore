@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "VisualCoreExperienceTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter VisualCoreExperienceTests",
+  "elapsed_seconds": 16.911,
+  "exit_code": 0,
+  "finished": "2026-11-25T10:27:09+00:00",
+  "gate": "X-R02-G16",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G16.followthrough-catalog.log",
+  "log_sha256": "796853c8db847a85cff96b42030d09be9030923a94c896e7c009086ad2879c65",
+  "name": "followthrough-catalog",
+  "started": "2026-11-25T10:26:52+00:00",
+  "timed_out": false
+}
