@@ -69,7 +69,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 - [X] T-R02G1602-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G16-02.*.json)
   `--name host-full`
 - [X] T-R02G1602-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-24: reference-1 exit 0 (.autonomy/migration/checks/R02-G16-02.reference-1.json)
-- [ ] T-R02G1602-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G1602-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-24: reference-2 exit 0 (.autonomy/migration/checks/R02-G16-02.reference-2.json)
 - [ ] T-R02G1602-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1602-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
