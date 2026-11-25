@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G16-04 (migration ledger, game feature of experience R02-G16) · ID namespace FR-R02G1604-###,
 SC-R02G1604-###, T-R02G1604-###
@@ -29,6 +29,63 @@ Canonical overrides:
   renderer of R02-G16-01 … 03.
 - **Model:** feature 444 (Voxel Origami's gameplay spatial interaction) for the gesture controller, picker, orbit and
   panel, adapted to a starship flying corridors between moving stars.
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+444's answers where the games agree. Facts checked in code (read-only, 2026-11-24): the host's `PointerEvent` (id,
+phase began/moved/ended/cancelled, location in view points with the origin top-left, timestamp); feature 444's
+thresholds (`VoxelOrigamiGestureController`: tap below 10 points and 0.5 s, drag from 16 points, double tap within
+0.35 s and 22 points, orbit 90° per view width and 60° per view height, yaw ±60°, pitch −20° … +35°). Starlit
+Cartouche's adapter declares `route.fly` [star, wait], `play.undo`, `play.redo`, `level.next` and `route.choose` [star,
+wait] (presentation only; the choice resets after every leg to the other end of the lowest-index corridor from the
+ship's star with wait 0). The scene (`StarlitCartoucheSceneGeometry`) draws stars of radius 0.07 with notched rings out
+to 0.098 at w(position(at: beat)) from eye (1.2, 1.0, 2.8) towards (0, −0.2, 0), fitted to the box x −0.95 … 0.95,
+y −1.45 … 0.95, z −0.95 … 0.95, the ship at its star and nine wait pips at y −1.35 from x 0.0 to 0.9.
+
+- Q: How is a touch picked? → A: at touch-down every star is projected through the drawn camera (orbit and launch
+  preview included) into view points; a star is hit when the touch lies within its projected ring radius (0.098) grown
+  by 8 points; of several hits the front-most wins (the one drawn last in the paint order). A hit on the ship's star is
+  a press on the ship. The time slider is the bounding box of the nine projected wait pips grown by 8 points. Anything
+  else (corridors, trails, hazards, the cartouche, bars, track, firmament) is empty space. Tap, drag and double-tap
+  thresholds are feature 444's. Impact: FR-R02G1604-005; SC-R02G1604-001.
+- Q: What do taps and double taps do? → A: a tap on a star other than the ship's sends `route.choose [star, wait]` (the
+  chosen wait kept) in any stage; a second tap on the same star within 0.35 s and 22 points while playing sends
+  `route.fly [star, wait]` (the kernel decides: a refusal is logged and shown, a failure ends the level). A tap on the
+  ship's star changes nothing; a tap on the slider chooses the wait of its nearest pip; a tap on empty space changes
+  nothing and two such taps within 0.35 s and 22 points reset the view. On a won or failed play no kernel action is
+  sent (taps and the slider still choose) and the description says the play is over (undo or next level). Impact:
+  FR-R02G1604-001, 007; SC-R02G1604-002.
+- Q: How do the slider and the launch preview work? → A: from touch-down on the slider, the wait is the index of the pip
+  whose projected centre is nearest to the finger's projection onto the screen line through pips 0 and 8, clamped to
+  0 … 8; every change sends `route.choose [destination, wait]` (never an undo step, never a kernel action). The launch
+  beat is L = beat + chosen wait. The scene draws every star (and the ship at its star) at w(position(at: L)) instead of
+  the current beat — at wait 0 the picture is R02-G16-03's — and, while playing and when a corridor joins the ship's
+  star and the destination, the previewed leg: a dashed sapphire ribbon 0.03 wide from the ship's star at L to the
+  destination at L + travel. Trails stay at the positions where they were flown; the cartouche and gauges are unchanged.
+  The preview is presentation only (the snapshot gains the launch beat and the launch positions; neither enters the
+  digest). Impact: FR-R02G1604-002, 003; SC-R02G1604-003, 004.
+- Q: How does a drag from the ship fly a leg, and how do two fingers behave? → A: a press on the ship that moves 16
+  points or more while playing becomes a ship drag: the star under the finger (picked as above, not the ship's) becomes
+  the pending destination and is previewed as the chosen leg would be; on release over such a star exactly one
+  `route.fly [star, wait]` is sent; a release elsewhere, on the ship's star or outside playing clears the pending
+  destination and sends nothing (a star with no corridor is explained in words). Two fingers as feature 444: a second
+  finger cancels any one-finger gesture (nothing sent) and orbits — yaw ±60° about the vertical axis through the
+  authored box centre (90° per view width), pitch −20° … +35° (60° per view height); a third finger re-bases the
+  midpoint; a double tap on empty space or "Reset view" returns to orbit (0, 0); the camera refits so the authored box
+  stays inside the view with a 5 % margin at every orbit and aspect 0.4 … 2.5 and the eye stays outside the box; meshes
+  are rebuilt when the orbit changes; orbit is not saved (schema stays 1). Impact: FR-R02G1604-004, 006, 007;
+  SC-R02G1604-002, 003, 004.
+- Q: How is it built and tested? → A: a Core gesture controller (`StarlitCartoucheGestureController`) with a picker
+  (`StarlitCartouchePicker`) and an orbit (`StarlitCartoucheOrbit`, with `camera(_:aspect:orbit:)` equal to the
+  authored camera at orbit 0) takes pointer events with the view size, the drawn snapshot and the orbit and returns
+  gesture actions (chooseDestination, chooseWait, fly, preview, clearPreview, resetView, explain) and the orbit; the
+  snapshot carries the launch beat and launch positions and the geometry draws the preview; host tests feed 500 seeded
+  taps, slider drags and ship drags on certified levels at several sizes and orbits against an independent pick in the
+  test; simulator tests send touches through the experience's pointer entry; a host test wins all 100 certified levels
+  through panel actions alone. Impact: FR-R02G1604-005, 008, 009; SC-R02G1604-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
