@@ -12,16 +12,16 @@ were corrected in the artifacts.
 ## Player impact
 
 - [x] CHK001 Is it stated what survives a save (level, phase changes, actions left, mode, stars, open levels, tutorial
-  step, sound choice; the chosen planet, the shown tick, a pending phase and the camera not saved) and what the player sees when results
-  are dropped? [Completeness, Spec §US1; FR-R02G1707-001; Edge Cases; Clarifications Q2]
+  step, sound choice; the chosen planet, the shown tick, a pending phase and the camera not saved) and what the player
+  sees when results are dropped? [Completeness, Spec §US1; FR-R02G1707-001; Edge Cases; Clarifications Q2]
 
 ## Deterministic invariants
 
 - [x] CHK002 Is the trace defined exactly (effective phase changes with body and offset, then the run; no undo or redo;
   actions spent still counting undone changes) and when a result is replaced? [Clarity, Spec §Clarifications Q1]
 - [x] CHK003 Is the reconciliation rule stated as a checkable condition (wins, the trace's phase changes no more
-  than the recorded actions spent, stars matching the stars rule for them and the certified change count) with the frontier kept as
-  saved? [Measurability, Spec §FR-R02G1707-003; Clarifications Q2]
+  than the recorded actions spent, stars matching the stars rule for them and the certified change count) with the
+  frontier kept as saved? [Measurability, Spec §FR-R02G1707-003; Clarifications Q2]
 - [x] CHK004 Are the inputs of the state listed so determinism is testable (seed, catalog, date action, actions; no
   clock)? [Clarity, Spec §FR-R02G1707-005; Clarifications Q5]
 - [x] CHK005 Is it stated that the sound choice and the dropped count never enter the digest? [Consistency, Spec
