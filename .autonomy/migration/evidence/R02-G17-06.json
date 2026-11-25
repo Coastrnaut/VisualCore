@@ -1,0 +1,214 @@
+{
+  "branch": "main",
+  "dirty": false,
+  "dirty_paths": [],
+  "failed_attempts": [
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing CelestialEclipseLabExperienceTests",
+      "exit_code": 65,
+      "log": ".autonomy/logs/migration/R02-G17-06.sim-27.log",
+      "log_sha256": "13180ed445e1938d966061573404061eed2da443d6b8094927f1bf8f4121f937",
+      "name": "sim-27",
+      "timed_out": false
+    }
+  ],
+  "gate": "R02-G17-06",
+  "ledger": "migration",
+  "passing_checks": [
+    {
+      "command": "python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:36:26+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.app-unit.log",
+      "log_sha256": "8a5019d4a37d994f28de582e8d8ad4248e53578740f97a51ab88b19417d2cd4a",
+      "name": "app-unit"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-25T16:52:43+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.baseline-host.log",
+      "log_sha256": "21d2a3c6abc919abef7b5461b43fce15ede6f83aac7afe9640c4a46c4a8e477e",
+      "name": "baseline-host"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter VoxelOrigami",
+      "exit_code": 0,
+      "finished": "2026-11-25T16:53:43+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.baseline-round02-1.log",
+      "log_sha256": "ef4d035c2106f18b5bdb8ea53d8d849db2e2b9ad71c38b109726ccd55e3d19a6",
+      "name": "baseline-round02-1"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges'",
+      "exit_code": 0,
+      "finished": "2026-11-25T16:54:29+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.baseline-round02-2.log",
+      "log_sha256": "9051a8f05334abf5f91d4367ca9b1bf39fe8ae0636b6e8b7bc712091e295a92a",
+      "name": "baseline-round02-2"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'AuroraLoom|LissajousLabyrinth|HueCompass|WaveKnotKeeper|ChronoConstellator|AmethystEscape|CelestialEclipseLab'",
+      "exit_code": 0,
+      "finished": "2026-11-25T16:56:43+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.baseline-round02-3c.log",
+      "log_sha256": "445ce7eeee3289e946812c40b932621b0372df35a93b3972eaa143f0f47f8e7c",
+      "name": "baseline-round02-3c"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForge|NocturneGarden|BackwardsAurora'",
+      "exit_code": 0,
+      "finished": "2026-11-25T16:58:48+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.baseline-round02-3e.log",
+      "log_sha256": "1fb541c5b25efaab59ed3f705532a91cf937597f7cc0778076d5d71098c6167e",
+      "name": "baseline-round02-3e"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'EchoCartographer|ColorfallCanyons|StarlitCartouche'",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:00:34+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.baseline-round02-3f.log",
+      "log_sha256": "8b1a0f1f3fd4607eb2ef24574eaa09d1208077d5ade64c07b20dced1569724ad",
+      "name": "baseline-round02-3f"
+    },
+    {
+      "command": "env VC_TIMING_ASSERTS=1 swift test --package-path Packages/VisualCore --filter 'aMeshAtTheBudgetBuildsAndValidates|analysisTimingLevelZeroMeanBelowBudget|wholeRunForTheSampleTakesLessThanTenSeconds|aPreparationOverItsLimitTimesOut|aCancelledPreparationEndsWithinOneSecond'",
+      "exit_code": 0,
+      "finished": "2026-11-25T16:52:47+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.baseline-timing.log",
+      "log_sha256": "6b48d56cefa72cdb899c3676d78a01132a6a11590dabb913d8668c2403a7201d",
+      "name": "baseline-timing"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesCreative --scheme ExperiencesCreative-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:34:35+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.experiences.log",
+      "log_sha256": "dca9f34c239258a18bfc00f04e6f9f7dd2b4b97072311ec8086267283adf7546",
+      "name": "experiences"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter CelestialEclipseLabFeedbackPlanTests",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:02:05+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.host-2.log",
+      "log_sha256": "08220d86e7c9de4ce3e2e69284a2843f25e609f1ddb043eaed11d8814c797a04",
+      "name": "host-2"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'CelestialEclipseLab(Lights|SoundRecipe)Tests'",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:02:11+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.host-3.log",
+      "log_sha256": "1763319e422dd46f4241d5951d72517930ab3df1e1be841955fcb455ea2428f8",
+      "name": "host-3"
+    },
+    {
+      "command": "swift test --package-path Packages/VisualCore",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:35:12+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.host-full.log",
+      "log_sha256": "475fe8451022b53fe4fa57df246b3d400a0324a1cdf4848bb859a99b756b5a23",
+      "name": "host-full"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter CelestialEclipseLabCoreTests",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:01:12+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.host.log",
+      "log_sha256": "de3716801c782643520d3dd86baa08f849ecd98ab8f3b1fae36d88c31b861609",
+      "name": "host"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-engine-xcframework reference-build-projectm-ios-sim reference-clean",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:36:48+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.reference-1.log",
+      "log_sha256": "db29c1834f5da7742a0e61898d1e6d8e3c458d55deb8c3fd26283160bab861ba",
+      "name": "reference-1"
+    },
+    {
+      "command": "python3 scripts/release_check.py --only reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27 projectm-reference-ios26",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:37:12+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.reference-2.log",
+      "log_sha256": "15be6528fb2ca96ffaba34ee2e7e2dba8409ab04c7262c2e4b6f2ab7d03f8429",
+      "name": "reference-2"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-26.5 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:28:29+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.rendering-26.log",
+      "log_sha256": "31a7c83105d6f0619bd2f2addd9ff0da7e9d0f6caa0a797f5c7524be4950ef18",
+      "name": "rendering-26"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:27:43+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.rendering-27.log",
+      "log_sha256": "501d28a618b9f3246143f66c6573bfa2ed37b386cd1bc20f8518cd04c136a4c3",
+      "name": "rendering-27"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter VoxelOrigami",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:15:34+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.round02-host-1.log",
+      "log_sha256": "b98f6af0e1f669445435e71a3a6264ed8eaf449c803a470452676fad69814dbe",
+      "name": "round02-host-1"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges'",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:16:21+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.round02-host-2.log",
+      "log_sha256": "8fab74586696249463c17b73a3af4088bfc8a06f7a13c1bf36456830875631aa",
+      "name": "round02-host-2"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'AuroraLoom|LissajousLabyrinth|HueCompass|WaveKnotKeeper|ChronoConstellator|AmethystEscape|CelestialEclipseLab'",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:18:29+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.round02-host-3c.log",
+      "log_sha256": "2e431dde2c0aacac05c45e2eafdc18a5099b8b7bad70419037f1519f7f04cd38",
+      "name": "round02-host-3c"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForge|NocturneGarden|BackwardsAurora'",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:20:45+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.round02-host-3e.log",
+      "log_sha256": "f2ddaf09dfa3a589efbac8503d7c9bfdfb6cb0fd2ea72ef00b47da47610ef34d",
+      "name": "round02-host-3e"
+    },
+    {
+      "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'EchoCartographer|ColorfallCanyons|StarlitCartouche'",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:22:32+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.round02-host-3f.log",
+      "log_sha256": "8bd419ff89373347527867760d62e77304666107c414f535ce3a5fbaeec4646d",
+      "name": "round02-host-3f"
+    },
+    {
+      "command": "python3 scripts/test_scripts.py",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:26:48+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.script-tests.log",
+      "log_sha256": "68e5193d96dba4cbe5a5ccdfa0a6de356a56f73e69a5368e096c5bee40731a4d",
+      "name": "script-tests"
+    },
+    {
+      "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing CelestialEclipseLabExperienceTests",
+      "exit_code": 0,
+      "finished": "2026-11-25T17:14:11+00:00",
+      "log": ".autonomy/logs/migration/R02-G17-06.sim-27b.log",
+      "log_sha256": "1345582d75b37b2aea9b1870c5a0ba36a050902c763e66d09e3306e176d0ca38",
+      "name": "sim-27b"
+    }
+  ],
+  "revision": "afcf2f49ad73b236e8fdb4af510d5334dbd146e7",
+  "revision_number": 1,
+  "sealed": "2026-11-25T17:37:32+00:00"
+}
