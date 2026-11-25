@@ -934,5 +934,7 @@ preview, the time dial and the panel's "Set phase". Feature 465 (R02-G17-05) add
 adds `CelestialEclipseLabFeedbackPlan` (announcements and haptics), `CelestialEclipseLabLights` (eased glow and won
 look) and `CelestialEclipseLabSoundRecipe` (the audition and the ambient loop), with VoiceOver support in the panel.
 Feature 467 (R02-G17-07) adds `CelestialEclipseLabReconciliation` (winning traces replayed on restore), snapshot schema
-3, the replay mode and the saved sound choice. See
+3, the replay mode and the saved sound choice. Feature 468 (R02-G17-08) adds the regression net:
+`CelestialEclipseLabGolden` (test builds only), `golden-frames.json`, the solver regression and
+`scripts/celestial_eclipse_lab_regression.py`. See
 [docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).

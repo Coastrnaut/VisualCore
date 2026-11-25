@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G17-07: Celestial Eclipse Lab persistence and replay).
+Last updated: 2026-11-25 (R02-G17-08: Celestial Eclipse Lab visual golden and solver regression).
 
 ## 1. What is tested, and where
 
@@ -985,6 +985,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   fingerprints). Simulator: `CelestialEclipseLabReplayTests` (4 tests through the presenter). Lessons: a fresh play
   already holds its begin and tutorial records, so replay positions count only phase and run records; adding results'
   traces changes the digested progress, so the scenario manifest is regenerated with the progress change itself.
+- **Celestial Eclipse Lab regression net** (R02-G17-08, 2026-11-25). Host: `CelestialEclipseLabRegressionSolverTests`
+  (14 tests: 100 witnesses replayed and re-planned within the counted work bound, twelve named alterations) and
+  `CelestialEclipseLabRegressionGoldenTests` (12 tests over the 16 pinned frame descriptions). Simulator:
+  `CelestialEclipseLabRegressionGoldenFrameTests` and `CelestialEclipseLabRegressionMemoryTests` (alone with
+  `TEST_RUNNER_CELESTIAL_ECLIPSE_LAB_MEMORY_ISOLATED=1`: 12 cycles from 28.47 MB, at most 0.41 MB growth). Local:
+  `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
+  palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
+  corrected to.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15
