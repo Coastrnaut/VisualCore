@@ -12,7 +12,7 @@ of R02-G17-04's CHK013).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1804-001 Baselines on the committed tree after R02-G18-03 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1804-001 Baselines on the committed tree after R02-G18-03 is recorded: `--name baseline-host`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host, baseline-timing and round02-1, -2, -3c, -3e, -3f exit 0 on the committed R02-G18-03 record; rendering baseline is R02-G18-03's rendering runs (exit 0)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G18-03's
   rendering runs (exit 0)
 
