@@ -103,8 +103,9 @@ visible, labelled controls and read the experience's spoken texts.
 **Acceptance Scenarios**:
 
 1. **Given** a fresh app on the simulator, **When** the tester opens Celestial Eclipse Lab and plays level 1's
-   certified solution (its phase changes, then the run) with the panel's buttons, **Then** the experience says the
-   eclipses came in the target order with 3 of 3 stars, and level 2 is open in the level picker.
+   certified solution (its phase changes, then the run) with the panel's buttons, **Then** the experience says "Every
+   target eclipse came in order inside its window.", the panel shows "Best: 3 of 3 stars", and level 2 is open in the
+   level picker.
 2. **Given** a won level, **When** the app is relaunched, **Then** the same progress, stars and open levels are shown.
 3. **Given** a solved level, **When** the tester starts the replay and steps through it, **Then** the replay ends won
    and stopping it returns to the campaign.
