@@ -68,7 +68,7 @@ shader material (the vertex-contract lesson of R02-G16-03 and R02-G17-03).
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G1704-004 [P] [US5] Create
+- [X] T-R02G1704-004 [P] [US5] Create — Verified 2026-11-25: 2026-11-25 all 100 certified levels won through a panel model (planet choose, pending offset, Set phase, run) within each budget in 10 groups, undo and redo digests restored; host-4 exit 0
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabPanelWinTests.swift`: all 100 certified
   levels won through panel actions only (FR-R02G1704-008; SC-R02G1704-005; planet − and + through `orbit.choose`, phase
   − and + moving the pending offset, "Set phase" sending one `orbit.phase`, then run; never more actions than the
