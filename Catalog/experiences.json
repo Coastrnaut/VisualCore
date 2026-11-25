@@ -1549,7 +1549,7 @@
       "id": "r02-g18.apsides-workshop",
       "code": "R02-G18",
       "title": "Apsides Workshop",
-      "summary": "Tune orbital eccentricity to sweep precise regions of a miniature sky",
+      "summary": "Tune one orbiter's ellipse around a star so it sweeps the target sky sectors with their shares of area and puts its apsides where the targets ask, in order, without striking a planet: a luminous compass. 100 certified levels. Drawn in code; offline.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1558,11 +1558,30 @@
         "orbital-dynamics"
       ],
       "order": 43,
-      "palette": [],
+      "palette": [
+        "#0A0B1F",
+        "#E8F1FF",
+        "#C2456E",
+        "#8C93B8",
+        "#1A1438"
+      ],
       "tile_seed": 1927673211,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Tune an orbit to sweep the sky",
+        "Kepler orbits in exact fixed point",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "73aef009a3044dde7ef6fd3ba29325aee3ab24115847b6338578494d69c0e87b",
+        "levels": 100
+      },
       "available": false
     },
     {

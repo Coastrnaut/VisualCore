@@ -84,7 +84,7 @@ R02-G17-03 (`git show <R02-G17-03 record commit>:<path>`).
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G1803-006 [US3] [US4] Create
+- [X] T-R02G1803-006 [US3] [US4] Create — Verified 2026-11-25: 2026-11-25 experience (presenter, compass scene, controls), scenarios (94: standard, fixtures, 80 acceptance rows) and manifest, candidate registered (registrations, catalog, registry, project.yml, AppModelTests synthetic candidate r02-g19, test_scripts); sim-27 (26 simulator tests; one expectation fixed to the engine's prefixed refusal code), packages, catalog-search and host-5 exit 0
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopExperience.swift`, `…Presenter.swift`,
   `…CompassScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; the star pulse from presentation time;
   Reduce Motion and Reduce Flashing; the presenter declares `probes(_:)` — two backdrop corners, as the round-two X

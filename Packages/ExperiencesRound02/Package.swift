@@ -58,6 +58,8 @@ let package = Package(
         .library(name: "CelestialEclipseLabExperience", targets: ["CelestialEclipseLabExperience"]),
         // Feature 471 (R02-G18-01): Apsides Workshop's rule kernel, a candidate until X-R02-G18.
         .library(name: "ApsidesWorkshopCore", targets: ["ApsidesWorkshopCore"]),
+        // Feature 473 (R02-G18-03): Apsides Workshop's experience (iOS only; a registered candidate until X-R02-G18).
+        .library(name: "ApsidesWorkshopExperience", targets: ["ApsidesWorkshopExperience"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -783,6 +785,27 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreMath", package: visualCore)],
                     path: "ApsidesWorkshop/CoreTests"),
+        // Feature 473 (R02-G18-03): Apsides Workshop's experience (presenter, scene, controls).
+        .target(name: "ApsidesWorkshopExperience",
+                dependencies: ["ApsidesWorkshopCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "ApsidesWorkshop/Experience"),
+        // Feature 473 (R02-G18-03): the simulator tests of Apsides Workshop's experience.
+        .testTarget(name: "ApsidesWorkshopExperienceTests",
+                    dependencies: ["ApsidesWorkshopExperience", "ApsidesWorkshopCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "ApsidesWorkshop/ExperienceTests"),
         // Feature 463 (R02-G17-03): Celestial Eclipse Lab's experience (presenter, scene, controls).
         .target(name: "CelestialEclipseLabExperience",
                 dependencies: ["CelestialEclipseLabCore",

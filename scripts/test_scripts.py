@@ -1614,7 +1614,10 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "StarlitCartoucheCore", "StarlitCartoucheExperience",
                                     # Feature 463 (R02-G17-03): Celestial Eclipse Lab, a registered candidate until
                                     # X-R02-G17.
-                                    "CelestialEclipseLabCore", "CelestialEclipseLabExperience"])
+                                    "CelestialEclipseLabCore", "CelestialEclipseLabExperience",
+                                    # Feature 473 (R02-G18-03): Apsides Workshop, a registered candidate until
+                                    # X-R02-G18.
+                                    "ApsidesWorkshopCore", "ApsidesWorkshopExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],
