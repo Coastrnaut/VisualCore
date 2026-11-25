@@ -4,6 +4,9 @@
 // refusal's reason code, or of a revealed hint's text), and the words of the panel's summary element. The presenter
 // only routes the plan through the shared feedback route (the person's haptics switch, the shared planners' rate
 // limits); a plan never changes state. Modelled on feature 456's `StarlitCartoucheFeedbackPlan`.
+// Feature 467 (R02-G17-07): the mode `replay` is named "replay"; a replay step is a phase or run record, announced like
+// the action it applies; a replayed win claims no stars (replay awards none); the three replay refusals have their own
+// words.
 //
 // Words: bodies as the level names them (`CelestialEclipseLabLevel.bodyName(_:)`, "body j", capitalised at the start
 // of a sentence), phases as the kernel's offsets, actions from 1. The progress that follows every accepted phase
@@ -102,7 +105,9 @@ public struct CelestialEclipseLabFeedbackPlan: Sendable, Equatable {
     /// cannot be used." (`r02-g17.date`), "That phase change, undo or redo cannot be made now." (`r02-g17.action`),
     /// "No actions are left: undo or retry." (`r02-g17.budget`), "The level has ended." (`r02-g17.stage`), "That value
     /// must be a whole number." (`r02-g17.not-whole`), "That body is not in this level." (`r02-g17.choice`), "That tick
-    /// is outside the timeline." (`r02-g17.tick`); any other code (`r02-g17.stale`, `r02-g17.level`, the engine's own
+    /// is outside the timeline." (`r02-g17.tick`), "There is no saved solution to replay for this level."
+    /// (`r02-g17.no-replay`), "The replay is over." (`r02-g17.replay-end`), "Stop the replay first." (`r02-g17.replay`,
+    /// feature 467); any other code (`r02-g17.stale`, `r02-g17.level`, the engine's own
     /// codes such as `action.out-of-range`) "That action was refused.".
     public static func refusalText(code: String) -> String {
         let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
@@ -116,6 +121,10 @@ public struct CelestialEclipseLabFeedbackPlan: Sendable, Equatable {
         case CelestialEclipseLabExperienceRule.notWhole: return "That value must be a whole number."
         case CelestialEclipseLabExperienceRule.choice: return "That body is not in this level."
         case CelestialEclipseLabExperienceRule.tick: return "That tick is outside the timeline."
+        // Feature 467: the replay refusals.
+        case CelestialEclipseLabExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case CelestialEclipseLabExperienceRule.replayEnd: return "The replay is over."
+        case CelestialEclipseLabExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }
@@ -148,13 +157,13 @@ public struct CelestialEclipseLabFeedbackPlan: Sendable, Equatable {
             + "\(level.horizon) ticks; a budget of " + actionsWords(level.budget)
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay" (feature 467).
     public static func modeName(_ mode: CelestialEclipseLabMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
-        case .replay: "replay"   // feature 467
+        case .replay: "replay"
         }
     }
 
@@ -211,7 +220,7 @@ public struct CelestialEclipseLabFeedbackPlan: Sendable, Equatable {
     }
 
     /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars in campaign and daily;
-    /// never in practice), haptic `success`; or the failure explanation, haptic `warning`.
+    /// never in practice or replay, feature 467), haptic `success`; or the failure explanation, haptic `warning`.
     static func outcomePlan(_ core: CelestialEclipseLabExperienceCore) -> CelestialEclipseLabFeedbackPlan {
         let play: CelestialEclipseLabPlay = core.play
         if play.stage == .won {

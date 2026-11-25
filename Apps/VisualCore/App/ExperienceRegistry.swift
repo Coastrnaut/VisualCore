@@ -141,8 +141,9 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [celestialEclipseLab].compactMap { $0 }
 
-    /// R02-G17 Celestial Eclipse Lab (feature 463, R02-G17-03): a candidate until X-R02-G17. Snapshot schema 2 since
-    /// feature 465 (R02-G17-05); the schema-1 example is registered at its in-app integration (R02-G17-09).
+    /// R02-G17 Celestial Eclipse Lab (feature 463, R02-G17-03): a candidate until X-R02-G17. Snapshot schema 3 since
+    /// feature 467 (R02-G17-07); its schema-1 and schema-2 examples are registered at its in-app integration
+    /// (R02-G17-09).
     fileprivate static var celestialEclipseLab: ExperienceRegistration? {
         guard let id = CelestialEclipseLabExperience.id else { return nil }
         var registration = ExperienceRegistration(id: id, core: CelestialEclipseLabExperienceCore.self) { launch in

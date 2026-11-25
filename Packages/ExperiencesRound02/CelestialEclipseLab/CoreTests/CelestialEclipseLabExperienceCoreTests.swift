@@ -22,6 +22,9 @@
 // played without opening it, progress and mode digested but never the tutorial step or the presentation, the tutorial
 // steps after changes, runs, undo, redo and dismissal, the schema-2 round trip, the migration of a schema-1 payload
 // and the refusal of a newer schema.
+// Feature 467 (R02-G17-07) T-R02G1707-003: schema 3 and digest v3, sixteen controls, wins store their trace (the
+// effective phase changes, then the run) as a verified result, the migration 1 → 2 → 3, and the refusal of schema 4;
+// the replay, reconciliation and sound rules are in `CelestialEclipseLabReplayCoreTests`.
 import Foundation
 import Testing
 @testable import CelestialEclipseLabCore
@@ -138,22 +141,23 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g17.celestial-eclipse-lab" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g17.celestial-eclipse-lab.v2")
+        #expect(Core.experienceID == "r02-g17.celestial-eclipse-lab" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g17.celestial-eclipse-lab.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["orbit.phase", "clock.run", "play.undo", "play.redo", "level.next", "orbit.choose",
                              "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                             "tutorial.dismiss"]
+                             "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"]
         #expect(Core.actionIDs == ids)
+        #expect(Core.controls[12].ranges == [1...100] && Core.controls[15].ranges == [0...1])
         #expect(Core.controls[0].ranges == [0...5, 0...23])
         #expect(Core.controls[5].ranges == [0...5])
         #expect(Core.controls[6].ranges == [0...95])
         #expect(Core.controls[7].ranges == [1...100])
         #expect(Core.controls[8].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [1, 2, 3, 4, 9, 10, 11]
+        let plainIndices: [Int] = [1, 2, 3, 4, 9, 10, 11, 13, 14]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == CelestialEclipseLabTier.all.count)
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == CelestialEclipseLabTier.all.map(\.name))
@@ -596,14 +600,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "orbit.phase", values: [1, 2]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -759,7 +763,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(core.play.stage == .won && CelestialEclipseLabProgress.actionsSpent(core.play) == certified + 1)
         let twoStars: Int = CelestialEclipseLabProgress.stars(actionsSpent: certified + 1, certified: certified)
         #expect(twoStars == 2)
-        let twoStarResult = CelestialEclipseLabProgress.Result(actionsSpent: certified + 1, stars: twoStars)
+        // Feature 467: the result carries the winning trace (the undone change left out, the run last), verified.
+        let twoStarResult = CelestialEclipseLabProgress.Result(actionsSpent: certified + 1, stars: twoStars,
+                                                               trace: actions + [.run], verified: true)
         #expect(core.progress.solved[1] == twoStarResult)
         #expect(core.progress.frontier == 2 && core.progress.isOpen(2) && !core.progress.isOpen(3))
         // level.next goes to the newly opened level 2, fresh, with its tutorial.
@@ -773,7 +779,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(core.levelNumber == 1 && !core.play.canUndo && core.mode == .campaign)
         #expect(try Self.win(&core))
         let best: CelestialEclipseLabProgress.Result = CelestialEclipseLabProgress.Result(actionsSpent: certified,
-                                                                                          stars: 3)
+                                                                                          stars: 3,
+                                                                                          trace: actions + [.run],
+                                                                                          verified: true)
         #expect(core.progress.solved[1] == best)
         // A worse result keeps the best one: four undone phase changes more than the plan (1 star) change nothing.
         #expect(core.apply(Self.act("level.select", [1])) == .accepted)
@@ -859,7 +867,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(try Self.win(&core))
         #expect(core.progress.frontier == 1 && !core.progress.isOpen(daily))
         let result: CelestialEclipseLabProgress.Result = try #require(core.progress.solved[daily])
-        #expect(result == CelestialEclipseLabProgress.Result(actionsSpent: dailyActions.count, stars: 3))
+        #expect(result == CelestialEclipseLabProgress.Result(actionsSpent: dailyActions.count, stars: 3,
+                                                             trace: dailyActions + [.run], verified: true))
         // Campaign from a level that is not open goes to the frontier.
         #expect(core.apply(Self.act("mode.campaign")) == .accepted)
         #expect(core.mode == .campaign && core.levelNumber == 1)
@@ -969,7 +978,7 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(restored == saved && restored.tutorial == .order)
     }
 
-    @Test func theSchemaTwoPayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
+    @Test func theSchemaThreePayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
         // Campaign with progress: level 1 won, level 2 reached with level.next.
         var campaign: Core = try await Core.prepare(seed: 0)
         #expect(try Self.win(&campaign))
@@ -1004,8 +1013,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
         let certified: Int = try Self.plan(1).count
         let progressText: String = "\"progress\":{\"frontier\":2,"
-            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3,\"trace\":[],\"verified\":false}]}"
-        #expect(campaignText.contains(progressText))
+            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3,\"trace\":["
+        // Feature 467: each result carries its trace and whether it is verified.
+        #expect(campaignText.contains(progressText) && campaignText.contains("\"verified\":true}]}"))
         #expect(campaignText.hasPrefix("{\"level\":2,\"mode\":{\"mode\":\"campaign\"},"))
         #expect(campaignText.hasSuffix(",\"tutorial\":\"phase\"}"))
         let dailyText: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
@@ -1045,7 +1055,7 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(core.apply(Self.act(plan[0])) == .accepted)
         #expect(core.tutorial == .order)
         let schemaOne: [String: Any] = try Self.schemaOne(core)
-        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(schemaOne))
         let chained: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
         let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
         let chainedData: Data = try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])
@@ -1067,8 +1077,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(throws: CelestialEclipseLabRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "3"]) }
         #expect(throws: CelestialEclipseLabRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
         // A newer schema is refused by the chain.
-        #expect(Core.schemaVersion == 2)
-        #expect(throws: MigrationError.newerVersion(3)) { try Core.migrations.migrate(schemaOne, from: 3) }
+        #expect(Core.schemaVersion == 3)
+        #expect(throws: MigrationError.newerVersion(4)) { try Core.migrations.migrate(schemaOne, from: 4) }
     }
 
     @Test func theEngineMigratesASchemaOneEnvelopeAndRefusesANewerOne() async throws {
@@ -1092,15 +1102,15 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(migrated.progress.frontier == 3 && migrated.progress.solved.isEmpty)
         #expect(migrated.tutorial == .phase && played.tutorial == .order)
         #expect(try engine.digest() == saved.digest)
-        // An envelope of schema 3 is refused and changes nothing.
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        // An envelope of schema 4 is refused and changes nothing.
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(engine.core == migrated)
