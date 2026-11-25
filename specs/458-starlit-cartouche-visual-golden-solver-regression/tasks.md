@@ -16,7 +16,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1608-002 [P] [US1] Create
+- [X] T-R02G1608-002 [P] [US1] Create — Verified 2026-11-25: 2026-11-25 host exit 0 (100 levels in 10 groups, 13 alteration kinds named; agent A's file retested by the lead)
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheRegressionSolverTests.swift` (agent A: for
   every level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's legs
   replay on a fresh play to a win on exactly the last leg and not before, within the budget, with its per-action
