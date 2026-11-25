@@ -55,7 +55,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 4: Stories 2 and 3 — failures, undo, redo, replay (P1)
 
-- [ ] T-R02G1801-004 [P] [US1] [US2] [US3] Create
+- [X] T-R02G1801-004 [P] [US1] [US2] [US3] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopPlay and ApsidesWorkshopPlayTests pass (host-3 exit 0)
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopPlay.swift` (agent B: stages "loading, tutorial,
   playing, paused, won, failed, result"; the orbit from the level; `periapsis(k, d)` and `size(a)` validated in the
   order stage, previous fingerprint, action ("out of range, unchanged or making the orbit invalid"), budget ("no action
