@@ -41,3 +41,23 @@ in deterministic integer fixed point and every rule is then decided exactly on i
   re-checked on decode (damaged, edited, newer and older forms refused; reversed bands, duplicate targets, a planet over
   the star and a starting orbit that is invalid or already wins are refused). The rules are an R02-F23 `PuzzleRules`
   over orbits.
+
+## Content pipeline (feature 472, R02-G18-02)
+
+- **Manifest.** `ApsidesWorkshopManifest` holds the 100 planned levels of the archived design (number, planned seed,
+  band 1 … 5, moves budget 8 … 19, control emphasis), 20 per band.
+- **Generator.** Candidate c of an entry draws from `SeededRandom(seed: SeedDerivation.derive(seed, index: c))`: a
+  period, a valid winning orbit, sweep targets from its shares and apsis targets from its apsides with bands of
+  band-dependent half-widths, the targets ordered by event tick, planets placed beside its path and clear of it, then
+  one or both levers moved away to make the start. Band profiles grow from one or two loose sweeps and one lever (band
+  1) to three or four tight targets with one or two apsis targets, two or three planets and both levers (band 5).
+  Adjacent levels never share their targets; at most 256 candidates per entry (the real catalog needs at most index 8).
+- **Solver.** The orbits reachable with d tunings are the valid orbits that differ from the start in d levers (the knob,
+  the size); depth 1 then depth 2 are searched in a fixed order, each orbit judged by the kernel's report with the apsis
+  targets checked first from the orbit's steps. The first win is minimal; the orbits judged at smaller depths are the
+  proof. Work is counted (at most 13 900 orbits in the catalog, bound 16 000). Two tunings go size first unless the
+  winning eccentricity is lower, so every orbit in between is valid.
+- **Certificates.** `docs/games/apsides-workshop/levels/NNN.witness.json` (schema 1) holds each level, its tunings and
+  the play, a state digest after every action, the play fingerprints, the terminal report (shares, apsides, the largest
+  Kepler residual, deviations) and the counterexample; the tests rebuild all 100 byte for byte and pin the catalog
+  digest. Witness lengths average 1.0, 1.0, 1.25, 2.0 and 2.0 by band, under R02-F24's progression rule.

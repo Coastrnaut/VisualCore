@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G18-01: Apsides Workshop rule kernel).
+Last updated: 2026-11-25 (R02-G18-02: Apsides Workshop content pipeline).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop content pipeline** (R02-G18-02, 2026-11-25). The `ApsidesWorkshop` filter now runs 87 tests in
+  about 3 s: the solver's orbit lists against an independent enumeration and hand minima (including a two-tuning plan
+  that must go knob first), the generator's draws and band profiles, the witness round trip and refusals, and the
+  catalog (pinned digest, progression, a full-report enumeration on two levels per band, 100 witness files byte for
+  byte, regenerated only with `APSIDES_WORKSHOP_WRITE_WITNESSES=1` and `--no-parallel`). Lesson: the opt-in write run
+  also runs the read tests, which fail before the files exist; run it once to write, then once without the variable.
+  The ranges were measured by a prototype first (all 100 entries certified, at most 13 731 orbits judged) and the real
+  generator then measured again (13 900, band 3 mean 1.25), so the plan states the bound, not the prototype's figure.
 - **Apsides Workshop rule kernel** (R02-G18-01, 2026-11-25). `swift test --package-path Packages/ExperiencesRound02
   --filter ApsidesWorkshop` (40 tests in five suites, about 3 s): level checks and the stored form, the fixed-point
   Kepler orbit against an independent `Double` solution within 2 sky units on 500 seeded orbits, every residual within

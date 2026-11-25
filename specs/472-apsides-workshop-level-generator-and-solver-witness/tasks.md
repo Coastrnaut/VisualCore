@@ -82,7 +82,7 @@ edited file is refused.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1802-007 Docs: `docs/architecture/apsides-workshop.md` (content pipeline),
+- [X] T-R02G1802-007 Docs: `docs/architecture/apsides-workshop.md` (content pipeline), — Verified 2026-11-25: 2026-11-25 architecture content pipeline, round-two README and automatedtesting entry written; round02-host-1, -2, -3c, -3e, -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G1802-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

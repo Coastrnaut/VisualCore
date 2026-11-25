@@ -952,3 +952,6 @@ sky units, octant sectors, triangle-quadrature shares, apsis readings and strict
 (immutable, fingerprinted, JSON schema 1, with names in words), the play state `ApsidesWorkshopPlay` with stages,
 tunings and the play, records, undo and redo, and `ApsidesWorkshopRules` (an R02-F23 `PuzzleRules` over orbits). See
 [docs/architecture/apsides-workshop.md](../../docs/architecture/apsides-workshop.md).
+Feature 472 (R02-G18-02) adds the content pipeline: `ApsidesWorkshopManifest` (100 planned levels), the generator, the
+depth-search solver with its minimality proof, difficulty metrics and the witness files in
+`docs/games/apsides-workshop/levels/`.
