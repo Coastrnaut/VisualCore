@@ -73,7 +73,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1606-006 Docs: `docs/architecture/starlit-cartouche.md` (polish and accessibility),
+- [X] T-R02G1606-006 Docs: `docs/architecture/starlit-cartouche.md` (polish and accessibility), — Verified 2026-11-24: round02-host-1..3 exit 0 (.autonomy/migration/checks/R02-G16-06.round02-host-*.json; chunk 3 344 s); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3` (the three round-two
   filters of feature 446)
 - [ ] T-R02G1606-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

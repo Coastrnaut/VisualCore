@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G16-05: Starlit Cartouche teaching and progression).
+Last updated: 2026-11-24 (R02-G16-06: Starlit Cartouche polish and accessibility).
 
 ## 1. What is tested, and where
 
@@ -878,6 +878,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   migration. Simulator: the panel's tutorial, hints, failure text, goal and modes. Lesson: the solver's certifying
   entry was rewritten as a call of the new state entry at the start, and the test pins both to the certified plan on
   every level, so the catalog digest could not drift.
+- **Starlit Cartouche polish and accessibility** (R02-G16-06, 2026-11-24). Host: feedback plans compared word for word
+  over legs, undos, redos, every refusal code (bare and prefixed), every leg failure kind and a budget-out (found by a
+  bounded search, budget-outs exist on 14 levels), wins and level changes; the lights through a scripted win and eight
+  adversarial flicker patterns sampled at 60 Hz; the audition and ambient recipes as pure functions. Simulator: labels
+  and values, the adjustable destination and wait, level 1 won through accessibility actions, recorded feedback, the
+  sound state table and the Reduce Motion and Reduce Flashing frames.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15

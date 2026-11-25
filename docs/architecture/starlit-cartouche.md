@@ -162,3 +162,22 @@ from the ship's star in index order, waits 0 … 8, flyable ones only) for the l
   ("r02-g16.starlit-cartouche.v2"), the tutorial step and the choice not; schema-1 payloads migrate (level 1 and the
   restored level open, campaign mode, the tutorial at its first step).
 
+## Polish and accessibility (feature 456, R02-G16-06)
+
+- **Feedback.** `StarlitCartoucheFeedbackPlan.after(old:new:)` turns each change of the adapter core into one
+  announcement and one haptic through the shared route: a leg ("Flew to star j after w beats along the corridor between
+  star a and star b." then the strokes drawn and actions left, `state`, selection), undo and redo, a win (`outcome`,
+  success, with stars outside practice), a failure (the failure explanation, `outcome`, warning), a level or mode change
+  (`level`) and refusals in words (`rejection`, error). A leg that ends the level plans only its outcome; choosing a
+  destination or wait plans nothing. The presenter keeps a feedback log.
+- **Comfort.** `StarlitCartoucheLights` eases the glow (0.7 playing, 1 won, 0.35 failed) and the won look by the frame
+  clock (0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade); the scene draws the eased levels, so no element
+  crosses half its range more than three times a second. Reduce Motion stops the firmament and the ship's glide.
+- **Sound.** Off by default (a Sound toggle). Choosing a destination plays its audition: star j's tone 220 Hz × 2^(j/12)
+  with its fifth when a corridor joins it to the ship's star, or with a partial 3 Hz above when none does, 0.6 s. The
+  ambient loop comes from the actions left (the root), the quarters of the symbol drawn (the partials) and the stage;
+  it is rebuilt only when that recipe changes and plays only while wanted, on screen and active.
+- **Panel.** A summary element ("a actions left. <progress>. Chosen: <leg>. Level: <level>."), the destination and the
+  wait adjustable with VoiceOver, a value in words on every control, rows that become columns at accessibility text
+  sizes and a 520-point readable width on iPad.
+
