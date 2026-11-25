@@ -44,7 +44,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 3: Story 1 — shape the orbit so it sweeps the prescribed sky (P1) 🎯
 
-- [ ] T-R02G1801-003 [P] [US1] Create
+- [X] T-R02G1801-003 [P] [US1] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopOrbitTests pass (host-2 exit 0): 500 orbits against a Double Kepler reference and direct recomputation, boundary and contact hand cases, bisection fallback reached
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopOrbitTests.swift` (agent A: on 500 seeded
   orbits, positions agree with an independent `Double` Kepler solution within 2 sky units, every residual is within
   2^−22, and sectors, shares, apsis readings, contact decisions, event ticks and the judge's outcome equal an
