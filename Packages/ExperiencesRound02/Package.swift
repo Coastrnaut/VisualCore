@@ -722,12 +722,21 @@ let package = Package(
         // Feature 451 (R02-G16-01): Starlit Cartouche's pure rule kernel.
         .target(name: "StarlitCartoucheCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 453 (R02-G16-03): the adapter, snapshot and scene geometry.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "StarlitCartouche/Core"),
         .testTarget(name: "StarlitCartoucheCoreTests",
                     dependencies: ["StarlitCartoucheCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
+                                   .product(name: "VisualCorePersistence", package: visualCore)],
                     path: "StarlitCartouche/CoreTests"),
         // Feature 441 (R02-G15-01): Voxel Origami's pure rule kernel.
         .target(name: "VoxelOrigamiCore",

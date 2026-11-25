@@ -11,7 +11,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 - [X] T-R02G1603-001 Baselines on the committed tree after R02-G16-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-24: baseline-host, baseline-timing, baseline-round02-1..3 exit 0 (.autonomy/migration/checks/R02-G16-03.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1 … 3` (the three round-two filters of feature 446); the rendering
   baseline is R02-G16-02's rendering runs (exit 0)
-- [ ] T-R02G1603-002 Edit `Packages/ExperiencesRound02/Package.swift` (`StarlitCartoucheCore` gains VisualCoreScenes,
+- [X] T-R02G1603-002 Edit `Packages/ExperiencesRound02/Package.swift` (`StarlitCartoucheCore` gains VisualCoreScenes, — Verified 2026-11-24: host exit 0 (.autonomy/migration/checks/R02-G16-03.host.json); Package.swift Core deps, StarlitCartoucheSceneSnapshot.swift (palette, tiers, snapshot with failedLeg and defaultChoice); invariant scans already read only kernelFiles
   VisualCoreExperience, VisualCoreDiagnostics and VisualCorePersistence; `StarlitCartoucheExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); the renderer-purity and time
   scans of `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheInvariantTests.swift` read only its
