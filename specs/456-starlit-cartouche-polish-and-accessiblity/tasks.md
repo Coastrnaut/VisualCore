@@ -78,7 +78,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
   filters of feature 446)
 - [X] T-R02G1606-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: 2026-11-24 rendering-27, rendering-26, experiences, host-full exit 0; app-unit exit 1 compiled half-done 457 edits in the working tree, app-unit-2 on the committed tree exit 0
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G1606-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1606-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-24: 2026-11-24 reference-1 exit 0
 - [ ] T-R02G1606-009 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G1606-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1606-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G1606-006)
