@@ -59,16 +59,17 @@ The R02-G18-03 panel sends one tuning per ± press, so stepping to a far orbit c
   SC-R02G1804-002.
 - Q: How do the knob and size drags map the finger to steps? → A: a press on a handle that moves 16 points or more while
   playing becomes a drag; the finger is cast onto the sky plane z = 0 through the drawn camera. Knob: the direction step
-  is the nearest multiple of 15° of the point's angle around the star (d = round(angle / 15°) mod 24) and the
-  eccentricity step is k = round(20 − 20 r / a) clamped to 0 … 15, with r the point's distance in lattice units and a
-  the current size (the periapsis lies at a(20 − k)/20). Size handle: a = round(20 R / (20 + k)) clamped to 8 … 48, with
-  R the point's distance and k the current eccentricity step (the apoapsis lies at a(20 + k)/20). The pending orbit is
-  previewed when it is valid: the presenter draws its kernel positions as a dashed ghost and the gauges show its
-  readings (the snapshot gains `previewOrbit` and its positions and readings, none in the digest); an invalid pending
-  orbit shows no ghost and says why ("the periapsis would dip into the star" or "the apoapsis would leave the sky"). On
-  release exactly one `orbit.periapsis [k, d]` or `orbit.size [a]` is sent when the pending orbit is valid and differs
-  from the current one, otherwise nothing; a release outside playing, a cancel or a second finger clears the preview and
-  sends nothing. Impact: FR-R02G1804-001, 002, 004, 007; SC-R02G1804-001, 003.
+  is the nearest multiple of 15° of the point's angle around the star (d = round(angle / 15°) mod 24) (a point exactly
+  at the star keeps the current direction) and the eccentricity step is k = round(20 − 20 r / a) clamped to 0 … 15, with
+  r the point's distance in lattice units and a the current size (the periapsis lies at a(20 − k)/20). Size handle: a =
+  round(20 R / (20 + k)) clamped to 8 … 48, with R the point's distance and k the current eccentricity step (the
+  apoapsis lies at a(20 + k)/20). The pending orbit is previewed when it is valid: the presenter draws its kernel
+  positions as a dashed ghost and the gauges show its readings (the snapshot gains `previewOrbit` and its positions and
+  readings, none in the digest); an invalid pending orbit shows no ghost and says why ("the periapsis would dip into the
+  star" or "the apoapsis would leave the sky"). On release exactly one `orbit.periapsis [k, d]` or `orbit.size [a]` is
+  sent when the pending orbit is valid and differs from the current one, otherwise nothing; a release outside playing, a
+  cancel or a second finger clears the preview and sends nothing. Impact: FR-R02G1804-001, 002, 004, 007;
+  SC-R02G1804-001, 003.
 - Q: How do the time crank and two fingers behave? → A: from touch-down on the orbiter, every move sets the tick whose
   projected position is nearest to the finger (lower on ties) and sends `clock.show [tick]` (never an undo step, never a
   kernel action). Two fingers as feature 464: a second finger cancels any one-finger gesture (nothing sent) and orbits —
