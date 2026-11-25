@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ApsidesWorkshopRulesTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter ApsidesWorkshopRulesTests",
+  "elapsed_seconds": 6.917,
+  "exit_code": 0,
+  "finished": "2026-11-25T21:27:10+00:00",
+  "gate": "R02-G18-01",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G18-01.host-4.log",
+  "log_sha256": "d027bd2c603503896b31b2aaf649d92f23921a324de9f4ed4155d1430cc92f70",
+  "name": "host-4",
+  "started": "2026-11-25T21:27:04+00:00",
+  "timed_out": false
+}

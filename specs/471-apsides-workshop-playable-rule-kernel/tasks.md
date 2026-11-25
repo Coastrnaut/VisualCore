@@ -68,7 +68,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1801-005 [P] [US4] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopRules.swift`
+- [X] T-R02G1801-005 [P] [US4] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopRules.swift` — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopRules and ApsidesWorkshopRulesTests pass (host-4 exit 0)
   (agent C: `PuzzleRules`: State = position (orbit, actions spent), Move = a tuning; legal moves "every legal tuning
   while actions are left"; goal "the predicted play wins") with
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopRulesTests.swift` (agreement with the play on
