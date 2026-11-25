@@ -3,14 +3,17 @@
 // mesh (the firmament, corridors, hazard tubes, trails and their ghosts, stars with notched rings, the ship, the beacon
 // and chosen rings, the failed leg and the gauges, in painter's order) with `StarlitCartoucheShaders.chart*`,
 // premultiplied, `u_firmamentAngle` turning the firmament with the presentation time (0 under Reduce Motion) and
-// `u_won` (`StarlitCartoucheSceneGeometry.wonFlag`) flaring the trails and sealing the cartouche of a won level; and the
-// tier's glow shells (stars, the ship and lit trails) with the glow program, additive and last (level-0 two shells,
+// `u_won` (`StarlitCartoucheSceneGeometry.wonFlag`) flaring the trails and sealing the cartouche of a won level; and
+// the tier's glow shells (stars, the ship and lit trails) with the glow program, additive and last (level-0 two shells,
 // level-1 one, level-2 none). Depth testing is off on this path: the geometry emits its triangles in painter's order.
 // The firmament turns by a uniform, so the meshes are rebuilt only when what they read changes: the level, the beat,
 // the legs, the drawn strokes, the choice, the stage, the failure, the actions left, the ship's glide, the tier or the
 // fallback. If a program fails, the scene falls back to the level-2 geometry drawn unlit with the shared `MeshRenderer`
 // (ambient 1, the geometry's fallback colours) and keeps the reason; nothing here can reach the kernel. A zero-sized
 // drawable is cleared and nothing else is drawn.
+// Since feature 454 (R02-G16-04) the camera follows the gesture controller's orbit (`orbit`, presentation only); the
+// meshes face the drawn eye, so an orbit change rebuilds them, a resize alone does not. The stars, the ship and the
+// launch preview are drawn at the snapshot's launch beat.
 #if os(iOS)
 import Foundation
 import StarlitCartoucheCore
@@ -35,6 +38,9 @@ final class StarlitCartoucheChartScene {
     private(set) var glowBuilds = 0
     /// The firmament angle passed on the last draw (tests).
     private(set) var lastFirmamentAngle: Double = 0
+    /// The orbit the camera is drawn at (feature 454, presentation only; the gesture controller's). The meshes are
+    /// built for the drawn eye, so a new orbit rebuilds them.
+    var orbit = StarlitCartoucheOrbit.authored
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the glide, the tier and the
     /// fallback.
@@ -52,6 +58,7 @@ final class StarlitCartoucheChartScene {
         let glide: Double
         let tier: Int
         let fallback: Bool
+        let orbit: StarlitCartoucheOrbit
     }
 
     private var registry: ResourceRegistry?
@@ -108,9 +115,10 @@ final class StarlitCartoucheChartScene {
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let place: Double = glide.isFinite ? min(max(glide, 0), 1) : 1
-        let camera = StarlitCartoucheSceneGeometry.camera(snapshot, aspect: aspect)
-        let next: GeometryKey = key(snapshot, tier: tier, glide: place)
-        if next != geometryKey { try rebuild(snapshot, tier: tier, glide: place) }
+        let camera = StarlitCartoucheSceneGeometry.camera(snapshot, aspect: aspect, orbit: orbit)
+        if key(snapshot, tier: tier, glide: place) != geometryKey {
+            try rebuild(snapshot, tier: tier, glide: place, camera: camera)
+        }
         geometryKey = key(snapshot, tier: tier, glide: place)
         if fallbackReason != nil {
             try drawFallback(camera)
@@ -130,23 +138,27 @@ final class StarlitCartoucheChartScene {
     private func key(_ s: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier, glide: Double) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, beat: s.beat, star: s.star, legs: s.legs, drawn: s.drawn,
                     chosenStar: s.chosenStar, chosenWait: s.chosenWait, stage: s.stage, failure: s.failure,
-                    actionsLeft: s.actionsLeft, glide: glide, tier: tier.index, fallback: fallbackReason != nil)
+                    actionsLeft: s.actionsLeft, glide: glide, tier: tier.index, fallback: fallbackReason != nil,
+                    orbit: orbit)
     }
 
-    /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
-    private func rebuild(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier, glide: Double) throws {
+    /// Rebuilds the GPU objects for `snapshot` at `tier` seen from `camera`: the two programs, or the unlit fallback.
+    private func rebuild(_ snapshot: StarlitCartoucheSceneSnapshot, tier: StarlitCartoucheTier, glide: Double,
+                         camera: StarlitCartoucheCamera) throws {
         guard let registry else { return }
         let keepFallback = fallbackReason
         release()
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let chart = try StarlitCartoucheSceneGeometry.chartMesh(snapshot, tier: tier, glide: glide)
+                let chart = try StarlitCartoucheSceneGeometry.chartMesh(snapshot, tier: tier, glide: glide,
+                                                                        camera: camera)
                 chartRenderer = try Self.renderer(chart, vertex: StarlitCartoucheShaders.chartVertex,
                                                   fragment: chartFragment, name: "starlit-cartouche-chart",
                                                   registry: registry)
                 chartBuilds += 1
-                let glow = try StarlitCartoucheSceneGeometry.glowMesh(snapshot, tier: tier, glide: glide)
+                let glow = try StarlitCartoucheSceneGeometry.glowMesh(snapshot, tier: tier, glide: glide,
+                                                                      camera: camera)
                 glowBuilds += 1
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: StarlitCartoucheShaders.glowVertex,
@@ -164,8 +176,8 @@ final class StarlitCartoucheChartScene {
         let minimal = StarlitCartoucheTier.of(StarlitCartoucheTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [StarlitCartoucheColouredMesh] = [
-            try StarlitCartoucheSceneGeometry.chartPart(snapshot, tier: minimal, glide: glide),
-            try StarlitCartoucheSceneGeometry.glowPart(snapshot, tier: minimal, glide: glide),
+            try StarlitCartoucheSceneGeometry.chartPart(snapshot, tier: minimal, glide: glide, camera: camera),
+            try StarlitCartoucheSceneGeometry.glowPart(snapshot, tier: minimal, glide: glide, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

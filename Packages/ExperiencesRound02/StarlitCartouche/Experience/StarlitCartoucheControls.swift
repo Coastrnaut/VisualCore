@@ -5,7 +5,8 @@
 // (`route.fly [star, wait]`), undo, redo and next level (kernel actions through the action port), each with an
 // accessibility label, value and identifier; the header shows the actions left of the budget, the status (stage, or the
 // failure in words), the progress description, the failure in words and a refused action in words. Tapping stars on
-// the canvas, the time slider, the route preview and full accessibility come in later features of R02-G16.
+// the canvas, the time slider and the route preview arrive in feature 454 (R02-G16-04), which adds the pending leg of
+// a ship drag and "Reset view" to the panel; full accessibility comes in a later feature of R02-G16.
 #if os(iOS)
 import StarlitCartoucheCore
 import SwiftUI
@@ -17,6 +18,11 @@ struct StarlitCartoucheControls: View {
     let port: ExperienceActionPort
     /// What the panel shows.
     let mirror: StarlitCartoucheMirror
+    /// Returns the camera to the authored view (feature 454; presentation only).
+    var resetView: () -> Void = {}
+    /// Sends a control and shows a refusal in words (the presenter's `send`, feature 454); nil sends through the port
+    /// directly.
+    var sender: ((String, [Double]) -> Void)? = nil
 
     /// The panel.
     var body: some View {
@@ -48,6 +54,10 @@ struct StarlitCartoucheControls: View {
         if let message = mirror.message {
             Text(message).font(.footnote)
                 .accessibilityIdentifier(port.identifier("message"))
+        }
+        if let pending = mirror.pending {
+            Text(pending).font(.footnote)
+                .accessibilityIdentifier(port.identifier("pending"))
         }
     }
 
@@ -102,6 +112,10 @@ struct StarlitCartoucheControls: View {
                 .accessibilityLabel("Go to the next level")
                 .accessibilityIdentifier(port.identifier("next-level"))
         }
+        Button("Reset view") { resetView() }
+            .accessibilityLabel("Return the camera to the authored view")
+            .accessibilityValue("presentation only")
+            .accessibilityIdentifier(port.identifier("reset-view"))
     }
 
     /// Chooses wait `wait` (clamped to 0 … 8) with the current destination.
@@ -111,6 +125,10 @@ struct StarlitCartoucheControls: View {
 
     /// Sends `control` and shows a refusal in words.
     private func send(_ control: String, _ values: [Double] = []) {
+        if let sender {
+            sender(control, values)
+            return
+        }
         let result = port.send(control, values)
         mirror.message = result.isAccepted
             ? nil : "That change was refused: \(StarlitCartoucheMirror.refusalText(code: result.code))."

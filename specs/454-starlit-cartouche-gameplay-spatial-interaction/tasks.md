@@ -77,7 +77,7 @@ owns the snapshot fields, the preview geometry and its shader material (R02-G16-
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter
 
-- [ ] T-R02G1604-005 [US4] Wire
+- [X] T-R02G1604-005 [US4] Wire — Verified 2026-11-24: sim-27 exit 0, 35 simulator tests incl. 9 gesture wiring tests (.autonomy/migration/checks/R02-G16-04.sim-27.json; sim-27a exit 0 before the wiring tests); presenter pointer entry, preview restore, refusal log, orbit in the scene, Reset view and pending line in the panel
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartouchePresenter.swift` (FR-R02G1604-001 … 009;
   `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot; fly sent through
   `route.fly`, the choices and the preview's destination through `route.choose` (on `clearPreview` the destination
