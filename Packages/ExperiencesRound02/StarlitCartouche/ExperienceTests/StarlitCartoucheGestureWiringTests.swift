@@ -782,8 +782,9 @@ enum StarlitCartoucheGestureScript {
         #expect(!code.hasPrefix(Mirror.rulePrefix), "the bare code, without the engine's prefix: \(code)")
         #expect(code == "r02-g16.action", "\(code)")
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message == "That change was refused: \(Mirror.refusalText(code: code)).", "\(message)")
-        #expect(Mirror.refusalText(code: code) == "no corridor can be flown there now")
+        // Since feature 456 the panel shows the feedback plan's words for a refusal.
+        #expect(message == Mirror.refusalText(code: code), "\(message)")
+        #expect(Mirror.refusalText(code: code) == "No corridor can be flown there now.")
         #expect(Mirror.refusalText(code: Mirror.rulePrefix + code) == Mirror.refusalText(code: code))
         let after: Core = try T.core(shell)
         #expect(after.play.legs.count == before.play.legs.count, "a refused leg changes nothing")

@@ -21,12 +21,27 @@
 // last leg, and the daily level is chosen from the local calendar date read here (`playDaily(port:date:)`), never by
 // the core. A refused `level.next` before a win (`r02-g16.locked`) and an impossible date (`r02-g16.date`) read in
 // words.
+// Feature 456 (R02-G16-06) T-R02G1606-005 (FR-R02G1606-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `StarlitCartoucheFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) and keeps a feedback log (`feedbackLog`); refusals are shown
+// and announced in words (`refused(code:)`; the panel shows exactly the plan's text), and a revealed hint is announced
+// as `state`. Choosing a destination or wait, the pending drag text, the slider and orbit are not announced (the
+// adjustable elements speak their values). The scene's lights (`StarlitCartoucheLights`: the glow and the won look)
+// step toward the drawn snapshot every frame by the frame clock's elapsed time (0.15 s fades, 0.45 s under Reduce
+// Flashing; the first frame settles them), so fades finish under Reduce Motion too, where the firmament is still. The
+// ambient loop (`StarlitCartoucheSound`) is offered the recipe of the actions left, the quarters of the symbol drawn
+// and the stage when the first state is described, when a level or mode opens and when that recipe changes; choosing
+// another destination (the play unchanged) plays its audition (`StarlitCartoucheAudition.of(_:star:)`) when the sound
+// is on, on screen and active; choosing a wait plays none. The mirror carries the summary element's text
+// (`StarlitCartoucheFeedbackPlan.summaryText(core:destination:wait:)`) and the sound choice (off by default).
+// Presentation only.
 #if os(iOS)
 import Foundation
 import StarlitCartoucheCore
 import SwiftUI
 import VisualCoreExperience
 import VisualCoreExperienceHost
+import VisualCoreAudioDSP
 import VisualCoreMath
 import VisualCoreRendering
 import VisualCoreScenes
@@ -78,6 +93,11 @@ final class StarlitCartoucheMirror {
     var certifiedLegs = 0
     /// The level the picker holds, 1 … 100 (presentation only; only open levels can be chosen) (feature 455).
     var pickedLevel = 1
+    /// The summary element's text (feature 456): `StarlitCartoucheFeedbackPlan.summaryText(core:destination:wait:)` of
+    /// the latest core and the chosen leg.
+    var summary = ""
+    /// Whether the sound is on (feature 456; off by default; presentation only).
+    var soundOn = false
 
     /// The goal and the level's difficulty band (of the five bands of 20), with its best stars when won (feature 455).
     var goalLabel: String {
@@ -149,19 +169,11 @@ final class StarlitCartoucheMirror {
         code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
     }
 
-    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``. Since feature 456 it
+    /// forwards to `StarlitCartoucheFeedbackPlan.refusalText(code:)` (clarification Q1's sentences, e.g. "No corridor
+    /// can be flown there now.").
     static func refusalText(code: String) -> String {
-        switch bareCode(code) {
-        case "r02-g16.stage": "the play is over: undo or go to the next level"
-        case "r02-g16.action": "no corridor can be flown there now"
-        case "r02-g16.stale": "the play changed before the action arrived"
-        case "r02-g16.level": "the next level could not be made"
-        case StarlitCartoucheExperienceRule.notWhole: "a star and a wait must be whole numbers"
-        case StarlitCartoucheExperienceRule.choice: "that destination or wait cannot be chosen"
-        case StarlitCartoucheExperienceRule.locked: "that level is not open yet: win the level before it first"
-        case StarlitCartoucheExperienceRule.date: "that date is not a calendar date"
-        default: "that action is not available now"
-        }
+        StarlitCartoucheFeedbackPlan.refusalText(code: code)
     }
 }
 
@@ -202,6 +214,16 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// How many refusal codes ``refusalLog`` keeps.
     static let refusalLogLimit = 64
+    /// The feedback route of announcements and haptics (feature 456; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 456; tests and diagnostics).
+    private(set) var feedbackLog: [StarlitCartoucheFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 456).
+    private(set) var lights: StarlitCartoucheLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the chosen destination's audition (feature 456).
+    let sound: StarlitCartoucheSound
     /// The destination chosen before a ship drag began previewing another, restored when the preview is cleared.
     private var previewRestore: Int?
     /// The latest core described (feature 455): hints and retry read it.
@@ -227,6 +249,9 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = StarlitCartoucheLights(reducedFlash: reduceFlashing)
+        sound = StarlitCartoucheSound(recipe: StarlitCartoucheSoundRecipe.recipe(rootStep: 0, quarters: 0,
+                                                                                 stage: .loading))
         scene.reducedFlash = reduceFlashing
         scene.reduceMotion = reduceMotion
     }
@@ -291,6 +316,15 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         let snapshot = core.snapshot(time: time)
         lastSnapshot = snapshot
+        // The lights settle on the very first frame only; every later change, a level change included, fades, stepped
+        // by the frame clock (feature 456; Reduce Motion stills the firmament, not the fades).
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         try scene.render(snapshot, tier: drawn, context: context, frame: frame, glide: glide)
     }
 
@@ -326,7 +360,22 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
             + "stars and reach \(level.starName(level.beacon)) by beat \(level.deadline)"
         let measure: String = level.progressDescription(report: play.report, actionsLeft: play.actionsLeft)
         mirror.measureLabel = measure
+        if let previous = latestCore {
+            route(StarlitCartoucheFeedbackPlan.after(old: previous, new: core))
+            let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+            if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+            // Choosing another destination (presentation state of the adapter; the play unchanged, so a leg's reset of
+            // the choice does not count) plays its audition when the sound is on; choosing a wait plays none.
+            if !opened, previous.play == core.play, previous.chosenStar != core.chosenStar, mirror.soundOn {
+                sound.audition(StarlitCartoucheAudition.of(core.play, star: core.chosenStar))
+            }
+        } else {
+            // The first described state offers its recipe, so the sound never holds a placeholder.
+            sound.offer(Self.recipe(core))
+        }
         absorbProgress(core)
+        mirror.summary = StarlitCartoucheFeedbackPlan.summaryText(core: core, destination: core.chosenStar,
+                                                                  wait: core.chosenWait)
         var text = "Starlit Cartouche level \(core.levelNumber). "
         text += measure + ". "
         if let pending = mirror.pending { text += pending + ". " }
@@ -445,7 +494,9 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
         if result.isAccepted {
             mirror.message = nil
         } else {
-            mirror.message = "That change was refused: \(StarlitCartoucheMirror.refusalText(code: result.code))."
+            let plan = StarlitCartoucheFeedbackPlan.refused(code: result.code)
+            mirror.message = plan.text
+            route(plan)
             refusalLog.append(StarlitCartoucheMirror.bareCode(result.code))
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
@@ -547,9 +598,11 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
             clearHint()
             return
         }
+        let revealed: Bool = mirror.hintLevel != level || mirror.hintText != hint.text
         hintKey = key
         mirror.hintLevel = level
         mirror.hintText = hint.text
+        if revealed { route(StarlitCartoucheFeedbackPlan.hint(text: hint.text)) }   // feature 456: announced as state
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -600,5 +653,36 @@ final class StarlitCartouchePresenter: ExperiencePresenter {
     static func dateValues(_ date: DateComponents) -> [Double] {
         [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
+
+    // MARK: Feedback and sound (feature 456, R02-G16-06)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: StarlitCartoucheFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// The ambient recipe of `core`: its actions left, the quarters of its symbol drawn and its stage.
+    static func recipe(_ core: StarlitCartoucheExperienceCore) -> AmbientLoopRecipe {
+        StarlitCartoucheSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Turns the sound on or off; turning it on plays the recipe of the current play.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 }
 #endif

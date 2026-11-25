@@ -14,6 +14,10 @@
 // Since feature 454 (R02-G16-04) the camera follows the gesture controller's orbit (`orbit`, presentation only); the
 // meshes face the drawn eye, so an orbit change rebuilds them, a resize alone does not. The stars, the ship and the
 // launch preview are drawn at the snapshot's launch beat.
+// Feature 456 (R02-G16-06) T-R02G1606-005 (FR-R02G1606-004; clarification Q3): the presenter's eased lights
+// (`StarlitCartoucheLights`) are drawn: the glow gain is multiplied by the glow level, `u_won` is the won level, and in
+// the fallback the trails' lift is the won level (`chartPart(_:tier:glide:wonLevel:camera:)`), the fallback rebuilt
+// when that level moves by a tenth or more. Without lights the snapshot's levels are drawn at once.
 #if os(iOS)
 import Foundation
 import StarlitCartoucheCore
@@ -41,6 +45,10 @@ final class StarlitCartoucheChartScene {
     /// The orbit the camera is drawn at (feature 454, presentation only; the gesture controller's). The meshes are
     /// built for the drawn eye, so a new orbit rebuilds them.
     var orbit = StarlitCartoucheOrbit.authored
+    /// The eased light levels the presenter steps every frame (feature 456): the glow gain is multiplied by
+    /// `lights.glow`, `u_won` is `lights.won`, and the fallback's trail lift is `lights.won` (rebuilt when it moves by
+    /// a tenth or more). Nil draws the snapshot's levels at once (the renderer tests' default).
+    var lights: StarlitCartoucheLights?
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the glide, the tier and the
     /// fallback.
@@ -59,6 +67,8 @@ final class StarlitCartoucheChartScene {
         let tier: Int
         let fallback: Bool
         let orbit: StarlitCartoucheOrbit
+        /// The won level in tenths, in the fallback only (feature 456): the fallback's colours depend on it.
+        let wonTenths: Int
     }
 
     private var registry: ResourceRegistry?
@@ -124,14 +134,20 @@ final class StarlitCartoucheChartScene {
             try drawFallback(camera)
             return
         }
-        let won = Float(StarlitCartoucheSceneGeometry.wonFlag(snapshot))
+        let won = Float(wonLevel(snapshot))
         let angle: Double = StarlitCartoucheShaders.firmamentAngle(time: snapshot.time, reduceMotion: reduceMotion)
         lastFirmamentAngle = angle
         try drawChart(camera, won: won, angle: Float(angle))
-        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
-        let gain = StarlitCartoucheShaders.glowGain(for: tier)
+        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty; feature 456 eases it by
+        // the glow level.
+        let gain = StarlitCartoucheShaders.glowGain(for: tier) * (lights?.glow ?? 1)
         guard gain > 0 else { return }
         try drawGlow(camera, gain: gain, won: won)
+    }
+
+    /// The won level drawn (feature 456): the eased `lights.won`, or the snapshot's won flag without lights.
+    private func wonLevel(_ snapshot: StarlitCartoucheSceneSnapshot) -> Double {
+        lights?.won ?? StarlitCartoucheSceneGeometry.wonFlag(snapshot)
     }
 
     /// The geometry key of `snapshot` at `tier` with `glide`.
@@ -139,7 +155,8 @@ final class StarlitCartoucheChartScene {
         GeometryKey(levelNumber: s.levelNumber, beat: s.beat, star: s.star, legs: s.legs, drawn: s.drawn,
                     chosenStar: s.chosenStar, chosenWait: s.chosenWait, stage: s.stage, failure: s.failure,
                     actionsLeft: s.actionsLeft, glide: glide, tier: tier.index, fallback: fallbackReason != nil,
-                    orbit: orbit)
+                    orbit: orbit,
+                    wonTenths: fallbackReason != nil ? Int((wonLevel(s) * 10).rounded(.down)) : 0)
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier` seen from `camera`: the two programs, or the unlit fallback.
@@ -176,7 +193,8 @@ final class StarlitCartoucheChartScene {
         let minimal = StarlitCartoucheTier.of(StarlitCartoucheTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [StarlitCartoucheColouredMesh] = [
-            try StarlitCartoucheSceneGeometry.chartPart(snapshot, tier: minimal, glide: glide, camera: camera),
+            try StarlitCartoucheSceneGeometry.chartPart(snapshot, tier: minimal, glide: glide,
+                                                        wonLevel: wonLevel(snapshot), camera: camera),
             try StarlitCartoucheSceneGeometry.glowPart(snapshot, tier: minimal, glide: glide, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {

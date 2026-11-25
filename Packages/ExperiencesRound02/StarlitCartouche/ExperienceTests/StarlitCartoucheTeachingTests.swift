@@ -60,9 +60,9 @@ enum StarlitCartoucheTeaching {
         StarlitCartoucheMirror.refusalText(code: code)
     }
 
-    /// The panel message of a refusal with reason `code`.
+    /// The panel message of a refusal with reason `code` (since feature 456 the feedback plan's words).
     static func refusalMessage(_ code: String) -> String {
-        "That change was refused: " + refusalWords(code) + "."
+        refusalWords(code)
     }
 
     /// Opens level `number` (seed `number − 1`) at a small view (one frame drawn) and describes the opening.
@@ -437,7 +437,7 @@ enum StarlitCartoucheTeaching {
         let early: ActionResult = try Teaching.send("level.next", [], shell)
         #expect(early == .rejected(.rule(code: StarlitCartoucheExperienceRule.locked)), "\(early.code)")
         let lockedWords: String = Teaching.refusalWords(StarlitCartoucheExperienceRule.locked)
-        #expect(lockedWords == "that level is not open yet: win the level before it first")
+        #expect(lockedWords == "That level is not open yet.")
         #expect(presenter.mirror.message == Teaching.refusalMessage(StarlitCartoucheExperienceRule.locked),
                 "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == StarlitCartoucheExperienceRule.locked)
@@ -508,7 +508,7 @@ enum StarlitCartoucheTeaching {
         _ = try Teaching.describe(shell)
         #expect(impossible == .rejected(.rule(code: StarlitCartoucheExperienceRule.date)), "\(impossible.code)")
         let dateWords: String = Teaching.refusalWords(StarlitCartoucheExperienceRule.date)
-        #expect(dateWords == "that date is not a calendar date")
+        #expect(dateWords == "That date cannot be used.")
         #expect(presenter.mirror.message == Teaching.refusalMessage(StarlitCartoucheExperienceRule.date),
                 "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == StarlitCartoucheExperienceRule.date)

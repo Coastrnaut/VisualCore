@@ -48,7 +48,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
 
 ## Phase 3: Wiring — presenter, scene, sound and panel
 
-- [ ] T-R02G1606-005 [US1] [US2] [US3] Create
+- [X] T-R02G1606-005 [US1] [US2] [US3] Create — Verified 2026-11-24: sim-27 exit 0, 52 simulator tests incl. 11 accessibility tests (.autonomy/migration/checks/R02-G16-06.sim-27.json; sim-27a failed only on two old refusal sentences in the teaching tests, sim-27b exit 0 after updating them); sound, feedback route and log, eased lights in the scene, panel accessibility
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartoucheSound.swift` (the ambient loop over
   `AmbientLoopPlayer` and the audition, playing exactly while wanted, on screen and active); edit
   `Packages/ExperiencesRound02/StarlitCartouche/Experience/StarlitCartouchePresenter.swift` (feedback through

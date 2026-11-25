@@ -9,8 +9,15 @@
 // a ship drag and "Reset view" to the panel. Feature 455 (R02-G16-05) T-R02G1605-005: the tutorial instruction with
 // Dismiss, Hint (each press reveals the next level), the failure explanation with Undo and Retry, the goal with the
 // level's band and best stars, Campaign / Daily / Practice and a picker of the open levels with Play level; all as
-// wrapping text in the panel, never over the chart. "Next level" stays; before a win it is refused in words. Full
-// accessibility comes in a later feature of R02-G16.
+// wrapping text in the panel, never over the chart. "Next level" stays; before a win it is refused in words.
+// Feature 456 (R02-G16-06) T-R02G1606-005 (FR-R02G1606-001, 005, 006; clarification Q5): the summary element ("Chart",
+// identifier `summary`), the adjustable destination and wait (`accessibilityAdjustableAction`, sending `route.choose`
+// like the buttons; their value is the chosen leg as the level words it: the star, the corridor or that none joins
+// them, and the wait), a value in words on every control (Fly the chosen leg, Undo and Redo the actions made, Next
+// level the next open level, Retry the level and mode, Play level the picked level, Reset view "authored" or
+// "orbited", Dismiss the instruction, Campaign / Daily / Practice "selected" or "not selected", Hint the level shown,
+// Sound "on" or "off"), refusals in the feedback plan's words, the Sound toggle (off by default, identifier `sound`),
+// rows that become columns at accessibility text sizes, wrapping text and a 520-point readable width (iPad).
 #if os(iOS)
 import StarlitCartoucheCore
 import SwiftUI
@@ -29,6 +36,13 @@ struct StarlitCartoucheControls: View {
     /// Sends a control and shows a refusal in words (the presenter's `send`, feature 454); nil sends through the port
     /// directly.
     var sender: ((String, [Double]) -> Void)? = nil
+    /// The text size: rows become columns at accessibility sizes (feature 456).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the sound plays only while it is (feature 456).
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 456).
+    static let readableWidth: CGFloat = 520
 
     /// The panel.
     var body: some View {
@@ -40,9 +54,31 @@ struct StarlitCartoucheControls: View {
                 waitRow
                 playRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter.controlsAppeared() }
+        .onDisappear { presenter.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 456).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 456; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter.setSound(on: $0) }))
+            .accessibilityLabel("Sound of the chart")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
     }
 
     /// The level, actions, status, failure and refusal lines.
@@ -50,21 +86,27 @@ struct StarlitCartoucheControls: View {
         Text("Level \(mirror.levelNumber) · \(mirror.actionsLeft) of \(mirror.budget) actions left")
             .font(.headline)
             .accessibilityIdentifier(port.identifier("actions"))
-        Text(mirror.status).font(.subheadline)
+        Text(mirror.status).font(.subheadline).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("status"))
         if let failure = mirror.failureText {
-            Text(failure).font(.footnote)
+            Text(failure).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("failure"))
         }
-        Text(mirror.measureLabel).font(.footnote)
+        Text(mirror.measureLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("progress"))
-        Text(mirror.targetLabel).font(.footnote)
+        Text(mirror.summary).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Chart")
+            .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("message"))
         }
         if let pending = mirror.pending {
-            Text(pending).font(.footnote)
+            Text(pending).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("pending"))
         }
     }
@@ -77,10 +119,11 @@ struct StarlitCartoucheControls: View {
                     .accessibilityIdentifier(port.identifier("instruction"))
                 Button("Dismiss") { presenter.dismissTutorial(port: port) }
                     .accessibilityLabel("Dismiss the tutorial")
+                    .accessibilityValue(instruction)
                     .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
             }
         }
-        HStack(spacing: 12) {
+        row {
             Button("Hint") { presenter.showHint() }
                 .accessibilityLabel("Show a hint")
                 .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
@@ -95,12 +138,14 @@ struct StarlitCartoucheControls: View {
         if let explanation = mirror.explanation {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("explanation"))
-            HStack(spacing: 12) {
+            row {
                 Button("Undo") { presenter.undoAction(port: port) }
                     .accessibilityLabel("Undo the last leg")
+                    .accessibilityValue(actionsMade)
                     .accessibilityIdentifier(port.identifier("failure-undo"))
                 Button("Retry") { presenter.retry(port: port) }
                     .accessibilityLabel("Start the level again")
+                    .accessibilityValue("level \(mirror.levelNumber), " + Self.modeName(mirror.mode))
                     .accessibilityIdentifier(port.identifier("retry"))
             }
         }
@@ -108,7 +153,7 @@ struct StarlitCartoucheControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 455).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { send("mode.campaign") }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(Self.modeName(mirror.mode) == "campaign" ? "selected" : "not selected")
@@ -122,7 +167,7 @@ struct StarlitCartoucheControls: View {
                 .accessibilityValue(Self.modeName(mirror.mode) == "practice" ? "selected" : "not selected")
                 .accessibilityIdentifier(port.identifier("practice"))
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -131,6 +176,7 @@ struct StarlitCartoucheControls: View {
                 .accessibilityIdentifier(port.identifier("level-picker"))
             Button("Play level") { send("level.select", [Double(mirror.pickedLevel)]) }
                 .accessibilityLabel("Play the picked level")
+                .accessibilityValue("level \(mirror.pickedLevel)")
                 .accessibilityIdentifier(port.identifier("play-level"))
         }
     }
@@ -153,30 +199,36 @@ struct StarlitCartoucheControls: View {
 
     /// Choose the previous or next destination star.
     @ViewBuilder private var destinationRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Star −") { send("route.choose", [Double(mirror.nextDestination(-1)), Double(mirror.wait)]) }
                 .accessibilityLabel("Choose the previous destination star")
                 .accessibilityValue(mirror.legLabel)
                 .accessibilityIdentifier(port.identifier("star-minus"))
             Text("star \(mirror.destination)")
+                .accessibilityLabel("Chosen destination")
+                .accessibilityValue(mirror.legLabel)
+                .accessibilityAdjustableAction { direction in adjustDestination(direction) }
                 .accessibilityIdentifier(port.identifier("star"))
             Button("Star +") { send("route.choose", [Double(mirror.nextDestination(1)), Double(mirror.wait)]) }
                 .accessibilityLabel("Choose the next destination star")
                 .accessibilityValue(mirror.legLabel)
                 .accessibilityIdentifier(port.identifier("star-plus"))
         }
-        Text(mirror.legLabel).font(.footnote)
+        Text(mirror.legLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("leg-detail"))
     }
 
     /// Choose a shorter or longer wait before launching.
     @ViewBuilder private var waitRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Wait −") { choose(wait: mirror.wait - 1) }
                 .accessibilityLabel("Wait one beat less before launching")
                 .accessibilityValue(mirror.legLabel)
                 .accessibilityIdentifier(port.identifier("wait-minus"))
             Text("wait \(mirror.wait)")
+                .accessibilityLabel("Chosen wait")
+                .accessibilityValue(mirror.legLabel)
+                .accessibilityAdjustableAction { direction in adjustWait(direction) }
                 .accessibilityIdentifier(port.identifier("wait"))
             Button("Wait +") { choose(wait: mirror.wait + 1) }
                 .accessibilityLabel("Wait one beat more before launching")
@@ -191,21 +243,51 @@ struct StarlitCartoucheControls: View {
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last leg")
+                .accessibilityValue(actionsMade)
                 .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the leg")
+                .accessibilityValue(actionsMade)
                 .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue(mirror.levelNumber < mirror.frontier ? "level \(mirror.levelNumber + 1)"
+                                    : "no further level open")
                 .accessibilityIdentifier(port.identifier("next-level"))
         }
         Button("Reset view") { resetView() }
             .accessibilityLabel("Return the camera to the authored view")
-            .accessibilityValue("presentation only")
+            .accessibilityValue(presenter.gestures.orbit == .authored ? "authored" : "orbited")
             .accessibilityIdentifier(port.identifier("reset-view"))
+    }
+
+    /// The destination's adjustable action (feature 456): increment and decrement choose the next and previous
+    /// destination like Star + and Star − (`route.choose`).
+    private func adjustDestination(_ direction: AccessibilityAdjustmentDirection) {
+        switch direction {
+        case .increment: send("route.choose", [Double(mirror.nextDestination(1)), Double(mirror.wait)])
+        case .decrement: send("route.choose", [Double(mirror.nextDestination(-1)), Double(mirror.wait)])
+        @unknown default: break
+        }
+    }
+
+    /// The wait's adjustable action (feature 456): increment and decrement choose one beat more or less like Wait +
+    /// and Wait − (`route.choose`, clamped to 0 … 8).
+    private func adjustWait(_ direction: AccessibilityAdjustmentDirection) {
+        switch direction {
+        case .increment: choose(wait: mirror.wait + 1)
+        case .decrement: choose(wait: mirror.wait - 1)
+        @unknown default: break
+        }
+    }
+
+    /// Undo and Redo's value (feature 456): the actions made of the budget, "k actions made of B".
+    private var actionsMade: String {
+        let made: Int = max(mirror.budget - mirror.actionsLeft, 0)
+        return (made == 1 ? "1 action made" : "\(made) actions made") + " of \(mirror.budget)"
     }
 
     /// Chooses wait `wait` (clamped to 0 … 8) with the current destination.
@@ -220,8 +302,7 @@ struct StarlitCartoucheControls: View {
             return
         }
         let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(StarlitCartoucheMirror.refusalText(code: result.code))."
+        mirror.message = result.isAccepted ? nil : StarlitCartoucheMirror.refusalText(code: result.code)
     }
 }
 #endif
