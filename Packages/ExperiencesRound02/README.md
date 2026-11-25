@@ -891,5 +891,7 @@ planned levels), `StarlitCartoucheGenerator` (seeded candidates by band, the fir
 `docs/games/starlit-cartouche/levels/` and a pinned catalog digest. Feature 453 (R02-G16-03) adds the hero renderer
 (`StarlitCartoucheSceneSnapshot`, `StarlitCartoucheSceneGeometry`, `StarlitCartoucheShaders`), the adapter
 `StarlitCartoucheExperienceCore`, the scenarios and the iOS target `StarlitCartoucheExperience`, registered as a
-candidate until X-R02-G16. See
+candidate until X-R02-G16. Feature 454 (R02-G16-04) adds `StarlitCartouchePicker`,
+`StarlitCartoucheGestureController`, the orbit and the launch preview (stars drawn at the launch beat, a previewed leg).
+See
 [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).

@@ -120,3 +120,24 @@ from the ship's star in index order, waits 0 … 8, flyable ones only) for the l
   is possible on only 17 of the 100 levels (each leg advances the beat into windows and the deadline), so the failure
   fixture and the even witness rows end on a failing leg.
 
+## Gestures, the time slider and the launch preview (feature 454, R02-G16-04)
+
+- **Picking.** `StarlitCartouchePicker` projects every star through the drawn camera (orbit included) at its launch
+  position; a touch within the projected ring radius (0.098) grown by 8 points hits it, the front-most (drawn last)
+  wins, and the ship's star is the ship. The time slider is the projected box of the nine wait pips grown by 8 points;
+  its wait is the pip nearest to the finger's projection onto the line through pips 0 and 8. Anything else is empty.
+- **Gestures.** `StarlitCartoucheGestureController` (feature 444's thresholds: tap below 10 points and 0.5 s, drag from
+  16 points, double tap within 0.35 s and 22 points): a tap on a star chooses it (`route.choose`, any stage), a second
+  tap flies to it with the chosen wait (`route.fly`, while playing); a tap or drag on the slider chooses the wait; a drag
+  from the ship previews the star under the finger and flies there on release (a release elsewhere restores the earlier
+  destination); two fingers orbit (yaw ±60°, pitch −20° … +35°, refitted so the authored box stays inside the view);
+  an empty double tap or "Reset view" returns to the authored view. A finished play sends no kernel action and says
+  so; cancels and second fingers send nothing.
+- **Launch preview.** The snapshot carries the launch beat L = beat + chosen wait and every star's position at L; the
+  stars, their corridors and hazards, the ship and the rings are drawn there, and while playing a dashed sapphire ribbon
+  0.03 wide (material 22) previews the leg from the ship's star at L to the destination at L + travel. Trails stay where
+  they were flown; at wait 0 the picture is R02-G16-03's. The preview, the choice and the orbit are presentation only.
+- **Panel.** Every move stays available without gestures (star −/+, wait −/+, fly, undo, redo, next level, "Reset
+  view"); all 100 certified levels are won through the panel in a host test. Refused actions are shown in words and
+  their codes kept in the presenter's refusal log.
+

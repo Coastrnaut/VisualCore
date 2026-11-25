@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G16-03: Starlit Cartouche hero renderer and experience).
+Last updated: 2026-11-24 (R02-G16-04: Starlit Cartouche gestures, time slider and launch preview).
 
 ## 1. What is tested, and where
 
@@ -865,6 +865,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   both, before the simulator run. The frame check first required the first actions bar on every level, but the bars
   stand a few pixels apart and a near star can project over them; neighbouring bars no longer count as hiding, and the
   bar is required on most levels.
+- **Starlit Cartouche gestures** (R02-G16-04, 2026-11-24). Host: the picker and slider rule against an independent
+  computation on 500 seeded points, 500 seeded gesture scripts through the adapter, orbit framing at every wait and
+  aspect, and all 100 certified levels won through panel actions. Simulator: 9 wiring tests through the presenter's
+  pointer entry (tap, double tap, ship drag, slider, orbit, refusal, finished play). Lesson: the gesture-controller
+  agent built against a stand-in picker written from the fixed API contract while the picker agent worked in
+  parallel; the lead ran the controller's tests against the real picker in a merged copy before landing either, and
+  they passed unchanged.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15
