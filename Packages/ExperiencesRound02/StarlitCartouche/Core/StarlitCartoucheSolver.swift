@@ -9,6 +9,9 @@
 // considered), counted and bounded; over the bound, or past the most legs asked for, there is no plan. The minimality
 // proof is that every state reachable in fewer legs was reached and none won (the states reached at each smaller depth
 // are counted). Nothing here reads a clock. Modelled on `VoxelOrigamiSolver` (feature 442).
+// Feature 455 (R02-G16-05) T-R02G1605-002 (clarification Q1) adds `plan(_:from:beat:drawn:maxLegs:workBound:)`: the
+// same search from a given star, beat and drawn strokes, for the hints; `plan(_:maxLegs:workBound:)` is that entry at
+// the start star, beat 0 and nothing drawn, so its result is unchanged.
 
 /// A minimal plan of a level: its legs in order, the states reached at each smaller depth and the work.
 public struct StarlitCartouchePlan: Sendable, Equatable, Codable {
@@ -47,13 +50,33 @@ public enum StarlitCartoucheSolver {
         let mask: Int
     }
 
-    /// The minimal plan of `level` within `maxLegs` legs and `workBound` legs tried, or nil.
+    /// The minimal plan of `level` within `maxLegs` legs and `workBound` legs tried, or nil: the search from the
+    /// level's start (``plan(_:from:beat:drawn:maxLegs:workBound:)`` at star `start`, beat 0, nothing drawn).
     public static func plan(_ level: StarlitCartoucheLevel, maxLegs: Int = maxLegs,
                             workBound: Int = workBound) -> StarlitCartouchePlan? {
+        plan(level, from: level.start, beat: 0, drawn: [], maxLegs: maxLegs, workBound: workBound)
+    }
+
+    /// The minimal plan of `level` from the ship at `star` at `beat` with the strokes `drawn` already drawn, within
+    /// `maxLegs` legs and `workBound` legs tried, or nil (feature 455 (R02-G16-05) T-R02G1605-002, clarification
+    /// Q1): the same breadth-first search as ``plan(_:maxLegs:workBound:)`` — corridors by index from the ship's
+    /// star, then waits 0 … 8, legs the chart refuses or fails skipped — started from the given state. Nil for an
+    /// unknown star, a negative beat, a drawn corridor outside the symbol (such a state can never win), a state that
+    /// already wins, no plan within `maxLegs` legs, or more than `workBound` legs tried. At the level's start (star
+    /// `start`, beat 0, nothing drawn) it is the certifying plan.
+    public static func plan(_ level: StarlitCartoucheLevel, from star: Int, beat: Int, drawn: Set<Int>,
+                            maxLegs: Int = maxLegs, workBound: Int = workBound) -> StarlitCartouchePlan? {
+        guard star >= 0, star < level.stars.count, beat >= 0 else { return nil }
         var strokeBit: [Int: Int] = [:]
         for (bit, corridor) in level.symbol.enumerated() { strokeBit[corridor] = bit }
+        var startMask: Int = 0
+        for corridor in drawn {
+            guard let bit = strokeBit[corridor] else { return nil }
+            startMask |= 1 << bit
+        }
         let full: Int = (1 << level.symbol.count) - 1
-        let start = State(star: level.start, beat: 0, mask: 0)
+        if startMask == full && star == level.beacon { return nil }
+        let start = State(star: star, beat: beat, mask: startMask)
         var parent: [State: (State, StarlitCartoucheAction)] = [:]
         var seen: Set<State> = [start]
         var frontier: [State] = [start]

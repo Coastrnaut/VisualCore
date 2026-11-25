@@ -16,7 +16,7 @@ by filter.
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1605-002 [P] [US2] [US3] Add `plan(_:from:beat:drawn:maxLegs:workBound:)` to
+- [X] T-R02G1605-002 [P] [US2] [US3] Add `plan(_:from:beat:drawn:maxLegs:workBound:)` to — Verified 2026-11-24: host-2 exit 0 (.autonomy/migration/checks/R02-G16-05.host-2.json); solver entry from a state (plan(_:) unchanged), hints at three levels, six failure explanations; exact hints win all 100 levels, 200 seeded states, 500 seeded failures
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheSolver.swift` (the breadth-first search of
   `plan(_:maxLegs:workBound:)` from the given star, beat and drawn strokes — corridors by index from the ship's star,
   waits 0 … 8, legs the chart refuses or fails skipped; `plan(_:)` unchanged and equal to `plan(level, from:
