@@ -948,7 +948,7 @@ adds its device-row definition and written campaign plan (`docs/apps/celestial-e
 fixed point (`ApsidesWorkshopFixed`: integer sine, cosine and square root, bounded Newton with a bisection fallback),
 the exact sky (`ApsidesWorkshopOrbit` with its size, eccentricity and periapsis direction steps, positions rounded to
 sky units, octant sectors, triangle-quadrature shares, apsis readings and strict planet contact in
-`ApsidesWorkshopSky`), the judge (`contact`, `order`, `share`, `apsis-sector`, `apsis-distance`), `ApsidesWorkshopLevel` (immutable,
-fingerprinted, JSON schema 1, with names in words), the play state `ApsidesWorkshopPlay` with stages, tunings and the
-play, records, undo and redo, and `ApsidesWorkshopRules` (an R02-F23 `PuzzleRules` over orbits). See
+`ApsidesWorkshopSky`), the judge (`contact`, `order`, `share`, `apsis-sector`, `apsis-distance`), `ApsidesWorkshopLevel`
+(immutable, fingerprinted, JSON schema 1, with names in words), the play state `ApsidesWorkshopPlay` with stages,
+tunings and the play, records, undo and redo, and `ApsidesWorkshopRules` (an R02-F23 `PuzzleRules` over orbits). See
 [docs/architecture/apsides-workshop.md](../../docs/architecture/apsides-workshop.md).
