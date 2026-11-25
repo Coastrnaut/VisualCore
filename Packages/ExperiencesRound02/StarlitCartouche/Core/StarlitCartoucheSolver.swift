@@ -79,7 +79,6 @@ public enum StarlitCartoucheSolver {
                         let reached = State(star: destination, beat: leg.arrive, mask: state.mask | (1 << bit))
                         let action: StarlitCartoucheAction = .leg(destination, wait)
                         if reached.mask == full && destination == level.beacon {
-                            parent[reached] = parent[reached] ?? (state, action)
                             var legs: [StarlitCartoucheAction] = [action]
                             var current: State = state
                             while current != start, let (previous, step) = parent[current] {

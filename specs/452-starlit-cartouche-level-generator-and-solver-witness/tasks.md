@@ -25,7 +25,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 3: Story 1 — every shipped level can be solved (P1) 🎯
 
-- [ ] T-R02G1602-003 [US1] Implement `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheSolver.swift`
+- [X] T-R02G1602-003 [US1] Implement `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheSolver.swift` — Verified 2026-11-24: host-2r2 exit 0 (.autonomy/migration/checks/R02-G16-02.host-2r2.json; host-2 failed to compile: solver tests use the generator, landed with T-004); StarlitCartoucheSolverTests 7 tests, hand minima + independent DFS
   (lead: a breadth-first search over route states (star, beat, strokes drawn) from the start; states expanded in the
   order reached, legs by corridor index (those touching the ship's star) then wait 0 … 8; a leg reaches a state only
   when the chart accepts it and finds no failure; states merged by star, beat and stroke mask; the first winning leg
