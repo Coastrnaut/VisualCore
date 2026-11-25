@@ -6,8 +6,8 @@ check and release step, pass conditions, owner steps, no device contact)
 **Feature**: [spec.md](../spec.md)
 
 Ownership: `[x]` means the reviewer judged the requirement's quality sufficient; it says nothing about the code.
-Evaluated by the lead under the owner's standing delegation on 2026-11-25; following feature 450's checklist; every item but CHK016
-passed at first reading.
+Evaluated by the lead under the owner's standing delegation on 2026-11-25; following feature 450's checklist; every item
+but CHK016 passed at first reading.
 
 ## Rows and coverage
 
