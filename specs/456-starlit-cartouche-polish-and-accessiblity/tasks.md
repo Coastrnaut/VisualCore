@@ -29,7 +29,7 @@ Motion holds at 0) and round02-host in three chunks (the second chunk reached 45
   of legs, undos, redos, refusals of every code (bare and prefixed), wins in campaign and practice, failures by every
   leg failure kind and the budget, and level and mode changes compare texts, kinds and haptics exactly; choosing a
   destination or wait plans nothing); agent A; `--name host-2`
-- [ ] T-R02G1606-004 [P] [US2] [US3] Create
+- [X] T-R02G1606-004 [P] [US2] [US3] Create — Verified 2026-11-24: host-3 exit 0 (.autonomy/migration/checks/R02-G16-06.host-3.json); lights with fades and the flicker measure, audition and ambient recipes; 20 tests
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheLights.swift` ("glow 0.7 playing / 1 won / 0.35
   failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade under
   Reduce Flashing, stepped by the frame clock's elapsed time; `maxHalfRangeCrossingsPerSecond`) and
