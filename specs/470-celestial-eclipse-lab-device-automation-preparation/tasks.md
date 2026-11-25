@@ -8,7 +8,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1710-001 Baselines after R02-G17-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1710-001 Baselines after R02-G17-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host, baseline-timing and round02-1, -2, -3c, -3e, -3f exit 0 on the committed R02-G17-09 record; rendering baseline is R02-G17-09's runs
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two chunks, 3c with `CelestialEclipseLab`; no Swift
   changes follow; the rendering baseline is R02-G17-09's runs)
 
