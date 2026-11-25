@@ -76,6 +76,13 @@ chart from the last record's action, and the item passes.
 - [x] CHK018 Are device frame-time measurements deferred to after ImplementationLock-100 and marked `{device}`?
   [Consistency, Spec §SC-R02G1603-006]
 
+## Registration and scenarios (appended by the /speckit-checklist invocation)
+
+- [x] CHK019 Are the candidate's registration contents (capabilities of at most 40 characters, tier names, palette,
+  scenario manifest path, no permissions, summary of at most 300 characters, content facts of 100 levels and the pinned
+  digest) and the 80 acceptance scenarios R2-G16-QA-001 … 080 specified, with availability withheld until X-R02-G16?
+  [Completeness, Spec §Clarifications Q5; Assumptions; FR-R02G1603-008]
+
 ## Notes
 
 - `/speckit-implement` reads these markers; it does not change them.
