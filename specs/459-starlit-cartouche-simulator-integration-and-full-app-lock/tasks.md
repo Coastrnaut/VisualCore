@@ -60,7 +60,7 @@ change (the shaders and reference of R02-G16-03 are unchanged and re-proven by t
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G1609-006 [US3] Release build and symbols (`StarlitCartoucheGolden`, `acceptanceScenarios` already
+- [X] T-R02G1609-006 [US3] Release build and symbols (`StarlitCartoucheGolden`, `acceptanceScenarios` already — Verified 2026-11-25: 2026-11-25 release exit 0 (app-release-build 75.7 s, app-release-symbols pass); regression exit 0 (host and simulator PASS, 100 of 100 levels)
   forbidden): `--name release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`;
   `--name regression -- python3 scripts/starlit_cartouche_regression.py` (100 of 100 levels, SC-R02G1609-004)
 

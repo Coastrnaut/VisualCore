@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/starlit_cartouche_regression.py"
+  ],
+  "command": "python3 scripts/starlit_cartouche_regression.py",
+  "elapsed_seconds": 45.348,
+  "exit_code": 0,
+  "finished": "2026-11-25T07:52:56+00:00",
+  "gate": "R02-G16-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G16-09.regression.log",
+  "log_sha256": "82eca8bc565978836c17919d114569dc6f0acc81356d537ce1cdebbb9e28c586",
+  "name": "regression",
+  "started": "2026-11-25T07:52:11+00:00",
+  "timed_out": false
+}
