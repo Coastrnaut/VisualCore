@@ -728,7 +728,9 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               // Feature 456 (R02-G16-06): the ambient sound recipe.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
                 path: "StarlitCartouche/Core"),
         .testTarget(name: "StarlitCartoucheCoreTests",
                     dependencies: ["StarlitCartoucheCore",
@@ -737,7 +739,8 @@ let package = Package(
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreDiagnostics", package: visualCore),
-                                   .product(name: "VisualCorePersistence", package: visualCore)],
+                                   .product(name: "VisualCorePersistence", package: visualCore),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "StarlitCartouche/CoreTests"),
         // Feature 453 (R02-G16-03): Starlit Cartouche's experience (presenter, scene, controls).
         .target(name: "StarlitCartoucheExperience",
@@ -747,7 +750,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 456 (R02-G16-06): the ambient loop and the audition.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "StarlitCartouche/Experience"),
         // Feature 453 (R02-G16-03): the simulator tests of Starlit Cartouche's experience.
         .testTarget(name: "StarlitCartoucheExperienceTests",
@@ -758,7 +764,9 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore),
+                                   .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "StarlitCartouche/ExperienceTests"),
         // Feature 441 (R02-G15-01): Voxel Origami's pure rule kernel.
         .target(name: "VoxelOrigamiCore",
