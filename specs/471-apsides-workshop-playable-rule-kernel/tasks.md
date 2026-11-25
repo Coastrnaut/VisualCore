@@ -73,7 +73,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
   while actions are left"; goal "the predicted play wins") with
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopRulesTests.swift` (agreement with the play on
   200 walks); `--name host-4`
-- [ ] T-R02G1801-006 [P] Create
+- [X] T-R02G1801-006 [P] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopInvariantTests pass (host-5 exit 0)
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopInvariantTests.swift` (agent D:
   `testApsidesWorkshopTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`, `…UndoBoundary`,
   `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each with a seeded
