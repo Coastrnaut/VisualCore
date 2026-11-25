@@ -747,7 +747,12 @@ let package = Package(
         // Feature 461 (R02-G17-01): Celestial Eclipse Lab's pure rule kernel.
         .target(name: "CelestialEclipseLabCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 463 (R02-G17-03): the adapter, snapshot, geometry and scenarios.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "CelestialEclipseLab/Core"),
         .testTarget(name: "CelestialEclipseLabCoreTests",
                     dependencies: ["CelestialEclipseLabCore",
