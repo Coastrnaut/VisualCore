@@ -15,7 +15,8 @@
 // `CelestialEclipseLabHint.failedText`. Progression: the band label of levels 1 and 21, the goal label; the modes
 // (Practice raises the budget to 24, Daily of 2026-01-01 opens level 1 in daily mode, Campaign returns); a locked level
 // and an impossible date (2026-02-30) are refused in words and change nothing. Explicit dates (no clock), no wall-clock
-// assertion; each test short. Explicit types and plain loops (CI type-check rule).
+// assertion; each test short. Explicit types and plain loops (CI type-check rule). Since feature 466 (R02-G17-06)
+// the refusal lines are the feedback plan's sentences ("That level is not open yet.", "That date cannot be used.").
 #if os(iOS)
 import CelestialEclipseLabCore
 import CoreGraphics
@@ -45,9 +46,9 @@ enum CelestialEclipseLabTeaching {
     /// The most hint-guided phase changes tried when following the hints (the solver's plans have at most 5).
     static let followLimit: Int = 8
 
-    /// The panel message of a refusal with reason `code`.
+    /// The panel message of a refusal with reason `code` (since feature 466 the feedback plan's sentence).
     static func refusalMessage(_ code: String) -> String {
-        "That change was refused: " + CelestialEclipseLabMirror.refusalText(code: code) + "."
+        CelestialEclipseLabMirror.refusalMessage(code: code)
     }
 
     /// Opens level `number` (seed `number − 1`) at a small view (one frame drawn) and describes the opening.
@@ -350,7 +351,7 @@ enum CelestialEclipseLabTeaching {
         let code: String = CelestialEclipseLabExperienceRule.locked
         #expect(Teaching.isRefusal(locked, code), "\(locked.code)")
         let message: String = Teaching.refusalMessage(code)
-        #expect(message == "That change was refused: that level is not open yet.")
+        #expect(message == "That level is not open yet.")
         #expect(presenter.mirror.message == message, "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused pick changes nothing")
@@ -371,7 +372,7 @@ enum CelestialEclipseLabTeaching {
         let code: String = CelestialEclipseLabExperienceRule.date
         #expect(Teaching.isRefusal(refused, code), "\(refused.code)")
         let message: String = Teaching.refusalMessage(code)
-        #expect(message == "That change was refused: that is not a calendar date.")
+        #expect(message == "That date cannot be used.")
         #expect(presenter.mirror.message == message, "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused date changes nothing")

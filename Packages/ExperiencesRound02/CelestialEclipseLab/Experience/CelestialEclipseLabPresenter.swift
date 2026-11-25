@@ -31,11 +31,27 @@
 // them. The daily level is asked for with today's local calendar date read here (`playDaily(port:date:)`); the core
 // never reads a clock. A refused `level.select` or `level.next` (`r02-g17.locked`) and an impossible date
 // (`r02-g17.date`) read in words.
+//
+// Feature 466 (R02-G17-06) T-R02G1706-005 (FR-R02G1706-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `CelestialEclipseLabFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route
+// (`feedback`, injectable; the shared `ExperienceFeedback` by default) once for every new core it takes in, from the
+// frame or the description, and keeps a feedback log (`feedbackLog`); refusals are shown and announced in words
+// (`refused(code:)`; the panel shows exactly the plan's text), and a revealed hint is announced as `state`. Choosing a
+// body, the pending phase, the shown tick and orbit are not announced (the adjustable elements speak their values).
+// The scene's lights (`CelestialEclipseLabLights`: the glow and the won look) step toward the drawn snapshot every
+// frame by the frame clock's elapsed time (0.15 s fades, 0.45 s under Reduce Flashing; the first frame settles them),
+// so fades finish under Reduce Motion too, where the halos hold still. The ambient loop (`CelestialEclipseLabSound`) is
+// offered the recipe of the actions left, the quarters of the target matched and the stage when the first core is
+// taken in, when a level or mode opens and when that recipe changes; choosing another body (the play unchanged) plays
+// its audition (`CelestialEclipseLabAudition.of(_:body:)`) when the sound is on, on screen and active. The mirror
+// carries the summary element's text (`CelestialEclipseLabFeedbackPlan.summaryText(core:body:phase:)`) and the sound
+// choice (off by default). Presentation only.
 #if os(iOS)
 import CelestialEclipseLabCore
 import Foundation
 import SwiftUI
 import VisualCoreExperience
+import VisualCoreAudioDSP
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
@@ -90,6 +106,17 @@ final class CelestialEclipseLabMirror {
     /// The failure explanation (`CelestialEclipseLabFailureExplanation`: what went wrong, then the advice), nil without
     /// a failure (feature 465).
     var explanation: String?
+    /// The latest core taken in, for the summary element (feature 466); nil before the first.
+    var summaryCore: CelestialEclipseLabExperienceCore?
+    /// Whether the sound is on (feature 466; off by default; presentation only).
+    var soundOn = false
+    /// The summary element's text (feature 466): `CelestialEclipseLabFeedbackPlan.summaryText(core:body:phase:)` of
+    /// the latest core, the chosen body and its pending phase (the current one when no change is pending).
+    var summary: String {
+        guard let core = summaryCore else { return "" }
+        return CelestialEclipseLabFeedbackPlan.summaryText(core: core, body: chosenBody,
+                                                           phase: pendingOffset ?? chosenPhase)
+    }
     /// The mode (feature 465).
     var mode: CelestialEclipseLabMode = .campaign
     /// The highest open level (feature 465).
@@ -269,9 +296,10 @@ final class CelestialEclipseLabMirror {
         code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
     }
 
-    /// The panel line of a refusal: "That change was refused: " and the reason in words.
+    /// The panel line of a refusal: since feature 466 exactly the feedback plan's sentence
+    /// (`CelestialEclipseLabFeedbackPlan.refusalText(code:)`, clarification Q1), the words that are announced.
     static func refusalMessage(code: String) -> String {
-        "That change was refused: \(refusalText(code: code))."
+        CelestialEclipseLabFeedbackPlan.refusalText(code: code)
     }
 
     /// Records the result of sending `control` with `values` (feature 464): a refusal is shown in words; an accepted
@@ -292,21 +320,11 @@ final class CelestialEclipseLabMirror {
         }
     }
 
-    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``. Since feature 466 it
+    /// forwards to `CelestialEclipseLabFeedbackPlan.refusalText(code:)` (clarification Q1's sentences, e.g. "That body
+    /// is not in this level.").
     static func refusalText(code: String) -> String {
-        switch bareCode(code) {
-        case "r02-g17.stage": "the play is over: undo a failed run or go to the next level"
-        case "r02-g17.action": "that phase cannot be set, or there is nothing to undo or redo"
-        case "r02-g17.budget": "no actions are left: run the clock or undo a change"
-        case "r02-g17.stale": "the play changed before the action arrived"
-        case "r02-g17.level": "the next level could not be made"
-        case CelestialEclipseLabExperienceRule.locked: "that level is not open yet"
-        case CelestialEclipseLabExperienceRule.date: "that is not a calendar date"
-        case CelestialEclipseLabExperienceRule.notWhole: "a body, phase and tick must be whole numbers"
-        case CelestialEclipseLabExperienceRule.choice: "that body cannot be chosen"
-        case CelestialEclipseLabExperienceRule.tick: "that tick is past the horizon"
-        default: "that action is not available now"
-        }
+        CelestialEclipseLabFeedbackPlan.refusalText(code: code)
     }
 }
 
@@ -360,10 +378,24 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
     /// What the hint line shows when the play has no hint (won, or not under way; feature 465).
     static let noHintText = "No hint now: the level is not being played."
 
+    /// The feedback route of announcements and haptics (feature 466; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 466; tests and diagnostics).
+    private(set) var feedbackLog: [CelestialEclipseLabFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 466).
+    private(set) var lights: CelestialEclipseLabLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the chosen body's audition (feature 466).
+    let sound: CelestialEclipseLabSound
+
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
+        lights = CelestialEclipseLabLights(reducedFlash: reduceFlashing)
+        sound = CelestialEclipseLabSound(recipe: CelestialEclipseLabSoundRecipe.recipe(rootStep: 0, quarters: 0,
+                                                                                      stage: .loading))
         scene.reducedFlash = reduceFlashing
         scene.reduceMotion = reduceMotion
     }
@@ -414,6 +446,15 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         let snapshot = presented(core.snapshot(time: time))
         lastSnapshot = snapshot
         scene.orbit = gestures.orbit
+        // The lights settle on the very first frame only; every later change, a level change included, fades, stepped
+        // by the frame clock (feature 466; Reduce Motion holds the halos, not the fades).
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
 
@@ -603,6 +644,7 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
         let result = port.send(control, values)
         mirror.record(control, values, accepted: result.isAccepted, code: result.code)
         if !result.isAccepted {
+            route(CelestialEclipseLabFeedbackPlan.refused(code: result.code))   // feature 466: announced and felt
             refusalLog.append(CelestialEclipseLabMirror.bareCode(result.code))
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
@@ -619,7 +661,9 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
     /// of the play hides the hint (the next press shows level 1).
     private func absorbProgress(_ core: CelestialEclipseLabExperienceCore) {
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        absorbFeedback(core)
         latestCore = core
+        mirror.summaryCore = core
         if let shown = hintPlay, shown != core.play { clearHint() }
         mirror.tutorialText = core.tutorial == .done ? nil : core.tutorial.text
         mirror.explanation = CelestialEclipseLabFailureExplanation(play: core.play)?.text
@@ -702,13 +746,18 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
     /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
     private func reveal(_ texts: [String]?, level: Int, play: CelestialEclipseLabPlay) {
         hintPlay = play
-        guard let texts, texts.indices.contains(level - 1) else {
+        let before: (Int, String?) = (mirror.hintLevel, mirror.hintText)
+        if let texts, texts.indices.contains(level - 1) {
+            mirror.hintLevel = level
+            mirror.hintText = texts[level - 1]
+        } else {
             mirror.hintLevel = 0
             mirror.hintText = Self.noHintText
-            return
         }
-        mirror.hintLevel = level
-        mirror.hintText = texts[level - 1]
+        // Feature 466: a newly shown hint (or the no-hint line) is announced as `state`.
+        if let text = mirror.hintText, before.0 != mirror.hintLevel || before.1 != text {
+            route(CelestialEclipseLabFeedbackPlan.hint(text: text))
+        }
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -752,5 +801,55 @@ final class CelestialEclipseLabPresenter: ExperiencePresenter {
     static func dateValues(_ date: DateComponents) -> [Double] {
         [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
+
+    // MARK: Feedback and sound (feature 466, R02-G17-06)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: CelestialEclipseLabFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// Takes a new core into the feedback and the sound, once per core (from the frame or the description): routes the
+    /// plan of the change from the latest core, offers the ambient recipe when a level or mode opened or the recipe
+    /// changed, and plays the audition of a newly chosen body (the play unchanged) when the sound is on. The first core
+    /// only offers its recipe, so the sound never holds a placeholder.
+    private func absorbFeedback(_ core: CelestialEclipseLabExperienceCore) {
+        guard let previous = latestCore else {
+            sound.offer(Self.recipe(core))
+            return
+        }
+        // No early return on `previous == core`: the core's equality leaves out presentation state (the chosen body,
+        // the shown tick), so a body choice compares equal; the plan of an unchanged play is `.none`.
+        route(CelestialEclipseLabFeedbackPlan.after(old: previous, new: core))
+        let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+        if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+        if !opened, previous.play == core.play, previous.chosenBody != core.chosenBody, mirror.soundOn {
+            sound.audition(CelestialEclipseLabAudition.of(core.play, body: core.chosenBody))
+        }
+    }
+
+    /// The ambient recipe of `core`: its actions left, the quarters of its target matched and its stage.
+    static func recipe(_ core: CelestialEclipseLabExperienceCore) -> AmbientLoopRecipe {
+        CelestialEclipseLabSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Turns the sound on or off; turning it on plays the recipe of the current play.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 }
 #endif

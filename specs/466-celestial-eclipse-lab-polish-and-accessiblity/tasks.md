@@ -48,7 +48,7 @@ tests updated with the panel's new refusal words) and round02-host in five chunk
 
 ## Phase 3: Wiring — presenter, scene, sound and panel
 
-- [ ] T-R02G1706-005 [US1] [US2] [US3] Create
+- [X] T-R02G1706-005 [US1] [US2] [US3] Create — Verified 2026-11-25: 2026-11-25 sim-27b exit 0, 54 simulator tests incl. 12 accessibility tests (.autonomy/migration/checks/R02-G17-06.sim-27b.json; sim-27 failed only on the audition test: the core's equality leaves out the chosen body, so the presenter's early return swallowed body choices; removed); sound, feedback route and log, eased lights and fallback colour blend in the scene, halos still under Reduce Flashing, panel accessibility; teaching tests take the new refusal words
   `Packages/ExperiencesRound02/CelestialEclipseLab/Experience/CelestialEclipseLabSound.swift` (the ambient loop over
   `AmbientLoopPlayer` and the audition, playing exactly while wanted, on screen and active); edit
   `Packages/ExperiencesRound02/CelestialEclipseLab/Experience/CelestialEclipseLabPresenter.swift` (feedback through

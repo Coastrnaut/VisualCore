@@ -24,6 +24,16 @@
 // (`mode.daily [year, month, day]` with today's local date from the presenter) and "Practice" (`mode.practice`), and a
 // picker of the open levels (1 … the frontier, with their bands and stars) with "Play level" (`level.select [n]`). All
 // wrapping text in the panel, never over the sky; refusals read in words.
+//
+// Feature 466 (R02-G17-06) T-R02G1706-005 (FR-R02G1706-001, 005, 006; clarification Q5): the summary element ("Sky",
+// identifier `summary`), the adjustable chosen planet and pending phase (`accessibilityAdjustableAction`: the planet's
+// increment and decrement choose the next and previous movable body like Planet + and −, the phase's move the pending
+// phase like Phase + and −; their values are "body j, phase p of q" and "pending phase p"), a value in words on every
+// control (Set phase the pending change, Run the progress, Undo and Redo the actions made, Next level the next open
+// level, Play level the picked level, Reset view "authored" or "orbited", Dismiss the instruction, Campaign / Daily /
+// Practice "selected" or "not selected", Hint the level shown, Sound "on" or "off"), refusals in the feedback plan's
+// words, the Sound toggle (off by default, identifier `sound`), rows that become columns at accessibility text sizes,
+// wrapping text and a 520-point readable width (iPad).
 #if os(iOS)
 import CelestialEclipseLabCore
 import SwiftUI
@@ -44,6 +54,13 @@ struct CelestialEclipseLabControls: View {
     var sender: ((String, [Double]) -> Void)? = nil
     /// Redraws the last snapshot with the mirror's preview after the pending phase moved (feature 464).
     var redraw: () -> Void = {}
+    /// The text size: rows become columns at accessibility sizes (feature 466).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the sound plays only while it is (feature 466).
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 466).
+    static let readableWidth: CGFloat = 520
 
     /// The panel.
     var body: some View {
@@ -56,9 +73,38 @@ struct CelestialEclipseLabControls: View {
                 tickRow
                 playRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter?.controlsAppeared() }
+        .onDisappear { presenter?.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter?.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 466).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 466; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter?.setSound(on: $0) }))
+            .disabled(presenter == nil)
+            .accessibilityLabel("Sound of the sky")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
+    }
+
+    /// The actions made of the budget, in words (feature 466): the value of Undo and Redo.
+    private var actionsMade: String {
+        let made: Int = max(mirror.budget - mirror.actionsLeft, 0)
+        return made == 1 ? "1 action made" : "\(made) actions made"
     }
 
     /// The level, actions, status, tutorial, failure and refusal lines.
@@ -66,17 +112,23 @@ struct CelestialEclipseLabControls: View {
         Text("Level \(mirror.levelNumber) · \(mirror.actionsLeft) of \(mirror.budget) actions left")
             .font(.headline)
             .accessibilityIdentifier(port.identifier("actions"))
-        Text(mirror.status).font(.subheadline)
+        Text(mirror.status).font(.subheadline).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("status"))
         if let failure = mirror.failureText, mirror.explanation == nil {
-            Text(failure).font(.footnote)
+            Text(failure).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("failure"))
         }
-        Text(mirror.measureLabel).font(.footnote)
+        Text(mirror.measureLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("progress"))
-        Text(mirror.targetLabel).font(.footnote)
+        Text(mirror.summary).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Sky")
+            .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("message"))
         }
     }
@@ -89,6 +141,7 @@ struct CelestialEclipseLabControls: View {
                 .accessibilityIdentifier(port.identifier("tutorial"))
             Button("Dismiss tutorial") { dismissTutorial() }
                 .accessibilityLabel("Dismiss the tutorial")
+                .accessibilityValue(tutorial)
                 .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
         }
         Button("Hint") { presenter?.showHint() }
@@ -104,7 +157,7 @@ struct CelestialEclipseLabControls: View {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("failure"))
         }
-        HStack(spacing: 12) {
+        row {
             Text(mirror.bandLabel).font(.footnote)
                 .accessibilityIdentifier(port.identifier("band"))
             Text(mirror.starsLabel).font(.footnote)
@@ -116,7 +169,7 @@ struct CelestialEclipseLabControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 465).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { campaign() }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(modeValue("campaign"))
@@ -130,7 +183,7 @@ struct CelestialEclipseLabControls: View {
                 .accessibilityValue(modeValue("practice"))
                 .accessibilityIdentifier(port.identifier("practice"))
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(mirror.levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -177,37 +230,43 @@ struct CelestialEclipseLabControls: View {
 
     /// Choose the previous or next movable planet.
     @ViewBuilder private var planetRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Planet −") { send("orbit.choose", [Double(mirror.nextBody(-1))]) }
                 .accessibilityLabel("Choose the previous planet")
                 .accessibilityValue(mirror.bodyLabel)
                 .accessibilityIdentifier(port.identifier("planet-minus"))
             Text("body \(mirror.chosenBody)")
+                .accessibilityLabel("Chosen planet")
+                .accessibilityValue(chosenValue)
+                .accessibilityAdjustableAction { direction in adjustPlanet(direction) }
                 .accessibilityIdentifier(port.identifier("planet"))
             Button("Planet +") { send("orbit.choose", [Double(mirror.nextBody(1))]) }
                 .accessibilityLabel("Choose the next planet")
                 .accessibilityValue(mirror.bodyLabel)
                 .accessibilityIdentifier(port.identifier("planet-plus"))
         }
-        Text(mirror.bodyLabel).font(.footnote)
+        Text(mirror.bodyLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("planet-detail"))
     }
 
     /// Move the chosen planet's pending phase back or forward by one (presentation only) and set it (one action).
     @ViewBuilder private var phaseRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Phase −") { movePending(step: -1) }
                 .accessibilityLabel("Move the pending phase back by one")
                 .accessibilityValue(phaseLabel)
                 .accessibilityIdentifier(port.identifier("phase-minus"))
             Text(phaseLabel)
+                .accessibilityLabel("Pending phase")
+                .accessibilityValue(pendingValue)
+                .accessibilityAdjustableAction { direction in adjustPhase(direction) }
                 .accessibilityIdentifier(port.identifier("phase"))
             Button("Phase +") { movePending(step: 1) }
                 .accessibilityLabel("Move the pending phase forward by one")
                 .accessibilityValue(phaseLabel)
                 .accessibilityIdentifier(port.identifier("phase-plus"))
         }
-        HStack(spacing: 16) {
+        row {
             Button("Set phase") { setPhase() }
                 .disabled(!mirror.pendingDiffers)
                 .accessibilityLabel("Set the chosen planet's phase to the pending one")
@@ -215,7 +274,7 @@ struct CelestialEclipseLabControls: View {
                 .accessibilityIdentifier(port.identifier("set-phase"))
             Button("Reset view") { resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
-                .accessibilityValue("presentation only")
+                .accessibilityValue((presenter?.gestures.orbit ?? .authored) == .authored ? "authored" : "orbited")
                 .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
@@ -228,7 +287,7 @@ struct CelestialEclipseLabControls: View {
 
     /// Show an earlier or later tick of the predicted sky, and run the clock.
     @ViewBuilder private var tickRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Tick −") { show(tick: mirror.shownTick - 1) }
                 .accessibilityLabel("Show the sky one tick earlier")
                 .accessibilityValue(mirror.tickLabel)
@@ -244,22 +303,55 @@ struct CelestialEclipseLabControls: View {
                 .accessibilityValue(mirror.measureLabel)
                 .accessibilityIdentifier(port.identifier("run"))
         }
-        Text(mirror.tickLabel).font(.footnote)
+        Text(mirror.tickLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("tick-detail"))
     }
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last phase change or run")
+                .accessibilityValue(actionsMade)
                 .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the phase change or run")
+                .accessibilityValue(actionsMade)
                 .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue(mirror.levelNumber < mirror.frontier ? "level \(mirror.levelNumber + 1)"
+                                    : "no further level open")
                 .accessibilityIdentifier(port.identifier("next-level"))
+        }
+    }
+
+    /// The chosen planet's value in words (feature 466): "body j, phase p of q" (q its period), or "body j, fixed".
+    private var chosenValue: String {
+        if mirror.chosenFixed { return "body \(mirror.chosenBody), fixed" }
+        return "body \(mirror.chosenBody), phase \(mirror.chosenPhase) of \(mirror.chosenPeriod)"
+    }
+
+    /// The pending phase's value in words (feature 466): "pending phase p" (the current phase when none is pending).
+    private var pendingValue: String { "pending phase \(mirror.pendingOffset ?? mirror.chosenPhase)" }
+
+    /// The planet's adjustable action (feature 466): increment and decrement choose the next and previous movable body
+    /// like Planet + and − (`orbit.choose`).
+    private func adjustPlanet(_ direction: AccessibilityAdjustmentDirection) {
+        switch direction {
+        case .increment: send("orbit.choose", [Double(mirror.nextBody(1))])
+        case .decrement: send("orbit.choose", [Double(mirror.nextBody(-1))])
+        @unknown default: break
+        }
+    }
+
+    /// The pending phase's adjustable action (feature 466): increment and decrement move the pending phase forward
+    /// and back by one like Phase + and − (presentation only; Set phase spends the action).
+    private func adjustPhase(_ direction: AccessibilityAdjustmentDirection) {
+        switch direction {
+        case .increment: movePending(step: 1)
+        case .decrement: movePending(step: -1)
+        @unknown default: break
         }
     }
 

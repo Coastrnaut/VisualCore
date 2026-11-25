@@ -20,6 +20,14 @@
 // and paint order face the drawn eye). The eye and view basis do not depend on the aspect, so an orbit change or a
 // preview change (the previewed body and offset, which draw the ghost and the preview timeline) rebuilds the meshes,
 // a resize alone does not.
+//
+// Feature 466 (R02-G17-06) T-R02G1706-005 (FR-R02G1706-004; clarification Q3): the presenter's eased lights
+// (`CelestialEclipseLabLights`) are drawn: the glow gain is multiplied by the glow level and `u_won` is the won level;
+// the halo pulse is asked with Reduce Motion or Reduce Flashing set, so under either the halos hold at 1 and the sky
+// is still between actions. The unlit fallback's geometry takes a won flag, not a level, so the fallback sky blends the
+// colours of the not-won and the won sky part by the won level (`blendedColours(off:on:level:)`; the two parts share
+// their positions, the won look changes colours only) and is rebuilt when that level moves by a tenth or more. Without
+// lights the snapshot's levels are drawn at once.
 #if os(iOS)
 import CelestialEclipseLabCore
 import Foundation
@@ -47,6 +55,13 @@ final class CelestialEclipseLabSkyScene {
     /// The orbit the camera is drawn at (feature 464, presentation only; the gesture controller's). The meshes are
     /// built for the drawn eye, so a new orbit rebuilds them.
     var orbit = CelestialEclipseLabOrbit.authored
+    /// The eased light levels the presenter steps every frame (feature 466): the glow gain is multiplied by
+    /// `lights.glow`, `u_won` is `lights.won`, and the fallback sky's won colours are blended by `lights.won` (rebuilt
+    /// when it moves by a tenth or more). Nil draws the snapshot's levels at once (the renderer tests' default).
+    var lights: CelestialEclipseLabLights?
+
+    /// Whether the halos hold still: Reduce Motion or Reduce Flashing (feature 466).
+    var halosStill: Bool { reduceMotion || reducedFlash }
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads (the preview included), the
     /// orbit, the tier and the fallback.
@@ -64,6 +79,8 @@ final class CelestialEclipseLabSkyScene {
         let orbit: CelestialEclipseLabOrbit
         let tier: Int
         let fallback: Bool
+        /// The won level in tenths, in the fallback only (feature 466): the fallback's colours depend on it.
+        let wonTenths: Int
     }
 
     private var registry: ResourceRegistry?
@@ -125,12 +142,13 @@ final class CelestialEclipseLabSkyScene {
             try drawFallback(camera)
             return
         }
-        let won: Float = snapshot.isWon ? 1 : 0
-        let pulse: Double = CelestialEclipseLabShaders.haloPulse(time: snapshot.time, reduceMotion: reduceMotion)
+        let won = Float(wonLevel(snapshot))
+        let pulse: Double = CelestialEclipseLabShaders.haloPulse(time: snapshot.time, reduceMotion: halosStill)
         lastPulse = pulse
         try drawSky(camera, won: won, pulse: Float(pulse))
-        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
-        let gain = CelestialEclipseLabShaders.glowGain(for: tier)
+        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty; feature 466 eases it by
+        // the glow level.
+        let gain = CelestialEclipseLabShaders.glowGain(for: tier) * (lights?.glow ?? 1)
         guard gain > 0 else { return }
         try drawGlow(camera, gain: gain, won: won, pulse: Float(pulse))
     }
@@ -140,7 +158,24 @@ final class CelestialEclipseLabSkyScene {
         GeometryKey(levelNumber: s.levelNumber, phases: s.phases, shownTick: s.shownTick, chosenBody: s.chosenBody,
                     stage: s.stage, failure: s.failure, matched: s.matched, actionsLeft: s.actionsLeft,
                     previewBody: s.previewBody, previewOffset: s.previewOffset, orbit: orbit, tier: tier.index,
-                    fallback: fallbackReason != nil)
+                    fallback: fallbackReason != nil,
+                    wonTenths: fallbackReason != nil ? Int((wonLevel(s) * 10).rounded(.down)) : 0)
+    }
+
+    /// The won level drawn (feature 466): the eased `lights.won`, or 1 on a won snapshot and 0 otherwise without
+    /// lights.
+    private func wonLevel(_ snapshot: CelestialEclipseLabSceneSnapshot) -> Double {
+        lights?.won ?? (snapshot.isWon ? 1 : 0)
+    }
+
+    /// The colours of the fallback sky at won level `level` (feature 466): each colour of `off` (the not-won part)
+    /// moved toward the same vertex's colour of `on` (the won part) by `level`, clamped to 0 … 1 (a non-finite level
+    /// reads 0). Parts of different sizes cannot be blended vertex by vertex: then `on`'s colours from a level of 0.5
+    /// up, `off`'s below. Pure.
+    static func blendedColours(off: [Vec4], on: [Vec4], level: Double) -> [Vec4] {
+        let t: Double = level.isFinite ? min(max(level, 0), 1) : 0
+        guard off.count == on.count else { return t >= 0.5 ? on : off }
+        return zip(off, on).map { a, b in a + (b - a) * t }
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier` seen from `camera`: the two programs, or the unlit fallback.
@@ -174,9 +209,16 @@ final class CelestialEclipseLabSkyScene {
         // included; level-2 has no glow).
         let minimal = CelestialEclipseLabTier.of(CelestialEclipseLabTier.all.count - 1)
         let up = Vec3(0, 0, 1)
-        let parts: [CelestialEclipseLabColouredMesh] = [
-            try CelestialEclipseLabSceneGeometry.skyPart(snapshot, tier: minimal, camera: camera),
-            try CelestialEclipseLabSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
+        // Feature 466: the sky's won colours blended by the won level (the won look changes colours, not positions).
+        let off = try CelestialEclipseLabSceneGeometry.skyPart(snapshot, tier: minimal, wonLevel: false, camera: camera)
+        let on = try CelestialEclipseLabSceneGeometry.skyPart(snapshot, tier: minimal, wonLevel: true, camera: camera)
+        let level: Double = wonLevel(snapshot)
+        // Parts of different sizes switch whole at a level of 0.5 (see `blendedColours(off:on:level:)`).
+        let skyMesh: Mesh = off.colours.count == on.colours.count || level < 0.5 ? off.mesh : on.mesh
+        let glow = try CelestialEclipseLabSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera)
+        let parts: [(mesh: Mesh, colours: [Vec4])] = [
+            (skyMesh, Self.blendedColours(off: off.colours, on: on.colours, level: level)),
+            (glow.mesh, glow.colours),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh
