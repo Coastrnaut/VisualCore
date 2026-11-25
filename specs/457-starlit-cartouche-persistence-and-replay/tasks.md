@@ -14,7 +14,7 @@ its convergence lesson (a restored replay validated against its trace) taken int
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1607-002 [P] [US2] Edit `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheProgress.swift`
+- [X] T-R02G1607-002 [P] [US2] Edit `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheProgress.swift` — Verified 2026-11-24: 2026-11-24 host-1 exit 0 (Reconciliation 13 and Progress tests; agent A's files retested by the lead in the merged copy, 230 tests)
   (Result gains "trace: [StarlitCartoucheAction]" (effective legs, each `.leg(star, wait)`) and "verified: Bool";
   `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing only when better (ties keep the
   earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace = empty, missing verified =

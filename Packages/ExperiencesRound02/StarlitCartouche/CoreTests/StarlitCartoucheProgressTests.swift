@@ -422,8 +422,8 @@ import VisualCoreSimulation
         #expect(decoded == progress)
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
-        #expect(text == "{\"frontier\":4,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3},"
-            + "{\"actionsSpent\":5,\"level\":3,\"stars\":2}]}")
+        #expect(text == "{\"frontier\":4,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3,\"trace\":[],"
+            + "\"verified\":false},{\"actionsSpent\":5,\"level\":3,\"stars\":2,\"trace\":[],\"verified\":false}]}")
         let empty: Progress = try decoder.decode(Progress.self, from: try Progress().encoded())
         #expect(empty == Progress())
 
@@ -457,7 +457,9 @@ import VisualCoreSimulation
             #expect(throws: (any Error).self) { try decoder.decode(Progress.self, from: Data(text.utf8)) }
         }
         let badModes: [String] = [
-            "{\"mode\":\"replay\",\"level\":1}",
+            "{\"mode\":\"replay\",\"level\":0}",
+            "{\"mode\":\"replay\"}",
+            "{\"mode\":\"rerun\",\"level\":1}",
             "{\"mode\":\"daily\"}",
             "{\"mode\":\"daily\",\"level\":0}",
             "{\"mode\":\"daily\",\"level\":101}"
