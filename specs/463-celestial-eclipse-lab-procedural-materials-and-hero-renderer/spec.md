@@ -20,9 +20,9 @@ Canonical overrides:
   FR-R02G1703-###, SC-R02G1703-###, T-R02G1703-###.
 - **Packaging (ADR-0009):** the source's `Apps/CelestialEclipseLab` becomes the experience target
   `CelestialEclipseLabExperience` (with its tests) in `Packages/ExperiencesRound02/CelestialEclipseLab/Experience`
-  beside the existing `CelestialEclipseLabCore` (the source's `Packages/GameModules/CelestialEclipseLabCore`); the experience
-  `r02-g17.celestial-eclipse-lab` (free) is registered in the catalog as a candidate (not available) and linked into the
-  one app, as Starlit Cartouche was at R02-G16-03; it becomes available only at its gate X-R02-G17.
+  beside the existing `CelestialEclipseLabCore` (the source's `Packages/GameModules/CelestialEclipseLabCore`); the
+  experience `r02-g17.celestial-eclipse-lab` (free) is registered in the catalog as a candidate (not available) and
+  linked into the one app, as Starlit Cartouche was at R02-G16-03; it becomes available only at its gate X-R02-G17.
 - **Superseded parts of the source prompt:** price and "no IAP" (free under the shared purchase controller); the Round 2
   lock and per-round device campaign (ImplementationLock-100); "content count 74" is a milestone figure — the catalog is
   the 100 certified levels of R02-G17-02. **Device-only items:** frame-time and thermal budgets on D1/D2/D3, recorded as
