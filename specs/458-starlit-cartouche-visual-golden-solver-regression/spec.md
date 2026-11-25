@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G16-08 (migration ledger, game feature of experience R02-G16) · ID namespace FR-R02G1608-###,
 SC-R02G1608-###, T-R02G1608-###
@@ -22,6 +22,66 @@ Canonical overrides:
   "content count 80" milestone figure (the catalog has 100 certified levels). **Device-only items:** frame time and
   memory on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 448 (Voxel Origami's visual golden and solver regression).
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+448's answers where the games agree. Facts checked in code (read-only, 2026-11-25): `StarlitCartoucheSolver.plan`
+certifies a level by a breadth-first search over route states (the ship's star, the beat, the strokes drawn) from its
+start (star `start`, beat 0, nothing drawn), each state's legs tried corridors by index then waits 0 … 8, a leg kept
+only when the chart accepts it and finds no failure, states merged by star, beat and strokes, at most 7 legs
+(`maxLegs`) and 300,000 legs tried (`workBound`), returning `legs`, `statesByDepth` and `work`; certifying one level
+takes a few milliseconds in a debug build; the 100 witness files in `docs/games/starlit-cartouche/levels/` hold the
+number, the level (stars on orbits, range, corridors, hazards, start, beacon, deadline, symbol, budget, tutorial,
+fingerprint), the actions (the plan's legs; the last one wins), the per-action digests, the fingerprints after `begin`,
+after `dismissTutorial` on a tutorial level and after each action, the counterexample (`depth` = size − 1 and `states`),
+the difficulty and the skipped candidate count, byte-checked by `StarlitCartoucheCatalogTests` with the catalog digest
+pinned; the simulator frame checks of feature 453 compare rendered frames with the CPU reference (a star's centre
+brighter than the backdrop by 0.25 in luminance, the ship's centre with blue above red by 0.08, the first actions bar
+0.1 from the backdrop, each point at least 6 px from what is drawn after it) at 1,152 × 768; the palette has 22 named
+colours (`night` … `glow`); `StarlitCartoucheChartScene.release()` frees every renderer, the next draw rebuilds them and
+`liveObjectCount` counts them; `ProcessMemory.footprint()` reads the footprint; the CI job `round02-host-tests` has a
+named regression step per earlier round-two game (Voxel Origami's the latest).
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's legs replay on a fresh
+  play to a win on exactly the last leg and not before, within the budget, with exactly its per-action fingerprints and
+  digests; and `plan` returns exactly the witness's legs with `statesByDepth[size − 1]` equal to the counterexample's
+  `states` at depth size − 1; `work` is at most `workBound` (counted, never timed). The run is split into tests of 10
+  levels (10 tests), each well under 10 s. Impact: FR-R02G1608-001; SC-R02G1608-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a star's orbit, a corridor's ends, a hazard, the
+  range, the beacon, the deadline, a symbol stroke, the budget; a plan leg; a witness action, a per-action fingerprint
+  or digest; the counterexample's state count. Impact: FR-R02G1608-002; SC-R02G1608-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after all of the witness's legs but the last, so the symbol is
+  part drawn, at least one action is spent from the actions bars and the level is not yet won, at presentation time 0,
+  the default choice, the authored camera, plus the hero frame of the scenario manifest's hero scenario at tier 0: 16
+  frames) the Core computes, at 1,152 × 768, the projected pixel positions of every star at the current beat, the ship,
+  the beacon, the midpoint of every drawn stroke and the first actions bar, rounded to 1/8 pixel, the counts of stars,
+  corridors, hazards, active hazards, symbol strokes, drawn strokes, lit and total actions bars, and the 22 palette
+  colours as 8-bit sRGB; serialized as JSON with sorted keys and hashed with SHA-256. The 16 descriptions and their
+  digests live in `Packages/ExperiencesRound02/StarlitCartouche/golden-frames.json`; the host test recomputes each: an
+  equal digest passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every count
+  and colour must be equal, or the test fails naming the frame and the first differing value; each pinned digest must
+  also equal the digest of its pinned description. The file is rewritten only when `STARLIT_CARTOUCHE_WRITE_GOLDEN=1` is
+  set. The simulator test renders the 16 frames and checks them against the same descriptions with the feature-453
+  tolerances. Impact: FR-R02G1608-003, 004; SC-R02G1608-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_STARLIT_CARTOUCHE_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU
+  objects of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a
+  named reason. Impact: FR-R02G1608-005; SC-R02G1608-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's `round02-host-tests` job keeps running all
+  round-two host tests and adds a named step "Starlit Cartouche regression (host)" that runs the Starlit Cartouche
+  regression filter alone. The local command `python3 scripts/starlit_cartouche_regression.py` runs the host regression
+  filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`, and prints one
+  summary line per part with pass or fail and the first failing name; its exit code is non-zero on any failure. Nothing
+  is timed against the wall clock. Impact: FR-R02G1608-006, 007; SC-R02G1608-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -70,11 +130,11 @@ A player who opens and closes the game many times, or plays a long session, does
 ends it.
 
 **Independent Test**: on the simulator, opening, drawing and closing the experience repeatedly and receiving memory
-warnings keeps the app's memory footprint within a stated bound after warm-up and releases the game's GPU objects.
+warnings keeps the app's memory footprint within 16 MB of the first cycle and releases the game's GPU objects.
 
 **Acceptance Scenarios**:
 
-1. **Given** repeated open-draw-warn-close cycles, **When** the footprint is read after each, **Then** every reading
+1. **Given** 12 open-draw-warn-close cycles, **When** the footprint is read after each, **Then** every reading
    after the first stays within the bound of the first, and no GPU object of the game remains after a close or a
    warning.
 
@@ -97,8 +157,8 @@ simulator parts and reports one summary.
 - **A baseline that must change on purpose** (a deliberate visual change): regenerating it is an explicit step with an
   environment switch, never automatic, and the new digest is committed with the change.
 - **A search that would exceed its bound:** the check fails with the level number instead of hanging.
-- **The deepest levels:** the longest band-5 searches are the most expensive, so the solver part runs in groups small
-  enough that every test stays under 10 seconds.
+- **The deepest levels:** the longest band-5 searches are the most expensive, so the solver part runs in groups of 10
+  levels and every test stays under 10 seconds.
 - **Frames at a tier whose detail differs:** each tier has its own description; positions shared by all tiers are
   checked against the same reference.
 - **Memory measurement noise:** the bound applies after a warm-up cycle, not to a single sample.
@@ -119,14 +179,15 @@ simulator parts and reports one summary.
 - **FR-R02G1608-002**: An altered level, plan or witness MUST make the regression fail, naming the level and the
   differing part.
 - **FR-R02G1608-003**: A golden set of frames (levels, tiers, frame times, including the hero frame) MUST have a
-  code-computed description (projected positions of the stars, the ship, the beacon and the first actions bar, the
-  counts of the drawn elements, palette colours) pinned in the repository with its digest; a recomputed description
+  code-computed description (projected positions of the stars, the ship, the beacon, the drawn strokes' midpoints and
+  the first actions bar, the counts of stars, corridors, hazards, active hazards, symbol and drawn strokes and lit and
+  total actions bars, palette colours) pinned in the repository with its digest; a recomputed description
   matches when its digest is equal or every position lies within one 1/8-pixel quantum and every count and colour is
   equal.
 - **FR-R02G1608-004**: Rendered frames of the golden set on the simulator MUST match their descriptions within the
   tolerances of User Story 2; regenerating a baseline MUST need an explicit switch.
 - **FR-R02G1608-005**: Repeatedly opening, drawing, closing the experience and memory warnings MUST keep the footprint
-  growth within a stated bound and MUST release the game's GPU objects.
+  growth within 16 MB of the first cycle and MUST release the game's GPU objects.
 - **FR-R02G1608-006**: The continuous-integration workflow MUST run the host part of the regression on every push; one
   documented local command MUST run the host and simulator parts with one summary.
 - **FR-R02G1608-007**: The regression MUST be deterministic (fixed seeds, no clock, no random source) and short (each
@@ -148,11 +209,11 @@ simulator parts and reports one summary.
 
 - **SC-R02G1608-001**: All 100 levels replay their witnesses and re-plan to their certified legs within the search's
   work bound; 100 of 100.
-- **SC-R02G1608-002**: Each kind of alteration of a level part, a plan leg and a witness part is detected and named.
+- **SC-R02G1608-002**: Each of the twelve kinds of alteration listed in the clarifications is detected and named.
 - **SC-R02G1608-003**: The golden set covers 5 levels × 3 tiers plus the hero frame (16 frames); every rendered frame
   matches its description within tolerance and every recomputed description matches its pinned entry.
-- **SC-R02G1608-004**: Over the memory cycles, every footprint reading after the first stays within the stated bound of
-  the first, and the game's GPU objects are released after each close and each memory warning.
+- **SC-R02G1608-004**: Over 12 open-draw-warn-close cycles, every footprint reading of cycles 2 … 12 stays within 16 MB
+  of cycle 1's, and the game's GPU objects are released after each close and each memory warning.
 - **SC-R02G1608-005**: The workflow runs the host part on every push and passes; the local command runs all parts and
   prints one summary.
 - **SC-R02G1608-006**: Existing tests pass; the reference regression passes 7 of 7; each test finishes in under 10
