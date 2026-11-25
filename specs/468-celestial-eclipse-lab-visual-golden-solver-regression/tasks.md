@@ -77,7 +77,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 - [X] T-R02G1708-007 Docs: `docs/architecture/celestial-eclipse-lab.md` (regression net), — Verified 2026-11-25: 2026-11-25 round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G17-08.round02-host-*.json); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the chunks of T-001)
-- [ ] T-R02G1708-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1708-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G17-08.*.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1708-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1708-010 Reference regression chunk 2 (`--name reference-2`)
