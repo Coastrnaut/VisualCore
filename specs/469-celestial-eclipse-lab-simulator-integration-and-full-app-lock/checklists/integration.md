@@ -14,10 +14,11 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-25, follo
 - [x] CHK001 Is every panel control the tests use named with its exact identifier and the shared prefix, and is the full
   list required to be pinned and unique? [Completeness, Spec §Clarifications Q1; FR-R02G1709-001]
 - [x] CHK002 Is the end-to-end journey stated step by step (open, dismiss tutorial, choose each body and move its
-  pending phase, Set phase, Run, win, stars, next level open, relaunch, replay, stop)? [Completeness, Spec §US1; Clarifications Q2]
+  pending phase, Set phase, Run, win, stars, next level open, relaunch, replay, stop)? [Completeness, Spec §US1;
+  Clarifications Q2]
 - [x] CHK003 Is what the tests read named (the canvas description phrase "Every target eclipse came in order inside its
-  window.", the `stars` text "Best: 3 of 3 stars", the `actions` text, the planet and phase controls' values)? [Clarity, Spec
-  §Clarifications Q1, Q2]
+  window.", the `stars` text "Best: 3 of 3 stars", the `actions` text, the planet and phase controls' values)? [Clarity,
+  Spec §Clarifications Q1, Q2]
 - [x] CHK004 Is the save point before a relaunch addressed (background before terminate)? [Edge Case, Spec §Edge Cases]
 
 ## Level 1 constants
@@ -30,8 +31,8 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-25, follo
 
 - [x] CHK006 Are both earlier schemas (1 and 2) covered with their contents and the expected restore result?
   [Completeness, Spec §FR-R02G1709-003; data-model]
-- [x] CHK007 Is the registration comment ("examples ... at its in-app integration (R02-G17-09)") required to be updated? [Consistency, Spec
-  §Clarifications Q3]
+- [x] CHK007 Is the registration comment ("examples ... at its in-app integration (R02-G17-09)") required to be updated?
+  [Consistency, Spec §Clarifications Q3]
 
 ## Release and availability
 
@@ -54,8 +55,8 @@ Evaluated by the lead under the owner's standing delegation on 2026-11-25, follo
   dropped? [Consistency, Spec §Clarifications Q2]
 - [x] CHK016 Is the way each certified action is played stated (choose the body and move its pending phase by their
   controls' values, then tap Set phase, reading the actions-left count before and after and counting a press only when
-  it moves, then Run), and is it stated that choosing a body or moving the pending phase spends no action? [Clarity, Spec §Clarifications Q2; §Edge Cases "A lost
-  tap"; research R2]
+  it moves, then Run), and is it stated that choosing a body or moving the pending phase spends no action? [Clarity,
+  Spec §Clarifications Q2; §Edge Cases "A lost tap"; research R2]
 
 ## Scope
 
