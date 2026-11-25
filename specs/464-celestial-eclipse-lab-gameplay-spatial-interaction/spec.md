@@ -79,7 +79,11 @@ brackets at y −1.05, and paints by kind (rings, bodies and shadow lenses by di
   geometry draws the ghost; host tests feed 500 seeded taps, phase drags and dial drags on certified levels at several
   sizes and orbits against an independent pick in the test; simulator tests send touches through the experience's
   pointer entry; a host test wins all 100 certified levels through panel actions alone (planet − and +, phase − and +,
-  run). Impact: FR-R02G1704-005, 008, 009; SC-R02G1704-001 … 005.
+  "Set phase", run). The panel's phase − and + no longer send a phase change each (every change costs an action, so
+  stepping to a far orbit position could exceed the budget): they move the chosen planet's pending offset (the same
+  presentation-only preview as a drag, wrapping 0 … period − 1), and a new "Set phase"
+  button sends exactly one `orbit.phase [body, pending offset]` when it differs from the current phase (the checklist's
+  CHK013 found this, 2026-11-25). Impact: FR-R02G1704-005, 008, 009; SC-R02G1704-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -129,8 +133,8 @@ changes.
 
 ### User Story 5 - Every move without gestures (Priority: P1)
 
-A player who cannot touch precisely can do everything through the labelled panel (planet − and +, phase − and +, tick −
-and +, run, undo, redo, next level, "Reset view"), including winning every certified level.
+A player who cannot touch precisely can do everything through the labelled panel (planet − and +, phase − and + with
+"Set phase", tick − and +, run, undo, redo, next level, "Reset view"), including winning every certified level.
 
 **Independent Test**: all 100 certified witnesses are replayed through panel actions on the host and win.
 
@@ -167,8 +171,9 @@ and +, run, undo, redo, next level, "Reset view"), including winning every certi
   a 5 % margin at every aspect 0.4 … 2.5 and never enter the digest, the snapshot's game state or the kernel; a double
   tap on empty space or "Reset view" returns to the authored view.
 - **FR-R02G1704-007**: Gestures on a finished play, cancelled touches and second fingers MUST send no kernel action.
-- **FR-R02G1704-008**: The panel MUST keep every action available without gestures and gain "Reset view"; every
-  certified witness MUST be replayable through panel actions.
+- **FR-R02G1704-008**: The panel MUST keep every action available without gestures and gain "Reset view" and "Set
+  phase" (phase − and + move a previewed pending offset; "Set phase" commits it as one action); every certified witness
+  MUST be replayable through panel actions within its budget.
 - **FR-R02G1704-009**: Gestures MUST be tested on the host by scripted pointer sequences and on the simulator through
   the experience's pointer entry; existing tests pass; every new public name is documented; refusals are logged with
   their reason code. Undo and redo stay the kernel's exact undo and redo through the panel.
