@@ -923,5 +923,8 @@ over phase vectors). Feature 462 (R02-G17-02) adds the content pipeline: `Celest
 planned levels), `CelestialEclipseLabGenerator` (seeded candidates by band on integer orbits, the neighbour rule),
 `CelestialEclipseLabSolver` (a phase search by number of changes over a pair-interval table, with a counted minimality
 proof), `CelestialEclipseLabDifficulty` and `CelestialEclipseLabWitness`, with the 100 witness files in
-`docs/games/celestial-eclipse-lab/levels/`. See
+`docs/games/celestial-eclipse-lab/levels/`. Feature 463 (R02-G17-03) adds the hero renderer
+(`CelestialEclipseLabSceneSnapshot`, `CelestialEclipseLabSceneGeometry` with the shadow lens,
+`CelestialEclipseLabShaders`), the adapter `CelestialEclipseLabExperienceCore`, the scenarios and the iOS target `CelestialEclipseLabExperience`,
+registered as a candidate until X-R02-G17. See
 [docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).

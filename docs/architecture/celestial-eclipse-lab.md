@@ -53,3 +53,27 @@ later features.
   level, the actions and the run, a state digest after every action, the play fingerprints, the terminal timeline with
   visibility classes, the counterexample, the difficulty and the candidates skipped; decoding re-checks everything by
   replay. The catalog digest over the 100 fingerprints is pinned; the progression rule holds and band means never fall.
+
+## Hero renderer and candidate experience (feature 463, R02-G17-03)
+
+- **Snapshot and purity.** `CelestialEclipseLabSceneSnapshot` copies what the renderer may read: the bodies, the current
+  phases, every body's lattice position at the shown tick, the eclipses under way at that tick with their classes, the
+  target, the predicted intervals and matched count, the failure, the shown tick, the chosen body, the stage, actions
+  left, budget, level number and presentation time. The renderer never holds the kernel.
+- **The sky.** Lattice positions map to world space by w(v) = (v − m) · s, m the centre of the bounding box of every
+  orbit position widened by each body's radius, s = 1.5 / (e + 1). Drawn back to front by camera distance: the ink-navy
+  backdrop with sparse specks, the orbital rings with notches ((index mod 6) + 1) and square frames for fixed bodies,
+  the ivory body spheres with layered shading, the shadow lens of every eclipse under way (the exact intersection of the
+  two projected circles, generated as geometry between the back and the front body, so the crescent seen is the overlap
+  judged), corona-gold halos for total and annular eclipses, the dashed chosen ring, and below the sky the timeline
+  (window brackets, matched diamonds, the failing cross, the playhead) and the actions bars. The shared mesh renderer
+  binds only position, normal and uv, which is why the crescent is geometry rather than a shader mask.
+- **Tiers.** `level-0` spheres of 24 × 16 segments and 2 glow shells, `level-1` 16 × 12 and 1 shell, `level-2` flat
+  20-sided discs and no glow; everything else is identical at every tier.
+- **Experience.** `CelestialEclipseLabExperienceCore` adapts the kernel (`orbit.phase`, `clock.run`, `play.undo`,
+  `play.redo`, `level.next`, `orbit.choose`, `clock.show`; digest = level number and play fingerprint; snapshot schema
+  1) and opens certified level (seed mod 100) + 1 from the witnesses' candidate indices. The iOS target
+  `CelestialEclipseLabExperience` has the presenter (tier log, fallback, Reduce Motion and Reduce Flashing, probes), the
+  GL sky scene and a minimal control panel. Registered as a candidate (not available) until X-R02-G17, with the scenario
+  manifest of 94 scenarios including the 80 acceptance rows.
+

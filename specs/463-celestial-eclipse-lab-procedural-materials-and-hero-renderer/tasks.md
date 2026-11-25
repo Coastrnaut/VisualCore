@@ -113,7 +113,7 @@ pass.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1703-007 Docs: `docs/architecture/celestial-eclipse-lab.md` (renderer and experience),
+- [X] T-R02G1703-007 Docs: `docs/architecture/celestial-eclipse-lab.md` (renderer and experience), — Verified 2026-11-25: 2026-11-25 architecture renderer section, round-two README and automatedtesting entry written; round02-host-1, -2, -3c, -3e, -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G1703-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
@@ -132,3 +132,9 @@ pass.
 draft in isolated copies before 001 (new files only). MVP: Stories 1 and 2. Requirement coverage: FR-001, 002 → 003,
 004; FR-003 → 002, 005; FR-004 → 002, 003, 004, 006; FR-005 → 005; FR-006 → 004, 006; FR-007 → 006; FR-008 → 006;
 FR-009 → 007 … 011.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G1703-014 Light the window brackets from `u_won` in the sky fragment shader of
+  `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabShaders.swift` (as the fallback colours do),
+  with a source test, per Spec Edge Cases "a won level" (partial)
