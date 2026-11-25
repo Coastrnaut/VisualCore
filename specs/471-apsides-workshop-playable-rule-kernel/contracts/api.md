@@ -18,10 +18,13 @@ public struct ApsidesWorkshopPlanet: Sendable, Hashable, Codable { public let x:
     public let radius: Int }
 public enum ApsidesWorkshopApsis: String, Sendable, Codable, CaseIterable { case periapsis, apoapsis }
 public enum ApsidesWorkshopTarget: Sendable, Hashable, Codable {
-    case sweep(sector: Int, low: Int, high: Int); case apsis(ApsidesWorkshopApsis, sector: Int, near: Int, far: Int) }
+    case sweep(sector: Int, low: Int, high: Int)
+    case apsis(ApsidesWorkshopApsis, sector: Int, near: Int, far: Int) }
 public enum ApsidesWorkshopFailure: Sendable, Hashable, Codable {
-    case contact(planet: Int, tick: Int); case order(target: Int, tick: Int); case share(target: Int, tick: Int, share: Int)
-    case apsisSector(target: Int, sector: Int); case apsisDistance(target: Int, distance: Int); public var code: String }
+    case contact(planet: Int, tick: Int); case order(target: Int, tick: Int)
+    case share(target: Int, tick: Int, share: Int)
+    case apsisSector(target: Int, sector: Int); case apsisDistance(target: Int, distance: Int)
+    public var code: String }
 public struct ApsidesWorkshopReport: Sendable, Equatable { public let positions: [ApsidesWorkshopPoint]
     public let shares: [Int]; public let largestResidual: Int64; public let eventTicks: [Int]
     public let deviations: [Int]; public let failure: ApsidesWorkshopFailure?; public var wins: Bool { get } }
@@ -51,7 +54,8 @@ public struct ApsidesWorkshopPlay: Sendable, Equatable {
     public let level: ApsidesWorkshopLevel
     public private(set) var stage: ApsidesWorkshopStage, orbit: ApsidesWorkshopOrbit, actionsSpent: Int,
         report: ApsidesWorkshopReport, failure: ApsidesWorkshopFailure?, records: [ApsidesWorkshopRecord]
-    public var actionsLeft: Int { get }; public var fingerprint: String { get }; public var canUndo, canRedo: Bool { get }
+    public var actionsLeft: Int { get }; public var fingerprint: String { get }
+    public var canUndo, canRedo: Bool { get }
     public init(level: ApsidesWorkshopLevel)
     public mutating func handle(_ event: ApsidesWorkshopEvent) throws(ApsidesWorkshopError)
     public mutating func apply(_ action: ApsidesWorkshopAction, expecting previous: String)

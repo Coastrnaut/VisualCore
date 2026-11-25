@@ -61,14 +61,13 @@ Packages/ExperiencesRound02/Package.swift                                       
 Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopError.swift           new   (lead)
 Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopFixed.swift           new   fixed point, Kepler (lead)
 Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopOrbit.swift           new   orbit, sectors, judge (lead)
-Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopLevel.swift           new   level, words, stored form (lead)
-Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopPlay.swift            new   play, records, replay (B)
-Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopRules.swift           new   PuzzleRules (C)
+Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopLevel.swift           new   level, words, stored form
+(lead) Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopPlay.swift            new   play, records, replay
+(B) Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopRules.swift           new   PuzzleRules (C)
 Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopFixtures.swift   new   seeded levels (lead)
-Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/{ApsidesWorkshopLevelTests (lead), …OrbitTests (A),
-  …PlayTests (B), …RulesTests (C), …InvariantTests (D)}.swift
-docs/architecture/apsides-workshop.md (new), Packages/ExperiencesRound02/README.md, docs/automatedtesting.md (lead)
-```
+Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/{ApsidesWorkshopLevelTests (lead), …OrbitTests (A), …PlayTests
+(B), …RulesTests (C), …InvariantTests (D)}.swift docs/architecture/apsides-workshop.md (new),
+Packages/ExperiencesRound02/README.md, docs/automatedtesting.md (lead) ```
 
 **Migration**: none (schema 1 is new). **Rollback**: revert the commits; the other games' targets are untouched.
 

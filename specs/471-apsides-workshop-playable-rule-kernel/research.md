@@ -16,17 +16,18 @@
 - **R4 Octant sectors.** Decision: 8 sectors of 45°, decided by signs and |x| against |y|, the boundary ray belonging
   to the sector it begins. Rationale: exact integer classification without trigonometry; apsis sectors follow from the
   direction step exactly (⌊d/3⌋), because 15° divides 45°.
-- **R5 Triangle quadrature.** Decision: one triangle star → P(t) → P(t + 1) per tick, its doubled area the integer
-  cross product, counted for the sector of P(t); shares in tenths of a percent rounded down. Rationale: "area swept via
-  quadrature" made exact; by Kepler's second law each tick sweeps nearly the same area, so the share reads as time spent.
+- **R5 Triangle quadrature.** Decision: one triangle star → P(t) → P(t + 1) per tick, its doubled area the integer cross
+  product, counted for the sector of P(t); shares in tenths of a percent rounded down. Rationale: "area swept via
+  quadrature" made exact; by Kepler's second law each tick sweeps nearly the same area, so the share reads as time
+  spent.
 - **R6 Strict segment contact.** Decision: contact when the planet centre's distance to a tick segment is strictly below
   its radius, decided with integer dot and cross products. Rationale: grazing is safe, as touching discs are in feature
   461; the chord between ticks is the drawn path.
 - **R7 Event ticks for the order.** Decision: a sweep's event tick is the first tick in its sector, periapsis 0,
   apoapsis T/2; targets must have non-decreasing event ticks. Rationale: "satisfied in order" and "a sequence of
   prescribed sky sectors" become the orbiter's visiting order from periapsis.
-- **R8 Play as the commitment.** Decision: tunings cost actions and keep the level playing; `play` costs nothing and ends
-  it; the predicted outcome is reported after every action. Rationale: the orbit decides everything, as the phases do
-  in feature 461.
+- **R8 Play as the commitment.** Decision: tunings cost actions and keep the level playing; `play` costs nothing and
+  ends it; the predicted outcome is reported after every action. Rationale: the orbit decides everything, as the phases
+  do in feature 461.
 - **R9 Fingerprints as the signed snapshot.** Decision: the play fingerprint (SHA-256 of schema, level fingerprint,
   orbit, actions spent, stage, failure) and records with previous and next fingerprints, as feature 461.
