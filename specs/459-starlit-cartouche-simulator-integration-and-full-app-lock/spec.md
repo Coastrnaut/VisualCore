@@ -31,22 +31,22 @@ Canonical overrides:
 
 Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
 449's answers where the games agree. Facts checked in code (read-only, 2026-11-25): feature 449 (Voxel Origami) is the
-model (`Apps/VisualCore/Tests/UI/VoxelOrigami`, namespace `VO`, serial chunk `x3`; `VoxelOrigamiControls.identifierNames`;
-`VoxelOrigamiSchemaExamples.swift`); Starlit Cartouche's panel (`StarlitCartoucheControls`) already gives every control
-a label, a value and an identifier through `port.identifier(name)` (features 453–457: `star`, `star-minus`,
-`star-plus`, `wait`, `wait-minus`, `wait-plus`, `fly`, `leg-detail`, `undo`, `redo`, `next-level`, `reset-view`,
-`dismiss-tutorial`, `hint`, `failure-undo`, `retry`, `campaign`, `daily`, `practice`, `level-picker`, `play-level`,
-`replay`, `replay-step`, `replay-stop`, `sound`, and the text elements `summary`, `status`, `actions`, `pending`,
-`progress`, `message`, `failure`, `explanation`, `instruction`, `hint-text`, `goal`, `replay-position` — 37 names), but
-no list of those names is pinned; the registration in `Apps/VisualCore/App/ExperienceRegistry.swift` stores no
-examples yet and says they come at R02-G16-09 (the snapshot is schema 3 since feature 457; migration 1 → 2 adds
-progress, the mode and the tutorial to `{level, records}`; 2 → 3 adds the sound choice and traces); the canvas
-description of a won level says "The trail draws the symbol and the ship rests at the beacon." followed by " Stars: k
-of 3."; level 1's certified witness is two legs from star 1, to star 4 after 1 beat and to star 5 after 0 beats (budget
-9), so the tests choose each destination with Star + or Star − (reading the star control's value) and the wait with
-Wait + or Wait − (reading the wait control's value), then press Fly; the `actions` text reads "Level n · a of b actions
-left"; the tutorial shows on levels 1 … 3; the UI chunk keys in `release_check.py` end at `x3` (`y3` is free); no UI
-test class uses the prefix `SC`.
+model (`Apps/VisualCore/Tests/UI/VoxelOrigami`, namespace `VO`, serial chunk `x3`;
+`VoxelOrigamiControls.identifierNames`; `VoxelOrigamiSchemaExamples.swift`); Starlit Cartouche's panel
+(`StarlitCartoucheControls`) already gives every control a label, a value and an identifier through
+`port.identifier(name)` (features 453–457: `star`, `star-minus`, `star-plus`, `wait`, `wait-minus`, `wait-plus`, `fly`,
+`leg-detail`, `undo`, `redo`, `next-level`, `reset-view`, `dismiss-tutorial`, `hint`, `failure-undo`, `retry`,
+`campaign`, `daily`, `practice`, `level-picker`, `play-level`, `replay`, `replay-step`, `replay-stop`, `sound`, and the
+text elements `summary`, `status`, `actions`, `pending`, `progress`, `message`, `failure`, `explanation`, `instruction`,
+`hint-text`, `goal`, `replay-position` — 37 names), but no list of those names is pinned; the registration in
+`Apps/VisualCore/App/ExperienceRegistry.swift` stores no examples yet and says they come at R02-G16-09 (the snapshot is
+schema 3 since feature 457; migration 1 → 2 adds progress, the mode and the tutorial to `{level, records}`; 2 → 3 adds
+the sound choice and traces); the canvas description of a won level says "The trail draws the symbol and the ship rests
+at the beacon." followed by " Stars: k of 3."; level 1's certified witness is two legs from star 1, to star 4 after 1
+beat and to star 5 after 0 beats (budget 9), so the tests choose each destination with Star + or Star − (reading the
+star control's value) and the wait with Wait + or Wait − (reading the wait control's value), then press Fly; the
+`actions` text reads "Level n · a of b actions left"; the tutorial shows on levels 1 … 3; the UI chunk keys in
+`release_check.py` end at `x3` (`y3` is free); no UI test class uses the prefix `SC`.
 
 - Q: How do the interface tests find controls and what do they read? → A: through the identifiers the panel already
   carries (`experience.r02-g16.starlit-cartouche.<name>`); this feature pins the full list as
@@ -56,15 +56,15 @@ test class uses the prefix `SC`.
   replay position. Impact: FR-R02G1609-001, 002.
 - Q: Which interface tests exist and how are they grouped? → A: namespace `SC` in
   `Apps/VisualCore/Tests/UI/StarlitCartouche/SCSupport.swift`; `SCPlayUITests` (fresh launch with `-vcResetData
-  -vcSkipWelcome -vcCandidates -openExperience r02-g16.starlit-cartouche`: dismiss the tutorial, play level 1's certified
-  legs by choosing each destination and wait and pressing Fly (counting a press only when the actions-left count
-  moves); read "The trail draws the symbol and the ship rests at the beacon." and "Stars: 3 of 3.", the level picker
-  shows level 2 open; relaunch without reset after sending the app to the background: the stars and level 2 are kept)
-  and `SCReplayUITests` (after the win, Replay best solution, Step until the replay ends won, Stop back to the campaign).
-  They run as a new serial chunk `y3` of `release_check.py` (its key checked unique); each test stays under 90 s apart
-  from the simulator's automation-session setup of each app launch (about 30 s per launch, and a relaunch test launches
-  twice). Level 1's certified legs are pinned in `SC` and checked against the Core by an app unit test. Impact:
-  FR-R02G1609-002, 007; SC-R02G1609-001.
+  -vcSkipWelcome -vcCandidates -openExperience r02-g16.starlit-cartouche`: dismiss the tutorial, play level 1's
+  certified legs by choosing each destination and wait and pressing Fly (counting a press only when the actions-left
+  count moves); read "The trail draws the symbol and the ship rests at the beacon." and "Stars: 3 of 3.", the level
+  picker shows level 2 open; relaunch without reset after sending the app to the background: the stars and level 2 are
+  kept) and `SCReplayUITests` (after the win, Replay best solution, Step until the replay ends won, Stop back to the
+  campaign). They run as a new serial chunk `y3` of `release_check.py` (its key checked unique); each test stays under
+  90 s apart from the simulator's automation-session setup of each app launch (about 30 s per launch, and a relaunch
+  test launches twice). Level 1's certified legs are pinned in `SC` and checked against the Core by an app unit test.
+  Impact: FR-R02G1609-002, 007; SC-R02G1609-001.
 - Q: Which earlier-schema examples are stored and where do they come from? → A:
   `StarlitCartoucheExperienceCore.schemaOneExample()` (the schema-1 saved state `{level: 1, records}` of a play of level
   1 with its first certified leg applied, so it is still playing and not won) and `schemaTwoExample()` (schema 2 with
@@ -97,7 +97,8 @@ visible, labelled controls and read the experience's spoken texts.
 **Acceptance Scenarios**:
 
 1. **Given** a fresh app on the simulator, **When** the tester opens Starlit Cartouche and plays level 1's certified
-   solution (its legs) with the panel's buttons, **Then** the experience says the trail draws the symbol at the beacon with 3 of 3 stars, and level 2 is open in the level picker.
+   solution (its legs) with the panel's buttons, **Then** the experience says the trail draws the symbol at the beacon
+   with 3 of 3 stars, and level 2 is open in the level picker.
 2. **Given** a won level, **When** the app is relaunched, **Then** the same progress, stars and open levels are shown.
 3. **Given** a solved level, **When** the tester starts the replay and steps through it, **Then** the replay ends won
    and stopping it returns to the campaign.
