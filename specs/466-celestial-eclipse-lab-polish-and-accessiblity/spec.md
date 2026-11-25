@@ -93,8 +93,8 @@ Flashing); the refusal codes are `r02-g17.level`, `action`, `budget`, `stage`, `
   system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the chosen body
   and its pending phase are accessibility-adjustable elements with their labels and values in words ("body j, phase p
   of q" and "pending phase p"); a summary element reads "a actions left. <the progress in words>. Chosen: body j at
-  phase p. Level: <the level in words>."; on iPad the panel keeps a readable width (at most 520 points). Impact:
-  FR-R02G1706-001, 005; SC-R02G1706-001.
+  phase p. Level: <the level in words>." (p the pending phase, the current one when no change is pending); on iPad the
+  panel keeps a readable width (at most 520 points). Impact: FR-R02G1706-001, 005; SC-R02G1706-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -103,8 +103,8 @@ Flashing); the refusal codes are `r02-g17.level`, `action`, `budget`, `stage`, `
 A blind or low-vision player can learn the level's state (the target eclipses in order with their windows, how many are
 matched, whether a run now would win, the chosen planet and its phase, the shown tick, the actions left), choose a
 planet, change its phase, run the clock, undo and redo, ask for hints, read failures, choose levels and modes, and hear
-every change and result, without seeing the sky. Planets and targets are named by number, so no colour or shape needs
-to be seen.
+every change and result, without seeing the sky. Planets and targets are named by number (a planet is spoken as "body
+j", the kernel's word), so no colour or shape needs to be seen.
 
 **Why this priority**: an experience that cannot be played with VoiceOver is not shippable in the one app.
 
