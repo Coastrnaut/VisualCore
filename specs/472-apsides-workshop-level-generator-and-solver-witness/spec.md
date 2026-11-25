@@ -77,11 +77,11 @@ per level and 3 346 full orbit reports for the whole catalog (0.2 s in a debug b
   different knob, size outermost, then eccentricity, then direction. Each orbit is judged by the kernel's report, the
   apsis targets checked first from the orbit's steps alone (an orbit failing one cannot win, so its positions are not
   computed). The first winning orbit ends the search; the plan is its tunings in the valid order, then `play`, replayed
-  through the kernel's play, whose report must agree. Work = orbits judged, counted and bounded at 16 000 (the largest
-  depth-2 space is 13 880 orbits, plus at most 423 at depth 1); over the bound, or outside the band's plan range, the
-  candidate is skipped. The minimality proof is the count of orbits at each smaller depth (the start alone for a
-  one-tuning plan; the start and every depth-1 orbit for a two-tuning plan), every one judged and none winning. Impact:
-  FR-R02G1802-002; SC-R02G1802-001, 002, 005.
+  through the kernel's play, whose report must agree. Work = orbits judged, counted and bounded at 16 000, above the
+  largest search space, as a guard (the largest depth-2 space is 13 880 orbits, plus at most 423 at depth 1); over the
+  bound, or outside the band's plan range, the candidate is skipped. The minimality proof is the count of orbits at each
+  smaller depth (the start alone for a one-tuning plan; the start and every depth-1 orbit for a two-tuning plan), every
+  one judged and none winning. Impact: FR-R02G1802-002; SC-R02G1802-001, 002, 005.
 - Q: What difficulty metrics are stored and what progression is required? → A: `ApsidesWorkshopDifficulty` holds the
   witness length (tunings), the targets, the apsis targets, the planets, the narrowest share band and the narrowest
   distance range (0 when the level has none), the orbits judged at smaller depths and the solver work. The catalog in
@@ -102,8 +102,8 @@ per level and 3 346 full orbit reports for the whole catalog (0.2 s in a debug b
   on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New refusals:
   `generation(Int)` (`r02-g18.generation`) and `witness(String)` (`r02-g18.witness`). The independent check of
   SC-R02G1802-002 judges, with the kernel's own report and no apsis shortcut, every orbit reachable with fewer tunings
-  than the plan on the two levels with the fewest planets in each band: none wins. Impact: FR-R02G1802-006;
-  SC-R02G1802-002, 006.
+  than the plan on the two levels with the fewest planets in each band (ties by level number): none wins. Impact:
+  FR-R02G1802-006; SC-R02G1802-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 

@@ -75,10 +75,10 @@ edited file is refused.
 - [ ] T-R02G1802-006 [US2] [US3] [US4] Create
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the budget, and no orbit with fewer tunings wins; the full
-  report enumeration on the two levels with the fewest planets in each band; neighbours differ; pinned digest;
-  progression rule and band means; witness files byte for byte, written only with `APSIDES_WORKSHOP_WRITE_WITNESSES=1`;
-  groups of 10) and the 100 files `docs/games/apsides-workshop/levels/001.witness.json` … `100.witness.json`; `--name
-  host-5`
+  report enumeration on the two levels with the fewest planets in each band (ties by level number); neighbours differ;
+  pinned digest; progression rule and band means; witness files byte for byte, written only with
+  `APSIDES_WORKSHOP_WRITE_WITNESSES=1`; groups of 10) and the 100 files
+  `docs/games/apsides-workshop/levels/001.witness.json` … `100.witness.json`; `--name host-5`
 
 ## Phase 6: Regression, documentation and close
 
