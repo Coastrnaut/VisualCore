@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G17-05: Celestial Eclipse Lab teaching and progression).
+Last updated: 2026-11-25 (R02-G17-06: Celestial Eclipse Lab polish and accessibility).
 
 ## 1. What is tested, and where
 
@@ -966,6 +966,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   through the presenter: tutorial, three hint levels searched off the main actor, failure text, band, goal, stars, modes
   and worded refusals). Lessons: the drafting agents wrote every file during the baselines without building and the
   merged suites passed on the first run; only the identity test still pinned the old control list.
+- **Celestial Eclipse Lab polish and accessibility** (R02-G17-06, 2026-11-25). Host:
+  `CelestialEclipseLabFeedbackPlanTests` (7 tests: plans compared word for word over phase changes, undos, redos, every
+  refusal code bare and prefixed, every failure kind, campaign, practice and daily wins, level and mode changes),
+  `CelestialEclipseLabLightsTests` and `CelestialEclipseLabSoundRecipeTests` (20 tests: a scripted win and adversarial
+  flicker sampled at 60 Hz, the audition and ambient recipes as pure functions). Simulator:
+  `CelestialEclipseLabAccessibilityTests` (12 tests: labels and values, the adjustable planet and pending phase, level 1
+  won through accessibility operations, recorded feedback, still frames under Reduce Motion and Reduce Flashing, the won
+  fade in the shader and fallback paths, the sound state table). Lesson: the adapter core's equality leaves out its
+  presentation state (the chosen body, the shown tick), so a presenter that skips "unchanged" cores misses body choices;
+  only the simulator audition test caught it.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15

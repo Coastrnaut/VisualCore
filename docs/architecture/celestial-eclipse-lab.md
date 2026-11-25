@@ -107,3 +107,25 @@ later features.
   and a campaign win opening the next, five bands of 20; the daily level is (days since 2026-01-01 × 29) mod 100 + 1;
   practice raises the budget to 24 without stars or unlocks. The snapshot is schema 2 with a migration from schema 1.
 
+## Polish and accessibility (feature 466, R02-G17-06)
+
+- **Feedback.** `CelestialEclipseLabFeedbackPlan.after(old:new:)` turns each change of the adapter core into one
+  announcement and one haptic through the shared route: a phase change ("Body j set to phase p." then the eclipses in
+  order, whether a run now would win and the actions left, `state`, selection), undo and redo, a won run (`outcome`,
+  success, with stars outside practice), a failed run (the failure explanation, `outcome`, warning), a level or mode
+  change (`level`) and refusals in words (`rejection`, error). The run, which always ends the level, plans only its
+  outcome; choosing a body or showing a tick plans nothing. The presenter keeps a feedback log.
+- **Comfort.** `CelestialEclipseLabLights` eases the glow (0.7 playing, 1 won, 0.35 failed) and the won look by the
+  frame clock (0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade); the scene draws the eased levels (`u_won`,
+  the glow gain, and in the unlit fallback the not-won and won colours blended by the won level), so no element crosses
+  half its range more than three times a second. Reduce Motion and Reduce Flashing hold the halo pulse at 1, so the sky
+  is still between actions.
+- **Sound.** Off by default (a Sound toggle). Choosing a body plays its audition: body j's tone 220 Hz × 2^(2j/12)
+  with its fifth when it takes part in an eclipse of the predicted timeline, or with a partial 3 Hz above when it does
+  not, 0.6 s. The ambient loop comes from the actions left (the root), the quarters of the target matched in order (the
+  partials) and the stage; it is rebuilt only when that recipe changes and plays only while wanted, on screen and
+  active.
+- **Panel.** A summary element ("a actions left. <progress>. Chosen: body j at phase p. Level: <level>."), the chosen
+  planet and its pending phase adjustable with VoiceOver, a value in words on every control, refusals in the feedback
+  plan's words, rows that become columns at accessibility text sizes and a 520-point readable width on iPad.
+
