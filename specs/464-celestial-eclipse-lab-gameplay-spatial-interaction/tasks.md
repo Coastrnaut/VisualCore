@@ -96,7 +96,7 @@ shader material (the vertex-contract lesson of R02-G16-03 and R02-G17-03).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1704-006 Docs: `docs/architecture/celestial-eclipse-lab.md` (gestures and the phase preview),
+- [X] T-R02G1704-006 Docs: `docs/architecture/celestial-eclipse-lab.md` (gestures and the phase preview), — Verified 2026-11-25: 2026-11-25 architecture gestures section, round-two README and automatedtesting entry written; round02-host-1, -2, -3c, -3e, -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G1704-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

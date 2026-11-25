@@ -77,3 +77,18 @@ later features.
   GL sky scene and a minimal control panel. Registered as a candidate (not available) until X-R02-G17, with the scenario
   manifest of 94 scenarios including the 80 acceptance rows.
 
+## Gameplay spatial interaction (feature 464, R02-G17-04)
+
+- **Picking.** At touch-down every planet is projected through the drawn camera; a planet is hit within its projected
+  disc radius grown by 8 points, the front-most (painted last) first. The time dial is the projected box of the
+  timeline strip and its window brackets grown by 8 points; anything else is empty space.
+- **Gestures.** A tap on a planet chooses it (any stage). Dragging a movable planet along its orbital ring (16 points
+  or more, while playing) previews the orbit position nearest to the finger: a dashed ghost of the planet and the
+  predicted timeline of that phase; lifting sets the phase there as one undoable action, or nothing when it is the
+  current phase. A fixed planet, or a finished play, explains itself in words instead. Dragging or tapping the timeline
+  shows the nearest projected tick (presentation only). Two fingers orbit the view within yaw ±60° and pitch −20° …
+  +35°; an empty double tap or "Reset view" returns to the authored view. Second fingers, cancels and finished plays
+  send no kernel action.
+- **Panel parity.** Phase − and + move a previewed pending offset (no action spent) and "Set phase" commits it as one
+  action, so every certified level can be won through the panel within its budget; a host test wins all 100.
+

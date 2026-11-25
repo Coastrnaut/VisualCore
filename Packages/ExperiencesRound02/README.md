@@ -926,5 +926,7 @@ proof), `CelestialEclipseLabDifficulty` and `CelestialEclipseLabWitness`, with t
 `docs/games/celestial-eclipse-lab/levels/`. Feature 463 (R02-G17-03) adds the hero renderer
 (`CelestialEclipseLabSceneSnapshot`, `CelestialEclipseLabSceneGeometry` with the shadow lens,
 `CelestialEclipseLabShaders`), the adapter `CelestialEclipseLabExperienceCore`, the scenarios and the iOS target `CelestialEclipseLabExperience`,
-registered as a candidate until X-R02-G17. See
+registered as a candidate until X-R02-G17. Feature 464 (R02-G17-04) adds `CelestialEclipseLabPicker`,
+`CelestialEclipseLabGestureController`, `CelestialEclipseLabOrbit`, the orbital-handle phase drag with its ghost
+preview, the time dial and the panel's "Set phase". See
 [docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).
