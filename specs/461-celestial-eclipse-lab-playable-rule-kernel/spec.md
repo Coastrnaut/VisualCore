@@ -42,7 +42,8 @@ code (read-only, 2026-11-25): Starlit Cartouche's kernel (`StarlitCartoucheLevel
 every limit as an integer range, fingerprints levels with SHA-256 of a canonical text and implements R02-F23's
 `PuzzleRules` (`VisualCoreSimulation`).
 
-- Q: What exactly are a body, its orbit and an eclipse, in integers? → A: a level has 2 … 6 bodies, numbered from 0; each
+- Q: What exactly are a body, its orbit and an eclipse, in integers? → A: a level has 2 … 6 bodies, numbered from 0;
+  each
   has an orbit of 4 … 24 lattice positions (x, y, z each −32 … 32), one per tick of its period, a disc radius 1 … 8 and
   a flag "fixed"; at least one body is movable. With phase p, body b is at tick t at orbit position (t + p) mod period.
   The projection drops z; the depth is z, a greater z being nearer the viewer. Every pair of bodies keeps one depth
