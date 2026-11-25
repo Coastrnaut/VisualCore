@@ -63,7 +63,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1701-005 [P] [US4] Create
+- [X] T-R02G1701-005 [P] [US4] Create — Verified 2026-11-25: 2026-11-25 CelestialEclipseLabRules and CelestialEclipseLabRulesTests pass (host-4 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabRules.swift` (agent C: `PuzzleRules`: State =
   position (phases, actions spent), Move = a phase change; legal moves "every legal phase change while actions are
   left"; goal "the predicted run wins") with
