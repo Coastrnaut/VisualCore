@@ -66,14 +66,14 @@ implements R02-F23's `PuzzleRules` (`VisualCoreSimulation`).
   a(20 + k). Impact: FR-R02G1801-001, 004.
 - Q: How are the targets ordered and judged, and what counts as contact? → A: a level has 1 … 6 targets, each a sweep
   (sector, lowest and highest share 0 … 1000, both included) or an apsis target (periapsis or apoapsis, sector, nearest
-  and farthest distance in twentieths, both included). Each target has an event tick: a sweep, the first tick whose
-  P(t) lies in its sector (T if none); periapsis 0; apoapsis T/2. Contact: a planet (centre −64 … 64 lattice units on
-  each axis, radius 1 … 8, never overlapping the star) is struck when its centre's closest distance to a segment
-  P(t) → P(t + 1) is strictly smaller than its radius, decided exactly in integers. Playing first walks the ticks: the
-  first contact (lowest tick, then lowest planet) fails `contact`; otherwise it walks the targets in order: a target with an
-  event tick earlier than the previous target's fails `order`; a sweep outside its band fails `share`; an apsis in
-  another sector fails `apsis-sector`, at a distance outside its range `apsis-distance`; all met wins. A failure names
-  the planet or target and its tick. Impact: FR-R02G1801-005; SC-R02G1801-004.
+  and farthest distance in twentieths, both included). Each target has an event tick: a sweep, the first tick whose P(t)
+  lies in its sector (T if none); periapsis 0; apoapsis T/2. Contact: a planet (centre −64 … 64 lattice units on each
+  axis, radius 1 … 8, never overlapping the star) is struck when its centre's closest distance to a segment P(t) → P(t +
+  1) is strictly smaller than its radius, decided exactly in integers. Playing first walks the ticks: the first contact
+  (lowest tick, then lowest planet) fails `contact`; otherwise it walks the targets in order: a target with an event
+  tick earlier than the previous target's fails `order`; a sweep outside its band fails `share`; an apsis in another
+  sector fails `apsis-sector`, at a distance outside its range `apsis-distance`; all met wins. A failure names the
+  planet or target and its tick. Impact: FR-R02G1801-005; SC-R02G1801-004.
 - Q: Which actions exist and how does a level live and how is it stored? → A: `periapsis(k, d)` sets the eccentricity
   and direction steps (at least one different) and `size(a)` the size; each spends one action and is refused
   `r02-g18.action` when out of range, unchanged or making the orbit invalid, `r02-g18.budget` when no action is left.
