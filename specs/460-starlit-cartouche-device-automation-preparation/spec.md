@@ -47,14 +47,14 @@ there with the chosen wait), a drag of the ship onto a star (preview, then fly o
 459 is `SC`, so the rows are SC-D1 … SC-D8.
 
 - Q: Which device rows exist and which tasks does each cover? → A: SC-D1 launch and first frame (UA-F13 launch,
-  first-frame); SC-D2 frame pacing and frame time per tier (T-R02G1603-012, T-R02G1608-012, UA-F13 frame-pacing);
-  SC-D3 memory per tier and thermal state with the round-two stress session (T-R02G1608-012, UA-F13 memory, thermal,
-  stress); SC-D4 touch feel and touch-to-frame latency of a tap that chooses a star, a double tap that flies, a ship
-  drag that previews and flies, a slider drag that sets the wait and two-finger orbit (T-R02G1604-011); SC-D5 sound and
-  haptics heard and felt (T-R02G1606-011); SC-D6 VoiceOver walk-through at the largest text size, non-gating
-  (T-R02G1606-011, P-08); SC-D7 progress across a real termination (T-R02G1607-011); SC-D8 panel journeys: win level 1
-  with its two legs chosen and flown, replay, relaunch (T-R02G1609-011). All rows run on D1, D2, D3 in that order.
-  Impact: FR-R02G1610-001, 003; SC-R02G1610-001.
+  first-frame); SC-D2 frame pacing and frame time per tier (T-R02G1603-012, T-R02G1608-012, UA-F13 frame-pacing); SC-D3
+  memory per tier and thermal state with the round-two stress session (T-R02G1608-012, UA-F13 memory, thermal, stress);
+  SC-D4 touch feel and touch-to-frame latency of a tap that chooses a star, a double tap that flies, a ship drag that
+  previews and flies, a slider drag that sets the wait, a double tap on empty space that resets the view and two-finger
+  orbit (T-R02G1604-011); SC-D5 sound and haptics heard and felt (T-R02G1606-011); SC-D6 VoiceOver walk-through at the
+  largest text size, non-gating (T-R02G1606-011, P-08); SC-D7 progress across a real termination (T-R02G1607-011); SC-D8
+  panel journeys: win level 1 with its two legs chosen and flown, replay, relaunch (T-R02G1609-011). All rows run on D1,
+  D2, D3 in that order. Impact: FR-R02G1610-001, 003; SC-R02G1610-001.
 - Q: What is the device scenario set? → A: the 11 standard and game scenarios (`launch-first-frame`, `input-response`,
   `completion`, `rejection`, `save-restore`, `reset`, `suspend-resume`, `teardown-reentry`, `cancel-prepare`,
   `full-playthrough`, `hero`) and `fixture-level-1-solved`; the 80 acceptance rows and the other two fixtures stay
