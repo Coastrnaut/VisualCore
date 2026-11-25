@@ -45,8 +45,8 @@ but CHK010 passed at first reading.
   that already win)? [Edge Case, Spec §FR-R02G1701-002; Clarifications Q1; data-model] — failed at first reading: a
   target naming the back body of its pair as the front one was not excluded, although it could never be met; FR-002 and
   the data model now refuse it.
-- [x] CHK011 Are the boundaries stated (an eclipse exactly on a window's opening or closing tick is inside; the horizon's
-  last tick counts; a spent budget still allows the run)? [Edge Case, Spec §Edge Cases; SC-R02G1701-004]
+- [x] CHK011 Are the boundaries stated (an eclipse exactly on a window's opening or closing tick is inside; the
+  horizon's last tick counts; a spent budget still allows the run)? [Edge Case, Spec §Edge Cases; SC-R02G1701-004]
 - [x] CHK012 Is it stated why the run costs no action and why the predicted outcome is reported before it (the timeline
   is fully determined by the phases; the run is the commitment)? [Consistency, Plan research R7]
 
