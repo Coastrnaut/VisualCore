@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g17.celestial-eclipse-lab",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g17.celestial-eclipse-lab --runtime 27",
+  "elapsed_seconds": 366.65,
+  "exit_code": 0,
+  "finished": "2026-11-25T21:12:47+00:00",
+  "gate": "X-R02-G17",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G17.followthrough-verify27.log",
+  "log_sha256": "bfff9e5d8a02f7b02e3dde269e4337a63110f0e9df823d4d0b31347b3b115f26",
+  "name": "followthrough-verify27",
+  "started": "2026-11-25T21:06:41+00:00",
+  "timed_out": false
+}
