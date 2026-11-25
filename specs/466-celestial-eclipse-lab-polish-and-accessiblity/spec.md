@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G17-06 (migration ledger, game feature of experience R02-G17) · ID namespace FR-R02G1706-###,
 SC-R02G1706-###, T-R02G1706-###
@@ -26,6 +26,75 @@ Canonical overrides:
   player, and the kernel, content, adapter, renderer, gestures and teaching of R02-G17-01 … 05.
 - **Model:** feature 456 (Starlit Cartouche's polish and accessibility), adapted to phase changes, the clock run and
   eclipse failures.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+456's answers where the games agree. Facts checked in code (read-only, 2026-11-25): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` are those feature 456 used; the kernel names bodies
+"body j" (0 … 5) and eclipses "body f in front of body b", and the progress reads "m of n eclipses in order; next: …
+between tick o and tick c; a run now would win (fail); a actions left"; a phase change spends one action and never ends
+the level, the run (`clock.run`) always ends it, won or failed; the halos pulse by `u_pulse` (0.85 … 1, period 2.4 s, 1
+under Reduce Motion); the won look is `u_won`, switched at once today, lighting the target brackets gold and flaring
+matched halos, and the fallback colours by its `wonLevel`; the glow gain is capped by `u_glowLimit` (0.5 under Reduce
+Flashing); the refusal codes are `r02-g17.level`, `action`, `budget`, `stage`, `stale`, `not-whole`, `choice`, `tick`,
+`locked` and `date` (reported by the engine as `action.rule.<code>`).
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted action (`state`), the change then the
+  progress: a phase change "Body j set to phase p."; undo and redo "Undone." / "Redone."; each followed by " m of n
+  eclipses in order, a run now would win (or fail), a actions left." ("1 action left" singular); a win (`outcome`):
+  "The eclipses came in the target order. Level won spending a actions, k of 3 stars." (without the stars in
+  practice); a failure (`outcome`): the failure explanation of feature 465; a level or mode change (`level`): "Level n,
+  band b, <mode>." with the tutorial instruction when shown; a refusal (`rejection`) in words: `r02-g17.locked` "That
+  level is not open yet.", `r02-g17.date` "That date cannot be used.", `r02-g17.action` "That phase change, undo or redo
+  cannot be made now.", `r02-g17.budget` "No actions are left: undo or retry.", `r02-g17.stage` "The level has ended.",
+  `r02-g17.not-whole` "That value must be a whole number.", `r02-g17.choice` "That body is not in this level.",
+  `r02-g17.tick` "That tick is outside the timeline.", any other code "That action was refused." (the engine's
+  `action.rule.` prefix read as the bare code). A revealed hint is announced (`state`) with its text. Choosing a body,
+  pending phase texts, the shown tick and orbit are not announced. Texts are a pure function of the old and new core (and
+  the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact: FR-R02G1706-002;
+  SC-R02G1706-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted phase change, undo or redo;
+  `success` for a won run; `warning` for a failed run; `error` for a refusal; choosing a body, the pending texts, the
+  shown tick, orbit and level changes play none. The run plays only its outcome. The shared planners' intervals apply.
+  Impact: FR-R02G1706-003; SC-R02G1706-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: as feature 456: the presenter keeps light levels for
+  the glow (0.7 while playing, 1 once won, 0.35 once failed) and the won look (1 once won, else 0), each easing toward
+  its target by the frame clock's elapsed time between drawn frames (0.15 s normally, 0.45 s under Reduce Flashing,
+  linear; under Reduce Flashing a fade that has started finishes before it may turn back); the scene draws the eased
+  levels (the glow gain times the glow level, `u_won` the won level, and in the fallback the won colours by the won
+  level, rebuilt when the level moves by a tenth or more); the state and digest never see them. Bodies, shadows,
+  predicted eclipses and gauges change only with the player's actions and are not faded. The halo pulse (0.42 cycles
+  per second, far below 3) is held at 1 under Reduce Motion and under Reduce Flashing, so the sky is still between
+  actions under either. The measure: sampling the drawn levels every 1/60 s through a scripted win and adversarial
+  flicker (a phase change undone and redone every frame, retry, level changes), no element crosses half its range more
+  than 3 times per second, and every complete one-way fade of more than half the range takes at least 0.4 s under
+  Reduce Flashing. Impact: FR-R02G1706-004; SC-R02G1706-003.
+- Q: Where does the sound choice live, and what are the audition and ambient recipes? → A: a Sound toggle in the panel,
+  off by default, held by the presenter (presentation only; saving it is R02-G17-07). Body j's tone is 220 Hz ×
+  2^(2j / 12) (a whole tone per body, at most ten semitones above). The audition of a chosen body is a pure function of
+  its index and whether it takes part in an eclipse of the predicted timeline: one that does sounds its tone and its
+  fifth (× 3/2) at gain 0.04 each, a clean chord; one that does not sounds its tone with a second partial detuned upward
+  by 3 Hz, so it beats audibly; 0.6 s with a linear decay to silence; played once per body choice, a new one replacing
+  the last. The ambient recipe is a pure function of the eclipses matched in order, the actions left as a share of the
+  budget and the stage: a root at 110 Hz times (1, 9/8, 5/4, 4/3) for more than three quarters of the actions left, more
+  than half, more than a quarter, or less; one partial per quarter of the target matched (floor of four times matched
+  over the target count, up to four), at the root times (5/4, 3/2, 2, 5/2)[k − 1], each with the base gain; the root
+  alone when less than a quarter is matched; an added octave when won and halved gains when failed; the loop's length is
+  the longest the shared player accepts at which every partial has a whole number of cycles (tested). The presenter
+  rebuilds the loop only when the level opens, an action, undo, redo or the run changes the quarters, the root step or
+  the stage, or the toggle turns on, never per frame. Sound plays exactly while the choice is on, the controls are on
+  screen and the scene is active. Impact: FR-R02G1706-006; SC-R02G1706-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the chosen body
+  and its pending phase are accessibility-adjustable elements with their labels and values in words ("body j, phase p
+  of q" and "pending phase p"); a summary element reads "a actions left. <the progress in words>. Chosen: body j at
+  phase p. Level: <the level in words>."; on iPad the panel keeps a readable width (at most 520 points). Impact:
+  FR-R02G1706-001, 005; SC-R02G1706-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -111,8 +180,8 @@ ambient recipes are pure functions of the state they are made from; sound plays 
 - **FR-R02G1706-003**: Haptics MUST map selection → accepted phase change, undo or redo, success → win, warning →
   failure, error → refused action, through the shared route and the person's switch; they never change state.
 - **FR-R02G1706-004**: Reduce Flashing MUST cap the glow and turn every brightness change of the glow and of the won
-  look into fades of at least 0.4 s, with every periodic motion below 3 cycles per second; Reduce Motion MUST keep the
-  sky still between actions (no halo pulse); neither changes the state or its digest.
+  look into fades of at least 0.4 s, with every periodic motion below 3 cycles per second; Reduce Motion and Reduce Flashing
+  MUST keep the sky still between actions (the halo pulse held); neither changes the state or its digest.
 - **FR-R02G1706-005**: The panel MUST support Dynamic Type up to the largest accessibility size and Increase Contrast on
   iPhone and iPad, scrolling instead of clipping.
 - **FR-R02G1706-006**: A planet's audition and an optional ambient sound MUST be synthesized in code — the audition from
