@@ -46,7 +46,7 @@ fewer tunings wins.
 
 **Independent test**: building the catalog twice gives identical levels and the pinned digest.
 
-- [ ] T-R02G1802-004 [US2] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopGenerator.swift`
+- [X] T-R02G1802-004 [US2] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopGenerator.swift` — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopGenerator and ApsidesWorkshopGeneratorTests pass (host-3 exit 0); the real catalog certifies all 100 entries within candidate index 8, at most 13 900 orbits judged
   (lead: band profiles "band 1 ({24}, 1 … 2, 0, 60 … 90, 40 … 60, 0, 1, 1), 2 ({24, 32}, 2, 0 … 1, 45 … 70, 40 … 60,
   0 … 1, 1, 1), 3 ({32}, 2 … 3, 1, 35 … 55, 25 … 45, 1, 1 … 2, 1 … 2), 4 ({32, 48}, 3, 1, 25 … 40, 20 … 35, 1 … 2, 2,
   2), 5 ({48}, 3 … 4, 1 … 2, 18 … 30, 15 … 25, 2 … 3, 2, 2)" (periods, targets, apsis targets, sweep half-width, apsis
