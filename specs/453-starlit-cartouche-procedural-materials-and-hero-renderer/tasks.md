@@ -42,7 +42,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheShaderSourceTests.swift` (version line,
   declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match, the angle
   rule); agent A; `--name host-2`
-- [ ] T-R02G1603-004 [P] [US1] Create
+- [X] T-R02G1603-004 [P] [US1] Create — Verified 2026-11-24: host-3 exit 0 (.autonomy/migration/checks/R02-G16-03.host-3.json); scene geometry (mapping, chart meshes per shader vertex contract, camera with 6 % fit, CPU reference, paint order, failure marks, glow per tier, fallback parts), 12 geometry tests
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheSceneGeometry.swift` (clarification Q1: w(v) =
   (v − m) · s with m the centre of the bounding box of every orbit position of every star and s = 1.5 / (e + 1) for its
   largest extent e; the firmament quad; corridor ribbons 0.02 wide between current positions, undrawn symbol corridors
