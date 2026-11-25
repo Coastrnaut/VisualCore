@@ -14,7 +14,7 @@
 // won level), the lit and unlit actions bars and the broken colour of what a failure names.
 //
 // Vertex streams (the geometry states the same contract): `a_uv.x` is the material code (``ApsidesWorkshopMaterial``,
-// 0 … 21), `a_uv.y` the primary local coordinate and `a_normal` the sphere normal (spheres) or a secondary local
+// 0 … 22), `a_uv.y` the primary local coordinate and `a_normal` the sphere normal (spheres) or a secondary local
 // coordinate. Per material: on the backdrop `a_uv.y` is the height h (0 at the bottom, 1 at the top) and `a_normal.x`
 // the horizontal coordinate s (-1 on the left edge, +1 on the right); on a wedge `a_uv.y` and `a_normal` are 0 (a flat
 // fill); on a strip (spoke, rim, notch, bracket, ghost, orbit, hazard, gauge track, gauge band, broken) `a_uv.y` is the
@@ -47,11 +47,21 @@
 // the glow program 8: u_mvp 4, u_glowGain, u_glowLimit, u_won and u_pulse 1 each), no texture samplers, no image
 // assets, no `discard` and no loops at all (so every loop is bounded). Output is premultiplied alpha. Palette constants
 // are written with six fixed decimals from `ApsidesWorkshopPalette`, so the shader colours equal the CPU's within 1e-6.
+//
+// Feature 474 (R02-G18-04) T-R02G1804-002 (FR-R02G1804-004; clarification Q3) adds material 22 ``ghostPreview``: the
+// ghost of a pending orbit, in glacial. `a_normal.z` names its shape (``ghostShapeLine`` 0, ``ghostShapeDiamond`` 1,
+// ``ghostShapeSquare`` 2). The dashed loop (shape 0) is a strip: `a_uv.y` the across coordinate d, `a_normal.x` the
+// fraction 0 … 1 along the loop (seam duplicated with 1.0), covered by the ribbon edge times ``ghostPreviewDashes``
+// dashes of duty ``ghostPreviewDuty`` (``ghostPreviewCoverage(across:along:)``). The outlined apsis markers (shapes 1
+// and 2) are mark quads (`a_normal.xy` the mark-local u, v): the band of half-width ``ghostOutlineHalf`` just inside
+// the diamond or the square (``ghostOutlineCoverage(shape:u:v:)``). Every ghost coverage is times
+// ``ghostPreviewAlpha``.
+// The decode clamp is now 0 … 22.
 
 import Foundation
 
 /// The material code a compass-program vertex carries in `a_uv.x` (FR-R02G1803-001, 002): one per kind of element the
-/// geometry draws, 0 … 21. The geometry writes ``code``; the compass vertex shader selects ``paletteConstant``.
+/// geometry draws, 0 … 22. The geometry writes ``code``; the compass vertex shader selects ``paletteConstant``.
 public enum ApsidesWorkshopMaterial: Int, Sendable, CaseIterable, Hashable {
     /// The backdrop quad (opaque; `a_uv.y` height h 0 … 1, `a_normal.x` horizontal s -1 … +1).
     case backdrop = 0
@@ -97,6 +107,9 @@ public enum ApsidesWorkshopMaterial: Int, Sendable, CaseIterable, Hashable {
     case barUnlit = 20
     /// What a failure names: the contact, the failing target's bracket or gauge, the offending apsis (strip).
     case broken = 21
+    /// The ghost of a pending orbit (feature 474): a dashed loop (strip; `a_normal.x` the fraction along the loop) and
+    /// outlined apsis markers (mark quads; `a_normal.z` the shape), glacial.
+    case ghostPreview = 22
 
     /// The value the geometry writes into `a_uv.x`.
     public var code: Float { Float(rawValue) }
@@ -110,7 +123,7 @@ public enum ApsidesWorkshopMaterial: Int, Sendable, CaseIterable, Hashable {
         case .spoke, .rim, .notch: return "AW_COMPASS"
         case .bracket, .periapsis, .apoapsis, .gaugeBand: return "AW_DEEP_ROSE"
         case .ghost, .gaugeTrack: return "AW_GHOST"
-        case .orbit, .orbiter: return "AW_GLACIAL"
+        case .orbit, .orbiter, .ghostPreview: return "AW_GLACIAL"
         case .planet: return "AW_PLANET"
         case .hazard: return "AW_HAZARD"
         case .star: return "AW_STAR"
@@ -128,11 +141,14 @@ public enum ApsidesWorkshopMaterial: Int, Sendable, CaseIterable, Hashable {
         return ApsidesWorkshopPalette.midnight
     }
 
-    /// The material of code `x` as the vertex shader decodes it: rounded to the nearest integer and clamped to 0 … 21
+    /// The highest material code, 22 (``ghostPreview``).
+    public static let maxCode: Int = ApsidesWorkshopMaterial.ghostPreview.rawValue
+
+    /// The material of code `x` as the vertex shader decodes it: rounded to the nearest integer and clamped to 0 … 22
     /// (non-finite counts as the backdrop).
     public static func decode(_ x: Double) -> ApsidesWorkshopMaterial {
         guard x.isFinite else { return .backdrop }
-        let maxCode: Double = Double(ApsidesWorkshopMaterial.broken.rawValue)
+        let maxCode: Double = Double(Self.maxCode)
         let m: Int = Int(min(max((x + 0.5).rounded(.down), 0), maxCode))
         return ApsidesWorkshopMaterial(rawValue: m) ?? .backdrop
     }
@@ -179,7 +195,7 @@ public enum ApsidesWorkshopShaders {
         (name: "a_uv", location: 2),
     ]
 
-    /// Every material as (Swift name, code, GLSL palette constant the compass vertex shader selects), codes 0 … 21.
+    /// Every material as (Swift name, code, GLSL palette constant the compass vertex shader selects), codes 0 … 22.
     public static var materials: [(name: String, code: Float, constant: String)] {
         var result: [(name: String, code: Float, constant: String)] = []
         for material in ApsidesWorkshopMaterial.allCases {
@@ -303,6 +319,21 @@ public enum ApsidesWorkshopShaders {
     /// The mark-local extent the geometry's mark quad spans on each axis (-extent … +extent), room for the feather.
     public static let markQuadExtent: Double = 1.25
 
+    /// The ghost preview's shape (`a_normal.z`) of its dashed loop (feature 474).
+    public static let ghostShapeLine: Double = 0
+    /// The ghost preview's shape of its outlined periapsis diamond (feature 474).
+    public static let ghostShapeDiamond: Double = 1
+    /// The ghost preview's shape of its outlined apoapsis square (feature 474).
+    public static let ghostShapeSquare: Double = 2
+    /// The dashes along the ghost preview's loop (feature 474).
+    public static let ghostPreviewDashes: Double = 48
+    /// The share of a ghost dash period that is drawn, from its start (feature 474).
+    public static let ghostPreviewDuty: Double = 0.55
+    /// The alpha of the ghost preview (feature 474).
+    public static let ghostPreviewAlpha: Double = 0.85
+    /// The half-width of a ghost marker's outline band in mark-local units, just inside its shape (feature 474).
+    public static let ghostOutlineHalf: Double = 0.14
+
     /// The star pulse's period in seconds.
     public static let pulsePeriod: Double = 2.4
     /// The star pulse's lowest value (its highest is 1).
@@ -366,7 +397,7 @@ public enum ApsidesWorkshopShaders {
     const vec3 AW_ACTIONS_LIT = \(vec3Literal(ApsidesWorkshopPalette.actionsLit));
     const vec3 AW_ACTIONS_UNLIT = \(vec3Literal(ApsidesWorkshopPalette.actionsUnlit));
     const vec3 AW_BROKEN = \(vec3Literal(ApsidesWorkshopPalette.broken));
-    const float AW_MAX_MATERIAL = \(fixed(Double(ApsidesWorkshopMaterial.broken.rawValue)));
+    const float AW_MAX_MATERIAL = \(fixed(Double(ApsidesWorkshopMaterial.maxCode)));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
@@ -396,6 +427,7 @@ public enum ApsidesWorkshopShaders {
         base = mix(base, AW_ACTIONS_LIT, isCode(m, 19.0));
         base = mix(base, AW_ACTIONS_UNLIT, isCode(m, 20.0));
         base = mix(base, AW_BROKEN, isCode(m, 21.0));
+        base = mix(base, AW_GLACIAL, isCode(m, 22.0));
         v_base = base;
         v_aux = a_normal;
         v_material = m;
@@ -454,6 +486,10 @@ public enum ApsidesWorkshopShaders {
     const float AW_MARK_FEATHER = \(fixed(markFeather));
     const float AW_RING_HALF = \(fixed(markRingHalf));
     const float AW_INV_SQRT2 = \(fixed(invSqrt2));
+    const float AW_GHOST_DASHES = \(fixed(ghostPreviewDashes));
+    const float AW_GHOST_DUTY = \(fixed(ghostPreviewDuty));
+    const float AW_GHOST_PREVIEW_ALPHA = \(fixed(ghostPreviewAlpha));
+    const float AW_GHOST_OUTLINE_HALF = \(fixed(ghostOutlineHalf));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
@@ -505,6 +541,15 @@ public enum ApsidesWorkshopShaders {
         float filled = markCover(1.0 - r);
         float hollow = markCover(AW_RING_HALF - abs(r - (1.0 - AW_RING_HALF)));
         float unmetMark = mix(hollow, filled, won);
+        float ghostShape = floor(v_aux.z + 0.5);
+        float ghostDash = 1.0 - step(AW_GHOST_DUTY, fract(t * AW_GHOST_DASHES));
+        float diamondDist = (1.0 - abs(p.x) - abs(p.y)) * AW_INV_SQRT2;
+        float squareDist = 1.0 - max(abs(p.x), abs(p.y));
+        float diamondOutline = markCover(AW_GHOST_OUTLINE_HALF - abs(diamondDist - AW_GHOST_OUTLINE_HALF));
+        float squareOutline = markCover(AW_GHOST_OUTLINE_HALF - abs(squareDist - AW_GHOST_OUTLINE_HALF));
+        float ghostCover = ribbon * ghostDash;
+        ghostCover = mix(ghostCover, diamondOutline, isCode(ghostShape, 1.0));
+        ghostCover = mix(ghostCover, squareOutline, isCode(ghostShape, 2.0));
         vec3 rgb = mix(v_base, backdrop, sky);
         rgb = mix(rgb, mix(v_base, AW_GLACIAL, AW_NOTCH_LIFT), isCode(m, 5.0));
         rgb = mix(rgb, orbit, isCode(m, 8.0));
@@ -518,6 +563,7 @@ public enum ApsidesWorkshopShaders {
         coverage = mix(coverage, squareMark, isCode(m, 10.0));
         coverage = mix(coverage, filled, isCode(m, 17.0));
         coverage = mix(coverage, unmetMark, isCode(m, 18.0));
+        coverage = mix(coverage, ghostCover * AW_GHOST_PREVIEW_ALPHA, isCode(m, 22.0));
         coverage = mix(coverage, 1.0, sky);
         float alpha = clamp(coverage, 0.0, 1.0);
         rgb = clamp(rgb, 0.0, 1.0);
@@ -701,6 +747,38 @@ public enum ApsidesWorkshopShaders {
             return hollow + (filled - hollow) * unit(won)
         default: return 0
         }
+    }
+
+    /// The dash of the ghost preview's loop at fraction `along` (clamped to 0 … 1; non-finite counts as 0) along it
+    /// (feature 474): 1 where fract(along · ``ghostPreviewDashes``) < ``ghostPreviewDuty``, else 0.
+    public static func ghostPreviewDash(along: Double) -> Double {
+        let t: Double = along.isFinite ? min(max(along, 0), 1) : 0
+        return fract(t * ghostPreviewDashes) < ghostPreviewDuty ? 1 : 0
+    }
+
+    /// The ghost preview loop's coverage at across coordinate `across` and fraction `along` (feature 474):
+    /// ``ribbonCoverage(across:)`` times ``ghostPreviewDash(along:)`` times ``ghostPreviewAlpha``.
+    public static func ghostPreviewCoverage(across: Double, along: Double) -> Double {
+        ribbonCoverage(across: across) * ghostPreviewDash(along: along) * ghostPreviewAlpha
+    }
+
+    /// The signed distance of mark-local (`u`, `v`) to a ghost marker's outline band (feature 474):
+    /// ``ghostOutlineHalf`` − |distance − ``ghostOutlineHalf``| with the distance of the diamond (`shape`
+    /// ``ghostShapeDiamond``) or the square (any other shape), positive inside the band just inside the shape's edge
+    /// (non-finite: -1).
+    public static func ghostOutlineDistance(shape: Double, u: Double, v: Double) -> Double {
+        guard u.isFinite, v.isFinite else { return -1 }
+        let inside: Double = (shape + 0.5).rounded(.down) == ghostShapeDiamond ? diamondDistance(u: u, v: v)
+            : squareDistance(u: u, v: v)
+        return ghostOutlineHalf - abs(inside - ghostOutlineHalf)
+    }
+
+    /// A ghost marker's coverage at mark-local (`u`, `v`) (feature 474): smoothstep(-``markFeather``, ``markFeather``,
+    /// ``ghostOutlineDistance(shape:u:v:)``) times ``ghostPreviewAlpha``; for shape ``ghostShapeLine`` (or a
+    /// non-finite shape) 0, the loop being covered by ``ghostPreviewCoverage(across:along:)``.
+    public static func ghostOutlineCoverage(shape: Double, u: Double, v: Double) -> Double {
+        guard shape.isFinite, (shape + 0.5).rounded(.down) >= ghostShapeDiamond else { return 0 }
+        return smoothstep(-markFeather, markFeather, ghostOutlineDistance(shape: shape, u: u, v: v)) * ghostPreviewAlpha
     }
 
     /// The layered colour of a sphere of `material` (planet, star or orbiter; any other material is shaded with its

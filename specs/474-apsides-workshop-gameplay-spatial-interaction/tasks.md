@@ -18,7 +18,7 @@ of R02-G17-04's CHK013).
 
 ## Phase 2: Foundational — view orbit, camera, tuning preview and picking
 
-- [ ] T-R02G1804-002 [P] Add `previewOrbit` ("nil when no preview"), `previewPositions` and `previewGauges` ("the
+- [X] T-R02G1804-002 [P] Add `previewOrbit` ("nil when no preview"), `previewPositions` and `previewGauges` ("the — Verified 2026-11-25: 2026-11-25 view orbit, camera(aspect:orbit:), preview fields, ghost (material 22) and ApsidesWorkshopPicker with picker, geometry and shader tests (40) pass (host-2 exit 0)
   kernel's positions and readings of the previewed orbit; presentation only; never in the digest; only for a valid
   pending orbit") and `previewing(_:)` to
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopSceneSnapshot.swift`; add `ApsidesWorkshopViewOrbit`

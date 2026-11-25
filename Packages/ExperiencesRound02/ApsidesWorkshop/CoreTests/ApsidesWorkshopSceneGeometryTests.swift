@@ -8,6 +8,16 @@
 // scale and actions bars at 0, half and the full budget; a won level in place; the glow empty at level-2 with its shell
 // counts per tier; the paint order by kind; each failure kind (contact, order, share, apsis-sector, apsis-distance)
 // marked. Seed 2_473; explicit types, plain loops; each test well under 10 s; no wall-clock asserts.
+//
+// Feature 474 (R02-G18-04) T-R02G1804-002 (FR-R02G1804-001 … 004, 006; SC-R02G1804-004; clarifications Q1, Q3, Q4):
+// the view orbit (clamped to yaw ±60° and pitch −20° … +35°, authored (0, 0)); `camera(aspect:)` equal to the
+// authored orbit's camera bit for bit; at the four orbit corners and 7 aspects every element of the compass and glow
+// meshes seen from that camera, every element centre and the ghost of every extreme valid orbit inside the view with
+// a 5 % margin, the box corners with the 6 % fitting margin and the eye outside the box; the facing backdrop filling
+// the view and the level-2 discs facing the eye; the camera-taking meshes equal to the plain ones for the authored
+// camera; the knob and handle centres; the ghost (a dashed loop through the preview's kernel positions, outlined
+// markers at its P(0) and P(T/2)) and the gauges drawn from the preview's readings; no preview (none, an invalid one,
+// or the preview removed) identical to R02-G18-03's geometry, and a preview of the current orbit adding only the ghost.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -594,5 +604,277 @@ struct ApsidesWorkshopSceneGeometryTests {
                                                          budget: fixture.level.budget))
         #expect(won.failure == nil)
         #expect(Self.vertices(try G.compassMesh(won, tier: .of(0)), .broken).isEmpty)
+    }
+
+    // MARK: Feature 474 — view orbit, camera refit, ghost preview
+
+    /// The four orbit corners: yaw ±60° with pitch −20° and +35°.
+    static let orbitCorners: [ApsidesWorkshopViewOrbit] = [
+        ApsidesWorkshopViewOrbit(yaw: ApsidesWorkshopViewOrbit.yawLimit,
+                                 pitch: ApsidesWorkshopViewOrbit.pitchRange.lowerBound),
+        ApsidesWorkshopViewOrbit(yaw: -ApsidesWorkshopViewOrbit.yawLimit,
+                                 pitch: ApsidesWorkshopViewOrbit.pitchRange.lowerBound),
+        ApsidesWorkshopViewOrbit(yaw: ApsidesWorkshopViewOrbit.yawLimit,
+                                 pitch: ApsidesWorkshopViewOrbit.pitchRange.upperBound),
+        ApsidesWorkshopViewOrbit(yaw: -ApsidesWorkshopViewOrbit.yawLimit,
+                                 pitch: ApsidesWorkshopViewOrbit.pitchRange.upperBound),
+    ]
+
+    /// The dot product of `a` and `b`.
+    static func dot(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> Double { a.x * b.x + a.y * b.y + a.z * b.z }
+
+    /// Whether `p` lies inside the authored box (each side grown by `slack`).
+    static func inBox(_ p: SIMD3<Double>, slack: Double = 0) -> Bool {
+        p.x >= G.boxLow.x - slack && p.x <= G.boxHigh.x + slack && p.y >= G.boxLow.y - slack
+            && p.y <= G.boxHigh.y + slack && p.z >= G.boxLow.z - slack && p.z <= G.boxHigh.z + slack
+    }
+
+    @Test func viewOrbitClampsAndTheAuthoredCameraIsUnchanged() throws {
+        typealias V = ApsidesWorkshopViewOrbit
+        #expect(V.authored == V(yaw: 0, pitch: 0))
+        #expect(abs(V.yawLimit - Double.pi / 3) < 1e-15)
+        #expect(abs(V.pitchRange.lowerBound + Double.pi / 9) < 1e-15)
+        #expect(abs(V.pitchRange.upperBound - 35 * Double.pi / 180) < 1e-15)
+        #expect(V(yaw: 5, pitch: 5).clamped() == V(yaw: V.yawLimit, pitch: V.pitchRange.upperBound))
+        #expect(V(yaw: -5, pitch: -5).clamped() == V(yaw: -V.yawLimit, pitch: V.pitchRange.lowerBound))
+        #expect(V(yaw: Double.nan, pitch: Double.infinity).clamped() == V.authored)
+        #expect(V(yaw: 0.3, pitch: -0.1).clamped() == V(yaw: 0.3, pitch: -0.1))
+        #expect(V(yaw: 0.3, pitch: -0.1).isWithinBounds && !V(yaw: 2, pitch: 0).isWithinBounds)
+        #expect(!V(yaw: 0, pitch: Double.nan).isWithinBounds)
+        let aspects: [Double] = Self.aspects + [Double.nan, 0, 100, 0.25, 4]
+        for aspect in aspects {
+            #expect(G.camera(aspect: aspect) == G.camera(aspect: aspect, orbit: .authored), "aspect \(aspect)")
+            #expect(G.camera(aspect: aspect) == G.camera(aspect: aspect, orbit: V(yaw: .nan, pitch: .nan)))
+            #expect(G.camera(aspect: aspect, orbit: V(yaw: 9, pitch: 9))
+                    == G.camera(aspect: aspect, orbit: V(yaw: V.yawLimit, pitch: V.pitchRange.upperBound)))
+        }
+        let camera: ApsidesWorkshopCamera = G.camera(aspect: 1.5, orbit: .authored)
+        #expect(camera.eye == SIMD3(0, -0.3, 3.6) && camera.target == SIMD3(0, -0.3, 0))
+        // Positive yaw moves the eye towards +x, positive pitch raises it; the look-at point stays on the pivot axis.
+        let yawed: ApsidesWorkshopCamera = G.camera(aspect: 1.5, orbit: V(yaw: 0.5, pitch: 0))
+        #expect(yawed.eye.x > 0.5 && abs(yawed.eye.y - G.eye.y) < 1e-12 && yawed.target == G.lookAt)
+        let pitched: ApsidesWorkshopCamera = G.camera(aspect: 1.5, orbit: V(yaw: 0, pitch: 0.4))
+        #expect(pitched.eye.y > G.eye.y + 1 && abs(pitched.eye.x) < 1e-12)
+        #expect(abs(Self.length(pitched.eye - pitched.target) - 3.6) < 1e-12)
+        #expect(G.camera(aspect: 1.5, orbit: V(yaw: 0.5, pitch: 0)) != camera)
+    }
+
+    @Test func everyElementAndGhostInsideTheViewAtTheOrbitCorners() throws {
+        var levels: [Level] = Self.catalogLevels
+        for fixture in Self.fixtures.prefix(4) { levels.append(fixture.level) }
+        #expect(levels.count == 9)
+        var checked: Int = 0
+        for (l, level) in levels.enumerated() {
+            let base: Snapshot = Self.snapshot(level, tick: level.period / 3)
+            // The ghost of one extreme valid orbit per level (each extreme orbit on at least two levels).
+            let ghostOrbit: Orbit = Self.extremeOrbits[l % Self.extremeOrbits.count]
+            #expect(ghostOrbit.isValid)
+            let snap: Snapshot = base.previewing(ghostOrbit)
+            #expect(snap.previewOrbit == ghostOrbit)
+            for orbit in Self.orbitCorners {
+                // The meshes face the eye, which does not depend on the aspect (only the lens does).
+                let camera: ApsidesWorkshopCamera = G.camera(aspect: 1, orbit: orbit)
+                let mesh: Mesh = try G.compassMesh(snap, tier: .of(l % 2), camera: camera)
+                let glow: Mesh = try G.glowMesh(snap, tier: .of(0), camera: camera)
+                var points: [SIMD3<Double>] = Self.positions(mesh, except: [.backdrop])
+                for index in glow.positions.indices { points.append(Self.point(glow, index)) }
+                for element in G.paintOrder(snap) where element.part != .backdrop { points.append(element.centre) }
+                points.append(contentsOf: G.ghostLoop(snap))
+                #expect(Self.vertices(mesh, .ghostPreview).count > 0)
+                for check in Self.aspects {
+                    let view: ApsidesWorkshopCamera = G.camera(aspect: check, orbit: orbit)
+                    var outside: Int = 0
+                    for p in points where !Self.inside(G.project(p, camera: view)) { outside += 1 }
+                    #expect(outside == 0, "\(level.id) \(orbit) aspect \(check): \(outside)")
+                }
+                checked += 1
+            }
+        }
+        #expect(checked == 9 * 4)
+        // The box keeps the 6 % fitting margin at every orbit corner and the extreme aspects; the eye stays outside it.
+        var orbits: [ApsidesWorkshopViewOrbit] = Self.orbitCorners
+        orbits.append(ApsidesWorkshopViewOrbit(yaw: 0, pitch: ApsidesWorkshopViewOrbit.pitchRange.upperBound))
+        orbits.append(ApsidesWorkshopViewOrbit(yaw: ApsidesWorkshopViewOrbit.yawLimit, pitch: 0))
+        for orbit in orbits {
+            for aspect in Self.aspects {
+                let camera: ApsidesWorkshopCamera = G.camera(aspect: aspect, orbit: orbit)
+                #expect(!Self.inBox(camera.eye, slack: 0.5), "\(orbit)")
+                #expect(abs(Self.length(camera.eye - camera.target) - 3.6) < 1e-9)
+                for index in 0..<8 {
+                    let q: SIMD2<Double>? = G.project(G.corner(index), camera: camera)
+                    #expect(q != nil && q!.x >= 0.06 - 1e-9 && q!.x <= 0.94 + 1e-9 && q!.y >= 0.06 - 1e-9
+                            && q!.y <= 0.94 + 1e-9, "\(orbit) aspect \(aspect) corner \(index)")
+                }
+            }
+        }
+    }
+
+    @Test func facingBackdropAndDiscsAndTheAuthoredCameraOverloads() throws {
+        let level: Level = Self.catalogLevels[1]
+        let snap: Snapshot = Self.snapshot(level, tick: 2)
+        for orbit in Self.orbitCorners {
+            let camera: ApsidesWorkshopCamera = G.camera(aspect: 1, orbit: orbit)
+            let forward: SIMD3<Double> = G.unit(camera.target - camera.eye)
+            let flat: Mesh = try G.compassMesh(snap, tier: .of(2), camera: camera)
+            // The backdrop's corners lie outside the view at every aspect, beyond every element.
+            let corners: [Int] = Self.vertices(flat, .backdrop)
+            #expect(corners.count == 4)
+            for aspect in Self.aspects {
+                let view: ApsidesWorkshopCamera = G.camera(aspect: aspect, orbit: orbit)
+                var low: SIMD2<Double> = SIMD2(Double.infinity, Double.infinity)
+                var high: SIMD2<Double> = SIMD2(-Double.infinity, -Double.infinity)
+                for index in corners {
+                    let q: SIMD2<Double> = try #require(G.project(Self.point(flat, index), camera: view))
+                    low = SIMD2(min(low.x, q.x), min(low.y, q.y))
+                    high = SIMD2(max(high.x, q.x), max(high.y, q.y))
+                }
+                #expect(low.x < 0 && low.y < 0 && high.x > 1 && high.y > 1, "\(orbit) aspect \(aspect)")
+            }
+            var nearest: Double = Double.infinity
+            for index in corners { nearest = min(nearest, Self.dot(Self.point(flat, index) - camera.eye, forward)) }
+            for index in 0..<8 { #expect(Self.dot(G.corner(index) - camera.eye, forward) < nearest) }
+            // A level-2 disc lies in the plane facing the eye.
+            for index in Self.vertices(flat, .star) {
+                #expect(abs(Self.dot(Self.point(flat, index) - G.starCentre(), forward)) < 1e-12)
+            }
+            #expect(Self.vertices(flat, .star).count == ApsidesWorkshopTier.discSides + 1)
+            // Every glow band shell faces the eye and is lifted towards it.
+            let glow: Mesh = try G.glowMesh(snap, tier: .of(1), camera: camera)
+            #expect(glow.triangleCount == (try G.glowMesh(snap, tier: .of(1))).triangleCount)
+        }
+        // For the authored camera the camera-taking overloads equal the plain ones.
+        for aspect in Self.aspects {
+            let camera: ApsidesWorkshopCamera = G.camera(aspect: aspect)
+            for tier in Tier.all {
+                #expect(try G.compassPart(snap, tier: tier, camera: camera) == (try G.compassPart(snap, tier: tier)))
+                #expect(try G.glowPart(snap, tier: tier, camera: camera) == (try G.glowPart(snap, tier: tier)))
+            }
+        }
+        // The knob and the size handle sit on the drawn apsis markers.
+        for element in G.paintOrder(snap) {
+            if element.part == .periapsis { #expect(element.centre == G.knobCentre(snap)) }
+            if element.part == .apoapsis { #expect(element.centre == G.handleCentre(snap)) }
+        }
+        #expect(G.knobCentre(snap) == G.world(snap.positions[0], depth: 0))
+        #expect(G.handleCentre(snap) == G.world(snap.positions[snap.period / 2], depth: 0))
+    }
+
+    @Test func ghostPreviewAndPreviewGauges() throws {
+        var checked: Int = 0
+        for level in Self.catalogLevels {
+            let base: Snapshot = Self.snapshot(level, tick: 1)
+            var preview: Orbit? = nil
+            for orbit in Self.extremeOrbits where orbit != base.orbit { preview = orbit; break }
+            let orbit: Orbit = try #require(preview)
+            let snap: Snapshot = base.previewing(orbit)
+            let report: ApsidesWorkshopReport = ApsidesWorkshopSky.report(level, orbit: orbit)
+            #expect(snap.isPreviewing && snap.previewOrbit == orbit && snap.previewPositions == report.positions)
+            #expect(snap.previewGauges.count == base.gauges.count)
+            for (i, gauge) in snap.previewGauges.enumerated() {
+                #expect(gauge.target == base.gauges[i].target)
+                #expect(gauge.deviation == report.deviations[i] && gauge.met == (i < report.met))
+                let reading: Int = gauge.target.kind == .sweep ? report.shares[gauge.target.sector]
+                    : (gauge.target.kind == .periapsis ? orbit.periapsisDistance : orbit.apoapsisDistance)
+                #expect(gauge.reading == reading)
+            }
+            // Nothing else changes; the preview is presentation only.
+            #expect(snap.orbit == base.orbit && snap.positions == base.positions && snap.gauges == base.gauges)
+            #expect(snap.failure == base.failure && snap.withoutPreview() == base)
+            for tier in Tier.all {
+                let mesh: Mesh = try G.compassMesh(snap, tier: tier)
+                let n: Int = snap.previewPositions.count
+                var loopTriangles: Int = 0
+                var markTriangles: Int = 0
+                for t in stride(from: 0, to: mesh.indices.count, by: 3) {
+                    let first: Int = Int(mesh.indices[t])
+                    guard mesh.uvs[first].x == Self.code(.ghostPreview) else { continue }
+                    if mesh.normals[first].z == 0 { loopTriangles += 1 } else { markTriangles += 1 }
+                }
+                #expect(loopTriangles == 2 * n && markTriangles == 4, "\(level.id) \(tier.name)")
+                // The dashed loop passes within half its width of every previewed kernel position, its fraction
+                // along the loop 0 … 1.
+                for p in G.ghostLoop(snap) {
+                    #expect(Self.near(mesh, .ghostPreview, p, G.ghostPreviewWidth / 2 + 1e-9) >= 2)
+                }
+                for index in Self.vertices(mesh, .ghostPreview) {
+                    let normal: Vec3 = mesh.normals[index]
+                    if normal.z == 0 { #expect(normal.x >= 0 && normal.x <= 1 && normal.y == 0) }
+                    #expect(normal.z == 0 || normal.z == 1 || normal.z == 2)
+                    #expect(mesh.uvs[index].y >= -1 && mesh.uvs[index].y <= 1)
+                }
+                // The outlined diamond at the preview's P(0), the outlined square at its P(T/2).
+                let knob: SIMD3<Double> = G.world(snap.previewPositions[0], depth: 0)
+                let handle: SIMD3<Double> = G.world(snap.previewPositions[n / 2], depth: 0)
+                var diamond: Int = 0
+                var square: Int = 0
+                for index in Self.vertices(mesh, .ghostPreview) {
+                    let normal: Vec3 = mesh.normals[index]
+                    let p: SIMD3<Double> = Self.point(mesh, index)
+                    let e: Double = ApsidesWorkshopShaders.markQuadExtent
+                    if normal.z == 1 && Self.length(p - knob) <= e * G.periapsisSize / 2 * 1.5 { diamond += 1 }
+                    if normal.z == 2 && Self.length(p - handle) <= e * G.apoapsisSize / 2 * 1.5 { square += 1 }
+                }
+                #expect(diamond == 4 && square == 4)
+                // The gauges are drawn from the preview's readings and met flags.
+                for i in snap.previewGauges.indices {
+                    let gauge: ApsidesWorkshopGauge = snap.previewGauges[i]
+                    let centre: SIMD3<Double> = SIMD3(G.gaugeX(gauge.reading, top: gauge.scaleTop),
+                                                      G.gaugeCentre(i).y, 0)
+                    #expect(G.markCentre(i, snap) == centre)
+                    let material: M = gauge.met ? .markMet : .markUnmet
+                    #expect(G.markMaterial(i, snap, won: false) == material)
+                    #expect(Self.near(mesh, material, centre, 1.25 * G.markRadius * 1.5) >= 4, "gauge \(i)")
+                }
+                // Each ghost marker is drawn after the real markers and before the planets and the star.
+                var firstGhost: Int = -1
+                var lastMarker: Int = -1
+                var firstStar: Int = -1
+                for t in stride(from: 0, to: mesh.indices.count, by: 3) {
+                    let x: Double = mesh.uvs[Int(mesh.indices[t])].x
+                    if x == Self.code(.ghostPreview) && firstGhost < 0 { firstGhost = t }
+                    if x == Self.code(.apoapsis) || x == Self.code(.periapsis) { lastMarker = t }
+                    if x == Self.code(.star) && firstStar < 0 { firstStar = t }
+                }
+                #expect(lastMarker < firstGhost && firstGhost < firstStar)
+            }
+            checked += 1
+        }
+        #expect(checked == Self.catalogLevels.count)
+        // An invalid orbit shows no preview.
+        let snap: Snapshot = Self.snapshot(Self.catalogLevels[0])
+        let invalid: Orbit = Orbit(size: 8, eccentricity: 15, direction: 0)
+        #expect(!invalid.isValid && snap.previewing(invalid) == snap && snap.previewing(invalid).previewOrbit == nil)
+        #expect(snap.previewing(Orbit(size: 99, eccentricity: 0, direction: 0)) == snap)
+        #expect(G.ghostLoop(snap).isEmpty && snap.previewPositions == snap.positions)
+        #expect(snap.previewGauges == snap.gauges)
+    }
+
+    @Test func noPreviewIsTheGeometryOfR02G1803() throws {
+        var levels: [Level] = Self.catalogLevels
+        for entry in try Self.failureLevels() { levels.append(entry.level) }
+        for level in levels {
+            let snap: Snapshot = Self.snapshot(level, tick: level.period / 2)
+            let invalid: Snapshot = snap.previewing(Orbit(size: 8, eccentricity: 15, direction: 3))
+            let removed: Snapshot = snap.previewing(Self.extremeOrbits[1]).withoutPreview()
+            let current: Snapshot = snap.previewing(snap.orbit)
+            #expect(current.previewGauges == snap.gauges && current.previewPositions == snap.positions)
+            for tier in Tier.all {
+                let plain: ApsidesWorkshopColouredMesh = try G.compassPart(snap, tier: tier)
+                #expect(Self.vertices(plain.mesh, .ghostPreview).isEmpty)
+                #expect(try G.compassPart(invalid, tier: tier) == plain)
+                #expect(try G.compassPart(removed, tier: tier) == plain)
+                #expect(try G.glowPart(removed, tier: tier) == (try G.glowPart(snap, tier: tier)))
+                // A preview of the current orbit adds only the ghost: everything else is the same, in order.
+                let withGhost: Mesh = try G.compassMesh(current, tier: tier)
+                #expect(Self.positions(withGhost, except: [.ghostPreview]) == Self.positions(plain.mesh, except: []))
+                #expect(withGhost.triangleCount == plain.mesh.triangleCount + 2 * snap.period + 4)
+                // The reading marks sit where R02-G18-03 put them (from the snapshot's gauges).
+                for i in snap.gauges.indices {
+                    let gauge: ApsidesWorkshopGauge = snap.gauges[i]
+                    #expect(G.markCentre(i, snap) == SIMD3(G.gaugeX(gauge.reading, top: gauge.scaleTop),
+                                                           G.gaugeCentre(i).y, 0))
+                }
+            }
+        }
     }
 }

@@ -47,9 +47,69 @@
 // on its outer edge. Every flat triangle winds counter-clockwise seen from the eye, every sphere triangle seen from
 // outside. Tiers change only the sphere detail, the orbit ribbon's refinement and the glow: every other position is
 // the same at every tier. Doubles are used for drawing only. Modelled on `CelestialEclipseLabSceneGeometry` (463).
+//
+// Feature 474 (R02-G18-04) T-R02G1804-002 (FR-R02G1804-001 … 004, 006; SC-R02G1804-004; clarifications Q1, Q3, Q4)
+// adds the player's view orbit (``ApsidesWorkshopViewOrbit``: yaw ±60° about the vertical axis through the authored
+// box centre (0, −0.325, 0), positive moving the eye from the front (+z) towards +x; pitch −20° … +35° about the
+// authored view's right axis, positive raising the eye; authored (0, 0)) and `camera(aspect:orbit:)`: the eye's offset
+// from the look-at point is pitched (its elevation changed, its length and horizontal direction kept), then the eye
+// and the look-at point are yawed together about that axis, and the field of view is refitted exactly as for the fixed
+// camera, so the authored box x −1.0 … 1.0, y −1.65 … 1.0, z −0.15 … 0.15 keeps ``fitMargin`` per side at every orbit
+// and aspect 0.4 … 2.5. The eye (3.6 from the look-at point, at least 3.6 · cos 35° · cos 60° ≈ 1.47 in front of the
+// plane z = 0) stays outside the box. At the authored orbit `camera(aspect:)` (which calls it) is unchanged bit for
+// bit. ``knobCentre(_:)`` is w(P(0)) and ``handleCentre(_:)`` w(P(T/2)) of the current orbit. While a pending orbit is
+// previewed (`previewOrbit`), the ghost — the preview's kernel positions as a closed dashed ribbon
+// ``ghostPreviewWidth`` wide in the plane z = 0 (material 22 ``ApsidesWorkshopMaterial/ghostPreview``, a_uv.y the
+// across coordinate, a_normal.x the fraction k / T along the loop with the seam repeated with 1, a_normal.z
+// ``ApsidesWorkshopShaders/ghostShapeLine``), then an outlined diamond (``periapsisSize``) at the preview's P(0) and an
+// outlined square (``apoapsisSize``) at its P(T/2) (mark quads, a_normal.z the shape) — is drawn right after the apsis
+// markers (after every element of kind marker, before the planets); it is not an element, so the paint order and the
+// picking are unchanged. The gauge marks are drawn from the snapshot's `previewGauges` (the preview's readings and met
+// flags), which equal `gauges` without a preview, so without a preview every mesh is R02-G18-03's. The camera-taking
+// overloads `compassMesh(_:tier:camera:)`, `glowMesh(_:tier:camera:)`, `compassPart(_:tier:wonLevel:camera:)` and
+// `glowPart(_:tier:camera:)` build the backdrop (a quad facing the eye behind the box), the level-2 discs and the glow
+// bands facing the given camera's eye and lift the glow towards it; for the authored camera they equal the overloads
+// without a camera, which use the authored camera. The orbit is presentation only: never saved, never read by rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
+
+/// The player's view of the compass: a yaw about the vertical axis through the authored box centre and a pitch about
+/// the authored view's right axis, both in radians (feature 474, R02-G18-04). Presentation only: never saved, never
+/// read by the rules, never part of the digest.
+public struct ApsidesWorkshopViewOrbit: Sendable, Equatable {
+    /// The yaw in radians about +y, from the front (+z) towards +x; allowed −``yawLimit`` … ``yawLimit``.
+    public var yaw: Double
+    /// The pitch in radians about the authored view's right axis: positive raises the eye (the compass seen more from
+    /// above), negative lowers it; allowed ``pitchRange`` (−20° … +35°).
+    public var pitch: Double
+
+    /// An orbit of the given yaw and pitch in radians (not clamped; see ``clamped()``).
+    public init(yaw: Double, pitch: Double) {
+        self.yaw = yaw
+        self.pitch = pitch
+    }
+
+    /// The authored orbit: yaw 0, pitch 0, the fixed camera of R02-G18-03.
+    public static let authored = ApsidesWorkshopViewOrbit(yaw: 0, pitch: 0)
+    /// The largest yaw either way, 60° in radians.
+    public static let yawLimit: Double = 60.0 * Double.pi / 180
+    /// The allowed pitches, −20° … +35° in radians.
+    public static let pitchRange: ClosedRange<Double> = (-20.0 * Double.pi / 180)...(35.0 * Double.pi / 180)
+
+    /// This orbit with yaw clamped to −60° … 60° and pitch to −20° … 35°; a non-finite angle becomes 0.
+    public func clamped() -> ApsidesWorkshopViewOrbit {
+        let y: Double = yaw.isFinite ? yaw : 0
+        let p: Double = pitch.isFinite ? pitch : 0
+        return ApsidesWorkshopViewOrbit(yaw: min(max(y, -Self.yawLimit), Self.yawLimit),
+                                        pitch: min(max(p, Self.pitchRange.lowerBound), Self.pitchRange.upperBound))
+    }
+
+    /// Whether this orbit lies within the bounds (finite, yaw within ±``yawLimit``, pitch within ``pitchRange``).
+    public var isWithinBounds: Bool {
+        yaw.isFinite && pitch.isFinite && abs(yaw) <= Self.yawLimit && Self.pitchRange.contains(pitch)
+    }
+}
 
 /// The camera of one frame: eye, target, lens and the matrices built from them.
 public struct ApsidesWorkshopCamera: Sendable, Equatable {
@@ -216,6 +276,8 @@ public enum ApsidesWorkshopSceneGeometry {
     public static let ghostWidth: Double = 0.008
     /// The orbit loop's width.
     public static let orbitWidth: Double = 0.014
+    /// The ghost preview loop's width (feature 474).
+    public static let ghostPreviewWidth: Double = 0.012
     /// A contact's broken segment width.
     public static let brokenSegmentWidth: Double = 0.024
     /// The periapsis diamond's size across (its half diagonal is the mark unit).
@@ -309,6 +371,30 @@ public enum ApsidesWorkshopSceneGeometry {
         world(snapshot.orbiter, depth: planeZ)
     }
 
+    /// The knob's centre (the periapsis diamond, feature 474): w(P(0)) of the current orbit (the origin without
+    /// positions).
+    public static func knobCentre(_ snapshot: ApsidesWorkshopSceneSnapshot) -> SIMD3<Double> {
+        guard let first = snapshot.positions.first else { return starCentre() }
+        return world(first, depth: planeZ)
+    }
+
+    /// The size handle's centre (the apoapsis square, feature 474): w(P(T/2)) of the current orbit (the origin without
+    /// positions).
+    public static func handleCentre(_ snapshot: ApsidesWorkshopSceneSnapshot) -> SIMD3<Double> {
+        let n: Int = snapshot.positions.count
+        guard n > 0 else { return starCentre() }
+        return world(snapshot.positions[(n / 2) % n], depth: planeZ)
+    }
+
+    /// The ghost preview's loop (feature 474): w of every previewed kernel position in tick order (z = 0); empty when
+    /// no pending orbit is previewed.
+    public static func ghostLoop(_ snapshot: ApsidesWorkshopSceneSnapshot) -> [SIMD3<Double>] {
+        guard snapshot.previewOrbit != nil else { return [] }
+        var loop: [SIMD3<Double>] = []
+        for p in snapshot.previewPositions { loop.append(world(p, depth: planeZ)) }
+        return loop
+    }
+
     /// The centre of planet `index` (clamped; the origin without planets): w of its centre in sky units.
     public static func planetCentre(_ index: Int, _ snapshot: ApsidesWorkshopSceneSnapshot) -> SIMD3<Double> {
         guard !snapshot.planets.isEmpty else { return SIMD3(0, 0, planeZ) }
@@ -335,11 +421,13 @@ public enum ApsidesWorkshopSceneGeometry {
         return gaugeStart + (gaugeEnd - gaugeStart) * min(max(Double(value), 0), t) / t
     }
 
-    /// The centre of target `index`'s reading mark (clamped; the first track's left end without targets).
+    /// The centre of target `index`'s reading mark (clamped; the first track's left end without targets), drawn from
+    /// the snapshot's `previewGauges` (the preview's reading while a pending orbit is previewed, else `gauges`'s).
     public static func markCentre(_ index: Int, _ snapshot: ApsidesWorkshopSceneSnapshot) -> SIMD3<Double> {
-        guard !snapshot.gauges.isEmpty else { return SIMD3(gaugeStart, gaugeTop, planeZ) }
-        let i: Int = clamped(index, snapshot.gauges.count)
-        let gauge: ApsidesWorkshopGauge = snapshot.gauges[i]
+        let drawn: [ApsidesWorkshopGauge] = snapshot.previewGauges
+        guard !drawn.isEmpty else { return SIMD3(gaugeStart, gaugeTop, planeZ) }
+        let i: Int = clamped(index, drawn.count)
+        let gauge: ApsidesWorkshopGauge = drawn[i]
         return SIMD3(gaugeX(gauge.reading, top: gauge.scaleTop), gaugeCentre(i).y, planeZ)
     }
 
@@ -389,11 +477,12 @@ public enum ApsidesWorkshopSceneGeometry {
         }
     }
 
-    /// The material of target `index`'s reading mark: met when the target is met or the level is won, else unmet.
+    /// The material of target `index`'s reading mark: met when the target is met (in the snapshot's `previewGauges`:
+    /// the preview's flags while a pending orbit is previewed) or the level is won, else unmet.
     public static func markMaterial(_ index: Int, _ snapshot: ApsidesWorkshopSceneSnapshot,
                                     won: Bool) -> ApsidesWorkshopMaterial {
-        guard index >= 0, index < snapshot.gauges.count else { return .markUnmet }
-        return won || snapshot.gauges[index].met ? .markMet : .markUnmet
+        guard index >= 0, index < snapshot.previewGauges.count else { return .markUnmet }
+        return won || snapshot.previewGauges[index].met ? .markMet : .markUnmet
     }
 
     // MARK: The orbit loop
@@ -518,31 +607,83 @@ public enum ApsidesWorkshopSceneGeometry {
 
     // MARK: Meshes
 
-    /// The compass mesh for the compass program, in painter's order (see the header).
+    /// The compass mesh for the compass program, in painter's order (see the header), seen from the authored camera.
     public static func compassMesh(_ snapshot: ApsidesWorkshopSceneSnapshot,
                                    tier: ApsidesWorkshopTier) throws(MeshError) -> Mesh {
         try compassPart(snapshot, tier: tier).mesh
     }
 
-    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2.
+    /// The compass mesh seen from `camera` (feature 474): the backdrop and the level-2 discs facing its eye
+    /// (``compassPart(_:tier:wonLevel:camera:)`` without colours).
+    public static func compassMesh(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier,
+                                   camera: ApsidesWorkshopCamera) throws(MeshError) -> Mesh {
+        try compassPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
+    /// The glow mesh for the glow program (`glowPart` without colours), seen from the authored camera; empty at
+    /// level-2.
     public static func glowMesh(_ snapshot: ApsidesWorkshopSceneSnapshot,
                                 tier: ApsidesWorkshopTier) throws(MeshError) -> Mesh {
         try glowPart(snapshot, tier: tier).mesh
     }
 
+    /// The glow mesh seen from `camera` (feature 474): bands facing its eye and lifted towards it
+    /// (``glowPart(_:tier:camera:)`` without colours); empty at level-2.
+    public static func glowMesh(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier,
+                                camera: ApsidesWorkshopCamera) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
     /// The whole compass with fallback colours (each material's palette colour, unlit; the backdrop from midnight at
     /// its bottom to midnight top at its top; on a won level every gauge mark in the met colour) for the shared unlit
     /// renderer: the same positions as ``compassMesh(_:tier:)``. `wonLevel` overrides `snapshot.isWon`; positions never
-    /// depend on it.
+    /// depend on it. Seen from the authored camera.
     public static func compassPart(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier,
                                    wonLevel: Bool? = nil) throws(MeshError) -> ApsidesWorkshopColouredMesh {
-        var parts: Parts = Parts()
+        try compass(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts())
+    }
+
+    /// The whole compass with fallback colours seen from `camera` (feature 474): the backdrop (a quad facing the eye
+    /// behind the authored box, large enough to fill the view at aspects 0.25 … 4 from that eye) and the level-2 discs
+    /// face its eye; every other position is as ``compassPart(_:tier:wonLevel:)``, which it equals for the authored
+    /// camera.
+    public static func compassPart(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier,
+                                   wonLevel: Bool? = nil,
+                                   camera: ApsidesWorkshopCamera) throws(MeshError) -> ApsidesWorkshopColouredMesh {
+        try compass(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(camera: camera))
+    }
+
+    /// Builds the compass into `parts` (empty, with the view to face): every element in painter's order, the ghost
+    /// preview right after the last element of kind marker (see the header).
+    static func compass(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier, wonLevel: Bool?,
+                        parts start: Parts) throws(MeshError) -> ApsidesWorkshopColouredMesh {
+        var parts: Parts = start
         let won: Bool = wonLevel ?? snapshot.isWon
         let ribbon: [SIMD3<Double>] = refinement(snapshot, tier: tier)
+        var ghostDrawn: Bool = false
         for element in paintOrder(snapshot) {
+            if !ghostDrawn && element.kind.rawValue > ApsidesWorkshopElement.Kind.marker.rawValue {
+                try ghostPreview(&parts, snapshot)
+                ghostDrawn = true
+            }
             try draw(element, into: &parts, snapshot, tier: tier, won: won, ribbon: ribbon)
         }
+        if !ghostDrawn { try ghostPreview(&parts, snapshot) }
         return parts.built()
+    }
+
+    /// Draws the ghost preview while a pending orbit is previewed (nothing otherwise): the dashed loop through
+    /// ``ghostLoop(_:)``, then the outlined diamond at its P(0) and the outlined square at its P(T/2) (see the header).
+    static func ghostPreview(_ parts: inout Parts, _ snapshot: ApsidesWorkshopSceneSnapshot) throws(MeshError) {
+        let loop: [SIMD3<Double>] = ghostLoop(snapshot)
+        let n: Int = loop.count
+        guard n > 0 else { return }
+        let ghost: Double = code(.ghostPreview)
+        try parts.dashedLoop(loop, width: ghostPreviewWidth, code: ghost)
+        try parts.mark(centre: loop[0], unit: periapsisSize / 2, code: ghost,
+                       shape: ApsidesWorkshopShaders.ghostShapeDiamond)
+        try parts.mark(centre: loop[(n / 2) % n], unit: apoapsisSize / 2, code: ghost,
+                       shape: ApsidesWorkshopShaders.ghostShapeSquare)
     }
 
     /// The backdrop's half width and half height: large enough to fill the view at its plane for every aspect in
@@ -574,6 +715,10 @@ public enum ApsidesWorkshopSceneGeometry {
         let c: SIMD3<Double> = element.centre
         switch element.part {
         case .backdrop:
+            if let view = parts.view {
+                try facingBackdrop(&parts, view.camera)
+                return
+            }
             let half: SIMD2<Double> = backdropHalf()
             let corners: [SIMD3<Double>] = [c + SIMD3(-half.x, -half.y, 0), c + SIMD3(half.x, -half.y, 0),
                                             c + SIMD3(half.x, half.y, 0), c + SIMD3(-half.x, half.y, 0)]
@@ -626,6 +771,30 @@ public enum ApsidesWorkshopSceneGeometry {
         }
     }
 
+    /// Draws the backdrop facing `camera`'s eye (feature 474): one quad behind the authored box, at the depth of its
+    /// farthest corner along the view plus 1, with the half height and half width that fill the view from that eye at
+    /// aspects 0.25 and 4 (``fitted(eye:target:aspect:)``), grown by 5 %; a_uv.y the height 0 … 1 and a_normal.x the
+    /// horizontal coordinate −1 … +1 as the authored backdrop.
+    static func facingBackdrop(_ parts: inout Parts, _ camera: ApsidesWorkshopCamera) throws(MeshError) {
+        typealias P = ApsidesWorkshopPalette
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis(camera)
+        var depth: Double = 0
+        for index in 0..<8 { depth = max(depth, dot(corner(index) - camera.eye, basis.forward)) }
+        depth += 1
+        let tall: ApsidesWorkshopCamera = fitted(eye: camera.eye, target: camera.target,
+                                                 aspect: backdropAspects.lowerBound)
+        let wide: ApsidesWorkshopCamera = fitted(eye: camera.eye, target: camera.target,
+                                                 aspect: backdropAspects.upperBound)
+        let halfHeight: Double = depth * tan(tall.fovY / 2) * 1.05
+        let halfWidth: Double = depth * tan(wide.fovY / 2) * wide.aspect * 1.05
+        let centre: SIMD3<Double> = camera.eye + basis.forward * depth
+        let w: SIMD3<Double> = basis.right * halfWidth
+        let h: SIMD3<Double> = basis.up * halfHeight
+        try parts.quad([centre - w - h, centre + w - h, centre + w + h, centre - w + h], code: code(.backdrop),
+                       local: [0, 0, 1, 1], colours: [P.midnight, P.midnight, P.midnightTop, P.midnightTop],
+                       slots: [SIMD3(-1, 0, 0), SIMD3(1, 0, 0), SIMD3(1, 0, 0), SIMD3(-1, 0, 0)])
+    }
+
     /// Draws the compass: spokes, rim, notches and the target brackets.
     static func compass(_ parts: inout Parts, _ snapshot: ApsidesWorkshopSceneSnapshot) throws(MeshError) {
         let sectors: Int = ApsidesWorkshopSky.sectorCount
@@ -663,10 +832,11 @@ public enum ApsidesWorkshopSceneGeometry {
     }
 
     /// Draws target `index`'s gauge: its track (broken when a failure names the target), its band bracket and its
-    /// reading mark.
+    /// reading mark; the band and the mark from the snapshot's `previewGauges` (the preview's reading while a pending
+    /// orbit is previewed; the same targets as `gauges`).
     static func gauge(_ parts: inout Parts, _ index: Int, _ snapshot: ApsidesWorkshopSceneSnapshot,
                       won: Bool) throws(MeshError) {
-        let gauge: ApsidesWorkshopGauge = snapshot.gauges[index]
+        let gauge: ApsidesWorkshopGauge = snapshot.previewGauges[index]
         let y: Double = gaugeCentre(index).y
         let broken: Bool = failingGauge(snapshot) == index
         try parts.strip(SIMD3(gaugeStart, y, planeZ), SIMD3(gaugeEnd, y, planeZ), width: trackHeight,
@@ -685,7 +855,7 @@ public enum ApsidesWorkshopSceneGeometry {
                        code: code(markMaterial(index, snapshot, won: won)))
     }
 
-    /// Draws a body: a UV sphere of the tier's detail, or a flat disc facing the eye at level-2.
+    /// Draws a body: a UV sphere of the tier's detail, or a flat disc facing the eye at level-2 (the parts' eye).
     static func body(_ parts: inout Parts, centre: SIMD3<Double>, radius: Double, material: ApsidesWorkshopMaterial,
                      tier: ApsidesWorkshopTier) throws(MeshError) {
         if tier.flatSpheres {
@@ -703,18 +873,34 @@ public enum ApsidesWorkshopSceneGeometry {
     /// half width orbitWidth / 2 + ``orbitGlowGrowth`` · k, a_uv.y 1, base ``ApsidesWorkshopPalette/glow``, kind orbit)
     /// and a band around the orbiter (from its radius, growth ``orbiterGlowGrowth``, base
     /// ``ApsidesWorkshopPalette/glacial``, kind orbiter). a_normal is the base colour and a_uv.x
-    /// ``ApsidesWorkshopShaders/GlowKind/code(factor:)``. Empty at level-2.
+    /// ``ApsidesWorkshopShaders/GlowKind/code(factor:)``. Empty at level-2. Seen from the authored camera.
     public static func glowPart(_ snapshot: ApsidesWorkshopSceneSnapshot,
                                 tier: ApsidesWorkshopTier) throws(MeshError) -> ApsidesWorkshopColouredMesh {
+        try glow(snapshot, tier: tier, parts: Parts())
+    }
+
+    /// The glow with fallback colours seen from `camera` (feature 474): the star and orbiter bands facing its eye and
+    /// every shell lifted 0.001 · k towards it; otherwise as ``glowPart(_:tier:)``, which it equals for the authored
+    /// camera.
+    public static func glowPart(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier,
+                                camera: ApsidesWorkshopCamera) throws(MeshError) -> ApsidesWorkshopColouredMesh {
+        try glow(snapshot, tier: tier, parts: Parts(camera: camera))
+    }
+
+    /// Builds the glow into `parts` (empty, with the view to face; see ``glowPart(_:tier:)``).
+    static func glow(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier,
+                     parts start: Parts) throws(MeshError) -> ApsidesWorkshopColouredMesh {
         typealias P = ApsidesWorkshopPalette
         typealias K = ApsidesWorkshopShaders.GlowKind
-        var parts: Parts = Parts()
+        var parts: Parts = start
         let shells: Int = max(tier.glowShells, 0)
         guard shells > 0 else { return parts.built() }
         let ribbon: [SIMD3<Double>] = refinement(snapshot, tier: tier)
+        let towards: SIMD3<Double> = parts.towardsEye
         for k in stride(from: shells, through: 1, by: -1) {
             let factor: Double = pow(glowWeight, Double(k))
-            let lift: SIMD3<Double> = SIMD3(0, 0, glowLift * Double(k))
+            let lift: SIMD3<Double> = parts.view == nil ? SIMD3(0, 0, glowLift * Double(k))
+                : towards * (glowLift * Double(k))
             try parts.glowBand(centre: starCentre() + lift, inner: starRadius,
                                outer: starRadius + starGlowGrowth * Double(k), base: P.star,
                                code: K.star.code(factor: factor), factor: factor)
@@ -747,8 +933,91 @@ public enum ApsidesWorkshopSceneGeometry {
     /// axis); the vertical field of view is the smallest that holds every corner of the box x −1.0 … 1.0, y −1.65 …
     /// 1.0, z −0.15 … 0.15 inside the view with ``fitMargin`` per side (the box is convex and in front of the eye, so
     /// every point inside it — the compass, every orbit, every planet of the catalog, the gauges and the bars — keeps
-    /// a margin of at least 5 % for aspect 0.4 … 2.5). Independent of the snapshot, the tier and the time.
+    /// a margin of at least 5 % for aspect 0.4 … 2.5). Independent of the snapshot, the tier and the time. Equals
+    /// ``camera(aspect:orbit:)`` at ``ApsidesWorkshopViewOrbit/authored`` bit for bit.
     public static func camera(aspect: Double) -> ApsidesWorkshopCamera {
+        camera(aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `orbit` (clamped, see ``ApsidesWorkshopViewOrbit/clamped()``) and `aspect` (feature 474,
+    /// T-R02G1804-002): from the orbit's eye looking at its look-at point (``orbitView(_:)``) with +y up (never
+    /// parallel: the view stays within 35° of level); the vertical field of view is the smallest that holds every
+    /// corner of the box x −1.0 … 1.0, y −1.65 … 1.0, z −0.15 … 0.15 inside the view with ``fitMargin`` per side, so
+    /// everything inside the box keeps a margin of at least 5 % at every orbit and aspect 0.4 … 2.5. The eye stays
+    /// outside the box. At the authored orbit it is the fixed camera of R02-G18-03, bit for bit. Presentation only;
+    /// independent of the snapshot, the tier and the time.
+    public static func camera(aspect: Double, orbit: ApsidesWorkshopViewOrbit) -> ApsidesWorkshopCamera {
+        let o: ApsidesWorkshopViewOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return authoredCamera(aspect: aspect) }
+        let view: (eye: SIMD3<Double>, target: SIMD3<Double>) = orbitView(o)
+        return fitted(eye: view.eye, target: view.target, aspect: aspect)
+    }
+
+    /// The vertical axis the orbit yaws about passes through the authored box centre (0, −0.325, 0).
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `p` yawed by `yaw` radians about the vertical axis through ``orbitPivot`` (from +z towards +x).
+    static func yawed(_ p: SIMD3<Double>, _ yaw: Double) -> SIMD3<Double> {
+        let c: Double = cos(yaw)
+        let s: Double = sin(yaw)
+        let d: SIMD3<Double> = p - orbitPivot
+        return SIMD3(orbitPivot.x + d.x * c + d.z * s, p.y, orbitPivot.z - d.x * s + d.z * c)
+    }
+
+    /// The eye and the look-at point of `orbit` (clamped): the authored eye's offset from the look-at point,
+    /// (0, 0, 3.6), pitched about the authored view's right axis (its elevation above the horizontal raised by the
+    /// pitch, its length and horizontal direction kept) and added to the look-at point; then both points yawed about
+    /// the vertical axis through ``orbitPivot``. Exactly ``eye`` and ``lookAt`` at the authored orbit.
+    static func orbitView(_ orbit: ApsidesWorkshopViewOrbit) -> (eye: SIMD3<Double>, target: SIMD3<Double>) {
+        let o: ApsidesWorkshopViewOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return (eye: eye, target: lookAt) }
+        let e: SIMD3<Double> = eye - lookAt
+        let horizontal: Double = (e.x * e.x + e.z * e.z).squareRoot()
+        let length: Double = dot(e, e).squareRoot()
+        let elevation: Double = atan2(e.y, horizontal) + o.pitch
+        let across: Double = length * cos(elevation) / horizontal
+        let pitched: SIMD3<Double> = lookAt + SIMD3(e.x * across, length * sin(elevation), e.z * across)
+        return (eye: yawed(pitched, o.yaw), target: yawed(lookAt, o.yaw))
+    }
+
+    /// The camera from `eye` looking at `target` with +y up for `aspect` (made usable): the vertical field of view is
+    /// the smallest that holds every corner of the authored box inside the view with ``fitMargin`` per side; near half
+    /// the nearest corner's depth (at least 0.001), far the farthest corner's depth plus 3 (past the facing backdrop).
+    static func fitted(eye: SIMD3<Double>, target: SIMD3<Double>, aspect: Double) -> ApsidesWorkshopCamera {
+        let a: Double = usableAspect(aspect)
+        let forward: SIMD3<Double> = unit(target - eye)
+        let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
+        let up: SIMD3<Double> = cross(right, forward)
+        let limit: Double = 1 - 2 * fitMargin
+        var tanHalf: Double = 0
+        var nearest: Double = Double.infinity
+        var farthest: Double = 0
+        for index in 0..<8 {
+            let r: SIMD3<Double> = corner(index) - eye
+            let depth: Double = dot(r, forward)
+            nearest = min(nearest, depth)
+            farthest = max(farthest, depth)
+            tanHalf = max(tanHalf, abs(dot(r, up)) / depth / limit, abs(dot(r, right)) / depth / (a * limit))
+        }
+        let fovY: Double = 2 * atan(tanHalf)
+        let near: Double = max(nearest * 0.5, 1e-3)
+        let far: Double = farthest + 3
+        let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: vec(target), up: Vec3(0, 1, 0))
+        let projection: Mat4 = Mat4.perspective(fovY: fovY, aspect: a, near: near, far: far)
+        return ApsidesWorkshopCamera(eye: eye, target: target, fovY: fovY, aspect: a, near: near, far: far, view: view,
+                                     projection: projection, viewProjection: projection * view)
+    }
+
+    /// `camera`'s unit forward, right and up vectors (from its eye towards its target, +y up).
+    static func viewBasis(_ camera: ApsidesWorkshopCamera) -> (forward: SIMD3<Double>, right: SIMD3<Double>,
+                                                               up: SIMD3<Double>) {
+        let forward: SIMD3<Double> = unit(camera.target - camera.eye)
+        let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
+        return (forward, right, cross(right, forward))
+    }
+
+    /// The fixed camera of R02-G18-03 for `aspect` (see ``camera(aspect:)``), unchanged.
+    static func authoredCamera(aspect: Double) -> ApsidesWorkshopCamera {
         let a: Double = usableAspect(aspect)
         let limit: Double = 1 - 2 * fitMargin
         var tanHalf: Double = 0
@@ -784,6 +1053,21 @@ public enum ApsidesWorkshopSceneGeometry {
     /// The unit direction at `angle` (radians, anticlockwise from +x) in the plane z = 0.
     static func direction(_ angle: Double) -> SIMD3<Double> { SIMD3(cos(angle), sin(angle), 0) }
 
+    /// The dot product of `a` and `b`.
+    static func dot(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> Double { a.x * b.x + a.y * b.y + a.z * b.z }
+
+    /// The cross product `a` × `b`.
+    static func cross(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> SIMD3<Double> {
+        SIMD3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+    }
+
+    /// `v` scaled to unit length (`v` itself when its length is 0 or not finite).
+    static func unit(_ v: SIMD3<Double>) -> SIMD3<Double> {
+        let length: Double = dot(v, v).squareRoot()
+        guard length.isFinite, length > 0 else { return v }
+        return v / length
+    }
+
     /// Collects vertices with fallback colours and triangles wound counter-clockwise seen from the eye (+z) or from
     /// outside a sphere.
     struct Parts {
@@ -791,8 +1075,33 @@ public enum ApsidesWorkshopSceneGeometry {
         var builder: MeshBuilder = MeshBuilder()
         /// One colour per welded vertex.
         var colours: [Vec4] = []
-        /// The side every flat piece faces: towards the eye.
+        /// The side every flat piece faces: towards the authored eye.
         static let facing: SIMD3<Double> = SIMD3(0, 0, 1)
+        /// The camera the pieces face with its unit view basis (feature 474); nil for the authored camera, whose
+        /// pieces are built exactly as in R02-G18-03.
+        let view: (camera: ApsidesWorkshopCamera, forward: SIMD3<Double>, right: SIMD3<Double>,
+                   up: SIMD3<Double>)?
+
+        /// Parts built for the authored camera.
+        init() { view = nil }
+
+        /// Parts built for `camera` (feature 474): the authored parts when it is the authored camera (its eye and
+        /// target), else parts whose billboards and backdrop face its eye.
+        init(camera: ApsidesWorkshopCamera) {
+            typealias G = ApsidesWorkshopSceneGeometry
+            if camera.eye == G.eye && camera.target == G.lookAt {
+                view = nil
+            } else {
+                let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = G.viewBasis(camera)
+                view = (camera: camera, forward: basis.forward, right: basis.right, up: basis.up)
+            }
+        }
+
+        /// The unit direction towards the eye the pieces face: +z for the authored camera, else −forward.
+        var towardsEye: SIMD3<Double> {
+            guard let v = view else { return Parts.facing }
+            return v.forward * -1
+        }
 
         /// Adds (or welds) a vertex at `p` with a_normal `slot` and uv (`code`, `local`); its fallback colour is
         /// `colour` (default the code's).
@@ -810,7 +1119,8 @@ public enum ApsidesWorkshopSceneGeometry {
         /// Adds the triangle wound counter-clockwise seen from the side `facing` points to; degenerate triangles are
         /// skipped.
         mutating func triangle(_ ids: (UInt32, UInt32, UInt32), _ pa: SIMD3<Double>, _ pb: SIMD3<Double>,
-                               _ pc: SIMD3<Double>, facing: SIMD3<Double> = Parts.facing) throws(MeshError) {
+                               _ pc: SIMD3<Double>, facing given: SIMD3<Double>? = nil) throws(MeshError) {
+            let facing: SIMD3<Double> = given ?? towardsEye
             let u: SIMD3<Double> = pb - pa
             let v: SIMD3<Double> = pc - pa
             let n: SIMD3<Double> = SIMD3(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x)
@@ -869,6 +1179,26 @@ public enum ApsidesWorkshopSceneGeometry {
             try quad([a + w, b + w, b - w, a - w], code: code, local: [-1, -1, 1, 1])
         }
 
+        /// A closed dashed ribbon of `width` through `points` (feature 474): one strip per segment k (the last back to
+        /// the first), a_uv.y −1 … +1 across it and a_normal.x the fraction k / n at its start and (k + 1) / n at its
+        /// end (the seam's end repeated with 1), a_normal.z ``ApsidesWorkshopShaders/ghostShapeLine``.
+        mutating func dashedLoop(_ points: [SIMD3<Double>], width: Double, code: Double) throws(MeshError) {
+            let n: Int = points.count
+            guard n >= 2 else { return }
+            let shape: Double = ApsidesWorkshopShaders.ghostShapeLine
+            for k in 0..<n {
+                let a: SIMD3<Double> = points[k]
+                let b: SIMD3<Double> = points[(k + 1) % n]
+                let d: SIMD3<Double> = b - a
+                let length: Double = (d.x * d.x + d.y * d.y).squareRoot()
+                guard length > 0 else { continue }
+                let w: SIMD3<Double> = SIMD3(d.y / length, -d.x / length, 0) * (width / 2)
+                let t0: SIMD3<Double> = SIMD3(Double(k) / Double(n), 0, shape)
+                let t1: SIMD3<Double> = SIMD3(k + 1 == n ? 1 : Double(k + 1) / Double(n), 0, shape)
+                try quad([a + w, b + w, b - w, a - w], code: code, local: [-1, -1, 1, 1], slots: [t0, t1, t1, t0])
+            }
+        }
+
         /// A closed ribbon of `width` through `points` (one strip per segment, the last back to the first).
         mutating func loop(_ points: [SIMD3<Double>], width: Double, code: Double) throws(MeshError) {
             let n: Int = points.count
@@ -877,13 +1207,14 @@ public enum ApsidesWorkshopSceneGeometry {
         }
 
         /// A mark quad of half side ``ApsidesWorkshopShaders/markQuadExtent`` · `unit` around `centre`: a_normal.xy the
-        /// mark-local coordinate (± markQuadExtent at the corners), a_uv.y 0.
-        mutating func mark(centre: SIMD3<Double>, unit: Double, code: Double) throws(MeshError) {
+        /// mark-local coordinate (± markQuadExtent at the corners), a_normal.z `shape` (0 except on a ghost preview
+        /// marker, feature 474), a_uv.y 0.
+        mutating func mark(centre: SIMD3<Double>, unit: Double, code: Double, shape: Double = 0) throws(MeshError) {
             let e: Double = ApsidesWorkshopShaders.markQuadExtent
             let h: Double = e * unit
             try quad([centre + SIMD3(-h, -h, 0), centre + SIMD3(h, -h, 0), centre + SIMD3(h, h, 0),
                       centre + SIMD3(-h, h, 0)], code: code, local: [0, 0, 0, 0],
-                     slots: [SIMD3(-e, -e, 0), SIMD3(e, -e, 0), SIMD3(e, e, 0), SIMD3(-e, e, 0)])
+                     slots: [SIMD3(-e, -e, shape), SIMD3(e, -e, shape), SIMD3(e, e, shape), SIMD3(-e, e, shape)])
         }
 
         /// A rectangle of half size `half` around `centre`, as a fan (a_uv.y 0 at the centre, 1 on the outline).
@@ -905,10 +1236,24 @@ public enum ApsidesWorkshopSceneGeometry {
             return points
         }
 
-        /// A flat disc of `sides` sides and `radius` around `centre`, as a fan (a_uv.y the radial coordinate),
-        /// a_normal ``ApsidesWorkshopShaders/viewDirection``.
+        /// The circle of `radius` around `centre` facing the eye in `segments` + 1 points (the last repeats the
+        /// first), anticlockwise from the eye: ``circlePoints(_:_:_:)`` for the authored camera, else in the plane of
+        /// the view's right and up vectors (feature 474).
+        func facingCirclePoints(_ centre: SIMD3<Double>, _ radius: Double, _ segments: Int) -> [SIMD3<Double>] {
+            guard let v = view else { return circlePoints(centre, radius, segments) }
+            var points: [SIMD3<Double>] = []
+            let n: Int = max(segments, 3)
+            for k in 0...n {
+                let angle: Double = 2 * Double.pi * Double(k % n) / Double(n)
+                points.append(centre + (v.right * cos(angle) + v.up * sin(angle)) * radius)
+            }
+            return points
+        }
+
+        /// A flat disc of `sides` sides and `radius` around `centre` facing the eye, as a fan (a_uv.y the radial
+        /// coordinate), a_normal ``ApsidesWorkshopShaders/viewDirection``.
         mutating func disc(centre: SIMD3<Double>, radius: Double, sides: Int, code: Double) throws(MeshError) {
-            try fan(centre: centre, outline: Array(circlePoints(centre, radius, sides).dropLast()), code: code,
+            try fan(centre: centre, outline: Array(facingCirclePoints(centre, radius, sides).dropLast()), code: code,
                     slot: ApsidesWorkshopShaders.viewDirection)
         }
 
@@ -978,13 +1323,13 @@ public enum ApsidesWorkshopSceneGeometry {
             }
         }
 
-        /// A glow band: a ring of ``ApsidesWorkshopSceneGeometry/glowSides`` sides from `inner` (a_uv.y 0) to `outer`
-        /// (a_uv.y 1) around `centre`, a_normal the base colour, a_uv.x `code`, coloured base · factor.
+        /// A glow band: a ring of ``ApsidesWorkshopSceneGeometry/glowSides`` sides facing the eye from `inner` (a_uv.y
+        /// 0) to `outer` (a_uv.y 1) around `centre`, a_normal the base colour, a_uv.x `code`, coloured base · factor.
         mutating func glowBand(centre: SIMD3<Double>, inner: Double, outer: Double, base: SIMD3<Double>, code: Double,
                                factor: Double) throws(MeshError) {
             let sides: Int = ApsidesWorkshopSceneGeometry.glowSides
-            let a: [SIMD3<Double>] = circlePoints(centre, inner, sides)
-            let b: [SIMD3<Double>] = circlePoints(centre, outer, sides)
+            let a: [SIMD3<Double>] = facingCirclePoints(centre, inner, sides)
+            let b: [SIMD3<Double>] = facingCirclePoints(centre, outer, sides)
             for k in 0..<(a.count - 1) {
                 try quad([a[k], b[k], b[k + 1], a[k + 1]], code: code, local: [0, 1, 1, 0], colour: base * factor,
                          slots: [base, base, base, base])

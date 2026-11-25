@@ -3,7 +3,7 @@
 // declared uniform listed (equal to the uniform name constants the scene sets) and used in its stage, at most 16 vec4
 // uniform slots per program, no texture sampler, no `discard`, no loop (so no unbounded one), vertex outputs matching
 // fragment inputs, balanced braces, ASCII-only sources, the attribute names and locations (the `ShaderMeshRenderer`
-// streams), the material code table (distinct, ordered 0 … 21, each selected by the vertex shader with its palette
+// streams), the material code table (distinct, ordered 0 … 22, each selected by the vertex shader with its palette
 // colour, decoded back), the GLSL palette constants parsing back to `ApsidesWorkshopPalette` within 1e-6, the layered
 // sphere shading (the orbiter's deep rose rim), the signed-distance references (edge, ribbon, hazard hatching, diamond,
 // square, filled and hollow marks), the orbit ribbon's emissive core and the won brightening, every gauge mark lit on a
@@ -11,6 +11,13 @@
 // with Reduce Motion, 0.85 … 1 otherwise, finite, 1 for a non-finite time), the glow per kind, the glow gain per tier
 // (0 at level-2) and the Reduce Flashing cap, and, when `glslangValidator` is installed, a real front-end compile of
 // each source (skipped otherwise). Test data uses explicit types and plain loops (CI type-check rule).
+//
+// Feature 474 (R02-G18-04) T-R02G1804-002 (FR-R02G1804-004; clarification Q3): the new material 22 `ghostPreview`
+// (glacial, selected by the vertex shader in code order, decoded back, the decode clamp now 0 … 22, 23 materials): its
+// dashed loop (``ApsidesWorkshopShaders/ghostPreviewDashes`` dashes of duty ``ApsidesWorkshopShaders/ghostPreviewDuty``
+// under the ribbon edge) and its outlined diamond and square (a band just inside the shape, empty at its centre and
+// outside), each times ``ApsidesWorkshopShaders/ghostPreviewAlpha``, inside the mark quad; the fragment shader's lines
+// for it and its constants.
 import Foundation
 import Testing
 @testable import ApsidesWorkshopCore
@@ -374,7 +381,7 @@ import Testing
         #expect(fragment.contains("const vec3 AW_MIDNIGHT_TOP = vec3(0.101961, 0.078431, 0.219608);"))
         let glowF: String = Shaders.glowFragment
         let floats: [(name: String, value: Double, source: String)] = [
-            (name: "AW_MAX_MATERIAL", value: 21, source: vertex),
+            (name: "AW_MAX_MATERIAL", value: 22, source: vertex),
             (name: "AW_EDGE_FEATHER", value: Shaders.edgeFeather, source: fragment),
             (name: "AW_RIBBON_FEATHER", value: Shaders.ribbonFeather, source: fragment),
             (name: "AW_CELLS_ACROSS", value: Shaders.cellsAcross, source: fragment),
@@ -397,6 +404,10 @@ import Testing
             (name: "AW_MARK_FEATHER", value: Shaders.markFeather, source: fragment),
             (name: "AW_RING_HALF", value: Shaders.markRingHalf, source: fragment),
             (name: "AW_INV_SQRT2", value: 1 / 2.0.squareRoot(), source: fragment),
+            (name: "AW_GHOST_DASHES", value: Shaders.ghostPreviewDashes, source: fragment),
+            (name: "AW_GHOST_DUTY", value: Shaders.ghostPreviewDuty, source: fragment),
+            (name: "AW_GHOST_PREVIEW_ALPHA", value: Shaders.ghostPreviewAlpha, source: fragment),
+            (name: "AW_GHOST_OUTLINE_HALF", value: Shaders.ghostOutlineHalf, source: fragment),
             (name: "AW_GLOW_WEIGHT", value: Shaders.glowWeight, source: glowF),
             (name: "AW_ORBIT_REST", value: Shaders.orbitRest, source: glowF),
             (name: "AW_MAX_GAIN", value: Shaders.maxGlowGain, source: glowF),
@@ -412,8 +423,10 @@ import Testing
         let names: [String] = [
             "backdrop", "wedge", "targetWedge", "spoke", "rim", "notch", "bracket", "ghost", "orbit", "periapsis",
             "apoapsis", "planet", "hazard", "star", "orbiter", "gaugeTrack", "gaugeBand", "markMet", "markUnmet",
-            "barLit", "barUnlit", "broken",
+            "barLit", "barUnlit", "broken", "ghostPreview",
         ]
+        #expect(names.count == 23)
+        #expect(Material.maxCode == 22)
         #expect(Material.allCases.count == names.count)
         #expect(Shaders.materials.count == names.count)
         var codes: Set<Float> = []
@@ -438,7 +451,8 @@ import Testing
         }
         #expect(codes.count == names.count)
         #expect(Material.decode(-4) == .backdrop)
-        #expect(Material.decode(99) == .broken)
+        #expect(Material.decode(99) == .ghostPreview)
+        #expect(Material.decode(21.4) == .broken)
         #expect(Material.decode(Double.nan) == .backdrop)
         // The vertex shader selects every material's colour with its code, in code order.
         let vertex: String = Shaders.compassVertex
@@ -470,6 +484,7 @@ import Testing
         #expect(Material.barLit.baseColour == Palette.actionsLit)
         #expect(Material.barUnlit.baseColour == Palette.actionsUnlit)
         #expect(Material.broken.baseColour == Palette.broken)
+        #expect(Material.ghostPreview.baseColour == Palette.glacial)
         // The fragment shader branches on the same codes.
         let fragment: String = Shaders.compassFragment
         let lines: [String] = [
@@ -485,6 +500,7 @@ import Testing
             "float isOrbiter = isCode(m, 14.0);",
             "coverage = mix(coverage, filled, isCode(m, 17.0));",
             "coverage = mix(coverage, unmetMark, isCode(m, 18.0));",
+            "coverage = mix(coverage, ghostCover * AW_GHOST_PREVIEW_ALPHA, isCode(m, 22.0));",
             "coverage = mix(coverage, 1.0, sky);",
         ]
         for line in lines { #expect(fragment.contains(line), "\(line)") }
@@ -601,6 +617,74 @@ import Testing
             "float squareMark = markCover(1.0 - max(abs(p.x), abs(p.y)));",
             "float filled = markCover(1.0 - r);",
             "float hollow = markCover(AW_RING_HALF - abs(r - (1.0 - AW_RING_HALF)));",
+        ]
+        for line in lines { #expect(fragment.contains(line), "\(line)") }
+    }
+
+    /// Feature 474: material 22, the ghost of a pending orbit — a dashed glacial loop and outlined apsis markers.
+    @Test func ghostPreviewIsADashedLoopWithOutlinedMarkers() {
+        #expect(Material.ghostPreview.rawValue == 22 && Material.ghostPreview.code == 22)
+        #expect(Material.ghostPreview.paletteConstant == "AW_GLACIAL")
+        #expect(Shaders.baseColour(of: .ghostPreview, won: 1) == Palette.glacial)
+        // The loop: the dashes with their duty, under the ribbon's soft edge, times the alpha.
+        var lit: Int = 0
+        var runs: Int = 0
+        var previous: Double = 0
+        let samples: Int = 4800
+        for step in 0..<samples {
+            let value: Double = Shaders.ghostPreviewDash(along: (Double(step) + 0.5) / Double(samples))
+            #expect(value == 0 || value == 1)
+            lit += Int(value)
+            if value == 1 && previous == 0 { runs += 1 }
+            previous = value
+        }
+        #expect(runs == Int(Shaders.ghostPreviewDashes))
+        #expect(abs(Double(lit) / Double(samples) - Shaders.ghostPreviewDuty) < 0.01)
+        #expect(Shaders.ghostPreviewDash(along: Double.nan) == 1)
+        #expect(Shaders.ghostPreviewCoverage(across: 0, along: 0.001) == Shaders.ghostPreviewAlpha)
+        #expect(Shaders.ghostPreviewCoverage(across: 1, along: 0.001) == 0)
+        let gap: Double = (Shaders.ghostPreviewDuty + 0.2) / Shaders.ghostPreviewDashes
+        #expect(Shaders.ghostPreviewCoverage(across: 0, along: gap) == 0)
+        #expect(Shaders.ghostPreviewCoverage(across: Double.nan, along: 0.001) == 0)
+        // The markers: a band just inside the diamond or the square; empty at the centre and outside.
+        let diamond: Double = Shaders.ghostShapeDiamond
+        let square: Double = Shaders.ghostShapeSquare
+        let half: Double = Shaders.ghostOutlineHalf
+        #expect(Shaders.ghostShapeLine == 0 && diamond == 1 && square == 2)
+        #expect(Shaders.ghostOutlineCoverage(shape: diamond, u: 0, v: 0) == 0)
+        #expect(Shaders.ghostOutlineCoverage(shape: square, u: 0, v: 0) == 0)
+        let onDiamondBand: Double = 1 - half * 2.0.squareRoot()
+        #expect(abs(Shaders.ghostOutlineCoverage(shape: diamond, u: onDiamondBand, v: 0)
+                    - Shaders.ghostPreviewAlpha) < 1e-12)
+        #expect(abs(Shaders.ghostOutlineCoverage(shape: square, u: 1 - half, v: 0.3)
+                    - Shaders.ghostPreviewAlpha) < 1e-12)
+        #expect(Shaders.ghostOutlineCoverage(shape: square, u: 1.2, v: 0) == 0)
+        #expect(Shaders.ghostOutlineCoverage(shape: diamond, u: 0.7, v: 0.7) == 0)
+        #expect(Shaders.ghostOutlineCoverage(shape: Shaders.ghostShapeLine, u: 1 - half, v: 0) == 0)
+        #expect(Shaders.ghostOutlineCoverage(shape: Double.nan, u: 1 - half, v: 0) == 0)
+        #expect(Shaders.ghostOutlineDistance(shape: diamond, u: Double.nan, v: 0) == -1)
+        // Both outlines fit inside the quad the geometry spans, with room for the feather.
+        let e: Double = Shaders.markQuadExtent
+        for step in 0...40 {
+            let s: Double = -e + 2 * e * Double(step) / 40
+            let edges: [SIMD2<Double>] = [SIMD2(s, e), SIMD2(s, -e), SIMD2(e, s), SIMD2(-e, s)]
+            for p in edges {
+                #expect(Shaders.ghostOutlineCoverage(shape: diamond, u: p.x, v: p.y) == 0, "\(p)")
+                #expect(Shaders.ghostOutlineCoverage(shape: square, u: p.x, v: p.y) == 0, "\(p)")
+            }
+        }
+        let vertex: String = Shaders.compassVertex
+        #expect(vertex.contains("base = mix(base, AW_GLACIAL, isCode(m, 22.0));"))
+        let fragment: String = Shaders.compassFragment
+        let lines: [String] = [
+            "float ghostShape = floor(v_aux.z + 0.5);",
+            "float ghostDash = 1.0 - step(AW_GHOST_DUTY, fract(t * AW_GHOST_DASHES));",
+            "float diamondOutline = markCover(AW_GHOST_OUTLINE_HALF - abs(diamondDist - AW_GHOST_OUTLINE_HALF));",
+            "float squareOutline = markCover(AW_GHOST_OUTLINE_HALF - abs(squareDist - AW_GHOST_OUTLINE_HALF));",
+            "float ghostCover = ribbon * ghostDash;",
+            "ghostCover = mix(ghostCover, diamondOutline, isCode(ghostShape, 1.0));",
+            "ghostCover = mix(ghostCover, squareOutline, isCode(ghostShape, 2.0));",
+            "coverage = mix(coverage, ghostCover * AW_GHOST_PREVIEW_ALPHA, isCode(m, 22.0));",
         ]
         for line in lines { #expect(fragment.contains(line), "\(line)") }
     }

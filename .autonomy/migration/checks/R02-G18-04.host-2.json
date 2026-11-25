@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "ApsidesWorkshopPickerTests|ApsidesWorkshopSceneGeometryTests|ApsidesWorkshopShaderSourceTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'ApsidesWorkshopPickerTests|ApsidesWorkshopSceneGeometryTests|ApsidesWorkshopShaderSourceTests'",
+  "elapsed_seconds": 11.852,
+  "exit_code": 0,
+  "finished": "2026-11-25T23:55:56+00:00",
+  "gate": "R02-G18-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G18-04.host-2.log",
+  "log_sha256": "c3758e26ac3e288bcf5fe609791535aa44aaaad32ecba01db002e6d380986299",
+  "name": "host-2",
+  "started": "2026-11-25T23:55:44+00:00",
+  "timed_out": false
+}

@@ -6,6 +6,15 @@
 // left and the budget, the level number and the presentation time; plus the palette and the three quality tiers. The
 // renderer never holds the kernel, so no drawing result can change the game (renderer purity), and the drawn orbit
 // passes through the kernel's positions.
+//
+// Feature 474 (R02-G18-04) T-R02G1804-002 (FR-R02G1804-001, 002, 004; clarification Q3) adds the preview of a pending
+// orbit (a knob or size-handle drag, or the panel's pending steps): ``ApsidesWorkshopSceneSnapshot/previewing(_:)``
+// returns a copy whose `previewOrbit` is the pending orbit and whose `previewPositions` and `previewGauges` are the
+// kernel's positions and readings (`ApsidesWorkshopSky.report` of the level's period, planets and targets) of that
+// orbit — only for a valid pending orbit; an invalid one gives the copy without a preview. Without a preview
+// (`previewOrbit` nil) `previewPositions` and `previewGauges` equal `positions` and `gauges`, so drawing from them is
+// R02-G18-03's drawing. Presentation only: the preview never enters the digest, the game state or the kernel; every
+// other field of the copy is unchanged.
 import Foundation
 
 /// The palette of Apsides Workshop, as linear colours 0 … 1 (glacial white and deep rose on midnight).
@@ -160,6 +169,15 @@ public struct ApsidesWorkshopSceneSnapshot: Sendable, Equatable {
     public let levelNumber: Int
     /// The presentation time in seconds (never negative or non-finite).
     public let time: Double
+    /// The previewed pending orbit; nil when no preview (presentation only; never part of the digest; only ever a
+    /// valid orbit).
+    public private(set) var previewOrbit: ApsidesWorkshopOrbit?
+    /// The kernel's positions of the previewed orbit at ticks 0 … period − 1 (sky units); equal to ``positions`` when
+    /// no preview (presentation only).
+    public private(set) var previewPositions: [ApsidesWorkshopPoint]
+    /// One gauge per target with the previewed orbit's reading, deviation and met flag (the kernel's report); equal to
+    /// ``gauges`` when no preview (presentation only).
+    public private(set) var previewGauges: [ApsidesWorkshopGauge]
 
     /// A snapshot of `play` with tick `shownTick` shown (clamped to 0 … period − 1).
     public init(play: ApsidesWorkshopPlay, shownTick: Int, levelNumber: Int, time: Double) {
@@ -191,6 +209,46 @@ public struct ApsidesWorkshopSceneSnapshot: Sendable, Equatable {
         budget = level.budget
         self.levelNumber = levelNumber
         self.time = time.isFinite ? max(0, time) : 0
+        previewOrbit = nil
+        previewPositions = positions
+        previewGauges = gauges
+    }
+
+    /// Whether a pending orbit is previewed (``previewOrbit`` set).
+    public var isPreviewing: Bool { previewOrbit != nil }
+
+    /// This snapshot with `orbit` previewed (feature 474): ``previewOrbit`` set and ``previewPositions`` and
+    /// ``previewGauges`` the kernel's positions and readings of `orbit` (`ApsidesWorkshopSky.report` of the snapshot's
+    /// period, planets and targets; met flags in order as the kernel reports them). An invalid orbit (see
+    /// `ApsidesWorkshopOrbit.isValid`) gives the snapshot without a preview. Presentation only: nothing else changes
+    /// and nothing reaches the kernel or the digest.
+    public func previewing(_ orbit: ApsidesWorkshopOrbit) -> ApsidesWorkshopSceneSnapshot {
+        guard orbit.isValid, period > 0 else { return withoutPreview() }
+        var targets: [ApsidesWorkshopTarget] = []
+        for gauge in gauges { targets.append(gauge.target) }
+        let report: ApsidesWorkshopReport = ApsidesWorkshopSky.report(period: period, planets: planets,
+                                                                      targets: targets, orbit: orbit)
+        var readings: [ApsidesWorkshopGauge] = []
+        for (index, target) in targets.enumerated() {
+            let reading: Int = Self.reading(target, orbit: orbit, shares: report.shares)
+            readings.append(ApsidesWorkshopGauge(target: target, reading: reading, deviation: report.deviations[index],
+                                                 met: index < report.met))
+        }
+        var copy: ApsidesWorkshopSceneSnapshot = self
+        copy.previewOrbit = orbit
+        copy.previewPositions = report.positions
+        copy.previewGauges = readings
+        return copy
+    }
+
+    /// This snapshot without a preview: ``previewOrbit`` nil, ``previewPositions`` equal to ``positions`` and
+    /// ``previewGauges`` equal to ``gauges`` (presentation only).
+    public func withoutPreview() -> ApsidesWorkshopSceneSnapshot {
+        var copy: ApsidesWorkshopSceneSnapshot = self
+        copy.previewOrbit = nil
+        copy.previewPositions = positions
+        copy.previewGauges = gauges
+        return copy
     }
 
     /// Whether the play is won.
