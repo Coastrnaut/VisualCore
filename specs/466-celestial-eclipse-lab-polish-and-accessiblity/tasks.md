@@ -78,7 +78,7 @@ tests updated with the panel's new refusal words) and round02-host in five chunk
   `-3f` (the five round-two filters)
 - [X] T-R02G1706-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G17-06.*.json)
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G1706-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1706-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-25: 2026-11-25 reference-1 exit 0 (.autonomy/migration/checks/R02-G17-06.reference-1.json)
 - [ ] T-R02G1706-009 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02G1706-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-25: 2026-11-25 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G17-06.script-tests.json)
 - [ ] T-R02G1706-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G1706-006)
