@@ -31,7 +31,7 @@ R02-G17-03 (`git show <R02-G17-03 record commit>:<path>`).
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1803-003 [P] [US1] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopShaders.swift`
+- [X] T-R02G1803-003 [P] [US1] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopShaders.swift` — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopShaders (compass and glow GLSL ES 3.00, material table 0 … 21, won brightening) and ApsidesWorkshopShaderSourceTests (17) pass (host-2 exit 0)
   (compass and glow sources, GLSL ES 3.00; layered sphere shading (core, limb darkening, rim light) from the normal;
   signed-distance shading of spokes, rim, notches, brackets, the periapsis diamond and apoapsis square, hazard hatching,
   gauge tracks, bands and filled or hollow marks and bars from per-vertex local coordinates (material codes in uv: the
