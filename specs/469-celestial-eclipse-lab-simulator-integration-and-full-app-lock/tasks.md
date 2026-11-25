@@ -54,7 +54,7 @@ change (the shaders and reference of R02-G17-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G1709-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore
+- [X] T-R02G1709-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore — Verified 2026-11-25: 2026-11-25 app-unit exit 0, 147 app unit tests (143 before; the four new Celestial Eclipse Lab tests: stored examples restore, candidate not available without -vcCandidates, level 1 won through registry and engine with its trace, CEL pins equal the Core) (.autonomy/migration/checks/R02-G17-09.app-unit.json)
   through the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win;
   without `-vcCandidates` it is not available and not openable; `CEL`'s pinned level 1 certified plan and budget
   equal the Core's); `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27

@@ -6,6 +6,7 @@ import AcousticConstellatorCore
 import AmethystEscapeCore
 import AuroraLoomCore
 import BackwardsAuroraCore
+import CelestialEclipseLabCore
 import ChronoConstellatorCore
 import ColorfallCanyonsCore
 import EchoCartographerCore
@@ -3357,6 +3358,166 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(opening.play.stage, StarlitCartoucheStage.playing, "the opening accepts actions")
         XCTAssertEqual(opening.certifiedLegs, certifiedLegs.count, "stars are counted against the witness")
         XCTAssertEqual(StarlitCartoucheExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Celestial Eclipse Lab in the app (feature 469, R02-G17-09; T-R02G1709-005, FR-R02G1709-003, 006;
+    // SC-R02G1709-002)
+
+    /// Celestial Eclipse Lab's registration: a candidate until X-R02-G17.
+    private func celestialEclipseLabRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(CelestialEclipseLabExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Celestial Eclipse Lab is a candidate")
+    }
+
+    /// FR-R02G1709-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheCelestialEclipseLabRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try celestialEclipseLabRegistration()
+        XCTAssertEqual(CelestialEclipseLabExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(CelestialEclipseLabExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(CelestialEclipseLabExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1709-006: without `-vcCandidates` Celestial Eclipse Lab is a candidate only: in `candidates`, outside
+    /// `all`, listed in the bundled catalog as not available, without a tile and not opened.
+    func testCelestialEclipseLabIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(CelestialEclipseLabExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g17.celestial-eclipse-lab")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1709-003, SC-R02G1709-002: with `-vcCandidates` Celestial Eclipse Lab is shown, opens through the
+    /// registry and engine with seed 0 (level 1), and level 1 is won by its certified phase changes
+    /// (`CelestialEclipseLabExperienceCore.generated(number: 1).plan.actions`) sent as `orbit.phase [body, offset]`,
+    /// then `clock.run`, with three stars (the opening play is already past the kernel's tutorial stage; the tutorial
+    /// step is presentation and blocks no action, so no `tutorial.dismiss` is needed); the win is recorded verified
+    /// with its trace (the phase changes, then the run), opens level 2, and `level.next` plays it.
+    func testCelestialEclipseLabOpensAsACandidateAndLevelOneIsWonByItsCertifiedPlan() async throws {
+        let registration = try celestialEclipseLabRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls = registration.controls.map(\.id)
+        for control in ["orbit.phase", "clock.run", "play.undo", "play.redo", "level.next", "orbit.choose",
+                        "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(CelestialEclipseLabExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<CelestialEclipseLabExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, CelestialEclipseLabStage.playing, "the opening play accepts actions")
+        let certified = try CelestialEclipseLabExperienceCore.generated(number: 1)
+        let changes: [CelestialEclipseLabAction] = certified.plan.actions
+        XCTAssertEqual(changes, [.phase(1, 2), .phase(2, 0)], "level 1's certified phase changes")
+        for change in changes {
+            switch change {
+            case .phase(let body, let offset):
+                let values: [Double] = [Double(body), Double(offset)]
+                XCTAssertEqual(engine.handle(control: "orbit.phase", values: values), .accepted, "change \(values)")
+            case .run:
+                XCTFail("a certified plan holds phase changes only")
+            }
+        }
+        XCTAssertNil(engine.outcome, "the phase changes alone do not end the level")
+        XCTAssertEqual(engine.handle(control: "clock.run"), .accepted)
+        XCTAssertEqual(engine.outcome?.code, CelestialEclipseLabExperienceCore.wonCode)
+        XCTAssertEqual(CelestialEclipseLabExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, CelestialEclipseLabStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified plan earns three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        let trace: [CelestialEclipseLabAction] = changes + [.run]
+        XCTAssertEqual(engine.core?.progress.solved[1]?.trace, trace, "the trace is the certified plan, then the run")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `CEL` (their own literals in
+    /// Tests/UI/CelestialEclipseLab/CELSupport.swift, which this target cannot import); the same literals equal the
+    /// Core's certified level 1: body 1 to phase offset 2, then body 2 to phase offset 0 (a body with its offset), then
+    /// the run; the budget is 9; each body is a movable body of the level and each offset lies below its period and in
+    /// the offset range. Seed 0 opens level 1.
+    func testCelestialEclipseLabLevelOnePinsInCELEqualTheCore() throws {
+        // The same literals as `CEL.levelOnePlan` and `CEL.levelOneBudget` in CELSupport.swift.
+        let levelOneChanges: [(body: Int, offset: Int)] = [(1, 2), (2, 0)]
+        let levelOneBudget = 9
+
+        let certified = try CelestialEclipseLabExperienceCore.generated(number: 1)
+        let certifiedChanges: [CelestialEclipseLabAction] = certified.plan.actions
+        XCTAssertEqual(CelestialEclipseLabExperienceCore.certifiedActions(1), certifiedChanges,
+                       "the certified plan's phase changes")
+        XCTAssertEqual(certifiedChanges, [.phase(1, 2), .phase(2, 0)], "level 1's certified phase changes")
+        var coreBodies: [Int] = []
+        var coreOffsets: [Int] = []
+        for change in certifiedChanges {
+            switch change {
+            case .phase(let body, let offset):
+                coreBodies.append(body)
+                coreOffsets.append(offset)
+            case .run:
+                XCTFail("a certified plan holds phase changes only")
+            }
+        }
+        let pinnedBodies: [Int] = levelOneChanges.map { $0.body }
+        let pinnedOffsets: [Int] = levelOneChanges.map { $0.offset }
+        XCTAssertEqual(coreBodies, pinnedBodies, "level 1 certified change bodies")
+        XCTAssertEqual(coreOffsets, pinnedOffsets, "level 1 certified change offsets")
+
+        let level: CelestialEclipseLabLevel = certified.level
+        XCTAssertEqual(level.budget, levelOneBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, certifiedChanges.count + 1, "the witness and the run fit the budget")
+        for change in levelOneChanges {
+            XCTAssertTrue((0..<level.bodies.count).contains(change.body), "one of the level's bodies \(change)")
+            XCTAssertTrue(CelestialEclipseLabExperienceCore.bodyRange.contains(change.body),
+                          "a declared body \(change)")
+            XCTAssertFalse(level.bodies[change.body].fixed, "a movable body \(change)")
+            XCTAssertTrue((0..<level.bodies[change.body].period).contains(change.offset), "below the period \(change)")
+            XCTAssertTrue(CelestialEclipseLabExperienceCore.offsetRange.contains(change.offset),
+                          "a declared offset \(change)")
+        }
+
+        let opening = try CelestialEclipseLabExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, levelOneBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, CelestialEclipseLabStage.playing, "the opening accepts actions")
+        XCTAssertEqual(opening.certifiedChanges, certifiedChanges.count, "stars are counted against the witness")
+        XCTAssertEqual(CelestialEclipseLabExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
