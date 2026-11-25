@@ -18,20 +18,20 @@ most, no soak) and a longer session is bounded by arithmetic from the short run 
 
 Starlit Cartouche (`r02-g16.starlit-cartouche`, a free candidate until X-R02-G16) is a puzzle of a sapphire ship among
 stars that drift on periodic orbits: the ship flies corridors between stars, and each leg waits whole beats until its
-two stars have drifted into range. Every leg flown along a stroke of the symbol draws that stroke with the meteor-gold trail
-on a cartouche, an ancient symbol drawn as strokes. The player flies legs within the action budget and wins when the whole symbol is drawn and the
-ship rests at the beacon by the deadline; a leg fails when a star is outside its time window, when it crosses a hazard
-tube, when it arrives after the deadline or when it draws a stray stroke, and the level fails when the budget is spent
-without a win; a leg to a star no corridor joins is refused. The panel has the destination stepper (Star − and Star +,
-naming the chosen star), the wait stepper (Wait − and Wait +), Fly, Undo, Redo, Next level, Reset view, Hint, the
-tutorial's Dismiss, the failure explanation with its Undo and Retry, Campaign, Daily, Practice, the level picker with
-Play level, Replay best solution with Step and Stop, the Sound toggle and a summary element. On the touch screen a tap
-on a star chooses it as the destination, a second tap on the same star within 0.35 s and 22 points flies there with the
-chosen wait, a drag of the ship (from 16 points of travel) previews the star under the finger and flies there on
-release, a drag on the time slider sets the wait, two fingers orbit the camera and a double tap on empty space restores
-the authored view. Level 1 is won by its certified legs, star 4 after 1 beat and then star 5 after 0 beats, with 3 of 3
-stars. A winning play can be replayed. Details: [starlit-cartouche.md](../../architecture/starlit-cartouche.md)
-(features 451 … 459).
+two stars have drifted into range. Every leg flown along a stroke of the symbol draws that stroke with the meteor-gold
+trail on a cartouche, an ancient symbol drawn as strokes. The player flies legs within the action budget and wins when
+the whole symbol is drawn and the ship rests at the beacon by the deadline; a leg fails when a star is outside its time
+window, when it crosses a hazard tube, when it arrives after the deadline or when it draws a stray stroke, and the level
+fails when the budget is spent without a win; a leg to a star no corridor joins is refused. The panel has the
+destination stepper (Star − and Star +, naming the chosen star), the wait stepper (Wait − and Wait +), Fly, Undo, Redo,
+Next level, Reset view, Hint, the tutorial's Dismiss, the failure explanation with its Undo and Retry, Campaign, Daily,
+Practice, the level picker with Play level, Replay best solution with Step and Stop, the Sound toggle and a summary
+element. On the touch screen a tap on a star chooses it as the destination, a second tap on the same star within 0.35 s
+and 22 points flies there with the chosen wait, a drag of the ship (from 16 points of travel) previews the star under
+the finger and flies there on release, a drag on the time slider sets the wait, two fingers orbit the camera and a
+double tap on empty space restores the authored view. Level 1 is won by its certified legs, star 4 after 1 beat and then
+star 5 after 0 beats, with 3 of 3 stars. A winning play can be replayed. Details:
+[starlit-cartouche.md](../../architecture/starlit-cartouche.md) (features 451 … 459).
 
 ## Devices
 
