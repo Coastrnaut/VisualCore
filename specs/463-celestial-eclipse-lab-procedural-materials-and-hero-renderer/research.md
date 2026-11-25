@@ -1,7 +1,7 @@
 # Research: R02-G17-03
 
 - **R1 World mapping.** Decision: w(v) = (v − m) · s, with m the centre of the bounding box of every orbit position of
-  every body and s = 1.5 / (e + 1) for the box's largest extent e. Rationale: bodies move with the shown tick and the
+  every body widened by its radius in x and y, and s = 1.5 / (e + 1) for the box's largest extent e. Rationale: bodies move with the shown tick and the
   phases, so the box of all their orbit positions keeps every body in the frame with one fixed camera; each drawn body
   sits at its kernel position. Alternatives: the box of the current positions (rejected: the sky would rescale after
   every phase change); a fixed scale (rejected: wide orbits would leave the frame).

@@ -53,8 +53,9 @@ the palette "corona gold, ink navy and muted ember", the hero "glowing planetary
 corona halos" and the geometry "analytic orbital rings, signed circle masks and eclipse glow shaders".
 
 - Q: What exactly does the scene show, and how does it map the rules to space? → A: lattice positions map to world space
-  by w(v) = (v − m) · s, where m is the centre of the bounding box of every orbit position of every body (so no body
-  leaves the frame at any tick) and s = 1.5 / (e + 1) with e the box's largest extent; y is up and +z (nearer in the
+  by w(v) = (v − m) · s, where m is the centre of the bounding box of every orbit position of every body widened by
+  that body's radius in x and y (so no disc leaves the frame at any tick) and s = 1.5 / (e + 1) with e the box's largest
+  extent; y is up and +z (nearer in the
   rules) is toward the camera, so the picture is seen from the side the rules project onto. Bodies are drawn at
   w(position(at: shown tick, phase)) for the current phases. Drawn back to front by distance from the eye (depth
   testing off, the shared mesh renderer's path; ties broken by kind — rings, bodies, halos, gauges — then by index):
