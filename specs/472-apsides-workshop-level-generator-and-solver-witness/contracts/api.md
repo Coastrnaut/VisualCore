@@ -21,7 +21,9 @@ public enum ApsidesWorkshopSolver {
     public static func orbits(from start: ApsidesWorkshopOrbit, depth: Int) -> [ApsidesWorkshopOrbit]  // in search order
     public static func tunings(from start: ApsidesWorkshopOrbit, to target: ApsidesWorkshopOrbit)
         -> [ApsidesWorkshopAction]                                      // a valid order
-    public static func wins(_ level: ApsidesWorkshopLevel, orbit: ApsidesWorkshopOrbit) -> Bool }
+    public static func wins(_ level: ApsidesWorkshopLevel, orbit: ApsidesWorkshopOrbit) -> Bool
+    public static func replayWins(_ level: ApsidesWorkshopLevel,
+                                  actions: [ApsidesWorkshopAction]) -> Bool }
 public struct ApsidesWorkshopDifficulty: Sendable, Hashable, Codable { public let tunings, targets, apsisTargets,
     planets, narrowestShareBand, narrowestDistanceRange, orbitsSearched, work: Int
     public var puzzleDifficulty: PuzzleDifficulty { get } }
@@ -41,6 +43,8 @@ public struct ApsidesWorkshopCounterexample: Sendable, Hashable, Codable {
     public let depth: Int       // plan.size − 1
     public let orbits: Int      // orbits judged at exactly that depth (none won)
     public init(depth: Int, orbits: Int) }
+public struct ApsidesWorkshopWitnessReport: Sendable, Equatable, Codable { /* shares, apsis sectors and distances,
+    largest residual, deviations, met */ }
 public struct ApsidesWorkshopWitness: Sendable, Equatable, Codable { /* fields per data-model.md */
     public static let schema: Int                                                    // 1
     public static func canonicalText(orbit: ApsidesWorkshopOrbit, spent: Int) -> String  // "orbit=24,5,6;spent=2"
