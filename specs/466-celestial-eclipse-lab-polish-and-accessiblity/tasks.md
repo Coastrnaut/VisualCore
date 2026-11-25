@@ -29,7 +29,7 @@ tests updated with the panel's new refusal words) and round02-host in five chunk
   sequences of phase changes, undos, redos, refusals of every code (bare and prefixed), won runs in campaign and
   practice, failed runs by every failure kind (window, unwanted, horizon), and level and mode changes compare texts,
   kinds and haptics exactly; choosing a body or showing a tick plans nothing); agent A; `--name host-2`
-- [ ] T-R02G1706-004 [P] [US2] [US3] Create
+- [X] T-R02G1706-004 [P] [US2] [US3] Create — Verified 2026-11-25: 2026-11-25 host-3 exit 0 (.autonomy/migration/checks/R02-G17-06.host-3.json); lights with fades and the flicker measure, audition and ambient recipes; 18 tests
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabLights.swift` ("glow 0.7 playing / 1 won /
   0.35 failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade
   under Reduce Flashing, stepped by the frame clock's elapsed time; `maxHalfRangeCrossingsPerSecond`) and
