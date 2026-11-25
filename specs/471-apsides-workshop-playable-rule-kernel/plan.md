@@ -28,16 +28,19 @@ Data: [data-model.md](data-model.md). API: [contracts/api.md](contracts/api.md).
 VisualCoreMath (`StableHash`), as the existing round-two Cores use them. No GPU, UIKit, Objective-C++ or GLSL code in
 this feature; no new package; one new target pair. **Package**: `Packages/ExperiencesRound02/Package.swift` gains
 `ApsidesWorkshopCore` (path `ApsidesWorkshop/Core`), its tests (`ApsidesWorkshop/CoreTests`) and the product.
-**Numbers**: `Int64` fixed point with 2^30 as one; sky positions within ±64 × 256 = ±16,384 units; the size in sky
-units (≤ 12,288) is multiplied by a fixed-point factor (≤ 2^31) and shifted to 2^16 as one before the rotation, so every
-product stays below 2^62; the contact test's products (squared lengths ≤ 2^31, cross products squared ≤ 2^61) fit
-`Int64`; shares use `Int64` areas (≤ 2^31 per triangle × 96). No platform floating point decides anything; `Double`
-appears only in tests' independent references and in the words. **Seeds**: fixtures use `SeededRandom(seed: 2_471)`;
-neighbouring-input checks seed 2_476. **Testing**: `swift test --package-path Packages/ExperiencesRound02 --filter
-ApsidesWorkshop`. **Performance**: an orbit is at most 96 Kepler inversions of at most 56 steps; a 500-trace test stays
-under 10 s. **Constraints**: additive; reason codes `r02-g18.*`; denylisted names (ProjectM, PresetLibrary, MilkDrop …)
-avoided. **CI**: the round-two host chunks of feature 457 gain the new targets in chunk 3f (with the latest games); the
-`round02-host-tests` job's `swift test` covers them; no workflow change.
+**Numbers**: `Int64` fixed point with 2^30 as one; the mean anomaly is M = (twoPi · t) / T by truncating integer
+division; the rotation factors for 15d° come from an exact quarter-turn table sin 15j° (j = 0 … 6, sin 0 = 0, sin 90° =
+one, sin 45° = cos 45°) extended by symmetry, so a periapsis on a sector boundary lies exactly on it; sky positions
+within ±64 × 256 = ±16,384 units; the size in sky units (≤ 12,288) is multiplied by a fixed-point factor (≤ 2^31) and
+shifted to 2^16 as one before the rotation, so every product stays below 2^62; the contact test's products (squared
+lengths ≤ 2^31, cross products squared ≤ 2^61) fit `Int64`; shares use `Int64` areas (≤ 2^31 per triangle × 96). No
+platform floating point decides anything; `Double` appears only in tests' independent references and in the words.
+**Seeds**: fixtures use `SeededRandom(seed: 2_471)`; neighbouring-input checks seed 2_476. **Testing**: `swift test
+--package-path Packages/ExperiencesRound02 --filter ApsidesWorkshop`. **Performance**: an orbit is at most 96 Kepler
+inversions of at most 56 steps; a 500-trace test stays under 10 s. **Constraints**: additive; reason codes `r02-g18.*`;
+denylisted names (ProjectM, PresetLibrary, MilkDrop …) avoided. **CI**: the round-two host chunks of feature 457 gain
+the new targets in chunk 3f (with the latest games); the `round02-host-tests` job's `swift test` covers them; no
+workflow change.
 
 No NEEDS CLARIFICATION remains.
 

@@ -25,12 +25,13 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
   at most 2^−24; otherwise 48 bisection steps on [M − e, M + e]"; every residual "at most 2^−22"),
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopOrbit.swift` (orbit "size 8 … 48, eccentricity 0 …
   15, direction 0 … 23", valid "a(20 − k) ≥ 60 and a(20 + k) ≤ 1280"; positions "(a(cos E − e), a·√(1 − e²)·sin E)
-  turned by 15d° and rounded to whole sky units, half away from zero", 256 sky units per lattice unit; sectors "8 of
-  45°, the boundary ray belonging to the sector it begins"; shares "one triangle per tick, counted for P(t), tenths of a
-  percent rounded down"; apsis readings "sector ⌊d/3⌋ at a(20 − k), sector ⌊(d + 12)/3⌋ mod 8 at a(20 + k), in
-  twentieths"; contact "the centre's distance to a tick segment strictly below the radius"; event ticks "sweep: first
-  tick in its sector, T if none; periapsis 0; apoapsis T/2"; the judge "contact first (lowest tick, then planet); then
-  targets in order: order, share, apsis-sector, apsis-distance; all met wins"; the report),
+  turned by 15d° (exact quarter-turn table sin 15j°, j = 0 … 6, extended by symmetry; M = (twoPi · t) / T truncated) and
+  rounded to whole sky units, half away from zero", 256 sky units per lattice unit; sectors "8 of 45°, the boundary ray
+  belonging to the sector it begins"; shares "one triangle per tick, counted for P(t), tenths of a percent rounded
+  down"; apsis readings "sector ⌊d/3⌋ at a(20 − k), sector ⌊(d + 12)/3⌋ mod 8 at a(20 + k), in twentieths"; contact "the
+  centre's distance to a tick segment strictly below the radius"; event ticks "sweep: first tick in its sector, T if
+  none; periapsis 0; apoapsis T/2"; the judge "contact first (lowest tick, then planet); then targets in order: order,
+  share, apsis-sector, apsis-distance; all met wins"; the report),
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopLevel.swift` ("period even 16 … 96", planets "0 … 6,
   centre −64 … 64, radius 1 … 8, never overlapping the star", targets "1 … 6", sweeps "sector 0 … 7, low ≤ high in 0 …
   1000", apsis targets "sector 0 … 7, near ≤ far", "no two targets identical", starting orbit "valid and does not win",
