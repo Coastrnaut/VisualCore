@@ -58,6 +58,7 @@ Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabExperien
 Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabScenarios.swift, Packages/ExperiencesRound02/CelestialEclipseLab/scenario-manifest.json   edit (lead)
 Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabExperienceCoreTests.swift   edit  schema 3, migrations, replay (lead)
 Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabPersistenceTests.swift      new   500 round trips, 100 migrations, 200 edited saves (agent B)
+Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabReplayCatalogTests.swift    new   every certified level won, then replayed against its witness fingerprints (agent B)
 Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabFeedbackPlan.swift               edit  replay refusal words, replay step and dropped texts (lead)
 Packages/ExperiencesRound02/CelestialEclipseLab/Experience/{CelestialEclipseLabPresenter, CelestialEclipseLabControls}.swift   edit  replay buttons, dropped announcement, saved sound (lead)
 Packages/ExperiencesRound02/CelestialEclipseLab/ExperienceTests/CelestialEclipseLabReplayTests.swift     new   replay through the port (agent C)
@@ -65,7 +66,7 @@ docs/architecture/celestial-eclipse-lab.md, Packages/ExperiencesRound02/README.m
 ```
 
 **Dependency graph**: progress and reconciliation → adapter (schema 3, replay, sound) → scenarios, feedback, presenter
-and panel → persistence and replay tests. **Migration**: schema 2 → 3 (results with empty traces, unverified; sound
+and panel → persistence, replay catalog and replay tests. **Migration**: schema 2 → 3 (results with empty traces, unverified; sound
 off). **Rollback**: revert the commits; a schema-3 save would then be refused as newer by the reverted build and the
 opening state used (the store keeps the file). **CI**: the round-two host suite, the script tests and the steering
 validators on every push; simulator suites run locally. The app's schema-example rule applies at R02-G17-09 (examples
