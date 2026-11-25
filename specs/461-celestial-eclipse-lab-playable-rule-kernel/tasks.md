@@ -40,7 +40,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 3: Story 1 — phase the orbits so the eclipses come in order (P1) 🎯
 
-- [ ] T-R02G1701-003 [P] [US1] Create
+- [X] T-R02G1701-003 [P] [US1] Create — Verified 2026-11-25: 2026-11-25 CelestialEclipseLabSky and CelestialEclipseLabSkyTests pass (host-2 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabSkyTests.swift` (agent A: on 500 seeded
   levels and phase vectors, positions, overlap decisions, events, intervals, classes, the matched prefix and the judge's
   outcome equal an independent recomputation by direct enumeration of every tick and pair; hand cases: a distance one
