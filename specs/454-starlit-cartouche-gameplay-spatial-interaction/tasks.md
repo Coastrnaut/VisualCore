@@ -100,7 +100,7 @@ owns the snapshot fields, the preview geometry and its shader material (R02-G16-
 
 - [X] T-R02G1604-006 Docs: `docs/architecture/starlit-cartouche.md` (gestures and the launch preview), — Verified 2026-11-24: round02-host-1..3 exit 0 (.autonomy/migration/checks/R02-G16-04.round02-host-*.json; chunk 3 337 s); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3`
-- [ ] T-R02G1604-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1604-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G16-04.*.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1604-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1604-009 Reference regression chunk 2 (`--name reference-2`)
