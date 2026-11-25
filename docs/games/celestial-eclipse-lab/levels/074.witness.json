@@ -1,0 +1,665 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 1,
+        "_1" : 0
+      }
+    },
+    {
+      "phase" : {
+        "_0" : 2,
+        "_1" : 0
+      }
+    },
+    {
+      "phase" : {
+        "_0" : 3,
+        "_1" : 4
+      }
+    },
+    {
+      "phase" : {
+        "_0" : 5,
+        "_1" : 0
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 3,
+    "settings" : 1190
+  },
+  "difficulty" : {
+    "bodies" : 6,
+    "changes" : 4,
+    "events" : 47,
+    "movable" : 5,
+    "settingsSearched" : 1462,
+    "targets" : 4,
+    "work" : 2008
+  },
+  "digests" : [
+    "a8517d7895e8abc8",
+    "3ddd288b55337d50",
+    "c9a6d8d36761d342",
+    "13b8c17b34255faf",
+    "13b8c17b34255faf"
+  ],
+  "fingerprints" : [
+    "681438cbd0f7b025bc231a91b575808eef788ce3182fcbde13240146a8947be6",
+    "0f189ea85eba977524a75f40ef039ee05b304795878fb4bb69e76288efee92ef",
+    "5c556282ad153c3aa1ea1af814046bec4afcfeab5ce022d6987c6a70f38607db",
+    "638817861713d2d7a3de3759ec05ab3e9bd063fd59e4d2e9fa76aa5fb2b26133",
+    "657ab21c50a023c343f46befe2de564a8b2f22d837252c95509673d3b7cdd7b2",
+    "374fbbba28536eff593ddaba50e91c4250ddb81359754d6276045ec68922b523"
+  ],
+  "level" : {
+    "bodies" : [
+      {
+        "fixed" : true,
+        "orbit" : [
+          {
+            "x" : 9,
+            "y" : -1,
+            "z" : -4
+          },
+          {
+            "x" : 6,
+            "y" : -5,
+            "z" : -4
+          },
+          {
+            "x" : -2,
+            "y" : -6,
+            "z" : -4
+          },
+          {
+            "x" : -8,
+            "y" : -3,
+            "z" : -4
+          },
+          {
+            "x" : -8,
+            "y" : 1,
+            "z" : -4
+          },
+          {
+            "x" : -2,
+            "y" : 4,
+            "z" : -4
+          },
+          {
+            "x" : 6,
+            "y" : 3,
+            "z" : -4
+          }
+        ],
+        "radius" : 4
+      },
+      {
+        "fixed" : false,
+        "orbit" : [
+          {
+            "x" : 7,
+            "y" : -8,
+            "z" : 4
+          },
+          {
+            "x" : 3,
+            "y" : -5,
+            "z" : 5
+          },
+          {
+            "x" : -7,
+            "y" : -5,
+            "z" : 5
+          },
+          {
+            "x" : -11,
+            "y" : -8,
+            "z" : 4
+          },
+          {
+            "x" : -7,
+            "y" : -11,
+            "z" : 3
+          },
+          {
+            "x" : 3,
+            "y" : -11,
+            "z" : 3
+          }
+        ],
+        "radius" : 1
+      },
+      {
+        "fixed" : false,
+        "orbit" : [
+          {
+            "x" : 0,
+            "y" : 7,
+            "z" : -8
+          },
+          {
+            "x" : -8,
+            "y" : -2,
+            "z" : -9
+          },
+          {
+            "x" : -16,
+            "y" : 7,
+            "z" : -8
+          },
+          {
+            "x" : -8,
+            "y" : 16,
+            "z" : -7
+          }
+        ],
+        "radius" : 1
+      },
+      {
+        "fixed" : false,
+        "orbit" : [
+          {
+            "x" : 7,
+            "y" : -2,
+            "z" : -12
+          },
+          {
+            "x" : 6,
+            "y" : 4,
+            "z" : -12
+          },
+          {
+            "x" : 2,
+            "y" : 6,
+            "z" : -12
+          },
+          {
+            "x" : -2,
+            "y" : 4,
+            "z" : -12
+          },
+          {
+            "x" : -3,
+            "y" : -2,
+            "z" : -12
+          },
+          {
+            "x" : -2,
+            "y" : -8,
+            "z" : -12
+          },
+          {
+            "x" : 2,
+            "y" : -10,
+            "z" : -12
+          },
+          {
+            "x" : 6,
+            "y" : -8,
+            "z" : -12
+          }
+        ],
+        "radius" : 3
+      },
+      {
+        "fixed" : false,
+        "orbit" : [
+          {
+            "x" : -4,
+            "y" : -3,
+            "z" : 8
+          },
+          {
+            "x" : -6,
+            "y" : 4,
+            "z" : 8
+          },
+          {
+            "x" : -10,
+            "y" : 4,
+            "z" : 8
+          },
+          {
+            "x" : -12,
+            "y" : -3,
+            "z" : 8
+          },
+          {
+            "x" : -10,
+            "y" : -10,
+            "z" : 8
+          },
+          {
+            "x" : -6,
+            "y" : -10,
+            "z" : 8
+          }
+        ],
+        "radius" : 4
+      },
+      {
+        "fixed" : false,
+        "orbit" : [
+          {
+            "x" : 8,
+            "y" : 4,
+            "z" : 0
+          },
+          {
+            "x" : 6,
+            "y" : 0,
+            "z" : 0
+          },
+          {
+            "x" : 0,
+            "y" : 0,
+            "z" : 0
+          },
+          {
+            "x" : -2,
+            "y" : 4,
+            "z" : 0
+          },
+          {
+            "x" : 0,
+            "y" : 8,
+            "z" : 0
+          },
+          {
+            "x" : 6,
+            "y" : 8,
+            "z" : 0
+          }
+        ],
+        "radius" : 1
+      }
+    ],
+    "budget" : 16,
+    "difficulty" : 4,
+    "fingerprint" : "d1d99770cf3e566da4d8a794eea81c308de24d3d2eca966e40493d7feea67099",
+    "horizon" : 40,
+    "id" : "celestial-eclipse-lab-074",
+    "phases" : [
+      1,
+      3,
+      2,
+      7,
+      2,
+      4
+    ],
+    "schema" : 1,
+    "seed" : 8776088090593270961,
+    "target" : [
+      {
+        "back" : 0,
+        "close" : 1,
+        "front" : 1,
+        "open" : 0
+      },
+      {
+        "back" : 3,
+        "close" : 1,
+        "front" : 0,
+        "open" : 0
+      },
+      {
+        "back" : 2,
+        "close" : 2,
+        "front" : 4,
+        "open" : 0
+      },
+      {
+        "back" : 0,
+        "close" : 2,
+        "front" : 1,
+        "open" : 1
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 74,
+  "schema" : 1,
+  "skipped" : 1,
+  "timeline" : {
+    "intervals" : [
+      {
+        "back" : 0,
+        "first" : 0,
+        "front" : 1,
+        "last" : 0,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 1,
+        "front" : 0,
+        "last" : 1,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 1,
+        "front" : 4,
+        "last" : 1,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 0,
+        "first" : 2,
+        "front" : 1,
+        "last" : 2,
+        "visibility" : "annular"
+      },
+      {
+        "back" : 0,
+        "first" : 2,
+        "front" : 4,
+        "last" : 2,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 4,
+        "front" : 0,
+        "last" : 4,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 0,
+        "first" : 4,
+        "front" : 4,
+        "last" : 4,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 0,
+        "first" : 4,
+        "front" : 5,
+        "last" : 4,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 4,
+        "front" : 5,
+        "last" : 4,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 5,
+        "front" : 0,
+        "last" : 5,
+        "visibility" : "total"
+      },
+      {
+        "back" : 0,
+        "first" : 7,
+        "front" : 1,
+        "last" : 7,
+        "visibility" : "annular"
+      },
+      {
+        "back" : 3,
+        "first" : 8,
+        "front" : 0,
+        "last" : 8,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 8,
+        "front" : 5,
+        "last" : 8,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 9,
+        "front" : 0,
+        "last" : 9,
+        "visibility" : "total"
+      },
+      {
+        "back" : 0,
+        "first" : 9,
+        "front" : 4,
+        "last" : 11,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 9,
+        "front" : 4,
+        "last" : 9,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 12,
+        "front" : 0,
+        "last" : 13,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 0,
+        "first" : 12,
+        "front" : 5,
+        "last" : 13,
+        "visibility" : "annular"
+      },
+      {
+        "back" : 2,
+        "first" : 13,
+        "front" : 4,
+        "last" : 13,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 0,
+        "first" : 15,
+        "front" : 4,
+        "last" : 17,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 15,
+        "front" : 5,
+        "last" : 15,
+        "visibility" : "annular"
+      },
+      {
+        "back" : 3,
+        "first" : 16,
+        "front" : 0,
+        "last" : 16,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 16,
+        "front" : 4,
+        "last" : 16,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 16,
+        "front" : 5,
+        "last" : 16,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 17,
+        "front" : 0,
+        "last" : 17,
+        "visibility" : "total"
+      },
+      {
+        "back" : 0,
+        "first" : 19,
+        "front" : 5,
+        "last" : 19,
+        "visibility" : "annular"
+      },
+      {
+        "back" : 3,
+        "first" : 20,
+        "front" : 0,
+        "last" : 20,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 0,
+        "first" : 22,
+        "front" : 4,
+        "last" : 24,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 22,
+        "front" : 5,
+        "last" : 22,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 23,
+        "front" : 4,
+        "last" : 23,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 24,
+        "front" : 0,
+        "last" : 24,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 25,
+        "front" : 4,
+        "last" : 25,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 28,
+        "front" : 0,
+        "last" : 28,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 28,
+        "front" : 5,
+        "last" : 28,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 0,
+        "first" : 30,
+        "front" : 4,
+        "last" : 31,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 31,
+        "front" : 0,
+        "last" : 32,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 32,
+        "front" : 0,
+        "last" : 32,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 0,
+        "first" : 32,
+        "front" : 5,
+        "last" : 32,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 32,
+        "front" : 5,
+        "last" : 32,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 33,
+        "front" : 4,
+        "last" : 33,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 35,
+        "front" : 0,
+        "last" : 35,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 37,
+        "front" : 0,
+        "last" : 37,
+        "visibility" : "total"
+      },
+      {
+        "back" : 0,
+        "first" : 37,
+        "front" : 4,
+        "last" : 37,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 2,
+        "first" : 37,
+        "front" : 4,
+        "last" : 37,
+        "visibility" : "partial"
+      },
+      {
+        "back" : 3,
+        "first" : 39,
+        "front" : 0,
+        "last" : 39,
+        "visibility" : "total"
+      },
+      {
+        "back" : 0,
+        "first" : 39,
+        "front" : 5,
+        "last" : 39,
+        "visibility" : "annular"
+      },
+      {
+        "back" : 3,
+        "first" : 39,
+        "front" : 5,
+        "last" : 39,
+        "visibility" : "annular"
+      }
+    ],
+    "matched" : 4
+  }
+}

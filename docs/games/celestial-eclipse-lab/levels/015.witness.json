@@ -1,0 +1,188 @@
+{
+  "actions" : [
+    {
+      "phase" : {
+        "_0" : 1,
+        "_1" : 1
+      }
+    },
+    {
+      "phase" : {
+        "_0" : 2,
+        "_1" : 6
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "settings" : 9
+  },
+  "difficulty" : {
+    "bodies" : 3,
+    "changes" : 2,
+    "events" : 1,
+    "movable" : 2,
+    "settingsSearched" : 10,
+    "targets" : 1,
+    "work" : 16
+  },
+  "digests" : [
+    "116caf6afa6fe372",
+    "4d333d726bd87ffd",
+    "4d333d726bd87ffd"
+  ],
+  "fingerprints" : [
+    "21389e1e59ba29a9fe47c17abc477cbdc7bc7c1fd20e8230a089ab9f500d4f08",
+    "a89568f95fe917332fb2185e4af57718834bff60edb6c526d815894df59b445a",
+    "fc691784467f15e90220d738c415386318f3ed7488b3dc25a8fc89031359c66b",
+    "7fa4ad3a88f6389dacbd89e58dcc06df26dc7ce5e736dde2e885f96e6fcd31a9"
+  ],
+  "level" : {
+    "bodies" : [
+      {
+        "fixed" : true,
+        "orbit" : [
+          {
+            "x" : -1,
+            "y" : 6,
+            "z" : -12
+          },
+          {
+            "x" : -4,
+            "y" : -3,
+            "z" : -11
+          },
+          {
+            "x" : -12,
+            "y" : -3,
+            "z" : -11
+          },
+          {
+            "x" : -15,
+            "y" : 6,
+            "z" : -12
+          },
+          {
+            "x" : -12,
+            "y" : 15,
+            "z" : -13
+          },
+          {
+            "x" : -4,
+            "y" : 15,
+            "z" : -13
+          }
+        ],
+        "radius" : 2
+      },
+      {
+        "fixed" : false,
+        "orbit" : [
+          {
+            "x" : 4,
+            "y" : -6,
+            "z" : -8
+          },
+          {
+            "x" : -3,
+            "y" : 2,
+            "z" : -8
+          },
+          {
+            "x" : -10,
+            "y" : -6,
+            "z" : -8
+          },
+          {
+            "x" : -3,
+            "y" : -14,
+            "z" : -8
+          }
+        ],
+        "radius" : 2
+      },
+      {
+        "fixed" : false,
+        "orbit" : [
+          {
+            "x" : 10,
+            "y" : -8,
+            "z" : -4
+          },
+          {
+            "x" : 9,
+            "y" : -15,
+            "z" : -3
+          },
+          {
+            "x" : 6,
+            "y" : -17,
+            "z" : -3
+          },
+          {
+            "x" : 4,
+            "y" : -12,
+            "z" : -4
+          },
+          {
+            "x" : 4,
+            "y" : -4,
+            "z" : -4
+          },
+          {
+            "x" : 6,
+            "y" : 1,
+            "z" : -5
+          },
+          {
+            "x" : 9,
+            "y" : -1,
+            "z" : -5
+          }
+        ],
+        "radius" : 2
+      }
+    ],
+    "budget" : 11,
+    "difficulty" : 1,
+    "fingerprint" : "3d276985363a4feacbb63557986e9d8d6c3cf8e72e5f50c150e68142402cb47c",
+    "horizon" : 31,
+    "id" : "celestial-eclipse-lab-015",
+    "phases" : [
+      2,
+      0,
+      1
+    ],
+    "schema" : 1,
+    "seed" : 15942397880937458323,
+    "target" : [
+      {
+        "back" : 1,
+        "close" : 19,
+        "front" : 2,
+        "open" : 18
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 15,
+  "schema" : 1,
+  "skipped" : 0,
+  "timeline" : {
+    "intervals" : [
+      {
+        "back" : 1,
+        "first" : 19,
+        "front" : 2,
+        "last" : 19,
+        "visibility" : "partial"
+      }
+    ],
+    "matched" : 1
+  }
+}

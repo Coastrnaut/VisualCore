@@ -72,7 +72,7 @@ edited file is refused.
   visibility; matched); counterexample (the depth one below and the count of settings at it); difficulty; skipped;
   decode refuses newer, damaged and non-replaying files) with
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G1702-006 [US2] [US3] [US4] Create
+- [X] T-R02G1702-006 [US2] [US3] [US4] Create — Verified 2026-11-25: 2026-11-25 catalog tests pass, 8 tests (host-5 exit 0): 100 witness files byte for byte, pinned digest c74bf277…, progression and band means, neighbours differ, whole-sky enumeration on two levels per band
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabCatalogTests.swift` (lead: 100 entries,
   20 per band; every level generated, won by its witness within the budget, and no setting with fewer changes wins; the
   whole-sky enumeration on the two levels with the fewest bodies in each band; neighbours differ; pinned digest;
