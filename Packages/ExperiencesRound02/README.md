@@ -893,5 +893,8 @@ planned levels), `StarlitCartoucheGenerator` (seeded candidates by band, the fir
 `StarlitCartoucheExperienceCore`, the scenarios and the iOS target `StarlitCartoucheExperience`, registered as a
 candidate until X-R02-G16. Feature 454 (R02-G16-04) adds `StarlitCartouchePicker`,
 `StarlitCartoucheGestureController`, the orbit and the launch preview (stars drawn at the launch beat, a previewed leg).
+Feature 455 (R02-G16-05) adds `StarlitCartoucheHints` (three hint levels from a solver entry at the current state),
+`StarlitCartoucheFailureExplanation`, `StarlitCartoucheProgress` (tutorial, stars, daily × 37, practice) and snapshot
+schema 2.
 See
 [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).

@@ -85,7 +85,7 @@ by filter.
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G1605-006 Docs: `docs/architecture/starlit-cartouche.md` (teaching and progression),
+- [X] T-R02G1605-006 Docs: `docs/architecture/starlit-cartouche.md` (teaching and progression), — Verified 2026-11-24: round02-host-1..3 exit 0 (.autonomy/migration/checks/R02-G16-05.round02-host-*.json; chunk 3 330.628 s); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3`
 - [ ] T-R02G1605-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`, `--name app-unit`

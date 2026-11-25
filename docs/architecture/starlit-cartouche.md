@@ -141,3 +141,24 @@ from the ship's star in index order, waits 0 … 8, flyable ones only) for the l
   view"); all 100 certified levels are won through the panel in a host test. Refused actions are shown in words and
   their codes kept in the presenter's refusal log.
 
+## Teaching and progression (feature 455, R02-G16-05)
+
+- **Hints.** `StarlitCartoucheSolver.plan(_:from:beat:drawn:)` runs the certifying breadth-first search from the
+  current star, beat and drawn strokes; `StarlitCartoucheHints` takes its first leg when the whole plan fits the
+  actions left and reveals it in three levels — the corridor and its stars, the destination, the destination with its
+  wait. A failed play's hint is to undo or retry; a state with no plan in the actions left says so. Following exact
+  hints from the opening wins all 100 certified levels; the presenter runs the bounded search off the main actor.
+- **Failures.** `StarlitCartoucheFailureExplanation` names the failing action (from 1), its destination and wait, and
+  what the kernel recorded: a departure or arrival window, a hazard with its beats, the deadline, a stray corridor, or
+  the last action spent without completing the symbol at the beacon; then "Undo the last action or retry the level."
+- **Tutorial.** On levels 1 … 3: fly (choose a star, set the wait, fly) → symbol (draw every stroke and end at the
+  beacon in time) → recover (what fails a leg), advanced by accepted legs and the level's end; `tutorial.dismiss`
+  ends it; undo never moves it back.
+- **Progress.** Stars from the actions spent (undone legs included): 3 at the certified witness's leg count, 2 within
+  + 2, else 1; level 1 open, a campaign win opens the next; `level.select` and `level.next` refuse a locked level
+  (`r02-g16.locked`). The daily level is (days since 2026-01-01 × 37) mod 100 + 1 (`mode.daily [y, m, d]`, refused
+  `r02-g16.date`), playable while locked and opening nothing; `mode.practice` plays a copy with budget 24 and no stars.
+- **Snapshot schema 2.** `{level, mode, progress, records, tutorial}`; progress and mode in the digest
+  ("r02-g16.starlit-cartouche.v2"), the tutorial step and the choice not; schema-1 payloads migrate (level 1 and the
+  restored level open, campaign mode, the tutorial at its first step).
+
