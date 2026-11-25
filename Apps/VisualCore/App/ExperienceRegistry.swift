@@ -139,8 +139,8 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [starlitCartouche].compactMap { $0 }
 
-    /// R02-G16 Starlit Cartouche (feature 453, R02-G16-03): a candidate until X-R02-G16. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G16 Starlit Cartouche (feature 453, R02-G16-03): a candidate until X-R02-G16. Snapshot schema 2 since
+    /// feature 455 (R02-G16-05); its schema-1 example is stored with the in-app integration (R02-G16-09).
     fileprivate static var starlitCartouche: ExperienceRegistration? {
         guard let id = StarlitCartoucheExperience.id else { return nil }
         var registration = ExperienceRegistration(id: id, core: StarlitCartoucheExperienceCore.self) { launch in

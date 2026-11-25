@@ -54,7 +54,7 @@ by filter.
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1605-004 Edit `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheExperienceCore.swift`
+- [X] T-R02G1605-004 Edit `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheExperienceCore.swift` — Verified 2026-11-24: host-4 exit 0 (.autonomy/migration/checks/R02-G16-05.host-4.json); adapter controls level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss, codes locked/date, schema 2 with migration from 1, v2 digest with progress and mode; scenarios (integration rows win before level.next) and manifest regenerated; identity test and registry comment follow
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g16.locked`, `r02-g16.date`; practice budget 24 on a copy of the level, no stars, no
   unlocks; the daily level is playable even while still locked in the campaign, and a daily win records the level's best

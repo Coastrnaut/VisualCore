@@ -1,6 +1,6 @@
 // StarlitCartoucheExperienceIdentityTests — feature 453 (R02-G16-03) T-R02G1603-006 (FR-R02G1603-005, 007, 008). The
 // experience's id is the catalog id, the factory builds a shell around the presenter with the accessibility settings
-// passed through, the controls are the five declared actions in order, the registration facts hold (100 certified
+// passed through, the controls are the ten declared actions in order (feature 455), the registration facts hold (100 certified
 // levels, schema 1, the tiers level-0 … level-2), the presenter's quality levels equal the Core's `qualityTiers`, the
 // presenter holds no GPU object and no snapshot before setup, and it declares its two frame probes once a frame was
 // drawn. iOS only, as the target.
@@ -20,11 +20,11 @@ import VisualCoreExperienceHost
         #expect(StarlitCartoucheExperienceCore.experienceID == "r02-g16.starlit-cartouche")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 1, three tiers.
+    /// The registration's content facts: 100 certified levels, schema 2 (feature 455), three tiers.
     @Test func theRegistrationFactsHold() {
         #expect(StarlitCartoucheExperienceCore.levelNumbers == 1...100)
         #expect(StarlitCartoucheExperienceCore.certifiedCandidates.count == 100)
-        #expect(StarlitCartoucheExperienceCore.schemaVersion == 1)
+        #expect(StarlitCartoucheExperienceCore.schemaVersion == 2)
         var names: [String] = []
         for level in StarlitCartoucheExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -36,7 +36,8 @@ import VisualCoreExperienceHost
         var ids: [String] = []
         for control in StarlitCartoucheExperienceCore.controls { ids.append(control.id) }
         #expect(ids == StarlitCartoucheExperienceCore.actionIDs)
-        #expect(ids == ["route.fly", "play.undo", "play.redo", "level.next", "route.choose"])
+        #expect(ids == ["route.fly", "play.undo", "play.redo", "level.next", "route.choose", "level.select",
+                        "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers`, named as the tiers.
