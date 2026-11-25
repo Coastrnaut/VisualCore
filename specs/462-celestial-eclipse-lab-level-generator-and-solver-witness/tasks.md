@@ -46,7 +46,7 @@ phase changes wins.
 
 **Independent test**: building the catalog twice gives identical levels and the pinned digest.
 
-- [ ] T-R02G1702-004 [US2] Create
+- [X] T-R02G1702-004 [US2] Create — Verified 2026-11-25: 2026-11-25 CelestialEclipseLabGenerator (band profiles, integer orbit table, candidates, neighbour rule, catalog, digest) and its 12 generator tests pass (host-3 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabGenerator.swift` (lead: band profiles "band 1
   (3, 1 … 2, 24 … 32, 2, 1 … 2), 2 (3 … 4, 2 … 3, 28 … 36, 3, 2 … 3), 3 (4 … 5, 2 … 3, 32 … 40, 4, 3 … 4), 4 (5 … 6, 3 …
   4, 36 … 44, 4, 3 … 4), 5 (6, 3 … 4, 40 … 48, 5, 4 … 5)" (bodies, targets, horizon, moved, plan range); the integer
