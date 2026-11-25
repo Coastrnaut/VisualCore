@@ -16,9 +16,9 @@
 - **R5 Replay as a mode.** Decision: `replay(level)` with `replay.start/step/stop` in the core, so a replay is part of
   the deterministic state and testable on the host.
 - **R6 Trace bound.** Decision: a trace with more than 64 actions, or with an action the kernel refuses, never verifies.
-  Rationale: a winning play spends at most 60 actions (the kernel's largest budget), so an honest effective trace has at
-  most 60; the bound keeps restore work small
-  against an edited file.
+  The kernel's budget is at most 24, so an honest trace never comes near the bound; it only stops an edited save from
+  making the check replay a very long list. Rationale: a winning play spends at most 60 actions (the kernel's largest
+  budget), so an honest effective trace has at most 60; the bound keeps restore work small against an edited file.
 - **R7 Actions spent versus trace.** Decision: `actionsSpent` keeps counting undone legs (R02-G16-05's rule), so
   reconciliation requires the trace's actions to be at most `actionsSpent` instead of equality. Rationale: an honest
   play with undos spends more than its effective actions; a lowered `actionsSpent` still cannot claim less than the

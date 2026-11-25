@@ -89,10 +89,10 @@ its convergence lesson (a restored replay validated against its trace) taken int
 ## Dependencies and parallel work
 
 001 → 002 (agent A) → {003 (lead), 004 (agent B, against the contract)} → 005 (lead; agent C writes the simulator tests)
-→ 006 … 010, 012. 011 stays open until device testing. Agent A may start in an isolated copy before 001 (its files are
-the progress and a new reconciliation file). Shared files (adapter, scenarios, feedback, presenter, panel, docs) stay
-with the lead. MVP: Stories 1 and 2. Requirement coverage: FR-001/002/005/007 → 003, 004; FR-003 → 002, 003, 004; FR-004
-→ 003, 005; FR-006 → 006 … 010.
+→ 006 … 010, 012; 013 (the replay catalog proof) after 003. 011 stays open until device testing. Agent A may start in an
+isolated copy before 001 (its files are the progress and a new reconciliation file). Shared files (adapter, scenarios,
+feedback, presenter, panel, docs) stay with the lead. MVP: Stories 1 and 2. Requirement coverage: FR-001/002/005/007 →
+003, 004; FR-003 → 002, 003, 004; FR-004 → 003, 005; FR-006 → 006 … 010.
 
 
 ## Phase 6: Replay catalog proof (taken from feature 447's convergence round)
