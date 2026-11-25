@@ -9,7 +9,7 @@ change (the shaders and reference of R02-G17-03 are unchanged and re-proven by t
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1709-001 Baselines on the committed tree after R02-G17-08 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1709-001 Baselines on the committed tree after R02-G17-08 is recorded: `--name baseline-host`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 on the committed tree (.autonomy/migration/checks/R02-G17-09.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two chunks, 3c with
   `CelestialEclipseLab`); the rendering baseline is R02-G17-08's rendering runs (exit 0)
 
