@@ -42,7 +42,7 @@ tests stay short (< 10 s each). No {owner} tasks.
   `Packages/ExperiencesRound02/CelestialEclipseLab/CoreTests/CelestialEclipseLabShaderSourceTests.swift` (version line,
   declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match, the pulse
   rule); agent A; `--name host-2`
-- [ ] T-R02G1703-004 [P] [US1] Create
+- [X] T-R02G1703-004 [P] [US1] Create — Verified 2026-11-25: 2026-11-25 sky geometry (widened scale box, rings, bodies, shadow lenses, halos, timeline, bars), camera, paint order, CPU reference; 17 geometry tests pass (host-3 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabSceneGeometry.swift` (clarification Q1: w(v)
   = (v − m) · s with m the centre of the bounding box of every orbit position of every body widened by its radius in x
   and y and s = 1.5 / (e + 1) for its largest extent e; the backdrop quad; ring ribbons 0.012 wide through every orbit
