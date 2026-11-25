@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g16.starlit-cartouche"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g16.starlit-cartouche",
+  "elapsed_seconds": 0.069,
+  "exit_code": 0,
+  "finished": "2026-11-25T08:40:44+00:00",
+  "gate": "R02-G16-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G16-10.device-rows.log",
+  "log_sha256": "facca714be16b1c804b739ab09742a3e6297dabcaf07f8f48172502e85de02ed",
+  "name": "device-rows",
+  "started": "2026-11-25T08:40:44+00:00",
+  "timed_out": false
+}
