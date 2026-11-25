@@ -114,7 +114,7 @@ pass.
 - [X] T-R02G1803-007 Docs: `docs/architecture/apsides-workshop.md` (renderer and experience), — Verified 2026-11-25: 2026-11-25 architecture renderer and experience section, round-two README and automatedtesting entry written; round02-host-1, -2, -3c, -3e, -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
-- [ ] T-R02G1803-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1803-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1803-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1803-010 Reference regression chunk 2 (`--name reference-2`)
