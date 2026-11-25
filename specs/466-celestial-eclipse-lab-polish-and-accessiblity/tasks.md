@@ -80,7 +80,7 @@ tests updated with the panel's new refusal words) and round02-host in five chunk
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1706-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1706-009 Reference regression chunk 2 (`--name reference-2`)
-- [ ] T-R02G1706-010 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G1706-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-25: 2026-11-25 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G17-06.script-tests.json)
 - [ ] T-R02G1706-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G1706-006)
 - [ ] T-R02G1706-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
