@@ -27,7 +27,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G1710-004 [P] [US2] Create `docs/apps/celestial-eclipse-lab/device-campaign.md` (agent B, modelled on
+- [X] T-R02G1710-004 [P] [US2] Create `docs/apps/celestial-eclipse-lab/device-campaign.md` (agent B, modelled on — Verified 2026-11-25: 2026-11-25 plan read against device-rows.json, spec and sources by the lead (panel labels, gestures, level 1 plan, devices); no Retry or second-tap fly sentence carried over
   `docs/apps/starlit-cartouche/device-campaign.md`, read against the gestures of feature 464: devices and order, D3 on
   iPadOS 26.5, owner actions as BLOCKED_OWNER_ACTION, every row CEL-D1 … CEL-D8 with devices, procedure, pass condition
   and "pending device campaign", no number claimed, the stress session only in the device campaign); `--name docs --
