@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G17-08: Celestial Eclipse Lab visual golden and solver regression).
+Last updated: 2026-11-25 (R02-G17-09: Celestial Eclipse Lab simulator integration and full app lock).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Celestial Eclipse Lab in the app** (R02-G17-09, 2026-11-25). Host: `CelestialEclipseLabSchemaExampleTests` (7
+  tests). Simulator: `CelestialEclipseLabIdentifierTests` (41 pinned names, each once). App: four AppModelTests (stored
+  examples, candidate availability, level 1 through the registry and engine, the `CEL` pins against the Core; 143 →
+  147 app unit tests) and the interface chunk `z3` (`CELPlayUITests`, `CELReplayUITests`: 3 tests in 321 s including
+  four app launches). Lesson: the panel used one identifier for two texts (the failure line and its explanation); the
+  pinned list's once-each rule found it before any interface test depended on it.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15

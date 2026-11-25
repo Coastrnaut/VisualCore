@@ -936,5 +936,6 @@ look) and `CelestialEclipseLabSoundRecipe` (the audition and the ambient loop), 
 Feature 467 (R02-G17-07) adds `CelestialEclipseLabReconciliation` (winning traces replayed on restore), snapshot schema
 3, the replay mode and the saved sound choice. Feature 468 (R02-G17-08) adds the regression net:
 `CelestialEclipseLabGolden` (test builds only), `golden-frames.json`, the solver regression and
-`scripts/celestial_eclipse_lab_regression.py`. See
+`scripts/celestial_eclipse_lab_regression.py`. Feature 469 (R02-G17-09) pins the panel's identifiers and adds the
+stored schema examples, the app's interface tests (`CEL`, chunk `z3`) and app unit tests. See
 [docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).

@@ -164,3 +164,18 @@ later features.
 - **Running it.** CI's round-two job has a "Celestial Eclipse Lab regression (host)" step;
   `python3 scripts/celestial_eclipse_lab_regression.py` runs the host and simulator parts with one summary.
 
+## In-app integration (feature 469, R02-G17-09)
+
+- **Identifiers.** Every panel element has an identifier `experience.r02-g17.celestial-eclipse-lab.<name>`; the 41
+  names are pinned in `CelestialEclipseLabControls.identifierNames` and each is used once (the failure explanation has
+  its own `explanation`).
+- **Interface tests.** `CELPlayUITests` opens the candidate in the one app, wins level 1 through the panel alone
+  (choose a body, move its pending phase, Set phase, then Run) with "Best: 3 of 3 stars", sees level 2 open and keeps
+  the progress over a relaunch; `CELReplayUITests` replays the solved level to its end and stops back to the campaign.
+  They run in the serial release-check chunk `z3`.
+- **Stored examples.** `schemaOneExample()` and `schemaTwoExample()` are registered with the app, which restores both
+  into schema 3; app unit tests also open the candidate through the registry and engine, win level 1 and confirm it is
+  not available without the testing argument.
+- **Builds.** The app compiles in debug and release for the simulator with the game linked; the release symbol check
+  confirms the test-only golden source and scenarios are absent.
+
