@@ -97,7 +97,7 @@ feedback, presenter, panel, docs) stay with the lead. MVP: Stories 1 and 2. Requ
 
 ## Phase 6: Replay catalog proof (taken from feature 447's convergence round)
 
-- [ ] T-R02G1607-013 Add
+- [X] T-R02G1607-013 Add — Verified 2026-11-24: 2026-11-24 host-6 exit 0 (all 100 levels won and replayed against the witness fingerprints; agent D's file retested by the lead)
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheReplayCatalogTests.swift`: for each of the 100
   certified levels (10 groups of 10, each under 10 s) win the level in campaign through the adapter with its certified
   legs, then `replay.start [level]` and `replay.step` to the end, checking each step's play fingerprint against the
