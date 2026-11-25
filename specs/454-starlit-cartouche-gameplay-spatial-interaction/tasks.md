@@ -102,7 +102,7 @@ owns the snapshot fields, the preview geometry and its shader material (R02-G16-
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1 … 3`
 - [X] T-R02G1604-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-24: rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G16-04.*.json)
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G1604-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1604-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-24: reference-1 exit 0 (.autonomy/migration/checks/R02-G16-04.reference-1.json)
 - [ ] T-R02G1604-009 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G1604-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1604-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G1604-007)
