@@ -50,7 +50,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 4: Stories 2 and 3 — failures, undo, redo, replay (P1)
 
-- [ ] T-R02G1701-004 [P] [US1] [US2] [US3] Create
+- [X] T-R02G1701-004 [P] [US1] [US2] [US3] Create — Verified 2026-11-25: 2026-11-25 CelestialEclipseLabPlay and CelestialEclipseLabPlayTests pass (host-3 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabPlay.swift` (agent B: stages "loading,
   tutorial, playing, paused, won, failed, result"; phases from the level; `phase(body, offset)` validated in the order
   stage, previous fingerprint, action ("an unknown or fixed body, an offset outside the period or equal to the current
