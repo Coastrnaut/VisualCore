@@ -39,9 +39,9 @@ targets are of different kinds, so no two targets are identical).
 - [x] CHK008 Is the catalog digest's input (fingerprints in manifest order), the progression rule on the witness length
   and the neighbour rule stated, with band plan ranges that keep the band means from falling? [Consistency, Spec
   §FR-R02G1802-005, 007; Clarifications Q1, Q3, Q5]
-- [x] CHK009 Is the tie rule for several minimal orbits stated in this game's terms (the first winning orbit in the fixed
-  depth order), and is the order of a two-tuning witness that passes only valid orbits stated? [Consistency, Spec §Edge
-  Cases; Clarifications Q2; research R5]
+- [x] CHK009 Is the tie rule for several minimal orbits stated in this game's terms (the first winning orbit in the
+  fixed depth order), and is the order of a two-tuning witness that passes only valid orbits stated? [Consistency, Spec
+  §Edge Cases; Clarifications Q2; research R5]
 - [x] CHK010 Is it stated that the acceptance ranges were measured by a prototype on the real kernel and the real
   manifest before being written down, with the figures? [Assumption, Spec §Clarifications preamble]
 
