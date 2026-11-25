@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1703-001 Baselines on the committed tree after R02-G17-02 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1703-001 Baselines on the committed tree after R02-G17-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host and round02-1, -2, -3c, -3e, -3f exit 0; baseline-timing printed bounds above its asserts (process tree at background priority PRI 4, VisualCore unchanged), host scheduling, not code; rendering baseline is R02-G17-02's rendering runs (exit 0)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G17-02's
   rendering runs (exit 0)
 - [ ] T-R02G1703-002 Edit `Packages/ExperiencesRound02/Package.swift` (`CelestialEclipseLabCore` gains VisualCoreScenes,
