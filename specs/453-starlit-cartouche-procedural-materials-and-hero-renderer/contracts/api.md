@@ -18,7 +18,8 @@ public struct StarlitCartoucheSceneSnapshot: Sendable, Equatable {
     public let drawn: [Int]; public let symbol: [Int]; public let star: Int; public let beat: Int
     public let beacon: Int; public let deadline: Int; public let chosenStar: Int; public let chosenWait: Int
     public let report: StarlitCartoucheRouteReport; public let stage: StarlitCartoucheStage
-    public let failure: StarlitCartoucheFailure?; public let actionsLeft: Int; public let budget: Int
+    public let failure: StarlitCartoucheFailure?; public let failedLeg: StarlitCartoucheLeg?   // from the last record
+    public let actionsLeft: Int; public let budget: Int
     public let levelNumber: Int; public let time: Double
     public init(play: StarlitCartouchePlay, chosenStar: Int, chosenWait: Int, levelNumber: Int, time: Double) }
 public struct StarlitCartoucheCamera: Sendable, Equatable { /* eye, view and projection, aspect */ }

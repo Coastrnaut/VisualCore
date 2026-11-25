@@ -13,9 +13,10 @@ tests stay short (< 10 s each). No {owner} tasks.
   baseline is R02-G16-02's rendering runs (exit 0)
 - [ ] T-R02G1603-002 Edit `Packages/ExperiencesRound02/Package.swift` (`StarlitCartoucheCore` gains VisualCoreScenes,
   VisualCoreExperience, VisualCoreDiagnostics and VisualCorePersistence; `StarlitCartoucheExperience` and its tests with
-  iOS-conditioned rendering dependencies join with their sources in T-006; the product); make the renderer-purity and
-  time scans of `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheInvariantTests.swift` skip the
-  presentation sources (snapshot, geometry, shaders, scenarios, adapter) if they scan the whole Core; create
+  iOS-conditioned rendering dependencies join with their sources in T-006; the product); the renderer-purity and time
+  scans of `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheInvariantTests.swift` read only its
+  explicit `kernelFiles` list, so the presentation sources (snapshot, geometry, shaders, scenarios, adapter) are
+  already outside them; create
   `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheSceneSnapshot.swift` (snapshot per data-model.md:
   stars, positions at the beat, corridors, hazards and active flags, legs with departure and arrival positions, drawn,
   symbol, star, beat, beacon, deadline, chosenStar, chosenWait, report, stage, failure, failedLeg (recomputed through

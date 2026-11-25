@@ -73,10 +73,11 @@ spheres and motion-blurred polyline trails".
   track at y = −1.2 from x = 0.0 to 0.9, filled to beat / deadline; the wait pips, 9 pips at y = −1.35 from x = 0.0 to
   0.9, lit up to the chosen wait. The glow is additive and drawn last. After a leg the ship glides along its new trail
   over 0.5 s of presentation time (presentation only; Reduce Motion places it at once). The chosen destination and wait
-  are presentation state of the adapter (`route.choose [star, wait]`, never in the digest), at opening the other end of
-  the lowest-index corridor from the start star with wait 0. The camera is a fixed authored perspective (eye (1.2, 1.0,
-  2.8) looking at (0, −0.2, 0)) fitted to the box x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95 with a 5 % margin for
-  aspect 0.4 … 2.5. Nothing drawn is consulted by the rules. Impact: FR-R02G1603-001, 002, 003, 006.
+  are presentation state of the adapter (`route.choose [star, wait]`, never in the digest), at opening and after each
+  leg the other end of the lowest-index corridor from the ship's star with wait 0. The camera is a fixed authored
+  perspective (eye (1.2, 1.0, 2.8) looking at (0, −0.2, 0)) fitted to the box x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 …
+  0.95 with a 5 % margin for aspect 0.4 … 2.5. Nothing drawn is consulted by the rules. Impact: FR-R02G1603-001, 002,
+  003, 006.
 - Q: What do the three quality tiers change? → A: `level-0` (richest): star spheres of 16 × 12 segments with layered
   shading (core, limb and corona), 3 motion-blur ghosts trailing each trail's end and 2 glow shells around the stars,
   the ship and lit trails; `level-1`: 12 × 8 segments, 1 ghost, 1 glow shell; `level-2` (the design's "Tier 0,
