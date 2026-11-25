@@ -49,7 +49,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 5: Stories 3 and 4 — difficulty and honest witness files (P2)
 
-- [ ] T-R02G1602-005 [P] [US4] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheWitness.swift`
+- [X] T-R02G1602-005 [P] [US4] Create `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheWitness.swift` — Verified 2026-11-24: host-4 exit 0 (.autonomy/migration/checks/R02-G16-02.host-4.json); StarlitCartoucheWitnessTests 13 tests: round trip, known digests, every refusal
   (agent B: schema 1 sorted-key JSON; state digests "first 16 hex of SHA-256 of the ship's star, the beat and the drawn
   strokes" after each action; play fingerprints after begin (and dismissTutorial) and each action; counterexample (the
   depth one below and the count of states reached at it); difficulty; skipped; decode refuses newer, damaged and
