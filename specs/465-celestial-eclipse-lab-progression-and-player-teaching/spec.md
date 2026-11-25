@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G17-05 (migration ledger, game feature of experience R02-G17) · ID namespace FR-R02G1705-###,
 SC-R02G1705-###, T-R02G1705-###
@@ -26,6 +26,64 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G17-01 … 04.
 - **Model:** feature 455 (Starlit Cartouche's progression and teaching) for hints, tutorial, failure text, progress,
   daily and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+455's answers where the games agree. Facts checked in code (read-only, 2026-11-25): `CelestialEclipseLabSolver.plan`
+certifies a level by searching phase settings by the number of changed movable bodies from the level's starting phases
+(subsets, then phases, in lexicographic order; at most 5 changes and 60,000 settings judged); a plan is its list of
+`.phase(body, offset)` actions in body order, followed by the run; every phase change spends 1 action and the run spends
+none; the run ends the level won, or failed with `unwanted(front, back, tick)`, `window(front, back, tick, open,
+close)` or `horizon(front, back, open, close)`, all deterministic; undo works in playing and failed plays, a won play is
+final; levels 1 … 3 carry the tutorial flag; budgets are 8 … 19 in the catalog (1 … 24 allowed); the adapter prepares
+level (seed mod 100) + 1, keeps the chosen body and shown tick outside the play and snapshots `{level, records}` as
+schema 1; the core may not read a clock; the other round-two games' daily multipliers are 31, 37, 41, 43, 47, 53, 59,
+61, 67, 71, 73, 79, 83, 89 and 97.
+
+- Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
+  failed play's hint is "Undo the last action or retry the level." While playing: when the current phases already win,
+  the hint is "The eclipses are in order: run the clock"; otherwise the solver searches from the current phases through
+  a solver entry that starts from them (`plan(_:from:)`, the certifying `plan(_:)` being that entry at the level's
+  starting phases) within min(actions left, 5) changes; its first change (b, p) is the hint; when no plan is found
+  (none, or the work bound exceeded): "No way to win was found in the actions left: undo the last action or retry the
+  level." Level 1 names the planet ("Move planet b next"), level 2 the way and distance ("Move planet b k steps forward"
+  or "back", the shorter way around its orbit, forward on a tie), level 3 the exact change ("Set planet b to phase p").
+  Hints never change the state, are unlimited, do not affect stars and reset to level 1 after any change of the play.
+  Impact: FR-R02G1705-002; SC-R02G1705-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
+  instructions in order: (1) "Drag a planet along its orbit (or use Phase − and + and Set phase) to change when it
+  passes the others; the timeline below the sky shows the eclipses that would follow" — it advances once a phase change
+  has been accepted; (2) "Make the target eclipses happen in order, each inside its bracket, then press Run — a hint
+  shows which planet to move" — it advances once a second phase change has been accepted or the level ends; (3) "Any
+  other eclipse first, or a target outside its window, fails the run: undo and change a phase" — until the level ends.
+  `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G1705-001; SC-R02G1705-001.
+- Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted phase-change record,
+  undone ones included: 3 when at most the certified witness's change count, 2 when at most that + 2, else 1; per level
+  the best (least) actions spent of a won campaign play and its stars, a better result replacing a worse one; level 1
+  open; a campaign win opens the next; `level.select [n]` opens any open level and refuses others (`r02-g17.locked`);
+  `level.next` moves to the next open level (refused when none, `r02-g17.locked`); the five bands of 20 are the
+  certified difficulty bands. Impact: FR-R02G1705-004; SC-R02G1705-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 29) mod 100 + 1, negative day counts wrapped into 0 … 99 (29 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g17.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the budget raised to the kernel's
+  maximum (24); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G1705-005;
+  SC-R02G1705-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 455: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the chosen body, shown tick and pending
+  phase stay presentation; the snapshot payload becomes schema 2 (`{level, mode, progress, records, tutorial}`) with a
+  migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its first step on tutorial
+  levels). A failure is explained from the run's failure, targets numbered from 1 and planets by index: an unwanted
+  eclipse — "The run met an unwanted eclipse first: planet f in front of planet b at tick t, before target k (planet f′
+  in front of planet b′)."; a window — "Target k (planet f in front of planet b) began at tick t, outside its window
+  from tick o to tick c."; the horizon — "The clock reached tick h before target k (planet f in front of planet b,
+  window o … c) happened." (h the last tick, horizon − 1) — each followed by "Undo the last action or retry the
+  level." Impact: FR-R02G1705-003, 007; SC-R02G1705-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
