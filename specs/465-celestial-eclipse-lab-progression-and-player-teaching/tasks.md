@@ -91,7 +91,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
   `-3f`
 - [X] T-R02G1705-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G17-05.*.json)
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G1705-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1705-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-25: 2026-11-25 reference-1 exit 0 (.autonomy/migration/checks/R02-G17-05.reference-1.json)
 - [ ] T-R02G1705-009 Reference regression chunk 2 (`--name reference-2`)
 - [X] T-R02G1705-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-25: 2026-11-25 script tests run alone exit 0 (.autonomy/migration/checks/R02-G17-05.script-tests.json)
 - [ ] T-R02G1705-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
