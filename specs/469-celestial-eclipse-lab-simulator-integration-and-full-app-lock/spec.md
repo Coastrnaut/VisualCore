@@ -53,11 +53,13 @@ on levels 1 … 3; the UI chunk keys in `release_check.py` end at `y3` (`z3` is 
 `CEL`.
 
 - Q: How do the interface tests find controls and what do they read? → A: through the identifiers the panel already
-  carries (`experience.r02-g17.celestial-eclipse-lab.<name>`); this feature pins the full list as
-  `CelestialEclipseLabControls.identifierNames` (the 40 names above) with a test that every name is unique and used
-  once in the panel. The tests read the canvas description for the level and the win, the `stars` text for the stars,
-  the `actions` text to confirm each phase change took effect, the planet and phase controls' values for the chosen
-  body and the pending phase, and the replay step's value for the replay position. Impact: FR-R02G1709-001, 002.
+  carries (`experience.r02-g17.celestial-eclipse-lab.<name>`); the failure explanation, which today shares `failure`
+  with the short failure line, gets its own identifier `explanation` (as in feature 459), and this feature pins the full
+  list as `CelestialEclipseLabControls.identifierNames` (the 40 names above plus `explanation`: 41) with a test that
+  every name is unique and used once in the panel. The tests read the canvas description for the level and the win, the
+  `stars` text for the stars, the `actions` text to confirm each phase change took effect, the planet and phase
+  controls' values for the chosen body and the pending phase, and the replay step's value for the replay position.
+  Impact: FR-R02G1709-001, 002.
 - Q: Which interface tests exist and how are they grouped? → A: namespace `CEL` in
   `Apps/VisualCore/Tests/UI/CelestialEclipseLab/CELSupport.swift`; `CELPlayUITests` (fresh launch with `-vcResetData
   -vcSkipWelcome -vcCandidates -openExperience r02-g17.celestial-eclipse-lab`: dismiss the tutorial, play level 1's
