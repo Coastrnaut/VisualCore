@@ -57,15 +57,16 @@ by filter.
 - [ ] T-R02G1605-004 Edit `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheExperienceCore.swift`
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g16.locked`, `r02-g16.date`; practice budget 24 on a copy of the level, no stars, no
-  unlocks; a daily win records the level's best result and stars and opens nothing; progress and mode in the digest,
-  the tutorial step snapshotted but not digested, the chosen destination and wait unchanged (presentation); snapshot
-  schema 2 `{level, mode, progress, records, tutorial}` with a migration from 1 "level 1 open plus the restored level,
-  campaign mode, tutorial at its first step on tutorial levels"; `level.next` to the next open level, refused with
-  `r02-g16.locked` when none; no level is ever gated by payment — locked means not yet unlocked (FR-R02G1605-006)) with
-  tests in `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheExperienceCoreTests.swift` (new
-  controls, refusals, schema 2 round trip, migration from a schema-1 payload, newer schema refused); update
-  `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheScenarios.swift` where the new controls and the
-  `level.next` rule change expectations and regenerate
+  unlocks; the daily level is playable even while still locked in the campaign, and a daily win records the level's best
+  result and stars and opens nothing; progress and mode in the digest, the tutorial step snapshotted but not digested,
+  the chosen destination and wait unchanged (presentation); snapshot schema 2 `{level, mode, progress, records,
+  tutorial}` with a migration from 1 "level 1 open plus the restored level, campaign mode, tutorial at its first step on
+  tutorial levels"; `level.next` to the next open level, refused with `r02-g16.locked` when none; no level is ever gated
+  by payment — locked means not yet unlocked (FR-R02G1605-006)) with tests in
+  `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheExperienceCoreTests.swift` (new controls,
+  refusals, a locked daily level played without opening it, schema 2 round trip, migration from a schema-1 payload,
+  newer schema refused); update `Packages/ExperiencesRound02/StarlitCartouche/Core/StarlitCartoucheScenarios.swift`
+  where the new controls and the `level.next` rule change expectations and regenerate
   `Packages/ExperiencesRound02/StarlitCartouche/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); update
   `StarlitCartouchePanelWinTests`, the gesture wiring tests and other suites whose `level.next` expectation changes;
   lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter StarlitCartouche`
