@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G17-04 (migration ledger, game feature of experience R02-G17) · ID namespace FR-R02G1704-###,
 SC-R02G1704-###, T-R02G1704-###
@@ -29,6 +29,57 @@ Canonical overrides:
   renderer of R02-G17-01 … 03.
 - **Model:** feature 454 (Starlit Cartouche's gameplay spatial interaction) for the gesture controller, picker, orbit
   and panel, adapted to miniature planets whose phases are set along their orbital rings.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+454's answers where the games agree. Facts checked in code (read-only, 2026-11-25): the host's `PointerEvent` (id,
+phase began/moved/ended/cancelled, location in view points with the origin top-left, timestamp); feature 454's
+thresholds (tap below 10 points and 0.5 s, drag from 16 points, double tap within 0.35 s and 22 points, orbit 90° per
+view width and 60° per view height, yaw ±60°, pitch −20° … +35°). Celestial Eclipse Lab's adapter declares
+`orbit.phase` [body, offset], `clock.run`, `play.undo`, `play.redo`, `level.next`, `orbit.choose` [body] and
+`clock.show` [tick] (the last two presentation only). The scene (`CelestialEclipseLabSceneGeometry`) draws each body as
+a disc of radius r · s at w(position(at: shown tick, phase)) from eye (0.3, 0.2, 3.4) towards (0, −0.25, 0), fitted to
+the box x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95, the timeline strip at y −1.15 from x −0.9 to 0.9 with window
+brackets at y −1.05, and paints by kind (rings, bodies and shadow lenses by distance, halos, gauges by index).
+
+- Q: How is a touch picked? → A: at touch-down every body is projected through the drawn camera (orbit included) into
+  view points; a body is hit when the touch lies within its projected disc radius (r · s) grown by 8 points; of several
+  hits the front-most wins (the one painted last). The time dial is the bounding box of the projected timeline strip
+  ends and window brackets grown by 8 points. Anything else (rings, halos, bars, backdrop) is empty space. Tap, drag and
+  double-tap thresholds are feature 454's. Impact: FR-R02G1704-005; SC-R02G1704-001.
+- Q: What do taps do? → A: a tap on a body sends `orbit.choose [body]` in any stage (a fixed body may be chosen; its
+  description says it cannot be moved); a tap on the time dial sends `clock.show [tick]` with the tick under the finger
+  (below); a tap on empty space changes nothing and two such taps within 0.35 s and 22 points reset the view. On a won
+  or failed play no kernel action is sent (taps and the dial still choose and show) and the description says the play
+  is over (undo or next level). Impact: FR-R02G1704-002, 003, 007; SC-R02G1704-002.
+- Q: How does the orbital-handle drag work? → A: a press on a movable body that moves 16 points or more while playing
+  becomes a phase drag: the pending offset is the phase p (0 … period − 1) whose position of that body at the shown
+  tick, orbit[(tick + p) mod period] mapped by w and projected, is nearest to the finger (ties to the lower p); the
+  presenter shows the body's ghost there (a dashed copy of its disc) and the snapshot's predicted timeline is the
+  kernel's timeline of the current phases with that body at the pending offset; on release exactly one `orbit.phase
+  [body, p]` is sent when p differs from the current phase, otherwise nothing; a release outside playing, a cancel or
+  a second finger clears the preview and sends nothing. A drag from a fixed body sends nothing and explains that it is
+  fixed. The preview is presentation only (the snapshot gains `previewBody`, `previewOffset` and the preview timeline;
+  none enters the digest). Impact: FR-R02G1704-001, 004, 007; SC-R02G1704-001, 003.
+- Q: How do the time dial and two fingers behave? → A: from touch-down on the dial, the tick is round(f · (horizon −
+  1)) for f the finger's position along the screen line through the projected strip ends, clamped to 0 … 1; every change
+  sends `clock.show [tick]` (never an undo step, never a kernel action). Two fingers as feature 454: a second finger
+  cancels any one-finger gesture (nothing sent) and orbits — yaw ±60° about the vertical axis through the authored box
+  centre (90° per view width), pitch −20° … +35° (60° per view height); a third finger re-bases the midpoint; a double
+  tap on empty space or "Reset view" returns to orbit (0, 0); the camera refits so the authored box stays inside the
+  view with a 5 % margin at every orbit and aspect 0.4 … 2.5 and the eye stays outside the box; meshes are rebuilt when
+  the orbit changes; orbit is not saved (schema stays 1). Impact: FR-R02G1704-003, 006; SC-R02G1704-002, 004.
+- Q: How is it built and tested? → A: a Core gesture controller (`CelestialEclipseLabGestureController`) with a picker
+  (`CelestialEclipseLabPicker`) and an orbit (`CelestialEclipseLabOrbit`, with `camera(_:aspect:orbit:)` equal to the
+  authored camera at orbit 0) takes pointer events with the view size, the drawn snapshot and the orbit and returns
+  gesture actions (choosePlanet, showTick, setPhase, preview, clearPreview, resetView, explain) and the orbit; the
+  geometry draws the ghost; host tests feed 500 seeded taps, phase drags and dial drags on certified levels at several
+  sizes and orbits against an independent pick in the test; simulator tests send touches through the experience's
+  pointer entry; a host test wins all 100 certified levels through panel actions alone (planet − and +, phase − and +,
+  run). Impact: FR-R02G1704-005, 008, 009; SC-R02G1704-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
