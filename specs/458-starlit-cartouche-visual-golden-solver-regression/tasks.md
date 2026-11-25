@@ -39,7 +39,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
   compare with the one-quantum fallback and the pinned-digest self-check), generate
   `Packages/ExperiencesRound02/StarlitCartouche/golden-frames.json` (schema 1) with `STARLIT_CARTOUCHE_WRITE_GOLDEN=1`,
   and add `StarlitCartoucheGolden` to `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G1608-004 [P] [US2] Create
+- [X] T-R02G1608-004 [P] [US2] Create — Verified 2026-11-25: 2026-11-25 host-2 exit 0 (12 golden tests; one over-strict drawn-strokes check relaxed by the lead: level 41 draws its three strokes before the beacon leg)
   `Packages/ExperiencesRound02/StarlitCartouche/CoreTests/StarlitCartoucheRegressionGoldenTests.swift` (agent B: every
   frame's recomputed description matches its pinned one; each pinned digest equals the digest of its pinned
   description; a moved position beyond a quantum, a changed colour or count, a missing frame, an unknown frame, schema
