@@ -16,7 +16,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1801-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `ApsidesWorkshopCore`,
+- [X] T-R02G1801-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `ApsidesWorkshopCore`, — Verified 2026-11-25: 2026-11-25 Package.swift gains ApsidesWorkshopCore and its tests; Error, Fixed, Orbit, Level, fixtures and ApsidesWorkshopLevelTests pass (host exit 0; the fixtures' known actions order size and knob so the orbit in between stays valid)
   `ApsidesWorkshopCoreTests`, product); create
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopError.swift` (codes "r02-g18.level, .action, .budget,
   .stage, .stale, .newer-schema, .malformed"),
