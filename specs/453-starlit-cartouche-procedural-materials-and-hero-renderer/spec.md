@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-24
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G16-03 (migration ledger, game feature of experience R02-G16) · ID namespace FR-R02G1603-###,
 SC-R02G1603-###, T-R02G1603-###
@@ -31,6 +31,94 @@ Canonical overrides:
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G16-01 and -02.
 - **Model:** feature 443 (Voxel Origami's hero renderer and experience).
+
+## Clarifications
+
+### Session 2026-11-24
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+443's answers where the games agree. Facts checked in code (read-only, 2026-11-24): Voxel Origami's experience
+(R02-G15-03 … 10) is the pattern in this package — a Core adapter with a table of certified candidates, an immutable
+scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+(`…Experience.swift`, presenter, scene, controls), a scenario manifest with 80 acceptance scenarios, a registration with
+content facts in `Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Starlit Cartouche kernel provides
+the level (4 … 12 stars with lattice orbits, glyph points on a 5 × 5 grid and windows; the range; corridors with travel;
+hazards with intervals; start, beacon, deadline, symbol and budget), the star position at a beat, the leg (from, to,
+corridor, wait, depart, arrive), the failures (departure, hazard, arrival, deadline, stroke, budget), the route report
+(star, beat, drawn, missing, stray, mismatch, clearance, matched), the play (leg, undo, redo, stages) and the certified
+catalog of R02-G16-02 (5 … 10 stars, orbit coordinates −5 … 5); `AppModelTests` uses `r02-g16.starlit-cartouche` as its
+synthetic unregistered candidate and the next round-two game is `r02-g17.celestial-eclipse-lab`; the archived matrix has
+80 acceptance rows R2-G16-QA-001 … 080; the catalog's design gives the palette "deep ultramarine, meteor gold and
+pearl", the hero "sapphire ship leaving comet-calligraphy across a rotating firmament" and the geometry "procedural star
+spheres and motion-blurred polyline trails".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: lattice positions map to world space
+  by w(v) = (v − m) · s, where m is the centre of the bounding box of every orbit position of every star (so no star
+  leaves the frame at any beat) and s = 1.5 / (e + 1) with e the box's largest extent; y is up. Stars are drawn at
+  w(position(at: beat)) for the play's current beat. Drawn back to front by distance from the eye (depth testing off,
+  the shared mesh renderer's path; ties broken by kind — corridors, hazards, trails, stars, ship and beacon, gauges —
+  then by index): the firmament backdrop (a large quad; a vertical gradient from night #0A1240 at the bottom to night
+  top #141E5C at the top with sparse procedural specks covering under 5 % of its pixels, turning about the vertical axis
+  at 0.02 radians per second of presentation time — a backdrop only, the chart never turns); the corridors, a ribbon
+  0.02 wide between the two stars' current positions, symbol corridors not yet drawn dashed pearl, other corridors
+  faint; the hazard tubes, a striped ribbon 0.06 wide along their corridor, coral while active (from ≤ beat ≤ to), dim
+  otherwise; the trails, one ribbon 0.05 wide per flown leg from w of the from-star's position at departure to w of the
+  to-star's position at arrival, meteor gold; the stars, spheres of radius 0.07 at their positions, pearl, each with
+  (index mod 6) + 1 notches on a ring around it; the ship, a sapphire arrow of length 0.14 at its star, pointing along
+  its last trail (toward +x before the first leg); the beacon ring of radius 0.12 around the beacon star; the chosen
+  destination's dashed sapphire ring of radius 0.1; the gauges in screen-facing world space below the chart: the
+  cartouche, a 5 × 5 grid 0.5 wide centred at (−0.5, −1.2) in which every symbol corridor is a line between its two
+  stars' glyph points, dashed pearl until drawn and solid gold once drawn; the actions bars, `budget` bars at y = −1.05
+  from x = 0.0 to 0.9 (each 0.9 / budget wide with a gap of a fifth, 0.04 tall), lit for the actions left; the beat
+  track at y = −1.2 from x = 0.0 to 0.9, filled to beat / deadline; the wait pips, 9 pips at y = −1.35 from x = 0.0 to
+  0.9, lit up to the chosen wait. The glow is additive and drawn last. After a leg the ship glides along its new trail
+  over 0.5 s of presentation time (presentation only; Reduce Motion places it at once). The chosen destination and wait
+  are presentation state of the adapter (`route.choose [star, wait]`, never in the digest), at opening the other end of
+  the lowest-index corridor from the start star with wait 0. The camera is a fixed authored perspective (eye (1.2, 1.0,
+  2.8) looking at (0, −0.2, 0)) fitted to the box x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95 with a 5 % margin for
+  aspect 0.4 … 2.5. Nothing drawn is consulted by the rules. Impact: FR-R02G1603-001, 002, 003, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): star spheres of 16 × 12 segments with layered
+  shading (core, limb and corona), 3 motion-blur ghosts trailing each trail's end and 2 glow shells around the stars,
+  the ship and lit trails; `level-1`: 12 × 8 segments, 1 ghost, 1 glow shell; `level-2` (the design's "Tier 0,
+  D3-safe"): flat screen-facing 12-sided star discs, no ghosts, no glow. Stars, corridors, hazards, trails, the ship,
+  the beacon, the cartouche, gauges, colours and positions are the same at every tier. Levels are ordered richest first;
+  the presenter logs each tier change with its reason. Impact: FR-R02G1603-004; SC-R02G1603-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects through the same
+  camera every star's centre, the ship's centre, the midpoint of every trail, the cartouche centre and the first
+  actions bar, orders them by camera distance as the painter does, and gives the palette. Simulator tests render
+  offscreen at 1,152 × 768 at time 0 and check, at points at least 6 pixels from every element drawn after them, that a
+  star's centre is brighter than the backdrop by at least 0.25 in luminance; that the ship's centre has blue above red
+  by at least 0.08 (sapphire); that a trail's midpoint has red above blue by at least 0.08 (gold); that the first
+  actions bar differs from the backdrop by at least 0.1; and that the median of a 9 × 9 pixel patch of backdrop away
+  from geometry matches the gradient colour at its height within 0.06 (the median ignores the sparse specks). Palette:
+  night #0A1240, night top #141E5C, speck #C9D2FF, pearl #F2EEE6, pearl shade #B8C0D8, corridor #3A4478, symbol dash
+  #C9CCE0, trail gold #F5B83D, trail glow #FFE3A0, ship #2F6BFF, ship glow #8FB0FF, beacon #F2EEE6, chosen #2F6BFF,
+  hazard active #FF5A5F, hazard idle #5A3A58, actions lit #F5B83D, actions unlit #283058, beat track #8FB0FF, wait lit
+  #2F6BFF, wait unlit #283058, broken #FF6B4A, glow #FFF4E0. Impact: FR-R02G1603-006; SC-R02G1603-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `StarlitCartoucheSceneSnapshot` (the stars' positions at the beat, glyph points and windows; the corridors and travel;
+  the hazards and which are active; the flown legs with the positions at their departure and arrival; the drawn
+  strokes and the symbol; the ship's star and beat; the beacon; the deadline; the chosen destination and wait; the route
+  report; stage, failure, actions left, budget, level number and presentation time) made by the adapter; it never holds
+  the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the shared unlit
+  mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion stops the
+  firmament turning and the ship's glide; Reduce Flashing caps the glow gain. A failure draws the failing corridor in
+  the broken colour and marks what failed (the star whose window was missed, the hazard met, or the stray stroke; a
+  deadline or budget failure marks the beat track or the actions bars), and the failure text names it, as the kernel's
+  reason does. Impact: FR-R02G1603-003, 007; SC-R02G1603-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g16.starlit-cartouche` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette, the
+  scenario manifest `Packages/ExperiencesRound02/StarlitCartouche/scenario-manifest.json`, no permissions, a summary of
+  at most 300 characters, content facts: 100 levels and the pinned catalog digest); `project.yml` and the app's
+  experience registry link `StarlitCartoucheExperience` as a candidate (`available: false` until X-R02-G16), opening at
+  seed 0 (level 1); `AppModelTests` switches its synthetic unregistered candidate to the next round-two game
+  (`r02-g17.celestial-eclipse-lab`). The adapter (`StarlitCartoucheExperienceCore`) prepares certified level (seed mod
+  100) + 1 from its table of certified candidates (the whole generator only if that candidate no longer certifies) and
+  accepts `route.fly [star, wait]`, `play.undo`, `play.redo`, `level.next` and `route.choose [star, wait]` (whole
+  numbers only); the kernel refuses everything out of range or out of stage, and `route.choose` refuses a star the
+  level does not have, the ship's own star or a wait outside 0 … 8; its digest is the level number and the play's
+  fingerprint (never the record history or the chosen destination, so undo restores the earlier digest); snapshot
+  schema 1 `{level, records}`. Impact: FR-R02G1603-005, 008, 009; SC-R02G1603-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -85,17 +173,18 @@ it as available, and the experience package, registry, catalog and content check
 - **Zero-size or very small views, rotation and resize:** a zero-size view draws nothing and reports no error; for every
   aspect ratio from 0.4 to 2.5 the camera fits every star's orbit, the cartouche and the gauges with a margin of at
   least 5 % on each side.
-- **Colour-blind players:** each star carries its glyph point as a small mark, the ship has a distinct arrow shape, the
-  beacon a ring, flown trails a solid stroke and unflown symbol corridors a dashed line, hazards a striped tube, and
-  windows and the deadline are rows of shapes; every star, corridor and measure can be named in words by the kernel, so
-  no information is carried by hue only.
-- **A failure (departure window, hazard, arrival window, deadline or stroke):** the failing leg is drawn in the broken
-  colour and the star, hazard or corridor concerned is marked; the gauges show what was reached and the failure shown
+- **Colour-blind players:** each star carries (index mod 6) + 1 notches on its ring, the ship has a distinct arrow
+  shape, the beacon a ring, the chosen destination a dashed ring, drawn strokes a solid line and undrawn symbol strokes
+  a dashed one, hazards a striped tube, and actions, the beat and the wait are rows of shapes; every star, corridor and
+  measure can be named in words by the kernel, so no information is carried by hue only.
+- **A failure (departure window, hazard, arrival window, deadline, stroke or budget):** the failing corridor is drawn
+  in the broken colour and what failed is marked (the star, the hazard, the stray stroke, the beat track or the actions
+  bars); the gauges show what was reached and the failure shown
   names it, as the kernel's reason does.
 - **A won level:** every symbol trail is lit and the cartouche seals; the frame checks use the same positions.
 - **Memory warning:** caches are released and rebuilt on the next frame.
-- **Reduce Motion:** the firmament does not turn and stars jump to their positions without gliding; Reduce Flashing caps
-  the glow to the shared limit.
+- **Reduce Motion:** the firmament does not turn and the ship is placed at its star without gliding; Reduce Flashing
+  caps the glow to the shared limit.
 
 ## Requirements *(mandatory)*
 
