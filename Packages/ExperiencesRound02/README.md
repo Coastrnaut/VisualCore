@@ -888,5 +888,8 @@ the play state `StarlitCartouchePlay` with stages, events, records, undo, redo a
 planned levels), `StarlitCartoucheGenerator` (seeded candidates by band, the first whose minimal plan is in range),
 `StarlitCartoucheSolver` (a breadth-first search over star, beat and strokes with a counted minimality proof),
 `StarlitCartoucheDifficulty` and `StarlitCartoucheWitness`, with the 100 witness files in
-`docs/games/starlit-cartouche/levels/` and a pinned catalog digest. See
+`docs/games/starlit-cartouche/levels/` and a pinned catalog digest. Feature 453 (R02-G16-03) adds the hero renderer
+(`StarlitCartoucheSceneSnapshot`, `StarlitCartoucheSceneGeometry`, `StarlitCartoucheShaders`), the adapter
+`StarlitCartoucheExperienceCore`, the scenarios and the iOS target `StarlitCartoucheExperience`, registered as a
+candidate until X-R02-G16. See
 [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).

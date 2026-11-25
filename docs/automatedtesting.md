@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-24 (R02-G16-02: Starlit Cartouche levels, solver and witness files).
+Last updated: 2026-11-24 (R02-G16-03: Starlit Cartouche hero renderer and experience).
 
 ## 1. What is tested, and where
 
@@ -855,6 +855,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   them). Lesson: the catalog enumeration first took 8.3 s on one band-5 level because every leg went through the play,
   which hashes its fingerprint two or three times per apply. Filtering each leg with the chart first (a refused or
   failing leg can only end the play) and keeping the most legs left per explored state brought it to 1.2 s.
+- **Starlit Cartouche hero renderer and experience** (R02-G16-03, 2026-11-24). Host: `swift test --package-path
+  Packages/ExperiencesRound02 --filter StarlitCartouche` (shader sources, scene geometry and the shader's vertex
+  contract, adapter, renderer purity over 200 seeded snapshots, the 94 scenarios replayed through the engine).
+  Simulator: `xcodebuild_package.py … --only-testing StarlitCartoucheExperienceTests` (26 tests: frames against the
+  CPU reference at three tiers on five levels, fallback, resize, memory warning, Reduce Motion, glide, tier log,
+  identity). Lessons: the shader and geometry agents worked in parallel and wrote different vertex conventions (material
+  numbers and what the normal slot carries); give the geometry agent the finished shader file, or let one agent own
+  both, before the simulator run. The frame check first required the first actions bar on every level, but the bars
+  stand a few pixels apart and a near star can project over them; neighbouring bars no longer count as hiding, and the
+  bar is required on most levels.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15

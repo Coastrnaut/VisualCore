@@ -73,3 +73,50 @@ from the ship's star in index order, waits 0 … 8, flyable ones only) for the l
   decoding re-checks everything by replay and by re-solving (`r02-g16.witness`). The catalog digest over the 100 level
   fingerprints is pinned, R02-F24's progression rule holds on the witness leg count, and a depth-first enumeration on
   the two levels with the fewest stars per band confirms the minima.
+
+## Hero renderer and experience (feature 453, R02-G16-03)
+
+- **Scene.** A lattice position v is drawn at w(v) = (v − m)·s, with m the centre of the bounding box of every orbit
+  position of every star (so no star leaves the frame at any beat) and s = 1.5 / (e + 1) for the box's largest extent
+  e; stars are drawn at their kernel positions for the current beat. Painter's order by distance from the eye,
+  farthest first, ties by kind (corridor, hazard, trail, failed leg, star, ship, beacon, chosen ring, cartouche, actions
+  bar, beat track, wait pip) then index, with depth testing off (`StarlitCartoucheSceneGeometry`): the firmament quad,
+  corridor ribbons 0.02 wide (undrawn symbol strokes dashed pearl), hazard tubes 0.06 wide (striped, coral while
+  active), meteor-gold trail ribbons 0.05 wide from each leg's departure to its arrival position with motion-blur
+  ghosts, pearl star spheres of radius 0.07 with rings of (index mod 6) + 1 notches, the sapphire ship arrow (0.14 long,
+  along its newest trail), the beacon ring (0.12) and the chosen destination's dashed ring (0.1), and the gauges below
+  the chart: the cartouche (a 5 × 5 grid 0.5 wide at (−0.5, −1.2), each symbol stroke a line between its stars' glyph
+  points, dashed until drawn), the actions bars at y −1.05, the beat track at y −1.2 (filled to beat / deadline) and nine
+  wait pips at y −1.35.
+- **Shading.** Two GLSL ES 3.00 programs (`StarlitCartoucheShaders`): the chart program selects one of 22 material
+  codes from uv.x and shades from the local coordinate in uv.y and the normal slot — layered star shading (core, limb,
+  corona), signed-distance dashes, stripes, notches, rings and the ship's dart, and the firmament (a gradient from
+  #0A1240 to #141E5C with hashed specks under 5 % of its pixels, turned by `u_firmamentAngle`, 0.02 rad/s of
+  presentation time, 0 under Reduce Motion). A won level brightens the trails and drawn strokes and seals the cartouche
+  in gold through `u_won` without moving anything; a failure draws the failed leg (recomputed through the chart from
+  the last record's action) in #FF6B4A and marks the star, hazard, stray stroke, beat track or actions bars it names.
+  The glow program draws shells around stars, the ship and lit trails additively and last; its gain is clamped by
+  `u_glowLimit`.
+- **Tiers.** level-0: spheres of 16 × 12 segments, three trail ghosts, two glow shells; level-1: 12 × 8, one ghost, one
+  shell; level-2: flat 12-sided discs, no ghosts, no glow. Positions are the same at every tier; the presenter logs tier
+  changes with their reason.
+- **Camera.** A fixed authored three-quarter view from eye (1.2, 1.0, 2.8) towards (0, −0.2, 0), fitted to the box
+  x −0.95 … 0.95, y −1.45 … 0.95, z −0.95 … 0.95 with a 6 % margin per side (at least the specified 5 %) for aspects
+  0.4 … 2.5.
+- **Adapter.** `StarlitCartoucheExperienceCore` opens certified level (seed mod 100) + 1 from its table of each
+  witness's skipped candidate and accepts `route.fly` [star, wait], `play.undo`, `play.redo`, `level.next` and
+  `route.choose` [star, wait] (presentation only; the choice resets at opening and after every leg to the other end of
+  the lowest-index corridor from the ship's star with wait 0; refusals `r02-g16.choice` and `r02-g16.not-whole`); its
+  digest ("r02-g16.starlit-cartouche.v1") is the level number and the play fingerprint, never the choice; snapshot
+  schema 1 `{level, records}`. The renderer reads only an immutable `StarlitCartoucheSceneSnapshot`, so nothing drawn
+  can change the game (renderer purity).
+- **Fallback and settings.** A shader failure draws the level-2 geometry unlit with the shared mesh renderer and keeps
+  the reason; Reduce Motion stops the firmament and the ship's 0.5 s glide along its newest trail; Reduce Flashing caps
+  the glow. The firmament turns by a uniform, so meshes are rebuilt only when what they read changes. The presenter
+  declares two frame probes (the top-left and bottom-right firmament corners) for the X gates.
+- **Candidate.** Registered in `Catalog/registrations.json` (100 levels, digest ee022539…969e) and linked into the app
+  as a candidate (`ExperienceRegistry.candidates`) until X-R02-G16; the scenario manifest holds 9 standard scenarios,
+  `full-playthrough`, `hero`, 80 acceptance scenarios (R2-G16-QA-001 … 080) and 3 fixtures. Spending the whole budget
+  is possible on only 17 of the 100 levels (each leg advances the beat into windows and the deadline), so the failure
+  fixture and the even witness rows end on a failing leg.
+
