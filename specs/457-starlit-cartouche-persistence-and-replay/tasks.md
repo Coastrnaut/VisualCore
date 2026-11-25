@@ -9,7 +9,7 @@ its convergence lesson (a restored replay validated against its trace) taken int
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1607-001 Baselines after R02-G16-06 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1607-001 Baselines after R02-G16-06 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host-2 and round02-1, -2, -3c, -3e, -3f exit 0 (chunk 3 split: host runs ~3x slower, the process tree at background priority PRI 4); baseline-timing printed bounds above its asserts on all six attempts (mesh 2.3-2.7 s vs 0.70 s, VisualCore unchanged since R02-G16-06), host scheduling, not code; first attempts timed out under agent contention
   baseline-round02-1 … 3` (the three round-two filters of feature 446)
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯

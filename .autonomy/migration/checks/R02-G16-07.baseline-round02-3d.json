@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForge|NocturneGarden|BackwardsAurora|EchoCartographer|ColorfallCanyons|StarlitCartouche"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForge|NocturneGarden|BackwardsAurora|EchoCartographer|ColorfallCanyons|StarlitCartouche'",
+  "elapsed_seconds": 600.031,
+  "exit_code": 124,
+  "finished": "2026-11-25T04:35:39+00:00",
+  "gate": "R02-G16-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G16-07.baseline-round02-3d.log",
+  "log_sha256": "905eab4573af97ef6bd4636ab64b12e22728e20dc8212690f1d4126708cd94c4",
+  "name": "baseline-round02-3d",
+  "started": "2026-11-25T04:25:39+00:00",
+  "timed_out": true
+}
