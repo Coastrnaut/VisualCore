@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} or {device} tasks.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1705-001 Baselines on the committed tree after R02-G17-04 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1705-001 Baselines on the committed tree after R02-G17-04 is recorded: `--name baseline-host`, `--name — Verified 2026-11-25: 2026-11-25 baseline-host, baseline-timing and round02-1, -2, -3c, -3e, -3f exit 0; rendering baseline is R02-G17-04's rendering runs (exit 0)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G17-04's
   rendering runs (exit 0)
 
