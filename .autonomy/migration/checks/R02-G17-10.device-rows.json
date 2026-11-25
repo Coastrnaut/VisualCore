@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g17.celestial-eclipse-lab"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g17.celestial-eclipse-lab",
+  "elapsed_seconds": 0.03,
+  "exit_code": 0,
+  "finished": "2026-11-25T19:54:15+00:00",
+  "gate": "R02-G17-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G17-10.device-rows.log",
+  "log_sha256": "d380e6950a41ceb8f2f0e621c6372699a6268ca41afffc17cc2cf043a7700e88",
+  "name": "device-rows",
+  "started": "2026-11-25T19:54:15+00:00",
+  "timed_out": false
+}

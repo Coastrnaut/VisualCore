@@ -1,0 +1,227 @@
+{
+  "devices": [
+    {
+      "ledger": "DEV1-R02-G17",
+      "name": "D1"
+    },
+    {
+      "ledger": "DEV2-R02-G17",
+      "name": "D2"
+    },
+    {
+      "ledger": "DEV3-R02-G17",
+      "name": "D3"
+    }
+  ],
+  "experience": "r02-g17.celestial-eclipse-lab",
+  "rows": [
+    {
+      "covers": [
+        "launch",
+        "first-frame"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "CEL-D1",
+      "measurements": [
+        "launch",
+        "first-frame"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "No shader program is compiled after the experience became interactive; stage times recorded for 200 samples per device and tier (docs/performance/budgets.md, proposal).",
+      "procedure": "Open Celestial Eclipse Lab from the catalog with the testing argument, 200 times per device across the three host tiers; the campaign records preparation, shader set-up and first present as stage times.",
+      "status": "pending device campaign",
+      "title": "Launch and first frame"
+    },
+    {
+      "covers": [
+        "frame-pacing",
+        "T-R02G1703-012",
+        "T-R02G1708-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "CEL-D2",
+      "measurements": [
+        "frame-pacing",
+        "frame-time-per-tier"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "60 frames per second with automatic levels (a documented 30 frames per second mode is acceptable on the last level), 200 samples per device; frame time per pinned tier recorded.",
+      "procedure": "Run the hero and full-playthrough scenarios pinned to tiers 0, 1 and 2 in turn, then with automatic levels; the campaign records each frame's interval.",
+      "status": "pending device campaign",
+      "title": "Frame pacing and frame time per tier"
+    },
+    {
+      "covers": [
+        "memory",
+        "thermal",
+        "stress",
+        "T-R02G1708-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "CEL-D3",
+      "measurements": [
+        "memory",
+        "thermal",
+        "stress"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner keeps the device unplugged for the stress session and tells the campaign the starting battery level."
+      ],
+      "pass": "Memory flat within the declared resource budget over the session (the growth rule of feature 192), 200 samples per device; thermal state and any tier change recorded.",
+      "procedure": "Run the 30-minute round-two stress session of UA-F13 (levels opened, planets chosen with taps, phases set with orbit drags and the panel, the clock run, the timeline shown with the dial, actions undone and redone, the camera orbited, levels retried and replayed in a loop) at automatic levels; the campaign samples the footprint and the thermal state.",
+      "status": "pending device campaign",
+      "title": "Memory, thermal state and the round-two stress session"
+    },
+    {
+      "covers": [
+        "T-R02G1704-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "CEL-D4",
+      "measurements": [
+        "touch-to-frame"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner taps planets to choose them, drags planets along their orbits, drags the timeline dial, double-taps empty space and orbits with two fingers; the campaign does not synthesise touches on hardware."
+      ],
+      "pass": "Touch-to-frame latency recorded for 200 samples per device; a tap (travel under 10 points, lifted within 0.5 s) on a planet chooses it; a drag of a movable planet (16 points or more) along its orbit shows the ghost preview at the nearest phase and sends exactly one orbit.phase on release; a drag on the timeline dial shows the nearest projected tick under the finger; a drag on a fixed planet explains why nothing moves; a double tap on empty space (within 0.35 s and 22 points) restores the authored orbit.",
+      "procedure": "Tap planets to choose them, drag a planet along its orbit to preview and set its phase, drag the timeline dial to show a tick, orbit the camera with two fingers and double-tap empty space on each device; the campaign records the interval from touch to the first frame showing the change.",
+      "status": "pending device campaign",
+      "title": "Touch feel and touch-to-frame latency"
+    },
+    {
+      "covers": [
+        "T-R02G1706-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "CEL-D5",
+      "measurements": [
+        "sound-audible",
+        "haptics-felt"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner listens and feels, and sets the silent switch and the system haptics setting."
+      ],
+      "pass": "The sound is audible only while it is on, the panel is shown and the scene is active, and follows the silent switch; each planned haptic is felt (where the device has no haptic engine, the haptic part is recorded as not applicable).",
+      "procedure": "Turn the Sound toggle on and play a level to a win and to a failure with the haptics switch on, including one refused action (setting a planet to the phase it already has, which the rules refuse); choose planets to hear their auditions; observe the sky's ambient sound and the selection, success, warning and error haptics.",
+      "status": "pending device campaign",
+      "title": "Sound heard and haptics felt"
+    },
+    {
+      "covers": [
+        "T-R02G1706-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": false,
+      "id": "CEL-D6",
+      "measurements": [
+        "voiceover-observation"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner turns VoiceOver and the text size on and off in Settings and performs the walk-through."
+      ],
+      "pass": "Every control and the summary element are read with their label and value; each phase change, undo, redo, refusal, failure and the win are announced; the panel stays readable at the largest accessibility text size; recorded as an observation (non-gating, P-08).",
+      "procedure": "With VoiceOver on and the largest accessibility text size, choose a planet and its pending phase with the adjustable controls, set each phase with Set phase and run the clock with Run to hear each change and the win; replay it.",
+      "status": "pending device campaign",
+      "title": "VoiceOver walk-through (manual, non-gating)"
+    },
+    {
+      "covers": [
+        "T-R02G1707-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "CEL-D7",
+      "measurements": [
+        "progress-kept"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner ends the app from the app switcher."
+      ],
+      "pass": "Level 1 is solved with its stars, level 2 is open and the replay of level 1 is offered after the reopen; an unfinished level restores to the same phases, actions left and records.",
+      "procedure": "Win level 1, leave the app to the background, end it from the app switcher, reopen Celestial Eclipse Lab.",
+      "status": "pending device campaign",
+      "title": "Progress across a real termination"
+    },
+    {
+      "covers": [
+        "T-R02G1709-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "CEL-D8",
+      "measurements": [
+        "scenarios",
+        "journeys"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "Every scenario of the device set passes; level 1 is won with its certified plan (body 1 to phase 2, then body 2 to phase 0, then the run) with 3 of 3 stars, level 2 is open, progress survives the relaunch, the replay ends won.",
+      "procedure": "Run the device scenario set by id and the interface journeys of chunk z3 (win level 1 with its two phase changes set and the run, replay, relaunch).",
+      "status": "pending device campaign",
+      "title": "Panel journeys in the app"
+    }
+  ],
+  "scenarios": [
+    "launch-first-frame",
+    "input-response",
+    "completion",
+    "rejection",
+    "save-restore",
+    "reset",
+    "suspend-resume",
+    "teardown-reentry",
+    "cancel-prepare",
+    "full-playthrough",
+    "hero",
+    "fixture-level-1-solved"
+  ],
+  "schema": 1
+}
