@@ -69,7 +69,7 @@ change (the shaders and reference of R02-G16-03 are unchanged and re-proven by t
 - [X] T-R02G1609-007 Docs: `docs/architecture/starlit-cartouche.md` (in-app integration), — Verified 2026-11-25: 2026-11-25 round02-host-1, -2, -3c, -3e, -3f exit 0; script-tests exit 0, run alone; docs updated (architecture in-app integration, round-two README, automatedtesting)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`; `--name script-tests` (alone)
-- [ ] T-R02G1609-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1609-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full exit 0 (app-unit and app-ui are this gate's own runs)
   `--name host-full` (app-unit and app-ui are this gate's own runs)
 - [ ] T-R02G1609-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1609-010 Reference regression chunk 2 (`--name reference-2`)
