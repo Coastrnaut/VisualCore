@@ -28,7 +28,7 @@ CI). No {owner} or {device} tasks (pure logic); no GLSL.
 **Independent test**: each catalog level's witness, replayed and run, wins within the budget; no setting with fewer
 phase changes wins.
 
-- [ ] T-R02G1702-003 [US1] Implement
+- [X] T-R02G1702-003 [US1] Implement — Verified 2026-11-25: 2026-11-25 CelestialEclipseLabSolver (pair-interval table, phase search by depth, counted proof) and CelestialEclipseLabSolverTests pass, 7 tests (host-2 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabSolver.swift` (lead: the pair-interval table
   "for every pair and every pair of phases, the pair's eclipse intervals over the horizon by the kernel's exact overlap
   and visibility rules", a setting's intervals merged "in timeline order (first tick, front, back)" and walked by the
