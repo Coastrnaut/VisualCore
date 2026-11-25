@@ -80,7 +80,7 @@ its convergence lesson (a restored replay validated against its trace) taken int
 - [X] T-R02G1607-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [X] T-R02G1607-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-25: 2026-11-25 reference-1 exit 0
-- [ ] T-R02G1607-009 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G1607-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-25: 2026-11-25 reference-2 exit 0
 - [ ] T-R02G1607-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1607-011 {device} After ImplementationLock-100: a save survives a real app termination on D1/D2/D3.
 - [ ] T-R02G1607-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
