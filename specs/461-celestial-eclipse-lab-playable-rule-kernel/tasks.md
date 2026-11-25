@@ -77,7 +77,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1701-007 Docs: `docs/architecture/celestial-eclipse-lab.md` (new: rules),
+- [X] T-R02G1701-007 Docs: `docs/architecture/celestial-eclipse-lab.md` (new: rules), — Verified 2026-11-25: 2026-11-25 docs/architecture/celestial-eclipse-lab.md, round-two README section and automatedtesting entry written; round02-host-1, -2, -3c (with CelestialEclipseLab), -3e, -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (chunk 3c gains CelestialEclipseLab)
 - [ ] T-R02G1701-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

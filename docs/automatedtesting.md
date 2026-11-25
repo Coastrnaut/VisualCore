@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G16-10: Starlit Cartouche device rows).
+Last updated: 2026-11-25 (R02-G17-01: Celestial Eclipse Lab rule kernel).
 
 ## 1. What is tested, and where
 
@@ -919,6 +919,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   failed at first reading (the touch-feel row left out the reset-view double tap) and the spec was corrected before the
   definition was written; the agent's written plan was then read against the definition and one rule sentence fixed (a
   leg off the symbol fails as a stray stroke, it draws nothing).
+- **Celestial Eclipse Lab rule kernel** (R02-G17-01, 2026-11-25). `swift test --package-path
+  Packages/ExperiencesRound02 --filter CelestialEclipseLab` (40 tests in five suites, about 13 s): level checks and the
+  stored form (damaged, edited, newer and older forms refused), the sky at every boundary (touching discs, a disc one
+  unit inside, each visibility class, an eclipse under way at tick 0), the judge against an independent tick-by-tick
+  reference on 500 seeded levels in five groups, the play (500 seeded traces replayed, undo and redo by fingerprint,
+  every refusal in order), the puzzle contract and the nine source invariants. Lesson: the hand-written sample level's
+  starting phases already won, which the level correctly refused; a fixture's comment must be checked against the
+  judge, not assumed.
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15

@@ -910,3 +910,14 @@ Feature 460 (R02-G16-10) adds its device-row definition and written campaign pla
 (`docs/apps/starlit-cartouche/`), checked by `scripts/check_device_rows.py`; no device is contacted.
 See
 [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).
+
+## Celestial Eclipse Lab (R02-G17, `r02-g17.celestial-eclipse-lab`, free)
+
+`CelestialEclipseLabCore` (feature 461, R02-G17-01) is the playable rule kernel: the exact sky
+(`CelestialEclipseLabVector`, `CelestialEclipseLabBody` on periodic lattice orbits with a disc radius and a phase,
+eclipses by the strict integer disc test, visibility classes total, annular and partial, intervals and the timeline in
+`CelestialEclipseLabSky`), the judge (match, `window`, `unwanted`, `horizon`), `CelestialEclipseLabLevel` (immutable,
+depth-ordered pairs, fingerprinted, JSON schema 1, with names in words), the play state `CelestialEclipseLabPlay` with
+stages, phase changes and the run, records, undo and redo, and `CelestialEclipseLabRules` (an R02-F23 `PuzzleRules`
+over phase vectors). See
+[docs/architecture/celestial-eclipse-lab.md](../../docs/architecture/celestial-eclipse-lab.md).
