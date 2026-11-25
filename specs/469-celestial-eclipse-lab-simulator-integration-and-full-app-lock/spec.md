@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G17-09 (migration ledger, game feature of experience R02-G17) · ID namespace FR-R02G1709-###,
 SC-R02G1709-###, T-R02G1709-###
@@ -26,6 +26,64 @@ Canonical overrides:
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 459 (Starlit Cartouche's simulator integration and full app lock), adapted to phase changes and
   the clock run.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+459's answers where the games agree. Facts checked in code (read-only, 2026-11-25): feature 459 (Starlit Cartouche) is
+the model (`Apps/VisualCore/Tests/UI/StarlitCartouche`, namespace `SC`, serial chunk `y3`;
+`StarlitCartoucheControls.identifierNames`; `StarlitCartoucheSchemaExamples.swift`); Celestial Eclipse Lab's panel
+(`CelestialEclipseLabControls`) already gives every control a label, a value and an identifier through
+`port.identifier(name)` (features 463–467): `planet`, `planet-minus`, `planet-plus`, `planet-detail`, `phase`,
+`phase-minus`, `phase-plus`, `set-phase`, `reset-view`, `tick`, `tick-minus`, `tick-plus`, `tick-detail`, `run`, `undo`,
+`redo`, `next-level`, `dismiss-tutorial`, `hint`, `campaign`, `daily`, `practice`, `level-picker`, `play-level`,
+`replay`, `replay-step`, `replay-stop`, `sound`, and the text elements `actions`, `status`, `failure`, `progress`,
+`summary`, `message`, `tutorial`, `hint-text`, `band`, `stars`, `goal`, `replay-position` — 40 names, but no list of
+them is pinned; the registration in `Apps/VisualCore/App/ExperienceRegistry.swift` stores no examples yet and says they
+come at R02-G17-09 (the snapshot is schema 3 since feature 467; migration 1 → 2 adds progress, the mode and the tutorial
+to `{level, records}`; 2 → 3 adds the sound choice and traces); the canvas description of a won level says "Every target
+eclipse came in order inside its window." and the panel's `stars` text reads "Best: 3 of 3 stars" once level 1 is won
+with its certified count; level 1's certified plan is two phase changes, body 1 to phase 2 and body 2 to phase 0 (budget
+9), then the run; the panel chooses a planet with Planet + or Planet − (the `planet` control's value "body j, phase p of
+q"), moves the pending phase with Phase + or Phase − (the `phase` control's value "pending phase p") and spends one
+action with Set phase; Run ends the level; the `actions` text reads "Level n · a of b actions left"; the tutorial shows
+on levels 1 … 3; the UI chunk keys in `release_check.py` end at `y3` (`z3` is free); no UI test class uses the prefix
+`CEL`.
+
+- Q: How do the interface tests find controls and what do they read? → A: through the identifiers the panel already
+  carries (`experience.r02-g17.celestial-eclipse-lab.<name>`); this feature pins the full list as
+  `CelestialEclipseLabControls.identifierNames` (the 40 names above) with a test that every name is unique and used
+  once in the panel. The tests read the canvas description for the level and the win, the `stars` text for the stars,
+  the `actions` text to confirm each phase change took effect, the planet and phase controls' values for the chosen
+  body and the pending phase, and the replay step's value for the replay position. Impact: FR-R02G1709-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `CEL` in
+  `Apps/VisualCore/Tests/UI/CelestialEclipseLab/CELSupport.swift`; `CELPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g17.celestial-eclipse-lab`: dismiss the tutorial, play level 1's
+  certified plan by choosing each body, moving its pending phase to the target and pressing Set phase (counting a press
+  only when the actions-left count moves), then Run; read "Every target eclipse came in order inside its window." and
+  "Best: 3 of 3 stars", the level picker shows level 2 open; relaunch without reset after sending the app to the
+  background: the stars and level 2 are kept) and `CELReplayUITests` (after the win, Replay best solution, Step until
+  the replay ends won, Stop back to the campaign). They run as a new serial chunk `z3` of `release_check.py` (its key
+  checked unique); each test stays under 90 s apart from the simulator's automation-session setup of each app launch
+  (about 30 s per launch, and a relaunch test launches twice). Level 1's certified plan is pinned in `CEL` and checked
+  against the Core by an app unit test. Impact: FR-R02G1709-002, 007; SC-R02G1709-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `CelestialEclipseLabExperienceCore.schemaOneExample()` (the schema-1 saved state `{level: 1, records}` of a play of
+  level 1 with its first certified phase change applied, so it is still playing and not won) and `schemaTwoExample()`
+  (schema 2 with progress, the campaign mode, the tutorial done and level 1 solved with its stars at one action above
+  the certified count, no trace), both `MigrationExample`s built in the Core (`CelestialEclipseLabSchemaExamples.swift`,
+  modelled on `StarlitCartoucheSchemaExamples`), registered with `examples:`; the app's migration check restores both
+  into schema 3 with progress kept (a schema-2 result without a trace keeps its stars unverified, as feature 467
+  reconciles). The registration's comment is updated. Impact: FR-R02G1709-003; SC-R02G1709-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `CelestialEclipseLabGolden` is forbidden by feature 468, and the scenarios exist only
+  under `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact:
+  FR-R02G1709-004; SC-R02G1709-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g17.celestial-eclipse-lab` as not available and the launcher cannot open it; the registry's candidates list
+  contains it and `all` does not. Impact: FR-R02G1709-006; SC-R02G1709-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
