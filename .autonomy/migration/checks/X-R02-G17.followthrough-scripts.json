@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/test_scripts.py"
+  ],
+  "command": "python3 scripts/test_scripts.py",
+  "elapsed_seconds": 229.762,
+  "exit_code": 0,
+  "finished": "2026-11-25T21:16:55+00:00",
+  "gate": "X-R02-G17",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G17.followthrough-scripts.log",
+  "log_sha256": "355bf594b4d45103608fd8aeb2a46b14519f7a74f45aba910b678140647f0b0c",
+  "name": "followthrough-scripts",
+  "started": "2026-11-25T21:13:06+00:00",
+  "timed_out": false
+}
