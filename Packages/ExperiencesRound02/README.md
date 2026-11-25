@@ -906,5 +906,7 @@ Feature 458 (R02-G16-08) adds the regression net: the solver regression over all
 `scripts/starlit_cartouche_regression.py`.
 Feature 459 (R02-G16-09) integrates it in the app as a candidate: the pinned identifier list, the stored schema-1
 and schema-2 examples, app unit tests and the interface tests `SCPlayUITests` and `SCReplayUITests` (chunk `y3`).
+Feature 460 (R02-G16-10) adds its device-row definition and written campaign plan
+(`docs/apps/starlit-cartouche/`), checked by `scripts/check_device_rows.py`; no device is contacted.
 See
 [docs/architecture/starlit-cartouche.md](../../docs/architecture/starlit-cartouche.md).

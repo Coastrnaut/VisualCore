@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G16-09: Starlit Cartouche in-app integration).
+Last updated: 2026-11-25 (R02-G16-10: Starlit Cartouche device rows).
 
 ## 1. What is tested, and where
 
@@ -912,6 +912,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   the previous gate's chain ran, without building; the lead compiled and ran them after the baselines and all passed on
   the first run. The star and wait controls' values are the leg in words ("star 4 along the corridor …, wait 1 beat"),
   so the interface tests read the number after "star " and after ", wait ".
+- **Starlit Cartouche device rows** (R02-G16-10, 2026-11-25). `python3 scripts/check_device_rows.py --experience
+  r02-g16.starlit-cartouche` (release step `device-rows-r02-g16`, tests `StarlitCartoucheDeviceRowsCheckTests`) checks
+  the definition (rows SC-D1 … SC-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G16
+  rows and the open {device} tasks of features 451 … 459; nothing contacts a device. The checklist's gesture item
+  failed at first reading (the touch-feel row left out the reset-view double tap) and the spec was corrected before the
+  definition was written; the agent's written plan was then read against the definition and one rule sentence fixed (a
+  leg off the symbol fails as a stray stroke, it draws nothing).
 - **Voxel Origami device rows** (R02-G15-10, 2026-11-24). `python3 scripts/check_device_rows.py --experience
   r02-g15.voxel-origami` (release step `device-rows-r02-g15`, tests `VoxelOrigamiDeviceRowsCheckTests`) checks the
   definition (rows VO-D1 … VO-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G15

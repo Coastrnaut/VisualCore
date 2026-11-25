@@ -35,7 +35,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1610-005 Docs: `docs/architecture/starlit-cartouche.md` (device preparation),
+- [X] T-R02G1610-005 Docs: `docs/architecture/starlit-cartouche.md` (device preparation), — Verified 2026-11-25: 2026-11-25 docs updated (architecture device preparation, round-two README, automatedtesting); round-two host evidence is this gate's baseline-round02-1, -2, -3c, -3e, -3f (exit 0): no file under Packages or Apps changed since R02-G16-09's record, so no duplicate run (owner rule: no baseline rerun on an unchanged commit)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G1610-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

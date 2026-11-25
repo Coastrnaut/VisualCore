@@ -253,3 +253,16 @@ from the ship's star in index order, waits 0 … 8, flyable ones only) for the l
   7), which the app restores into schema 3; Starlit Cartouche stays a candidate (not available without
   `-vcCandidates`) until X-R02-G16.
 - **Release.** The Release simulator build compiles without the test-only golden descriptions and scenarios.
+
+## Device preparation (feature 460, R02-G16-10)
+
+Nothing here touches a device. `docs/apps/starlit-cartouche/device-rows.json` defines the device scenario set (the 11
+standard and game scenarios and `fixture-level-1-solved`) and rows SC-D1 … SC-D8 for D1, D2 and D3 (the ledger's
+DEV1/2/3-R02-G16 rows): launch and first frame, frame pacing and frame time per tier, memory and thermal state with the
+round-two stress session, touch feel and latency (a tap that chooses a star, a double tap that flies, a ship drag that
+previews and flies, a slider drag that sets the wait, a double tap on empty space that resets the view, orbit), sound
+and haptics, a non-gating VoiceOver walk-through, progress across a real termination and the panel journeys. Every row
+is "pending device campaign" and covers the open {device} tasks of features 453, 454 and 456 … 459 and UA-F13's
+measurements; `scripts/check_device_rows.py --experience r02-g16.starlit-cartouche` (release step
+`device-rows-r02-g16`) keeps it true. The written plan is `docs/apps/starlit-cartouche/device-campaign.md`; D3 stays on
+iPadOS 26.5.
