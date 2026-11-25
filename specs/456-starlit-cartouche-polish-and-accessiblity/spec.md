@@ -132,8 +132,8 @@ at the largest accessibility text size without clipping the controls.
 **Acceptance Scenarios**:
 
 1. **Given** Reduce Flashing, **When** the level is won or fails, **Then** every change of the glow and of the won look
-   is a fade of at least 0.4 s, not a flash (what the player's action changes — the stars' positions, the trails, the gauges —
-   appears with the action).
+   is a fade of at least 0.4 s, not a flash (what the player's action changes — the stars' positions, the trails, the
+   gauges — appears with the action).
 2. **Given** Reduce Motion or Reduce Flashing, **When** two frames of the same state are drawn at different times (after
    any fade has finished), **Then** they are identical.
 
