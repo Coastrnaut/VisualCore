@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g17.celestial-eclipse-lab",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g17.celestial-eclipse-lab --runtime 27",
+  "elapsed_seconds": 372.892,
+  "exit_code": 0,
+  "finished": "2026-11-25T20:30:28+00:00",
+  "gate": "X-R02-G17",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G17.sim27.log",
+  "log_sha256": "f7781302c02256ebe351a2914efc35f74f569bc02d87b2fdb71c0ca7fb2cbf82",
+  "name": "sim27",
+  "started": "2026-11-25T20:24:15+00:00",
+  "timed_out": false
+}
