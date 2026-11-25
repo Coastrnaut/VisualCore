@@ -84,15 +84,16 @@ epicycles" and the geometry "adaptive analytic ellipse tessellation".
   richest first; the presenter logs each tier change with its reason. Impact: FR-R02G1803-004; SC-R02G1803-001.
 - Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects through the same
   camera the star's centre, the orbiter at the shown tick, every planet's centre, the first gauge track's centre and the
-  first actions bar, and gives the palette. Simulator tests render offscreen at 1,152 × 768 at the shown tick 0 and
-  check, at points at least 6 pixels from every element drawn after them, that the star's centre and the orbiter's
-  centre are brighter than the backdrop by at least 0.25 in luminance; that the first actions bar (lit) has red above
-  blue by at least 0.08 (deep rose); that the first gauge track differs from the backdrop by at least 0.1; and that the
-  median of a 9 × 9 pixel patch of backdrop away from geometry matches the gradient colour at its height within 0.06
-  (the median ignores the sparse specks). Palette: midnight #0A0B1F, midnight top #1A1438, speck #D8E4FF, wedge
-  #2A2350, target wedge #6B2346, compass #3A3F6B, ghost #5B6390, glacial #E8F1FF, deep rose #C2456E, planet #8C93B8,
-  hazard #C2456E, star #FFF4D6, met #C2456E, unmet #E8F1FF, actions lit #C2456E, actions unlit #262A4E, broken #E0533A,
-  glow #F4F8FF. Impact: FR-R02G1803-006; SC-R02G1803-001.
+  first actions bar, and gives the palette. Simulator tests render offscreen at 1,152 × 768 at the shown tick T/2 (the
+  apoapsis, at least 8 lattice units from the star, so the orbiter never covers the star's check point) and check, at
+  points at least 6 pixels from every element drawn after them, that the star's centre and the orbiter's centre are
+  brighter than the backdrop by at least 0.25 in luminance; that the first actions bar (lit) has red above blue by at
+  least 0.08 (deep rose); that the first gauge track differs from the backdrop by at least 0.1; and that the median of a
+  9 × 9 pixel patch of backdrop away from geometry matches the gradient colour at its height within 0.06 (the median
+  ignores the sparse specks). Palette: midnight #0A0B1F, midnight top #1A1438, speck #D8E4FF, wedge #2A2350, target
+  wedge #6B2346, compass #3A3F6B, ghost #5B6390, glacial #E8F1FF, deep rose #C2456E, planet #8C93B8, hazard #C2456E,
+  star #FFF4D6, met #C2456E, unmet #E8F1FF, actions lit #C2456E, actions unlit #262A4E, broken #E0533A, glow #F4F8FF.
+  Impact: FR-R02G1803-006; SC-R02G1803-001.
 - Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
   `ApsidesWorkshopSceneSnapshot` (the current orbit's steps and positions, the starting orbit's positions, the orbiter's
   position at the shown tick, the shares, the apsis readings, the planets, the targets with their bands, readings,
