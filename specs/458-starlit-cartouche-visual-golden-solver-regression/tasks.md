@@ -78,7 +78,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
   `-3f` (the chunks of T-001)
 - [X] T-R02G1608-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G1608-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1608-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-25: 2026-11-25 reference-1 exit 0
 - [ ] T-R02G1608-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G1608-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1608-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden
