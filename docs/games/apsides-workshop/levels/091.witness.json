@@ -1,0 +1,130 @@
+{
+  "actions" : [
+    {
+      "size" : {
+        "_0" : 33
+      }
+    },
+    {
+      "periapsis" : {
+        "_0" : 9,
+        "_1" : 22
+      }
+    },
+    {
+      "play" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "orbits" : 423
+  },
+  "difficulty" : {
+    "apsisTargets" : 1,
+    "narrowestDistanceRange" : 30,
+    "narrowestShareBand" : 44,
+    "orbitsSearched" : 424,
+    "planets" : 3,
+    "targets" : 4,
+    "tunings" : 2,
+    "work" : 9686
+  },
+  "digests" : [
+    "4d50ddab3a5a9140",
+    "44dbdf22d5cf26f6",
+    "44dbdf22d5cf26f6"
+  ],
+  "fingerprints" : [
+    "bc48d00e416f02238b7d8ff02ec83a25b378fbcc4b05a859bdeba48060ebc7c8",
+    "9259ff6564a59b4dff8e6ed68ba50f0359c4e0ffc2ec64c99a936d1bf565c857",
+    "8a03a6f2e92f53c288ce70e7aac302419fb859161f0ddcc3041a8039881cfd47",
+    "d4c67dcc678f931e771c8b11d8cb38a4f673d3b6ed8949431ac48b1633707609"
+  ],
+  "level" : {
+    "budget" : 19,
+    "difficulty" : 5,
+    "fingerprint" : "9e2ceb7bc2bd9aa77015fd9680cb6ed41b582e17ba9a1f1965ea64a42ab16c29",
+    "id" : "apsides-workshop-091",
+    "orbit" : {
+      "direction" : 3,
+      "eccentricity" : 4,
+      "size" : 18
+    },
+    "period" : 48,
+    "planets" : [
+      {
+        "radius" : 2,
+        "x" : -17,
+        "y" : 35
+      },
+      {
+        "radius" : 2,
+        "x" : 26,
+        "y" : -5
+      },
+      {
+        "radius" : 3,
+        "x" : -4,
+        "y" : 32
+      }
+    ],
+    "schema" : 1,
+    "seed" : 12062971578586823423,
+    "targets" : [
+      {
+        "high" : 967,
+        "kind" : "apoapsis",
+        "low" : 937,
+        "sector" : 3
+      },
+      {
+        "high" : 189,
+        "kind" : "sweep",
+        "low" : 143,
+        "sector" : 4
+      },
+      {
+        "high" : 111,
+        "kind" : "sweep",
+        "low" : 55,
+        "sector" : 5
+      },
+      {
+        "high" : 84,
+        "kind" : "sweep",
+        "low" : 40,
+        "sector" : 6
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 91,
+  "report" : {
+    "apoapsisDistance" : 957,
+    "apoapsisSector" : 3,
+    "deviations" : [
+      0,
+      0,
+      0,
+      0
+    ],
+    "largestResidual" : 49,
+    "met" : 4,
+    "periapsisDistance" : 363,
+    "periapsisSector" : 7,
+    "shares" : [
+      62,
+      104,
+      208,
+      271,
+      187,
+      62,
+      61,
+      41
+    ]
+  },
+  "schema" : 1,
+  "skipped" : 0
+}

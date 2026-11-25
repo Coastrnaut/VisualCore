@@ -1,0 +1,118 @@
+{
+  "actions" : [
+    {
+      "periapsis" : {
+        "_0" : 7,
+        "_1" : 3
+      }
+    },
+    {
+      "size" : {
+        "_0" : 47
+      }
+    },
+    {
+      "play" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "orbits" : 416
+  },
+  "difficulty" : {
+    "apsisTargets" : 1,
+    "narrowestDistanceRange" : 33,
+    "narrowestShareBand" : 54,
+    "orbitsSearched" : 417,
+    "planets" : 2,
+    "targets" : 3,
+    "tunings" : 2,
+    "work" : 13900
+  },
+  "digests" : [
+    "6ef0c2cc0db1c9a8",
+    "bce76d615754afe8",
+    "bce76d615754afe8"
+  ],
+  "fingerprints" : [
+    "1344e1d2d566b39883b2635fb5f94e26e26ffe3fdb35dd6ad62285c7a2359c86",
+    "40663156ac9501b8d360440311f2c1fb67080be431bcc140da35905abacf9236",
+    "9c58e167d2b9bb9cc355ac91a03869b6419cf3531df1b17ad1deaf8833902cfb",
+    "344d6791044a084ac398605d2a4d50443270d17cbc2a66bbb8fb98ae8d215cc5"
+  ],
+  "level" : {
+    "budget" : 17,
+    "difficulty" : 5,
+    "fingerprint" : "f0ccf51e07a464158860a5cc8d3fbe031335c35d3c744531f5ce3e1897de50db",
+    "id" : "apsides-workshop-089",
+    "orbit" : {
+      "direction" : 0,
+      "eccentricity" : 11,
+      "size" : 25
+    },
+    "period" : 48,
+    "planets" : [
+      {
+        "radius" : 2,
+        "x" : -36,
+        "y" : -47
+      },
+      {
+        "radius" : 1,
+        "x" : -34,
+        "y" : 23
+      }
+    ],
+    "schema" : 1,
+    "seed" : 1475168624572591560,
+    "targets" : [
+      {
+        "high" : 92,
+        "kind" : "sweep",
+        "low" : 32,
+        "sector" : 1
+      },
+      {
+        "high" : 256,
+        "kind" : "sweep",
+        "low" : 202,
+        "sector" : 5
+      },
+      {
+        "high" : 1280,
+        "kind" : "apoapsis",
+        "low" : 1247,
+        "sector" : 5
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 89,
+  "report" : {
+    "apoapsisDistance" : 1269,
+    "apoapsisSector" : 5,
+    "deviations" : [
+      0,
+      0,
+      0
+    ],
+    "largestResidual" : 55,
+    "met" : 3,
+    "periapsisDistance" : 611,
+    "periapsisSector" : 1,
+    "shares" : [
+      41,
+      62,
+      83,
+      145,
+      208,
+      229,
+      145,
+      83
+    ]
+  },
+  "schema" : 1,
+  "skipped" : 1
+}

@@ -72,7 +72,7 @@ edited file is refused.
   (the depth one below and the count of orbits at it); difficulty; skipped; decode refuses newer, damaged and
   non-replaying files) with `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopWitnessTests.swift`;
   `--name host-4`
-- [ ] T-R02G1802-006 [US2] [US3] [US4] Create
+- [X] T-R02G1802-006 [US2] [US3] [US4] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopCatalogTests pass (host-5 exit 0): pinned digest, progression and band means 1.0, 1.0, 1.25, 2.0, 2.0, full-report enumeration on two levels per band, 100 witness files byte for byte
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the budget, and no orbit with fewer tunings wins; the full
   report enumeration on the two levels with the fewest planets in each band (ties by level number); neighbours differ;

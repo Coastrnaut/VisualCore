@@ -1,0 +1,95 @@
+{
+  "actions" : [
+    {
+      "periapsis" : {
+        "_0" : 12,
+        "_1" : 7
+      }
+    },
+    {
+      "play" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 0,
+    "orbits" : 1
+  },
+  "difficulty" : {
+    "apsisTargets" : 0,
+    "narrowestDistanceRange" : 0,
+    "narrowestShareBand" : 134,
+    "orbitsSearched" : 1,
+    "planets" : 0,
+    "targets" : 2,
+    "tunings" : 1,
+    "work" : 296
+  },
+  "digests" : [
+    "68619962a5eecd9d",
+    "68619962a5eecd9d"
+  ],
+  "fingerprints" : [
+    "eaa8d3240d471bc88c229c21be765ad60937e0047edf8e372dd687e7af8bdfbb",
+    "0b64a851573ed7263a8b3353f6283f4fec56e92dd82a3f7e923a7646c48c41c0",
+    "86befdc86757b86c57cb17557046414fc70901dfb0cdc113c0efd8aece232846"
+  ],
+  "level" : {
+    "budget" : 8,
+    "difficulty" : 1,
+    "fingerprint" : "d1e3b27b1f8ea5d78a047cdbc685957e8aca46bba71aa9cbfb99711eba0d6650",
+    "id" : "apsides-workshop-016",
+    "orbit" : {
+      "direction" : 23,
+      "eccentricity" : 0,
+      "size" : 24
+    },
+    "period" : 24,
+    "planets" : [
+
+    ],
+    "schema" : 1,
+    "seed" : 16179331129987866191,
+    "targets" : [
+      {
+        "high" : 338,
+        "kind" : "sweep",
+        "low" : 174,
+        "sector" : 5
+      },
+      {
+        "high" : 494,
+        "kind" : "sweep",
+        "low" : 360,
+        "sector" : 6
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 16,
+  "report" : {
+    "apoapsisDistance" : 768,
+    "apoapsisSector" : 6,
+    "deviations" : [
+      0,
+      0
+    ],
+    "largestResidual" : 31,
+    "met" : 2,
+    "periapsisDistance" : 192,
+    "periapsisSector" : 2,
+    "shares" : [
+      77,
+      0,
+      36,
+      40,
+      83,
+      211,
+      382,
+      168
+    ]
+  },
+  "schema" : 1,
+  "skipped" : 1
+}

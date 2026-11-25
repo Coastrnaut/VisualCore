@@ -1,0 +1,113 @@
+{
+  "actions" : [
+    {
+      "periapsis" : {
+        "_0" : 1,
+        "_1" : 5
+      }
+    },
+    {
+      "size" : {
+        "_0" : 36
+      }
+    },
+    {
+      "play" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "orbits" : 423
+  },
+  "difficulty" : {
+    "apsisTargets" : 1,
+    "narrowestDistanceRange" : 40,
+    "narrowestShareBand" : 56,
+    "orbitsSearched" : 424,
+    "planets" : 1,
+    "targets" : 3,
+    "tunings" : 2,
+    "work" : 10627
+  },
+  "digests" : [
+    "a0596eacf3af14f5",
+    "d72622855cb84d0b",
+    "d72622855cb84d0b"
+  ],
+  "fingerprints" : [
+    "c97869c72befbce6f9986874395ec9029d685810faf2c921724c28f54f2ebaaf",
+    "f0754ccc2ba89a3b5999008277bfefcc10248e3a09691f6ac1f94c97c511d835",
+    "b79500c70fd6b13661cf7a906d6efa9213aac77dfe97c7b45567bce1b7d6d973",
+    "475f5f09f8a9c532cfd8f6aefd22b36bf86b44c060e779b6420f3ad477e6e427"
+  ],
+  "level" : {
+    "budget" : 16,
+    "difficulty" : 4,
+    "fingerprint" : "1ad83b15f64c4c74b65a2f8286d5640fd20917f6251ec89ffa23ded0e75e6832",
+    "id" : "apsides-workshop-062",
+    "orbit" : {
+      "direction" : 8,
+      "eccentricity" : 5,
+      "size" : 30
+    },
+    "period" : 32,
+    "planets" : [
+      {
+        "radius" : 2,
+        "x" : 0,
+        "y" : -54
+      }
+    ],
+    "schema" : 1,
+    "seed" : 881513268965195797,
+    "targets" : [
+      {
+        "high" : 708,
+        "kind" : "periapsis",
+        "low" : 668,
+        "sector" : 1
+      },
+      {
+        "high" : 121,
+        "kind" : "sweep",
+        "low" : 65,
+        "sector" : 2
+      },
+      {
+        "high" : 187,
+        "kind" : "sweep",
+        "low" : 125,
+        "sector" : 4
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 62,
+  "report" : {
+    "apoapsisDistance" : 756,
+    "apoapsisSector" : 5,
+    "deviations" : [
+      0,
+      0,
+      0
+    ],
+    "largestResidual" : 32,
+    "met" : 3,
+    "periapsisDistance" : 684,
+    "periapsisSector" : 1,
+    "shares" : [
+      124,
+      124,
+      93,
+      124,
+      156,
+      125,
+      125,
+      125
+    ]
+  },
+  "schema" : 1,
+  "skipped" : 0
+}

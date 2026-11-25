@@ -1,0 +1,106 @@
+{
+  "actions" : [
+    {
+      "periapsis" : {
+        "_0" : 2,
+        "_1" : 15
+      }
+    },
+    {
+      "play" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 0,
+    "orbits" : 1
+  },
+  "difficulty" : {
+    "apsisTargets" : 1,
+    "narrowestDistanceRange" : 76,
+    "narrowestShareBand" : 70,
+    "orbitsSearched" : 1,
+    "planets" : 1,
+    "targets" : 3,
+    "tunings" : 1,
+    "work" : 64
+  },
+  "digests" : [
+    "86cd9524c8f41ef9",
+    "86cd9524c8f41ef9"
+  ],
+  "fingerprints" : [
+    "7be990231fa6c270500975763466e3c76b9108dc197a24688e20a2d68e126fd1",
+    "ceb3315d8bfaf3dbd2daeb22288c9469786637130db044f9886f3e837e94fc17",
+    "5213bb90e210a63b02a31ef6c5401ddf00d88d8ce99e0f6bfed1a92491bf819e"
+  ],
+  "level" : {
+    "budget" : 13,
+    "difficulty" : 3,
+    "fingerprint" : "920f979f9b1a7ab7dbf76c100b6bfae6bb6bbbf99803bb696d5d49f07f0d6643",
+    "id" : "apsides-workshop-049",
+    "orbit" : {
+      "direction" : 3,
+      "eccentricity" : 2,
+      "size" : 42
+    },
+    "period" : 32,
+    "planets" : [
+      {
+        "radius" : 2,
+        "x" : -41,
+        "y" : 24
+      }
+    ],
+    "schema" : 1,
+    "seed" : 9773000220176923677,
+    "targets" : [
+      {
+        "high" : 794,
+        "kind" : "periapsis",
+        "low" : 718,
+        "sector" : 5
+      },
+      {
+        "high" : 139,
+        "kind" : "sweep",
+        "low" : 47,
+        "sector" : 6
+      },
+      {
+        "high" : 191,
+        "kind" : "sweep",
+        "low" : 121,
+        "sector" : 1
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 49,
+  "report" : {
+    "apoapsisDistance" : 924,
+    "apoapsisSector" : 1,
+    "deviations" : [
+      0,
+      0,
+      0
+    ],
+    "largestResidual" : 51,
+    "met" : 3,
+    "periapsisDistance" : 756,
+    "periapsisSector" : 5,
+    "shares" : [
+      125,
+      156,
+      156,
+      93,
+      93,
+      124,
+      93,
+      156
+    ]
+  },
+  "schema" : 1,
+  "skipped" : 0
+}

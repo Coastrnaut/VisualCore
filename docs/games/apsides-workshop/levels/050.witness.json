@@ -1,0 +1,106 @@
+{
+  "actions" : [
+    {
+      "size" : {
+        "_0" : 8
+      }
+    },
+    {
+      "periapsis" : {
+        "_0" : 9,
+        "_1" : 18
+      }
+    },
+    {
+      "play" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "orbits" : 423
+  },
+  "difficulty" : {
+    "apsisTargets" : 1,
+    "narrowestDistanceRange" : 76,
+    "narrowestShareBand" : 94,
+    "orbitsSearched" : 424,
+    "planets" : 1,
+    "targets" : 2,
+    "tunings" : 2,
+    "work" : 658
+  },
+  "digests" : [
+    "bdd54b258cc7fbb9",
+    "fe69f14779f4e37e",
+    "fe69f14779f4e37e"
+  ],
+  "fingerprints" : [
+    "21224439d3be2bb313ee1fc71fdb8612efe44859d8cf18b7b08883ab6753ceff",
+    "f06b3a1438cd886650187a251d8668e8e68fe50a69a0a87d2c35edc8fc852a84",
+    "9639911e0d71f91d2974d61ebe673164817f7b4d2bdd6570202a15071072b74f",
+    "4401f61204fff1e610eaf69e52b4f993a0e4822f30c20c0f8ca1731087781906"
+  ],
+  "level" : {
+    "budget" : 14,
+    "difficulty" : 3,
+    "fingerprint" : "a50b773b21b53dd15ef59b43253a9bdc0fd96f5c2d3dc1382854c89042db448e",
+    "id" : "apsides-workshop-050",
+    "orbit" : {
+      "direction" : 21,
+      "eccentricity" : 4,
+      "size" : 25
+    },
+    "period" : 32,
+    "planets" : [
+      {
+        "radius" : 2,
+        "x" : 11,
+        "y" : 7
+      }
+    ],
+    "schema" : 1,
+    "seed" : 10439401777503950055,
+    "targets" : [
+      {
+        "high" : 128,
+        "kind" : "periapsis",
+        "low" : 52,
+        "sector" : 6
+      },
+      {
+        "high" : 362,
+        "kind" : "sweep",
+        "low" : 268,
+        "sector" : 2
+      }
+    ],
+    "tutorial" : false
+  },
+  "number" : 50,
+  "report" : {
+    "apoapsisDistance" : 232,
+    "apoapsisSector" : 2,
+    "deviations" : [
+      0,
+      0
+    ],
+    "largestResidual" : 36,
+    "met" : 2,
+    "periapsisDistance" : 88,
+    "periapsisSector" : 6,
+    "shares" : [
+      125,
+      251,
+      283,
+      125,
+      61,
+      30,
+      60,
+      61
+    ]
+  },
+  "schema" : 1,
+  "skipped" : 0
+}
