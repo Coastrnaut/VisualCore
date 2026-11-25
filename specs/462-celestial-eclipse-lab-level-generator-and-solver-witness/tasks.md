@@ -65,7 +65,7 @@ phase changes wins.
 **Independent test**: band means of the witness length do not fall; the 100 witness files match byte for byte and an
 edited file is refused.
 
-- [ ] T-R02G1702-005 [P] [US4] Create
+- [X] T-R02G1702-005 [P] [US4] Create — Verified 2026-11-25: 2026-11-25 CelestialEclipseLabWitness and its 16 tests pass (host-4 exit 0)
   `Packages/ExperiencesRound02/CelestialEclipseLab/Core/CelestialEclipseLabWitness.swift` (agent B: schema 1 sorted-key
   JSON; state digests "16 hex characters of the SHA-256 of the phases and the actions spent" after each action; play
   fingerprints after begin (and dismissTutorial) and each action; terminal timeline (front, back, first, last,
