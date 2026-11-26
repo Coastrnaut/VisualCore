@@ -74,7 +74,8 @@ import Testing
                          "r02-g14.moonlit-mechanism",
                          "r02-g15.voxel-origami",
                          "r02-g16.starlit-cartouche",
-                         "r02-g17.celestial-eclipse-lab"].compactMap(ExperienceID.init(rawValue:))
+                         "r02-g17.celestial-eclipse-lab",
+                         "r02-g18.apsides-workshop"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }

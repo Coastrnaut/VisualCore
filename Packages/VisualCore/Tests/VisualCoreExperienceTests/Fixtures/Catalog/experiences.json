@@ -1582,7 +1582,7 @@
         "catalog_sha256": "73aef009a3044dde7ef6fd3ba29325aee3ab24115847b6338578494d69c0e87b",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g19.microscopic-aurora",

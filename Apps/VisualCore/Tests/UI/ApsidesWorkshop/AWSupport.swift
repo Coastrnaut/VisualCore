@@ -1,7 +1,7 @@
 // AWSupport — feature 479 (R02-G18-09) T-R02G1809-004, modelled on feature 469 (FR-R02G1809-002; SC-R02G1809-001;
 // clarifications Q1, Q2): helpers of the interface tests of Apsides Workshop (R02-G18) inside the one app, ported from
-// `CELSupport` (feature 469). The namespace is `AW` (no other UI test uses `AW`). Apsides Workshop is a candidate until
-// X-R02-G18; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and
+// `CELSupport` (feature 469). The namespace is `AW` (no other UI test uses `AW`). Apsides Workshop was a candidate until
+// X-R02-G18 (2026-11-26); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and
 // are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens
 // the experience directly with `-openExperience r02-g18.apsides-workshop`; a relaunch (`AW.reopen`) backgrounds the app
 // first (its save point, the lesson of feature 309), terminates it and starts again without the reset, so the stored

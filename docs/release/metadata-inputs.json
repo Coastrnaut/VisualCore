@@ -349,9 +349,17 @@
       "name": "Celestial Eclipse Lab",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G18",
+      "id": "r02-g18.apsides-workshop",
+      "name": "Apsides Workshop",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "8866e8e91eae5053089898d968f5bed193b732124b07c86bfbb541ca10551506",
+  "ledger_sha256": "965dca622fa09d0d785c0a9b189afb948dbac2093e06da68ecfa265696502df1",
   "privacy_answers": "unproven",
   "schema": 1
 }
