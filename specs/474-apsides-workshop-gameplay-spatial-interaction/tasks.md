@@ -80,7 +80,7 @@ of R02-G17-04's CHK013).
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter, panel
 
-- [ ] T-R02G1804-005 [US4] Wire `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopPresenter.swift`
+- [X] T-R02G1804-005 [US4] Wire `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopPresenter.swift` — Verified 2026-11-25: 2026-11-25 presenter pointer entry with the gesture controller, drawn preview, refusalLog and resetView; compass scene at the view orbit with camera-taking meshes; panel pending orbit with Set periapsis, Set size and Reset view (pendingReason narrowed to the pending orbit after agent E's review); ApsidesWorkshopGestureWiringTests (11); sim-27 exit 0 (ApsidesWorkshopExperienceTests, 37 tests)
   (FR-R02G1804-001 … 009; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot;
   tunings sent through `orbit.periapsis` and `orbit.size`, ticks through `clock.show`; the preview kept as presentation
   state and drawn; explain texts for a handle tap, an invalid orbit and a finished play ("The play is over: undo or go

@@ -12,6 +12,12 @@
 // the fallback. If a program fails, the scene falls back to the level-2 geometry drawn unlit with the shared
 // `MeshRenderer` (ambient 1, the geometry's fallback colours, the won marks included) and keeps the reason; nothing
 // here can reach the kernel. A zero-sized drawable is cleared and nothing else is drawn.
+//
+// Feature 474 (R02-G18-04) T-R02G1804-005 (FR-R02G1804-004, 006; clarifications Q3, Q4): the camera follows the
+// gesture controller's view orbit (`orbit`, presentation only) through `ApsidesWorkshopSceneGeometry.camera(aspect:
+// orbit:)`, and the meshes are built with the camera-taking overloads (the backdrop, discs and glow bands face the drawn
+// eye). The eye and view basis do not depend on the aspect, so an orbit change or a preview change (the previewed orbit,
+// which draws the ghost and the previewed gauges) rebuilds the meshes, a resize alone does not.
 #if os(iOS)
 import ApsidesWorkshopCore
 import Foundation
@@ -40,15 +46,21 @@ final class ApsidesWorkshopCompassScene {
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the fallback.
     private struct GeometryKey: Equatable {
         let levelNumber: Int
-        let orbit: ApsidesWorkshopOrbit
+        let kernelOrbit: ApsidesWorkshopOrbit
         let shownTick: Int
         let stage: ApsidesWorkshopStage
         let failure: ApsidesWorkshopFailure?
         let met: [Bool]
+        let previewOrbit: ApsidesWorkshopOrbit?
+        let orbit: ApsidesWorkshopViewOrbit
         let actionsLeft: Int
         let tier: Int
         let fallback: Bool
     }
+
+    /// The view orbit the camera is drawn at (feature 474, presentation only; the gesture controller's). The meshes
+    /// are built for the drawn eye, so a new orbit rebuilds them.
+    var orbit = ApsidesWorkshopViewOrbit.authored
 
     private var registry: ResourceRegistry?
     private var compassRenderer: ShaderMeshRenderer?
@@ -63,12 +75,10 @@ final class ApsidesWorkshopCompassScene {
         resize(context)
     }
 
-    /// Records the new aspect; the camera follows on the next draw. The meshes face the authored camera, so they are
-    /// rebuilt only when the aspect really changed.
+    /// Records the new aspect; the camera follows on the next draw. The meshes face the drawn eye, which does not
+    /// depend on the aspect, so a resize alone rebuilds nothing.
     func resize(_ context: RenderContext) {
-        let next: Double = Double(max(1, context.pixelWidth)) / Double(max(1, context.pixelHeight))
-        if next != aspect { geometryKey = nil }
-        aspect = next
+        aspect = Double(max(1, context.pixelWidth)) / Double(max(1, context.pixelHeight))
     }
 
     /// Releases every GPU object; the next draw rebuilds them (memory warning, teardown).
@@ -103,9 +113,9 @@ final class ApsidesWorkshopCompassScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = ApsidesWorkshopSceneGeometry.camera(aspect: aspect)
+        let camera = ApsidesWorkshopSceneGeometry.camera(aspect: aspect, orbit: orbit)
         let next: GeometryKey = key(snapshot, tier: tier)
-        if next != geometryKey { try rebuild(snapshot, tier: tier) }
+        if next != geometryKey { try rebuild(snapshot, tier: tier, camera: camera) }
         geometryKey = key(snapshot, tier: tier)
         if fallbackReason != nil {
             try drawFallback(camera)
@@ -125,25 +135,26 @@ final class ApsidesWorkshopCompassScene {
     private func key(_ s: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier) -> GeometryKey {
         var met: [Bool] = []
         for gauge in s.gauges { met.append(gauge.met) }
-        return GeometryKey(levelNumber: s.levelNumber, orbit: s.orbit, shownTick: s.shownTick, stage: s.stage,
-                           failure: s.failure, met: met, actionsLeft: s.actionsLeft, tier: tier.index,
-                           fallback: fallbackReason != nil)
+        return GeometryKey(levelNumber: s.levelNumber, kernelOrbit: s.orbit, shownTick: s.shownTick, stage: s.stage,
+                           failure: s.failure, met: met, previewOrbit: s.previewOrbit, orbit: orbit,
+                           actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil)
     }
 
-    /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
-    private func rebuild(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier) throws {
+    /// Rebuilds the GPU objects for `snapshot` at `tier` seen from `camera`: the two programs, or the unlit fallback.
+    private func rebuild(_ snapshot: ApsidesWorkshopSceneSnapshot, tier: ApsidesWorkshopTier,
+                         camera: ApsidesWorkshopCamera) throws {
         guard let registry else { return }
         let keepFallback = fallbackReason
         release()
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let compass = try ApsidesWorkshopSceneGeometry.compassMesh(snapshot, tier: tier)
+                let compass = try ApsidesWorkshopSceneGeometry.compassMesh(snapshot, tier: tier, camera: camera)
                 compassRenderer = try Self.renderer(compass, vertex: ApsidesWorkshopShaders.compassVertex,
                                                     fragment: compassFragment, name: "apsides-workshop-compass",
                                                     registry: registry)
                 compassBuilds += 1
-                let glow = try ApsidesWorkshopSceneGeometry.glowMesh(snapshot, tier: tier)
+                let glow = try ApsidesWorkshopSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera)
                 glowBuilds += 1
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: ApsidesWorkshopShaders.glowVertex,
@@ -161,8 +172,8 @@ final class ApsidesWorkshopCompassScene {
         let minimal = ApsidesWorkshopTier.of(ApsidesWorkshopTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [ApsidesWorkshopColouredMesh] = [
-            try ApsidesWorkshopSceneGeometry.compassPart(snapshot, tier: minimal),
-            try ApsidesWorkshopSceneGeometry.glowPart(snapshot, tier: minimal),
+            try ApsidesWorkshopSceneGeometry.compassPart(snapshot, tier: minimal, camera: camera),
+            try ApsidesWorkshopSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

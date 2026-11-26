@@ -9,6 +9,16 @@
 // description, the tutorial on levels that have one, the failure in words and a refused action in words. Dragging the
 // periapsis knob and the semi-major axis, turning the time crank and full accessibility come in later features of
 // R02-G18.
+//
+// Feature 474 (R02-G18-04) T-R02G1804-005 (FR-R02G1804-008; clarification Q5): the eccentricity, direction and size − and
+// + no longer send a tuning each (every tuning costs an action, so stepping to a far orbit could exceed the budget);
+// they move the pending orbit (`mirror.pendingOrbit`, presentation only; the direction wraps 0 … 23, the eccentricity
+// clamps to 0 … 15 and the size to 8 … 48), drawn as the same preview as a drag, and each line reads "value → pending"
+// while one is pending. "Set periapsis" sends exactly one `orbit.periapsis [k, d]` with the pending eccentricity and
+// direction, and "Set size" one `orbit.size [a]` with the pending size, each only when the pending value differs from
+// the current one and the resulting orbit is valid (disabled otherwise); "Reset view" returns the camera to the
+// authored view. Every button sends through the presenter's `send` (refusals shown in words and logged with their
+// codes).
 #if os(iOS)
 import ApsidesWorkshopCore
 import SwiftUI
@@ -20,6 +30,13 @@ struct ApsidesWorkshopControls: View {
     let port: ExperienceActionPort
     /// What the panel shows.
     let mirror: ApsidesWorkshopMirror
+    /// Returns the camera to the authored view (feature 474; presentation only).
+    var resetView: () -> Void = {}
+    /// Sends a control and shows a refusal in words (the presenter's `send`, feature 474); nil sends through the port
+    /// directly.
+    var sender: ((String, [Double]) -> Void)? = nil
+    /// Redraws the last snapshot with the mirror's preview after the pending orbit moved (feature 474).
+    var redraw: () -> Void = {}
 
     /// The panel.
     var body: some View {
@@ -29,6 +46,7 @@ struct ApsidesWorkshopControls: View {
                 eccentricityRow
                 directionRow
                 sizeRow
+                setRow
                 tickRow
                 playRow
             }
@@ -63,14 +81,14 @@ struct ApsidesWorkshopControls: View {
     /// Lower or raise the eccentricity by one step (one action).
     @ViewBuilder private var eccentricityRow: some View {
         HStack(spacing: 16) {
-            Button("Eccentricity −") { knob(eccentricityStep: -1, directionStep: 0) }
-                .accessibilityLabel("Lower the eccentricity by one step")
+            Button("Eccentricity −") { movePending(eccentricity: -1, direction: 0, size: 0) }
+                .accessibilityLabel("Lower the pending eccentricity by one step")
                 .accessibilityValue(mirror.orbitLabel)
                 .accessibilityIdentifier(port.identifier("eccentricity-minus"))
-            Text("eccentricity \(mirror.orbit.eccentricity)")
+            Text(mirror.pendingLine("eccentricity", mirror.orbit.eccentricity, mirror.pending.eccentricity))
                 .accessibilityIdentifier(port.identifier("eccentricity"))
-            Button("Eccentricity +") { knob(eccentricityStep: 1, directionStep: 0) }
-                .accessibilityLabel("Raise the eccentricity by one step")
+            Button("Eccentricity +") { movePending(eccentricity: 1, direction: 0, size: 0) }
+                .accessibilityLabel("Raise the pending eccentricity by one step")
                 .accessibilityValue(mirror.orbitLabel)
                 .accessibilityIdentifier(port.identifier("eccentricity-plus"))
         }
@@ -81,14 +99,14 @@ struct ApsidesWorkshopControls: View {
     /// Turn the periapsis direction back or forward by 15° (one action).
     @ViewBuilder private var directionRow: some View {
         HStack(spacing: 16) {
-            Button("Direction −") { knob(eccentricityStep: 0, directionStep: -1) }
-                .accessibilityLabel("Turn the periapsis 15 degrees clockwise")
+            Button("Direction −") { movePending(eccentricity: 0, direction: -1, size: 0) }
+                .accessibilityLabel("Turn the pending periapsis 15 degrees clockwise")
                 .accessibilityValue(mirror.orbitLabel)
                 .accessibilityIdentifier(port.identifier("direction-minus"))
-            Text("direction \(mirror.orbit.direction * 15)°")
+            Text(mirror.pendingLine("direction", mirror.orbit.direction * 15, mirror.pending.direction * 15, unit: "°"))
                 .accessibilityIdentifier(port.identifier("direction"))
-            Button("Direction +") { knob(eccentricityStep: 0, directionStep: 1) }
-                .accessibilityLabel("Turn the periapsis 15 degrees counterclockwise")
+            Button("Direction +") { movePending(eccentricity: 0, direction: 1, size: 0) }
+                .accessibilityLabel("Turn the pending periapsis 15 degrees counterclockwise")
                 .accessibilityValue(mirror.orbitLabel)
                 .accessibilityIdentifier(port.identifier("direction-plus"))
         }
@@ -97,16 +115,40 @@ struct ApsidesWorkshopControls: View {
     /// Shrink or grow the orbit by one lattice unit (one action).
     @ViewBuilder private var sizeRow: some View {
         HStack(spacing: 16) {
-            Button("Size −") { send("orbit.size", [Double(mirror.orbit.size - 1)]) }
-                .accessibilityLabel("Shrink the orbit by one unit")
+            Button("Size −") { movePending(eccentricity: 0, direction: 0, size: -1) }
+                .accessibilityLabel("Shrink the pending orbit by one unit")
                 .accessibilityValue(mirror.orbitLabel)
                 .accessibilityIdentifier(port.identifier("size-minus"))
-            Text("size \(mirror.orbit.size)")
+            Text(mirror.pendingLine("size", mirror.orbit.size, mirror.pending.size))
                 .accessibilityIdentifier(port.identifier("size"))
-            Button("Size +") { send("orbit.size", [Double(mirror.orbit.size + 1)]) }
-                .accessibilityLabel("Grow the orbit by one unit")
+            Button("Size +") { movePending(eccentricity: 0, direction: 0, size: 1) }
+                .accessibilityLabel("Grow the pending orbit by one unit")
                 .accessibilityValue(mirror.orbitLabel)
                 .accessibilityIdentifier(port.identifier("size-plus"))
+        }
+    }
+
+    /// Set the pending periapsis or size (one action each) and return the camera.
+    @ViewBuilder private var setRow: some View {
+        HStack(spacing: 16) {
+            Button("Set periapsis") { setPeriapsis() }
+                .disabled(!mirror.periapsisSettable)
+                .accessibilityLabel("Set the periapsis to the pending eccentricity and direction")
+                .accessibilityValue(mirror.orbitLabel)
+                .accessibilityIdentifier(port.identifier("set-periapsis"))
+            Button("Set size") { setSize() }
+                .disabled(!mirror.sizeSettable)
+                .accessibilityLabel("Set the size to the pending size")
+                .accessibilityValue(mirror.orbitLabel)
+                .accessibilityIdentifier(port.identifier("set-size"))
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue("presentation only")
+                .accessibilityIdentifier(port.identifier("reset-view"))
+        }
+        if let reason = mirror.pendingReason {
+            Text(reason).font(.footnote)
+                .accessibilityIdentifier(port.identifier("pending-reason"))
         }
     }
 
@@ -147,11 +189,23 @@ struct ApsidesWorkshopControls: View {
         }
     }
 
-    /// Sends the periapsis knob with the eccentricity and direction moved by the given steps (the direction wraps).
-    private func knob(eccentricityStep: Int, directionStep: Int) {
-        let orbit: ApsidesWorkshopOrbit = mirror.orbit
-        let direction: Int = ((orbit.direction + directionStep) % 24 + 24) % 24
-        send("orbit.periapsis", [Double(orbit.eccentricity + eccentricityStep), Double(direction)])
+    /// Moves the pending orbit by the given steps (presentation only) and redraws the preview.
+    private func movePending(eccentricity: Int, direction: Int, size: Int) {
+        mirror.movePending(eccentricity: eccentricity, direction: direction, size: size)
+        redraw()
+    }
+
+    /// Sets the periapsis to the pending eccentricity and direction (one action) when settable.
+    private func setPeriapsis() {
+        guard mirror.periapsisSettable else { return }
+        let pending: ApsidesWorkshopOrbit = mirror.pending
+        send("orbit.periapsis", [Double(pending.eccentricity), Double(pending.direction)])
+    }
+
+    /// Sets the size to the pending size (one action) when settable.
+    private func setSize() {
+        guard mirror.sizeSettable else { return }
+        send("orbit.size", [Double(mirror.pending.size)])
     }
 
     /// Shows tick `tick` (clamped to 0 … period − 1).
@@ -159,11 +213,14 @@ struct ApsidesWorkshopControls: View {
         send("clock.show", [Double(mirror.clampedTick(tick))])
     }
 
-    /// Sends `control` and shows a refusal in words.
+    /// Sends `control` through the presenter (or the port when no sender is set) and shows a refusal in words.
     private func send(_ control: String, _ values: [Double] = []) {
+        if let sender {
+            sender(control, values)
+            return
+        }
         let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(ApsidesWorkshopMirror.refusalText(code: result.code))."
+        mirror.record(control, values, accepted: result.isAccepted, code: result.code)
     }
 }
 #endif
