@@ -240,7 +240,8 @@ file is refused.
   progression rule.
 - **SC-R02G1902-005**: For every level, no well setting reachable with fewer actions than its witness wins; edited, newer and
   damaged witness files are refused.
-- **SC-R02G1902-006**: Existing tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes
+- **SC-R02G1902-006**: Existing tests pass unchanged, except feature 481's out-of-range budget case, which moves from
+  13 to 25 with the widened range; the reference regression passes 7 of 7; each unit test finishes
   in under 10 seconds on a debug host build, the catalog certification split as needed.
 
 ## Assumptions
