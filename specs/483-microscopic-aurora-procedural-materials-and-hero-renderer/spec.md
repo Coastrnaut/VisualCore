@@ -58,7 +58,7 @@ microscope" and the geometry "instanced tapered capsules, deterministic ribbon t
   testing off (the shared mesh renderer's path), in this order: the water backdrop (a large quad; a vertical gradient from
   abyss #04110F at the bottom to abyss top #0B2A26 at the top, still); the dish field (a disc of radius R · 256 · s,
   field #0E2E2A); the fronds (at the two richer tiers only: small L-system fronds of three generations rooted outside the
-  rim, frond #2E6B5C, decoration only); the rim (a ring at the enclosure radius, 0.012 wide, rim #6FB7A6); the stencil
+  rim, reaching at most 0.07 beyond it, frond #2E6B5C, decoration only); the rim (a ring at the enclosure radius, 0.012 wide, rim #6FB7A6); the stencil
   (each stencil cell an outline square of side 256 · s, 0.004 wide, stencil #3E7F72); the lit cells (each lit cell a
   filled square inset by 10 %, lit #7FE0C4 for a stencil cell, stray #2F6B5F outside the stencil); the sites (a ring of
   radius 0.35 cell at each site's centre, site #B58CE0); the wells (a spiral of strength + 1 half-turns, radius 0.45
@@ -84,7 +84,8 @@ microscope" and the geometry "instanced tapered capsules, deterministic ribbon t
   camera the dish centre, the rim's rightmost point, every swimmer at the shown tick, the first site, the coverage
   track's centre and the first actions bar, and gives the palette. Simulator tests render offscreen at 1,152 × 768 at the
   shown tick half the ticks swum and check, at points at least 6 pixels from every element drawn after them, that each
-  swimmer's centre is brighter than the dish field by at least 0.25 in luminance; that the rim's rightmost point differs
+  swimmer's centre is brighter than the dish field by at least 0.25 in luminance (swimmers are drawn in index order, so
+  the last swimmer is never excluded by another, and at least one swimmer is checked in every frame); that the rim's rightmost point differs
   from the backdrop by at least 0.1; that the first actions bar (lit) has blue above green by at least 0.08 (heliotrope);
   that the coverage track differs from the backdrop by at least 0.1; and that the median of a 9 × 9 pixel patch of
   backdrop in a corner matches the gradient colour at its height within 0.06. Palette: abyss #04110F, abyss top
