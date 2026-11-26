@@ -108,7 +108,7 @@ R02-G18-04 (`git show <R02-G18-04 record commit>:<path>`).
 - [X] T-R02G1904-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-26: reference-2 exit 0 (7 of 7 with chunk 1)
 - [X] T-R02G1904-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-26: script-tests exit 0, run alone
 - [ ] T-R02G1904-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G1904-007)
-- [ ] T-R02G1904-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1904-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-26: /speckit-converge converged (nothing appended); README row R02-G19-04 pass, 184 round-two features, gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
