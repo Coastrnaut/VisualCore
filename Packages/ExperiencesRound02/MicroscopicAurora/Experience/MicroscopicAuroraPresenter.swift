@@ -6,6 +6,15 @@
 // words, as presentation, not as a kernel stage. A refused action is shown in words. A memory warning releases the GPU
 // objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the kernel
 // (renderer purity). Its probes (two backdrop corners) let the verification runner check a frame.
+// Feature 484 (R02-G19-04) T-R02G1904-005 (FR-R02G1904-001 … 010): a canvas touch goes through the presenter's
+// `MicroscopicAuroraGestureController` with the drawn snapshot (`pointer`): a tap on an empty site places a well with the
+// panel's strength and sense in the first free slot (`well.place`), a well drag previews the swim with the well moved
+// (the preview of `MicroscopicAuroraSceneSnapshot.previewing`, presentation only, kept in the mirror) and its release
+// sends one `well.place` to the new site or one `well.remove` off the dish; a scrubber drag shows ticks (`clock.show`, in
+// any stage); a tap on the dish field toggles the freeze (`toggleFreeze()`, presentation only: the committed swim stays
+// drawn and only the gauges preview); two fingers orbit the camera and a double tap outside the dish or "Reset view"
+// (`resetView()`) returns it (presentation only; the meshes are rebuilt). A refused action is shown in the panel and its
+// code, read with or without the engine's `action.rule.` prefix, is kept in the refusal log.
 #if os(iOS)
 import Foundation
 import MicroscopicAuroraCore
@@ -14,6 +23,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show: the latest state the presenter described, the shown tick and the panel's selection.
 @MainActor
@@ -39,8 +49,12 @@ final class MicroscopicAuroraMirror {
     var shownTick = 0
     /// The play followed (a copy; never sent anywhere).
     var play: MicroscopicAuroraPlay?
-    /// The text of the last refused change, if any.
+    /// The text of the last refused change, or why a gesture did nothing, if any.
     var message: String?
+    /// A well drag's preview (feature 484; presentation only): the slot and its target, nil while no drag previews.
+    var preview: (slot: Int, target: MicroscopicAuroraPreviewTarget)?
+    /// Whether the freeze is on (feature 484; presentation only): the committed swim stays drawn under a preview.
+    var frozen = false
     /// The slot the panel edits (0 … 2).
     var slot = 0
     /// The index of the site the panel would place on.
@@ -100,9 +114,28 @@ final class MicroscopicAuroraMirror {
         }
     }
 
-    /// A refused action's reason code in words.
+    /// The engine's prefix of rule codes (feature 484: codes are read with or without it).
+    static let rulePrefix = "action.rule."
+
+    /// `code` without the engine's ``rulePrefix``.
+    static func bareCode(_ code: String) -> String {
+        code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+    }
+
+    /// The panel line of a refusal: "That change was refused: " and the reason in words.
+    static func refusalMessage(code: String) -> String {
+        "That change was refused: \(refusalText(code: code))."
+    }
+
+    /// Records the result of sending a control (feature 484): a refusal is shown in words; an accepted action clears
+    /// the message.
+    func record(accepted: Bool, code: String) {
+        message = accepted ? nil : Self.refusalMessage(code: code)
+    }
+
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
     static func refusalText(code: String) -> String {
-        switch code {
+        switch bareCode(code) {
         case "r02-g19.stage": "the play is over: undo a failed play or go to the next level"
         case "r02-g19.action": "that well cannot be placed there, or there is nothing to undo, redo or remove"
         case "r02-g19.budget": "no actions are left: play the swim or undo a placement"
@@ -148,8 +181,16 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
     let scene = MicroscopicAuroraDishScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G1903-004).
     private(set) var tierLog: [MicroscopicAuroraTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot drawn (tests, the description and the gestures), with the drawn preview and freeze applied.
     private(set) var lastSnapshot: MicroscopicAuroraSceneSnapshot?
+    /// The core's snapshot last drawn, without the preview or the freeze, and its level (feature 484).
+    private var lastBase: (snapshot: MicroscopicAuroraSceneSnapshot, level: MicroscopicAuroraLevel)?
+    /// The gesture controller (feature 484): site taps, well drags, the scrubber, the freeze, double taps and the orbit.
+    private(set) var gestures = MicroscopicAuroraGestureController()
+    /// The bare codes of refused actions, oldest first, at most ``refusalLogLimit`` (feature 484).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -199,8 +240,11 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
         }
         follow(core)
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
-        let snapshot = core.snapshot(time: time)
+        let base: MicroscopicAuroraSceneSnapshot = core.snapshot(time: time)
+        lastBase = (snapshot: base, level: core.play.level)
+        let snapshot = presented(base, level: core.play.level)
         lastSnapshot = snapshot
+        scene.orbit = gestures.orbit
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
 
@@ -260,9 +304,118 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
         return text
     }
 
-    /// The control panel.
+    /// `snapshot` with the mirror's freeze and drag preview applied (feature 484; presentation only).
+    private func presented(_ snapshot: MicroscopicAuroraSceneSnapshot,
+                           level: MicroscopicAuroraLevel) -> MicroscopicAuroraSceneSnapshot {
+        var shown: MicroscopicAuroraSceneSnapshot = snapshot.freezing(mirror.frozen)
+        if let preview = mirror.preview {
+            shown = shown.previewing(slot: preview.slot, target: preview.target, level: level)
+        }
+        return shown
+    }
+
+    /// Re-applies the mirror's preview and freeze to the last snapshot, so tests and the next gesture read them.
+    private func refreshPreview() {
+        guard let base = lastBase else { return }
+        lastSnapshot = presented(base.snapshot, level: base.level)
+    }
+
+    /// The control panel: "Freeze" and "Reset view" (feature 484); every kernel button sends through
+    /// ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(MicroscopicAuroraControls(port: port, mirror: mirror))
+        AnyView(MicroscopicAuroraControls(port: port, mirror: mirror,
+                                          sendAction: { [weak self] control, values in
+                                              self?.send(control, values, port: port)
+                                          },
+                                          freeze: { [weak self] in self?.toggleFreeze() },
+                                          resetView: { [weak self] in self?.resetView() }))
+    }
+
+    /// The camera's orbit (presentation only; the gesture controller's).
+    var orbit: MicroscopicAuroraViewOrbit { gestures.orbit }
+
+    /// The canvas gestures place, move and remove wells and show ticks; the preview, the freeze and the orbit are
+    /// presentation state.
+    var gestureActions: Set<String> { ["well.place", "well.remove", "clock.show"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(Core.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
+    /// order: a placement or move through `well.place` and a removal through `well.remove` (one action each; the preview
+    /// is dropped), a tick through `clock.show` (presentation only), a preview kept in the mirror and drawn, the freeze
+    /// toggled, a slot selected in the panel, a reset view (the controller is already at the authored orbit) and an
+    /// explanation to the mirror's message. The controller places with the panel's strength and sense.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let drawn = lastSnapshot else { return }
+        gestures.strength = mirror.strength
+        gestures.sense = mirror.counterclockwise ? .counterclockwise : .clockwise
+        let actions: [MicroscopicAuroraGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: drawn)
+        for action in actions {
+            switch action {
+            case let .place(slot, well), let .move(slot, well):
+                mirror.preview = nil
+                send("well.place", [Double(slot), Double(well.cell.row), Double(well.cell.column),
+                                    Double(well.strength), well.sense == .counterclockwise ? 1 : 0], port: port)
+            case let .remove(slot):
+                mirror.preview = nil
+                send("well.remove", [Double(slot)], port: port)
+            case let .showTick(tick):
+                send("clock.show", [Double(tick)], port: port)
+            case let .preview(slot, target):
+                mirror.preview = (slot: slot, target: target)
+            case .clearPreview:
+                mirror.preview = nil
+            case .toggleFreeze:
+                mirror.frozen.toggle()
+            case let .selectSlot(slot):
+                mirror.slot = slot
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            case let .explain(reason):
+                mirror.message = reason
+            }
+        }
+        if event.phase == .ended || event.phase == .cancelled || gestures.state == .orbiting
+            || gestures.state == .cancelled {
+            mirror.preview = nil
+        }
+        scene.orbit = gestures.orbit
+        refreshPreview()
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the preview disappears.
+    func cancelPointers() {
+        gestures.cancel()
+        mirror.preview = nil
+        refreshPreview()
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Toggles the freeze ("Freeze", or a tap on the dish field; presentation only).
+    func toggleFreeze() {
+        mirror.frozen.toggle()
+        refreshPreview()
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its bare code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        mirror.record(accepted: result.isAccepted, code: result.code)
+        if !result.isAccepted {
+            refusalLog.append(MicroscopicAuroraMirror.bareCode(result.code))
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        refreshPreview()
+        return result
     }
 }
 #endif

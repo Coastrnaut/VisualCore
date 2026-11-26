@@ -80,7 +80,7 @@ R02-G18-04 (`git show <R02-G18-04 record commit>:<path>`).
 
 ## Phase 5: Story 4 and wiring — orbit, reset, presenter, panel
 
-- [ ] T-R02G1904-005 [US4] Wire `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraPresenter.swift`
+- [X] T-R02G1904-005 [US4] Wire `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraPresenter.swift` — Verified 2026-11-26: sim-27 exit 0 on sim-27.2: presenter pointer entry places, moves and removes wells, scrubs, toggles the freeze; orbit and reset change no digest; refusals shown and logged; finished play sends nothing (MicroscopicAuroraExperienceTests)
   (FR-R02G1904-001 … 010; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot
   and the panel's strength and sense; placements, moves and removals sent through `well.place` and `well.remove`, ticks
   through `clock.show`; the preview and the freeze kept as presentation state and drawn; explain texts for a well tap, a

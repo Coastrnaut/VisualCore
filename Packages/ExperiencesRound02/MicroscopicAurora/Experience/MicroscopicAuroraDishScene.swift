@@ -6,7 +6,8 @@
 // every stencil cell; and the tier's glow shells (the swimmers and ribbons) with the glow program, additive and last
 // (level-0 two shells, level-1 one, level-2 none), the gain capped by `u_glowLimit` (the Reduce Flashing cap). Nothing
 // moves by time, so the meshes are rebuilt only when what they read changes: the level, the wells, the shown tick, the
-// stage, the failure, the actions left, the tier or the fallback. Depth testing is off on this path: the geometry emits
+// stage, the failure, the actions left, the tier, the fallback or (feature 484, R02-G19-04 T-R02G1904-005) the camera's
+// orbit, the aspect, the drawn preview or the freeze; the meshes face the camera of the presenter's orbit. Depth testing is off on this path: the geometry emits
 // its triangles in painter's order. If a program fails, the scene falls back to the level-2 geometry drawn unlit with
 // the shared `MeshRenderer` (ambient 1, the geometry's fallback colours, the won look included) and keeps the reason;
 // nothing here can reach the kernel. A zero-sized drawable is cleared and nothing else is drawn.
@@ -41,6 +42,14 @@ final class MicroscopicAuroraDishScene {
         let actionsLeft: Int
         let tier: Int
         let fallback: Bool
+        /// The camera's orbit (feature 484; the meshes face the drawn camera).
+        let orbit: MicroscopicAuroraViewOrbit
+        /// The aspect the meshes were built for.
+        let aspect: Double
+        /// The drawn preview (feature 484; presentation only).
+        let preview: MicroscopicAuroraPreview?
+        /// Whether the freeze is on (feature 484; presentation only).
+        let frozen: Bool
     }
 
     private var registry: ResourceRegistry?
@@ -49,6 +58,9 @@ final class MicroscopicAuroraDishScene {
     private var fallbackRenderers: [MeshRenderer] = []
     private var geometryKey: GeometryKey?
     private var aspect = 1.0
+    /// The camera's orbit (feature 484; presentation only, the presenter's gesture controller's). A changed orbit
+    /// rebuilds the meshes on the next draw.
+    var orbit: MicroscopicAuroraViewOrbit = .authored
 
     /// Records the registry and the view's aspect.
     func setup(_ context: RenderContext) {
@@ -96,9 +108,9 @@ final class MicroscopicAuroraDishScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = MicroscopicAuroraSceneGeometry.camera(aspect: aspect)
+        let camera = MicroscopicAuroraSceneGeometry.camera(aspect: aspect, orbit: orbit)
         let next: GeometryKey = key(snapshot, tier: tier)
-        if next != geometryKey { try rebuild(snapshot, tier: tier) }
+        if next != geometryKey { try rebuild(snapshot, tier: tier, camera: camera) }
         geometryKey = key(snapshot, tier: tier)
         if fallbackReason != nil {
             try drawFallback(camera)
@@ -115,23 +127,25 @@ final class MicroscopicAuroraDishScene {
     /// The geometry key of `snapshot` at `tier`.
     private func key(_ s: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, wells: s.wells, shownTick: s.shownTick, stage: s.stage,
-                    failure: s.failure, actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil)
+                    failure: s.failure, actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil,
+                    orbit: orbit, aspect: aspect, preview: s.preview, frozen: s.frozen)
     }
 
-    /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
-    private func rebuild(_ snapshot: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier) throws {
+    /// Rebuilds the GPU objects for `snapshot` at `tier` facing `camera`: the two programs, or the unlit fallback.
+    private func rebuild(_ snapshot: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier,
+                         camera: MicroscopicAuroraCamera) throws {
         guard let registry else { return }
         let keepFallback = fallbackReason
         release()
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let dish = try MicroscopicAuroraSceneGeometry.dishMesh(snapshot, tier: tier)
+                let dish = try MicroscopicAuroraSceneGeometry.dishMesh(snapshot, tier: tier, camera: camera)
                 dishRenderer = try Self.renderer(dish, vertex: MicroscopicAuroraShaders.dishVertex,
                                                  fragment: dishFragment, name: "microscopic-aurora-dish",
                                                  registry: registry)
                 dishBuilds += 1
-                let glow = try MicroscopicAuroraSceneGeometry.glowMesh(snapshot, tier: tier)
+                let glow = try MicroscopicAuroraSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera)
                 glowBuilds += 1
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: MicroscopicAuroraShaders.glowVertex,
@@ -149,8 +163,8 @@ final class MicroscopicAuroraDishScene {
         let minimal = MicroscopicAuroraTier.of(MicroscopicAuroraTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [MicroscopicAuroraColouredMesh] = [
-            try MicroscopicAuroraSceneGeometry.dishPart(snapshot, tier: minimal),
-            try MicroscopicAuroraSceneGeometry.glowPart(snapshot, tier: minimal),
+            try MicroscopicAuroraSceneGeometry.dishPart(snapshot, tier: minimal, camera: camera),
+            try MicroscopicAuroraSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

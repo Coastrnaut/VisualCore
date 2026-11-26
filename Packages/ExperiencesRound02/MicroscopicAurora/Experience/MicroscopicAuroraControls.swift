@@ -7,8 +7,10 @@
 // adapter (a level opens at tick 0). A placement the kernel refuses (an occupied site, an unchanged well, no action
 // left) is still sent: the kernel refuses it and the panel says why. The header shows the actions left of the budget,
 // the status (stage, or the failure in words), the progress description, the tutorial on levels that have one, the
-// failure in words and a refused action in words. Dragging wells, scrubbing the speed, freezing the field and full
-// accessibility come in later features of R02-G19.
+// failure in words and a refused action in words. Feature 484 (R02-G19-04) T-R02G1904-005 (FR-R02G1904-009): every
+// kernel button sends through the presenter (so refusals are logged), and the panel gains "Freeze" (the presenter's
+// freeze, presentation only) and "Reset view" (the authored camera); a well tapped on the canvas selects its slot here.
+// Full accessibility comes in a later feature of R02-G19.
 #if os(iOS)
 import MicroscopicAuroraCore
 import SwiftUI
@@ -20,6 +22,12 @@ struct MicroscopicAuroraControls: View {
     let port: ExperienceActionPort
     /// What the panel shows (and the panel's selection).
     @Bindable var mirror: MicroscopicAuroraMirror
+    /// Sends a control with its values through the presenter (feature 484).
+    let sendAction: (String, [Double]) -> Void
+    /// Toggles the presenter's freeze (feature 484).
+    let freeze: () -> Void
+    /// Returns the camera to the authored view (feature 484).
+    let resetView: () -> Void
 
     /// The panel.
     var body: some View {
@@ -32,6 +40,7 @@ struct MicroscopicAuroraControls: View {
                 placeRow
                 tickRow
                 playRow
+                viewRow
             }
             .padding()
         }
@@ -170,6 +179,19 @@ struct MicroscopicAuroraControls: View {
         }
     }
 
+    /// Freeze the field and reset the view (feature 484; presentation only).
+    @ViewBuilder private var viewRow: some View {
+        HStack(spacing: 16) {
+            Button(mirror.frozen ? "Unfreeze" : "Freeze") { freeze() }
+                .accessibilityLabel(mirror.frozen ? "Unfreeze the swim" : "Freeze the swim")
+                .accessibilityValue(mirror.frozen ? "frozen" : "not frozen")
+                .accessibilityIdentifier(port.identifier("freeze"))
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityIdentifier(port.identifier("reset-view"))
+        }
+    }
+
     /// Moves the site selection by `step`, wrapping over the level's sites.
     private func moveSite(_ step: Int) {
         let count: Int = max(1, mirror.sites.count)
@@ -191,11 +213,9 @@ struct MicroscopicAuroraControls: View {
         send("clock.show", [Double(mirror.clampedTick(tick))])
     }
 
-    /// Sends `control` and shows a refusal in words.
+    /// Sends `control` through the presenter, which shows a refusal in words.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(MicroscopicAuroraMirror.refusalText(code: result.code))."
+        sendAction(control, values)
     }
 }
 #endif
