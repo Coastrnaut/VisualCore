@@ -10,7 +10,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1807-001 Baselines on the committed tree after R02-G18-06 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1807-001 Baselines on the committed tree after R02-G18-06 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: 2026-11-26 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 on the committed tree (.autonomy/migration/checks/R02-G18-07.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters)
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
