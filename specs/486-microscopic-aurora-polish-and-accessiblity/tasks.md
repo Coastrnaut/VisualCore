@@ -31,7 +31,7 @@ the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Microscopic Auror
   of placements and removals, undos, redos, refusals of every code (bare and prefixed), won plays in campaign and
   practice, failed plays by every failure kind (exit, coherence, coverage, connectedness), and level and mode changes
   compare texts, kinds and haptics exactly; showing a tick plans nothing); agent A; `--name host-2`
-- [ ] T-R02G1906-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraLights.swift`
+- [X] T-R02G1906-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraLights.swift` — Verified 2026-11-26: host-3 exit 0: lights fade 0.15/0.45 s, at most 3 half-range crossings per second and fades >= 0.4 s under Reduce Flashing over a scripted win and adversarial flicker; audition and ambient recipes pure, whole-cycle loops, consonant interval vs 3 Hz beat (20 tests)
   ("glow 0.7 playing / 1 won / 0.35 failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce
   Flashing, no reversal mid-fade under Reduce Flashing, stepped by the frame clock's elapsed time;
   `maxHalfRangeCrossingsPerSecond`) and
