@@ -6,6 +6,7 @@
 // same positions at every tier (fronds, ribbons and capsules aside); ribbons through kernel positions only; gauges at
 // 0, half and full; a won level in place; the glow empty at level-2 with its shells per tier; the paint order by kind;
 // the well spirals turning like the kernel; each failure kind (exit, coherence, coverage, connectedness) marked.
+// Feature 484 (R02-G19-04) T-R02G1904-002 adds the view orbit, the scrubber and the preview (see the extension below).
 // Seed 2_483; explicit types, plain loops; no wall-clock asserts.
 import Foundation
 import Testing
@@ -666,5 +667,352 @@ struct MicroscopicAuroraSceneGeometryTests {
         // A won fixture shows no broken colour.
         let pair: (before: Snapshot, won: Snapshot) = try Self.won(Self.fixtures[0], tick: 0)
         #expect(Self.vertices(try G.dishMesh(pair.won, tier: .of(0)), .broken).isEmpty)
+    }
+}
+
+// MARK: Feature 484 (R02-G19-04) T-R02G1904-002
+
+// The view orbit, the scrubber and the preview (FR-R02G1904-002 … 004, 007; SC-R02G1904-003, 004): every element, the
+// scrubber and a preview (unfrozen, frozen, a removal) inside the authored box and inside the view with a 5 % margin
+// at the four orbit corners and 7 aspects, the box corners within the fitted margin and the eye outside the box at the
+// authored orbit and the corners; the previewed swim equal to the kernel's (the play after the
+// drop: positions, velocities, report, stray cells); unfrozen the previewed swim drawn with a ghost well, frozen the
+// committed swim with the previewed gauge readings; refused drops not previewed; without a preview the dish exactly
+// R02-G19-03's drawing (the elements' painter's loop) followed by the scrubber, at the authored camera bit for bit.
+extension MicroscopicAuroraSceneGeometryTests {
+    typealias ViewOrbit = MicroscopicAuroraViewOrbit
+    typealias Well = MicroscopicAuroraWell
+
+    /// The orbits checked: the authored one and the four corners of the bounds.
+    static let orbitChecks: [ViewOrbit] = [.authored] + ViewOrbit.corners
+
+    /// A play of `level` begun, with a strength-3 counterclockwise well on site 0 in slot 0 and a strength-2 clockwise
+    /// well on site 2 in slot 1 (catalog levels list at least three sites).
+    static func playWithWells(_ level: Level) throws -> Play {
+        var play: Play = Play(level: level)
+        try play.handle(.begin)
+        if play.stage == .tutorial { try play.handle(.dismissTutorial) }
+        let sites: [Cell] = level.sites ?? []
+        try play.apply(.place(slot: 0, well: Well(cell: sites[0], strength: 3, sense: .counterclockwise)),
+                       expecting: play.fingerprint)
+        try play.apply(.place(slot: 1, well: Well(cell: sites[2], strength: 2, sense: .clockwise)),
+                       expecting: play.fingerprint)
+        return play
+    }
+
+    /// The dish of `snapshot` drawn by R02-G19-03's loop: every element in painter's order, nothing else.
+    static func elementsOnly(_ snapshot: Snapshot, tier: Tier) throws -> MicroscopicAuroraColouredMesh {
+        var parts: G.Parts = G.Parts()
+        let broken: Set<Int> = G.brokenSwimmers(snapshot)
+        let outlines: Set<Int> = G.brokenOutlines(snapshot)
+        for element in G.paintOrder(snapshot) {
+            try G.draw(element, into: &parts, snapshot, tier: tier, won: snapshot.isWon, brokenSwimmers: broken,
+                       brokenOutlines: outlines)
+        }
+        return parts.built()
+    }
+
+    @Test func viewOrbitBoundsAndCamera() throws {
+        #expect(ViewOrbit.authored == ViewOrbit(yaw: 0, pitch: 0))
+        #expect(abs(ViewOrbit.yawLimit - Double.pi / 3) < 1e-15)
+        #expect(ViewOrbit.yawRange == (-Double.pi / 3)...(Double.pi / 3))
+        #expect(abs(ViewOrbit.pitchRange.lowerBound + 20 * Double.pi / 180) < 1e-15)
+        #expect(abs(ViewOrbit.pitchRange.upperBound - 35 * Double.pi / 180) < 1e-15)
+        #expect(ViewOrbit(yaw: 3, pitch: -3).clamped() == ViewOrbit(yaw: ViewOrbit.yawLimit,
+                                                                    pitch: ViewOrbit.pitchRange.lowerBound))
+        #expect(ViewOrbit(yaw: .nan, pitch: .infinity).clamped() == .authored)
+        #expect(!ViewOrbit(yaw: 2, pitch: 0).isWithinBounds && ViewOrbit(yaw: 0.5, pitch: 0.5).isWithinBounds)
+        #expect(ViewOrbit.corners.count == 4)
+        for aspect in Self.aspects + [Double.nan, 100] {
+            #expect(G.camera(aspect: aspect) == G.camera(aspect: aspect, orbit: .authored), "\(aspect)")
+            #expect(G.camera(aspect: aspect, orbit: ViewOrbit(yaw: 0, pitch: 0)) == G.camera(aspect: aspect))
+        }
+        // Beyond the bounds the camera is the clamped orbit's.
+        #expect(G.camera(aspect: 1, orbit: ViewOrbit(yaw: 5, pitch: 5))
+                == G.camera(aspect: 1, orbit: ViewOrbit(yaw: ViewOrbit.yawLimit, pitch: ViewOrbit.pitchRange.upperBound)))
+        for orbit in Self.orbitChecks {
+            for aspect in Self.aspects {
+                let camera: MicroscopicAuroraCamera = G.camera(aspect: aspect, orbit: orbit)
+                // The eye outside the box, the look-at point in the middle of the view, the eye at the authored
+                // distance from it.
+                let e: SIMD3<Double> = camera.eye
+                #expect(!(abs(e.x) <= 1 && e.y >= -1.35 && e.y <= 1 && abs(e.z) <= 0.02), "\(orbit) \(aspect)")
+                #expect(e.z > 1.3, "\(orbit)")
+                #expect(abs(Self.length(e - camera.target) - 3.4) < 1e-9)
+                let centre: SIMD2<Double> = try #require(G.project(camera.target, camera: camera))
+                #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9)
+                // Every box corner within the fitted margin.
+                for index in 0..<8 {
+                    let q: SIMD2<Double> = try #require(G.project(G.corner(index), camera: camera))
+                    #expect(q.x >= 0.06 - 1e-9 && q.x <= 0.94 + 1e-9 && q.y >= 0.06 - 1e-9 && q.y <= 0.94 + 1e-9,
+                            "\(orbit) \(aspect) corner \(index)")
+                }
+            }
+        }
+        // Yaw moves the eye towards +x, pitch raises it.
+        #expect(G.camera(aspect: 1, orbit: ViewOrbit(yaw: 0.5, pitch: 0)).eye.x > 0)
+        #expect(G.camera(aspect: 1, orbit: ViewOrbit(yaw: 0, pitch: 0.5)).eye.y > G.eye.y)
+        #expect(G.camera(aspect: 1, orbit: ViewOrbit(yaw: 0, pitch: -0.3)).eye.y < G.eye.y)
+    }
+
+    @Test func everyElementScrubberAndPreviewInsideTheViewAtOrbitCorners() throws {
+        // Catalog levels 1, 41 and 81 (level-1 meshes: every position but the capsule detail is the same at every
+        // tier, and the capsules lie inside the box at every tier).
+        let levels: [Level] = [Self.catalogLevels[0], Self.catalogLevels[2], Self.catalogLevels[4]]
+        var checked: Int = 0
+        for level in levels {
+            let play: Play = try Self.playWithWells(level)
+            let sites: [Cell] = level.sites ?? []
+            let base: Snapshot = Snapshot(play: play, shownTick: 0, levelNumber: 1, time: 0)
+            let moved: Snapshot = base.previewing(slot: 0, target: .site(sites[1]), level: level)
+            #expect(moved.preview != nil, "\(level.id)")
+            let previews: [Snapshot] = [base, moved, moved.freezing(true),
+                                        base.previewing(slot: 1, target: .removal, level: level)]
+            for snap in previews {
+                for tick in [0, snap.ticksSwum] {
+                    let shown: Snapshot = Self.copy(snap, shownTick: tick)
+                    let view: Snapshot = snap.preview == nil ? shown : shown.previewing(
+                        slot: snap.preview!.slot, target: snap.preview!.target, level: level).freezing(snap.frozen)
+                    // The authored orbit is checked by everyElementInsideTheViewAtSevenAspects (no preview) and
+                    // costs nothing new here; the four corners bound every orbit (the fit holds the box at each).
+                    for orbit in ViewOrbit.corners {
+                        let drawn: MicroscopicAuroraCamera = G.camera(aspect: 1, orbit: orbit)
+                        let mesh: Mesh = try G.dishMesh(view, tier: .of(1), camera: drawn)
+                        let glow: Mesh = try G.glowMesh(view, tier: .of(1), camera: drawn)
+                        #expect(Self.badVertices(mesh) == 0 && Self.badVertices(glow) == 0)
+                        var points: [SIMD3<Double>] = Self.positions(mesh, except: [.backdrop])
+                        for index in glow.positions.indices { points.append(Self.point(glow, index)) }
+                        for element in G.paintOrder(G.drawnSnapshot(view)) where element.part != .backdrop {
+                            points.append(element.centre)
+                        }
+                        points.append(G.scrubberPoint(0))
+                        points.append(G.scrubberPoint(1))
+                        points.append(G.scrubberMark(view) + SIMD3(0, G.scrubberMarkReach, 0))
+                        points.append(G.scrubberMark(view) - SIMD3(0, G.scrubberMarkReach, 0))
+                        #expect(!Self.vertices(mesh, .scrubber).isEmpty)
+                        for aspect in Self.aspects {
+                            let camera: MicroscopicAuroraCamera = G.camera(aspect: aspect, orbit: orbit)
+                            var outside: Int = 0
+                            for p in points where !Self.inside(G.project(p, camera: camera)) { outside += 1 }
+                            #expect(outside == 0, "\(level.id) tick \(tick) \(orbit) aspect \(aspect)")
+                            checked += 1
+                        }
+                    }
+                }
+            }
+        }
+        #expect(checked == 3 * 4 * 2 * 4 * 7)
+    }
+
+    @Test func backdropFacesTheOrbitEyeAndFillsTheView() throws {
+        let snap: Snapshot = Self.snapshot(Self.catalogLevels[0])
+        for orbit in ViewOrbit.corners {
+            for aspect in [0.4, 1.0, 2.5] {
+                let camera: MicroscopicAuroraCamera = G.camera(aspect: aspect, orbit: orbit)
+                let mesh: Mesh = try G.dishMesh(snap, tier: .of(1), camera: camera)
+                let corners: [Int] = Self.vertices(mesh, .backdrop)
+                #expect(corners.count == 4)
+                var low: SIMD2<Double> = SIMD2(Double.infinity, Double.infinity)
+                var high: SIMD2<Double> = SIMD2(-Double.infinity, -Double.infinity)
+                for index in corners {
+                    let q: SIMD2<Double> = try #require(G.project(Self.point(mesh, index), camera: camera))
+                    low = SIMD2(min(low.x, q.x), min(low.y, q.y))
+                    high = SIMD2(max(high.x, q.x), max(high.y, q.y))
+                }
+                #expect(low.x < 0 && low.y < 0 && high.x > 1 && high.y > 1, "\(orbit) \(aspect)")
+                // Behind the box from that eye.
+                let forward: SIMD3<Double> = G.viewBasis(camera).forward
+                for index in corners {
+                    #expect(G.dot(Self.point(mesh, index) - camera.eye, forward) > 3.4, "\(orbit)")
+                }
+            }
+        }
+    }
+
+    @Test func previewedSwimEqualsTheKernelSwim() throws {
+        for level in [Self.catalogLevels[1], Self.catalogLevels[3]] {
+            let play: Play = try Self.playWithWells(level)
+            let sites: [Cell] = level.sites ?? []
+            let base: Snapshot = Snapshot(play: play, shownTick: 7, levelNumber: 1, time: 0)
+            let fingerprint: String = play.fingerprint
+            // A move of slot 0 to site 1 and a removal of slot 1, each against the play after that action.
+            let moved: Well = Well(cell: sites[1], strength: 3, sense: .counterclockwise)
+            let cases: [(target: MicroscopicAuroraPreviewTarget, slot: Int, action: MicroscopicAuroraAction)] = [
+                (target: .site(sites[1]), slot: 0, action: .place(slot: 0, well: moved)),
+                (target: .removal, slot: 1, action: .remove(slot: 1)),
+            ]
+            for entry in cases {
+                let previewed: Snapshot = base.previewing(slot: entry.slot, target: entry.target, level: level)
+                let preview: MicroscopicAuroraPreview = try #require(previewed.preview)
+                var after: Play = play
+                try after.apply(entry.action, expecting: after.fingerprint)
+                let truth: Snapshot = Snapshot(play: after, shownTick: 7, levelNumber: 1, time: 0)
+                #expect(preview.slot == entry.slot && preview.target == entry.target)
+                #expect(preview.wells == after.wells)
+                #expect(preview.report == after.report)
+                #expect(preview.report == MicroscopicAuroraDish.report(level, wells: after.placedWells))
+                #expect(preview.positions == truth.positions)
+                #expect(preview.velocities == truth.velocities)
+                #expect(preview.stray == truth.stray && preview.litStencil == truth.litStencil)
+                #expect(preview.coverage == truth.coverage && preview.coherence == truth.coherence)
+                #expect(preview.ticksSwum == truth.ticksSwum && preview.density == truth.density)
+                // The game state and the committed swim are untouched.
+                #expect(play.fingerprint == fingerprint)
+                #expect(previewed.positions == base.positions && previewed.wells == base.wells)
+                #expect(previewed.coverage == base.coverage && previewed.stage == base.stage)
+                #expect(previewed.clearingPreview() == base)
+                // Unfrozen, the drawn swim is the previewed one (the truth's, at the same shown tick).
+                let drawn: Snapshot = G.drawnSnapshot(previewed)
+                #expect(drawn.positions == truth.positions && drawn.shownTick == truth.shownTick)
+                #expect(drawn.coverage == truth.coverage && drawn.failure == truth.failure)
+                let swim: [M] = [.ribbon, .swimmer, .swimmerTail, .litCell, .strayCell]
+                for tier in Tier.all {
+                    let mesh: Mesh = try G.dishMesh(previewed, tier: tier)
+                    let reference: Mesh = try G.dishMesh(truth, tier: tier)
+                    for material in swim {
+                        var got: [SIMD3<Double>] = []
+                        for index in Self.vertices(mesh, material) { got.append(Self.point(mesh, index)) }
+                        var want: [SIMD3<Double>] = []
+                        for index in Self.vertices(reference, material) { want.append(Self.point(reference, index)) }
+                        #expect(got == want, "\(level.id) \(material) \(tier.name)")
+                    }
+                    #expect(try G.glowMesh(previewed, tier: tier) == G.glowMesh(truth, tier: tier))
+                    // The ghost well at the target site (a move), none for a removal.
+                    let ghost: [Int] = Self.vertices(mesh, .ghostWell)
+                    switch entry.target {
+                    case .site(let cell):
+                        #expect(!ghost.isEmpty)
+                        let reach: Double = G.wellRadiusShare * G.cellSide + G.arrowLength + G.wellWidth
+                        for index in ghost {
+                            #expect(Self.length(Self.point(mesh, index) - G.cellCentre(cell)) <= reach)
+                        }
+                    case .removal:
+                        #expect(ghost.isEmpty)
+                    }
+                    // The committed wells stay drawn.
+                    #expect(Self.vertices(mesh, .wellSpiral).count == Self.vertices(try G.dishMesh(base, tier: tier),
+                                                                                    .wellSpiral).count)
+                }
+            }
+            // Refused drops are not previewed: the own site, another well's site, an empty slot, a cell that is not a
+            // site, a slot out of range.
+            let refused: [(slot: Int, target: MicroscopicAuroraPreviewTarget)] = [
+                (slot: 0, target: .site(sites[0])), (slot: 0, target: .site(sites[2])),
+                (slot: 2, target: .site(sites[1])), (slot: 2, target: .removal),
+                (slot: 0, target: .site(Cell(row: 0, column: 0))), (slot: 5, target: .removal),
+                (slot: -1, target: .removal),
+            ]
+            for entry in refused {
+                #expect(base.previewing(slot: entry.slot, target: entry.target, level: level).preview == nil,
+                        "\(entry.slot) \(entry.target)")
+            }
+        }
+    }
+
+    @Test func frozenDrawsTheCommittedSwimWithPreviewedGauges() throws {
+        let level: Level = Self.catalogLevels[2]
+        let play: Play = try Self.playWithWells(level)
+        let sites: [Cell] = level.sites ?? []
+        let base: Snapshot = Snapshot(play: play, shownTick: 11, levelNumber: 1, time: 0)
+        #expect(!base.frozen && base.preview == nil && !base.drawsPreviewSwim)
+        let frozen: Snapshot = base.previewing(slot: 0, target: .site(sites[1]), level: level).freezing(true)
+        let preview: MicroscopicAuroraPreview = try #require(frozen.preview)
+        #expect(frozen.frozen && !frozen.drawsPreviewSwim)
+        #expect(G.ghostWell(frozen) == nil)
+        let drawn: Snapshot = G.drawnSnapshot(frozen)
+        #expect(drawn.positions == base.positions && drawn.litStencil == base.litStencil)
+        #expect(drawn.failure == base.failure && drawn.shownTick == base.shownTick)
+        #expect(drawn.coverage == preview.coverage && drawn.coherence == preview.coherence)
+        #expect(G.coverageMark(drawn) == SIMD3(G.gaugeX(preview.coverage, top: 1000), G.coverageY, 0))
+        #expect(G.coherenceMark(drawn) == SIMD3(G.gaugeX(preview.coherence, top: G.coherenceTop(base)), G.coherenceY,
+                                                0))
+        let swim: [M] = [.ribbon, .swimmer, .swimmerTail, .litCell, .strayCell, .wellSpiral, .wellArrow, .stencil]
+        for tier in Tier.all {
+            let mesh: Mesh = try G.dishMesh(frozen, tier: tier)
+            let committed: Mesh = try G.dishMesh(base, tier: tier)
+            #expect(Self.positions(mesh, except: [.markMet, .markUnmet]).count
+                    == Self.positions(committed, except: [.markMet, .markUnmet]).count)
+            for material in swim {
+                var got: [SIMD3<Double>] = []
+                for index in Self.vertices(mesh, material) { got.append(Self.point(mesh, index)) }
+                var want: [SIMD3<Double>] = []
+                for index in Self.vertices(committed, material) { want.append(Self.point(committed, index)) }
+                #expect(got == want, "\(material) \(tier.name)")
+            }
+            #expect(Self.vertices(mesh, .ghostWell).isEmpty)
+            #expect(try G.glowMesh(frozen, tier: tier) == G.glowMesh(base, tier: tier))
+        }
+        // Unfreezing draws the preview again; freezing without a preview changes nothing drawn.
+        #expect(G.ghostWell(frozen.freezing(false)) != nil)
+        #expect(try G.dishPart(base.freezing(true), tier: .of(0)) == G.dishPart(base, tier: .of(0)))
+    }
+
+    @Test func noPreviewIsR02G1903GeometryFollowedByTheScrubber() throws {
+        var levels: [Level] = []
+        for fixture in Self.fixtures { levels.append(fixture.level) }
+        levels.append(Self.catalogLevels[0])
+        levels.append(Self.extremeLevels[Self.extremeLevels.count - 1])
+        for level in levels {
+            let base: Snapshot = Self.snapshot(level)
+            for tick in [0, base.ticksSwum / 2, base.ticksSwum] {
+                let snap: Snapshot = Self.copy(base, shownTick: tick)
+                #expect(snap.preview == nil && !snap.frozen)
+                #expect(G.drawnSnapshot(snap) == snap)
+                for tier in Tier.all {
+                    let full: MicroscopicAuroraColouredMesh = try G.dishPart(snap, tier: tier)
+                    let legacy: MicroscopicAuroraColouredMesh = try Self.elementsOnly(snap, tier: tier)
+                    let n: Int = legacy.mesh.positions.count
+                    #expect(Array(full.mesh.positions.prefix(n)) == legacy.mesh.positions)
+                    #expect(Array(full.mesh.normals.prefix(n)) == legacy.mesh.normals)
+                    #expect(Array(full.mesh.uvs.prefix(n)) == legacy.mesh.uvs)
+                    #expect(Array(full.colours.prefix(n)) == legacy.colours)
+                    #expect(Array(full.mesh.indices.prefix(legacy.mesh.indices.count)) == legacy.mesh.indices)
+                    // What follows is the scrubber: its track and its mark, two quads.
+                    #expect(full.mesh.positions.count == n + 8)
+                    #expect(full.mesh.indices.count == legacy.mesh.indices.count + 12)
+                    for index in n..<full.mesh.positions.count {
+                        #expect(Self.material(full.mesh, index) == .scrubber)
+                    }
+                    // The camera-taking overloads at the authored camera are the same, bit for bit.
+                    let authored: MicroscopicAuroraCamera = G.camera(aspect: 1.7)
+                    #expect(try G.dishPart(snap, tier: tier, camera: authored) == full)
+                    #expect(try G.dishMesh(snap, tier: tier, camera: authored) == full.mesh)
+                    #expect(try G.glowPart(snap, tier: tier, camera: authored) == G.glowPart(snap, tier: tier))
+                    #expect(try G.glowMesh(snap, tier: tier, camera: authored) == G.glowMesh(snap, tier: tier))
+                }
+            }
+        }
+    }
+
+    @Test func scrubberPlacement() throws {
+        #expect(G.scrubberY == -1.31)
+        #expect(G.scrubberPoint(0) == SIMD3(-0.9, -1.31, 0) && G.scrubberPoint(1) == SIMD3(0.9, -1.31, 0))
+        #expect(G.scrubberPoint(0.5).x == 0 && G.scrubberPoint(-3) == G.scrubberPoint(0))
+        #expect(G.scrubberPoint(7) == G.scrubberPoint(1) && G.scrubberPoint(.nan) == G.scrubberPoint(0))
+        // Below the actions bars and inside the box.
+        #expect(G.scrubberY + G.scrubberMarkReach < G.barsY - G.barHeight / 2)
+        #expect(G.scrubberY - G.scrubberMarkReach >= G.boxLow.y)
+        let base: Snapshot = Self.snapshot(Self.catalogLevels[0])
+        for tick in [0, base.ticksSwum / 3, base.ticksSwum] {
+            let snap: Snapshot = Self.copy(base, shownTick: tick)
+            let x: Double = -0.9 + 1.8 * Double(tick) / Double(base.ticksSwum)
+            #expect(abs(G.scrubberMark(snap).x - x) < 1e-12 && G.scrubberMark(snap).y == -1.31)
+            let mesh: Mesh = try G.dishMesh(snap, tier: .of(2))
+            let marks: Int = Self.near(mesh, .scrubber, G.scrubberMark(snap), G.scrubberMarkReach + 0.01)
+            #expect(marks >= 4)
+        }
+        // A swim of no ticks puts the mark at the start.
+        let still: Snapshot = Snapshot(radius: 11, positions: [[Point(x: 3072, y: 3072)]],
+                                       velocities: [[Point(x: 0, y: 0)]], ticksSwum: 0, shownTick: 0, density: [],
+                                       litStencil: [], stray: [], stencil: [], sites: [], wells: [nil, nil, nil],
+                                       coverage: 0, requiredCoverage: 500, coherence: 1, requiredCoherence: 2,
+                                       swarm: 1, coherenceRadius: 2, failure: nil, stage: .playing, actionsLeft: 1,
+                                       budget: 1, levelNumber: 1, time: 0)
+        #expect(G.scrubberMark(still) == G.scrubberPoint(0))
+        // The well centres.
+        let play: Play = try Self.playWithWells(Self.catalogLevels[0])
+        let snap: Snapshot = Snapshot(play: play, shownTick: 0, levelNumber: 1, time: 0)
+        #expect(G.wellCentre(0, snap) == G.cellCentre(Self.catalogLevels[0].sites![0]))
+        #expect(G.wellCentre(2, snap) == nil && G.wellCentre(3, snap) == nil && G.wellCentre(-1, snap) == nil)
     }
 }

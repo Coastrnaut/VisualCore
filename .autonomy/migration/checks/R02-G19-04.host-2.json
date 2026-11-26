@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MicroscopicAuroraPicker|MicroscopicAuroraSceneGeometry|MicroscopicAuroraShaderSource|MicroscopicAuroraRendererPurity|MicroscopicAuroraInvariant|MicroscopicAuroraScenarios|MicroscopicAuroraExperienceCore"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'MicroscopicAuroraPicker|MicroscopicAuroraSceneGeometry|MicroscopicAuroraShaderSource|MicroscopicAuroraRendererPurity|MicroscopicAuroraInvariant|MicroscopicAuroraScenarios|MicroscopicAuroraExperienceCore'",
+  "elapsed_seconds": 22.529,
+  "exit_code": 0,
+  "finished": "2026-11-26T20:54:46+00:00",
+  "gate": "R02-G19-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G19-04.host-2.log",
+  "log_sha256": "fd0678ec81878f97ba6b34eaa7c49c4277952586e3aa33b8a1d7aac2e1d10b2a",
+  "name": "host-2",
+  "started": "2026-11-26T20:54:23+00:00",
+  "timed_out": false
+}

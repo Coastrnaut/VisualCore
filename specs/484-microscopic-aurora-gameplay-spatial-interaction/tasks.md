@@ -15,7 +15,7 @@ R02-G18-04 (`git show <R02-G18-04 record commit>:<path>`).
 
 ## Phase 2: Foundational — view orbit, camera, preview, scrubber and picking
 
-- [ ] T-R02G1904-002 [P] Add the preview ("nil when no preview": slot, target site or removal, previewed wells and the
+- [X] T-R02G1904-002 [P] Add the preview ("nil when no preview": slot, target site or removal, previewed wells and the — Verified 2026-11-26: host-2 exit 0: picker (500 seeded points, 3 orbits), view orbit, camera(aspect:orbit:) inside the view at orbit corners x 7 aspects, preview equals the kernel swim, frozen, scrubber, materials 20/21; purity, invariant, scenarios and adapter suites unchanged
   previewed swim — positions, density, lit cells, coverage, coherence, failure — computed with the kernel's
   `MicroscopicAuroraDish.swim`; "presentation only; never in the digest"), `frozen` ("presentation only"),
   `previewing(slot:target:level:)` and `freezing(_:)` to

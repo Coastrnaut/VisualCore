@@ -56,6 +56,29 @@
 // on its outer edge. Every flat triangle winds counter-clockwise seen from the eye, every capsule triangle seen from
 // outside. Tiers change only the capsules, the ribbons' length, the fronds and the glow: every other position is the
 // same at every tier. Doubles are used for drawing only. Modelled on `ApsidesWorkshopSceneGeometry` (473).
+//
+// Feature 484 (R02-G19-04) T-R02G1904-002 (FR-R02G1904-002 … 004, 006, 007; SC-R02G1904-001, 004) adds:
+//   * the player's view orbit (``MicroscopicAuroraViewOrbit``) and `camera(aspect:orbit:)`: the authored eye's offset
+//     from the look-at point is pitched about the authored view's right axis (its elevation changed, its length and
+//     horizontal direction kept), then the eye and the look-at point are yawed together about the vertical axis through
+//     the authored box centre, and the field of view is refitted as for the fixed camera, so the box x −1.0 … 1.0,
+//     y −1.35 … 1.0, z −0.02 … 0.02 keeps ``fitMargin`` per side at every orbit and aspect 0.4 … 2.5. The eye (3.4 from
+//     the look-at point, at least 3.4 · cos 35° · cos 60° ≈ 1.39 in front of the plane z = 0) stays outside the box. At
+//     the authored orbit `camera(aspect:)` (which calls it) is the fixed camera of R02-G19-03, bit for bit;
+//   * the swim scrubber, drawn after every element (it is not an element, so the paint order and the CPU reference are
+//     unchanged): a track ``scrubberTrackWidth`` wide at y = ``scrubberY`` (−1.31) from x = −0.9 to 0.9 and a mark (a
+//     vertical strip ``scrubberMarkWidth`` wide, ±``scrubberMarkReach``) at the shown tick's fraction of the ticks
+//     swum, both material 21 ``MicroscopicAuroraMaterial/scrubber``;
+//   * the well preview (`snapshot.preview`): unfrozen, the previewed swim (ribbons, swimmers, lit and stray cells,
+//     failure marks and gauge readings, shown at the shown tick clamped to its ticks) is drawn in place of the
+//     committed one and the dragged well as a ghost at its target site (spiral and arrowhead, material 20
+//     ``MicroscopicAuroraMaterial/ghostWell``) right after the wells (none for a removal); frozen, the committed swim
+//     stays and only the gauge readings and their met flags are the preview's. Without a preview nothing changes;
+//   * camera-taking `dishMesh(_:tier:camera:)`, `glowMesh(_:tier:camera:)`, `dishPart(_:tier:wonLevel:camera:)` and
+//     `glowPart(_:tier:camera:)`: the backdrop becomes a quad facing the camera's eye behind the box and the glow is
+//     lifted towards the eye; for the authored camera they equal the overloads without a camera, which use it. So
+//     without a preview and at the authored camera every mesh is R02-G19-03's followed by the scrubber.
+// The orbit, the preview and the freeze are presentation only: never saved, never read by the rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -330,6 +353,18 @@ public enum MicroscopicAuroraSceneGeometry {
     public static let aspectRange: ClosedRange<Double> = 0.4...2.5
     /// The aspects the backdrop fills.
     public static let backdropAspects: ClosedRange<Double> = 0.25...4
+    /// The swim scrubber's centre line (feature 484), below the actions bars.
+    public static let scrubberY: Double = -1.31
+    /// The scrubber track's left end (tick 0).
+    public static let scrubberStart: Double = -0.9
+    /// The scrubber track's right end (the last tick swum).
+    public static let scrubberEnd: Double = 0.9
+    /// The scrubber track's width.
+    public static let scrubberTrackWidth: Double = 0.008
+    /// The scrubber mark's reach above and below the track's centre line.
+    public static let scrubberMarkReach: Double = 0.03
+    /// The scrubber mark's width.
+    public static let scrubberMarkWidth: Double = 0.008
 
     // MARK: Material codes
 
@@ -421,6 +456,67 @@ public enum MicroscopicAuroraSceneGeometry {
     /// The coherence track's centre: (0, −1.15, 0).
     public static func coherenceTrackCentre() -> SIMD3<Double> {
         SIMD3((gaugeStart + gaugeEnd) / 2, coherenceY, planeZ)
+    }
+
+    /// The scrubber track's point at `fraction` (clamped to 0 … 1; non-finite counts as 0): (−0.9 + 1.8 · fraction,
+    /// −1.31, 0) (feature 484).
+    public static func scrubberPoint(_ fraction: Double) -> SIMD3<Double> {
+        let f: Double = fraction.isFinite ? min(max(fraction, 0), 1) : 0
+        return SIMD3(scrubberStart + (scrubberEnd - scrubberStart) * f, scrubberY, planeZ)
+    }
+
+    /// The fraction of the scrubber track at the shown tick: shown / ticks swum (0 when nothing was swum).
+    public static func scrubberFraction(_ snapshot: MicroscopicAuroraSceneSnapshot) -> Double {
+        guard snapshot.ticksSwum > 0 else { return 0 }
+        return Double(snapshot.shownTick) / Double(snapshot.ticksSwum)
+    }
+
+    /// The scrubber mark's centre: ``scrubberPoint(_:)`` of ``scrubberFraction(_:)`` (the committed swim's tick).
+    public static func scrubberMark(_ snapshot: MicroscopicAuroraSceneSnapshot) -> SIMD3<Double> {
+        scrubberPoint(scrubberFraction(snapshot))
+    }
+
+    /// The centre of slot `slot`'s well (the committed wells), nil when the slot is out of range or empty
+    /// (feature 484).
+    public static func wellCentre(_ slot: Int, _ snapshot: MicroscopicAuroraSceneSnapshot) -> SIMD3<Double>? {
+        guard snapshot.wells.indices.contains(slot), let well = snapshot.wells[slot] else { return nil }
+        return cellCentre(well.cell)
+    }
+
+    /// The ghost well drawn for the preview (feature 484): the dragged well at its target site while a preview is
+    /// drawn unfrozen; nil for a removal, without a preview or while frozen.
+    public static func ghostWell(_ snapshot: MicroscopicAuroraSceneSnapshot) -> MicroscopicAuroraWell? {
+        guard snapshot.drawsPreviewSwim, let preview = snapshot.preview,
+              case .site = preview.target, preview.wells.indices.contains(preview.slot) else { return nil }
+        return preview.wells[preview.slot]
+    }
+
+    /// The snapshot the dish is drawn from (feature 484): `snapshot` itself without a preview; unfrozen with a
+    /// preview, a copy with the previewed swim (positions, velocities, ticks swum, the shown tick clamped to them,
+    /// density, lit stencil and stray cells, coverage, coherence and failure; the committed wells kept); frozen with a
+    /// preview, a copy with only the previewed coverage and coherence (the gauge readings). The copy carries no
+    /// preview.
+    public static func drawnSnapshot(_ snapshot: MicroscopicAuroraSceneSnapshot) -> MicroscopicAuroraSceneSnapshot {
+        guard let preview = snapshot.preview else { return snapshot }
+        let s: MicroscopicAuroraSceneSnapshot = snapshot
+        if snapshot.frozen {
+            return MicroscopicAuroraSceneSnapshot(
+                radius: s.radius, positions: s.positions, velocities: s.velocities, ticksSwum: s.ticksSwum,
+                shownTick: s.shownTick, density: s.density, litStencil: s.litStencil, stray: s.stray,
+                stencil: s.stencil, sites: s.sites, wells: s.wells, coverage: preview.coverage,
+                requiredCoverage: s.requiredCoverage, coherence: preview.coherence,
+                requiredCoherence: s.requiredCoherence, swarm: s.swarm, coherenceRadius: s.coherenceRadius,
+                failure: s.failure, stage: s.stage, actionsLeft: s.actionsLeft, budget: s.budget,
+                levelNumber: s.levelNumber, time: s.time)
+        }
+        return MicroscopicAuroraSceneSnapshot(
+            radius: s.radius, positions: preview.positions, velocities: preview.velocities,
+            ticksSwum: preview.ticksSwum, shownTick: s.shownTick, density: preview.density,
+            litStencil: preview.litStencil, stray: preview.stray, stencil: s.stencil, sites: s.sites, wells: s.wells,
+            coverage: preview.coverage, requiredCoverage: s.requiredCoverage, coherence: preview.coherence,
+            requiredCoherence: s.requiredCoherence, swarm: s.swarm, coherenceRadius: s.coherenceRadius,
+            failure: preview.failure, stage: s.stage, actionsLeft: s.actionsLeft, budget: s.budget,
+            levelNumber: s.levelNumber, time: s.time)
     }
 
     /// The x of `value` on a gauge whose scale is 0 … `top`: −0.9 + 1.8 · value / top (value clamped to 0 … top; top
@@ -639,33 +735,80 @@ public enum MicroscopicAuroraSceneGeometry {
 
     // MARK: Meshes
 
-    /// The dish mesh for the dish program, in painter's order (see the header).
+    /// The dish mesh for the dish program, in painter's order (see the header), seen from the authored camera.
     public static func dishMesh(_ snapshot: MicroscopicAuroraSceneSnapshot,
                                 tier: MicroscopicAuroraTier) throws(MeshError) -> Mesh {
         try dishPart(snapshot, tier: tier).mesh
     }
 
-    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2.
+    /// The dish mesh seen from `camera` (feature 484): the backdrop facing its eye
+    /// (``dishPart(_:tier:wonLevel:camera:)`` without colours); equal to ``dishMesh(_:tier:)`` for the authored camera.
+    public static func dishMesh(_ snapshot: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier,
+                                camera: MicroscopicAuroraCamera) throws(MeshError) -> Mesh {
+        try dishPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
+    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2. Seen from the authored
+    /// camera.
     public static func glowMesh(_ snapshot: MicroscopicAuroraSceneSnapshot,
                                 tier: MicroscopicAuroraTier) throws(MeshError) -> Mesh {
         try glowPart(snapshot, tier: tier).mesh
     }
 
+    /// The glow mesh seen from `camera` (feature 484): shells lifted towards its eye (``glowPart(_:tier:camera:)``
+    /// without colours); empty at level-2; equal to ``glowMesh(_:tier:)`` for the authored camera.
+    public static func glowMesh(_ snapshot: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier,
+                                camera: MicroscopicAuroraCamera) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
     /// The whole dish with fallback colours (each material's palette colour, unlit; the backdrop from abyss at its
     /// bottom to abyss top at its top; a ribbon from the field colour at its tail to the ribbon colour at its head; on
     /// a won level every stencil outline in the lit colour and every mark met) for the shared unlit renderer: the same
-    /// positions as ``dishMesh(_:tier:)``. `wonLevel` overrides `snapshot.isWon`; positions never depend on it.
+    /// positions as ``dishMesh(_:tier:)``. `wonLevel` overrides `snapshot.isWon`; positions never depend on it. Seen
+    /// from the authored camera; the preview and the scrubber as in the header (feature 484).
     public static func dishPart(_ snapshot: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier,
                                 wonLevel: Bool? = nil) throws(MeshError) -> MicroscopicAuroraColouredMesh {
-        var parts: Parts = Parts()
+        try dish(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts())
+    }
+
+    /// The whole dish with fallback colours seen from `camera` (feature 484): the backdrop a quad facing its eye
+    /// behind the box; otherwise as ``dishPart(_:tier:wonLevel:)``, which it equals for the authored camera.
+    public static func dishPart(_ snapshot: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier,
+                                wonLevel: Bool? = nil,
+                                camera: MicroscopicAuroraCamera) throws(MeshError) -> MicroscopicAuroraColouredMesh {
+        try dish(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(camera: camera))
+    }
+
+    /// Builds the dish into `parts` (empty, with the view to face): every element of the drawn snapshot
+    /// (``drawnSnapshot(_:)``) in painter's order, the ghost well right after the wells, then the scrubber.
+    static func dish(_ snapshot: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier, wonLevel: Bool?,
+                     parts start: Parts) throws(MeshError) -> MicroscopicAuroraColouredMesh {
+        var parts: Parts = start
+        let drawn: MicroscopicAuroraSceneSnapshot = drawnSnapshot(snapshot)
         let won: Bool = wonLevel ?? snapshot.isWon
-        let broken: Set<Int> = brokenSwimmers(snapshot)
-        let outlines: Set<Int> = brokenOutlines(snapshot)
-        for element in paintOrder(snapshot) {
-            try draw(element, into: &parts, snapshot, tier: tier, won: won, brokenSwimmers: broken,
+        let broken: Set<Int> = brokenSwimmers(drawn)
+        let outlines: Set<Int> = brokenOutlines(drawn)
+        var ghost: MicroscopicAuroraWell? = ghostWell(snapshot)
+        for element in paintOrder(drawn) {
+            if let g = ghost, element.kind.rawValue > MicroscopicAuroraElement.Kind.well.rawValue {
+                try spiral(&parts, g, ghost: true)
+                ghost = nil
+            }
+            try draw(element, into: &parts, drawn, tier: tier, won: won, brokenSwimmers: broken,
                      brokenOutlines: outlines)
         }
+        if let g = ghost { try spiral(&parts, g, ghost: true) }
+        try scrubber(&parts, snapshot)
         return parts.built()
+    }
+
+    /// Draws the scrubber (feature 484): the track and the mark at the shown tick (strips, material 21).
+    static func scrubber(_ parts: inout Parts, _ snapshot: MicroscopicAuroraSceneSnapshot) throws(MeshError) {
+        try parts.strip(scrubberPoint(0), scrubberPoint(1), width: scrubberTrackWidth, code: code(.scrubber))
+        let mark: SIMD3<Double> = scrubberMark(snapshot)
+        try parts.strip(mark - SIMD3(0, scrubberMarkReach, 0), mark + SIMD3(0, scrubberMarkReach, 0),
+                        width: scrubberMarkWidth, code: code(.scrubber))
     }
 
     /// The backdrop's half width and half height: large enough to fill the view at its plane for every aspect in
@@ -697,6 +840,10 @@ public enum MicroscopicAuroraSceneGeometry {
         let c: SIMD3<Double> = element.centre
         switch element.part {
         case .backdrop:
+            if let view = parts.view {
+                try facingBackdrop(&parts, view.camera)
+                return
+            }
             let half: SIMD2<Double> = backdropHalf()
             let corners: [SIMD3<Double>] = [c + SIMD3(-half.x, -half.y, 0), c + SIMD3(half.x, -half.y, 0),
                                             c + SIMD3(half.x, half.y, 0), c + SIMD3(-half.x, half.y, 0)]
@@ -751,6 +898,30 @@ public enum MicroscopicAuroraSceneGeometry {
             let material: MicroscopicAuroraMaterial = i < litActions(snapshot) ? .barLit : .barUnlit
             try parts.rectangle(centre: c, half: half, code: code(material))
         }
+    }
+
+    /// Draws the backdrop facing `camera`'s eye (feature 484): one quad behind the authored box, at the depth of its
+    /// farthest corner along the view plus 1, with the half height and half width that fill the view from that eye at
+    /// aspects 0.25 and 4 (``fitted(eye:target:aspect:)``), grown by 5 %; a_uv.y the height 0 … 1 and a_normal.x the
+    /// horizontal coordinate −1 … +1 as the authored backdrop.
+    static func facingBackdrop(_ parts: inout Parts, _ camera: MicroscopicAuroraCamera) throws(MeshError) {
+        typealias P = MicroscopicAuroraPalette
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis(camera)
+        var depth: Double = 0
+        for index in 0..<8 { depth = max(depth, dot(corner(index) - camera.eye, basis.forward)) }
+        depth += 1
+        let tall: MicroscopicAuroraCamera = fitted(eye: camera.eye, target: camera.target,
+                                                   aspect: backdropAspects.lowerBound)
+        let wide: MicroscopicAuroraCamera = fitted(eye: camera.eye, target: camera.target,
+                                                   aspect: backdropAspects.upperBound)
+        let halfHeight: Double = depth * tan(tall.fovY / 2) * 1.05
+        let halfWidth: Double = depth * tan(wide.fovY / 2) * wide.aspect * 1.05
+        let centre: SIMD3<Double> = camera.eye + basis.forward * depth
+        let w: SIMD3<Double> = basis.right * halfWidth
+        let h: SIMD3<Double> = basis.up * halfHeight
+        try parts.quad([centre - w - h, centre + w - h, centre + w + h, centre - w + h], code: code(.backdrop),
+                       local: [0, 0, 1, 1], colours: [P.abyss, P.abyss, P.abyssTop, P.abyssTop],
+                       slots: [SIMD3(-1, 0, 0), SIMD3(1, 0, 0), SIMD3(1, 0, 0), SIMD3(-1, 0, 0)])
     }
 
     /// The frond stems in drawing order as (from, to, generation): `frondCount` fronds at angles 2π (k + ½) / count,
@@ -836,14 +1007,16 @@ public enum MicroscopicAuroraSceneGeometry {
         return (tip: end + t * arrowLength, left: end + n, right: end - n)
     }
 
-    /// Draws `well`'s spiral (strips) and arrowhead (a flat fill).
-    static func spiral(_ parts: inout Parts, _ well: MicroscopicAuroraWell) throws(MeshError) {
+    /// Draws `well`'s spiral (strips) and arrowhead (a flat fill); as a ghost (feature 484) both in material 20
+    /// ``MicroscopicAuroraMaterial/ghostWell``.
+    static func spiral(_ parts: inout Parts, _ well: MicroscopicAuroraWell, ghost: Bool = false) throws(MeshError) {
         let points: [SIMD3<Double>] = spiralPoints(well)
+        let line: Double = code(ghost ? .ghostWell : .wellSpiral)
         for k in 0..<(points.count - 1) {
-            try parts.strip(points[k], points[k + 1], width: wellWidth, code: code(.wellSpiral))
+            try parts.strip(points[k], points[k + 1], width: wellWidth, code: line)
         }
         let arrow = arrowhead(well)
-        try parts.flatTriangle(arrow.tip, arrow.left, arrow.right, code: code(.wellArrow))
+        try parts.flatTriangle(arrow.tip, arrow.left, arrow.right, code: code(ghost ? .ghostWell : .wellArrow))
     }
 
     /// Draws a ribbon through `points` (tail first): a strip of ``ribbonWidth`` per segment, a_uv.x
@@ -964,19 +1137,36 @@ public enum MicroscopicAuroraSceneGeometry {
     /// ``MicroscopicAuroraPalette/glow``, kind swimmer) and a band along each ribbon (from its centre line, a_uv.y 0,
     /// to half width ribbonWidth / 2 + ``ribbonGlowGrowth`` · k, a_uv.y 1, base ``MicroscopicAuroraPalette/ribbon``,
     /// kind ribbon, the factor times the along coordinate). a_normal is the base colour and a_uv.x
-    /// ``MicroscopicAuroraShaders/GlowKind/code(factor:)``. Empty at level-2.
+    /// ``MicroscopicAuroraShaders/GlowKind/code(factor:)``. Empty at level-2. Seen from the authored camera; drawn
+    /// from ``drawnSnapshot(_:)`` (the previewed swim while a preview is drawn unfrozen, feature 484).
     public static func glowPart(_ snapshot: MicroscopicAuroraSceneSnapshot,
                                 tier: MicroscopicAuroraTier) throws(MeshError) -> MicroscopicAuroraColouredMesh {
+        try glow(snapshot, tier: tier, parts: Parts())
+    }
+
+    /// The glow with fallback colours seen from `camera` (feature 484): every shell lifted 0.001 · k towards its eye;
+    /// otherwise as ``glowPart(_:tier:)``, which it equals for the authored camera.
+    public static func glowPart(_ snapshot: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier,
+                                camera: MicroscopicAuroraCamera) throws(MeshError) -> MicroscopicAuroraColouredMesh {
+        try glow(snapshot, tier: tier, parts: Parts(camera: camera))
+    }
+
+    /// Builds the glow into `parts` (empty, with the view to face; see ``glowPart(_:tier:)``).
+    static func glow(_ source: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier,
+                     parts start: Parts) throws(MeshError) -> MicroscopicAuroraColouredMesh {
         typealias P = MicroscopicAuroraPalette
         typealias K = MicroscopicAuroraShaders.GlowKind
-        var parts: Parts = Parts()
+        var parts: Parts = start
         let shells: Int = max(tier.glowShells, 0)
         guard shells > 0 else { return parts.built() }
+        let snapshot: MicroscopicAuroraSceneSnapshot = drawnSnapshot(source)
+        let towards: SIMD3<Double> = parts.towardsEye
         var ribbons: [[SIMD3<Double>]] = []
         for i in snapshot.positions.indices { ribbons.append(ribbon(i, snapshot, tier: tier)) }
         for k in stride(from: shells, through: 1, by: -1) {
             let factor: Double = pow(glowWeight, Double(k))
-            let lift: SIMD3<Double> = SIMD3(0, 0, glowLift * Double(k))
+            let lift: SIMD3<Double> = parts.view == nil ? SIMD3(0, 0, glowLift * Double(k))
+                : towards * (glowLift * Double(k))
             for points in ribbons {
                 var lifted: [SIMD3<Double>] = []
                 for p in points { lifted.append(p + lift) }
@@ -1010,8 +1200,91 @@ public enum MicroscopicAuroraSceneGeometry {
     /// axis); the vertical field of view is the smallest that holds every corner of the box x −1.0 … 1.0, y −1.35 …
     /// 1.0, z −0.02 … 0.02 inside the view with ``fitMargin`` per side (the box is convex and in front of the eye, so
     /// every point inside it — the dish, the fronds, every swimmer, the gauges and the bars — keeps a margin of at
-    /// least 5 % for aspect 0.4 … 2.5). Independent of the snapshot, the tier and the time.
+    /// least 5 % for aspect 0.4 … 2.5). Independent of the snapshot, the tier and the time. Equals
+    /// ``camera(aspect:orbit:)`` at ``MicroscopicAuroraViewOrbit/authored`` bit for bit.
     public static func camera(aspect: Double) -> MicroscopicAuroraCamera {
+        camera(aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `orbit` (clamped, see ``MicroscopicAuroraViewOrbit/clamped()``) and `aspect` (feature 484,
+    /// T-R02G1904-002): from the orbit's eye looking at its look-at point (``orbitView(_:)``) with +y up (never
+    /// parallel: the view stays within 35° of level); the vertical field of view is the smallest that holds every
+    /// corner of the box x −1.0 … 1.0, y −1.35 … 1.0, z −0.02 … 0.02 inside the view with ``fitMargin`` per side, so
+    /// everything inside the box (the dish, the gauges, the bars, the scrubber, a preview) keeps a margin of at least
+    /// 5 % at every orbit and aspect 0.4 … 2.5. The eye stays outside the box. At the authored orbit it is the fixed
+    /// camera of R02-G19-03, bit for bit. Presentation only; independent of the snapshot, the tier and the time.
+    public static func camera(aspect: Double, orbit: MicroscopicAuroraViewOrbit) -> MicroscopicAuroraCamera {
+        let o: MicroscopicAuroraViewOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return authoredCamera(aspect: aspect) }
+        let view: (eye: SIMD3<Double>, target: SIMD3<Double>) = orbitView(o)
+        return fitted(eye: view.eye, target: view.target, aspect: aspect)
+    }
+
+    /// The vertical axis the orbit yaws about passes through the authored box centre (0, −0.175, 0).
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `p` yawed by `yaw` radians about the vertical axis through ``orbitPivot`` (from +z towards +x).
+    static func yawed(_ p: SIMD3<Double>, _ yaw: Double) -> SIMD3<Double> {
+        let c: Double = cos(yaw)
+        let s: Double = sin(yaw)
+        let d: SIMD3<Double> = p - orbitPivot
+        return SIMD3(orbitPivot.x + d.x * c + d.z * s, p.y, orbitPivot.z - d.x * s + d.z * c)
+    }
+
+    /// The eye and the look-at point of `orbit` (clamped): the authored eye's offset from the look-at point,
+    /// (0, 0, 3.4), pitched about the authored view's right axis (its elevation above the horizontal raised by the
+    /// pitch, its length and horizontal direction kept) and added to the look-at point; then both points yawed about
+    /// the vertical axis through ``orbitPivot``. Exactly ``eye`` and ``lookAt`` at the authored orbit.
+    static func orbitView(_ orbit: MicroscopicAuroraViewOrbit) -> (eye: SIMD3<Double>, target: SIMD3<Double>) {
+        let o: MicroscopicAuroraViewOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return (eye: eye, target: lookAt) }
+        let e: SIMD3<Double> = eye - lookAt
+        let horizontal: Double = (e.x * e.x + e.z * e.z).squareRoot()
+        let length: Double = dot(e, e).squareRoot()
+        let elevation: Double = atan2(e.y, horizontal) + o.pitch
+        let across: Double = length * cos(elevation) / horizontal
+        let pitched: SIMD3<Double> = lookAt + SIMD3(e.x * across, length * sin(elevation), e.z * across)
+        return (eye: yawed(pitched, o.yaw), target: yawed(lookAt, o.yaw))
+    }
+
+    /// The camera from `eye` looking at `target` with +y up for `aspect` (made usable): the vertical field of view is
+    /// the smallest that holds every corner of the authored box inside the view with ``fitMargin`` per side; near half
+    /// the nearest corner's depth (at least 0.001), far the farthest corner's depth plus 3 (past the facing backdrop).
+    static func fitted(eye: SIMD3<Double>, target: SIMD3<Double>, aspect: Double) -> MicroscopicAuroraCamera {
+        let a: Double = usableAspect(aspect)
+        let forward: SIMD3<Double> = unit(target - eye)
+        let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
+        let up: SIMD3<Double> = cross(right, forward)
+        let limit: Double = 1 - 2 * fitMargin
+        var tanHalf: Double = 0
+        var nearest: Double = Double.infinity
+        var farthest: Double = 0
+        for index in 0..<8 {
+            let r: SIMD3<Double> = corner(index) - eye
+            let depth: Double = dot(r, forward)
+            nearest = min(nearest, depth)
+            farthest = max(farthest, depth)
+            tanHalf = max(tanHalf, abs(dot(r, up)) / depth / limit, abs(dot(r, right)) / depth / (a * limit))
+        }
+        let fovY: Double = 2 * atan(tanHalf)
+        let near: Double = max(nearest * 0.5, 1e-3)
+        let far: Double = farthest + 3
+        let view: Mat4 = Mat4.lookAt(eye: vec(eye), target: vec(target), up: Vec3(0, 1, 0))
+        let projection: Mat4 = Mat4.perspective(fovY: fovY, aspect: a, near: near, far: far)
+        return MicroscopicAuroraCamera(eye: eye, target: target, fovY: fovY, aspect: a, near: near, far: far,
+                                       view: view, projection: projection, viewProjection: projection * view)
+    }
+
+    /// `camera`'s unit forward, right and up vectors (from its eye towards its target, +y up).
+    public static func viewBasis(_ camera: MicroscopicAuroraCamera) -> (forward: SIMD3<Double>, right: SIMD3<Double>,
+                                                                        up: SIMD3<Double>) {
+        let forward: SIMD3<Double> = unit(camera.target - camera.eye)
+        let right: SIMD3<Double> = unit(cross(forward, SIMD3(0, 1, 0)))
+        return (forward, right, cross(right, forward))
+    }
+
+    /// The fixed camera of R02-G19-03 for `aspect` (see ``camera(aspect:)``), unchanged.
+    static func authoredCamera(aspect: Double) -> MicroscopicAuroraCamera {
         let a: Double = usableAspect(aspect)
         let limit: Double = 1 - 2 * fitMargin
         var tanHalf: Double = 0
@@ -1047,6 +1320,21 @@ public enum MicroscopicAuroraSceneGeometry {
     /// The unit direction at `angle` (radians, anticlockwise from +x) in the plane z = 0.
     static func direction(_ angle: Double) -> SIMD3<Double> { SIMD3(cos(angle), sin(angle), 0) }
 
+    /// The dot product of `a` and `b`.
+    static func dot(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> Double { a.x * b.x + a.y * b.y + a.z * b.z }
+
+    /// The cross product `a` × `b`.
+    static func cross(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> SIMD3<Double> {
+        SIMD3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+    }
+
+    /// `v` scaled to unit length (`v` itself when its length is 0 or not finite).
+    static func unit(_ v: SIMD3<Double>) -> SIMD3<Double> {
+        let length: Double = dot(v, v).squareRoot()
+        guard length.isFinite, length > 0 else { return v }
+        return v / length
+    }
+
     /// Collects vertices with fallback colours and triangles wound counter-clockwise seen from the eye (+z) or from
     /// outside a capsule.
     struct Parts {
@@ -1054,8 +1342,33 @@ public enum MicroscopicAuroraSceneGeometry {
         var builder: MeshBuilder = MeshBuilder()
         /// One colour per welded vertex.
         var colours: [Vec4] = []
-        /// The side every flat piece faces: towards the eye.
+        /// The side every flat piece faces: towards the authored eye (every orbit's eye is on this side of the dish).
         static let facing: SIMD3<Double> = SIMD3(0, 0, 1)
+        /// The camera the backdrop faces with its unit view basis (feature 484); nil for the authored camera, whose
+        /// pieces are built exactly as in R02-G19-03.
+        let view: (camera: MicroscopicAuroraCamera, forward: SIMD3<Double>, right: SIMD3<Double>,
+                   up: SIMD3<Double>)?
+
+        /// Parts built for the authored camera.
+        init() { view = nil }
+
+        /// Parts built for `camera` (feature 484): the authored parts when it is the authored camera (its eye and
+        /// target), else parts whose backdrop faces its eye and whose glow lifts towards it.
+        init(camera: MicroscopicAuroraCamera) {
+            typealias G = MicroscopicAuroraSceneGeometry
+            if camera.eye == G.eye && camera.target == G.lookAt {
+                view = nil
+            } else {
+                let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = G.viewBasis(camera)
+                view = (camera: camera, forward: basis.forward, right: basis.right, up: basis.up)
+            }
+        }
+
+        /// The unit direction towards the eye: +z for the authored camera, else −forward.
+        var towardsEye: SIMD3<Double> {
+            guard let v = view else { return Parts.facing }
+            return v.forward * -1
+        }
 
         /// Adds (or welds) a vertex at `p` with a_normal `slot` and uv (`code`, `local`); its fallback colour is
         /// `colour` (default the code's).

@@ -3,7 +3,7 @@
 // declared uniform listed (equal to the uniform name constants the scene sets) and used in its stage, no time input,
 // at most 16 vec4 uniform slots per program, no texture sampler, no `discard`, no loop (so no unbounded one), vertex
 // outputs matching fragment inputs, balanced braces, ASCII-only sources, the attribute names and locations (the
-// `ShaderMeshRenderer` streams), the material code table (distinct, ordered 0 … 19, each selected by the vertex shader
+// `ShaderMeshRenderer` streams), the material code table (distinct, ordered 0 … 21, each selected by the vertex shader
 // with its palette colour and handled exactly once by the fragment shader, decoded back), the ribbon's along
 // coordinate carried in uv, the GLSL palette constants parsing back to `MicroscopicAuroraPalette` within 1/255 (and
 // 1e-6), the layered capsule shading (flat on level-2), the signed-distance references (edge, ribbon, cell square,
@@ -11,6 +11,10 @@
 // a won level, the still backdrop gradient, the glow per kind, the glow gain per tier (0 at level-2) and the Reduce
 // Flashing cap, and, when `glslangValidator` is installed, a real front-end compile of each source (skipped
 // otherwise). Test data uses explicit types and plain loops (CI type-check rule).
+//
+// Feature 484 (R02-G19-04) T-R02G1904-002 (FR-R02G1904-002 … 004): the table grows to 0 … 21 with 20 `ghostWell` (well
+// colour, strip coverage at `ghostAlpha`) and 21 `scrubber` (rim colour, strip coverage), 0 … 19 unchanged; decoding
+// clamps to 21; each new code is selected by the vertex shader and handled once by the fragment shader.
 import Foundation
 import Testing
 @testable import MicroscopicAuroraCore
@@ -392,7 +396,7 @@ import Testing
         #expect(fragment.contains("const vec3 MA_ABYSS_TOP = vec3(0.043137, 0.164706, 0.149020);"))
         let glowF: String = Shaders.glowFragment
         let floats: [(name: String, value: Double, source: String)] = [
-            (name: "MA_MAX_MATERIAL", value: 19, source: vertex),
+            (name: "MA_MAX_MATERIAL", value: 21, source: vertex),
             (name: "MA_ALONG_SCALE", value: Shaders.alongScale, source: vertex),
             (name: "MA_EDGE_FEATHER", value: Shaders.edgeFeather, source: fragment),
             (name: "MA_RIBBON_FEATHER", value: Shaders.ribbonFeather, source: fragment),
@@ -407,6 +411,7 @@ import Testing
             (name: "MA_WON_LIFT", value: Shaders.wonLift, source: fragment),
             (name: "MA_MARK_FEATHER", value: Shaders.markFeather, source: fragment),
             (name: "MA_RING_HALF", value: Shaders.markRingHalf, source: fragment),
+            (name: "MA_GHOST_ALPHA", value: Shaders.ghostAlpha, source: fragment),
             (name: "MA_GLOW_WEIGHT", value: Shaders.glowWeight, source: glowF),
             (name: "MA_RIBBON_REST", value: Shaders.ribbonRest, source: glowF),
             (name: "MA_MAX_GAIN", value: Shaders.maxGlowGain, source: glowF),
@@ -422,7 +427,7 @@ import Testing
         let names: [String] = [
             "backdrop", "field", "frond", "rim", "stencil", "litCell", "strayCell", "siteRing", "wellSpiral",
             "wellArrow", "ribbon", "swimmer", "swimmerTail", "gaugeTrack", "requirementTick", "markMet", "markUnmet",
-            "barLit", "barUnlit", "broken",
+            "barLit", "barUnlit", "broken", "ghostWell", "scrubber",
         ]
         #expect(Material.allCases.count == names.count)
         #expect(Shaders.materials.count == names.count)
@@ -448,7 +453,7 @@ import Testing
         }
         #expect(codes.count == names.count)
         #expect(Material.decode(-4) == .backdrop)
-        #expect(Material.decode(99) == .broken)
+        #expect(Material.decode(99) == .scrubber)
         #expect(Material.decode(Double.nan) == .backdrop)
         // The vertex shader selects every material's colour with its code, in code order.
         let vertex: String = Shaders.dishVertex
@@ -487,11 +492,49 @@ import Testing
         #expect(Material.barLit.baseColour == Palette.actionsLit)
         #expect(Material.barUnlit.baseColour == Palette.actionsUnlit)
         #expect(Material.broken.baseColour == Palette.broken)
+        #expect(Material.ghostWell.baseColour == Palette.well)
+        #expect(Material.scrubber.baseColour == Palette.rim)
         // The lit bar reads heliotrope: blue above green by more than the frame check's 0.08.
         #expect(Palette.actionsLit.z - Palette.actionsLit.y >= 0.08)
         // The gauge track and the rim differ from the backdrop by more than the frame check's 0.1.
         #expect(Self.luminance(Material.gaugeTrack.baseColour) - Self.luminance(Palette.abyssTop) >= 0.1)
         #expect(Self.luminance(Material.rim.baseColour) - Self.luminance(Palette.abyssTop) >= 0.1)
+    }
+
+    /// Feature 484: the ghost well and the scrubber materials, 0 … 19 unchanged.
+    @Test func ghostWellAndScrubberMaterials() {
+        #expect(Material.ghostWell.rawValue == 20 && Material.scrubber.rawValue == 21)
+        #expect(Material.allCases.count == 22)
+        #expect(Material.broken.rawValue == 19 && Material.backdrop.rawValue == 0)
+        #expect(Material.ghostWell.paletteConstant == "MA_WELL" && Material.scrubber.paletteConstant == "MA_RIM")
+        #expect(Material.decode(20.4) == .ghostWell && Material.decode(21.49) == .scrubber)
+        #expect(Material.decode(19.4) == .broken && Material.decode(1_000) == .scrubber)
+        // The fallback colours.
+        #expect(MicroscopicAuroraSceneGeometry.colour(of: 20) == Palette.well)
+        #expect(MicroscopicAuroraSceneGeometry.colour(of: 21) == Palette.rim)
+        #expect(MicroscopicAuroraSceneGeometry.colour(of: 22) == Palette.broken)
+        // The vertex shader selects them after the broken colour; the fragment shader treats the scrubber as a strip
+        // and the ghost as a strip at the ghost alpha.
+        let vertex: String = Shaders.dishVertex
+        #expect(vertex.contains("base = mix(base, MA_WELL, isCode(m, 20.0));"))
+        #expect(vertex.contains("base = mix(base, MA_RIM, isCode(m, 21.0));"))
+        #expect(vertex.contains("const float MA_MAX_MATERIAL = 21.000000;"))
+        let fragment: String = Shaders.dishFragment
+        #expect(fragment.contains("isCode(m, 19.0) + isCode(m, 21.0);"))
+        #expect(fragment.contains("float ghost = isCode(m, 20.0);"))
+        #expect(fragment.contains("coverage = coverage + edge * ghost * MA_GHOST_ALPHA;"))
+        #expect(fragment.contains("const float MA_GHOST_ALPHA = 0.500000;"))
+        // The CPU reference of the ghost's coverage.
+        #expect(Shaders.ghostAlpha > 0 && Shaders.ghostAlpha < 1)
+        #expect(Shaders.ghostCoverage(local: 0) == Shaders.ghostAlpha)
+        #expect(Shaders.ghostCoverage(local: 1) == 0)
+        #expect(Shaders.ghostCoverage(local: Double.nan) == 0)
+        #expect(Shaders.ghostCoverage(local: 0.9) == Shaders.edgeCoverage(local: 0.9) * Shaders.ghostAlpha)
+        // The scrubber reads against the backdrop like the rim (the frame check's 0.1).
+        #expect(Self.luminance(Material.scrubber.baseColour) - Self.luminance(Palette.abyssTop) >= 0.1)
+        // A ribbon code still decodes to the ribbon; codes above the table clamp to the scrubber.
+        #expect(Material.decode(Shaders.ribbonCode(along: 1)) == .ribbon)
+        #expect(Shaders.ribbonAlong(code: 21) == 0)
     }
 
     @Test func theRibbonsAlongCoordinateTravelsInUV() {

@@ -17,7 +17,7 @@
 // 473); the shown tick is chosen by the adapter and baked into the geometry, so Reduce Motion needs no shader input.
 //
 // Vertex streams (the geometry states the same contract): `a_uv.x` is the material code (``MicroscopicAuroraMaterial``,
-// 0 … 19) — on a ribbon plus ``MicroscopicAuroraShaders/alongScale`` times the along coordinate (0 at the tail, 1 at
+// 0 … 21) — on a ribbon plus ``MicroscopicAuroraShaders/alongScale`` times the along coordinate (0 at the tail, 1 at
 // the head; ``MicroscopicAuroraShaders/ribbonCode(along:)``), so the tail fade travels in uv — `a_uv.y` the primary
 // local coordinate and `a_normal` the capsule normal or a secondary local coordinate. Per material: on the backdrop
 // `a_uv.y` is the height h (0 at the bottom, 1 at the top), `a_normal` zero; on a flat fill (field, arrowhead)
@@ -48,11 +48,18 @@
 // the glow program 7: u_mvp 4, u_glowGain, u_glowLimit and u_won 1 each), no texture samplers, no image assets, no
 // `discard` and no loops at all (so every loop is bounded). Output is premultiplied alpha. Palette constants are
 // written with six fixed decimals from `MicroscopicAuroraPalette`, so the shader colours equal the CPU's within 1e-6.
+//
+// Feature 484 (R02-G19-04) T-R02G1904-002 (FR-R02G1904-002, 003, 004) adds two materials, codes 0 … 19 unchanged:
+// 20 ``MicroscopicAuroraMaterial/ghostWell`` — the dragged well drawn at its target while a drop is previewed (the
+// spiral as strips, the arrowhead as a flat fill), in the well colour at ``MicroscopicAuroraShaders/ghostAlpha`` of
+// the strip coverage — and 21 ``MicroscopicAuroraMaterial/scrubber`` — the swim scrubber's track and its mark at the
+// shown tick (strips), in the rim colour. Both are strips to the fragment shader (`a_uv.y` the across coordinate, 0 on
+// a flat fill). The dish fragment shader's constants grow by one (`MA_GHOST_ALPHA`); the uniforms are unchanged.
 
 import Foundation
 
 /// The material code a dish-program vertex carries in `a_uv.x` (FR-R02G1903-001, 002): one per kind of element the
-/// geometry draws, 0 … 19. The geometry writes ``code`` (a ribbon writes
+/// geometry draws, 0 … 21 (20 and 21 added by feature 484, R02-G19-04). The geometry writes ``code`` (a ribbon writes
 /// ``MicroscopicAuroraShaders/ribbonCode(along:)``); the dish vertex shader selects ``paletteConstant``.
 public enum MicroscopicAuroraMaterial: Int, Sendable, CaseIterable, Hashable {
     /// The water backdrop quad (opaque; `a_uv.y` height h 0 … 1), the still gradient from abyss to abyss top.
@@ -97,6 +104,13 @@ public enum MicroscopicAuroraMaterial: Int, Sendable, CaseIterable, Hashable {
     /// What a failure names: the escaping swimmer or its rim mark, a swimmer outside the largest group, an unlit
     /// stencil outline, the named cell (strip or capsule geometry in the broken colour).
     case broken = 19
+    /// The dragged well drawn as a ghost at its target while a drop is previewed (feature 484, R02-G19-04): the
+    /// spiral (strip) and the arrowhead (flat fill) in the well colour at ``MicroscopicAuroraShaders/ghostAlpha`` of
+    /// the strip coverage.
+    case ghostWell = 20
+    /// The swim scrubber below the actions bars (feature 484, R02-G19-04): its track and its mark at the shown tick
+    /// (strips), rim colour.
+    case scrubber = 21
 
     /// The value the geometry writes into `a_uv.x` (a ribbon adds its along coordinate; see
     /// ``MicroscopicAuroraShaders/ribbonCode(along:)``).
@@ -108,12 +122,12 @@ public enum MicroscopicAuroraMaterial: Int, Sendable, CaseIterable, Hashable {
         case .backdrop: return "MA_ABYSS"
         case .field: return "MA_FIELD"
         case .frond: return "MA_FROND"
-        case .rim: return "MA_RIM"
+        case .rim, .scrubber: return "MA_RIM"
         case .stencil, .gaugeTrack: return "MA_STENCIL"
         case .litCell: return "MA_LIT"
         case .strayCell: return "MA_STRAY"
         case .siteRing, .swimmerTail: return "MA_SITE"
-        case .wellSpiral, .wellArrow, .requirementTick: return "MA_WELL"
+        case .wellSpiral, .wellArrow, .requirementTick, .ghostWell: return "MA_WELL"
         case .ribbon: return "MA_RIBBON"
         case .swimmer: return "MA_SWIMMER"
         case .markMet: return "MA_MET"
@@ -132,12 +146,12 @@ public enum MicroscopicAuroraMaterial: Int, Sendable, CaseIterable, Hashable {
         return MicroscopicAuroraPalette.abyss
     }
 
-    /// The material of code `x` as the vertex shader decodes it: rounded to the nearest integer and clamped to 0 … 19
+    /// The material of code `x` as the vertex shader decodes it: rounded to the nearest integer and clamped to 0 … 21
     /// (non-finite counts as the backdrop). A ribbon code with its along share (at most ``alongScale`` above 10)
     /// decodes to the ribbon.
     public static func decode(_ x: Double) -> MicroscopicAuroraMaterial {
         guard x.isFinite else { return .backdrop }
-        let maxCode: Double = Double(MicroscopicAuroraMaterial.broken.rawValue)
+        let maxCode: Double = Double(MicroscopicAuroraMaterial.scrubber.rawValue)
         let m: Int = Int(min(max((x + 0.5).rounded(.down), 0), maxCode))
         return MicroscopicAuroraMaterial(rawValue: m) ?? .backdrop
     }
@@ -182,7 +196,7 @@ public enum MicroscopicAuroraShaders {
         (name: "a_uv", location: 2),
     ]
 
-    /// Every material as (Swift name, code, GLSL palette constant the dish vertex shader selects), codes 0 … 19.
+    /// Every material as (Swift name, code, GLSL palette constant the dish vertex shader selects), codes 0 … 21.
     public static var materials: [(name: String, code: Float, constant: String)] {
         var result: [(name: String, code: Float, constant: String)] = []
         for material in MicroscopicAuroraMaterial.allCases {
@@ -281,6 +295,8 @@ public enum MicroscopicAuroraShaders {
     /// The quad-local extent the geometry's cell and mark quads span on each axis (-extent … +extent), room for the
     /// feather (a lit cell inset by 10 % fills -1 … +1 of a quad spanning the whole cell).
     public static let markQuadExtent: Double = 1.25
+    /// The share of the strip coverage the ghost well is drawn with (feature 484): a preview, not a placed well.
+    public static let ghostAlpha: Double = 0.5
 
     /// The alpha weight of the glow, times the glow gain, the glow factor and the fade.
     public static let glowWeight: Double = 0.5
@@ -339,7 +355,7 @@ public enum MicroscopicAuroraShaders {
     const vec3 MA_ACTIONS_LIT = \(vec3Literal(MicroscopicAuroraPalette.actionsLit));
     const vec3 MA_ACTIONS_UNLIT = \(vec3Literal(MicroscopicAuroraPalette.actionsUnlit));
     const vec3 MA_BROKEN = \(vec3Literal(MicroscopicAuroraPalette.broken));
-    const float MA_MAX_MATERIAL = \(fixed(Double(MicroscopicAuroraMaterial.broken.rawValue)));
+    const float MA_MAX_MATERIAL = \(fixed(Double(MicroscopicAuroraMaterial.scrubber.rawValue)));
     const float MA_ALONG_SCALE = \(fixed(alongScale));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
@@ -367,6 +383,8 @@ public enum MicroscopicAuroraShaders {
         base = mix(base, MA_ACTIONS_LIT, isCode(m, 17.0));
         base = mix(base, MA_ACTIONS_UNLIT, isCode(m, 18.0));
         base = mix(base, MA_BROKEN, isCode(m, 19.0));
+        base = mix(base, MA_WELL, isCode(m, 20.0));
+        base = mix(base, MA_RIM, isCode(m, 21.0));
         base = mix(base, MA_LIT, isCode(m, 4.0) * won);
         v_base = base;
         v_aux = a_normal;
@@ -410,6 +428,7 @@ public enum MicroscopicAuroraShaders {
     const float MA_WON_LIFT = \(fixed(wonLift));
     const float MA_MARK_FEATHER = \(fixed(markFeather));
     const float MA_RING_HALF = \(fixed(markRingHalf));
+    const float MA_GHOST_ALPHA = \(fixed(ghostAlpha));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
@@ -426,7 +445,8 @@ public enum MicroscopicAuroraShaders {
         float sky = isCode(m, 0.0);
         float flatFill = isCode(m, 1.0) + isCode(m, 9.0);
         float strip = isCode(m, 2.0) + isCode(m, 3.0) + isCode(m, 4.0) + isCode(m, 7.0) + isCode(m, 8.0);
-        strip = strip + isCode(m, 13.0) + isCode(m, 14.0) + isCode(m, 19.0);
+        strip = strip + isCode(m, 13.0) + isCode(m, 14.0) + isCode(m, 19.0) + isCode(m, 21.0);
+        float ghost = isCode(m, 20.0);
         float cellQuad = isCode(m, 5.0) + isCode(m, 6.0);
         float isRibbon = isCode(m, 10.0);
         float isCapsule = isCode(m, 11.0) + isCode(m, 12.0);
@@ -455,6 +475,7 @@ public enum MicroscopicAuroraShaders {
         rgb = mix(rgb, capsule, isCapsule);
         float coverage = sky + flatFill;
         coverage = coverage + edge * (strip + fan + isCapsule);
+        coverage = coverage + edge * ghost * MA_GHOST_ALPHA;
         coverage = coverage + cell * cellQuad;
         coverage = coverage + ribbonCover * isRibbon;
         coverage = coverage + filled * isMet + hollow * isUnmet;
@@ -539,7 +560,7 @@ public enum MicroscopicAuroraShaders {
     /// ``alongScale`` clamped to 0 … 1 (non-finite counts as 0).
     public static func ribbonAlong(code: Double) -> Double {
         guard code.isFinite else { return 0 }
-        let maxCode: Double = Double(MicroscopicAuroraMaterial.broken.rawValue)
+        let maxCode: Double = Double(MicroscopicAuroraMaterial.scrubber.rawValue)
         let m: Double = min(max((code + 0.5).rounded(.down), 0), maxCode)
         return unit((code - m) / alongScale)
     }
@@ -565,6 +586,12 @@ public enum MicroscopicAuroraShaders {
     public static func edgeCoverage(local: Double) -> Double {
         guard local.isFinite else { return 0 }
         return 1 - smoothstep(1 - edgeFeather, 1, min(abs(local), 1))
+    }
+
+    /// The ghost well's coverage at local coordinate `local` (feature 484): ``edgeCoverage(local:)`` times
+    /// ``ghostAlpha`` (non-finite counts as the outline, 0 coverage).
+    public static func ghostCoverage(local: Double) -> Double {
+        edgeCoverage(local: local) * ghostAlpha
     }
 
     /// A ribbon's soft-edge coverage at across coordinate `across`: 1 - smoothstep(1 - ``ribbonFeather``, 1, |across|)

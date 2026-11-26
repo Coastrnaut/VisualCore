@@ -5,6 +5,17 @@
 // smallest coherence with their requirements, the failure, the stage, the actions left and the budget, the level number
 // and the presentation time; plus the palette and the three quality tiers. The renderer never holds the kernel, so no
 // drawing result can change the game (renderer purity), and every drawn swimmer stands at a kernel position.
+//
+// Feature 484 (R02-G19-04) T-R02G1904-002 (FR-R02G1904-002, 004, 005; SC-R02G1904-003) adds the preview of a well drop
+// and the freeze. ``MicroscopicAuroraSceneSnapshot/previewing(slot:target:level:)`` returns a copy whose `preview`
+// holds the slot, the target (a site or removal), the previewed wells and the previewed swim — the report (density,
+// lit stencil cells, coverage, smallest coherence, failure, ticks), every swimmer's positions and velocities and the
+// stray cells — computed with the kernel's own `MicroscopicAuroraDish.swim` of the previewed wells (placed wells in
+// slot order, as the play recomputes its report); nothing is approximated. Only a drop the play would accept is
+// previewed (the slot holds a well; a site the level allows, not the well's own and not held by another slot; or
+// removal); anything else gives the copy without a preview. ``MicroscopicAuroraSceneSnapshot/freezing(_:)`` sets `frozen`.
+// Presentation only: the preview and the freeze never enter the digest, the game state or the kernel; every snapshot
+// made by the initialisers has no preview and is not frozen, so the existing drawing is unchanged.
 import Foundation
 
 /// The palette of Microscopic Aurora, as linear colours 0 … 1 (sea glass green, heliotrope and white on an abyss).
@@ -89,6 +100,114 @@ public struct MicroscopicAuroraTier: Sendable, Equatable, Hashable {
     }
 }
 
+/// Where a dragged well would go (feature 484, R02-G19-04): a site, or off the dish (removal).
+public enum MicroscopicAuroraPreviewTarget: Sendable, Equatable {
+    /// The well moved to this site.
+    case site(MicroscopicAuroraCell)
+    /// The well removed from its slot.
+    case removal
+}
+
+/// The preview of one well drop (feature 484, R02-G19-04): the previewed wells and the kernel's swim of them.
+/// Presentation only; never in the digest.
+public struct MicroscopicAuroraPreview: Sendable, Equatable {
+    /// The slot of the dragged well, 0 … 2.
+    public let slot: Int
+    /// Where the well would go.
+    public let target: MicroscopicAuroraPreviewTarget
+    /// The wells as they would be after the drop, one entry per slot.
+    public let wells: [MicroscopicAuroraWell?]
+    /// The kernel's report of the previewed wells (density, lit stencil cells, coverage, smallest coherence, failure,
+    /// ticks swum).
+    public let report: MicroscopicAuroraReport
+    /// Each swimmer's position at ticks 0 … report.ticks of the previewed swim (the kernel's), indexed [swimmer][tick].
+    public let positions: [[MicroscopicAuroraPoint]]
+    /// Each swimmer's velocity at ticks 0 … report.ticks, indexed [swimmer][tick]: the level's starting velocity at
+    /// tick 0 and the kernel's position step p(t) − p(t − 1) after it (exactly the velocity the kernel's step sets).
+    public let velocities: [[MicroscopicAuroraPoint]]
+    /// The cells lit outside the stencil by the previewed swim, row-major.
+    public let stray: [MicroscopicAuroraCell]
+
+    /// A preview of the given values (unchecked).
+    public init(slot: Int, target: MicroscopicAuroraPreviewTarget, wells: [MicroscopicAuroraWell?],
+                report: MicroscopicAuroraReport, positions: [[MicroscopicAuroraPoint]],
+                velocities: [[MicroscopicAuroraPoint]], stray: [MicroscopicAuroraCell]) {
+        self.slot = slot
+        self.target = target
+        self.wells = wells
+        self.report = report
+        self.positions = positions
+        self.velocities = velocities
+        self.stray = stray
+    }
+
+    /// The previewed coverage in tenths of a percent.
+    public var coverage: Int { report.coverage }
+    /// The previewed smallest coherence.
+    public var coherence: Int { report.smallestCoherence }
+    /// The previewed failure, nil when the previewed swim wins.
+    public var failure: MicroscopicAuroraFailure? { report.failure }
+    /// The previewed lit stencil cells, row-major.
+    public var litStencil: [MicroscopicAuroraCell] { report.litStencil }
+    /// The previewed trail density, row-major (576 values).
+    public var density: [Int] { report.density }
+    /// The ticks the previewed swim swam.
+    public var ticksSwum: Int { report.ticks }
+
+    /// The preview of moving slot `slot`'s well to `target` in `level` with `wells`, swum by the kernel
+    /// (`MicroscopicAuroraDish.swim` of the previewed placed wells in slot order, keeping positions); nil when the play
+    /// would refuse the drop (slot out of range or empty; a site the level does not allow, the well's own site or a
+    /// site held by another slot).
+    public static func of(slot: Int, target: MicroscopicAuroraPreviewTarget, wells: [MicroscopicAuroraWell?],
+                          level: MicroscopicAuroraLevel) -> MicroscopicAuroraPreview? {
+        guard wells.indices.contains(slot), let well = wells[slot] else { return nil }
+        var next: [MicroscopicAuroraWell?] = wells
+        switch target {
+        case .site(let cell):
+            guard level.allows(cell), cell != well.cell else { return nil }
+            for other in wells.indices where other != slot {
+                if let placed = wells[other], placed.cell == cell { return nil }
+            }
+            next[slot] = MicroscopicAuroraWell(cell: cell, strength: well.strength, sense: well.sense)
+        case .removal:
+            next[slot] = nil
+        }
+        var placed: [MicroscopicAuroraWell] = []
+        for entry in next {
+            if let w = entry { placed.append(w) }
+        }
+        let swim: (report: MicroscopicAuroraReport, positions: [[MicroscopicAuroraPoint]]) =
+            MicroscopicAuroraDish.swim(level, wells: placed, keepPositions: true)
+        let count: Int = level.swimmers.count
+        var positions: [[MicroscopicAuroraPoint]] = []
+        var velocities: [[MicroscopicAuroraPoint]] = []
+        for i in 0..<count {
+            var track: [MicroscopicAuroraPoint] = []
+            var speeds: [MicroscopicAuroraPoint] = []
+            for (tick, frame) in swim.positions.enumerated() {
+                track.append(frame[i])
+                if tick == 0 {
+                    speeds.append(level.swimmers[i].velocity)
+                } else {
+                    let before: MicroscopicAuroraPoint = swim.positions[tick - 1][i]
+                    speeds.append(MicroscopicAuroraPoint(x: frame[i].x - before.x, y: frame[i].y - before.y))
+                }
+            }
+            positions.append(track)
+            velocities.append(speeds)
+        }
+        let stencilSet: Set<MicroscopicAuroraCell> = Set(level.stencil)
+        var stray: [MicroscopicAuroraCell] = []
+        for index in swim.report.density.indices where swim.report.density[index] >= level.threshold {
+            let cell = MicroscopicAuroraCell(row: index / MicroscopicAuroraDish.cells,
+                                             column: index % MicroscopicAuroraDish.cells)
+            if !stencilSet.contains(cell) { stray.append(cell) }
+        }
+        return MicroscopicAuroraPreview(slot: slot, target: target, wells: next, report: swim.report,
+                                        positions: positions, velocities: velocities, stray: stray)
+    }
+}
+
 /// An immutable copy of what the renderer may read (see the file header).
 public struct MicroscopicAuroraSceneSnapshot: Sendable, Equatable {
     /// The enclosure radius in cells.
@@ -137,6 +256,10 @@ public struct MicroscopicAuroraSceneSnapshot: Sendable, Equatable {
     public let levelNumber: Int
     /// The presentation time in seconds (never negative or non-finite).
     public let time: Double
+    /// The previewed well drop; nil when no preview (feature 484; presentation only; never in the digest).
+    public private(set) var preview: MicroscopicAuroraPreview? = nil
+    /// Whether the field is frozen: a preview then shows only the gauges (feature 484; presentation only).
+    public private(set) var frozen: Bool = false
 
     /// A snapshot of `play` with tick `shownTick` shown (clamped to 0 … ticks swum).
     public init(play: MicroscopicAuroraPlay, shownTick: Int, levelNumber: Int, time: Double) {
@@ -223,6 +346,34 @@ public struct MicroscopicAuroraSceneSnapshot: Sendable, Equatable {
 
     /// Whether the play is won.
     public var isWon: Bool { stage == .won }
+
+    /// This snapshot with slot `slot`'s well previewed at `target` (feature 484): ``preview`` is
+    /// ``MicroscopicAuroraPreview/of(slot:target:wells:level:)`` of this snapshot's wells in `level` (the snapshot's
+    /// level), the kernel's swim; a drop the play would refuse gives this snapshot without a preview. Presentation
+    /// only: nothing else changes.
+    public func previewing(slot: Int, target: MicroscopicAuroraPreviewTarget,
+                           level: MicroscopicAuroraLevel) -> MicroscopicAuroraSceneSnapshot {
+        var copy: MicroscopicAuroraSceneSnapshot = self
+        copy.preview = MicroscopicAuroraPreview.of(slot: slot, target: target, wells: wells, level: level)
+        return copy
+    }
+
+    /// This snapshot without a preview (feature 484; presentation only).
+    public func clearingPreview() -> MicroscopicAuroraSceneSnapshot {
+        var copy: MicroscopicAuroraSceneSnapshot = self
+        copy.preview = nil
+        return copy
+    }
+
+    /// This snapshot with ``frozen`` set to `frozen` (feature 484; presentation only).
+    public func freezing(_ frozen: Bool) -> MicroscopicAuroraSceneSnapshot {
+        var copy: MicroscopicAuroraSceneSnapshot = self
+        copy.frozen = frozen
+        return copy
+    }
+
+    /// Whether the previewed swim is drawn in place of the committed one: a preview while not frozen.
+    public var drawsPreviewSwim: Bool { preview != nil && !frozen }
 
     /// Swimmer `index`'s position at the shown tick.
     public func position(_ index: Int) -> MicroscopicAuroraPoint { positions[index][shownTick] }
