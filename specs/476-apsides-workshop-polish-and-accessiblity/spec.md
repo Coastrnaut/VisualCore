@@ -57,25 +57,25 @@ the engine as `action.rule.<code>`).
   `r02-g18.level` "That level could not be made.", `r02-g18.not-whole` "That value must be a whole number.",
   `r02-g18.tick` "That tick is outside the revolution.", any other code "That action was refused." (the engine's
   `action.rule.` prefix read as the bare code). A revealed hint is announced (`state`) with its text. Moving the pending
-  orbit, drag previews, the shown tick and the view are not announced. Texts are a pure function of the old and new
-  core (and the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact:
-  FR-R02G1806-002; SC-R02G1806-002.
+  orbit, drag previews, the shown tick and the view are not announced. Texts are a pure function of the old and new core
+  (and the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact: FR-R02G1806-002;
+  SC-R02G1806-002.
 - Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted tuning, undo or redo; `success`
-  for a won play; `warning` for a failed play; `error` for a refusal; moving the pending orbit, previews, the shown tick,
-  the view and level changes play none. The play plays only its outcome. The shared planners' intervals apply. Impact:
-  FR-R02G1806-003; SC-R02G1806-002.
+  for a won play; `warning` for a failed play; `error` for a refusal; moving the pending orbit, previews, the shown
+  tick, the view and level changes play none. The play plays only its outcome. The shared planners' intervals apply.
+  Impact: FR-R02G1806-003; SC-R02G1806-002.
 - Q: How are fades done and measured under Reduce Flashing? → A: as feature 466: the presenter keeps light levels for
   the glow (0.7 while playing, 1 once won, 0.35 once failed) and the won look (1 once won, else 0), each easing toward
   its target by the frame clock's elapsed time between drawn frames (0.15 s normally, 0.45 s under Reduce Flashing,
   linear; under Reduce Flashing a fade that has started finishes before it may turn back); the scene draws the eased
   levels (the glow gain times the glow level, `u_won` the won level, and in the fallback the won colours by the won
-  level, rebuilt when the level moves by a tenth or more); the state and digest never see them. The orbit, wedges,
-  apsis markers, planets and gauges change only with the player's actions and are not faded. The star pulse (0.42
-  cycles per second, far below 3) is held at 1 under Reduce Motion and under Reduce Flashing, so the sky is still
-  between actions under either. The measure: sampling the drawn levels every 1/60 s through a scripted win and
-  adversarial flicker (a tuning undone and redone every frame, retry, level changes), no element crosses half its range
-  more than 3 times per second, and every complete one-way fade of more than half the range takes at least 0.4 s under
-  Reduce Flashing. Impact: FR-R02G1806-004; SC-R02G1806-003.
+  level, rebuilt when the level moves by a tenth or more); the state and digest never see them. The orbit, wedges, apsis
+  markers, planets and gauges change only with the player's actions and are not faded. The star pulse (0.42 cycles per
+  second, far below 3) is held at 1 under Reduce Motion and under Reduce Flashing, so the sky is still between actions
+  under either. The measure: sampling the drawn levels every 1/60 s through a scripted win and adversarial flicker (a
+  tuning undone and redone every frame, retry, level changes), no element crosses half its range more than 3 times per
+  second, and every complete one-way fade of more than half the range takes at least 0.4 s under Reduce Flashing.
+  Impact: FR-R02G1806-004; SC-R02G1806-003.
 - Q: Where does the sound choice live, and what are the audition and ambient recipes? → A: a Sound toggle in the panel,
   off by default, held by the presenter (presentation only; saving it is R02-G18-07). The pending orbit's tone is 220 Hz
   × 2^(n / 12) with n = (48 − a) / 4 rounded down (0 … 10: a larger orbit sounds lower, a whole step per 8 units of
@@ -87,12 +87,12 @@ the engine as `action.rule.<code>`).
   targets met in order, the actions left as a share of the budget and the stage: a root at 110 Hz times (1, 9/8, 5/4,
   4/3) for more than three quarters of the actions left, more than half, more than a quarter, or less; one partial per
   quarter of the targets met (floor of four times met over the target count, up to four), at the root times (5/4, 3/2,
-  2, 5/2)[q − 1] for q = 1 … quarters, each with the base gain; the root alone when less than a quarter is met; an added octave when won and
-  halved gains when failed; the loop's length is the longest the shared player accepts at which every partial has a
-  whole number of cycles (tested). The presenter rebuilds the loop only when the level opens, a tuning, undo, redo or
-  the play changes the quarters, the root step or the stage, or the toggle turns on, never per frame. Sound plays
-  exactly while the choice is on, the controls are on screen and the scene is active. Impact: FR-R02G1806-006;
-  SC-R02G1806-004.
+  2, 5/2)[q − 1] for q = 1 … quarters, each with the base gain; the root alone when less than a quarter is met; an added
+  octave when won and halved gains when failed; the loop's length is the longest the shared player accepts at which
+  every partial has a whole number of cycles (tested). The presenter rebuilds the loop only when the level opens, a
+  tuning, undo, redo or the play changes the quarters, the root step or the stage, or the toggle turns on, never per
+  frame. Sound plays exactly while the choice is on, the controls are on screen and the scene is active. Impact:
+  FR-R02G1806-006; SC-R02G1806-004.
 - Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
   styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
   system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the pending
