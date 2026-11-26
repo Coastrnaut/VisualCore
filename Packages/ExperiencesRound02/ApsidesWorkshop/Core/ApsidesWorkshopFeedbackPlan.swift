@@ -4,6 +4,9 @@
 // text), and the words of the panel's summary element. The presenter only routes the plan through the shared feedback
 // route (the person's haptics switch, the shared planners' rate limits); a plan never changes state. Modelled on
 // feature 466's `CelestialEclipseLabFeedbackPlan`.
+// Feature 477 (R02-G18-07): the mode `replay` is named "replay"; a replay step is a tuning or play record, announced
+// like the action it applies; a replayed win claims no stars (replay awards none); the three replay refusals have their
+// own words.
 //
 // Words: the level's own words (`ApsidesWorkshopLevel.orbitDescription(_:)`: "size a, eccentricity 0.ee, periapsis at
 // d°" with the eccentricity k × 0.05 written with two decimals and the direction d × 15°; "sector s", "planet p"),
@@ -103,8 +106,10 @@ public struct ApsidesWorkshopFeedbackPlan: Sendable, Equatable {
     /// (`r02-g18.action`), "No actions are left: undo or retry." (`r02-g18.budget`), "The level has ended."
     /// (`r02-g18.stage`), "The play changed before the action arrived." (`r02-g18.stale`), "That level could not be
     /// made." (`r02-g18.level`), "That value must be a whole number." (`r02-g18.not-whole`), "That tick is outside the
-    /// revolution." (`r02-g18.tick`); any other code (the kernel's `r02-g18.malformed`, the engine's own codes such as
-    /// `action.out-of-range`) "That action was refused.".
+    /// revolution." (`r02-g18.tick`), "There is no saved solution to replay for this level." (`r02-g18.no-replay`),
+    /// "The replay is over." (`r02-g18.replay-end`), "Stop the replay first." (`r02-g18.replay`, feature 477); any
+    /// other code (the kernel's `r02-g18.malformed`, the engine's own codes such as `action.out-of-range`) "That action
+    /// was refused.".
     public static func refusalText(code: String) -> String {
         let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
         switch bare {
@@ -118,6 +123,10 @@ public struct ApsidesWorkshopFeedbackPlan: Sendable, Equatable {
         case ApsidesWorkshopError.level("").reasonCode: return "That level could not be made."
         case ApsidesWorkshopExperienceRule.notWhole: return "That value must be a whole number."
         case ApsidesWorkshopExperienceRule.tick: return "That tick is outside the revolution."
+        // Feature 477: the replay refusals.
+        case ApsidesWorkshopExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case ApsidesWorkshopExperienceRule.replayEnd: return "The replay is over."
+        case ApsidesWorkshopExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }
@@ -156,13 +165,13 @@ public struct ApsidesWorkshopFeedbackPlan: Sendable, Equatable {
             + "a budget of " + actionsWords(level.budget)
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay" (feature 477).
     public static func modeName(_ mode: ApsidesWorkshopMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
-        case .replay: "replay"   // feature 477
+        case .replay: "replay"
         }
     }
 
@@ -225,7 +234,7 @@ public struct ApsidesWorkshopFeedbackPlan: Sendable, Equatable {
     }
 
     /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars in campaign and daily,
-    /// never in practice), haptic `success`; or the failure explanation, haptic `warning`.
+    /// never in practice or replay, feature 477), haptic `success`; or the failure explanation, haptic `warning`.
     static func outcomePlan(_ core: ApsidesWorkshopExperienceCore) -> ApsidesWorkshopFeedbackPlan {
         let play: ApsidesWorkshopPlay = core.play
         if play.stage == .won {

@@ -34,7 +34,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G1807-003 [US1] [US2] [US3] Edit
+- [X] T-R02G1807-003 [US1] [US2] [US3] Edit — Verified 2026-11-26: 2026-11-26 host-2 exit 0, 242 Apsides host tests incl. 8 replay core tests (.autonomy/migration/checks/R02-G18-07.host-2.json); schema 3 and digest v3, migration 2 → 3, traces stored on wins, reconciliation on restore, replay.start/step/stop, settings.sound, replay refusal words, scenarios and manifest regenerated
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopExperienceCore.swift` (schema 3, migration
   2 → 3 "results with an empty trace and verified false, sound off", digest v3; a campaign or daily win records the
   winning effective-action trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions
