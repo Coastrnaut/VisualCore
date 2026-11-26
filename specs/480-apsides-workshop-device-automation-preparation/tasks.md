@@ -27,7 +27,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G1810-004 [P] [US2] Create `docs/apps/apsides-workshop/device-campaign.md` (agent B, modelled on
+- [X] T-R02G1810-004 [P] [US2] Create `docs/apps/apsides-workshop/device-campaign.md` (agent B, modelled on — Verified 2026-11-26: 2026-11-26: device-campaign.md rows AW-D1…AW-D8 agree with device-rows.json (procedure, pass, owner steps); validate_docs PASS, run-check docs exit=0 (.autonomy/migration/checks/R02-G18-10.docs.json)
   `docs/apps/apsides-workshop/device-campaign.md`, read against the gestures of feature 474: devices and order, D3 on
   iPadOS 26.5, owner actions as BLOCKED_OWNER_ACTION, every row AW-D1 … AW-D8 with devices, procedure, pass condition
   and "pending device campaign", no number claimed, the stress session only in the device campaign); `--name docs --
