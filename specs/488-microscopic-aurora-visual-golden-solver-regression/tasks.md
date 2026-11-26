@@ -48,7 +48,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1908-005 [US2] [US3] Create
+- [X] T-R02G1908-005 [US2] [US3] Create — Verified 2026-11-26: 2026-11-26 sim-27 exit 0: 68 simulator tests in 10 suites incl. RegressionGoldenFrameTests (16 frames) and RegressionMemoryTests (12 cycles, 30.1-34.1 MB) (.autonomy/migration/checks/R02-G19-08.sim-27.json)
   `Packages/ExperiencesRound02/MicroscopicAurora/ExperienceTests/MicroscopicAuroraRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/MicroscopicAurora/ExperienceTests/MicroscopicAuroraRegressionMemoryTests.swift` (agent C:
   the 16 frames rendered and checked against their descriptions with the feature-483 tolerances (each swimmer's centre
