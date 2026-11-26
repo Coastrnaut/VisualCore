@@ -72,7 +72,7 @@ R02-G18-04 (`git show <R02-G18-04 record commit>:<path>`).
 
 ## Phase 4: Story 5 — every move without gestures (P1)
 
-- [ ] T-R02G1904-004 [P] [US5] Create
+- [X] T-R02G1904-004 [P] [US5] Create — Verified 2026-11-26: host-4 exit 0: all 100 certified levels won through panel actions within budget (20 groups of 5) and panel undo/redo restores digests
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraPanelWinTests.swift`: all 100 certified
   levels won through panel actions only (FR-R02G1904-009; SC-R02G1904-005; each witness placement as the panel's slot,
   site, strength and sense sending one `well.place`, then Play; never more actions than the budget), split so each test
