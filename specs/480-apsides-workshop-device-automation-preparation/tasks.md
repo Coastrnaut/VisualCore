@@ -14,7 +14,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 2: Story 1 — the campaign knows what to run (P1) 🎯
 
-- [ ] T-R02G1810-002 [US1] Create `docs/apps/apsides-workshop/device-rows.json` (data-model.md: "schema 1, sorted keys";
+- [X] T-R02G1810-002 [US1] Create `docs/apps/apsides-workshop/device-rows.json` (data-model.md: "schema 1, sorted keys"; — Verified 2026-11-26: 2026-11-26: device-rows.json AW-D1…AW-D8 and release step device-rows-r02-g18; check_device_rows.py PASS (8 rows, 12 scenarios), run-check device-rows exit=0 (.autonomy/migration/checks/R02-G18-10.device-rows.json); release_check --only device-rows-r02-g18 1/1
   devices D1 → DEV1-R02-G18, D2 → DEV2-R02-G18, D3 → DEV3-R02-G18; the 12 scenarios of clarification Q2; rows AW-D1 …
   AW-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false only
   for AW-D6), covers, owner_steps, status "pending device campaign"; no result field); edit `scripts/release_check.py`
