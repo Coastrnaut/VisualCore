@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G19-05 (migration ledger, game feature of experience R02-G19) · ID namespace FR-R02G1905-###,
 SC-R02G1905-###, T-R02G1905-###
@@ -27,6 +27,68 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G19-01 … 04.
 - **Model:** feature 475 (Apsides Workshop's progression and teaching): hints from the current state, tutorial,
   failure text, progress and stars, daily and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+475's answers where the games agree. Facts checked in code (read-only, 2026-11-26): a report depends only on the set of
+wells (`MicroscopicAuroraDish.report(level, wells:)`); `MicroscopicAuroraSolver.plan` certifies a level with sites and no
+starting well by judging every set of 0, 1, 2 … wells on distinct sites (strengths 1 … 4, two senses), at most 1,200
+sets judged; the certified witnesses are 1 or 2 placements followed by the play; `place(slot:well:)` and `remove(slot:)`
+each spend 1 action, the play none, and placements off the level's sites are refused ("not a site"); the play ends the
+level won, or failed with `exit(swimmer, tick)`, `coherence(tick, group)`, `coverage(lit, needed)` or
+`connectedness(cell)`, all deterministic; undo works in playing, paused and failed plays, a won play is final; levels
+1 … 3 carry the tutorial flag; catalog budgets are 8 … 19 (1 … 24 allowed); levels have 3 … 6 sites; the adapter
+prepares level (seed mod 100) + 1, keeps the shown tick, the freeze, the preview and the orbit outside the play and
+snapshots `{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily multipliers
+are 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89 and 97.
+
+- Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
+  failed play's hint is "Undo the last action or retry the level." While playing: when the current wells already win,
+  the hint is "The trails already cover the stencil as one pattern: play the swim"; otherwise a bounded search from the
+  current wells looks for a winning set of wells reachable within min(actions left, 2) actions, where an action places a
+  well on a site no other well holds (into the first free slot, or replacing a slot's well) or takes a slot's well away;
+  one action is tried before two; the certified witness's next placement is tried first whenever the current wells are
+  a subset of the witness's wells (so exact hints from a level's start replay its witness), then removals by slot, then
+  placements by slot, site, strength 1 … 4 and sense (clockwise first); at most 1,200 sets judged. The first action of
+  the found sequence is the hint; when none is found: "No way to win was found in the actions left: undo the last
+  action or retry the level." Level 1 names the site or the well ("Use the site at row r, column c next" or "Take well
+  n away"); level 2 adds the sense ("Place a clockwise (or counterclockwise) well at the site at row r, column c");
+  level 3 the exact well ("Place well n at row r, column c with strength s, turning clockwise" or "counterclockwise";
+  "Take well n away"). Hints never change the state, are unlimited, do not affect stars and reset to level 1 after any
+  change of the play. Impact: FR-R02G1905-002; SC-R02G1905-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
+  instructions in order: (1) "Tap a marked site (or choose a site and press Place) to put a magnetic well there; the
+  trails and gauges show the new swim" — it advances once a placement has been accepted; (2) "Light every stencil cell
+  with the trails as one joined pattern, then press Play — a hint shows which site to use" — it advances once a second
+  action has been accepted or the level ends; (3) "A swimmer leaving the dish, the swarm splitting, too few lit cells or
+  a lit cell cut off from the pattern fails the swim: undo and try another well" — until the level ends.
+  `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G1905-001; SC-R02G1905-001.
+- Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted placement and removal
+  record, undone ones included: 3 when at most the certified witness's placement count, 2 when at most that + 2, else 1;
+  per level the best (least) actions spent of a won campaign play and its stars, a better result replacing a worse one;
+  level 1 open; a campaign win opens the next; `level.select [n]` opens any open level and refuses others
+  (`r02-g19.locked`); `level.next` moves to the next open level (refused when none, `r02-g19.locked`); the five bands of
+  20 are the certified difficulty bands. Impact: FR-R02G1905-004; SC-R02G1905-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 19) mod 100 + 1, negative day counts wrapped into 0 … 99 (19 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g19.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the budget raised to the kernel's
+  maximum (24); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G1905-005;
+  SC-R02G1905-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 475: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the shown tick, the freeze, a drag's
+  preview and the orbit stay presentation; the snapshot payload becomes schema 2 (`{level, mode, progress, records,
+  tutorial}`) with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its first
+  step on tutorial levels). A failure is explained from the play's failure, swimmers numbered from 1 and cells in the
+  level's words ("the cell at row r, column c"): an exit — "Swimmer s left the dish at tick t."; a split — "The swarm
+  split at tick t: its largest group had g swimmers, fewer than the n needed."; coverage — "Only l stencil cells were
+  lit; n were needed."; a cut-off cell — "The cell at row r, column c is lit but not joined to the pattern." — each
+  followed by "Undo the last action or retry the level." Impact: FR-R02G1905-003, 007; SC-R02G1905-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
