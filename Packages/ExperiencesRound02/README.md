@@ -971,3 +971,14 @@ only), `golden-frames.json`, the solver regression and `scripts/apsides_workshop
 pins the panel's identifiers and adds the stored schema examples, the app's interface tests (`AW`, chunk `a4`) and app
 unit tests. Feature 480 (R02-G18-10) adds its device-row definition and written campaign plan
 (`docs/apps/apsides-workshop/`), checked by `scripts/check_device_rows.py`; no device is contacted.
+
+## Microscopic Aurora (R02-G19, `r02-g19.microscopic-aurora`, free)
+
+`MicroscopicAuroraCore` (feature 481, R02-G19-01) is the playable rule kernel: the exact swim in deterministic integer
+arithmetic (`MicroscopicAuroraDish`: a round enclosure in a dish of 24 × 24 cells, one synchronous step of separation,
+alignment and cohesion plus the curl of up to three magnetic wells per tick with every division truncating toward zero
+and per-axis clamps, trail density per cell, the stencil's coverage, four-neighbour groups and the swarm's coherence),
+the judge (`exit`, `coherence`, `coverage`, `connectedness`), `MicroscopicAuroraLevel` (immutable, fingerprinted, JSON
+schema 1, with names in words), the play state `MicroscopicAuroraPlay` with stages, placements, removals and the play,
+records, undo and redo, and `MicroscopicAuroraPuzzle` (an R02-F23 `PuzzleRules` over well placements). See
+[docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).
