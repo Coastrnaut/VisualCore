@@ -68,8 +68,10 @@ evidence commands are found as described in Auto-Creator.md §19. Simulators are
    `test-without-building` chunks) and may use parallel simulator clones (`--parallel N`). **All system
    accessibility audits wait until device testing** (`VC_RUN_AUDITS=1` only there). A gate's interface evidence is
    one pass on the iOS 27.x phone. **Stopping a run:** TaskStop the whole loop; check `pgrep -fl xcodebuild` first.
-   **No summary after a step** (2026-11-18/19/22): after a commit or a reply to the owner (a side question
-   too) comes a tool call; a running chain is waited on in a bounded loop, never by ending the turn.
+   **No summary after a step** (2026-11-18/19/22/26): after a commit or a reply to the owner (a side question
+   too) comes a tool call; a running chain is waited on in a bounded loop, never by ending the turn. **A context
+   summary is no boundary** (2026-11-26): the first message after it carries `next` and the next skill, never a
+   recap of gates just recorded; "next is X" is never written, X is started.
    **A gate boundary is never a turn end** (2026-11-14): after `record` the next action is `next`;
    wrap-up only at a §28 stop.
    **Faster gates** (owner, 2026-11-14): iOS 27/26 runs in parallel; the next gate's Spec Kit steps start
