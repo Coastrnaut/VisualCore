@@ -9,7 +9,7 @@ R02-G18-04 (`git show <R02-G18-04 record commit>:<path>`).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1904-001 Baselines on the committed tree after R02-G19-03 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1904-001 Baselines on the committed tree after R02-G19-03 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: baselines exit 0 on the committed tree after R02-G19-03 (host, timing, round02-1, -2, -3c, -3e, -3f)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G19-03's
   rendering runs (exit 0)
 
