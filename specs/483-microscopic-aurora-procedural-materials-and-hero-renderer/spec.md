@@ -64,7 +64,8 @@ microscope" and the geometry "instanced tapered capsules, deterministic ribbon t
   radius 0.35 cell at each site's centre, site #B58CE0); the wells (a spiral of strength + 1 half-turns, radius 0.45
   cell, its arrowhead pointing in the turning sense, well #D2A8FF); the ribbons (for each swimmer a ribbon through its
   kernel positions of the last L ticks up to the shown tick, 0.01 wide fading to its tail, ribbon #8FF0D6); the swimmers
-  (a tapered capsule 0.05 long and 0.016 wide at its position at the shown tick, oriented along its velocity, swimmer
+  (a tapered capsule 0.05 long and 0.016 wide at its position at the shown tick, oriented along its velocity (+x for
+  a still swimmer), swimmer
   #E9FFF8 with a heliotrope tail tip); the gauges below the dish: coverage on a track at y = −1.08 from x = −0.9 to 0.9
   mapping 0 … 1000 with a tick at the requirement and a mark at the reading (filled, met #B58CE0, when met; hollow,
   unmet #E9FFF8, otherwise); coherence on a track at y = −1.15 mapping 0 … N with a tick at the requirement and a mark
