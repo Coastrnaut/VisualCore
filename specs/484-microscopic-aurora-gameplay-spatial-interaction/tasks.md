@@ -50,7 +50,7 @@ R02-G18-04 (`git show <R02-G18-04 record commit>:<path>`).
 
 ## Phase 3: Stories 1, 2 and 3 — wells, scrubber and freeze (P1) 🎯
 
-- [ ] T-R02G1904-003 [US1] [US2] [US3] Create
+- [X] T-R02G1904-003 [US1] [US2] [US3] Create — Verified 2026-11-26: host-3 exit 0 against the real picker: 500 seeded scripts match the independent expectation (levels 1, 41, 90; playing, won, failed; 3 sizes, 3 orbits); thresholds, well drags, scrubs, orbit, cancels send no kernel action
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraGestureController.swift` (FR-R02G1904-001 …
   005, 007, 008; SC-R02G1904-001 … 003; `MicroscopicAuroraGestureAction` place(slot, well), move(slot, well),
   remove(slot), showTick(tick), preview(slot, target), clearPreview, toggleFreeze, selectSlot(slot), resetView,

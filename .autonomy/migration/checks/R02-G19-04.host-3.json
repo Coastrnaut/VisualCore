@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MicroscopicAuroraGestureController"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter MicroscopicAuroraGestureController",
+  "elapsed_seconds": 11.221,
+  "exit_code": 0,
+  "finished": "2026-11-26T20:55:11+00:00",
+  "gate": "R02-G19-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G19-04.host-3.log",
+  "log_sha256": "d4a32e3a40c10228353af6a54eb32321454c250535cc4d79dcd665f3009fb9b0",
+  "name": "host-3",
+  "started": "2026-11-26T20:54:59+00:00",
+  "timed_out": false
+}
