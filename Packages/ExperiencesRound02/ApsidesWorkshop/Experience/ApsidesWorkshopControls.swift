@@ -46,6 +46,9 @@
 // n", identifier `replay-position`) with Step (identifier `replay-step`, value "Action k of n") and Stop (identifier
 // `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
 // `settings.sound`.
+// Feature 479 (R02-G18-09) T-R02G1809-003 (clarification Q1): the failure explanation has its own identifier
+// `explanation` (it shared `failure` with the short failure line), and the identifiers the panel gives through
+// `port.identifier` (`experience.r02-g18.apsides-workshop.<name>`) are listed in ``identifierNames``, each once.
 #if os(iOS)
 import ApsidesWorkshopCore
 import SwiftUI
@@ -66,6 +69,16 @@ struct ApsidesWorkshopControls: View {
     var sender: ((String, [Double]) -> Void)? = nil
     /// Redraws the last snapshot with the mirror's preview after the pending orbit moved (feature 474).
     var redraw: () -> Void = {}
+    /// Every identifier name the panel gives (clarification Q1 of feature 479), each once; the identifier is
+    /// `experience.r02-g18.apsides-workshop.<name>` (`port.identifier`).
+    static let identifierNames: [String] = [
+        "eccentricity", "eccentricity-minus", "eccentricity-plus", "direction", "direction-minus", "direction-plus",
+        "size", "size-minus", "size-plus", "orbit-detail", "set-periapsis", "set-size", "reset-view", "pending-reason",
+        "tick", "tick-minus", "tick-plus", "tick-detail", "play", "undo", "redo", "next-level", "dismiss-tutorial",
+        "hint", "campaign", "daily", "practice", "level-picker", "play-level", "replay", "replay-step", "replay-stop",
+        "sound", "actions", "status", "failure", "explanation", "progress", "summary", "message", "tutorial",
+        "hint-text", "band", "stars", "goal", "replay-position",
+    ]
     /// The text size: rows become columns at accessibility sizes (feature 476).
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 476).
@@ -227,7 +240,7 @@ struct ApsidesWorkshopControls: View {
         }
         if let explanation = mirror.explanation {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier(port.identifier("failure"))
+                .accessibilityIdentifier(port.identifier("explanation"))
         }
         row {
             Text(mirror.bandLabel).font(.footnote)

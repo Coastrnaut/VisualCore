@@ -28,7 +28,7 @@ change (the shaders and reference of R02-G18-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1809-003 [US1] Edit `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopControls.swift`:
+- [X] T-R02G1809-003 [US1] Edit `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopControls.swift`: — Verified 2026-11-26: 2026-11-26 sim-27 exit 0, 75 simulator tests incl. 5 identifier tests (.autonomy/migration/checks/R02-G18-09.sim-27.json); the explanation has its own identifier and identifierNames pins the 46 names, each used once
   the failure explanation's identifier becomes `explanation` (it shared `failure`), and `identifierNames` lists the 46
   identifiers (spec Clarifications Q1: eccentricity, eccentricity-minus, eccentricity-plus, direction, direction-minus,
   direction-plus, size, size-minus, size-plus, orbit-detail, set-periapsis, set-size, reset-view, pending-reason, tick,
