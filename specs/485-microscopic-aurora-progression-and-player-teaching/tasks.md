@@ -9,7 +9,7 @@ campaign covers the game). Agents model their files on Apsides Workshop's as rec
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1905-001 Baselines on the committed tree after R02-G19-04 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1905-001 Baselines on the committed tree after R02-G19-04 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: baselines exit 0 on the committed tree after the R02-G19-04 record (host, timing, round02-1, -2, -3c, -3e, -3f); rendering baseline is R02-G19-04's rendering runs
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G19-04's
   rendering runs (exit 0)
 
