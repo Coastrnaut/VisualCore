@@ -90,7 +90,7 @@ campaign covers the game). Agents model their files on Apsides Workshop's as rec
 - [X] T-R02G1905-006 Docs: `docs/architecture/microscopic-aurora.md` (teaching and progression), — Verified 2026-11-26: docs updated (architecture teaching and progression, round-two README, automatedtesting); round02-host-1, -2, -3c, -3e, -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
-- [ ] T-R02G1905-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1905-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-26: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1905-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1905-009 Reference regression chunk 2 (`--name reference-2`)
