@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G18-09: Apsides Workshop simulator integration and full app lock).
+Last updated: 2026-11-26 (R02-G18-10: Apsides Workshop device rows).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop device rows** (R02-G18-10, 2026-11-26). `python3 scripts/check_device_rows.py --experience
+  r02-g18.apsides-workshop` (release step `device-rows-r02-g18`, tests `ApsidesWorkshopDeviceRowsCheckTests`, 8)
+  checks the definition (rows AW-D1 … AW-D8, 12 device scenarios) against the scenario manifest, the ledger's
+  DEV1/2/3-R02-G18 rows and the open {device} tasks of features 471 … 479; nothing contacts a device. The rows were
+  adapted from Celestial Eclipse Lab's definition, with the touch row rewritten for the gestures of feature 474.
 - **Apsides Workshop in the app** (R02-G18-09, 2026-11-26). Host: `ApsidesWorkshopSchemaExampleTests` (7 tests).
   Simulator: `ApsidesWorkshopIdentifierTests` (5 tests; 46 pinned names, each once; the suite now runs 75). App: four
   AppModelTests (stored examples, candidate availability, level 1 through the registry and engine, the `AW` pins against

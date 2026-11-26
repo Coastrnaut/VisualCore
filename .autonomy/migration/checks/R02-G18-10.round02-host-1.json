@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "VoxelOrigami"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter VoxelOrigami",
+  "elapsed_seconds": 57.155,
+  "exit_code": 0,
+  "finished": "2026-11-26T16:55:22+00:00",
+  "gate": "R02-G18-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G18-10.round02-host-1.log",
+  "log_sha256": "b40f4d7ced98d845fcd6ba3b772dab819448cd3c3d0b9a587244af28072f9bc6",
+  "name": "round02-host-1",
+  "started": "2026-11-26T16:54:25+00:00",
+  "timed_out": false
+}

@@ -200,3 +200,16 @@ in deterministic integer fixed point and every rule is then decided exactly on i
   not available without the testing argument.
 - **Builds.** The app compiles in debug and release for the simulator with the game linked; the release symbol check
   confirms the test-only golden source and scenarios are absent.
+
+## Device preparation (feature 480, R02-G18-10)
+
+Nothing here touches a device. `docs/apps/apsides-workshop/device-rows.json` defines the device scenario set (the 11
+standard and game scenarios and `fixture-level-1-solved`) and rows AW-D1 … AW-D8 for D1, D2 and D3 (the ledger's
+DEV1/2/3-R02-G18 rows): launch and first frame, frame pacing and frame time per tier, memory and thermal state with the
+round-two stress session, touch feel and latency (the periapsis-knob drag and the size-handle drag with their ghost
+preview, the orbiter drag that cranks the time, a double tap on empty space that resets the view, orbit), sound and
+haptics, a non-gating VoiceOver walk-through, progress across a real termination and the panel journeys. Every row is
+"pending device campaign" and covers the open {device} tasks of features 473, 474 and 476 … 479 and UA-F13's
+measurements; `scripts/check_device_rows.py --experience r02-g18.apsides-workshop` (release step
+`device-rows-r02-g18`) keeps it true. The written plan is `docs/apps/apsides-workshop/device-campaign.md`; D3 stays on
+iPadOS 26.5.

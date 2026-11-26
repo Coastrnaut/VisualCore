@@ -969,4 +969,5 @@ Feature 477 (R02-G18-07) adds `ApsidesWorkshopReconciliation` (winning traces re
 the replay mode and the saved sound choice. Feature 478 (R02-G18-08) adds the regression net: `ApsidesWorkshopGolden` (test builds
 only), `golden-frames.json`, the solver regression and `scripts/apsides_workshop_regression.py`. Feature 479 (R02-G18-09)
 pins the panel's identifiers and adds the stored schema examples, the app's interface tests (`AW`, chunk `a4`) and app
-unit tests.
+unit tests. Feature 480 (R02-G18-10) adds its device-row definition and written campaign plan
+(`docs/apps/apsides-workshop/`), checked by `scripts/check_device_rows.py`; no device is contacted.
