@@ -967,4 +967,6 @@ adds `ApsidesWorkshopFeedbackPlan` (announcements and haptics), `ApsidesWorkshop
 `ApsidesWorkshopSoundRecipe` (the pending orbit's audition and the ambient loop), with VoiceOver support in the panel.
 Feature 477 (R02-G18-07) adds `ApsidesWorkshopReconciliation` (winning traces replayed on restore), snapshot schema 3,
 the replay mode and the saved sound choice. Feature 478 (R02-G18-08) adds the regression net: `ApsidesWorkshopGolden` (test builds
-only), `golden-frames.json`, the solver regression and `scripts/apsides_workshop_regression.py`.
+only), `golden-frames.json`, the solver regression and `scripts/apsides_workshop_regression.py`. Feature 479 (R02-G18-09)
+pins the panel's identifiers and adds the stored schema examples, the app's interface tests (`AW`, chunk `a4`) and app
+unit tests.

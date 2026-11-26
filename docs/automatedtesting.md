@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G18-08: Apsides Workshop visual golden and solver regression).
+Last updated: 2026-11-26 (R02-G18-09: Apsides Workshop simulator integration and full app lock).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop in the app** (R02-G18-09, 2026-11-26). Host: `ApsidesWorkshopSchemaExampleTests` (7 tests).
+  Simulator: `ApsidesWorkshopIdentifierTests` (5 tests; 46 pinned names, each once; the suite now runs 75). App: four
+  AppModelTests (stored examples, candidate availability, level 1 through the registry and engine, the `AW` pins against
+  the Core; 147 → 151 app unit tests) and the interface chunk `a4` (`AWPlayUITests`, `AWReplayUITests`: 3 tests in 290 s
+  including four app launches). Lesson: the release-check log of an app unit run does not list test names, so the new
+  tests are confirmed by the count rising by exactly the number added (147 → 151).
 - **Apsides Workshop regression net** (R02-G18-08, 2026-11-26). Host: `ApsidesWorkshopRegressionSolverTests` (14
   tests: 100 witnesses replayed and re-planned within the counted work bound, twelve named alterations) and
   `ApsidesWorkshopRegressionGoldenTests` (12 tests over the 16 pinned frame descriptions). Simulator:
