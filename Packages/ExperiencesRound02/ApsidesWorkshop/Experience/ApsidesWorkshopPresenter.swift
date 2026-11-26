@@ -140,6 +140,7 @@ final class ApsidesWorkshopMirror {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"   // feature 477
         }
     }
 

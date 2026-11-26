@@ -15,7 +15,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1807-002 [P] [US2] Edit `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopProgress.swift`
+- [X] T-R02G1807-002 [P] [US2] Edit `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopProgress.swift` — Verified 2026-11-26: 2026-11-26 host-1 exit 0, 37 tests incl. the reconciliation suite (.autonomy/migration/checks/R02-G18-07.host-1.json); results carry trace and verified, replay mode (no stars, opens nothing, campaign budget), reconciliation with every certified witness trace verifying; progress JSON test and mode names take the new fields
   (Result gains "trace: [ApsidesWorkshopAction]" (effective `.periapsis(k, d)` and `.size(a)` tunings, then `.play`) and
   "verified: Bool"; `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing only when
   better (ties keep the earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace = empty,
