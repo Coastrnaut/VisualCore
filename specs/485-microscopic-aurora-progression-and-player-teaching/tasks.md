@@ -71,7 +71,7 @@ campaign covers the game). Agents model their files on Apsides Workshop's as rec
   (`UPDATE_SCENARIO_MANIFEST=1`); update `MicroscopicAuroraPanelWinTests`, the gesture wiring tests and other suites
   whose `level.next` expectation changes; lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02
   --filter MicroscopicAurora`
-- [ ] T-R02G1905-005 Edit `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraPresenter.swift`
+- [X] T-R02G1905-005 Edit `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraPresenter.swift` — Verified 2026-11-26: presenter: tutorial from the core's step, hint levels 1 to 3 searched off the main actor (stale searches dropped), failure explanation, band, goal, best stars, modes, locked and date refusals in words; panel: Hint, Dismiss tutorial, level picker, Play level, Campaign, Daily, Practice; MicroscopicAuroraTeachingTests (10); sim-27 exit 0 (MicroscopicAuroraExperienceTests, 46 tests)
   (the tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets
   it, the search off the main actor and a stale search never owning the hint state — and the failure explanation as
   panel text, replacing the mirror's own failure words, with the level's difficulty band (of the five bands of 20), its

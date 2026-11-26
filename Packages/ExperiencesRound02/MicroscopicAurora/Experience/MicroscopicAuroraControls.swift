@@ -11,6 +11,15 @@
 // kernel button sends through the presenter (so refusals are logged), and the panel gains "Freeze" (the presenter's
 // freeze, presentation only) and "Reset view" (the authored camera); a well tapped on the canvas selects its slot here.
 // Full accessibility comes in a later feature of R02-G19.
+//
+// Feature 485 (R02-G19-05) T-R02G1905-005 (FR-R02G1905-001 … 005; clarifications Q1 … Q4): a teaching block under the
+// header — the tutorial instruction with "Dismiss tutorial" (`tutorial.dismiss`), "Hint" (each press shows the next of
+// three levels through the presenter's `showHint()`; hints send nothing) with the hint text, the failure explanation
+// (in place of the short failure words), and the level's band, goal and best stars — and a progress block after the
+// view row: "Campaign" (`mode.campaign`), "Daily" (`mode.daily [year, month, day]` with today's local date from the
+// presenter) and "Practice" (`mode.practice`), and a picker of the open levels (1 … the frontier, with their bands and
+// stars) with "Play level" (`level.select [n]`). All wrapping text in the panel, never over the dish; refusals read in
+// words. The existing rows are unchanged.
 #if os(iOS)
 import MicroscopicAuroraCore
 import SwiftUI
@@ -22,6 +31,8 @@ struct MicroscopicAuroraControls: View {
     let port: ExperienceActionPort
     /// What the panel shows (and the panel's selection).
     @Bindable var mirror: MicroscopicAuroraMirror
+    /// The presenter (feature 485): hints, the tutorial, the modes and the daily date; nil sends through `sendAction`.
+    var presenter: MicroscopicAuroraPresenter? = nil
     /// Sends a control with its values through the presenter (feature 484).
     let sendAction: (String, [Double]) -> Void
     /// Toggles the presenter's freeze (feature 484).
@@ -34,6 +45,7 @@ struct MicroscopicAuroraControls: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
                 header
+                teaching
                 slotRow
                 siteRow
                 strengthRow
@@ -41,6 +53,7 @@ struct MicroscopicAuroraControls: View {
                 tickRow
                 playRow
                 viewRow
+                progressRows
             }
             .padding()
         }
@@ -53,11 +66,7 @@ struct MicroscopicAuroraControls: View {
             .accessibilityIdentifier(port.identifier("actions"))
         Text(mirror.status).font(.subheadline)
             .accessibilityIdentifier(port.identifier("status"))
-        if let tutorial = mirror.tutorialText {
-            Text(tutorial).font(.footnote)
-                .accessibilityIdentifier(port.identifier("tutorial"))
-        }
-        if let failure = mirror.failureText {
+        if let failure = mirror.failureText, mirror.explanation == nil {
             Text(failure).font(.footnote)
                 .accessibilityIdentifier(port.identifier("failure"))
         }
@@ -177,6 +186,103 @@ struct MicroscopicAuroraControls: View {
                 .accessibilityLabel("Go to the next level")
                 .accessibilityIdentifier(port.identifier("next-level"))
         }
+    }
+
+    /// The tutorial instruction with Dismiss tutorial, Hint with the hint text, the failure explanation, and the band,
+    /// goal and best stars (feature 485).
+    @ViewBuilder private var teaching: some View {
+        if let tutorial = mirror.tutorialText {
+            Text(tutorial).font(.callout).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("tutorial"))
+            Button("Dismiss tutorial") { dismissTutorial() }
+                .accessibilityLabel("Dismiss the tutorial")
+                .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
+        }
+        Button("Hint") { presenter?.showHint() }
+            .disabled(presenter == nil)
+            .accessibilityLabel("Show a hint")
+            .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+            .accessibilityIdentifier(port.identifier("hint"))
+        if let hint = mirror.hintText {
+            Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("hint-text"))
+        }
+        if let explanation = mirror.explanation {
+            Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("failure"))
+        }
+        HStack(spacing: 12) {
+            Text(mirror.bandLabel).font(.footnote)
+                .accessibilityIdentifier(port.identifier("band"))
+            Text(mirror.starsLabel).font(.footnote)
+                .accessibilityIdentifier(port.identifier("stars"))
+        }
+        Text(mirror.goalLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier(port.identifier("goal"))
+    }
+
+    /// The mode buttons and the picker of open levels with their bands and stars (feature 485).
+    @ViewBuilder private var progressRows: some View {
+        HStack(spacing: 12) {
+            Button("Campaign") { campaign() }
+                .accessibilityLabel("Play the campaign")
+                .accessibilityValue(modeValue("campaign"))
+                .accessibilityIdentifier(port.identifier("campaign"))
+            Button("Daily") { daily() }
+                .accessibilityLabel("Play today's daily level")
+                .accessibilityValue(modeValue("daily"))
+                .accessibilityIdentifier(port.identifier("daily"))
+            Button("Practice") { practice() }
+                .accessibilityLabel("Practise this level with more actions")
+                .accessibilityValue(modeValue("practice"))
+                .accessibilityIdentifier(port.identifier("practice"))
+        }
+        HStack(spacing: 12) {
+            Stepper(mirror.levelLabel(mirror.pickedLevel),
+                    onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
+                    onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
+                .accessibilityLabel("Level to play")
+                .accessibilityValue(mirror.levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("level-picker"))
+            Button("Play level") { selectLevel(mirror.pickedLevel) }
+                .accessibilityLabel("Play the picked level")
+                .accessibilityValue(mirror.levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("play-level"))
+        }
+    }
+
+    /// "selected" when `name` is the current mode's name, else "not selected".
+    private func modeValue(_ name: String) -> String {
+        MicroscopicAuroraMirror.modeName(mirror.mode) == name ? "selected" : "not selected"
+    }
+
+    /// Ends the tutorial of the level (`tutorial.dismiss`).
+    private func dismissTutorial() {
+        if let presenter { presenter.dismissTutorial(port: port) } else { send("tutorial.dismiss") }
+    }
+
+    /// Returns to the campaign (`mode.campaign`).
+    private func campaign() {
+        if let presenter { presenter.playCampaign(port: port) } else { send("mode.campaign") }
+    }
+
+    /// Plays today's daily level (`mode.daily` with the presenter's local calendar date).
+    private func daily() {
+        if let presenter {
+            presenter.playDaily(port: port)
+        } else {
+            send("mode.daily", MicroscopicAuroraPresenter.dateValues(MicroscopicAuroraPresenter.today()))
+        }
+    }
+
+    /// Replays the level with the practice budget (`mode.practice`).
+    private func practice() {
+        if let presenter { presenter.playPractice(port: port) } else { send("mode.practice") }
+    }
+
+    /// Plays open level `level` (`level.select [level]`).
+    private func selectLevel(_ level: Int) {
+        if let presenter { presenter.selectLevel(level, port: port) } else { send("level.select", [Double(level)]) }
     }
 
     /// Freeze the field and reset the view (feature 484; presentation only).

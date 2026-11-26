@@ -2,7 +2,7 @@
 // 009). The experience's id is the catalog id; the registry's factory (`make(id:storage:reduceMotion:reduceFlashing:)`,
 // which does not depend on the registration) builds a shell around the presenter with the accessibility settings
 // passed through, as does the tests' factory; the controls are the seven declared actions in order; the registration
-// facts hold (100 certified levels, schema 1, the tiers level-0 … level-2, the palette); the presenter's quality
+// facts hold (100 certified levels, schema 2, the tiers level-0 … level-2, the palette); the presenter's quality
 // levels equal the Core's `qualityTiers`; the presenter holds no GPU object and no snapshot before setup; and it
 // declares its two frame probes (the backdrop corners) once a frame was drawn. iOS only, as the target.
 #if os(iOS)
@@ -21,11 +21,11 @@ import VisualCoreExperienceHost
         #expect(MicroscopicAuroraExperienceCore.experienceID == "r02-g19.microscopic-aurora")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 1, three tiers, the five-colour palette.
+    /// The registration's content facts: 100 certified levels, schema 2 (feature 485), three tiers, the five-colour palette.
     @Test func theRegistrationFactsHold() {
         #expect(MicroscopicAuroraExperienceCore.levelNumbers == 1...100)
         #expect(MicroscopicAuroraExperienceCore.certifiedCandidates.count == 100)
-        #expect(MicroscopicAuroraExperienceCore.schemaVersion == 1)
+        #expect(MicroscopicAuroraExperienceCore.schemaVersion == 2)
         var names: [String] = []
         for level in MicroscopicAuroraExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -39,7 +39,8 @@ import VisualCoreExperienceHost
         for control in MicroscopicAuroraExperienceCore.controls { ids.append(control.id) }
         #expect(ids == MicroscopicAuroraExperienceCore.actionIDs)
         #expect(ids == ["well.place", "well.remove", "swim.play", "play.undo", "play.redo", "level.next",
-                        "clock.show"])
+                        "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers`, named as the tiers.

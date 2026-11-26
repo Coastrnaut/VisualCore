@@ -15,6 +15,20 @@
 // drawn and only the gauges preview); two fingers orbit the camera and a double tap outside the dish or "Reset view"
 // (`resetView()`) returns it (presentation only; the meshes are rebuilt). A refused action is shown in the panel and its
 // code, read with or without the engine's `action.rule.` prefix, is kept in the refusal log.
+//
+// Feature 485 (R02-G19-05) T-R02G1905-005 (FR-R02G1905-001 … 005, 007; clarifications Q1 … Q5) adds teaching and
+// progression to the panel: the tutorial instruction (`core.tutorial.text` until the step is `done`, replacing the
+// presenter's own tutorial sentence), the hint at its current level (`showHint()`: each press raises the level
+// 1 → 2 → 3; any change of the play hides it, so the next press shows level 1; one search per play through
+// `MicroscopicAuroraHints.hint(level:play:certified:)` with the core's certified wells, run off the main actor in a
+// detached task, with a generation counter so that a stale search never owns the hint state; hints never send an
+// action), the failure explanation (`MicroscopicAuroraFailureExplanation(play:)`, shown in the panel in place of the
+// mirror's short `failureText`, which stays the status line), the mode, the open levels, the level's band (of the five
+// bands of 20), its goal (the stencil in words and the certified placement count that earns 3 stars,
+// `core.certifiedPlacements`) and its best stars (`core.progress.stars(of:)`). The description includes them. The daily
+// level is asked for with today's local calendar date read here (`playDaily(port:date:)`); the core never reads a
+// clock. A refused `level.select` or `level.next` (`r02-g19.locked`) and an impossible date (`r02-g19.date`) read in
+// words.
 #if os(iOS)
 import Foundation
 import MicroscopicAuroraCore
@@ -43,7 +57,7 @@ final class MicroscopicAuroraMirror {
     var measureLabel = ""
     /// The level in words.
     var targetLabel = ""
-    /// The tutorial in words on levels that have one; nil otherwise.
+    /// The tutorial instruction of the current step (`core.tutorial.text`, feature 485); nil once the step is `done`.
     var tutorialText: String?
     /// The shown tick, the adapter's.
     var shownTick = 0
@@ -55,6 +69,67 @@ final class MicroscopicAuroraMirror {
     var preview: (slot: Int, target: MicroscopicAuroraPreviewTarget)?
     /// Whether the freeze is on (feature 484; presentation only): the committed swim stays drawn under a preview.
     var frozen = false
+    /// The hint level shown, 1 … 3; 0 while no hint is shown (feature 485; presentation only).
+    var hintLevel = 0
+    /// The hint shown at ``hintLevel``, ``MicroscopicAuroraPresenter/searchingText`` while its search runs, or
+    /// ``MicroscopicAuroraPresenter/noHintText`` when the play has no hint; nil while no hint is shown (feature 485).
+    var hintText: String?
+    /// The failure explanation (`MicroscopicAuroraFailureExplanation`: what went wrong, then the advice), nil without
+    /// a failure (feature 485).
+    var explanation: String?
+    /// The mode (feature 485).
+    var mode: MicroscopicAuroraMode = .campaign
+    /// The highest open level (feature 485).
+    var frontier = 1
+    /// The level's difficulty band, 1 … 5 (the five bands of 20; feature 485).
+    var band = 1
+    /// The best stars of the current level, 0 … 3 (0 while it has not been won; feature 485).
+    var bestStars = 0
+    /// The stars of each won level, by level number (the level picker; feature 485).
+    var stars: [Int: Int] = [:]
+    /// The goal in words: the stencil and the certified placement count that earns 3 stars (feature 485).
+    var goalLabel = ""
+    /// The level the picker holds, 1 … ``frontier`` (presentation only; feature 485).
+    var pickedLevel = 1
+
+    /// "Band b of 5" (feature 485).
+    var bandLabel: String { "Band \(band) of 5" }
+
+    /// "Best: s of 3 stars", or "Best: not won yet" while the level has not been won (feature 485).
+    var starsLabel: String {
+        bestStars > 0 ? "Best: \(bestStars) of 3 stars" : "Best: not won yet"
+    }
+
+    /// "Mode: campaign", "Mode: practice" or "Mode: daily" (feature 485).
+    var modeLabel: String { "Mode: " + Self.modeName(mode) }
+
+    /// The mode's name: campaign, practice or daily (feature 485).
+    static func modeName(_ mode: MicroscopicAuroraMode) -> String {
+        switch mode {
+        case .campaign: "campaign"
+        case .practice: "practice"
+        case .daily: "daily"
+        }
+    }
+
+    /// The picker's line for level `level`: "Level n, band b", with ", s of 3 stars" once it has been won
+    /// (feature 485).
+    func levelLabel(_ level: Int) -> String {
+        let band: Int = MicroscopicAuroraProgress.band(of: level)
+        if let won = stars[level] { return "Level \(level), band \(band), \(won) of 3 stars" }
+        return "Level \(level), band \(band)"
+    }
+
+    /// The goal of `level` with `certified` placements in the certified plan (feature 485): "Goal: light at least L of
+    /// the S stencil cells as one joined pattern, keeping a group of at least G swimmers, then play the swim. 3 stars
+    /// within C actions" ("1 action" singular), L the cells the coverage needs.
+    static func goalText(_ level: MicroscopicAuroraLevel, certified: Int) -> String {
+        let needed: Int = MicroscopicAuroraDish.neededCells(stencil: level.stencil.count, required: level.coverage)
+        let unit: String = certified == 1 ? "action" : "actions"
+        return "Goal: light at least \(needed) of the \(level.stencil.count) stencil cells as one joined pattern, "
+            + "keeping a group of at least \(level.coherence) swimmers, then play the swim. 3 stars within "
+            + "\(certified) \(unit)"
+    }
     /// The slot the panel edits (0 … 2).
     var slot = 0
     /// The index of the site the panel would place on.
@@ -141,6 +216,8 @@ final class MicroscopicAuroraMirror {
         case "r02-g19.budget": "no actions are left: play the swim or undo a placement"
         case "r02-g19.stale": "the play changed before the action arrived"
         case "r02-g19.level": "the next level could not be made"
+        case MicroscopicAuroraExperienceRule.locked: "that level is locked: win the level before it to open it"
+        case MicroscopicAuroraExperienceRule.date: "that is not a calendar date"
         case MicroscopicAuroraExperienceRule.notWhole: "the slot, cell, strength, sense and tick must be whole numbers"
         case MicroscopicAuroraExperienceRule.tick: "that tick is past the end of the swim"
         default: "that action is not available now"
@@ -167,10 +244,6 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
     /// The pure core this presenter draws.
     typealias Core = MicroscopicAuroraExperienceCore
 
-    /// The tutorial shown on levels that have one (presentation, not a kernel stage).
-    static let tutorial = "Place magnetic wells on the marked sites so the swimmers' glowing trails cover the "
-        + "stencil as one pattern, without a swimmer leaving the dish or the swarm breaking apart; then play the swim."
-
     /// Whether Reduce Motion is on (the scene is still already).
     let reduceMotion: Bool
     /// Whether the glow gain is capped (Reduce Flashing).
@@ -191,6 +264,22 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The latest core seen (feature 485): hints, the daily date and the progress lines read it.
+    private(set) var latestCore: MicroscopicAuroraExperienceCore?
+    /// The play the shown hint belongs to; nil while no hint is shown (feature 485).
+    private var hintPlay: MicroscopicAuroraPlay?
+    /// The hint texts of levels 1 … 3 searched for a play (nil texts: the play has no hint), one search per play
+    /// (feature 485).
+    private var hintCache: (play: MicroscopicAuroraPlay, texts: [String]?)?
+    /// The search under way, off the main actor, for ``hintPlay`` (feature 485); tests may await its end.
+    private(set) var hintSearch: Task<Void, Never>?
+    /// The hint generation (feature 485): raised by every new search and every hidden hint; a search whose generation
+    /// is no longer current owns nothing.
+    private(set) var hintGeneration = 0
+    /// What the hint line shows while the search runs (feature 485).
+    static let searchingText = "Finding a hint…"
+    /// What the hint line shows when the play has no hint (won, or not under way; feature 485).
+    static let noHintText = "No hint now: the level is not being played."
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -239,6 +328,7 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
             tierLog.append(MicroscopicAuroraTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
+        if latestCore != core { absorbProgress(core) }
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         let base: MicroscopicAuroraSceneSnapshot = core.snapshot(time: time)
         lastBase = (snapshot: base, level: core.play.level)
@@ -273,10 +363,10 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbProgress(core)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
-        mirror.tutorialText = level.tutorial ? Self.tutorial : nil
         mirror.targetLabel = "Level: a stencil of \(level.stencil.count) cells, \(level.swimmers.count) swimmers, "
             + "\(level.sites?.count ?? 0) well sites, \(level.length) ticks per swim"
         let measure: String = level.progressDescription(report: play.report, wells: play.wells,
@@ -292,6 +382,8 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
         case .failed, .result:
             let reason: String = MicroscopicAuroraMirror.failureText(play.failure) ?? "The play failed."
             text += reason
+            // Since feature 485 the failure explanation too (what went wrong, then the advice).
+            if let explanation = mirror.explanation { text += " " + explanation }
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         default:
@@ -301,7 +393,23 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
             mirror.status = played ? "Playing" : "Ready"
             mirror.failureText = nil
         }
+        text += " " + teachingText()
         return text
+    }
+
+    /// The teaching and progress sentences of the description (feature 485): the mode, the band, the goal, the best
+    /// stars, then the tutorial instruction and the hint when shown; each ends in a full stop, joined by spaces.
+    private func teachingText() -> String {
+        var parts: [String] = [mirror.modeLabel, mirror.bandLabel, mirror.goalLabel, mirror.starsLabel]
+        if let tutorial = mirror.tutorialText { parts.append("Tutorial: " + tutorial) }
+        if let hint = mirror.hintText {
+            parts.append((mirror.hintLevel > 0 ? "Hint \(mirror.hintLevel) of 3: " : "Hint: ") + hint)
+        }
+        var sentences: [String] = []
+        for part in parts {
+            sentences.append(part.hasSuffix(".") || part.hasSuffix("…") ? part : part + ".")
+        }
+        return sentences.joined(separator: " ")
     }
 
     /// `snapshot` with the mirror's freeze and drag preview applied (feature 484; presentation only).
@@ -323,7 +431,7 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
     /// The control panel: "Freeze" and "Reset view" (feature 484); every kernel button sends through
     /// ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(MicroscopicAuroraControls(port: port, mirror: mirror,
+        AnyView(MicroscopicAuroraControls(port: port, mirror: mirror, presenter: self,
                                           sendAction: { [weak self] control, values in
                                               self?.send(control, values, port: port)
                                           },
@@ -416,6 +524,148 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
         }
         refreshPreview()
         return result
+    }
+
+    // MARK: Teaching and progression (feature 485, R02-G19-05)
+
+    /// Takes the core's teaching and progress state into the mirror (feature 485): the tutorial instruction, the
+    /// failure explanation, the mode, the open levels with their stars, the band, the goal and the best stars; a change
+    /// of the play hides the hint (the next press shows level 1).
+    private func absorbProgress(_ core: MicroscopicAuroraExperienceCore) {
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let shown = hintPlay, shown != core.play { clearHint() }
+        mirror.tutorialText = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.explanation = MicroscopicAuroraFailureExplanation(play: core.play)?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        mirror.pickedLevel = min(max(mirror.pickedLevel, 1), core.progress.frontier)
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.band = core.band
+        mirror.bestStars = core.progress.stars(of: core.levelNumber)
+        mirror.goalLabel = MicroscopicAuroraMirror.goalText(core.play.level, certified: core.certifiedPlacements)
+    }
+
+    /// Hides the hint shown and drops a search under way; the generation is raised so that search owns nothing.
+    private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hintGeneration += 1
+        hintPlay = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// The hint texts of levels 1 … 3 of `play` from one search (`MicroscopicAuroraHints.hint(level:play:certified:)`
+    /// at level 1): a placement or removal hint gives each level's text (`MicroscopicAuroraHint.actionText(level:
+    /// action:)`); a play, stuck or failed hint reads the same at every level; nil when the play has no hint (won, or
+    /// not under way). Runs off the main actor.
+    nonisolated static func hintTexts(_ play: MicroscopicAuroraPlay,
+                                      certified: [MicroscopicAuroraWell]?) -> [String]? {
+        guard let first = MicroscopicAuroraHints.hint(level: 1, play: play, certified: certified) else { return nil }
+        guard first.kind == .place || first.kind == .remove, let action = first.action else {
+            return [first.text, first.text, first.text]
+        }
+        var texts: [String] = []
+        for level in 1...3 {
+            let text: String? = MicroscopicAuroraHint.actionText(level: level, action: action)
+            texts.append(text ?? first.text)
+        }
+        return texts
+    }
+
+    /// Shows the next hint level (1 → 2 → 3, then 3 again) for the current play; never sends an action. The search
+    /// runs once per play in a detached task, never on the frame: meanwhile the hint line reads ``searchingText`` (a
+    /// press during the search raises the level it will show); the result is shown only when its generation is still
+    /// current, and later levels come from the cache.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let play: MicroscopicAuroraPlay = core.play
+        let certified: [MicroscopicAuroraWell] = core.certifiedWells
+        let next: Int = hintPlay == play ? min(mirror.hintLevel + 1, 3) : 1
+        if let cached = hintCache, cached.play == play {
+            reveal(cached.texts, level: next, play: play)
+            return
+        }
+        if hintSearch != nil, hintPlay == play {
+            mirror.hintLevel = next   // the search for this play is running; it shows this level
+            return
+        }
+        hintSearch?.cancel()
+        hintGeneration += 1
+        let generation: Int = hintGeneration
+        hintPlay = play
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            let texts: [String]? = MicroscopicAuroraPresenter.hintTexts(play, certified: certified)
+            await self?.finishSearch(texts, play: play, generation: generation)
+        }
+    }
+
+    /// Takes the hint texts searched for `play` by the search of `generation`: cached and shown when that generation
+    /// is still current (a stale search changes nothing, not even the handle of a newer search).
+    private func finishSearch(_ texts: [String]?, play: MicroscopicAuroraPlay, generation: Int) {
+        guard generation == hintGeneration, hintPlay == play else { return }
+        hintSearch = nil
+        hintCache = (play, texts)
+        reveal(texts, level: mirror.hintLevel, play: play)
+    }
+
+    /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
+    private func reveal(_ texts: [String]?, level: Int, play: MicroscopicAuroraPlay) {
+        hintPlay = play
+        guard let texts, texts.indices.contains(level - 1) else {
+            mirror.hintLevel = 0
+            mirror.hintText = Self.noHintText
+            return
+        }
+        mirror.hintLevel = level
+        mirror.hintText = texts[level - 1]
+    }
+
+    /// Ends the tutorial of the current level (`tutorial.dismiss`).
+    @discardableResult
+    func dismissTutorial(port: ExperienceActionPort) -> ActionResult {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Plays open level `level` in campaign mode (`level.select [level]`; a closed level is refused in words).
+    @discardableResult
+    func selectLevel(_ level: Int, port: ExperienceActionPort) -> ActionResult {
+        send("level.select", [Double(level)], port: port)
+    }
+
+    /// Plays the daily level of `date` (`mode.daily [year, month, day]`; the local calendar date by default; the core
+    /// never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = MicroscopicAuroraPresenter.today()) -> ActionResult {
+        send("mode.daily", Self.dateValues(date), port: port)
+    }
+
+    /// Replays the current level with the practice budget (`mode.practice`).
+    @discardableResult
+    func playPractice(port: ExperienceActionPort) -> ActionResult {
+        send("mode.practice", [], port: port)
+    }
+
+    /// Returns to the campaign (`mode.campaign`).
+    @discardableResult
+    func playCampaign(port: ExperienceActionPort) -> ActionResult {
+        send("mode.campaign", [], port: port)
+    }
+
+    /// The local calendar date now: Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the core refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
 }
 #endif
