@@ -15,7 +15,7 @@ campaign covers the game). Agents model their files on Apsides Workshop's as rec
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1905-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraHints.swift`
+- [X] T-R02G1905-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraHints.swift` — Verified 2026-11-26: host-2 exit 0: exact hints win all 100 certified levels within budget (replaying the certified plan), 200 seeded reachable states get accepted hints, off-path states match an unbounded brute force, 500 seeded failures explained truly (all four kinds)
   (`MicroscopicAuroraHintPlan`, `MicroscopicAuroraHintKind` place/remove/play/stuck, `MicroscopicAuroraHint` with levels
   1 … 3 and the texts of clarification Q1 — "Use the site at row r, column c next" or "Take well n away"; "Place a
   clockwise (or counterclockwise) well at the site at row r, column c"; "Place well n at row r, column c with strength
