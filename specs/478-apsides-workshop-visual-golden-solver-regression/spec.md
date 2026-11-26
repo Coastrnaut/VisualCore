@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G18-08 (migration ledger, game feature of experience R02-G18) · ID namespace FR-R02G1808-###,
 SC-R02G1808-###, T-R02G1808-###
@@ -23,6 +23,67 @@ Canonical overrides:
   memory on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 468 (Celestial Eclipse Lab's visual golden and solver regression), adapted to orbit tunings, the
   play of the revolution, the cosmic compass and the luminous orbit loops.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+468's answers where the games agree. Facts checked in code (read-only, 2026-11-26): `ApsidesWorkshopSolver.plan`
+certifies a level by a search by number of tunings from its starting orbit, returning `actions` (the tunings), `orbit`
+(the winning orbit), `orbitsByDepth` (orbits judged per number of tunings) and `work`, within at most 2 tunings
+(`maxTunings`) and 16,000 orbits judged (`workBound`); the 100 witness files in `docs/games/apsides-workshop/levels/`
+hold the number, the level (period, planets with centre and radius, targets with kind, sector and band, starting
+orbit, budget, tutorial, fingerprint), the actions (the plan's tunings, then the play that wins), the per-action
+digests, the fingerprints after `begin`, after `dismissTutorial` on a tutorial level and after each action, the report
+(shares, apsides, deviations, met count), the counterexample (`depth` = size − 1 and `orbits`), the difficulty and the
+skipped candidate count, byte-checked by the catalog tests with the catalog digest pinned; the simulator frame checks
+of feature 473 compare rendered frames with the CPU reference (the star's and the orbiter's centres brighter than the
+backdrop by 0.25 in luminance, the first lit actions bar with red above blue by 0.08, the first gauge track's centre 0.1
+from the backdrop, each point at least 6 px from what is drawn after it, the backdrop patches within 0.06 of the
+gradient) at 1,152 × 768; the palette has 18 named colours (the 19th constant is a hex list);
+`ApsidesWorkshopCompassScene.release()` frees every renderer, the next draw rebuilds them and `liveObjectCount` counts
+them; `ProcessMemory.footprint()` reads the footprint; the CI job `round02-host-tests` has a named regression step per
+earlier round-two game (Celestial Eclipse Lab's the latest).
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win on exactly the final play and not before, within the budget, with exactly its per-action fingerprints
+  and digests; and `plan` returns exactly the witness's tunings with `orbitsByDepth[size − 1]` equal to the
+  counterexample's `orbits` at depth size − 1; `work` is at most `workBound` (counted, never timed). The run is split
+  into tests of 10 levels (10 tests), each well under 10 s. Impact: FR-R02G1808-001; SC-R02G1808-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a planet's centre, a planet's radius, a target's kind,
+  a target's sector, a target's band, the starting orbit, the period, the budget; a plan tuning; a witness action, a
+  per-action fingerprint or digest; the counterexample's orbits count. Impact: FR-R02G1808-002; SC-R02G1808-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after all of the witness's tunings but before the play, so
+  actions are spent from the actions bars and the level is not yet won, shown at tick T / 2 (the period halved, as the
+  feature-473 frame checks), at presentation time 0, the authored camera and no preview, plus the hero frame of the
+  scenario manifest's hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the projected pixel
+  positions of the star, the orbiter at the shown tick, the periapsis and apoapsis markers, every planet and the first
+  actions bar, rounded to 1/8 pixel, the counts of sectors, swept-area wedges, orbit-loop points, planets, gauges, met
+  gauges, lit and total actions bars, and the 18 palette colours as 8-bit sRGB; serialized as JSON with sorted keys and
+  hashed with SHA-256. The 16 descriptions and their digests live in
+  `Packages/ExperiencesRound02/ApsidesWorkshop/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every count and colour
+  must be equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal
+  the digest of its pinned description. The file is rewritten only when `APSIDES_WORKSHOP_WRITE_GOLDEN=1` is set. The
+  simulator test renders the 16 frames and checks them against the same descriptions with the feature-473 tolerances.
+  Impact: FR-R02G1808-003, 004; SC-R02G1808-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_APSIDES_WORKSHOP_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU objects
+  of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a named
+  reason. Impact: FR-R02G1808-005; SC-R02G1808-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's `round02-host-tests` job keeps running all
+  round-two host tests and adds a named step "Apsides Workshop regression (host)" that runs the Apsides Workshop
+  regression filter alone. The local command `python3 scripts/apsides_workshop_regression.py` runs the host regression
+  filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`, and prints one
+  summary line per part with pass or fail and the first failing name; its exit code is non-zero on any failure. Nothing
+  is timed against the wall clock. Impact: FR-R02G1808-006, 007; SC-R02G1808-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -124,7 +185,7 @@ simulator parts and reports one summary.
 - **FR-R02G1808-003**: A golden set of frames (levels, tiers, frame times, including the hero frame) MUST have a
   code-computed description (projected positions of the star, the orbiter, the apsis markers, the planets and the first
   actions bar, the counts of sectors, wedges, orbit points, planets, gauges, met gauges and lit and total actions bars,
-  palette colours) pinned in the repository with its digest; a recomputed description
+  the 18 palette colours) pinned in the repository with its digest; a recomputed description
   matches when its digest is equal or every position lies within one 1/8-pixel quantum and every count and colour is
   equal.
 - **FR-R02G1808-004**: Rendered frames of the golden set on the simulator MUST match their descriptions within the
