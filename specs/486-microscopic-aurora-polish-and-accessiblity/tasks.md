@@ -80,7 +80,7 @@ the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Microscopic Auror
   `-3f` (the five round-two filters)
 - [X] T-R02G1906-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-26: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G1906-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1906-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-26: reference-1 exit 0
 - [ ] T-R02G1906-009 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G1906-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1906-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G1906-006)
