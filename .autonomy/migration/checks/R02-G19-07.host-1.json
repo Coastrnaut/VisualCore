@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MicroscopicAuroraReconciliationTests|MicroscopicAuroraProgressTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'MicroscopicAuroraReconciliationTests|MicroscopicAuroraProgressTests'",
+  "elapsed_seconds": 19.133,
+  "exit_code": 0,
+  "finished": "2026-11-26T22:54:10+00:00",
+  "gate": "R02-G19-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G19-07.host-1.log",
+  "log_sha256": "b295700dc22c8ff6e2030182b11155799867be40bd8ff61a84748441b7c00563",
+  "name": "host-1",
+  "started": "2026-11-26T22:53:51+00:00",
+  "timed_out": false
+}

@@ -15,7 +15,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G1907-002 [P] [US2] Edit `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraProgress.swift`
+- [X] T-R02G1907-002 [P] [US2] Edit `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraProgress.swift` — Verified 2026-11-26: host-1 exit 0: results carry traces (placements and removals then the play) and verified; traced record keeps the better result; drop keeps the frontier; replay mode Codable; net trace from records with undo/redo; reconciliation keeps honest results and drops edited stars, actions spent, steps and over-long traces (41 tests)
   (Result gains "trace: [MicroscopicAuroraAction]" (effective `.place(slot:well:)` and `.remove(slot:)` actions, then
   `.play`) and "verified: Bool"; `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing
   only when better (ties keep the earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace =

@@ -167,12 +167,13 @@ public struct MicroscopicAuroraFeedbackPlan: Sendable, Equatable {
             + counted(level.length, "tick") + ", " + sites + "; a budget of " + actionsWords(level.budget)
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay" (feature 487).
     public static func modeName(_ mode: MicroscopicAuroraMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 
