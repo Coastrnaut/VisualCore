@@ -63,7 +63,7 @@ R02-G18-03 (`git show <R02-G18-03 record commit>:<path>`).
   the same positions at every tier; ribbons through kernel positions only; gauges at 0, half and full; a won level in
   place; the glow mesh empty at level-2 and its shell counts per tier; each failure kind marked); agent B; `--name
   host-3`
-- [ ] T-R02G1903-005 [P] [US2] Create
+- [X] T-R02G1903-005 [P] [US2] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraExperienceCore (controls, digest, snapshot schema 1, certified-candidate table from the 100 witnesses) with its tests and the renderer-purity tests pass (host-4 exit 0, 17 tests)
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraExperienceCore.swift` (controls "well.place
   [slot, row, column, strength, sense], well.remove [slot], swim.play, play.undo, play.redo, level.next, clock.show
   [tick]"; `clock.show` refuses a tick outside 0 … ticks swum; digest "level number and play fingerprint", never the shown
