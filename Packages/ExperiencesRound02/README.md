@@ -992,5 +992,9 @@ the iOS target `MicroscopicAuroraExperience` (presenter, scene, controls), regis
 the swim scrubber and the dish field picked through the drawn camera) and `MicroscopicAuroraGestureController` (tap a
 site to place a well, drag a well to another site or off the dish with a preview of the kernel's swim, scrub the shown
 tick, tap the field to freeze, two-finger orbit, double-tap or "Reset view"), wired through the presenter's pointer
-entry; the panel gains "Freeze" and "Reset view". See
+entry; the panel gains "Freeze" and "Reset view". Feature 485 (R02-G19-05) adds teaching and progression:
+`MicroscopicAuroraHints` (three hint levels from the current wells, the certified plan's next placement first, at most
+1,200 sets judged), `MicroscopicAuroraFailureExplanation`, `MicroscopicAuroraProgress` (tutorial steps, stars, the
+daily level × 19, campaign, practice with budget 24, daily modes) and adapter snapshot schema 2 with a migration from
+schema 1. See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).

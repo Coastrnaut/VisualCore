@@ -112,3 +112,26 @@ decided exactly on integer positions; the catalog's 0.008333 s timestep is a pre
   Next level) and gains "Freeze" and "Reset view"; its kernel buttons send through the presenter, which logs refusal
   codes with or without the engine's prefix. A host test wins all 100 certified levels through the panel within their
   budgets.
+
+## Teaching and progression (feature 485, R02-G19-05)
+
+- **Hints.** `MicroscopicAuroraHints` searches from the current wells for the fewest actions (at most two placements or
+  removals, within the actions left) that make a winning set of wells: one action before two, the certified plan's next
+  placement first while the current wells are a subset of the certified ones, then removals and placements in a fixed
+  order, at most 1,200 sets judged (a report depends only on the set of wells). The hint escalates from the site ("Use
+  the site at row r, column c next", or "Take well n away") to the sense ("Place a clockwise well at the site at row r,
+  column c") to the exact well ("Place well n at row r, column c with strength s, turning clockwise"); winning wells say
+  "play the swim"; no plan says so and suggests undo or retry. Following exact hints from every opening and then
+  playing replays the certified plan and wins all 100 levels within their budgets. The presenter runs the search off
+  the main actor, once per play.
+- **Failure text.** `MicroscopicAuroraFailureExplanation` puts the play's failure in words: the swimmer that left the
+  dish and the tick, the tick the swarm split with its largest group and the coherence needed, the stencil cells lit
+  and needed, or the lit cell cut off from the pattern, swimmers numbered from 1 and cells by row and column.
+- **Tutorial.** Levels 1 … 3 show three instructions (put a well on a marked site; light the stencil as one joined
+  pattern and play; what fails a swim), each advancing when done (a placement, then a second action, then the level's
+  end); dismissible; undo never moves it back.
+- **Progress.** Stars by actions spent against the certified plan's placements (3 at most, 2 within two more, else 1),
+  level 1 open and a campaign win opening the next (no wrap after 100), five bands of 20; the daily level is (days since
+  2026-01-01 × 19) mod 100 + 1 and is playable while still locked without opening it; practice raises the budget to 24
+  without stars or unlocks. The panel shows the band, the goal, the best stars, the modes and a picker of open levels.
+  The snapshot is schema 2 (digest domain `r02-g19.microscopic-aurora.v2`) with a migration from schema 1.

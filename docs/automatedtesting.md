@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-04: Microscopic Aurora gameplay spatial interaction).
+Last updated: 2026-11-26 (R02-G19-05: Microscopic Aurora progression and player teaching).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Microscopic Aurora progression and player teaching** (R02-G19-05, 2026-11-26). Host:
+  `MicroscopicAuroraHintsTests` (5 functions, 261 cases: exact hints win all 100 levels from the start, 200 seeded
+  reachable states get hints the kernel accepts, off-path states agree with an unbounded brute force, 500 seeded
+  failures explained truly), `…ProgressTests` (18: tutorial steps by witness plays, stars, frontier, the daily level
+  over 2026 … 2036), `…ProgressionCoreTests` (11: the twelve controls, refusals, campaign, practice and daily rules,
+  digest, schema 2 round trip, migration from schema 1, a newer schema refused); the adapter and scenario suites follow
+  `level.next` to the next open level (the manifest regenerated with `UPDATE_SCENARIO_MANIFEST=1`). Simulator:
+  `…TeachingTests` drive the panel's tutorial, hints, failure text, stars and modes. Lesson: a full 1,200-set hint
+  search costs several seconds in a debug build, so the seeded-state test runs one state per case.
 - **Microscopic Aurora gameplay spatial interaction** (R02-G19-04, 2026-11-26). Host: `MicroscopicAuroraPickerTests`
   (5; an independent pick, drop and tick rule on 500 seeded points over certified levels and three orbits),
   `…GestureControllerTests` (6; 500 seeded scripted taps, well drags and scrubs against an independent expectation at
