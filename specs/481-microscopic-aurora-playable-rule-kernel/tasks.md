@@ -67,7 +67,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G1901-005 [P] [US4] Create
+- [X] T-R02G1901-005 [P] [US4] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraPuzzle and its tests pass (host-4 exit 0): moves equal a hand enumeration on 200 walks and agree with the play on 200 walks; a trial with halved samples was discarded (no time gain)
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraPuzzle.swift` (agent C: `PuzzleRules`: State =
   position (wells, actions spent), Move = a placement; legal moves "every legal placement while actions are left";
   goal "the predicted play wins"; rulesID "r02-g19-microscopic-aurora") with
