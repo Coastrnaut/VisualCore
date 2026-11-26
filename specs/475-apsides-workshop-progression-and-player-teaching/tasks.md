@@ -41,15 +41,16 @@ campaign covers the game).
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
 - [ ] T-R02G1805-003 [P] [US1] [US4] Create
-  `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopProgress.swift` (`ApsidesWorkshopTutorialStep` knob
-  → order → recover → done with the texts of clarification Q2, advanced by an accepted tuning (knob → order, order → recover) or the level's end (→ done), never moved back by undo — an undo passes
-  `afterTuning: false` and the play's real end, a redo that restores a won or failed play ends it;
-  `ApsidesWorkshopProgress` "3 when at most the certified witness's tuning count, 2 when at most that + 2, else 1" by
-  actions spent (every accepted tuning record, undone ones included), frontier with level 1 open, best actions spent per
-  level, a better result replacing a worse one; `dailyLevel(year:month:day:)` "(days from 2026-01-01 × 23) mod 100 + 1,
-  negative day counts wrapped", nil for an impossible date; `ApsidesWorkshopMode` campaign, practice, daily(level)) with
-  `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopProgressTests.swift` (tutorial steps on levels
-  1 … 3 by scripted plays following the witnesses; stars and frontier over a 100-level script; every date 2026-01-01 …
+  `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopProgress.swift` (`ApsidesWorkshopTutorialStep` knob →
+  order → recover → done with the texts of clarification Q2, advanced by an accepted tuning (knob → order, order →
+  recover) or the level's end (→ done), never moved back by undo — an undo passes `afterTuning: false` and the play's
+  real end, a redo that restores a won or failed play ends it; `ApsidesWorkshopProgress` "3 when at most the certified
+  witness's tuning count, 2 when at most that + 2, else 1" by actions spent (every accepted tuning record, undone ones
+  included), frontier with level 1 open, best actions spent per level, a better result replacing a worse one;
+  `dailyLevel(year:month:day:)` "(days from 2026-01-01 × 23) mod 100 + 1, negative day counts wrapped", nil for an
+  impossible date; `ApsidesWorkshopMode` campaign, practice, daily(level)) with
+  `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopProgressTests.swift` (tutorial steps on levels 1
+  … 3 by scripted plays following the witnesses; stars and frontier over a 100-level script; every date 2026-01-01 …
   2036-12-31 gives a level in 1 … 100, stable; impossible dates nil; Codable round trips); agent C; `--name host-3`
 
 ## Phase 4: Adapter, scenarios, presenter
