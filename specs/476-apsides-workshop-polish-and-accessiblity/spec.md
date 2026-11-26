@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G18-06 (migration ledger, game feature of experience R02-G18) · ID namespace FR-R02G1806-###,
 SC-R02G1806-###, T-R02G1806-###
@@ -26,6 +26,81 @@ Canonical overrides:
   player, and the kernel, content, adapter, renderer, gestures and teaching of R02-G18-01 … 05.
 - **Model:** feature 466 (Celestial Eclipse Lab's polish and accessibility), adapted to orbit tunings (the periapsis
   knob and the size), the play of one revolution, targets met in order and planet strikes.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+466's answers where the games agree. Facts checked in code (read-only, 2026-11-26): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` are those feature 466 used; the kernel names sectors
+"sector s" (0 … 7) and planets "planet p", describes an orbit as "size a, eccentricity 0.ee, periapsis at d°" (k × 0.05,
+d × 15°) and the progress as "<orbit>; m of n targets met in order; next: …; playing now would win (fail); a actions
+left"; a tuning (`orbit.periapsis` with steps k and d, `orbit.size` with a) spends one action and never ends the level,
+the play (`orbit.play`) always ends it, won or failed; the star pulses by `u_pulse` (0.85 … 1, period 2.4 s, 1 under
+Reduce Motion); the won look is `u_won`, switched at once today, raising the orbit shells to full and lighting the won
+marks, and the fallback draws the won marks in its colours; the glow gain is capped by `u_glowLimit` (0.5 under Reduce
+Flashing, else 1.5); an orbit can be set when its steps are in range and it stays in the sky (`isValid`); the refusal
+codes are `r02-g18.level`, `action`, `budget`, `stage`, `stale`, `not-whole`, `tick`, `locked` and `date` (reported by
+the engine as `action.rule.<code>`).
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted action (`state`), the change then the
+  progress: "Periapsis set: eccentricity 0.ee, periapsis at d°." / "Size set to a."; undo and redo "Undone." /
+  "Redone."; each followed by " m of n targets met in order, playing now would win (or fail), a actions left." ("1
+  action left" singular); a win (`outcome`): "Every target was met in order. Level won spending a actions, k of 3
+  stars." (without the stars in practice); a failure (`outcome`): the failure explanation of feature 475; a level or
+  mode change (`level`): "Level n, band b, <mode>." with the tutorial instruction when shown; a refusal (`rejection`) in
+  words: `r02-g18.locked` "That level is not open yet.", `r02-g18.date` "That date cannot be used.", `r02-g18.action`
+  "That orbit cannot be set, or there is nothing to undo or redo.", `r02-g18.budget` "No actions are left: undo or
+  retry.", `r02-g18.stage` "The level has ended.", `r02-g18.stale` "The play changed before the action arrived.",
+  `r02-g18.level` "That level could not be made.", `r02-g18.not-whole` "That value must be a whole number.",
+  `r02-g18.tick` "That tick is outside the revolution.", any other code "That action was refused." (the engine's
+  `action.rule.` prefix read as the bare code). A revealed hint is announced (`state`) with its text. Moving the pending
+  orbit, drag previews, the shown tick and the view are not announced. Texts are a pure function of the old and new
+  core (and the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact:
+  FR-R02G1806-002; SC-R02G1806-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted tuning, undo or redo; `success`
+  for a won play; `warning` for a failed play; `error` for a refusal; moving the pending orbit, previews, the shown tick,
+  the view and level changes play none. The play plays only its outcome. The shared planners' intervals apply. Impact:
+  FR-R02G1806-003; SC-R02G1806-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: as feature 466: the presenter keeps light levels for
+  the glow (0.7 while playing, 1 once won, 0.35 once failed) and the won look (1 once won, else 0), each easing toward
+  its target by the frame clock's elapsed time between drawn frames (0.15 s normally, 0.45 s under Reduce Flashing,
+  linear; under Reduce Flashing a fade that has started finishes before it may turn back); the scene draws the eased
+  levels (the glow gain times the glow level, `u_won` the won level, and in the fallback the won colours by the won
+  level, rebuilt when the level moves by a tenth or more); the state and digest never see them. The orbit, wedges,
+  apsis markers, planets and gauges change only with the player's actions and are not faded. The star pulse (0.42
+  cycles per second, far below 3) is held at 1 under Reduce Motion and under Reduce Flashing, so the sky is still
+  between actions under either. The measure: sampling the drawn levels every 1/60 s through a scripted win and
+  adversarial flicker (a tuning undone and redone every frame, retry, level changes), no element crosses half its range
+  more than 3 times per second, and every complete one-way fade of more than half the range takes at least 0.4 s under
+  Reduce Flashing. Impact: FR-R02G1806-004; SC-R02G1806-003.
+- Q: Where does the sound choice live, and what are the audition and ambient recipes? → A: a Sound toggle in the panel,
+  off by default, held by the presenter (presentation only; saving it is R02-G18-07). The pending orbit's tone is 220 Hz
+  × 2^(n / 12) with n = (48 − a) / 4 rounded down (0 … 10: a larger orbit sounds lower, a whole step per 8 units of
+  size); the eccentricity step k sets the second partial: an orbit that can be set sounds its tone and the tone × (3/2
+  for k ≤ 7, 4/3 for k ≥ 8) at gain 0.04 each, a clean interval; one that cannot be set sounds its tone with a second
+  partial detuned upward by 3 Hz, so it beats audibly; 0.6 s with a linear decay to silence; played once per change of
+  the pending orbit (the panel's − and + and the adjustable values), a new one replacing the last; never for drag
+  previews. The audition is a pure function of (n, k ≤ 7, can be set). The ambient recipe is a pure function of the
+  targets met in order, the actions left as a share of the budget and the stage: a root at 110 Hz times (1, 9/8, 5/4,
+  4/3) for more than three quarters of the actions left, more than half, more than a quarter, or less; one partial per
+  quarter of the targets met (floor of four times met over the target count, up to four), at the root times (5/4, 3/2,
+  2, 5/2)[q − 1] for q = 1 … quarters, each with the base gain; the root alone when less than a quarter is met; an added octave when won and
+  halved gains when failed; the loop's length is the longest the shared player accepts at which every partial has a
+  whole number of cycles (tested). The presenter rebuilds the loop only when the level opens, a tuning, undo, redo or
+  the play changes the quarters, the root step or the stage, or the toggle turns on, never per frame. Sound plays
+  exactly while the choice is on, the controls are on screen and the scene is active. Impact: FR-R02G1806-006;
+  SC-R02G1806-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the pending
+  orbit's eccentricity, direction and size are accessibility-adjustable elements with their labels and values in words
+  ("pending eccentricity 0.ee", "pending periapsis at d°", "pending size a"); a summary element reads "a actions left.
+  <the progress in words>. Pending: size a, eccentricity 0.ee, periapsis at d°. Level: <the level in words>." (the
+  current orbit when nothing is pending); on iPad the panel keeps a readable width (at most 520 points). Impact:
+  FR-R02G1806-001, 005; SC-R02G1806-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -117,8 +192,9 @@ ambient recipes are pure functions of the state they are made from; sound plays 
 - **FR-R02G1806-005**: The panel MUST support Dynamic Type up to the largest accessibility size and Increase Contrast on
   iPhone and iPad, scrolling instead of clipping.
 - **FR-R02G1806-006**: An orbit audition and an optional ambient sound MUST be synthesized in code — the audition from
-  the pending orbit (its shape and whether it can be set), the ambient sound from the targets met, the actions left and
-  the stage — play only while wanted, on screen and active, and never touch audio when off.
+  the pending orbit (its size step, its eccentricity half and whether it can be set), the ambient sound from the
+  targets met, the actions left and the stage — play only while wanted, on screen and active, and never touch audio
+  when off.
 - **FR-R02G1806-007**: Existing tests pass; no state or digest change; new public names documented; the reference
   regression passes.
 
