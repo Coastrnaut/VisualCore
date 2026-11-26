@@ -7483,6 +7483,72 @@ class CelestialEclipseLabDeviceRowsCheckTests(unittest.TestCase):
                          ["scripts/check_device_rows.py", "--experience", "r02-g17.celestial-eclipse-lab"])
 
 
+class ApsidesWorkshopDeviceRowsCheckTests(unittest.TestCase):
+    """Feature 480 R02-G18-10 (T-R02G1810-003, FR-R02G1810-003, FR-R02G1810-004, SC-R02G1810-001, SC-R02G1810-002):
+    the device-row check accepts Apsides Workshop's real definition (AW-D1 ... AW-D8) and names each defect of a
+    temporary copy; the release check runs it as `device-rows-r02-g18`. Reuses the fixture helpers of
+    DeviceRowsCheckTests (feature 310)."""
+
+    GAME = "r02-g18.apsides-workshop"
+    DEFINITION = "docs/apps/apsides-workshop/device-rows.json"
+    MANIFEST = "Packages/ExperiencesRound02/ApsidesWorkshop/scenario-manifest.json"
+    SPECS = "specs/47[1-9]-apsides-workshop-*/tasks.md"
+    CODE = "R02-G18"
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = load("check_device_rows")
+
+    setUp = DeviceRowsCheckTests.setUp
+    tearDown = DeviceRowsCheckTests.tearDown
+    run_main = DeviceRowsCheckTests.run_main
+    edit = DeviceRowsCheckTests.edit
+    assert_fails = DeviceRowsCheckTests.assert_fails
+
+    def test_real_repository_passes(self):
+        code, out = self.run_main(ROOT_DIR)
+        self.assertEqual(code, 0, out)
+        self.assertEqual(out.strip(), "device-rows r02-g18.apsides-workshop: PASS (8 rows, 12 scenarios)")
+
+    def test_minimal_copy_passes(self):
+        code, out = self.run_main(self.root)
+        self.assertEqual(code, 0, out)
+
+    def test_scenario_removed_from_manifest_fails(self):
+        self.edit(self.MANIFEST, lambda d: d.update(
+            scenarios=[s for s in d["scenarios"] if s["name"] != "fixture-level-1-solved"]))
+        self.assert_fails("scenario fixture-level-1-solved not in the manifest")
+
+    def test_unknown_scenario_in_definition_fails(self):
+        self.edit(self.DEFINITION, lambda d: d["scenarios"].append("no-such-scenario"))
+        self.assert_fails("scenario no-such-scenario not in the manifest")
+
+    def test_missing_row_field_fails(self):
+        self.edit(self.DEFINITION, lambda d: d["rows"][0].pop("pass"))
+        self.assert_fails("AW-D1: missing field pass")
+
+    def test_uncovered_task_fails(self):
+        def drop(d):
+            for row in d["rows"]:
+                if "T-R02G1809-011" in row["covers"]:
+                    row["covers"].remove("T-R02G1809-011")
+        self.edit(self.DEFINITION, drop)
+        self.assert_fails("T-R02G1809-011 not covered by any row")
+
+    def test_uncovered_interaction_task_fails(self):
+        def drop(d):
+            for row in d["rows"]:
+                if "T-R02G1804-011" in row["covers"]:
+                    row["covers"].remove("T-R02G1804-011")
+        self.edit(self.DEFINITION, drop)
+        self.assert_fails("T-R02G1804-011 not covered by any row")
+
+    def test_release_check_runs_the_check(self):
+        steps = {s.name: s.argv for s in relcheck.steps("X")}
+        self.assertEqual(steps["device-rows-r02-g18"][1:],
+                         ["scripts/check_device_rows.py", "--experience", "r02-g18.apsides-workshop"])
+
+
 class HarmonicBridgesRegressionTests(unittest.TestCase):
     """The local Harmonic Bridges regression command (feature 418, T-R02G1208-006, FR-R02G1208-006 and
     FR-R02G1208-007, SC-R02G1208-005): the commands in order (the simulator part with its memory isolation variable),

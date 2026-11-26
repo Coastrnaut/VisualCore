@@ -20,7 +20,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   for AW-D6), covers, owner_steps, status "pending device campaign"; no result field); edit `scripts/release_check.py`
   (step `device-rows-r02-g18`); `--name device-rows -- python3 scripts/check_device_rows.py --experience
   r02-g18.apsides-workshop`
-- [ ] T-R02G1810-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Apsides Workshop definition passes; a
+- [X] T-R02G1810-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Apsides Workshop definition passes; a — Verified 2026-11-26: 2026-11-26: ApsidesWorkshopDeviceRowsCheckTests (8 tests: real repo, copy, removed scenario, unknown scenario, missing field, uncovered tasks, release step); script-tests run-check exit=0 (.autonomy/migration/checks/R02-G18-10.script-tests.json)
   copy with a scenario removed, a copy with AW-D1's `pass` field removed and a copy with T-R02G1809-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g18` runs the check for
   `r02-g18.apsides-workshop`); `--name script-tests` (alone)
