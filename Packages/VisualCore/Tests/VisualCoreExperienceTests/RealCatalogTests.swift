@@ -184,7 +184,9 @@ enum CatalogFixture {
                                // Feature 463 (R02-G17-03); integrated at X-R02-G17.
                                "r02-g17.celestial-eclipse-lab",
                                // Feature 473 (R02-G18-03); integrated at X-R02-G18.
-                               "r02-g18.apsides-workshop"],
+                               "r02-g18.apsides-workshop",
+                               // Feature 483 (R02-G19-03); a registered candidate until X-R02-G19.
+                               "r02-g19.microscopic-aurora"],
                 "the registrations of Catalog/registrations.json")
     }
 

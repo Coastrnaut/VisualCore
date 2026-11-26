@@ -62,6 +62,8 @@ let package = Package(
         .library(name: "ApsidesWorkshopExperience", targets: ["ApsidesWorkshopExperience"]),
         // Feature 481 (R02-G19-01): Microscopic Aurora's rule kernel, a candidate until X-R02-G19.
         .library(name: "MicroscopicAuroraCore", targets: ["MicroscopicAuroraCore"]),
+        // Feature 483 (R02-G19-03): Microscopic Aurora's experience (iOS only; a registered candidate until X-R02-G19).
+        .library(name: "MicroscopicAuroraExperience", targets: ["MicroscopicAuroraExperience"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -836,6 +838,27 @@ let package = Package(
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore)],
                     path: "MicroscopicAurora/CoreTests"),
+        // Feature 483 (R02-G19-03): Microscopic Aurora's experience (presenter, scene, controls).
+        .target(name: "MicroscopicAuroraExperience",
+                dependencies: ["MicroscopicAuroraCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "MicroscopicAurora/Experience"),
+        // Feature 483 (R02-G19-03): the simulator tests of Microscopic Aurora's experience.
+        .testTarget(name: "MicroscopicAuroraExperienceTests",
+                    dependencies: ["MicroscopicAuroraExperience", "MicroscopicAuroraCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "MicroscopicAurora/ExperienceTests"),
         // Feature 463 (R02-G17-03): Celestial Eclipse Lab's experience (presenter, scene, controls).
         .target(name: "CelestialEclipseLabExperience",
                 dependencies: ["CelestialEclipseLabCore",

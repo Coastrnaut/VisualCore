@@ -1588,7 +1588,7 @@
       "id": "r02-g19.microscopic-aurora",
       "code": "R02-G19",
       "title": "Microscopic Aurora",
-      "summary": "Manipulate magnetic swimmers to build a glowing bacterial pattern",
+      "summary": "Place magnetic wells on the marked sites so a swarm of luminous swimmers draws a glowing target pattern under a microscope: the trails must cover the stencil as one connected shape, without a swimmer escaping the dish or the swarm breaking apart.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1597,11 +1597,30 @@
         "micro-ecosystems"
       ],
       "order": 44,
-      "palette": [],
+      "palette": [
+        "#04110F",
+        "#8FF0D6",
+        "#B58CE0",
+        "#E9FFF8",
+        "#0E2E2A"
+      ],
       "tile_seed": 3511848477,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Steer swimmers with magnetic wells",
+        "Swarm rules in exact integers",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "03c1dc197f26f838811878aa6a1b0e5ca8c8a82704c10ba01738dea106bd3329",
+        "levels": 100
+      },
       "available": false
     },
     {

@@ -60,6 +60,8 @@ import CelestialEclipseLabCore
 import CelestialEclipseLabExperience
 import ApsidesWorkshopCore
 import ApsidesWorkshopExperience
+import MicroscopicAuroraCore
+import MicroscopicAuroraExperience
 import VoxelOrigamiCore
 import VoxelOrigamiExperience
 import VisualCoreExperience
@@ -142,7 +144,26 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [microscopicAurora].compactMap { $0 }
+
+    /// R02-G19 Microscopic Aurora (feature 483, R02-G19-03): a candidate until X-R02-G19. Snapshot schema 1, so no
+    /// earlier example is stored yet.
+    fileprivate static var microscopicAurora: ExperienceRegistration? {
+        guard let id = MicroscopicAuroraExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: MicroscopicAuroraExperienceCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return MicroscopicAuroraExperience.make(
+                id: id, storage: launch.storage,
+                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        // Seed 0 opens certified level 1, as for the other round-two puzzles.
+        registration.openingSeed = 0
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = MicroscopicAuroraExperienceCore.manifest(for: id)
+        #endif
+        return registration
+    }
 
     /// R02-G18 Apsides Workshop (features 471–480, R02-G18-01…10): integrated at X-R02-G18 (2026-11-26). Snapshot
     /// schema 3 since feature 477 (R02-G18-07); its schema-1 and schema-2 examples are registered since feature 479

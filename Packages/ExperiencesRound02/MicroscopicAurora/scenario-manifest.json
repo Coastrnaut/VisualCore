@@ -1,0 +1,7412 @@
+{
+  "controls" : [
+    "well.place",
+    "well.remove",
+    "swim.play",
+    "play.undo",
+    "play.redo",
+    "level.next",
+    "clock.show"
+  ],
+  "experience" : "r02-g19.microscopic-aurora",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fa482f9e7440b89c8cfd7452320b86cee1a678d061973197c8f20cac37318e38",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              3,
+              9,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              -1,
+              9,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              24,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              -1,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              24,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              -1,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              5,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1,
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              481
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0.5,
+              9,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9.5,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1.5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0,
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              121
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1,
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fa482f9e7440b89c8cfd7452320b86cee1a678d061973197c8f20cac37318e38",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              13,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              14,
+              17,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f6e63a632ca8afbd3e4467ef203ebebefb7790a0ea72167bd88b2126ed200afa",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fa482f9e7440b89c8cfd7452320b86cee1a678d061973197c8f20cac37318e38",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              8,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              8,
+              3,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6d403b7c8083b63c5c2e5e60495e0f2e44344da7ff4d108c9048ed94f36229ef",
+        "initialDigest" : "79f53e117744c62ad64cbf8f1e41ef3d84095885233aa212ba22bbda920df8ea"
+      },
+      "name" : "acceptance-001",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              19,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "616de8209cc1c611f2934e28f4f8502b1be979b988113367312e6f821410a5ce",
+        "initialDigest" : "49a59fc1541965488d748dd350fb7a600cfa49826c3c7384c8d2b4335dc94a7a"
+      },
+      "name" : "acceptance-002",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              2.5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "59423d9c87597a88c4c2b53c3632023b644820a6b9332da76aa5e6bb3fdb5220",
+        "initialDigest" : "ab953ba4e0f19b13d0b8015135774a409e190fa86c247e94cf282d70f75741cf"
+      },
+      "name" : "acceptance-003",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              6,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              8,
+              6,
+              3,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9bc26fe47db3302e99c6b4798adf0175f74244149d18944f5a0b61307ec0ffa3",
+        "initialDigest" : "e874ad67b76030a980cb2abe19ab32ab58fd1d060510ddfa676c0761f9be597f"
+      },
+      "name" : "acceptance-004",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              12,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              12,
+              5,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f108a2415b9d83334d77642c00ff602f069c17cf9313bae8139cb7b24b8fc7a0",
+        "initialDigest" : "576accc90654364743dda7c29e9fdd50fa1fc90e8412accfbeb721cc09b333c4"
+      },
+      "name" : "acceptance-005",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              9,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              9,
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "af7ad685b66ab13a7704907c6764fcb470f56807b0ca4c12b56c6217c6726683",
+        "initialDigest" : "eb5be92783b18994ac003643096ce4c3a55299fc58f6334a601b6e35442de730"
+      },
+      "name" : "acceptance-006",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              15,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "905791f11b2acdb8c30a62a70174ad9cfb626bf4721ca594c69c457ac84e2a75",
+        "initialDigest" : "5d346c41124ebc527d885d33c84d08525d693d36f158d0c9af7086727b5a1f3e"
+      },
+      "name" : "acceptance-007",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              18,
+              10,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              18,
+              10,
+              3.5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f69ec5c5ca7852054b02cb9b2baaf6670093b159bd70ea717ffe9d09bcf374c3",
+        "initialDigest" : "3a0ef5c6795f71227bffe3f64749ec6174792b96d6b9863f5a27893805245e65"
+      },
+      "name" : "acceptance-008",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              6,
+              12,
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "88acb1da703964400a976dbde09201a1ec414ade955e69af67a16de6cd3bd6f9",
+        "initialDigest" : "f4a0ed2bc792bbc50e76c3f7cd8806a03c38ca4483349632b2ef9b7154bef9b8"
+      },
+      "name" : "acceptance-009",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              17,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              17,
+              5,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a13a042e97e746b69cbbb2f48254ca473f045a220f872c5c4be4d8b1838629ed",
+        "initialDigest" : "1fd0f44ecd01a071dc497c750a0c5331740b56310b866964b81943e3bf4367b2"
+      },
+      "name" : "acceptance-010",
+      "seed" : "27"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              11,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              19,
+              11,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1de08c0511e554afcba2391d3949246953af0c12e0cc153ab30841d0740e8656",
+        "initialDigest" : "27e590622a73d67a97c9ce25edc28a172ca41115177ba7d3ceb5cdf41421fae1",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-011",
+      "seed" : "34"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              19,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6e1f4e0f02e4ce082091a4dbb3ca2d11464f10f93b3481d8c6846248062ab045",
+        "initialDigest" : "df0cbdddfe1ec2cc97067f16afe331e37744a1001b990d626909789507cf1783",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-012",
+      "seed" : "41"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              8,
+              7,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4b1dfe8679897f1733deaaaa488ba8f07a9e4faffcdc837d3310edb629ab4a4b",
+        "initialDigest" : "e5503959cef3407bcdcbdb47ca72c2e16c11e7f2c1cd29a765d5e76bd98fbc85",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-013",
+      "seed" : "48"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a693a69749958f2a4de515a450c0b071fc7f360775f73821331b4bfd6cd6a99f",
+        "initialDigest" : "90b439c19f1a95cfab4ff0669e09c02a8d0049fd70564f8d3123eaf50c44215f",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-014",
+      "seed" : "55"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              18,
+              13,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              8,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              19,
+              11,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a4d437992616141d74da7b54da6df1ddbaf3119d0a5f05c32cffd1c849df26fd",
+        "initialDigest" : "288b917f59466794d67a95d06e23f1c2f845409556edc7b8dedcd6b02d1accbf",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-015",
+      "seed" : "62"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              5,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bc4daebff249febb63809f36c5d4e7686b664bd12cd9f33d60f114ee7c7ad442",
+        "initialDigest" : "d5ad990dcc9ba20517fe11f1349d4ac9384301c74278fd2dc6d8e4419e6cfddc",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-016",
+      "seed" : "69"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              9,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              12,
+              18,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b940f6b319e0e5fa987e94fd03c3c3d3cd2be23b4f846e90b57b102b91024a69",
+        "initialDigest" : "12859bc54c92ddd7f11b6f3d6d6417c14d25fcf8ba434d332aee04ac7d210462",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-017",
+      "seed" : "76"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1be14d6e2833b43b60aa9aa044172b0096bdf67b1751cdaf4310ff5e60a9a8f5",
+        "initialDigest" : "bbf88cac3842c2fd4b9c22a70ec930b896dd9e5fc9aba7e469238be20eb56705",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-018",
+      "seed" : "83"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              17,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              15,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              17,
+              17,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "66be86d5c609f82c0a985f3ee4b7d3ea7b372539d6fb1e014f09eff82f3274b5",
+        "initialDigest" : "69f92d3f321b8fef4b07369b38c90f686143187a093cf30c0f17c1c009e1bf85",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-019",
+      "seed" : "90"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3177fa12d16a20a401fe7321f32e83e9282c0bee335004c1c3f53d5bc1556cbb",
+        "initialDigest" : "c4541d5ba1e33af9728692f705942adaee5d5dbc422655d3981aba4fd0b7e506",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-020",
+      "seed" : "97"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              14,
+              5,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              3,
+              9,
+              14,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              14,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              121
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              14,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              19,
+              10,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a254f9a86de4d4a7355ade3676dd29c701bc02e8671bafb68e23c1ca85e675e2",
+        "initialDigest" : "a254f9a86de4d4a7355ade3676dd29c701bc02e8671bafb68e23c1ca85e675e2"
+      },
+      "name" : "acceptance-021",
+      "seed" : "4"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              24,
+              10,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              10,
+              1,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              10,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              121
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              10,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              14,
+              17,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cfb1ffd1cf014ae2aa0663bbad59e37e18ed62aea2a808ebef5066658af7a8d0",
+        "initialDigest" : "cfb1ffd1cf014ae2aa0663bbad59e37e18ed62aea2a808ebef5066658af7a8d0"
+      },
+      "name" : "acceptance-022",
+      "seed" : "11"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              120
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              8,
+              5,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              3,
+              8,
+              8,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              8,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              121
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              8,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              16,
+              8,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7b93f403fd07cf7463555b5cdb930cfeca2907640bfc338f193f8400c542321c",
+        "initialDigest" : "7b93f403fd07cf7463555b5cdb930cfeca2907640bfc338f193f8400c542321c"
+      },
+      "name" : "acceptance-023",
+      "seed" : "18"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              137
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              24,
+              4,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              13,
+              4,
+              1,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              4,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              138
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              13,
+              4,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              16,
+              6,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b633ff8f1fd83baecdd3aac32a45698acd03e2fec9869fa1e5e24cc32ac61cee",
+        "initialDigest" : "b633ff8f1fd83baecdd3aac32a45698acd03e2fec9869fa1e5e24cc32ac61cee"
+      },
+      "name" : "acceptance-024",
+      "seed" : "25"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              132
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              14,
+              5,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              3,
+              6,
+              14,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              14,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              133
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              14,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              17,
+              12,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "50c40448d54fd26766e1b50ecac75fbaef21b99530eb5bdc5618a3cc240cc6e7",
+        "initialDigest" : "50c40448d54fd26766e1b50ecac75fbaef21b99530eb5bdc5618a3cc240cc6e7"
+      },
+      "name" : "acceptance-025",
+      "seed" : "32"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              121
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              24,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              4,
+              12,
+              1,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              122
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              4,
+              12,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              12,
+              19,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2705b840405ae0e666454ce301f22deb5509b05303f737842815a2e7e2c3234b",
+        "initialDigest" : "2705b840405ae0e666454ce301f22deb5509b05303f737842815a2e7e2c3234b"
+      },
+      "name" : "acceptance-026",
+      "seed" : "39"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              140
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              18,
+              5,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              3,
+              9,
+              18,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              18,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              141
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              18,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              19,
+              14,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5d16371258265464e765b9ed1921acff2e0b7e98a85d10a741973cada15c70c5",
+        "initialDigest" : "5d16371258265464e765b9ed1921acff2e0b7e98a85d10a741973cada15c70c5"
+      },
+      "name" : "acceptance-027",
+      "seed" : "46"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              140
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              24,
+              11,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              11,
+              1,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              11,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              141
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              11,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              15,
+              16,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b809bcb5f08b522112596f2fbceccd29ad931f8eb0520ab416155f8b0747e923",
+        "initialDigest" : "b809bcb5f08b522112596f2fbceccd29ad931f8eb0520ab416155f8b0747e923"
+      },
+      "name" : "acceptance-028",
+      "seed" : "53"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              148
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              10,
+              5,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              3,
+              9,
+              10,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              10,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              149
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              10,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              17,
+              12,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "55792f9d7daa12059849632f939e456e8d56f514823a7b87391f5f352b18bba1",
+        "initialDigest" : "55792f9d7daa12059849632f939e456e8d56f514823a7b87391f5f352b18bba1"
+      },
+      "name" : "acceptance-029",
+      "seed" : "60"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              141
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              24,
+              4,
+              1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              4,
+              1,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              1,
+              9,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              0.5,
+              4,
+              1,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g19.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              142
+            ]
+          },
+          "result" : "action.rule.r02-g19.tick",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              4,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              14,
+              18,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "72a6d6ad5e2545cbfcf2770da4ad6ca3a71c2e8ddd7ee14bf0a9d82b6c340d32",
+        "initialDigest" : "72a6d6ad5e2545cbfcf2770da4ad6ca3a71c2e8ddd7ee14bf0a9d82b6c340d32"
+      },
+      "name" : "acceptance-030",
+      "seed" : "67"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              11,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              77
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "15e231419b855f661b080b2f5a247f21c361aa715851b896878751a003595ff1",
+        "initialDigest" : "550912c77874e2c2851add745b746affedbc4991e8579ff2d4ef06c39d154d59"
+      },
+      "name" : "acceptance-031",
+      "seed" : "74"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              9,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              80
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "efae61a7efee7a00e0439f96cfde945d3b722bb4e273528494ba93efc875b4e8",
+        "initialDigest" : "5fec8ce56909e75732e07811d97f4e96697afc66facebc558d00a01f60ab16c5"
+      },
+      "name" : "acceptance-032",
+      "seed" : "81"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              14,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              80
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f149f09f4a9d9a1cef7a0a34da6841fc2929c3b0e5f1b3c4f76bd4d9dc31db87",
+        "initialDigest" : "53255e70de68da53c6a84ce203e4c12254aa1b9644329d0107b2b4b85bfef27a"
+      },
+      "name" : "acceptance-033",
+      "seed" : "88"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              12,
+              6,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              62
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "72d35ad4d4304d3da52937bea425dd66944878280e0c32fafd7159bb6aef46c4",
+        "initialDigest" : "571050ec25a3fed271a65a06fdeb784cc876989b5dbdee478d7f7d65709b649b"
+      },
+      "name" : "acceptance-034",
+      "seed" : "95"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              14,
+              17,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              60
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1ce31e84b7d9ebeb6375b4e65be71407d08764e4ace07075ddc649df4776fac1",
+        "initialDigest" : "12ba97c499fb4fdddd483240c7806f947bfb1fc9d7be0cca7d2da8a98aa8c787"
+      },
+      "name" : "acceptance-035",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              16,
+              11,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              60
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6135834eb71e6338240623bc7b3293cb8a4c8af4ee013289bf6741b9548b2246",
+        "initialDigest" : "dcf0247985050d6f5809aa3f418ecbbd790ec88ccb86521dbc99f203d2124219"
+      },
+      "name" : "acceptance-036",
+      "seed" : "9"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              6,
+              16,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              60
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "04e7a74a4e989ba0ba5322a10f07d3a78a60b4ee0f3422fdf805db7fdbfb6db3",
+        "initialDigest" : "d9a6986d2aa877e583dd768ae763c52cbd15144d16ff2140c40c3335c0721690"
+      },
+      "name" : "acceptance-037",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              14,
+              10,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              62
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c72729b9b9dfa6f169bd3b33020dbf3a5513e433e7bbc9ed83c17693eca3f4a3",
+        "initialDigest" : "7675a560a8e990f5d661d6ea24eb5945a76bb6c0bc9269d06cc3abd79720cf2e"
+      },
+      "name" : "acceptance-038",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              13,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              68
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "82212aed8165f5b448d2decfcc1cffd31b2eac45791b4c1d19c3d76ae7b5ae1b",
+        "initialDigest" : "5399b7e26892f93d83bb26031242a70b6b3b0522dbbda10d36365bcf2d0d3489"
+      },
+      "name" : "acceptance-039",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              13,
+              16,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              69
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c3aef6dd8113f9c5becc399a6b44988666ea539d88a03d4d5e2953135b357d7a",
+        "initialDigest" : "d0c9ef87709df8fb85efb07f048aee2350833c5b0a5b4b677672959d22d88f13"
+      },
+      "name" : "acceptance-040",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              12,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              13,
+              13,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "030ede29c598b6089cc67b6e6d5303fe9a9632df636a5567bbd7f2b31a3bda97",
+        "initialDigest" : "c98dcb7567a15b920dc7019a7694ffc9c56dd57ca11651a8b44639d95e6caa45",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-041",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              12,
+              8,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              14,
+              12,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f34a3a88e6d44426fb8e8394d430ea90addaa77a6689f9da4543197c2ed9dda6",
+        "initialDigest" : "56a48b4daa529e19ab1b23ab5f4cebfa3ee120e09841a13e9d529b54eef02e8e",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-042",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              12,
+              12,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              14,
+              11,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9a62b44c01536543fddd6c371cb144dbc74d9ccc6937519d5b0206bceceab0be",
+        "initialDigest" : "50d4f1f5ed5098effbc35031fbeb591fbc73722e2f87622964bd9b7db7fbe230",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-043",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              16,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              16,
+              14,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f90438ecfca405cc4e597ddb4a05e42a39384eee06df48f8f4ae9ce3d5d589bf",
+        "initialDigest" : "0b37fd85dd8403852e35cbb2332a97e4a8eb479f00b8bdc496af16bb7e2cdda9",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-044",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              14,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              12,
+              16,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "47eaeeb3f71bcdfe14290c1cbdeaafd06611a54f787a197572252decd1c2c8aa",
+        "initialDigest" : "241d0f8d0d45655584e2fc0745c1e0323a82b8b9ea1260f6d96f173ef88801c9",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-045",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              10,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              16,
+              10,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6df23765b5ca3efa1354733d956270d21b008e6de2315b223308c361ab364043",
+        "initialDigest" : "cb145d83c547220cb49ac4050f9a3f4a6dff05540ba35dcba0b8f0eb44ce2c95",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-046",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              14,
+              12,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              17,
+              15,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cf15606f349f09eb07d2f1c3d3184119bea3ff96d706f2aecdd7d199b08c5350",
+        "initialDigest" : "73b32adae31931aa19cb1905bb7323be8f9b0cb2f3e09f18470e215c6e1a514f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-047",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              13,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              11,
+              14,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f78c64d4a4b075bcf222b36592de52cfa1c6e16f4ec7da999fa37816bcf63596",
+        "initialDigest" : "51e8f8aa1f21a92129588f391bcc1be217036269c15573d77e0ee2ffc595702c",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-048",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "15ad4221be6de887c20d986f9a0c1d806b0498da192bfe9778e6b76936242610",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-049",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              11,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6a846749a315f334460c7f15a2306e4eb35bf66f2b4753fa0c163f6ff5f1c261",
+        "initialDigest" : "b8e285a57506d46c2df01176b6568581e775815ff3506cbbcdb70ec9c3ba7efa",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-050",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "50076f839d23c22132f4ac4696194eb81d0b902cfb14ca61ca00e057e9f86790",
+        "initialDigest" : "50076f839d23c22132f4ac4696194eb81d0b902cfb14ca61ca00e057e9f86790"
+      },
+      "name" : "acceptance-051",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e5a9c28dcdcc556f233addad4806dfeb1df5923fad94c93f0e21c06cbfda6f02",
+        "initialDigest" : "e5a9c28dcdcc556f233addad4806dfeb1df5923fad94c93f0e21c06cbfda6f02"
+      },
+      "name" : "acceptance-052",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5d847ced3de7dbca7882b29c54f3e8f11030a493060786158588c103175ef5c5",
+        "initialDigest" : "5d847ced3de7dbca7882b29c54f3e8f11030a493060786158588c103175ef5c5"
+      },
+      "name" : "acceptance-053",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cc60da81de33bba2e4ee220cc43ef161cc663ff256a22cc47dbeebe9a1b3f39f",
+        "initialDigest" : "cc60da81de33bba2e4ee220cc43ef161cc663ff256a22cc47dbeebe9a1b3f39f"
+      },
+      "name" : "acceptance-054",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              8,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bedb1e0587d916ed6f6fe0eb5a45c51b15022dca8d8184a5a649ccaa29db3c27",
+        "initialDigest" : "c270eb640b83bf28443fec44c7e9376018942bf6e7ed9b31330cbc16e77f7042"
+      },
+      "name" : "acceptance-055",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5de59e7a937e5a2a21839fd61723720701d0e26477c795ad2b05a05077e10d19",
+        "initialDigest" : "5de59e7a937e5a2a21839fd61723720701d0e26477c795ad2b05a05077e10d19"
+      },
+      "name" : "acceptance-056",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9a983ba75fc1314b0ce69713c9bf5c80a2ba898f3cf4fbdb57b929346dcf3ebf",
+        "initialDigest" : "9a983ba75fc1314b0ce69713c9bf5c80a2ba898f3cf4fbdb57b929346dcf3ebf"
+      },
+      "name" : "acceptance-057",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              12,
+              6,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "74df89768401a4ca2cc3f3b20a732b014cad33957399d7c8818be7ea881c3ace",
+        "initialDigest" : "fda9c13869b9e1a79cab1521fb4bdbe599a0754ef3e9952903ed7fd370cf1a38"
+      },
+      "name" : "acceptance-058",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              15,
+              6,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6902b4c7008ca800417f248a147b8b51ac598df8683bbace1413d9346d0e861c",
+        "initialDigest" : "8011be80f9a66df4675b19c7ae34a2d98a645a364a3c33572ab0a0d49e3d8eca"
+      },
+      "name" : "acceptance-059",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9cb38588f9602afb27f3d8909ad0ce3db359452d9c67e8dc8079f75e7f946262",
+        "initialDigest" : "9cb38588f9602afb27f3d8909ad0ce3db359452d9c67e8dc8079f75e7f946262"
+      },
+      "name" : "acceptance-060",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              18,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              18,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              18,
+              10,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4d88b01c3952e8a0c4a11083e25bca2159fbefa6d85188a2ffd5060c991b4b12",
+        "initialDigest" : "779f213b383b44b0ff892af820effb868d2fa1d4a35e1ccf6f10cb52d0fb0b30",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-061",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              17,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              17,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              16,
+              11,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a88eb34944fc8eabc76c53e2fb1c7a341bddbf3bae886f642ef26ab0369d0600",
+        "initialDigest" : "24a312446495be2cdc5da71827cc96128f45a16b080d7e45a13e2a3432482d19",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-062",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              10,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              10,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              12,
+              13,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "53759afff052d543a905b809825e1dbf6d7afc3870b89d3436d015d5d24f275f",
+        "initialDigest" : "fc4e73ffe34728e1bfc0b57123d3b749921995c502c048f2e2e30431922d288f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-063",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              15,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              15,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4067a90ee166ec0230d2a9d03733f904b9cad11868c88ccc69687b6fa8644dcb",
+        "initialDigest" : "1c171e68344a594ff34e72c55a97d4ef9d99f22026991950f0b88b4020c00a79",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-064",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              4,
+              11,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              4,
+              11,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "020b0bcd851c497b60581b6beb8790b1f853eb58a288deff593ce350134215a1",
+        "initialDigest" : "f4135b33123bc5a80232ef11b634e8893ed5ef0a9d5e5e087e7f520399dd4087",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-065",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              4,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              4,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a49fa0549470b6d5e42d8a504af2c90ffb973b6ebc75b1e13c180e46aa856443",
+        "initialDigest" : "fe47f8fd6da86fd5453041d70cae0b4963b8b2eb30998768768c90e30251b2a6",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-066",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              17,
+              14,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              17,
+              14,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aa33bfbbe50912d469773f907be87eadb8c75f69d9250b78ceb111227ef6615a",
+        "initialDigest" : "dfdd4ff43eaae1763cf7951b0461d5a1a6e1e9b9df858a65a4dc878b9a79a480",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-067",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              4,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              4,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f68c3cb42278b82d15fd875d8721a4d8346217d505dc941b3990b11ab16adaee",
+        "initialDigest" : "40ed9ed30b7fe9c4cd4c65b2cfe498da761e76893ca52db40b7c4063188e4be3",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-068",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              14,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              5,
+              14,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              14,
+              15,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "30fd02f9b5914e1c8c99d63d43ce7a9acc43330a0d20092e80ae38ef5d1141c3",
+        "initialDigest" : "2c9bcb76290808897209921d515d29b88a4889f21ac5766cf3e8f1c217b76e30",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-069",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              8,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              8,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              1,
+              17,
+              12,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9121ee2a843f9d09a137ed22fe3c21e8cb6887f48230a087281e8affba1f8055",
+        "initialDigest" : "1dc74c18a870a19d2596c17d678a62326a1d997d6d6e4ee4d3381fa778503cec",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-070",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              7,
+              9,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "90b439c19f1a95cfab4ff0669e09c02a8d0049fd70564f8d3123eaf50c44215f",
+        "initialDigest" : "1ac0170815d11798ff37debd7203bb7783d0d9783681d24ee5ea6c1c84ae6378"
+      },
+      "name" : "acceptance-071",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              18,
+              13,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "288b917f59466794d67a95d06e23f1c2f845409556edc7b8dedcd6b02d1accbf",
+        "initialDigest" : "6545f7948f63609679c087c322db4c0b6287d13d427fdc58cadee99bb9aa6df2"
+      },
+      "name" : "acceptance-072",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              12,
+              17,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d5ad990dcc9ba20517fe11f1349d4ac9384301c74278fd2dc6d8e4419e6cfddc",
+        "initialDigest" : "a52ff36b832cd319b225e04ca86f5e0b57a3ce266d9df4f134ccc3ddda50f4f8"
+      },
+      "name" : "acceptance-073",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              10,
+              9,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "12859bc54c92ddd7f11b6f3d6d6417c14d25fcf8ba434d332aee04ac7d210462",
+        "initialDigest" : "98b5a3cab1a141f0627352ccd78e6c7ab0aabb4ddcf4af74c05e099510ae345e"
+      },
+      "name" : "acceptance-074",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              12,
+              11,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bbf88cac3842c2fd4b9c22a70ec930b896dd9e5fc9aba7e469238be20eb56705",
+        "initialDigest" : "9f636b2999a5ecd4ccaac3369f8f3dd7ff9702b0fe348aa039dae75603114102"
+      },
+      "name" : "acceptance-075",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              17,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "69f92d3f321b8fef4b07369b38c90f686143187a093cf30c0f17c1c009e1bf85",
+        "initialDigest" : "51e75d5368b8f6b6a4eeb1134e49bc4628d28a95c477ed7c7392d8da4a9a468d"
+      },
+      "name" : "acceptance-076",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              8,
+              7,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c4541d5ba1e33af9728692f705942adaee5d5dbc422655d3981aba4fd0b7e506",
+        "initialDigest" : "a170b4c2cb5019ec1edb6b96c05a7d1929433e300e7c7251ebac4ab033beecd7"
+      },
+      "name" : "acceptance-077",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              16,
+              17,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a254f9a86de4d4a7355ade3676dd29c701bc02e8671bafb68e23c1ca85e675e2",
+        "initialDigest" : "fe8e241be72af1f6cc9fbb9d4765619e0961f911b252632ab88a61c78e74929f"
+      },
+      "name" : "acceptance-078",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              9,
+              10,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "cfb1ffd1cf014ae2aa0663bbad59e37e18ed62aea2a808ebef5066658af7a8d0",
+        "initialDigest" : "f5a34d4b4272b530b9e9681362d55a192d9289a2f811788dc839a2ecdb96b39d"
+      },
+      "name" : "acceptance-079",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              16,
+              8,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g19.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7b93f403fd07cf7463555b5cdb930cfeca2907640bfc338f193f8400c542321c",
+        "initialDigest" : "3013e7e4dad25d092509d4f5813fceb930698d2a1c2218b65f6f203768e9511a"
+      },
+      "name" : "acceptance-080",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "15ad4221be6de887c20d986f9a0c1d806b0498da192bfe9778e6b76936242610",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "swim.play",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d09daa2801c2bf3d536f8098b5c0aeb44ebbc1224921d83eb5c9d626c0615ee9",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-run-fails",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "well.place",
+            "values" : [
+              0,
+              11,
+              18,
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "fa482f9e7440b89c8cfd7452320b86cee1a678d061973197c8f20cac37318e38",
+        "initialDigest" : "0a59d8c00cccb0e288d108e1e34258cc98c66aefa998d4415f84c8df0c6b1418"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

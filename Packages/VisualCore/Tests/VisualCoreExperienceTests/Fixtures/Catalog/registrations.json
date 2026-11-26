@@ -1110,6 +1110,34 @@
       "manifest": "Packages/ExperiencesRound02/ApsidesWorkshop/scenario-manifest.json",
       "permissions": [],
       "summary": "Tune one orbiter's ellipse around a star so it sweeps the target sky sectors with their shares of area and puts its apsides where the targets ask, in order, without striking a planet: a luminous compass. 100 certified levels. Drawn in code; offline."
+    },
+    "r02-g19.microscopic-aurora": {
+      "capabilities": [
+        "Steer swimmers with magnetic wells",
+        "Swarm rules in exact integers",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#04110F",
+        "#8FF0D6",
+        "#B58CE0",
+        "#E9FFF8",
+        "#0E2E2A"
+      ],
+      "content": {
+        "catalog_sha256": "03c1dc197f26f838811878aa6a1b0e5ca8c8a82704c10ba01738dea106bd3329",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/MicroscopicAurora/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Place magnetic wells on the marked sites so a swarm of luminous swimmers draws a glowing target pattern under a microscope: the trails must cover the stencil as one connected shape, without a swimmer escaping the dish or the swarm breaking apart."
     }
   }
 }

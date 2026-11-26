@@ -82,7 +82,7 @@ R02-G18-03 (`git show <R02-G18-03 record commit>:<path>`).
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G1903-006 [US3] [US4] Create
+- [X] T-R02G1903-006 [US3] [US4] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraExperience (presenter, dish scene, controls), scenarios (94: standard, three-level playthrough, hero, 3 fixtures, 80 acceptance) and manifest, the candidate registered (registrations with content facts, catalog, registry, project.yml + xcodegen, AppModelTests candidate -> r02-g20.mushroom-weather, test_scripts); sim-27 exit 0 (26 of 26 simulator tests by agent D), packages and packages-2 exit 0, catalog-search exit 0, scenarios exit 0
   `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraExperience.swift`, `…Presenter.swift`,
   `…DishScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing; the
   presenter declares `probes(_:)` — two backdrop corners, as the round-two X gates require — and its quality levels equal
