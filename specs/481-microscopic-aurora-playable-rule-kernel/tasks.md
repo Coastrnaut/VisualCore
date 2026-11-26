@@ -54,7 +54,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 4: Stories 2 and 3 — failures, undo, redo, replay (P1)
 
-- [ ] T-R02G1901-004 [P] [US1] [US2] [US3] Create
+- [X] T-R02G1901-004 [P] [US1] [US2] [US3] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraPlay and MicroscopicAuroraPlayTests pass (host-3 exit 0, 8 tests)
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraPlay.swift` (agent B: stages "loading,
   tutorial, playing, paused, won, failed, result"; the wells from the level; `place(slot, well)` and `remove(slot)`
   validated in the order stage, previous fingerprint, action ("out of range, unchanged, on an occupied or outside cell,
