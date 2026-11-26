@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G18-07: Apsides Workshop persistence and replay).
+Last updated: 2026-11-26 (R02-G18-08: Apsides Workshop visual golden and solver regression).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop regression net** (R02-G18-08, 2026-11-26). Host: `ApsidesWorkshopRegressionSolverTests` (14
+  tests: 100 witnesses replayed and re-planned within the counted work bound, twelve named alterations) and
+  `ApsidesWorkshopRegressionGoldenTests` (12 tests over the 16 pinned frame descriptions). Simulator:
+  `ApsidesWorkshopRegressionGoldenFrameTests` and `ApsidesWorkshopRegressionMemoryTests` (alone with
+  `TEST_RUNNER_APSIDES_WORKSHOP_MEMORY_ISOLATED=1`: 12 cycles from 28.96 MB, at most 0.42 MB growth; the suite now runs
+  70). Local: `python3 scripts/apsides_workshop_regression.py`; CI step "Apsides Workshop regression (host)". Lesson:
+  the certifying search is bounded at 16,000 orbits, so the 100-level solver regression finishes in under a second;
+  its log was checked for all 10 groups of 10 cases before the time was trusted.
 - **Apsides Workshop persistence and replay** (R02-G18-07, 2026-11-26). Host: `ApsidesWorkshopReconciliationTests`
   (13 tests: every certified witness trace verifies; edited stars, actions spent, trace steps, play-less and overlong
   traces are dropped and counted), `ApsidesWorkshopReplayCoreTests` (8 tests: stored traces, replay rules and codes, a

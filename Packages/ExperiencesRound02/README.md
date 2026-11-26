@@ -966,4 +966,5 @@ panel's pending orbit with "Set periapsis" and "Set size". Feature 475 (R02-G18-
 adds `ApsidesWorkshopFeedbackPlan` (announcements and haptics), `ApsidesWorkshopLights` (eased glow and won look) and
 `ApsidesWorkshopSoundRecipe` (the pending orbit's audition and the ambient loop), with VoiceOver support in the panel.
 Feature 477 (R02-G18-07) adds `ApsidesWorkshopReconciliation` (winning traces replayed on restore), snapshot schema 3,
-the replay mode and the saved sound choice.
+the replay mode and the saved sound choice. Feature 478 (R02-G18-08) adds the regression net: `ApsidesWorkshopGolden` (test builds
+only), `golden-frames.json`, the solver regression and `scripts/apsides_workshop_regression.py`.

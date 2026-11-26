@@ -71,7 +71,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G1808-007 Docs: `docs/architecture/apsides-workshop.md` (regression net),
+- [X] T-R02G1808-007 Docs: `docs/architecture/apsides-workshop.md` (regression net), — Verified 2026-11-26: 2026-11-26 round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G18-08.round02-host-*.json); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the chunks of T-001)
 - [ ] T-R02G1808-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name

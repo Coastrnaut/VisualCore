@@ -168,3 +168,20 @@ in deterministic integer fixed point and every rule is then decided exactly on i
   records are the start of that trace.
 - **Settings.** The sound choice is saved through `settings.sound [0 … 1]`, snapshotted but never digested, and applied
   when the experience opens.
+
+## Regression net (feature 478, R02-G18-08)
+
+- **Solver regression.** For all 100 levels the generated level equals its witness, the witness replays to a win on
+  exactly its final play with its per-action fingerprints and digests, and the certifying search returns exactly the
+  witness's tunings with the counted orbits one tuning short, within its work bound (counted, never timed); twelve
+  kinds of alteration are each detected and named. Ten tests of ten levels.
+- **Golden frames.** `ApsidesWorkshopGolden` (debug and automation builds only; forbidden in Release) describes 16
+  frames — levels 1, 21, 41, 61 and 81 at three tiers after their certified tunings, shown at tick T / 2, plus the hero
+  frame — by the projected star, orbiter, periapsis and apoapsis markers, planets and first actions bar in eighths of
+  a pixel, element counts and the 18 palette colours, pinned with SHA-256 digests in `golden-frames.json` and rewritten
+  only with `APSIDES_WORKSHOP_WRITE_GOLDEN=1`. The simulator renders the same frames and checks them with the
+  feature-473 tolerances.
+- **Memory.** Twelve open–draw–warn–close cycles on the simulator stay within 16 MB of the first (bound applied when the
+  class runs alone) and release every GPU object of the scene.
+- **Running it.** CI's round-two job has an "Apsides Workshop regression (host)" step;
+  `python3 scripts/apsides_workshop_regression.py` runs the host and simulator parts with one summary.
