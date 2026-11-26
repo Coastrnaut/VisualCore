@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-06: Microscopic Aurora polish and accessibility).
+Last updated: 2026-11-26 (R02-G19-07: Microscopic Aurora persistence and replay).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Microscopic Aurora persistence and replay** (R02-G19-07, 2026-11-26). Host: `MicroscopicAuroraReconciliationTests`
+  and `…ProgressTests` (41 together: net traces from records with undo and redo, honest results kept, edited stars,
+  actions spent, steps and over-long traces dropped and counted), `…PersistenceTests` (9 functions, 39 cases: 500
+  seeded round trips, schema 1 and 2 migrations for 100 states each, 200 edited saves) and `…ReplayCatalogTests` (6
+  functions, 15 cases: every certified level won, then replayed step by step to its stored fingerprints; the replay
+  refusals and the saved-replay prefix rule); the adapter and scenario suites follow schema 3 (manifest regenerated).
+  Simulator: `…ReplayTests` (4: replay through the panel, refusals in words, the saved sound choice, the dropped-results
+  announcement). Lesson: the first persistence case certifies the levels it opens (about 6 s locally), so the round
+  trips are grouped by 25 and later groups reuse the cached certification.
 - **Microscopic Aurora polish and accessibility** (R02-G19-06, 2026-11-26). Host: `MicroscopicAuroraFeedbackPlanTests`
   (7: announcement texts, kinds and haptics exact for placements, removals, undo, redo, every refusal code bare and
   prefixed, wins and failures of all four kinds, level and mode changes), `…LightsTests` (10: a scripted win and

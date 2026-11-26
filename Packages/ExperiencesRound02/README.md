@@ -999,5 +999,8 @@ daily level × 19, campaign, practice with budget 24, daily modes) and adapter s
 schema 1. Feature 486 (R02-G19-06) adds polish and accessibility: `MicroscopicAuroraFeedbackPlan` (announcements and
 haptics through the shared route), `MicroscopicAuroraLights` (eased glow and won look, fades of at least 0.4 s under
 Reduce Flashing), `MicroscopicAuroraSoundRecipe` (the selected well's audition and an ambient loop, both synthesized,
-off by default) and an accessible panel (a summary element, adjustable selection, values in words). See
+off by default) and an accessible panel (a summary element, adjustable selection, values in words). Feature 487
+(R02-G19-07) adds persistence and replay: snapshot schema 3 with winning traces, `MicroscopicAuroraReconciliation`
+(every saved result replayed on restore, edited ones dropped and counted), replay of the best solution
+(`replay.start`, `replay.step`, `replay.stop`) and the saved sound choice (`settings.sound`). See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).
