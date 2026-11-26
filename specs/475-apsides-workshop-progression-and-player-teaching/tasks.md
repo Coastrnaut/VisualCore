@@ -15,7 +15,7 @@ campaign covers the game).
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G1805-002 [P] [US2] [US3] Add `plan(_:from:maxTunings:workBound:)` to
+- [X] T-R02G1805-002 [P] [US2] [US3] Add `plan(_:from:maxTunings:workBound:)` to — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopSolver.plan(_:from:maxTunings:workBound:) (plan(_:) equal to it at the opening on all 100 levels, witnesses unchanged), ApsidesWorkshopHints (three levels, play, failed and stuck texts) and ApsidesWorkshopFailureExplanation (five failure kinds in the level's words); ApsidesWorkshopHintsTests (exact hints win all 100, 200 seeded states accepted, 500 seeded failures explained); host-2 exit 0 (ApsidesWorkshopCoreTests)
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopSolver.swift` (the search of `plan(_:workBound:)`
   from the given orbit — the valid orbits differing in one lever, then in both, in the existing order; `plan(_:)`
   unchanged in result, proof and work and equal to `plan(level, from: level.orbit)`; a plan of no tunings when the given

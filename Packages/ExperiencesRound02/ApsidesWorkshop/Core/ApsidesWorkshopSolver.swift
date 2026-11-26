@@ -12,6 +12,11 @@
 // eccentricity is not lower than the start's, the knob first otherwise, so the orbit in between keeps the lower
 // eccentricity and is valid. Work = orbits judged (the start included), bounded at 16 000 as a guard above the largest
 // search space (1 + 423 + 13 880). Modelled on `CelestialEclipseLabSolver` (feature 462).
+//
+// Feature 475 (R02-G18-05) T-R02G1805-001 (FR-R02G1805-002; clarification Q1): `plan(_:from:maxTunings:workBound:)`
+// searches the same way from any valid orbit, judging that orbit first (a plan of no tunings when it already wins) and
+// limiting the depth to `maxTunings`; the certifying `plan(_:workBound:)` is that entry at the level's starting orbit,
+// so every certified plan, witness and work count is unchanged (the start, which never wins, counts as work 1).
 
 /// A certified plan: the tunings to the first winning orbit at the smallest depth, with its proof and work.
 public struct ApsidesWorkshopPlan: Sendable, Equatable, Codable {
@@ -105,18 +110,35 @@ public enum ApsidesWorkshopSolver {
         return ApsidesWorkshopSky.report(level, orbit: orbit).wins
     }
 
-    /// The minimal plan of `level`, or nil when no orbit within two tunings wins or the work bound is reached.
+    /// The minimal plan of `level`, or nil when no orbit within two tunings wins or the work bound is reached: exactly
+    /// ``plan(_:from:maxTunings:workBound:)`` at the level's starting orbit (which the level rules guarantee does not
+    /// win, so its results, witnesses and work are those of the search from the start).
     public static func plan(_ level: ApsidesWorkshopLevel, workBound: Int = workBound) -> ApsidesWorkshopPlan? {
-        let start: ApsidesWorkshopOrbit = level.orbit
-        var work: Int = 1   // the start, which the level rules guarantee does not win
+        plan(level, from: level.orbit, maxTunings: 2, workBound: workBound)
+    }
+
+    /// The minimal plan of `level` from `orbit` (feature 475, clarification Q1): depth 0 judges `orbit` itself (work
+    /// 1) and gives a plan of no tunings when it wins; then depth 1 and, when `maxTunings` ≥ 2, depth 2 in the order of
+    /// ``orbits(from:depth:)``, the tunings ordered as ``tunings(from:to:)``. Nil when `orbit` is invalid, no orbit
+    /// within min(`maxTunings`, 2) tunings wins, or more than `workBound` orbits would be judged.
+    public static func plan(_ level: ApsidesWorkshopLevel, from orbit: ApsidesWorkshopOrbit, maxTunings: Int = 2,
+                            workBound: Int = workBound) -> ApsidesWorkshopPlan? {
+        guard orbit.isValid, workBound >= 1 else { return nil }
+        let start: ApsidesWorkshopOrbit = orbit
+        var work: Int = 1   // the start, judged at depth 0
+        if wins(level, orbit: start) {
+            return ApsidesWorkshopPlan(actions: [], orbit: start, orbitsByDepth: [], work: work)
+        }
         var byDepth: [Int] = [1]
-        for depth in 1...2 {
+        let deepest: Int = min(maxTunings, 2)
+        guard deepest >= 1 else { return nil }
+        for depth in 1...deepest {
             let candidates: [ApsidesWorkshopOrbit] = orbits(from: start, depth: depth)
-            for orbit in candidates {
+            for candidate in candidates {
                 work += 1
                 if work > workBound { return nil }
-                if wins(level, orbit: orbit) {
-                    return ApsidesWorkshopPlan(actions: tunings(from: start, to: orbit), orbit: orbit,
+                if wins(level, orbit: candidate) {
+                    return ApsidesWorkshopPlan(actions: tunings(from: start, to: candidate), orbit: candidate,
                                                orbitsByDepth: byDepth, work: work)
                 }
             }
