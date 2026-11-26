@@ -14,7 +14,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1908-002 [P] [US1] Create
+- [X] T-R02G1908-002 [P] [US1] Create — Verified 2026-11-26: 2026-11-26 host exit 0: 14 regression solver tests (all 100 levels in ten groups, twelve alterations) passed in 4.9 s (.autonomy/migration/checks/R02-G19-08.host.json)
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraRegressionSolverTests.swift` (agent A: for
   every level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's actions
   replay on a fresh play to a win on exactly the final play and not before, within the budget, with its per-action
