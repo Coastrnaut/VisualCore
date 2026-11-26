@@ -47,7 +47,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G1808-005 [US2] [US3] Create
+- [X] T-R02G1808-005 [US2] [US3] Create — Verified 2026-11-26: 2026-11-26 sim-27 exit 0, 70 simulator tests incl. 3 golden frame and 3 memory tests (.autonomy/migration/checks/R02-G18-08.sim-27.json)
   `Packages/ExperiencesRound02/ApsidesWorkshop/ExperienceTests/ApsidesWorkshopRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/ApsidesWorkshop/ExperienceTests/ApsidesWorkshopRegressionMemoryTests.swift` (agent C: the
   16 frames rendered and checked against their descriptions with the feature-473 tolerances (the star's and the
