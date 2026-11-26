@@ -84,7 +84,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 - [X] T-R02G1901-007 Docs: `docs/architecture/microscopic-aurora.md` (new: rules), — Verified 2026-11-26: 2026-11-26: docs/architecture/microscopic-aurora.md, round-two README section and automatedtesting entry written; round02-host-1, -2, -3c, -3e (with MicroscopicAurora), -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (chunk 3e gains MicroscopicAurora)
-- [ ] T-R02G1901-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1901-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-26: 2026-11-26: rendering-27, rendering-26, experiences, host-full exit 0 (app-unit too)
   `--name host-full`
 - [ ] T-R02G1901-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1901-010 Reference regression chunk 2 (`--name reference-2`)
