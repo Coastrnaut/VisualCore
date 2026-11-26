@@ -62,4 +62,5 @@ were corrected in the artifacts.
 
 - `/speckit-implement` reads this checklist's state and does not change its markers.
 - Every item passed at first reading; feature 477's answers (a save taken during a replay, the frontier as saved) were
-  taken into the spec from the start, and the trace of placements and removals ending with the play is the adaptation to this game.
+  taken into the spec from the start, and the trace of placements and removals ending with the play is the adaptation to
+  this game.
