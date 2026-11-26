@@ -53,7 +53,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraExperienceCoreTests.swift` updates (schema
   3, migrations 1 → 3 and 2 → 3, reconciliation on restore, replay rules and codes, a replay saved mid-way restores
   while a changed, reordered or undo-carrying replay is refused `damaged`, sound setting); `--name host-2`
-- [ ] T-R02G1907-004 [P] [US1] [US2] Create
+- [X] T-R02G1907-004 [P] [US1] [US2] Create — Verified 2026-11-26: host-3 exit 0: 500 seeded round trips with equal digests (sound choice in the payload, never the digest), schema 1 and 2 migrations for 100 states each, 200 saves with honest results kept and edited ones dropped and counted, deterministic seeds and dates
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraPersistenceTests.swift` (agent B: 500 seeded
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
