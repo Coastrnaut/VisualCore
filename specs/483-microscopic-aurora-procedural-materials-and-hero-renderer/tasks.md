@@ -9,7 +9,7 @@ R02-G18-03 (`git show <R02-G18-03 record commit>:<path>`).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1903-001 Baselines on the committed tree after R02-G19-02 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1903-001 Baselines on the committed tree after R02-G19-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: 2026-11-26: baseline-host, baseline-timing and round02-1, -2, -3c, -3e, -3f exit 0 on the committed R02-G19-02 record; rendering baseline is R02-G19-02's rendering runs (exit 0)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G19-02's
   rendering runs (exit 0)
 - [ ] T-R02G1903-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MicroscopicAuroraCore` gains VisualCoreScenes,
