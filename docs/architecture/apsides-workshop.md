@@ -125,3 +125,28 @@ in deterministic integer fixed point and every rule is then decided exactly on i
   and a campaign win opening the next, five bands of 20; the daily level is (days since 2026-01-01 × 23) mod 100 + 1;
   practice raises the budget to 24 without stars or unlocks. The snapshot is schema 2 (digest domain
   `r02-g18.apsides-workshop.v2`) with a migration from schema 1.
+
+## Polish and accessibility (feature 476, R02-G18-06)
+
+- **Feedback.** `ApsidesWorkshopFeedbackPlan.after(old:new:)` turns each change of the adapter core into one
+  announcement and one haptic through the shared route: a periapsis tuning ("Periapsis set: eccentricity 0.ee,
+  periapsis at d°.") or a size tuning ("Size set to a.") followed by the targets met in order, whether playing now
+  would win and the actions left (`state`, selection), undo and redo, a won play (`outcome`, success, with stars
+  outside practice), a failed play (the failure explanation, `outcome`, warning), a level or mode change (`level`) and
+  refusals in words (`rejection`, error). The play, which always ends the level, plans only its outcome; showing a tick
+  or dismissing the tutorial plans nothing. The presenter keeps a feedback log.
+- **Comfort.** `ApsidesWorkshopLights` eases the glow (0.7 playing, 1 won, 0.35 failed) and the won look by the frame
+  clock (0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade); the scene draws the eased levels (`u_won`, the
+  glow gain, and in the unlit fallback the not-won and won colours blended by the won level), so no element crosses
+  half its range more than three times a second. Reduce Motion and Reduce Flashing hold the star pulse at 1, so the
+  sky is still between actions.
+- **Sound.** Off by default (a Sound toggle). Each change of the pending orbit through the panel (− and + or the
+  adjustable values; never a drag preview) plays its audition: the size tone 220 Hz × 2^(n/12), n = (48 − a) / 4
+  rounded down, with a fifth (eccentricity step k ≤ 7) or a fourth (k ≥ 8) when the orbit can be set, or with a
+  partial 3 Hz above when it cannot, 0.6 s. The ambient loop comes from the actions left (the root), the quarters of
+  the targets met in order (the partials) and the stage; it is rebuilt only when that recipe changes and plays only
+  while wanted, on screen and active.
+- **Panel.** A summary element ("a actions left. <progress>. Pending: size a, eccentricity 0.ee, periapsis at d°.
+  Level: <level>."), the pending eccentricity, direction and size adjustable with VoiceOver, a value in words on every
+  control, refusals in the feedback plan's words, rows that become columns at accessibility text sizes and a
+  520-point readable width on iPad.

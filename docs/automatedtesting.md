@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G18-05: Apsides Workshop teaching and progression).
+Last updated: 2026-11-26 (R02-G18-06: Apsides Workshop polish and accessibility).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,17 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop polish and accessibility** (R02-G18-06, 2026-11-26). Host: `ApsidesWorkshopFeedbackPlanTests`
+  (7 tests: plans compared word for word over periapsis and size tunings, undos, redos, every refusal code bare and
+  prefixed, all five failure kinds from real level openings, campaign, practice and daily wins, level and mode
+  changes), `ApsidesWorkshopLightsTests` and `ApsidesWorkshopSoundRecipeTests` (20 tests: a scripted win and
+  adversarial flicker sampled at 60 Hz, the audition over every size and eccentricity and the ambient recipe as pure
+  functions); the `ApsidesWorkshop` filter runs 221 tests. Simulator: `ApsidesWorkshopAccessibilityTests` (13 tests:
+  labels and values, the adjustable pending orbit, level 1 won through accessibility operations, recorded feedback,
+  still frames under Reduce Motion and Reduce Flashing, the won fade in the shader and fallback paths, the sound state
+  table; the suite now runs 60). Lesson: a test copied from another game's model can carry that game's visual
+  assumption — Apsides' unlit won look only marks gauges met, which a winning orbit's gauges already are, so the
+  fallback frame cannot change; check what the won flag actually recolours before asserting a pixel change.
 - **Apsides Workshop teaching and progression** (R02-G18-05, 2026-11-25). Host: `ApsidesWorkshopHintsTests` (exact
   hints from every opening win all 100 levels and equal the witness's tunings, `plan(_:)` equal to `plan(_:from:)` at
   the opening with the same proof and work; 200 seeded states whose hints the kernel accepts; 500 seeded failures
