@@ -41,8 +41,8 @@ campaign covers the game).
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
 - [ ] T-R02G1805-003 [P] [US1] [US4] Create
-  `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopProgress.swift` (`ApsidesWorkshopTutorialStep` knob → order → recover → done with the texts of clarification Q2, advanced by an
-  accepted tuning (knob → order, order → recover) or the level's end (→ done), never moved back by undo — an undo passes
+  `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopProgress.swift` (`ApsidesWorkshopTutorialStep` knob
+  → order → recover → done with the texts of clarification Q2, advanced by an accepted tuning (knob → order, order → recover) or the level's end (→ done), never moved back by undo — an undo passes
   `afterTuning: false` and the play's real end, a redo that restores a won or failed play ends it;
   `ApsidesWorkshopProgress` "3 when at most the certified witness's tuning count, 2 when at most that + 2, else 1" by
   actions spent (every accepted tuning record, undone ones included), frontier with level 1 open, best actions spent per
