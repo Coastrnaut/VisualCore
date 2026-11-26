@@ -69,7 +69,7 @@ fewer placements wins.
 **Independent test**: band means of the witness length do not fall; the 100 witness files match byte for byte and an
 edited file is refused.
 
-- [ ] T-R02G1902-005 [P] [US4] Create
+- [X] T-R02G1902-005 [P] [US4] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraWitness and MicroscopicAuroraWitnessTests pass (host-4 exit 0, 7 tests): byte-for-byte round trip, digests, replay agreement, damaged, newer and non-replaying witnesses refused
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraWitness.swift` (agent B: schema 1 sorted-key
   JSON; state digests "16 hex characters of the SHA-256 of the wells and the actions spent" after each action; play
   fingerprints after begin (and dismissTutorial) and each action; terminal report (lit stencil cells, coverage, groups,
