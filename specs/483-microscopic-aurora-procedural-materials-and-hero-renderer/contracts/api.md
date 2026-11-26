@@ -20,6 +20,7 @@ public struct MicroscopicAuroraSceneSnapshot: Sendable, Equatable {
     public let wells: [MicroscopicAuroraWell?]
     public let coverage: Int; public let requiredCoverage: Int
     public let coherence: Int; public let requiredCoherence: Int; public let swarm: Int
+    public let coherenceRadius: Int                 // κ, to mark a coherence failure's outlying swimmers
     public let failure: MicroscopicAuroraFailure?; public let stage: MicroscopicAuroraStage
     public let actionsLeft: Int; public let budget: Int; public let levelNumber: Int; public let time: Double
     public init(play: MicroscopicAuroraPlay, shownTick: Int, levelNumber: Int, time: Double) }

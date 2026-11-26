@@ -12,7 +12,7 @@ R02-G18-03 (`git show <R02-G18-03 record commit>:<path>`).
 - [X] T-R02G1903-001 Baselines on the committed tree after R02-G19-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: 2026-11-26: baseline-host, baseline-timing and round02-1, -2, -3c, -3e, -3f exit 0 on the committed R02-G19-02 record; rendering baseline is R02-G19-02's rendering runs (exit 0)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G19-02's
   rendering runs (exit 0)
-- [ ] T-R02G1903-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MicroscopicAuroraCore` gains VisualCoreScenes,
+- [X] T-R02G1903-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MicroscopicAuroraCore` gains VisualCoreScenes, — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraCore gains VisualCoreScenes, Experience, Diagnostics, Persistence; MicroscopicAuroraSceneSnapshot (palette, tiers, snapshot with the coherence radius agent B needed); the invariant scans read only the kernel files; all 79 MicroscopicAurora tests pass (host exit 0)
   VisualCoreExperience, VisualCoreDiagnostics and VisualCorePersistence; `MicroscopicAuroraExperience` and its tests with
   iOS-conditioned rendering dependencies join with their sources in T-006; the product); the renderer-purity and time
   scans of `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraInvariantTests.swift` read only the

@@ -219,13 +219,21 @@ import VisualCoreSimulation
             return (play, fingerprints)
         }
 
-        /// The kernel sources present in the Core directory next to this test directory.
+        /// The kernel files the time and purity scans read (features 481 and 482). The presentation sources of feature
+        /// 483 (snapshot, geometry, shaders, adapter, scenarios) are outside the kernel and read only its snapshot, so
+        /// they are not scanned here (their purity is tested by `MicroscopicAuroraRendererPurityTests`).
+        static let kernelFiles: [String] = ["MicroscopicAuroraDifficulty.swift", "MicroscopicAuroraError.swift",
+                                            "MicroscopicAuroraGenerator.swift", "MicroscopicAuroraLevel.swift",
+                                            "MicroscopicAuroraManifest.swift", "MicroscopicAuroraPlay.swift",
+                                            "MicroscopicAuroraPuzzle.swift", "MicroscopicAuroraSolver.swift",
+                                            "MicroscopicAuroraSwim.swift", "MicroscopicAuroraWitness.swift"]
+
+        /// The kernel sources in the Core directory next to this test directory.
         static func kernelSources() throws -> [(name: String, text: String)] {
             let tests: URL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             let core: URL = tests.deletingLastPathComponent().appendingPathComponent("Core")
             var sources: [(name: String, text: String)] = []
-            let names: [String] = (try? FileManager.default.contentsOfDirectory(atPath: core.path)) ?? []
-            for name in names.sorted() where name.hasSuffix(".swift") {
+            for name in kernelFiles {
                 let url: URL = core.appendingPathComponent(name)
                 sources.append((name, try String(contentsOf: url, encoding: .utf8)))
             }

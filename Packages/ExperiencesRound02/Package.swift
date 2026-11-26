@@ -821,12 +821,20 @@ let package = Package(
         // Feature 481 (R02-G19-01): Microscopic Aurora's pure rule kernel.
         .target(name: "MicroscopicAuroraCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 483 (R02-G19-03): the adapter, snapshot, geometry and scenarios.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "MicroscopicAurora/Core"),
         .testTarget(name: "MicroscopicAuroraCoreTests",
                     dependencies: ["MicroscopicAuroraCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   // Feature 483 (R02-G19-03): meshes and the experience contract in tests.
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore)],
                     path: "MicroscopicAurora/CoreTests"),
         // Feature 463 (R02-G17-03): Celestial Eclipse Lab's experience (presenter, scene, controls).
         .target(name: "CelestialEclipseLabExperience",
