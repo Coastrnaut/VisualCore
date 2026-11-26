@@ -40,7 +40,7 @@ campaign covers the game).
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1805-003 [P] [US1] [US4] Create
+- [X] T-R02G1805-003 [P] [US1] [US4] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopProgress (tutorial steps knob/order/recover/done with the Q2 texts, stars 3/2/1, frontier, daily x 23, modes, practice budget 24, Codable) and ApsidesWorkshopProgressTests (17 tests: 100-level script, tutorial walks, daily over 2026 ... 2036 and 100 consecutive days, impossible dates); host-3 exit 0
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopProgress.swift` (`ApsidesWorkshopTutorialStep` knob →
   order → recover → done with the texts of clarification Q2, advanced by an accepted tuning (knob → order, order →
   recover) or the level's end (→ done), never moved back by undo — an undo passes `afterTuning: false` and the play's
