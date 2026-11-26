@@ -172,13 +172,14 @@ enum ApsidesWorkshopA11y {
 
     /// The controls of the panel by identifier name: each needs a label and a value (clarification Q5). The plain
     /// texts (actions, status, progress, the level line, tutorial, hint text, failure, band, stars, goal, the orbit and
-    /// tick detail lines, the bare tick line, the pending reason) are read as text, not controls.
+    /// tick detail lines, the bare tick line, the pending reason, the replay position) are read as text, not
+    /// controls; since feature 477 the replay controls (Replay, Step, Stop) are listed too.
     static let controlNames: [String] = ["sound", "summary", "dismiss-tutorial", "hint", "campaign", "daily",
                                          "practice", "level-picker", "play-level", "eccentricity-minus",
                                          "eccentricity", "eccentricity-plus", "direction-minus", "direction",
                                          "direction-plus", "size-minus", "size", "size-plus", "set-periapsis",
                                          "set-size", "reset-view", "tick-minus", "tick-plus", "play", "undo", "redo",
-                                         "next-level"]
+                                         "next-level", "replay", "replay-step", "replay-stop"]
     /// The adjustable elements (increment and decrement).
     static let adjustableNames: [String] = ["eccentricity", "direction", "size"]
 

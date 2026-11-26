@@ -1,11 +1,11 @@
 // ApsidesWorkshopExperienceIdentityTests — feature 473 (R02-G18-03) T-R02G1803-006 (FR-R02G1803-005, 007, 008, 009).
-// The experience's id is the catalog id; the registry's factory (`make(id:storage:reduceMotion:reduceFlashing:)`,
-// which does not depend on the registration) builds a shell around the presenter with the accessibility settings
-// passed through, as does the tests' factory; the controls are the declared actions in order (seven, twelve since
-// feature 475); the registration facts hold (100 certified levels, schema 2 since feature 475, the tiers
-// level-0 … level-2, the palette); the presenter's quality levels equal the Core's `qualityTiers`; the presenter holds
-// no GPU object and no snapshot before setup; and it declares its two frame probes (the backdrop corners) once a frame
-// was drawn. iOS only, as the target.
+// The experience's id is the catalog id; the registry's factory (`make(id:storage:reduceMotion:reduceFlashing:)`, which
+// does not depend on the registration) builds a shell around the presenter with the accessibility settings passed
+// through, as does the tests' factory; the controls are the declared actions in order (seven, twelve since feature 475,
+// sixteen since 477); the registration facts hold (100 certified levels, schema 3 since feature 477, the tiers level-0
+// … level-2, the palette); the presenter's quality levels equal the Core's `qualityTiers`; the presenter holds no GPU
+// object and no snapshot before setup; and it declares its two frame probes (the backdrop corners) once a frame was
+// drawn. iOS only, as the target.
 #if os(iOS)
 import ApsidesWorkshopCore
 import Foundation
@@ -26,8 +26,8 @@ import VisualCoreExperienceHost
     @Test func theRegistrationFactsHold() {
         #expect(ApsidesWorkshopExperienceCore.levelNumbers == 1...100)
         #expect(ApsidesWorkshopExperienceCore.certifiedCandidates.count == 100)
-        // Schema 2 since feature 475 (R02-G18-05) T-R02G1805-004: progress, mode and tutorial step in the payload.
-        #expect(ApsidesWorkshopExperienceCore.schemaVersion == 2)
+        // Schema 3 since feature 477 (R02-G18-07) T-R02G1807-003: results with traces and the sound choice.
+        #expect(ApsidesWorkshopExperienceCore.schemaVersion == 3)
         var names: [String] = []
         for level in ApsidesWorkshopExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -42,7 +42,7 @@ import VisualCoreExperienceHost
         #expect(ids == ApsidesWorkshopExperienceCore.actionIDs)
         #expect(ids == ["orbit.periapsis", "orbit.size", "orbit.play", "play.undo", "play.redo", "level.next",
                         "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                        "tutorial.dismiss"])
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers`, named as the tiers.

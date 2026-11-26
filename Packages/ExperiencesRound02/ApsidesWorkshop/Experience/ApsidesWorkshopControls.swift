@@ -40,6 +40,12 @@
 // "not selected", Hint the level shown, Sound "on" or "off"), refusals in the feedback plan's words, the Sound toggle
 // (off by default, identifier `sound`), rows that become columns at accessibility text sizes, wrapping text and a
 // 520-point readable width (iPad).
+//
+// Feature 477 (R02-G18-07) T-R02G1807-006 (clarifications Q2, Q4, Q5): "Replay best solution" (identifier `replay`,
+// value the level) for a level with a verified stored solution, and during replay its position ("Replay: action k of
+// n", identifier `replay-position`) with Step (identifier `replay-step`, value "Action k of n") and Stop (identifier
+// `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
+// `settings.sound`.
 #if os(iOS)
 import ApsidesWorkshopCore
 import SwiftUI
@@ -81,6 +87,7 @@ struct ApsidesWorkshopControls: View {
                 tickRow
                 playRow
                 progressRows
+                replaySection
                 soundToggle
             }
             .padding()
@@ -100,13 +107,70 @@ struct ApsidesWorkshopControls: View {
         }
     }
 
-    /// The Sound toggle (feature 476; off by default; presentation only).
+    /// The Sound toggle (feature 476; off by default; since feature 477 saved through `settings.sound`).
     @ViewBuilder private var soundToggle: some View {
-        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter?.setSound(on: $0) }))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { saveSound(on: $0) }))
             .disabled(presenter == nil)
             .accessibilityLabel("Sound of the sky")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
             .accessibilityIdentifier(port.identifier("sound"))
+    }
+
+    /// Saves the sound choice through the presenter (`settings.sound`, feature 477), or sends it directly without one.
+    private func saveSound(on: Bool) {
+        if let presenter { presenter.saveSound(on: on, port: port) } else { send("settings.sound", [on ? 1 : 0]) }
+    }
+
+    /// Replay of the best stored solution: Replay, or during replay its position with Step and Stop (feature 477).
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text(Self.replayPositionText(mirror)).font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("replay-position"))
+            row {
+                Button("Step") { replay("replay.step") }
+                    .accessibilityLabel("Apply the next action of the replay")
+                    .accessibilityValue(Self.replayStepValue(mirror))
+                    .accessibilityIdentifier(port.identifier("replay-step"))
+                Button("Stop") { replay("replay.stop") }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue(Self.replayStopValue(mirror))
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { replay("replay.start", [Double(mirror.levelNumber)]) }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue("Level \(mirror.levelNumber)")
+                .accessibilityIdentifier(port.identifier("replay"))
+        }
+    }
+
+    /// Sends a replay control through the presenter (refusals in words) or directly without one (feature 477).
+    private func replay(_ control: String, _ values: [Double] = []) {
+        guard let presenter else {
+            send(control, values)
+            return
+        }
+        switch control {
+        case "replay.start": presenter.startReplay(port: port)
+        case "replay.step": presenter.stepReplay(port: port)
+        default: presenter.stopReplay(port: port)
+        }
+    }
+
+    /// The replay position line: "Replay: action k of n" (feature 477).
+    static func replayPositionText(_ mirror: ApsidesWorkshopMirror) -> String {
+        "Replay: action \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// Step's value: "Action k of n", the trace actions played (feature 477).
+    static func replayStepValue(_ mirror: ApsidesWorkshopMirror) -> String {
+        "Action \(mirror.replayPosition) of \(mirror.replayLength)"
+    }
+
+    /// Stop's value: the trace's actions (feature 477).
+    static func replayStopValue(_ mirror: ApsidesWorkshopMirror) -> String {
+        mirror.replayLength == 1 ? "1 action" : "\(mirror.replayLength) actions"
     }
 
     /// The actions made of the budget, in words (feature 476): the value of Undo and Redo.

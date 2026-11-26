@@ -68,7 +68,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1807-006 [US3] Edit
+- [X] T-R02G1807-006 [US3] Edit — Verified 2026-11-26: 2026-11-26 sim-27 exit 0, 64 simulator tests incl. 4 replay tests (.autonomy/migration/checks/R02-G18-07.sim-27.json); Replay, Step and Stop with labels and values, replay position, the Sound toggle saved through settings.sound and applied on open, dropped results announced once; identity tests take schema 3 and sixteen controls
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopPresenter.swift` and
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopControls.swift` (Replay for a verified
   solved level, Step and Stop with labels and values, the replay position; the Sound toggle sends `settings.sound` and

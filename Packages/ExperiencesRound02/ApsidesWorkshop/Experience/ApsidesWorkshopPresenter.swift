@@ -38,16 +38,27 @@
 // injectable; the shared `ExperienceFeedback` by default) once for every new core it takes in, from the frame or the
 // description, and keeps a feedback log (`feedbackLog`); refusals are shown and announced in words (`refused(code:)`;
 // the panel shows exactly the plan's text), and a revealed hint is announced as `state`. Moving the pending orbit, drag
-// previews, the shown tick, the view, dismissing the tutorial and the Sound toggle are not announced (the controls speak
-// their own values). The scene's lights (`ApsidesWorkshopLights`: the glow and the won look) step toward the drawn
-// snapshot every frame by the frame clock's elapsed time (0.15 s fades, 0.45 s under Reduce Flashing; the first frame
-// settles them), so fades finish under Reduce Motion too, where the star holds still. The ambient loop
+// previews, the shown tick, the view, dismissing the tutorial and the Sound toggle are not announced (the controls
+// speak their own values). The scene's lights (`ApsidesWorkshopLights`: the glow and the won look) step toward the
+// drawn snapshot every frame by the frame clock's elapsed time (0.15 s fades, 0.45 s under Reduce Flashing; the first
+// frame settles them), so fades finish under Reduce Motion too, where the star holds still. The ambient loop
 // (`ApsidesWorkshopSound`) is offered the recipe of the actions left, the quarters of the targets met and the stage
 // when the first core is taken in, when a level or mode opens and when that recipe changes; a change of the pending
 // orbit through the panel (`movePending(eccentricity:direction:size:)`: the − and + buttons and the adjustable values)
 // plays its audition (`ApsidesWorkshopAudition.of(_:)`) when the sound is on, on screen and active; drag previews play
 // none. The mirror carries the summary element's text (`ApsidesWorkshopFeedbackPlan.summaryText(core:pending:)`) and
 // the sound choice (off by default). Presentation only.
+//
+// Feature 477 (R02-G18-07) T-R02G1807-006 (FR-R02G1807-003, 004, 007; clarifications Q2, Q4, Q5): the mirror carries
+// whether a verified replay exists for the level (`replayAvailable`: a verified result with a trace, outside replay),
+// whether a replay runs and its position (`replaying`, `replayPosition` = the trace actions played, `replayLength` =
+// the trace's actions, the play included); `startReplay`, `stepReplay` and `stopReplay` send `replay.start [level]`,
+// `replay.step` and `replay.stop` (a refusal, `r02-g18.no-replay`, `r02-g18.replay-end` or `r02-g18.replay`, is shown
+// and announced in the plan's words); the Sound toggle saves the choice through `settings.sound [0/1]`
+// (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied when the experience opens (the first
+// core taken in) and whenever it changes; the results a restore dropped (`core.reconciliationDropped`) are announced
+// once per presenter as `state` ("n saved results could not be checked and were removed.", "1 saved result could not
+// be checked and was removed.").
 #if os(iOS)
 import ApsidesWorkshopCore
 import Foundation
@@ -114,8 +125,16 @@ final class ApsidesWorkshopMirror {
     var pickedLevel = 1
     /// The latest core taken in, for the summary element (feature 476); nil before the first.
     var summaryCore: ApsidesWorkshopExperienceCore?
-    /// Whether the sound is on (feature 476; off by default; presentation only).
+    /// Whether the sound is on (feature 476; off by default; since feature 477 the core's saved choice, `soundOn`).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 477).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 477).
+    var replaying = false
+    /// The trace actions of the running replay played so far (0 when no replay runs; feature 477).
+    var replayPosition = 0
+    /// The actions of the running replay's trace, the play included (0 when no replay runs; feature 477).
+    var replayLength = 0
     /// The summary element's text (feature 476): `ApsidesWorkshopFeedbackPlan.summaryText(core:pending:)` of the latest
     /// core and the pending orbit (the current orbit when none is pending).
     var summary: String {
@@ -675,6 +694,8 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
     private func absorbProgress(_ core: ApsidesWorkshopExperienceCore) {
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
         absorbFeedback(core)
+        absorbSaved(core)
+        absorbReplay(core)
         latestCore = core
         mirror.summaryCore = core
         if let shown = hintPlay, shown != core.play { clearHint() }
@@ -857,6 +878,92 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
         mirror.soundOn = on
+    }
+
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 477); the change taken in turns the loop on or
+    /// off (`absorbSaved(_:)` applies `core.soundOn`).
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    // MARK: Persistence and replay (feature 477, R02-G18-07)
+
+    /// Starts the replay of the current level's verified stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Applies the next action of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 477).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 477).
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 477).
+    static func isReplay(_ mode: ApsidesWorkshopMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
+    /// The trace actions a play applied: its tuning and play records (feature 477; a fresh play also holds its begin
+    /// and tutorial records).
+    static func appliedActions(_ play: ApsidesWorkshopPlay) -> Int {
+        var count: Int = 0
+        for record in play.records where record.kind == .periapsis || record.kind == .size || record.kind == .play {
+            count += 1
+        }
+        return count
+    }
+
+    /// Takes the saved parts of `core` in (feature 477): the restored sound choice when it first appears (the
+    /// experience opens) or changes, and the dropped results announced once.
+    private func absorbSaved(_ core: ApsidesWorkshopExperienceCore) {
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(ApsidesWorkshopFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                              haptic: nil))
+        }
+    }
+
+    /// Takes the replay state of `core` into the mirror: Replay is offered for a level with a verified result that has
+    /// a trace (outside replay); during replay the position is the trace actions played of the trace's actions.
+    private func absorbReplay(_ core: ApsidesWorkshopExperienceCore) {
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = Self.appliedActions(core.play)
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
     }
 
     /// The controls view appeared (the loop may play).
