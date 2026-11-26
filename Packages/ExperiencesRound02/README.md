@@ -1002,5 +1002,8 @@ Reduce Flashing), `MicroscopicAuroraSoundRecipe` (the selected well's audition a
 off by default) and an accessible panel (a summary element, adjustable selection, values in words). Feature 487
 (R02-G19-07) adds persistence and replay: snapshot schema 3 with winning traces, `MicroscopicAuroraReconciliation`
 (every saved result replayed on restore, edited ones dropped and counted), replay of the best solution
-(`replay.start`, `replay.step`, `replay.stop`) and the saved sound choice (`settings.sound`). See
+(`replay.start`, `replay.step`, `replay.stop`) and the saved sound choice (`settings.sound`). Feature 488
+(R02-G19-08) adds the regression net: a solver regression over all 100 levels, golden frame descriptions
+(`MicroscopicAuroraGolden`, `golden-frames.json`), simulator golden-frame and memory tests, a CI step and
+`scripts/microscopic_aurora_regression.py`. See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).

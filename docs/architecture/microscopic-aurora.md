@@ -178,3 +178,21 @@ decided exactly on integer positions; the catalog's 0.008333 s timestep is a pre
   when its records are the start of that trace.
 - **Settings.** The sound choice is saved through `settings.sound [0 … 1]`, snapshotted but never digested, and applied
   when the experience opens.
+
+## Regression net (feature 488, R02-G19-08)
+
+- **Solver regression.** For all 100 levels the generated level equals its witness, the witness replays to a win on
+  exactly its final play with its per-action fingerprints and digests, and the certifying search returns exactly the
+  witness's wells with the counted well sets one placement short and the nearest miss, within its work bound (counted,
+  never timed); twelve kinds of alteration are each detected and named. Ten tests of ten levels; each level is solved
+  once (the group tests build the certified candidate directly instead of solving twice through the adapter's cache).
+- **Golden frames.** `MicroscopicAuroraGolden` (debug and automation builds only; forbidden in Release) describes 16
+  frames — levels 1, 21, 41, 61 and 81 at three tiers after their certified placements, shown at half the ticks swum,
+  plus the hero frame — by the projected dish centre, swimmers, wells, sites and first actions bar in eighths of a
+  pixel, element counts and the 18 palette colours, pinned with SHA-256 digests in `golden-frames.json` and rewritten
+  only with `MICROSCOPIC_AURORA_WRITE_GOLDEN=1`. The simulator renders the same frames and checks them with the
+  feature-483 tolerances.
+- **Memory.** Twelve open–draw–warn–close cycles on the simulator stay within 16 MB of the first (bound applied when the
+  class runs alone) and release every GPU object of the scene.
+- **Running it.** CI's round-two job has a "Microscopic Aurora regression (host)" step;
+  `python3 scripts/microscopic_aurora_regression.py` runs the host and simulator parts with one summary.

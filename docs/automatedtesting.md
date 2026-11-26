@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-07: Microscopic Aurora persistence and replay).
+Last updated: 2026-11-26 (R02-G19-08: Microscopic Aurora visual golden and solver regression).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Microscopic Aurora visual golden and solver regression** (R02-G19-08, 2026-11-26). Host:
+  `MicroscopicAuroraRegressionSolverTests` (14: all 100 levels in ten groups — level, witness replay with per-action
+  fingerprints and digests, the certified wells with the counted sets and nearest miss within the work bound — and the
+  twelve alterations named), `…RegressionGoldenTests` (13: the 16 golden frame descriptions against
+  `golden-frames.json`, the one-quantum fallback, the digest self-check, every kind of manifest damage named).
+  Simulator: `…RegressionGoldenFrameTests` and `…RegressionMemoryTests` (12 cycles within 16 MB when run alone with
+  `TEST_RUNNER_MICROSCOPIC_AURORA_MEMORY_ISOLATED=1`). Local: `python3 scripts/microscopic_aurora_regression.py`; CI step
+  "Microscopic Aurora regression (host)". Lesson: a group test that went through the adapter's certification and then
+  called the solver again solved each band-5 level twice (16 s); building the certified candidate directly and solving
+  once brought the slowest group under 9 s.
 - **Microscopic Aurora persistence and replay** (R02-G19-07, 2026-11-26). Host: `MicroscopicAuroraReconciliationTests`
   and `…ProgressTests` (41 together: net traces from records with undo and redo, honest results kept, edited stars,
   actions spent, steps and over-long traces dropped and counted), `…PersistenceTests` (9 functions, 39 cases: 500
