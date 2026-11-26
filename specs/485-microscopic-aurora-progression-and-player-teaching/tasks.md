@@ -38,7 +38,7 @@ campaign covers the game). Agents model their files on Apsides Workshop's as rec
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G1905-003 [P] [US1] [US4] Create
+- [X] T-R02G1905-003 [P] [US1] [US4] Create — Verified 2026-11-26: host-3 exit 0: tutorial steps place/cover/recover/done on levels 1-3 by witness plays, stars and frontier over a 100-level script, daily x 19 over 2026-2036 and 100 consecutive days, impossible dates nil, Codable round trips (18 tests)
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraProgress.swift` (`MicroscopicAuroraTutorialStep`
   place → cover → recover → done with the texts of clarification Q2, advanced by an accepted placement (place → cover),
   a second accepted action (cover → recover) or the level's end (→ done), never moved back by undo — an undo passes no
