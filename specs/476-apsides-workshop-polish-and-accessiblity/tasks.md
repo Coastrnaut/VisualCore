@@ -22,7 +22,7 @@ lives in the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Apsides 
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G1806-003 [P] [US1] [US3] Create
+- [X] T-R02G1806-003 [P] [US1] [US3] Create — Verified 2026-11-26: 2026-11-26 host-2 exit 0 (.autonomy/migration/checks/R02-G18-06.host-2.json); feedback plan with Q1 texts, Q2 haptics, refusals bare and prefixed, summary; 7 tests incl. all five failure kinds from real levels and campaign, practice and daily wins
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopFeedbackPlan.swift` (texts and kinds of
   clarification Q1 word for word, the engine's `action.rule.` prefix read as the bare code, a revealed hint as `state`
   (`hint(text:)`); haptics of Q2 — the play plans only its outcome; `after(old:new:)`, `refused(code:)`,
