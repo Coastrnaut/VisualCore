@@ -31,7 +31,7 @@ lives in the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Apsides 
   periapsis and size tunings, undos, redos, refusals of every code (bare and prefixed), won plays in campaign and
   practice, failed plays by every failure kind (contact, order, share, apsis sector, apsis distance), and level and mode
   changes compare texts, kinds and haptics exactly; showing a tick plans nothing); agent A; `--name host-2`
-- [ ] T-R02G1806-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopLights.swift`
+- [X] T-R02G1806-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopLights.swift` — Verified 2026-11-26: 2026-11-26 host-3 exit 0 (.autonomy/migration/checks/R02-G18-06.host-3.json); lights with fades and the flicker measure, audition and ambient recipes
   ("glow 0.7 playing / 1 won / 0.35 failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce
   Flashing, no reversal mid-fade under Reduce Flashing, stepped by the frame clock's elapsed time;
   `maxHalfRangeCrossingsPerSecond`) and `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopSoundRecipe.swift`
