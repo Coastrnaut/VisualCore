@@ -27,4 +27,7 @@
 - **R9 Fingerprints as the signed snapshot.** Decision: the play fingerprint (SHA-256 of schema, level fingerprint,
   wells, actions spent, stage, failure) and records with previous and next fingerprints, as feature 471.
 - **R10 Search space.** Decision: wells on inside cells, strengths 1 … 4, two senses, at most three wells. Rationale:
-  R02-G19-02's "low-dimensional field strength search" searches strengths and senses over a few candidate cells.
+  R02-G19-02's "low-dimensional field strength search" searches strengths and senses over a few candidate cells. Found while
+  implementing (2026-11-26): the full move list of `MicroscopicAuroraPuzzle` reaches about 9,100 placements at radius
+  11, far above R02-F23's `FairnessBudget.maxBranching` of 1,024, so R02-G19-02's certification uses a narrowed move
+  set (the level's candidate cells), as this decision intends.
