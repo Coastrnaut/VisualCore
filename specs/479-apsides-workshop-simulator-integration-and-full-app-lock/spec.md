@@ -106,8 +106,8 @@ visible, labelled controls and read the experience's spoken texts.
 **Acceptance Scenarios**:
 
 1. **Given** a fresh app on the simulator, **When** the tester opens Apsides Workshop and plays level 1's certified
-   solution (its tunings, then the play) with the panel's buttons, **Then** the experience says every target was met in
-   order with 3 of 3 stars, and level 2 is open in the level picker.
+   solution (its tunings, then the play) with the panel's buttons, **Then** the experience says "Every target was met in
+   order without striking a planet.", the stars read "Best: 3 of 3 stars", and level 2 is open in the level picker.
 2. **Given** a won level, **When** the app is relaunched, **Then** the same progress, stars and open levels are shown.
 3. **Given** a solved level, **When** the tester starts the replay and steps through it, **Then** the replay ends won
    and stopping it returns to the campaign.
