@@ -80,14 +80,15 @@ are 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89 and 97.
 - Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 465: progress and the
   mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
   level is presentation (held by the presenter, its search off the main actor); the shown tick, the pending orbit and a
-  drag's preview stay presentation; the snapshot payload becomes schema 2 (`{level, mode, progress, records,
-  tutorial}`) with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its first
-  step on tutorial levels). A failure is explained from the play's failure, targets numbered from 1, sectors and
-  distances in words as the level names them: a contact — "The orbit struck planet p after tick t."; an order — "Target
-  k was reached at tick t, before the target before it."; a share — "Target k (sector s, reached at tick t) swept x %,
-  outside its band from l % to h %."; an apsis sector — "Target k: the periapsis (or apoapsis) lies in sector s, not in
-  sector s′."; an apsis distance — "Target k: the periapsis (or apoapsis) lies at r units, outside its range from l to h
-  units." — each followed by "Undo the last action or retry the level." Impact: FR-R02G1805-003, 007; SC-R02G1805-003.
+  drag's preview stay presentation; the snapshot payload becomes schema 2 (`{level, mode, progress, records, tutorial}`)
+  with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its first step on
+  tutorial levels). A failure is explained from the play's failure, targets numbered from 1, planets, sectors, shares
+  and distances in the level's words ("planet 2", "sector 3", one decimal of a percent as in "12.5 %", hundredths of a
+  unit as in "6.55 units"): a contact — "The orbit struck planet p after tick t."; an order — "Target k was reached at
+  tick t, before the target before it."; a share — "Target k (sector s, reached at tick t) swept x %, outside its band
+  from l % to h %."; an apsis sector — "Target k: the periapsis (or apoapsis) lies in sector s, not in sector s′."; an
+  apsis distance — "Target k: the periapsis (or apoapsis) lies at r units, outside its range from l to h units." — each
+  followed by "Undo the last action or retry the level." Impact: FR-R02G1805-003, 007; SC-R02G1805-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
