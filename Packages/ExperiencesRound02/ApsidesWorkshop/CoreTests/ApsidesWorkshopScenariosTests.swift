@@ -6,9 +6,11 @@
 // standard scenario and fixture ends in the kernel state its actions describe; every acceptance row ends in the state
 // of its family (a refusal with the engine's, the kernel's or the adapter's code, a perturbed plan recovered, an
 // exhausted budget refusing further tunings, a won plan whose digest no quality tier changes, undo and redo restoring
-// digests, a shown tick that leaves the digest alone, a failing play undone, the next level's opening digest); and the
-// committed `scenario-manifest.json` equal to the Swift manifest (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run
-// (`swift test`); explicit types, plain loops. Modelled on `CelestialEclipseLabScenariosTests` (feature 463).
+// digests, a shown tick that leaves the digest alone, a failing play undone, the won level recorded and the next
+// level's fresh play); and the committed `scenario-manifest.json` equal to the Swift manifest
+// (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run (`swift test`); explicit types, plain loops. Modelled on
+// `CelestialEclipseLabScenariosTests` (feature 463). Feature 475 (R02-G18-05) T-R02G1805-004: the integration rows win
+// their level before `level.next` (the next open level).
 #if DEBUG || VISUALCORE_AUTOMATION
 @testable import ApsidesWorkshopCore
 import Foundation
@@ -336,12 +338,29 @@ private func digest(of core: ApsidesWorkshopExperienceCore) throws -> String {
                 let restoredDigest: String = try digest(of: restored)
                 #expect(restored == core && restoredDigest == played.final, "\(name)")
             case .integration:
+                // Feature 475: `level.next` needs the next level open, so the row first wins its level's plan; on
+                // level 100 `level.next` is refused `r02-g18.locked` (no wrap) and level 1 is chosen instead.
                 let next: Int = Core.nextLevel(after: level)
                 #expect(core.levelNumber == next && core.play.stage == .playing, "\(name)")
-                let nextOpening: String = try #require(Core.expectedDigest(for: scenarioID, seed: UInt64(next - 1),
-                                                                           entries: []))
-                #expect(played.final == nextOpening, "\(name)")
-                #expect(played.results == ["accepted", "accepted", "accepted", Core.kernelActionCode], "\(name)")
+                let kinds: [ApsidesWorkshopRecordKind] = Self.kinds(core)
+                #expect(kinds.count == 2 && kinds.last == .undo && core.play.actionsSpent == 0, "\(name)")
+                #expect(core.mode == .campaign && core.progress.solved[level] != nil, "\(name)")
+                var won: [ScenarioStep] = Core.winningEntries(level)
+                won += Core.integrationMoveEntries(level)
+                let nextFresh: String = try #require(Core.expectedDigest(for: scenarioID, seed: spec.seed,
+                                                                         entries: won))
+                #expect(played.final == nextFresh, "\(name)")
+                var results: [String] = []
+                for _ in 0...actions.count { results.append("accepted") }
+                if level == Core.levelNumbers.upperBound {
+                    #expect(core.progress.frontier == Core.levelNumbers.upperBound, "\(name)")
+                    results += [Core.lockedCode, "accepted"]
+                } else {
+                    #expect(core.progress.frontier == next, "\(name)")
+                    results.append("accepted")
+                }
+                results += ["accepted", "accepted", Core.kernelActionCode]
+                #expect(played.results == results, "\(name)")
             }
         }
         // The scripted failing plays reach every failure the kernel names: a planet struck, sweeps out of order, a

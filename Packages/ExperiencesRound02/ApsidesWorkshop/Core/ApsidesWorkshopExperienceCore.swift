@@ -28,7 +28,8 @@
 //                                 `failed` with its failure;
 //   play.undo, play.redo          the kernel's exact undo and redo (`r02-g18.action` when there is nothing to undo or
 //                                 redo; undo works in a failed play and returns it to playing; a won play is final);
-//   level.next                    the next certified level (100 wraps to 1) with a fresh play;
+//   level.next                    the next certified level with a fresh play (since feature 475 the next open level;
+//                                 see below);
 //   clock.show [0…95]             shows the orbiter at a tick (presentation only; accepted in every stage); a tick
 //                                 outside 0 … period − 1 of the level is refused `r02-g18.tick` without touching the
 //                                 kernel.
@@ -39,34 +40,66 @@
 // refusal (`ApsidesWorkshopError`) becomes `.rule(code: error.reasonCode)`. A refused action changes nothing, the shown
 // tick included.
 //
-// Digest ("r02-g18.apsides-workshop.v1"): the level number and the play's fingerprint (not its record history, so
-// undo restores the earlier digest exactly); never the shown tick, the quality tier or a time. Snapshot schema 1: the
-// JSON object `{"level", "records"}` with sorted keys; restoring replays the records on a fresh play of that level
-// (`ApsidesWorkshopPlay.replay`), resets the shown tick and throws `ApsidesWorkshopRestoreRefusal` for a damaged
-// payload, a level number outside 1 … 100 or a trace the kernel refuses (a record of a newer schema or of another
-// level's seed among them). An envelope of a newer schema is refused by the engine before the core sees it.
+// Digest ("r02-g18.apsides-workshop.v1" until feature 475): the level number and the play's fingerprint (not its
+// record history, so undo restores the earlier digest exactly); never the shown tick, the quality tier or a time.
+// Snapshot schema 1: the JSON object `{"level", "records"}` with sorted keys; restoring replays the records on a fresh
+// play of that level (`ApsidesWorkshopPlay.replay`), resets the shown tick and throws `ApsidesWorkshopRestoreRefusal`
+// for a damaged payload, a level number outside 1 … 100 or a trace the kernel refuses (a record of a newer schema or of
+// another level's seed among them). An envelope of a newer schema is refused by the engine before the core sees it.
 //
 // Quality: three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best and no budget
 // may rise). Host tier `t` draws `ApsidesWorkshopTier.of(t)`: level-0 = spheres of 24 × 16 segments, 4 refinement
 // points per tick, 2 glow shells; level-1 = 16 × 12 segments, 2 points, 1 glow shell; level-2 = flat 20-sided discs,
 // chords only, no glow. Outcome: `won` or `failed` while the play is in that stage, else nil. Rules use integers only.
+//
+// Feature 475 (R02-G18-05) T-R02G1805-004 (FR-R02G1805-001, 004 … 007; clarifications Q2–Q5): the core also holds the
+// player's progress (`ApsidesWorkshopProgress`: won levels with the least actions spent and stars, the open frontier),
+// the mode (campaign, practice with the budget raised to the kernel's maximum 24, daily) and the tutorial step
+// (`ApsidesWorkshopTutorialStep`). No level is ever gated by payment: a locked level is one not yet unlocked
+// (FR-R02G1805-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g18.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g18.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 24 (a copy of the level);
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing a level or a mode drops the left level's records (the play starts fresh with tick 0 shown). `level.next`
+// moves to the next open level in campaign mode and is refused with `r02-g18.locked` when there is none (100 does not
+// wrap). A win (the play reaching `won` on an accepted `orbit.play` or redo) records
+// `progress.record(level:actionsSpent:certified:mode:)` with the actions spent (`ApsidesWorkshopProgress.actionsSpent`:
+// every accepted tuning record, undone ones included) against the certified witness's tuning count
+// (`certifiedTunings`, the certified plan's size): campaign opens the next level, daily records the level's best result
+// and stars and opens nothing, practice records nothing. The tutorial starts at
+// `ApsidesWorkshopTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and is advanced after
+// every accepted tuning, play, undo and redo by `advanced(afterTuning:ended:)` (afterTuning for a tuning; ended when
+// the play is won or failed — an undo never ends it, a redo only when it restores a won or failed moment), never back;
+// `clock.show` never moves it. The shown tick stays presentation. Digest "r02-g18.apsides-workshop.v2": level, play
+// fingerprint, progress and mode (never the tutorial step or the shown tick). Snapshot schema 2:
+// `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys; schema-1 payloads migrate (no won levels,
+// level 1 open plus the levels up to the restored level, campaign mode, the tutorial at its first step — `knob` on the
+// tutorial levels, else `done`); an envelope of a newer schema is refused.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCorePersistence
 
-/// The rule codes of Apsides Workshop's adapter refusals (feature 473).
+/// The rule codes of Apsides Workshop's adapter refusals (feature 473; `locked` and `date` since feature 475).
 public enum ApsidesWorkshopExperienceRule {
     /// A value that must be a whole number (a step, a size or a tick) and is not.
     public static let notWhole = "r02-g18.not-whole"
     /// A shown tick outside 0 … period − 1 of the level (`clock.show`).
     public static let tick = "r02-g18.tick"
+    /// A level that is not open yet, or no next open level (feature 475). Never a payment gate.
+    public static let locked = "r02-g18.locked"
+    /// An impossible calendar date (`mode.daily`, feature 475).
+    public static let date = "r02-g18.date"
 }
 
 /// Why a saved Apsides Workshop state was refused on restore (feature 473). A refused restore changes nothing.
 public enum ApsidesWorkshopRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress, the mode or the
+    /// tutorial step is invalid (feature 475).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -74,17 +107,20 @@ public enum ApsidesWorkshopRestoreRefusal: Error, Equatable, Sendable {
     case kernel(ApsidesWorkshopError)
 }
 
-/// The state of Apsides Workshop as an experience (see the file header). Snapshot schema 1.
+/// The state of Apsides Workshop as an experience (see the file header). Snapshot schema 2.
 public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g18.apsides-workshop"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g18.apsides-workshop.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g18.apsides-workshop.v2"
     /// The action ids in declaration order.
     public static let actionIDs = ["orbit.periapsis", "orbit.size", "orbit.play", "play.undo", "play.redo",
-                                   "level.next", "clock.show"]
+                                   "level.next", "clock.show", "level.select", "mode.daily", "mode.practice",
+                                   "mode.campaign", "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`ApsidesWorkshopMode.practiceBudget`, 24).
+    public static let practiceBudget: Int = ApsidesWorkshopMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a shown tick: the longest period any level allows (`ApsidesWorkshopLevel.periods`,
@@ -97,27 +133,57 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: ApsidesWorkshopPlay
+    /// The player's progress (feature 475): in the digest and the snapshot.
+    public private(set) var progress: ApsidesWorkshopProgress
+    /// The mode (feature 475): in the digest and the snapshot.
+    public private(set) var mode: ApsidesWorkshopMode
+    /// The tutorial step (feature 475): in the snapshot and `==`, not in the digest.
+    public private(set) var tutorial: ApsidesWorkshopTutorialStep
+    /// The certified witness's tuning count of the current level (its certified plan's size), against which a win's
+    /// stars are counted. Derived from the level number.
+    public private(set) var certifiedTunings: Int
     /// The shown tick, 0 … period − 1; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var shownTick: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: ApsidesWorkshopPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber` with tick 0 shown, whose reset returns to `openingPlay` of
-    /// `openingNumber`.
-    init(levelNumber: Int, play: ApsidesWorkshopPlay, openingNumber: Int, openingPlay: ApsidesWorkshopPlay) {
+    /// What a reset restores (feature 475).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: ApsidesWorkshopPlay
+        /// The opening progress: level 1 open plus the levels up to the opening level, none won.
+        let progress: ApsidesWorkshopProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: ApsidesWorkshopTutorialStep
+        /// The opening level's certified witness tuning count.
+        let certifiedTunings: Int
+    }
+
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial` and tick 0 shown, whose
+    /// reset returns to `opening` of `openingNumber`.
+    init(levelNumber: Int, play: ApsidesWorkshopPlay, progress: ApsidesWorkshopProgress, mode: ApsidesWorkshopMode,
+         tutorial: ApsidesWorkshopTutorialStep, certifiedTunings: Int, openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedTunings = certifiedTunings
         self.shownTick = 0
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
+
+    /// The difficulty band (1 … 5) of the current level: 20 levels per band, the certified difficulty bands
+    /// (`ApsidesWorkshopProgress.band(of:)`; feature 475).
+    public var band: Int { ApsidesWorkshopProgress.band(of: levelNumber) }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
     public static func levelNumber(forSeed seed: UInt64) -> Int {
@@ -203,14 +269,42 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
         return play
     }
 
-    /// The opening state of manifest number `number`: a play begun and past its tutorial, ready to accept actions,
-    /// with tick 0 shown.
+    /// The practice copy of `level` (feature 475): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: ApsidesWorkshopLevel)
+        throws(ApsidesWorkshopError) -> ApsidesWorkshopLevel {
+        try ApsidesWorkshopLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, period: level.period,
+                                 planets: level.planets, targets: level.targets, orbit: level.orbit,
+                                 budget: ApsidesWorkshopMode.practice.budget(base: level.budget),
+                                 tutorial: level.tutorial)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: ApsidesWorkshopGenerated, mode: ApsidesWorkshopMode)
+        throws(ApsidesWorkshopError) -> ApsidesWorkshopLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
+    /// accept actions, with tick 0 shown; campaign mode, level 1 open plus the levels up to `number`, none won, the
+    /// tutorial at its first step (feature 475).
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(ApsidesWorkshopError) -> ApsidesWorkshopExperienceCore {
-        let play: ApsidesWorkshopPlay = try freshPlay(of: try level(number: number))
-        return ApsidesWorkshopExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                             openingPlay: play)
+        let certified: ApsidesWorkshopGenerated = try generated(number: number)
+        let play: ApsidesWorkshopPlay = try freshPlay(of: certified.level)
+        var progress: ApsidesWorkshopProgress = ApsidesWorkshopProgress()
+        progress.open(through: number)
+        let tutorial: ApsidesWorkshopTutorialStep = ApsidesWorkshopTutorialStep.initial(level: number)
+        let tunings: Int = certified.plan.size
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial, certifiedTunings: tunings)
+        return ApsidesWorkshopExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                             tutorial: tutorial, certifiedTunings: tunings, openingNumber: number,
+                                             opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -257,15 +351,44 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the shown tick, the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown tick, the
+    /// quality tier or the opening level).
     public static func == (lhs: ApsidesWorkshopExperienceCore, rhs: ApsidesWorkshopExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 475): no won levels with level 1 open
+    /// plus the levels up to the restored level, campaign mode, no tutorial key (restore starts the tutorial at its
+    /// first step: `knob` on the tutorial levels 1 … 3, else `done`).
+    ///
+    /// - Throws: ``ApsidesWorkshopRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw ApsidesWorkshopRestoreRefusal.damaged
+        }
+        var progress: ApsidesWorkshopProgress = ApsidesWorkshopProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(ApsidesWorkshopMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the ranges of the file header as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -278,6 +401,11 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
         ExperienceControl(id: "clock.show", ranges: [declared(tickRange)]),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(ApsidesWorkshopProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -285,7 +413,8 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The seven controls with their declared ranges (see the file header); play, undo, redo and next take no values.
+    /// The twelve controls with their declared ranges (see the file header); `orbit.play`, `play.undo`, `play.redo`,
+    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with tick 0 shown; no clock is read.
@@ -323,26 +452,49 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
             case "orbit.periapsis":
                 // The shown tick stays (presentation of the same level; the period does not change).
                 try play.apply(.periapsis(values[0], values[1]), expecting: play.fingerprint)
+                advanceTutorial(afterTuning: true)
             case "orbit.size":
                 try play.apply(.size(values[0]), expecting: play.fingerprint)
+                advanceTutorial(afterTuning: true)
             case "orbit.play":
                 try play.apply(.play, expecting: play.fingerprint)
+                advanceTutorial(afterTuning: false)
+                recordIfWon()
             case "play.undo":
                 try play.undo()
+                advanceTutorial(afterTuning: false)
             case "play.redo":
                 try play.redo()
+                advanceTutorial(afterTuning: false)
+                recordIfWon()
             case "clock.show":
                 // Presentation only: the play and the digest do not change, and the kernel is not consulted.
                 guard values[0] < play.level.period else {
                     return .rejected(.rule(code: ApsidesWorkshopExperienceRule.tick))
                 }
                 shownTick = values[0]
-            default:   // level.next
-                let next: Int = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh: ApsidesWorkshopPlay = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
-                shownTick = 0
+            case "level.next":
+                guard let next = progress.nextOpen(after: levelNumber) else {
+                    return .rejected(.rule(code: ApsidesWorkshopExperienceRule.locked))
+                }
+                try open(number: next, mode: .campaign)
+            case "level.select":
+                guard progress.isOpen(values[0]) else {
+                    return .rejected(.rule(code: ApsidesWorkshopExperienceRule.locked))
+                }
+                try open(number: values[0], mode: .campaign)
+            case "mode.daily":
+                guard let daily = ApsidesWorkshopProgress.dailyLevel(year: values[0], month: values[1],
+                                                                     day: values[2]) else {
+                    return .rejected(.rule(code: ApsidesWorkshopExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+            default:   // tutorial.dismiss
+                tutorial = tutorial.dismissed()
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
@@ -356,11 +508,49 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose with tick 0 shown; the quality tier, which is not state, is
-    /// kept.
+    /// Advances the tutorial step after an accepted tuning, play, undo or redo
+    /// (`ApsidesWorkshopTutorialStep.advanced(afterTuning:ended:)`): `afterTuning` for a tuning, ended when the play is
+    /// won or failed (never after an undo, which always lands on a moment before the end; after a redo only when it
+    /// restores a won or failed moment). Never back.
+    private mutating func advanceTutorial(afterTuning: Bool) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterTuning: afterTuning, ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's first
+    /// tutorial step and tick 0 shown; the records of the level left are dropped. Changes nothing when the kernel
+    /// refuses.
+    private mutating func open(number: Int, mode: ApsidesWorkshopMode) throws(ApsidesWorkshopError) {
+        let certified: ApsidesWorkshopGenerated = try Self.generated(number: number)
+        let fresh: ApsidesWorkshopPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedTunings = certified.plan.size
+        tutorial = ApsidesWorkshopTutorialStep.initial(level: number)
+        shownTick = 0
+    }
+
+    /// After an accepted action that won the play: records the actions spent
+    /// (`ApsidesWorkshopProgress.actionsSpent(_:)`) against the certified witness's tuning count in the current mode
+    /// (campaign opens the next level; daily records the best result and stars and opens nothing; practice records
+    /// nothing). A won play is final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, actionsSpent: ApsidesWorkshopProgress.actionsSpent(play),
+                        certified: certifiedTunings, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode, tick 0 shown); the quality tier,
+    /// which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedTunings = opening.certifiedTunings
         shownTick = 0
     }
 
@@ -373,38 +563,48 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g18.apsides-workshop.v1", then the level number and the play's fingerprint (actions spent, failure,
-    /// level, orbit, stage).
+    /// "r02-g18.apsides-workshop.v2", then the level number, the play's fingerprint (actions spent, failure, level,
+    /// orbit, stage), the progress and the mode (their sorted JSON); never the tutorial step or the shown tick.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly; never the
-        // shown tick (presentation).
+        // shown tick (presentation) or the tutorial step.
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: ApsidesWorkshopMode
+        /// The progress.
+        var progress: ApsidesWorkshopProgress
         /// The play's records.
         var records: [ApsidesWorkshopRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: ApsidesWorkshopTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level, with tick 0 shown; a reset
-    /// returns to the level `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), with tick 0 shown;
+    /// a reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``ApsidesWorkshopRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level or
-    ///   trace the kernel refuses.
+    /// - Throws: ``ApsidesWorkshopRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or tutorial
+    ///   step, or a daily mode naming another level among them), a level number outside 1 … 100 or a level or trace
+    ///   the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> ApsidesWorkshopExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw ApsidesWorkshopRestoreRefusal.damaged
@@ -412,15 +612,21 @@ public struct ApsidesWorkshopExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw ApsidesWorkshopRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw ApsidesWorkshopRestoreRefusal.damaged
+        }
         do throws(ApsidesWorkshopError) {
-            let saved: ApsidesWorkshopLevel = try level(number: decoded.level)
-            let play: ApsidesWorkshopPlay = try ApsidesWorkshopPlay.replay(level: saved, records: decoded.records)
-            let openingNumber: Int = levelNumber(forSeed: seed)
-            let openingPlay: ApsidesWorkshopPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return ApsidesWorkshopExperienceCore(levelNumber: decoded.level, play: play,
-                                                 openingNumber: openingNumber, openingPlay: openingPlay)
+            let certified: ApsidesWorkshopGenerated = try generated(number: decoded.level)
+            let play: ApsidesWorkshopPlay = try ApsidesWorkshopPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: ApsidesWorkshopTutorialStep = decoded.tutorial
+                ?? ApsidesWorkshopTutorialStep.initial(level: decoded.level)
+            let openingCore: ApsidesWorkshopExperienceCore = try opening(number: levelNumber(forSeed: seed))
+            return ApsidesWorkshopExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                 mode: decoded.mode, tutorial: tutorial,
+                                                 certifiedTunings: certified.plan.size,
+                                                 openingNumber: openingCore.openingNumber,
+                                                 opening: openingCore.opening)
         } catch {
             throw ApsidesWorkshopRestoreRefusal.kernel(error)
         }

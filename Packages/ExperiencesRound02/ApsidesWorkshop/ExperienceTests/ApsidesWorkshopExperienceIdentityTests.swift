@@ -1,10 +1,11 @@
 // ApsidesWorkshopExperienceIdentityTests — feature 473 (R02-G18-03) T-R02G1803-006 (FR-R02G1803-005, 007, 008, 009).
 // The experience's id is the catalog id; the registry's factory (`make(id:storage:reduceMotion:reduceFlashing:)`,
 // which does not depend on the registration) builds a shell around the presenter with the accessibility settings
-// passed through, as does the tests' factory; the controls are the seven declared actions in order; the registration
-// facts hold (100 certified levels, schema 1, the tiers level-0 … level-2, the palette); the presenter's quality levels
-// equal the Core's `qualityTiers`; the presenter holds no GPU object and no snapshot before setup; and it declares its
-// two frame probes (the backdrop corners) once a frame was drawn. iOS only, as the target.
+// passed through, as does the tests' factory; the controls are the declared actions in order (seven, twelve since
+// feature 475); the registration facts hold (100 certified levels, schema 2 since feature 475, the tiers
+// level-0 … level-2, the palette); the presenter's quality levels equal the Core's `qualityTiers`; the presenter holds
+// no GPU object and no snapshot before setup; and it declares its two frame probes (the backdrop corners) once a frame
+// was drawn. iOS only, as the target.
 #if os(iOS)
 import ApsidesWorkshopCore
 import Foundation
@@ -21,11 +22,12 @@ import VisualCoreExperienceHost
         #expect(ApsidesWorkshopExperienceCore.experienceID == "r02-g18.apsides-workshop")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 1, three tiers, the five-colour palette.
+    /// The registration's content facts: 100 certified levels, schema 2, three tiers, the five-colour palette.
     @Test func theRegistrationFactsHold() {
         #expect(ApsidesWorkshopExperienceCore.levelNumbers == 1...100)
         #expect(ApsidesWorkshopExperienceCore.certifiedCandidates.count == 100)
-        #expect(ApsidesWorkshopExperienceCore.schemaVersion == 1)
+        // Schema 2 since feature 475 (R02-G18-05) T-R02G1805-004: progress, mode and tutorial step in the payload.
+        #expect(ApsidesWorkshopExperienceCore.schemaVersion == 2)
         var names: [String] = []
         for level in ApsidesWorkshopExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -39,7 +41,8 @@ import VisualCoreExperienceHost
         for control in ApsidesWorkshopExperienceCore.controls { ids.append(control.id) }
         #expect(ids == ApsidesWorkshopExperienceCore.actionIDs)
         #expect(ids == ["orbit.periapsis", "orbit.size", "orbit.play", "play.undo", "play.redo", "level.next",
-                        "clock.show"])
+                        "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers`, named as the tiers.

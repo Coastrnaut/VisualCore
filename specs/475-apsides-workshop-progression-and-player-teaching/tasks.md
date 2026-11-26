@@ -55,7 +55,7 @@ campaign covers the game).
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1805-004 Edit `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopExperienceCore.swift`
+- [X] T-R02G1805-004 Edit `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopExperienceCore.swift` — Verified 2026-11-25: 2026-11-25 adapter: level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss; r02-g18.locked and r02-g18.date; practice budget 24; progress and mode digested (r02-g18.apsides-workshop.v2), tutorial snapshotted; schema 2 with migration from 1; level.next to the next open level; scenarios and regenerated manifest; ApsidesWorkshopProgressionCoreTests (10); host-4 exit 0 (ApsidesWorkshop filter, 194 tests)
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g18.locked`, `r02-g18.date`; practice budget 24 on a copy of the level, no stars, no
   unlocks; the daily level is playable even while still locked in the campaign, and a daily win records the level's best
