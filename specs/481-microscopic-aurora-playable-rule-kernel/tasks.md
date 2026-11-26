@@ -73,7 +73,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
   goal "the predicted play wins"; rulesID "r02-g19-microscopic-aurora") with
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraPuzzleTests.swift` (agreement with the play
   on 200 walks); `--name host-4`
-- [ ] T-R02G1901-006 [P] Create
+- [X] T-R02G1901-006 [P] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraInvariantTests pass (host-5 exit 0, 9 tests); the save invariant found the Codable path accepting schema 0, fixed in T-002
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraInvariantTests.swift` (agent D:
   `testMicroscopicAuroraTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
