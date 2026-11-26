@@ -55,7 +55,8 @@ level and was rejected.
 - Q: How does the kernel change, and how is a level built from its manifest entry? → A: the kernel widens the budget
   range to 1 … 24 and gains optional well sites: a level may list 2 … 8 distinct usable cells as its sites; with sites,
   a placement on any other cell is refused `r02-g19.action` ("not a site") by the play and is not a move of the puzzle
-  contract; a level without sites encodes, fingerprints and plays exactly as in feature 481 (the field is omitted). The
+  contract, and every starting well must lie on a site ("well not on a site"); a level without sites encodes,
+  fingerprints and plays exactly as in feature 481 (the field is omitted). The
   100 entries (number, planned seed, band, budget, control emphasis) are a table in `MicroscopicAuroraManifest` with
   their provenance. Candidate c of entry n draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index:
   c))`, in this order: the swim length; the swarm rules (ρ 2 … 4, σ 1 … ρ, κ 6 … 8, wₛ 0 … 3, wₐ 1 … 6, w_c 1 … 6, a_max
@@ -77,7 +78,8 @@ level and was rejected.
 - Q: How does the solver find a minimal plan, and what proves nothing shorter wins? → A: a placement changes or fills
   one slot and a removal empties one, and a report depends only on the set of wells, so the settings reachable with at
   most d actions from a start with no well are exactly the sets of at most d wells on distinct sites (8 options per
-  site: strength 1 … 4 × sense). The solver judges depth 0 (no well), then every set of one well, then of two, …; each
+  site: strength 1 … 4 × sense); for a level without sites or with a starting well the solver returns no plan. The
+  solver judges depth 0 (no well), then every set of one well, then of two, …; each
   set is a list of wells in site order, enumerated by site, then strength, then sense (clockwise first). Depths below
   the last are judged in that fixed order; the last depth is ordered by a shape loss, the loss of the set's prefix (the
   set without its last well) judged one depth earlier, ties keeping the fixed order: loss = the stencil cells left unlit
