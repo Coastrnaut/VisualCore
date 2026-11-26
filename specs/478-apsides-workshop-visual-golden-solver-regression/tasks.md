@@ -14,7 +14,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G1808-002 [P] [US1] Create
+- [X] T-R02G1808-002 [P] [US1] Create — Verified 2026-11-26: 2026-11-26 host exit 0, 14 tests: 10 groups of 10 levels plus the twelve named alterations on levels 1, 41, 81 (.autonomy/migration/checks/R02-G18-08.host.json)
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopRegressionSolverTests.swift` (agent A: for every
   level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's actions replay
   on a fresh play to a win on exactly the final play and not before, within the budget, with its per-action fingerprints
