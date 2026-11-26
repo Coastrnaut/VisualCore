@@ -18,7 +18,8 @@ were corrected in the artifacts.
 ## Deterministic invariants
 
 - [x] CHK002 Is the trace defined exactly (effective periapsis and size tunings with their steps, then the play; no undo
-  or redo; actions spent still counting undone tunings) and when a result is replaced? [Clarity, Spec §Clarifications Q1]
+  or redo; actions spent still counting undone tunings) and when a result is replaced? [Clarity, Spec
+  §Clarifications Q1]
 - [x] CHK003 Is the reconciliation rule stated as a checkable condition (wins, the trace's tunings no more than
   the recorded actions spent, stars matching the stars rule for them and the certified tuning count) with the
   frontier kept as saved? [Measurability, Spec §FR-R02G1807-003; Clarifications Q2]
