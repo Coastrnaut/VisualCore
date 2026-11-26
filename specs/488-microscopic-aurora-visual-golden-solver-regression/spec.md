@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G19-08 (migration ledger, game feature of experience R02-G19) · ID namespace FR-R02G1908-###,
 SC-R02G1908-###, T-R02G1908-###
@@ -23,6 +23,68 @@ Canonical overrides:
   memory on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 478 (the Apsides Workshop visual golden and solver regression), adapted to well placements on
   sites, the play of the swim, the microscope dish and the luminous swimmers and ribbons.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+478's answers where the games agree. Facts checked in code (read-only, 2026-11-26): `MicroscopicAuroraSolver.plan`
+certifies a level with sites and no starting well by judging every set of 0, 1, 2 … wells on distinct sites, depth by
+depth, returning `actions` (the placements), `wells`, `setsByDepth` (sets judged per depth), `nearestMiss` and `work`,
+within 1,200 sets judged (`workBound`); the 100 witness files in `docs/games/microscopic-aurora/levels/` hold the
+number, the level (radius, length, rules, swimmers, stencil, threshold, coverage, coherence, sites, wells, budget,
+tutorial, fingerprint), the actions (the plan's placements, then the play that wins), the per-action digests, the
+fingerprints after `begin`, after `dismissTutorial` on a tutorial level and after each action, the report, the
+counterexample (`depth` = size − 1, `sets` judged at that depth and `nearestMiss`), the difficulty and the skipped
+candidate count, byte-checked by the catalog tests with the catalog digest pinned; the simulator frame checks of feature
+483 compare rendered frames with the CPU reference (each swimmer's centre brighter than the dish field by 0.25 in
+luminance, the first lit actions bar with blue above green by 0.08, each point at least 6 px from what is drawn after
+it, the backdrop patches within tolerance of the abyss gradient) at 1,152 × 768; the palette has 18 named colours (the
+19th constant is a hex list); `MicroscopicAuroraDishScene.release()` frees every renderer, the next draw rebuilds them
+and `liveObjectCount` counts them; `ProcessMemory.footprint()` reads the footprint; the CI job `round02-host-tests` has
+a named regression step per earlier round-two game (Apsides Workshop's the latest).
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win on exactly the final play and not before, within the budget, with exactly its per-action fingerprints
+  and digests; and `plan` returns exactly the witness's placements with `setsByDepth[size − 1]` equal to the
+  counterexample's `sets` and `nearestMiss` equal to its `nearestMiss`; `work` is at most `workBound` (counted, never
+  timed). The run is split into tests of 10 levels (10 tests), each well under 10 s. Impact: FR-R02G1908-001;
+  SC-R02G1908-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a swimmer's position, a swimmer's velocity, a stencil
+  cell, a site, the threshold, the coverage requirement, the coherence requirement, the budget; a plan placement; a
+  witness action, a per-action fingerprint or digest; the counterexample's sets count. Impact: FR-R02G1908-002;
+  SC-R02G1908-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after all of the witness's placements but before the play, so
+  actions are spent from the actions bars and the level is not yet won, shown at the tick half the ticks swum (as the
+  feature-483 frame checks), at presentation time 0, the authored camera, no preview and no freeze, plus the hero frame
+  of the scenario manifest's hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the projected pixel
+  positions of the dish centre, every swimmer at the shown tick, every placed well, every site and the first actions
+  bar, rounded to 1/8 pixel, the counts of stencil cells, lit and stray cells, sites, wells, swimmers, ribbon points,
+  gauges, met gauges, lit and total actions bars, and the 18 palette colours as 8-bit sRGB; serialized as JSON with
+  sorted keys and hashed with SHA-256. The 16 descriptions and their digests live in
+  `Packages/ExperiencesRound02/MicroscopicAurora/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every count and colour
+  must be equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal
+  the digest of its pinned description. The file is rewritten only when `MICROSCOPIC_AURORA_WRITE_GOLDEN=1` is set. The
+  simulator test renders the 16 frames and checks them against the same descriptions with the feature-483 tolerances.
+  Impact: FR-R02G1908-003, 004; SC-R02G1908-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_MICROSCOPIC_AURORA_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU objects
+  of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a named
+  reason. Impact: FR-R02G1908-005; SC-R02G1908-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's `round02-host-tests` job keeps running all
+  round-two host tests and adds a named step "Microscopic Aurora regression (host)" that runs the Microscopic Aurora
+  regression filter alone. The local command `python3 scripts/microscopic_aurora_regression.py` runs the host
+  regression filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`, and
+  prints one summary line per part with pass or fail and the first failing name; its exit code is non-zero on any
+  failure. Nothing is timed against the wall clock. Impact: FR-R02G1908-006, 007; SC-R02G1908-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
