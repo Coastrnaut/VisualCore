@@ -63,7 +63,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1808-006 [P] [US4] Create `scripts/apsides_workshop_regression.py` and its test in `scripts/test_scripts.py`
+- [X] T-R02G1808-006 [P] [US4] Create `scripts/apsides_workshop_regression.py` and its test in `scripts/test_scripts.py` — Verified 2026-11-26: 2026-11-26 regression exit 0 (.autonomy/migration/checks/R02-G18-08.regression.json): host and simulator parts PASS with the memory class isolated; 5 script tests for the command (run alone with the full script tests at T-011); CI step 'Apsides Workshop regression (host)' added
   (agent D: host filter `ApsidesWorkshopRegression`, then the simulator classes through `xcodebuild_package.py
   --only-testing` with the isolation variable, one summary line per part with pass or fail and the first failing name, a
   non-zero exit on any failure), and add the named step "Apsides Workshop regression (host)" to the `round02-host-tests`
