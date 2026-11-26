@@ -35,7 +35,7 @@ on CI). No {owner} or {device} tasks (pure logic); no GLSL.
 **Independent test**: each catalog level's witness, replayed and played, wins within the budget; no set reachable with
 fewer placements wins.
 
-- [ ] T-R02G1902-003 [US1] Implement `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraSolver.swift`
+- [X] T-R02G1902-003 [US1] Implement `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraSolver.swift` — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraSolver and MicroscopicAuroraSolverTests pass (host-2 exit 0, 9 tests): an independent enumeration agrees with every plan's depth, set counts and nearest miss on levels of every band; agent A found nearestMiss counting the winning depth's misses, fixed (smaller depths only)
   (lead: sets of wells on distinct sites "enumerated by site, then strength, then sense (clockwise first)"; depths 0, 1,
   2 … judged in that order, "the last depth ordered by the loss of the set's prefix judged one depth earlier, ties keeping
   the fixed order"; loss "the stencil cells left unlit plus the cells lit outside the stencil"; the first winning set ends
