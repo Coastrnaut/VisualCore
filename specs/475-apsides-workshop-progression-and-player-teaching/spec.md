@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-25
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G18-05 (migration ledger, game feature of experience R02-G18) · ID namespace FR-R02G1805-###,
 SC-R02G1805-###, T-R02G1805-###
@@ -27,6 +27,67 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G18-01 … 04.
 - **Model:** feature 465 (Celestial Eclipse Lab's progression and teaching) for hints from a solver entry at the current
   state, tutorial, failure text, progress, daily and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-25
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+465's answers where the games agree. Facts checked in code (read-only, 2026-11-25): `ApsidesWorkshopSolver.plan`
+certifies a level by searching the valid orbits that differ from the level's starting orbit in one lever (the periapsis
+knob — eccentricity and direction together — or the size), then in both, in a fixed order, at most 16,000 orbits judged;
+a plan is one or two tunings (`.periapsis(k, d)`, `.size(a)`), ordered so the orbit in between stays valid, followed by
+the play; every tuning spends 1 action and the play none; the play ends the level won, or failed with `contact(planet,
+tick)`, `order(target, tick)`, `share(target, tick, share)`, `apsisSector(target, sector)` or `apsisDistance(target,
+distance)`, all deterministic; undo works in playing, paused and failed plays, a won play is final; levels 1 … 3 carry
+the tutorial flag; budgets are 8 … 19 in the catalog (1 … 24 allowed); the certified plans have 1 or 2 tunings; the
+adapter prepares level (seed mod 100) + 1, keeps the shown tick and the panel's pending orbit outside the play and
+snapshots `{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily multipliers
+are 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89 and 97.
+
+- Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
+  failed play's hint is "Undo the last action or retry the level." While playing: when the current orbit already wins,
+  the hint is "Every target reads in its band: play the revolution"; otherwise the solver searches from the current
+  orbit through a solver entry that starts from it (`plan(_:from:)`, the certifying `plan(_:)` being that entry at the
+  level's starting orbit) within min(actions left, 2) tunings; its first tuning is the hint; when no plan is found (none,
+  or the work bound exceeded): "No way to win was found in the actions left: undo the last action or retry the level."
+  Level 1 names the lever ("Turn the periapsis knob next" or "Change the size next"); level 2 the way and distance
+  ("Raise the eccentricity by n steps and turn the periapsis m steps counterclockwise" or "clockwise", the shorter way
+  around, counterclockwise on a tie, a lever part that does not change left out; "Grow the orbit by n units" or
+  "Shrink"); level 3 the exact setting ("Set the periapsis to eccentricity k, direction d°" or "Set the size to a").
+  Hints never change the state, are unlimited, do not affect stars and reset to level 1 after any change of the play.
+  Impact: FR-R02G1805-002; SC-R02G1805-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
+  instructions in order: (1) "Drag the periapsis knob (or use the − and + buttons and Set periapsis) to shape and aim
+  the orbit; the gauges show what the new orbit would read" — it advances once a tuning has been accepted; (2) "Bring
+  every target into its band, in order, then press Play — a hint shows which lever to change" — it advances once a
+  second tuning has been accepted or the level ends; (3) "Striking a planet, a target out of order or a reading outside
+  its band fails the revolution: undo and tune again" — until the level ends. `tutorial.dismiss` ends it for that level;
+  undo never moves it back. Impact: FR-R02G1805-001; SC-R02G1805-001.
+- Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted tuning record, undone
+  ones included: 3 when at most the certified witness's tuning count, 2 when at most that + 2, else 1; per level the
+  best (least) actions spent of a won campaign play and its stars, a better result replacing a worse one; level 1 open;
+  a campaign win opens the next; `level.select [n]` opens any open level and refuses others (`r02-g18.locked`);
+  `level.next` moves to the next open level (refused when none, `r02-g18.locked`); the five bands of 20 are the
+  certified difficulty bands. Impact: FR-R02G1805-004; SC-R02G1805-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 23) mod 100 + 1, negative day counts wrapped into 0 … 99 (23 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g18.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the budget raised to the kernel's
+  maximum (24); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G1805-005;
+  SC-R02G1805-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 465: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the shown tick, the pending orbit and a
+  drag's preview stay presentation; the snapshot payload becomes schema 2 (`{level, mode, progress, records,
+  tutorial}`) with a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its first
+  step on tutorial levels). A failure is explained from the play's failure, targets numbered from 1, sectors and
+  distances in words as the level names them: a contact — "The orbit struck planet p after tick t."; an order — "Target
+  k was reached at tick t, before the target before it."; a share — "Target k (sector s, reached at tick t) swept x %,
+  outside its band from l % to h %."; an apsis sector — "Target k: the periapsis (or apoapsis) lies in sector s, not in
+  sector s′."; an apsis distance — "Target k: the periapsis (or apoapsis) lies at r units, outside its range from l to h
+  units." — each followed by "Undo the last action or retry the level." Impact: FR-R02G1805-003, 007; SC-R02G1805-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
