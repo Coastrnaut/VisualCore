@@ -42,7 +42,7 @@ R02-G18-03 (`git show <R02-G18-03 record commit>:<path>`).
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraShaderSourceTests.swift` (version line,
   declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match, glow caps);
   agent A; `--name host-2`
-- [ ] T-R02G1903-004 [P] [US1] Create
+- [X] T-R02G1903-004 [P] [US1] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraSceneGeometry (dish, glow and fallback meshes, camera, CPU reference) and MicroscopicAuroraSceneGeometryTests pass (host-3 exit 0, 12 tests): extreme settings, view margins at 7 aspects, tiers, ribbons at kernel positions only, gauges, won level, each failure kind, spirals turning like the kernel
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraSceneGeometry.swift` (clarification Q1: world =
   ((x − 3072) · s, (3072 − y) · s) with s = 0.9 / 2816; the backdrop quad; the field disc of radius R · 256 · s; fronds
   of three generations at the two richer tiers, reaching at most 0.07 beyond the rim; the rim 0.012 wide; stencil
