@@ -63,8 +63,8 @@ with one action, so every certified witness (its placements on sites, then the p
   FR-R02G1904-001, 003, 005, 008; SC-R02G1904-002.
 - Q: How does a well drag map the finger to a change, and what is previewed? → A: a press on a well that moves 16 points
   or more while playing becomes a drag; the finger's target is the site whose projected centre is nearest the finger
-  within 24 points, other than a site another well holds (the well's own site counts as no change); outside the
-  projected enclosure the target is removal; otherwise no change. The snapshot gains a preview (the slot, the target
+  within 24 points (lower site index on ties); if that site is the well's own or another well holds it, no change;
+  outside the projected enclosure the target is removal; otherwise no change. The snapshot gains a preview (the slot, the target
   and the previewed swim of the wells with that change: positions, density, lit cells, coverage, coherence and failure;
   none in the digest): unfrozen, the scene draws the previewed swim in place of the committed one and the dragged well
   as a ghost at its target; frozen, the committed swim stays and only the gauges show the previewed readings. On release
