@@ -56,7 +56,8 @@ implements R02-F23's `PuzzleRules` (`ApsidesWorkshopRules`, `VisualCoreSimulatio
   its neighbours are the other swimmers within the neighbour radius ρ (2 … 6 cells, compared as squared distances in
   dish units). Separation sums pᵢ − pⱼ over neighbours within the separation radius σ (1 cell … ρ); two swimmers at the
   same point push along +x for the lower index and −x for the higher, by one dish unit. Alignment is the neighbours'
-  mean velocity minus vᵢ, cohesion their mean position minus pᵢ (means by integer division truncating toward zero).
+  mean velocity minus vᵢ, cohesion their mean position minus pᵢ (means by integer division truncating toward zero;
+  with no neighbour, alignment and cohesion are zero, and with none within σ, separation is zero).
   The swarm acceleration is (wₛ·separation)/64 + (wₐ·alignment)/16 + (w_c·cohesion)/256 with weights 0 … 8 each.
   Each well at the centre q of its cell, with strength s 1 … 4 and sense ±1 (+1 counterclockwise), adds the curl
   acceleration sense·s·4096·(−dy, dx)/(dx² + dy² + 65536) with (dx, dy) = p − q. Every division truncates toward zero.
@@ -81,7 +82,7 @@ implements R02-F23's `PuzzleRules` (`ApsidesWorkshopRules`, `VisualCoreSimulatio
   column, strength, sense)` puts a well into a slot or changes it (the result must differ from the slot's current
   well), on a cell whose centre is inside the enclosure and that no other well occupies; `remove(slot)` empties an
   occupied slot. Each spends one action and is refused `r02-g19.action` when out of range, unchanged or on an
-  occupied or outside cell, `r02-g19.budget` when no action is left. `play` spends nothing and ends the level (won or
+  occupied or outside cell, or removing an empty slot, `r02-g19.budget` when no action is left. `play` spends nothing and ends the level (won or
   failed); undo and redo restore placements and, from failed, undo returns to playing with the wells before the play.
   The budget is 1 … 12. As feature 471: stages loading → tutorial → playing ⇄ paused → won or failed → result; begin,
   dismissTutorial, pause and resume are their own record kinds; each record carries the schema, the level seed, an
