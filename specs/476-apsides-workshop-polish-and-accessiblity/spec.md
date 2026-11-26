@@ -57,9 +57,9 @@ the engine as `action.rule.<code>`).
   `r02-g18.level` "That level could not be made.", `r02-g18.not-whole` "That value must be a whole number.",
   `r02-g18.tick` "That tick is outside the revolution.", any other code "That action was refused." (the engine's
   `action.rule.` prefix read as the bare code). A revealed hint is announced (`state`) with its text. Moving the pending
-  orbit, drag previews, the shown tick and the view are not announced. Texts are a pure function of the old and new core
-  (and the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact: FR-R02G1806-002;
-  SC-R02G1806-002.
+  orbit, drag previews, the shown tick, the view, dismissing the tutorial and the Sound toggle are not announced (the
+  controls speak their own values). Texts are a pure function of the old and new core (and the refusal code), so tests
+  compare them exactly; the panel shows the same refusal text. Impact: FR-R02G1806-002; SC-R02G1806-002.
 - Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted tuning, undo or redo; `success`
   for a won play; `warning` for a failed play; `error` for a refusal; moving the pending orbit, previews, the shown
   tick, the view and level changes play none. The play plays only its outcome. The shared planners' intervals apply.
