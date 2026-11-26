@@ -8,14 +8,17 @@
 // unchanged placement, an empty slot and nothing to undo or redo, `r02-g19.budget` and `r02-g19.stage`; `stale` cannot
 // arise because every action names the current fingerprint); sense 0 is clockwise and 1 counterclockwise; undo restores
 // the earlier digest exactly and redo the later one; `clock.show` changes the snapshot but never the digest, the play
-// or the payload, a placement, undo and redo keep it (clamped to the ticks swum), and `level.next`, reset and restore
-// return it to 0; the certified plan of level 1 wins through the adapter and a play from the opening fails, undo
-// returning the failed play to playing; `level.next` wraps 100 to 1 and reset returns; the snapshot round trip and
+// or the payload, a placement, undo and redo keep it (clamped to the ticks swum), and a new opening (a mode or a
+// level), reset and restore return it to 0; the certified plan of level 1 wins through the adapter and a play from the
+// opening fails, undo returning the failed play to playing; `level.next` needs an open level (no wrap) and reset
+// returns; the snapshot round trip and
 // refused payloads (damaged, level out of range, a trace of another level, a record of a newer schema, an edited trace,
 // an envelope of a newer schema); the certified-candidate table equals the 100 stored witnesses' `skipped` and the
 // directly certified levels equal the stored witness levels; `snapshot(time:)` copies the play, its swimmers standing
 // at the kernel's positions. Levels are certified once per process, so the run stays short. Explicit types, plain
 // loops, single-literal comments. Modelled on ApsidesWorkshopExperienceCoreTests (feature 473).
+// Feature 485 (R02-G19-05) T-R02G1905-004: schema 2 and digest v2, twelve controls, `level.next` to the next open level
+// (no wrap; `r02-g19.locked` when none); the progression itself is tested in `MicroscopicAuroraProgressionCoreTests`.
 @testable import MicroscopicAuroraCore
 import Foundation
 import Testing
@@ -77,15 +80,16 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
 
     @Test func conformance() async throws {
         let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
-        // Levels 1 and 3 (then 2 and 4). Level 1's certified plan is a clockwise well of strength 2 on (11, 18); the
-        // play from the opening fails and is undone.
+        // Levels 1 and 3. Level 1's certified plan is a clockwise well of strength 2 on (11, 18); the play from the
+        // opening fails and is undone; practice reopens the level with the budget raised to 24 (feature 485:
+        // `level.next` needs the next level open), where a well on the site (9, 7) is placed and undone.
         let actions: [ScriptedAction] = [ScriptedAction("well.place", [0, 11, 18, 2, 0]), ScriptedAction("play.undo"),
                                          ScriptedAction("play.redo"), ScriptedAction("clock.show", [10]),
                                          ScriptedAction("play.undo"), ScriptedAction("swim.play"),
                                          ScriptedAction("play.undo"), ScriptedAction("well.place", [1, 9, 7, 1, 1]),
-                                         ScriptedAction("well.remove", [1]), ScriptedAction("level.next"),
+                                         ScriptedAction("well.remove", [1]), ScriptedAction("mode.practice"),
                                          ScriptedAction("clock.show", [5]),
-                                         ScriptedAction("well.place", [0, 9, 13, 2, 0]), ScriptedAction("play.undo")]
+                                         ScriptedAction("well.place", [0, 9, 7, 2, 0]), ScriptedAction("play.undo")]
         // Refused on the openings of levels 1 and 3 (no well placed, swims of at most 160 ticks).
         let rejected: [ScriptedAction] = [ScriptedAction("well.place", [3, 11, 18, 2, 0]),
                                           ScriptedAction("well.place", [-1, 11, 18, 2, 0]),
@@ -110,7 +114,13 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
                                           ScriptedAction("clock.show"),
                                           ScriptedAction("play.undo"), ScriptedAction("play.redo"),
                                           ScriptedAction("swim.play", [1]), ScriptedAction("level.next", [1]),
-                                          ScriptedAction("bogus")]
+                                          ScriptedAction("level.next"), ScriptedAction("level.select", [4]),
+                                          ScriptedAction("level.select", [0]), ScriptedAction("level.select"),
+                                          ScriptedAction("mode.daily", [2026, 2, 30]),
+                                          ScriptedAction("mode.daily", [2026, 13, 1]),
+                                          ScriptedAction("mode.daily", [2026, 1]),
+                                          ScriptedAction("mode.practice", [1]), ScriptedAction("mode.campaign", [1]),
+                                          ScriptedAction("tutorial.dismiss", [1]), ScriptedAction("bogus")]
         let plan = ConformancePlan(seeds: [0, 2], stepsPerSegment: 2, actions: actions, rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
         #expect(report.entries.count == ConformanceCheck.allCases.count)
@@ -121,19 +131,22 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g19.microscopic-aurora" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g19.microscopic-aurora.v1")
+        #expect(Core.experienceID == "r02-g19.microscopic-aurora" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g19.microscopic-aurora.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["well.place", "well.remove", "swim.play", "play.undo", "play.redo", "level.next",
-                             "clock.show"]
+                             "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                             "tutorial.dismiss"]
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [0...2, 0...23, 0...23, 1...4, 0...1])
         #expect(Core.controls[1].ranges == [0...2])
         #expect(Core.controls[6].ranges == [0...480])
-        let plainIndices: [Int] = [2, 3, 4, 5]
+        #expect(Core.controls[7].ranges == [1...100])
+        #expect(Core.controls[8].ranges == [1...9999, 1...12, 1...31])
+        let plainIndices: [Int] = [2, 3, 4, 5, 9, 10, 11]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == MicroscopicAuroraTier.all.count)
-        #expect(Core.migrations.currentVersion == 1)
+        #expect(Core.migrations.currentVersion == 2)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == MicroscopicAuroraTier.all.map(\.name))
@@ -147,6 +160,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(passes == [2, 1, 0] && resolutions == [1, 1, 1])
         #expect(MicroscopicAuroraExperienceRule.notWhole == "r02-g19.not-whole")
         #expect(MicroscopicAuroraExperienceRule.tick == "r02-g19.tick")
+        #expect(MicroscopicAuroraExperienceRule.locked == "r02-g19.locked")
+        #expect(MicroscopicAuroraExperienceRule.date == "r02-g19.date")
+        #expect(Core.practiceBudget == 24)
         #expect(Core.wonCode == "won" && Core.failedCode == "failed")
     }
 
@@ -366,8 +382,11 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let shown: Int = probe.play.report.ticks
         #expect(probe.apply(Self.act("clock.show", [Double(shown)])) == .accepted && probe.shownTick == shown)
         #expect(probe.apply(Self.act("well.place", [0, 9, 7, 3, 1])) == action && probe.shownTick == shown)
-        #expect(probe.apply(Self.act("level.next")) == .accepted && probe.levelNumber == 2)
-        #expect(probe.play.stage == .playing && probe.play.actionsLeft == probe.play.level.budget)
+        // Feature 485: `level.next` needs the next level open; level 2 is not open until level 1 is won.
+        #expect(probe.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g19.locked")))
+        #expect(probe.shownTick == shown && probe.levelNumber == 1)
+        #expect(probe.apply(Self.act("mode.practice")) == .accepted && probe.levelNumber == 1)
+        #expect(probe.play.stage == .playing && probe.play.actionsLeft == Core.practiceBudget)
         #expect(probe.shownTick == 0)
     }
 
@@ -443,7 +462,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(core.apply(Self.act("clock.show", [3.25])) == .rejected(.rule(code: "r02-g19.not-whole")))
         #expect(core.apply(Self.act("clock.show", [481])) == .rejected(.outOfRange(index: 0)))
         #expect(core.snapshot(time: 1).shownTick == shown && core.shownTick == shown)
-        // Reset, restore and level.next return to tick 0.
+        // Reset, restore and a new opening (here practice; since feature 485 `level.next` needs the next level open)
+        // return to tick 0.
         var reset: Core = core
         reset.reset()
         let opened: Core = try Core.opening(number: 1)
@@ -451,7 +471,7 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
         #expect(restored == core && restored.shownTick == 0)
         var next: Core = core
-        #expect(next.apply(Self.act("level.next")) == .accepted)
+        #expect(next.apply(Self.act("mode.practice")) == .accepted)
         #expect(next.shownTick == 0)
         // Undoing the placement swims the opening's ticks; the shown tick is clamped to them.
         var undone: Core = core
@@ -460,19 +480,34 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(undone.snapshot(time: 0).shownTick == undone.shownTick)
     }
 
-    @Test func levelNextWrapsAndResetReturns() async throws {
+    /// The fields of a schema-2 payload after its level number: campaign mode, level 1 open, no records (feature 485).
+    static let restOfPayload: String = ",\"mode\":{\"mode\":\"campaign\"},"
+        + "\"progress\":{\"frontier\":1,\"solved\":[]},\"records\":[]}"
+
+    @Test func levelNextNeedsAnOpenLevelAndResetReturns() async throws {
         var core: Core = try await Core.prepare(seed: 99)
         #expect(core.levelNumber == 100)
-        let first: MicroscopicAuroraAction = try #require(try Core.generated(number: 100).plan.actions.first)
+        let hundred: MicroscopicAuroraGenerated = try Core.generated(number: 100)
+        let first: MicroscopicAuroraAction = try #require(hundred.plan.actions.first)
         #expect(core.apply(Self.act(first)) == .accepted)
         #expect(core.apply(Self.act("clock.show", [1])) == .accepted)
-        #expect(core.apply(Self.act("level.next")) == .accepted)
+        // Feature 485: no wrap; after winning level 100, `level.next` is still refused and level 1 is chosen with
+        // `level.select`.
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g19.locked")))
+        #expect(core.shownTick == 1)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for step in hundred.plan.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.apply(Self.act("swim.play")) == .accepted)
+        #expect(core.play.stage == .won && core.progress.solved[100] != nil && core.progress.frontier == 100)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g19.locked")))
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         #expect(core.levelNumber == 1 && core.play.stage == .playing && !core.play.canUndo)
         #expect(core.play.level == (try Core.level(number: 1)))
         #expect(core.shownTick == 0)
         core.setQualityTier(2)
         core.reset()
         #expect(core.levelNumber == 100 && !core.play.canUndo && core.qualityTier == 2)
+        #expect(core.progress.solved.isEmpty && core.mode == .campaign)
         let fresh: Core = try await Core.prepare(seed: 99)
         #expect(core == fresh)
         #expect(try Self.digest(core) == Self.digest(fresh))
@@ -491,7 +526,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let savedDigest: StateDigest = try Self.digest(core)
         let payload: Data = try core.snapshotPayload()
         let text: String = String(decoding: payload, as: UTF8.self)
-        #expect(text.hasPrefix("{\"level\":21,\"records\":["))
+        let prefix: String = "{\"level\":21,\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":21,"
+        #expect(text.hasPrefix(prefix))
         let restored: Core = try Core.restore(payload: payload, seed: 20)
         let restoredDigest: StateDigest = try Self.digest(restored)
         #expect(restored == core && restoredDigest == savedDigest)
@@ -523,10 +559,10 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
             try Core.restore(payload: Data("{\"level\":\"21\",\"records\":[]}".utf8), seed: 20)
         }
         #expect(throws: MicroscopicAuroraRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":0" + Self.restOfPayload).utf8), seed: 20)
         }
         #expect(throws: MicroscopicAuroraRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":101" + Self.restOfPayload).utf8), seed: 20)
         }
         // A trace of level 21 restored as level 22 (another seed).
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "{\"level\":21,", with: "{\"level\":22,").utf8)
@@ -557,14 +593,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "well.place", values: [0, 11, 18, 2, 0]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)

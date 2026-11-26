@@ -54,7 +54,7 @@ campaign covers the game). Agents model their files on Apsides Workshop's as rec
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G1905-004 Edit `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraExperienceCore.swift`
+- [X] T-R02G1905-004 Edit `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraExperienceCore.swift` — Verified 2026-11-26: adapter: level.select, mode.daily, mode.practice, mode.campaign, tutorial.dismiss; r02-g19.locked and r02-g19.date; practice budget 24; progress and mode digested (v2), tutorial snapshotted; schema 2 with migration from 1; level.next to the next open level; scenarios and regenerated manifest; MicroscopicAuroraProgressionCoreTests (11); host-4 exit 0 (MicroscopicAurora filter)
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g19.locked`, `r02-g19.date`; practice budget 24 on a copy of the level, no stars, no
   unlocks; the daily level is playable even while still locked in the campaign, and a daily win records the level's best

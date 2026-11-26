@@ -30,7 +30,8 @@
 //                                 `failed` with its failure;
 //   play.undo, play.redo          the kernel's exact undo and redo (`r02-g19.action` when there is nothing to undo or
 //                                 redo; undo works in a failed play and returns it to playing; a won play is final);
-//   level.next                    the next certified level (100 wraps to 1) with a fresh play;
+//   level.next                    the next certified level with a fresh play (since feature 485 the next open level;
+//                                 see below);
 //   clock.show [0…480]            shows the swimmers at a tick (presentation only; accepted in every stage); a tick
 //                                 outside 0 … ticks swum of the current report is refused `r02-g19.tick` without
 //                                 touching the kernel.
@@ -42,7 +43,7 @@
 // (`MicroscopicAuroraError`) becomes `.rule(code: error.reasonCode)`. A refused action changes nothing, the shown tick
 // included.
 //
-// Digest ("r02-g19.microscopic-aurora.v1"): the level number and the play's fingerprint (not its record history, so
+// Digest ("r02-g19.microscopic-aurora.v1" until feature 485): the level number and the play's fingerprint (not its record history, so
 // undo restores the earlier digest exactly); never the shown tick, the quality tier or a time. Snapshot schema 1: the
 // JSON object `{"level", "records"}` with sorted keys; restoring replays the records on a fresh play of that level
 // (`MicroscopicAuroraPlay.replay`), resets the shown tick and throws `MicroscopicAuroraRestoreRefusal` for a damaged
@@ -53,23 +54,55 @@
 // may rise). Host tier `t` draws `MicroscopicAuroraTier.of(t)`: level-0 = capsules of 12 segments, ribbons of 64 ticks,
 // fronds, 2 glow shells; level-1 = 8 segments, 32 ticks, fronds, 1 glow shell; level-2 = flat capsules, 16 ticks, no
 // fronds, no glow. Outcome: `won` or `failed` while the play is in that stage, else nil. Rules use integers only.
+//
+// Feature 485 (R02-G19-05) T-R02G1905-004 (FR-R02G1905-001, 004 … 007; clarifications Q2–Q5): the core also holds the
+// player's progress (`MicroscopicAuroraProgress`: won levels with the least actions spent and stars, the open
+// frontier), the mode (campaign, practice with the budget raised to the kernel's maximum 24, daily) and the tutorial
+// step (`MicroscopicAuroraTutorialStep`). No level is ever gated by payment: a locked level is one not yet unlocked
+// (FR-R02G1905-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g19.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g19.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 24 (a copy of the level);
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing a level or a mode drops the left level's records (the play starts fresh with tick 0 shown). `level.next`
+// moves to the next open level in campaign mode and is refused with `r02-g19.locked` when there is none (100 does not
+// wrap). A win (the play reaching `won` on an accepted `swim.play` or redo) records
+// `progress.record(level:actionsSpent:certified:mode:)` with the actions spent (`MicroscopicAuroraProgress.actionsSpent`:
+// every accepted placement and removal record, undone ones included) against the certified plan's placement count
+// (`certifiedPlacements`): campaign opens the next level, daily records the level's best result and stars and opens
+// nothing, practice records nothing. The certified wells (`certifiedWells`) feed the hints. The tutorial starts at
+// `MicroscopicAuroraTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and is advanced after
+// every accepted placement, removal, play, undo and redo by `advanced(afterAction:placement:ended:)` (afterAction for a
+// placement or removal, placement for a placement; ended when the play is won or failed — an undo never ends it, a redo
+// only when it restores a won or failed moment), never back; `clock.show` never moves it. The shown tick stays
+// presentation. Digest "r02-g19.microscopic-aurora.v2": level, play fingerprint, progress and mode (never the tutorial
+// step or the shown tick). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys;
+// schema-1 payloads migrate (no won levels, level 1 open plus the levels up to the restored level, campaign mode, the
+// tutorial at its first step — `place` on the tutorial levels, else `done`); an envelope of a newer schema is refused.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCorePersistence
 
-/// The rule codes of Microscopic Aurora's adapter refusals (feature 483).
+/// The rule codes of Microscopic Aurora's adapter refusals (feature 483; `locked` and `date` since feature 485).
 public enum MicroscopicAuroraExperienceRule {
     /// A value that must be a whole number (a slot, a cell, a strength, a sense or a tick) and is not.
     public static let notWhole = "r02-g19.not-whole"
     /// A shown tick outside 0 … ticks swum of the current report (`clock.show`).
     public static let tick = "r02-g19.tick"
+    /// A level that is not open yet, or no next open level (feature 485). Never a payment gate.
+    public static let locked = "r02-g19.locked"
+    /// An impossible calendar date (`mode.daily`, feature 485).
+    public static let date = "r02-g19.date"
 }
 
 /// Why a saved Microscopic Aurora state was refused on restore (feature 483). A refused restore changes nothing.
 public enum MicroscopicAuroraRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress, the mode or the
+    /// tutorial step is invalid (feature 485).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -77,17 +110,20 @@ public enum MicroscopicAuroraRestoreRefusal: Error, Equatable, Sendable {
     case kernel(MicroscopicAuroraError)
 }
 
-/// The state of Microscopic Aurora as an experience (see the file header). Snapshot schema 1.
+/// The state of Microscopic Aurora as an experience (see the file header). Snapshot schema 2.
 public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g19.microscopic-aurora"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g19.microscopic-aurora.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g19.microscopic-aurora.v2"
     /// The action ids in declaration order.
     public static let actionIDs = ["well.place", "well.remove", "swim.play", "play.undo", "play.redo", "level.next",
-                                   "clock.show"]
+                                   "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                                   "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`MicroscopicAuroraMode.practiceBudget`, 24).
+    public static let practiceBudget: Int = MicroscopicAuroraMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a slot: 0 … `MicroscopicAuroraLevel.slots` − 1.
@@ -106,27 +142,61 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: MicroscopicAuroraPlay
+    /// The player's progress (feature 485): in the digest and the snapshot.
+    public private(set) var progress: MicroscopicAuroraProgress
+    /// The mode (feature 485): in the digest and the snapshot.
+    public private(set) var mode: MicroscopicAuroraMode
+    /// The tutorial step (feature 485): in the snapshot and `==`, not in the digest.
+    public private(set) var tutorial: MicroscopicAuroraTutorialStep
+    /// The certified plan's wells of the current level (its placements in slot order), which the hints try first.
+    /// Derived from the level number.
+    public private(set) var certifiedWells: [MicroscopicAuroraWell]
     /// The shown tick, 0 … ticks swum; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var shownTick: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: MicroscopicAuroraPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber` with tick 0 shown, whose reset returns to `openingPlay` of
-    /// `openingNumber`.
-    init(levelNumber: Int, play: MicroscopicAuroraPlay, openingNumber: Int, openingPlay: MicroscopicAuroraPlay) {
+    /// What a reset restores (feature 485).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: MicroscopicAuroraPlay
+        /// The opening progress: level 1 open plus the levels up to the opening level, none won.
+        let progress: MicroscopicAuroraProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: MicroscopicAuroraTutorialStep
+        /// The opening level's certified wells.
+        let certifiedWells: [MicroscopicAuroraWell]
+    }
+
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial` and tick 0 shown, whose
+    /// reset returns to `opening` of `openingNumber`.
+    init(levelNumber: Int, play: MicroscopicAuroraPlay, progress: MicroscopicAuroraProgress, mode: MicroscopicAuroraMode,
+         tutorial: MicroscopicAuroraTutorialStep, certifiedWells: [MicroscopicAuroraWell], openingNumber: Int,
+         opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedWells = certifiedWells
         self.shownTick = 0
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
+
+    /// The certified plan's placement count of the current level, against which a win's stars are counted.
+    public var certifiedPlacements: Int { certifiedWells.count }
+
+    /// The difficulty band (1 … 5) of the current level: 20 levels per band, the certified difficulty bands
+    /// (`MicroscopicAuroraProgress.band(of:)`; feature 485).
+    public var band: Int { MicroscopicAuroraProgress.band(of: levelNumber) }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
     public static func levelNumber(forSeed seed: UInt64) -> Int {
@@ -212,14 +282,44 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         return play
     }
 
-    /// The opening state of manifest number `number`: a play begun and past its tutorial, ready to accept actions,
-    /// with tick 0 shown.
+    /// The practice copy of `level` (feature 485): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: MicroscopicAuroraLevel)
+        throws(MicroscopicAuroraError) -> MicroscopicAuroraLevel {
+        try MicroscopicAuroraLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, radius: level.radius,
+                                   length: level.length, rules: level.rules, swimmers: level.swimmers,
+                                   stencil: level.stencil, threshold: level.threshold, coverage: level.coverage,
+                                   coherence: level.coherence, wells: level.wells,
+                                   budget: MicroscopicAuroraMode.practice.budget(base: level.budget),
+                                   tutorial: level.tutorial, sites: level.sites)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: MicroscopicAuroraGenerated, mode: MicroscopicAuroraMode)
+        throws(MicroscopicAuroraError) -> MicroscopicAuroraLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
+    /// accept actions, with tick 0 shown; campaign mode, level 1 open plus the levels up to `number`, none won, the
+    /// tutorial at its first step (feature 485).
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(MicroscopicAuroraError) -> MicroscopicAuroraExperienceCore {
-        let play: MicroscopicAuroraPlay = try freshPlay(of: try level(number: number))
-        return MicroscopicAuroraExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                               openingPlay: play)
+        let certified: MicroscopicAuroraGenerated = try generated(number: number)
+        let play: MicroscopicAuroraPlay = try freshPlay(of: certified.level)
+        var progress: MicroscopicAuroraProgress = MicroscopicAuroraProgress()
+        progress.open(through: number)
+        let tutorial: MicroscopicAuroraTutorialStep = MicroscopicAuroraTutorialStep.initial(level: number)
+        let wells: [MicroscopicAuroraWell] = certified.plan.wells
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial, certifiedWells: wells)
+        return MicroscopicAuroraExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                               tutorial: tutorial, certifiedWells: wells, openingNumber: number,
+                                               opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -262,15 +362,44 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the shown tick, the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown tick, the
+    /// quality tier or the opening level).
     public static func == (lhs: MicroscopicAuroraExperienceCore, rhs: MicroscopicAuroraExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 485): no won levels with level 1 open
+    /// plus the levels up to the restored level, campaign mode, no tutorial key (restore starts the tutorial at its
+    /// first step: `place` on the tutorial levels 1 … 3, else `done`).
+    ///
+    /// - Throws: ``MicroscopicAuroraRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw MicroscopicAuroraRestoreRefusal.damaged
+        }
+        var progress: MicroscopicAuroraProgress = MicroscopicAuroraProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(MicroscopicAuroraMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the ranges of the file header as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -283,6 +412,11 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
         ExperienceControl(id: "clock.show", ranges: [declared(tickRange)]),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(MicroscopicAuroraProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -290,7 +424,8 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The seven controls with their declared ranges (see the file header); play, undo, redo and next take no values.
+    /// The twelve controls with their declared ranges (see the file header); `swim.play`, `play.undo`, `play.redo`,
+    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with tick 0 shown; no clock is read.
@@ -335,14 +470,21 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
             switch action.control {
             case "well.place":
                 try play.apply(.place(slot: values[0], well: Self.well(values)), expecting: play.fingerprint)
+                advanceTutorial(afterAction: true, placement: true)
             case "well.remove":
                 try play.apply(.remove(slot: values[0]), expecting: play.fingerprint)
+                advanceTutorial(afterAction: true, placement: false)
             case "swim.play":
                 try play.apply(.play, expecting: play.fingerprint)
+                advanceTutorial(afterAction: false, placement: false)
+                recordIfWon()
             case "play.undo":
                 try play.undo()
+                advanceTutorial(afterAction: false, placement: false)
             case "play.redo":
                 try play.redo()
+                advanceTutorial(afterAction: false, placement: false)
+                recordIfWon()
             case "clock.show":
                 // Presentation only: the play and the digest do not change, and the kernel is not consulted.
                 guard values[0] <= play.report.ticks else {
@@ -350,12 +492,33 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
                 }
                 shownTick = values[0]
                 return .accepted
-            default:   // level.next
-                let next: Int = levelNumber % Self.levelNumbers.upperBound + 1
-                let fresh: MicroscopicAuroraPlay = try Self.freshPlay(of: try Self.level(number: next))
-                levelNumber = next
-                play = fresh
-                shownTick = 0
+            case "level.next":
+                guard let next = progress.nextOpen(after: levelNumber) else {
+                    return .rejected(.rule(code: MicroscopicAuroraExperienceRule.locked))
+                }
+                try open(number: next, mode: .campaign)
+                return .accepted
+            case "level.select":
+                guard progress.isOpen(values[0]) else {
+                    return .rejected(.rule(code: MicroscopicAuroraExperienceRule.locked))
+                }
+                try open(number: values[0], mode: .campaign)
+                return .accepted
+            case "mode.daily":
+                guard let daily = MicroscopicAuroraProgress.dailyLevel(year: values[0], month: values[1],
+                                                                       day: values[2]) else {
+                    return .rejected(.rule(code: MicroscopicAuroraExperienceRule.date))
+                }
+                try open(number: daily, mode: .daily(level: daily))
+                return .accepted
+            case "mode.practice":
+                try open(number: levelNumber, mode: .practice)
+                return .accepted
+            case "mode.campaign":
+                try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+                return .accepted
+            default:   // tutorial.dismiss
+                tutorial = tutorial.dismissed()
                 return .accepted
             }
         } catch {
@@ -372,11 +535,49 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose with tick 0 shown; the quality tier, which is not state, is
-    /// kept.
+    /// Advances the tutorial step after an accepted placement, removal, play, undo or redo
+    /// (`MicroscopicAuroraTutorialStep.advanced(afterAction:placement:ended:)`): `afterAction` for a placement or a
+    /// removal, `placement` for a placement, ended when the play is won or failed (never after an undo, which always
+    /// lands on a moment before the end; after a redo only when it restores a won or failed moment). Never back.
+    private mutating func advanceTutorial(afterAction: Bool, placement: Bool) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterAction: afterAction, placement: placement, ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's first
+    /// tutorial step and tick 0 shown; the records of the level left are dropped. Changes nothing when the kernel
+    /// refuses.
+    private mutating func open(number: Int, mode: MicroscopicAuroraMode) throws(MicroscopicAuroraError) {
+        let certified: MicroscopicAuroraGenerated = try Self.generated(number: number)
+        let fresh: MicroscopicAuroraPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedWells = certified.plan.wells
+        tutorial = MicroscopicAuroraTutorialStep.initial(level: number)
+        shownTick = 0
+    }
+
+    /// After an accepted action that won the play: records the actions spent
+    /// (`MicroscopicAuroraProgress.actionsSpent(_:)`) against the certified plan's placement count in the current mode
+    /// (campaign opens the next level; daily records the best result and stars and opens nothing; practice records
+    /// nothing). A won play is final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, actionsSpent: MicroscopicAuroraProgress.actionsSpent(play),
+                        certified: certifiedPlacements, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode, tick 0 shown); the quality tier,
+    /// which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedWells = opening.certifiedWells
         shownTick = 0
     }
 
@@ -389,38 +590,48 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g19.microscopic-aurora.v1", then the level number and the play's fingerprint (actions spent, failure,
-    /// level, stage, wells).
+    /// "r02-g19.microscopic-aurora.v2", then the level number, the play's fingerprint (actions spent, failure, level,
+    /// stage, wells), the progress and the mode (their sorted JSON); never the tutorial step or the shown tick.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly; never the
-        // shown tick (presentation).
+        // shown tick (presentation) or the tutorial step.
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: MicroscopicAuroraMode
+        /// The progress.
+        var progress: MicroscopicAuroraProgress
         /// The play's records.
         var records: [MicroscopicAuroraRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: MicroscopicAuroraTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level, with tick 0 shown; a reset
-    /// returns to the level `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), with tick 0 shown;
+    /// a reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``MicroscopicAuroraRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level
-    ///   or trace the kernel refuses.
+    /// - Throws: ``MicroscopicAuroraRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or
+    ///   tutorial step, or a daily mode naming another level among them), a level number outside 1 … 100 or a level or
+    ///   trace the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> MicroscopicAuroraExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw MicroscopicAuroraRestoreRefusal.damaged
@@ -428,15 +639,21 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw MicroscopicAuroraRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw MicroscopicAuroraRestoreRefusal.damaged
+        }
         do throws(MicroscopicAuroraError) {
-            let saved: MicroscopicAuroraLevel = try level(number: decoded.level)
-            let play: MicroscopicAuroraPlay = try MicroscopicAuroraPlay.replay(level: saved, records: decoded.records)
-            let openingNumber: Int = levelNumber(forSeed: seed)
-            let openingPlay: MicroscopicAuroraPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return MicroscopicAuroraExperienceCore(levelNumber: decoded.level, play: play,
-                                                   openingNumber: openingNumber, openingPlay: openingPlay)
+            let certified: MicroscopicAuroraGenerated = try generated(number: decoded.level)
+            let play: MicroscopicAuroraPlay = try MicroscopicAuroraPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: MicroscopicAuroraTutorialStep = decoded.tutorial
+                ?? MicroscopicAuroraTutorialStep.initial(level: decoded.level)
+            let openingCore: MicroscopicAuroraExperienceCore = try opening(number: levelNumber(forSeed: seed))
+            return MicroscopicAuroraExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                   mode: decoded.mode, tutorial: tutorial,
+                                                   certifiedWells: certified.plan.wells,
+                                                   openingNumber: openingCore.openingNumber,
+                                                   opening: openingCore.opening)
         } catch {
             throw MicroscopicAuroraRestoreRefusal.kernel(error)
         }
