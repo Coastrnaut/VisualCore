@@ -22,7 +22,7 @@ the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Microscopic Auror
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G1906-003 [P] [US1] [US3] Create
+- [X] T-R02G1906-003 [P] [US1] [US3] Create — Verified 2026-11-26: host-2 exit 0: feedback plan texts, kinds and haptics exact for placements, removals, undo, redo, every refusal code bare and prefixed, wins in campaign, practice and daily, failures of all four kinds, level and mode changes; clock.show plans nothing (7 tests)
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraFeedbackPlan.swift` (texts and kinds of
   clarification Q1 word for word, the engine's `action.rule.` prefix read as the bare code, a revealed hint as `state`
   (`hint(text:)`); haptics of Q2 — the play plans only its outcome; `after(old:new:)`, `refused(code:)`,
