@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-02: Microscopic Aurora content pipeline).
+Last updated: 2026-11-26 (R02-G19-03: Microscopic Aurora hero renderer).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Microscopic Aurora hero renderer** (R02-G19-03, 2026-11-26). Host: shader sources (17), scene geometry (12),
+  adapter and renderer purity (17), scenarios (7; regenerate the manifest with `UPDATE_SCENARIO_MANIFEST=1`).
+  Simulator (`--only-testing MicroscopicAuroraExperienceTests`): frames of levels 1, 21, 41, 61, 81 at three tiers
+  against the CPU reference at half the ticks swum, fallback, resize, memory warning, failure marks, the won look and
+  identity. Lessons: the invariant tests' time and purity scans now name the kernel files, so the presentation sources
+  stay outside them; the frame check states the swimmer order so a bunched swarm cannot exclude every check point.
 - **Microscopic Aurora content pipeline** (R02-G19-02, 2026-11-26). The `MicroscopicAurora` filter adds
   `MicroscopicAuroraSitesTests` (7), `…SolverTests` (9, an independent enumeration agreeing with each plan's depth, set
   counts and nearest miss), `…GeneratorTests` (10, the drawing order re-derived independently), `…WitnessTests` (7) and

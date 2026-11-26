@@ -63,3 +63,30 @@ decided exactly on integer positions; the catalog's 0.008333 s timestep is a pre
   stencil cells, coverage, groups, the smallest coherence) and the counterexample; the tests rebuild all 100 byte for
   byte in 20 groups of 5 and pin the catalog digest. Witness lengths are 1, 1, 2, 2 and 2 by band, under R02-F24's
   progression rule.
+
+## Hero renderer and experience (feature 483, R02-G19-03)
+
+- **Snapshot.** `MicroscopicAuroraSceneSnapshot` is all the renderer reads: every swimmer's integer position and
+  velocity at each tick of the predicted swim of the current wells, the ticks swum and the shown tick, the density with
+  the lit stencil and stray cells, the stencil, the sites, the wells, the coverage and coherence with their requirements
+  and the coherence radius, and the stage, failure, actions and level.
+- **The dish.** One fixed scale for every level (s = 0.9 / 2816, an 11-cell rim at radius 0.9), so placing wells never
+  rescales the picture. In painter's order with depth testing off: the still abyss backdrop, the dish field, small
+  L-system fronds outside the rim (decoration only, at the richer tiers), the rim, the stencil outlines, the lit and
+  stray cells, the site rings, the well spirals (strength + 1 half-turns, an arrow for the turning sense), the ribbons
+  through each swimmer's kernel positions of the last ticks, the tapered capsule swimmers oriented along their velocity,
+  the coverage and coherence gauges with requirement ticks and the actions bars; the glow is additive and last. Every
+  drawn swimmer and ribbon point is a kernel position; nothing moves by time.
+- **Tiers.** `level-0`: capsules of 12 segments, 64 ribbon ticks, fronds, 2 glow shells; `level-1`: 8 segments, 32
+  ticks, fronds, 1 shell; `level-2`: flat capsules, 16 ticks, no fronds, no glow. Everything else is identical.
+- **Shaders.** GLSL ES 3.00 dish and glow programs with 20 material codes in the uv stream (the shared mesh renderer
+  binds only position, normal and uv); a won level brightens the ribbons and lights every stencil outline; Reduce
+  Flashing caps the glow.
+- **Adapter.** `MicroscopicAuroraExperienceCore` opens certified level (seed mod 100) + 1 from a table of each
+  witness's candidate index, accepts `well.place`, `well.remove`, `swim.play`, `play.undo`, `play.redo`, `level.next`
+  and `clock.show`; its digest is the level number and the play's fingerprint (never the shown tick); snapshot schema 1.
+- **Experience.** The presenter draws with the fixed camera, logs tier changes, falls back to the unlit level-2
+  geometry when a program fails, and declares two backdrop probes; the minimal control panel chooses a slot, a site, a
+  strength and a sense, places and removes wells, steps the shown tick and plays, undoes, redoes and moves to the next
+  level. The candidate is registered in the one app (not available until X-R02-G19) with its scenario manifest (the
+  standard scenarios, a three-level playthrough, fixtures and the 80 acceptance rows R2-G19-QA-001 … 080).

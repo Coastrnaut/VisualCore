@@ -984,5 +984,8 @@ records, undo and redo, and `MicroscopicAuroraPuzzle` (an R02-F23 `PuzzleRules` 
 (R02-G19-02) adds well sites and budgets up to 24 to the level, then the content pipeline: `MicroscopicAuroraManifest`
 (100 planned levels), `MicroscopicAuroraGenerator`, `MicroscopicAuroraSolver` (minimal well sets with a full proof over
 the sites), `MicroscopicAuroraDifficulty` and `MicroscopicAuroraWitness` (the 100 files in
-`docs/games/microscopic-aurora/levels/`). See
+`docs/games/microscopic-aurora/levels/`). Feature 483 (R02-G19-03) adds the hero renderer and the experience:
+`MicroscopicAuroraSceneSnapshot`, `MicroscopicAuroraSceneGeometry` (the dish, the swimmers' capsules and ribbons, the
+CPU reference), `MicroscopicAuroraShaders`, the adapter `MicroscopicAuroraExperienceCore`, the scenario manifest and
+the iOS target `MicroscopicAuroraExperience` (presenter, scene, controls), registered as a candidate. See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).
