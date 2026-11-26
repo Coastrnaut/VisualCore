@@ -8168,6 +8168,94 @@ class ApsidesWorkshopRegressionTests(unittest.TestCase):
         self.assertEqual(code, 1)
 
 
+class MicroscopicAuroraRegressionTests(unittest.TestCase):
+    """The local Microscopic Aurora regression command (feature 488, R02-G19-08, T-R02G1908-006,
+    FR-R02G1908-006 and FR-R02G1908-007, SC-R02G1908-005): the commands in order (the simulator part with its memory
+    isolation variable), the first-failing-name parser and the summary with an injected runner (no process is
+    spawned)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = load("microscopic_aurora_regression")
+
+    def run_main(self, *argv, codes=(), outputs=()):
+        calls = []
+
+        def run(cmd, cwd):
+            calls.append((list(cmd), cwd))
+            i = len(calls) - 1
+            return (codes[i] if i < len(codes) else 0), (outputs[i] if i < len(outputs) else "")
+
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = self.tool.main(list(argv), root=Path("/repo"), run=run)
+        return code, out.getvalue(), calls
+
+    def test_dry_run_prints_both_commands_in_order(self):
+        code, out, calls = self.run_main("--dry-run")
+        self.assertEqual(code, 0)
+        self.assertEqual(calls, [])
+        lines = out.splitlines()
+        self.assertEqual(lines, [
+            "$ swift test --package-path Packages/ExperiencesRound02 --filter MicroscopicAuroraRegression",
+            "$ env TEST_RUNNER_MICROSCOPIC_AURORA_MEMORY_ISOLATED=1 python3 scripts/xcodebuild_package.py --package "
+            "Packages/ExperiencesRound02 --scheme "
+            "ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing "
+            "MicroscopicAuroraExperienceTests/MicroscopicAuroraRegressionGoldenFrameTests "
+            "MicroscopicAuroraExperienceTests/MicroscopicAuroraRegressionMemoryTests",
+        ])
+
+    def test_skip_simulator_omits_the_second_command(self):
+        code, out, calls = self.run_main("--dry-run", "--skip-simulator")
+        self.assertEqual(code, 0)
+        self.assertEqual(len(out.splitlines()), 1)
+        self.assertNotIn("xcodebuild_package.py", out)
+        code, out, calls = self.run_main("--skip-simulator")
+        self.assertEqual(code, 0)
+        self.assertEqual([c[0][:2] for c in calls], [["swift", "test"]])
+        self.assertNotIn("simulator", out)
+
+    def test_simulator_part_passes_the_isolation_variable(self):
+        code, out, calls = self.run_main()
+        self.assertEqual(code, 0)
+        host, simulator = calls[0][0], calls[1][0]
+        self.assertNotIn("env", host)
+        self.assertEqual(simulator[:2], ["env", "TEST_RUNNER_MICROSCOPIC_AURORA_MEMORY_ISOLATED=1"])
+        self.assertEqual(simulator[2:4], ["python3", "scripts/xcodebuild_package.py"])
+
+    def test_first_failing_parser(self):
+        parse = self.tool.first_failing
+        self.assertEqual(parse("✔ Test solverIsOptimal() passed\n"
+                               "✘ Test goldenFramesMatch() recorded an issue at "
+                               "MicroscopicAuroraRegressionTests.swift:40\n"
+                               "✘ Test levelsSolvable() failed after 0.2 seconds with 1 issue."), "goldenFramesMatch")
+        memory = "MicroscopicAuroraExperienceTests.MicroscopicAuroraRegressionMemoryTests"
+        self.assertEqual(parse(f"Test Case '-[{memory} testMemoryStaysBounded]' started.\n"
+                               f"Test Case '-[{memory} testMemoryStaysBounded]' failed (1.234 seconds)."),
+                         "testMemoryStaysBounded")
+        self.assertIsNone(parse("Test Case '-[A.B testPasses]' passed (0.1 seconds).\n✔ Test fine() passed"))
+        self.assertIsNone(parse(""))
+
+    def test_exit_code_and_summary_with_a_fake_runner(self):
+        code, out, calls = self.run_main()
+        self.assertEqual(code, 0)
+        self.assertEqual([c[1] for c in calls], [Path("/repo")] * 2)
+        self.assertIn("microscopic-aurora-regression host: PASS", out)
+        self.assertIn("microscopic-aurora-regression simulator: PASS", out)
+        self.assertTrue(out.rstrip().endswith("microscopic-aurora-regression: PASS"))
+        code, out, calls = self.run_main(codes=(1, 0), outputs=("✘ Test levelsSolvable() failed\n", ""))
+        self.assertEqual(code, 1)
+        self.assertEqual(len(calls), 2, "the simulator part still runs after a host failure")
+        self.assertIn("microscopic-aurora-regression host: FAIL (exit 1; first failing: levelsSolvable)", out)
+        self.assertIn("microscopic-aurora-regression simulator: PASS", out)
+        self.assertTrue(out.rstrip().endswith("microscopic-aurora-regression: FAIL"))
+        code, out, _ = self.run_main(codes=(0, 65), outputs=("", "Test Case '-[M.C testFrames]' failed (2 s)."))
+        self.assertEqual(code, 1)
+        self.assertIn("microscopic-aurora-regression simulator: FAIL (exit 65; first failing: testFrames)", out)
+        code, out, _ = self.run_main("--skip-simulator", codes=(1,), outputs=("error: build failed",))
+        self.assertEqual(code, 1)
+
+
 if __name__ == "__main__":
     tree_before = ledger_tree_hash()
     program = unittest.main(verbosity=2, exit=False)

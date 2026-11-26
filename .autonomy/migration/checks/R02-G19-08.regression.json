@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/microscopic_aurora_regression.py"
+  ],
+  "command": "python3 scripts/microscopic_aurora_regression.py",
+  "elapsed_seconds": 29.126,
+  "exit_code": 0,
+  "finished": "2026-11-26T23:39:40+00:00",
+  "gate": "R02-G19-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G19-08.regression.log",
+  "log_sha256": "f479bfdf8291b50cc9998a0613730751845fa027824cb3ebdb46199983f36095",
+  "name": "regression",
+  "started": "2026-11-26T23:39:11+00:00",
+  "timed_out": false
+}

@@ -63,7 +63,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G1908-006 [P] [US4] Create `scripts/microscopic_aurora_regression.py` and its test in
+- [X] T-R02G1908-006 [P] [US4] Create `scripts/microscopic_aurora_regression.py` and its test in — Verified 2026-11-26: 2026-11-26 regression exit 0: host PASS, simulator PASS with isolation, 12 cycles 29.1-29.4 MB within 16 MB (.autonomy/migration/checks/R02-G19-08.regression.json); 5 script unit tests OK; CI step 'Microscopic Aurora regression (host)' added
   `scripts/test_scripts.py` (agent D: host filter `MicroscopicAuroraRegression`, then the simulator classes through
   `xcodebuild_package.py --only-testing` with the isolation variable, one summary line per part with pass or fail and
   the first failing name, a non-zero exit on any failure), and add the named step "Microscopic Aurora regression (host)"

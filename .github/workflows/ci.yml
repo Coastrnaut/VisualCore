@@ -205,6 +205,10 @@ jobs:
         # Feature 478 (R02-G18-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/apsides_workshop_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter ApsidesWorkshopRegression
+      - name: Microscopic Aurora regression (host)
+        # Feature 488 (R02-G19-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/microscopic_aurora_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter MicroscopicAuroraRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase
