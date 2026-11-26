@@ -84,7 +84,7 @@ the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Microscopic Auror
 - [X] T-R02G1906-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-26: reference-2 exit 0 (7 of 7 with chunk 1)
 - [X] T-R02G1906-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-26: script-tests exit 0, run alone
 - [ ] T-R02G1906-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G1906-006)
-- [ ] T-R02G1906-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1906-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-26: /speckit-converge converged (nothing appended); README row R02-G19-06 pass, 186 round-two features, gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
