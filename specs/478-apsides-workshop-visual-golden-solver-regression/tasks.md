@@ -27,7 +27,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1808-003 [US2] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopGolden.swift` (DEBUG
+- [X] T-R02G1808-003 [US2] Create `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopGolden.swift` (DEBUG — Verified 2026-11-26: 2026-11-26 ApsidesWorkshopGolden (16 frames, 1/8-px positions, 18 colours, SHA-256) and golden-frames.json generated with APSIDES_WORKSHOP_WRITE_GOLDEN=1 (orbiter equals the apoapsis marker at T / 2 in every frame); ApsidesWorkshopGolden in RELEASE_FORBIDDEN
   or VISUALCORE_AUTOMATION; "16 frames: levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all of the
   witness's tunings but not the play, with no preview, shown at tick T / 2, plus the hero frame of
   `scenario-manifest.json` at tier 0; at 1,152 × 768 with the authored camera: the star, the orbiter at the shown tick,
