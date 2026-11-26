@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G19-03 (migration ledger, game feature of experience R02-G19) · ID namespace FR-R02G1903-###,
 SC-R02G1903-###, T-R02G1903-###
@@ -31,6 +31,91 @@ Canonical overrides:
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G19-01 and -02.
 - **Model:** feature 473 (Apsides Workshop's hero renderer and experience).
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+473's answers where the games agree. Facts checked in code (read-only, 2026-11-26): Apsides Workshop's experience as
+recorded at R02-G18-03 is the pattern in this package — a Core adapter with a table of certified candidate indices
+(`certifiedCandidates`, each stored witness's `skipped`), an immutable scene snapshot, a CPU projection reference, GLSL
+sources in the Core, an iOS-only experience target (`…Experience.swift`, presenter, scene, controls), a scenario
+manifest with 80 acceptance scenarios, a registration with content facts in `Catalog/registrations.json` and the public
+`ShaderMeshRenderer`; the Microscopic Aurora kernel provides the level (enclosure, swim length, swarm, stencil,
+threshold, coverage, coherence, sites, budget), the swim's integer positions per tick (`MicroscopicAuroraDish.swim(…,
+keepPositions: true)`, dish units 0 … 6143), the report (density, lit stencil, coverage, groups, coherence, failure:
+exit, coherence, coverage, connectedness), the play (place, remove, play, undo, redo, stages) and the certified catalog
+of R02-G19-02 (enclosure 11, 3 … 6 sites, 4 … 8 swimmers, swims of 120 … 160 ticks, digest 03c1dc19…); `AppModelTests`
+uses `r02-g19.microscopic-aurora` as its synthetic unregistered candidate and the next round-two game is
+`r02-g20.mushroom-weather`; the archived matrix has 80 acceptance rows R2-G19-QA-001 … 080; the catalog's design gives
+the palette "sea glass green, heliotrope, white", the hero "bioluminescent protozoa making aurora-like ribbons under a
+microscope" and the geometry "instanced tapered capsules, deterministic ribbon trails".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: one fixed scale for every level: a
+  dish point (x, y) in dish units maps to world ((x − 3072) · s, (3072 − y) · s, depth) with s = 0.9 / 2816, so an
+  enclosure of 11 cells has its rim at radius 0.9; y is up and the camera looks down the z axis. Drawn with depth
+  testing off (the shared mesh renderer's path), in this order: the water backdrop (a large quad; a vertical gradient from
+  abyss #04110F at the bottom to abyss top #0B2A26 at the top, still); the dish field (a disc of radius R · 256 · s,
+  field #0E2E2A); the fronds (at the two richer tiers only: small L-system fronds of three generations rooted outside the
+  rim, frond #2E6B5C, decoration only); the rim (a ring at the enclosure radius, 0.012 wide, rim #6FB7A6); the stencil
+  (each stencil cell an outline square of side 256 · s, 0.004 wide, stencil #3E7F72); the lit cells (each lit cell a
+  filled square inset by 10 %, lit #7FE0C4 for a stencil cell, stray #2F6B5F outside the stencil); the sites (a ring of
+  radius 0.35 cell at each site's centre, site #B58CE0); the wells (a spiral of strength + 1 half-turns, radius 0.45
+  cell, its arrowhead pointing in the turning sense, well #D2A8FF); the ribbons (for each swimmer a ribbon through its
+  kernel positions of the last L ticks up to the shown tick, 0.01 wide fading to its tail, ribbon #8FF0D6); the swimmers
+  (a tapered capsule 0.05 long and 0.016 wide at its position at the shown tick, oriented along its velocity, swimmer
+  #E9FFF8 with a heliotrope tail tip); the gauges below the dish: coverage on a track at y = −1.08 from x = −0.9 to 0.9
+  mapping 0 … 1000 with a tick at the requirement and a mark at the reading (filled, met #B58CE0, when met; hollow,
+  unmet #E9FFF8, otherwise); coherence on a track at y = −1.15 mapping 0 … N with a tick at the requirement and a mark
+  at the smallest coherence; the actions bars, `budget` bars at y = −1.25 from x = −0.9 to 0.9 (each 1.8 / budget wide
+  with a gap of a fifth, 0.04 tall), lit for the actions left. The glow is additive and drawn last. The positions are
+  the predicted swim of the current wells; the shown tick is presentation state of the adapter (`clock.show [tick]`,
+  0 … ticks swum, never in the digest), 0 at opening and never advanced by time. The camera is a fixed authored
+  perspective (eye (0, −0.15, 3.4) looking at (0, −0.15, 0)) fitted to the box x −1.0 … 1.0, y −1.35 … 1.0 with a 5 %
+  margin for aspect 0.4 … 2.5. Nothing drawn is consulted by the rules. Impact: FR-R02G1903-001, 002, 003, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): capsules of 12 segments with layered shading
+  (core, rim light), ribbons of the last 64 ticks, fronds and 2 glow shells around the swimmers and ribbons; `level-1`:
+  8 segments, 32 ticks, fronds, 1 glow shell; `level-2` (the design's "Tier 0, D3-safe"): flat capsules (screen-facing
+  quads with rounded ends), 16 ticks, no fronds, no glow. The backdrop, field, rim, stencil, lit cells, sites, wells,
+  gauges, colours and positions are the same at every tier. Levels are ordered richest first; the presenter logs each
+  tier change with its reason. Impact: FR-R02G1903-004; SC-R02G1903-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects through the same
+  camera the dish centre, the rim's rightmost point, every swimmer at the shown tick, the first site, the coverage
+  track's centre and the first actions bar, and gives the palette. Simulator tests render offscreen at 1,152 × 768 at the
+  shown tick half the ticks swum and check, at points at least 6 pixels from every element drawn after them, that each
+  swimmer's centre is brighter than the dish field by at least 0.25 in luminance; that the rim's rightmost point differs
+  from the backdrop by at least 0.1; that the first actions bar (lit) has blue above green by at least 0.08 (heliotrope);
+  that the coverage track differs from the backdrop by at least 0.1; and that the median of a 9 × 9 pixel patch of
+  backdrop in a corner matches the gradient colour at its height within 0.06. Palette: abyss #04110F, abyss top
+  #0B2A26, field #0E2E2A, frond #2E6B5C, rim #6FB7A6, stencil #3E7F72, lit #7FE0C4, stray #2F6B5F, site #B58CE0, well
+  #D2A8FF, ribbon #8FF0D6, swimmer #E9FFF8, met #B58CE0, unmet #E9FFF8, actions lit #B58CE0, actions unlit #1E3A35,
+  broken #FF6B5E, glow #F2FFFB. Impact: FR-R02G1903-006; SC-R02G1903-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `MicroscopicAuroraSceneSnapshot` (the swimmers' positions and velocities by tick of the predicted swim, the ticks
+  swum, the shown tick, the density and lit cells, the stencil, the sites, the wells, coverage and coherence with their
+  requirements, stage, failure, actions left, budget, level number and presentation time) made by the adapter; it never
+  holds the kernel. If a program fails to compile or link, the scene draws the level-2 geometry unlit with the shared
+  unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion keeps
+  everything still (nothing moves by time already); Reduce Flashing caps the glow gain. A failure marks the failing
+  element in the broken colour (an exit: the escaping swimmer and a mark on the rim where it crossed; a coherence
+  failure: the swimmers outside the largest group; a coverage failure: the unlit stencil outlines; a connectedness
+  failure: the named cell) and the failure text names it, as the kernel's reason does. Impact: FR-R02G1903-003, 007;
+  SC-R02G1903-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g19.microscopic-aurora` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette #04110F,
+  #8FF0D6, #B58CE0, #E9FFF8, #0E2E2A, the scenario manifest `Packages/ExperiencesRound02/MicroscopicAurora/
+  scenario-manifest.json`, no permissions, a summary of at most 300 characters, content facts: 100 levels and the pinned
+  catalog digest); `project.yml` and the app's experience registry link `MicroscopicAuroraExperience` as a candidate
+  (`available: false` until X-R02-G19), opening at seed 0 (level 1); `AppModelTests` switches its synthetic unregistered
+  candidate to the next round-two game (`r02-g20.mushroom-weather`). The adapter (`MicroscopicAuroraExperienceCore`)
+  prepares certified level (seed mod 100) + 1 from its table of certified candidate indices (the whole catalog only if
+  that candidate no longer certifies) and accepts `well.place [slot, row, column, strength, sense]` (sense 0 clockwise,
+  1 counterclockwise), `well.remove [slot]`, `swim.play`, `play.undo`, `play.redo`, `level.next` and `clock.show
+  [tick]` (whole numbers only); the kernel refuses everything out of range or out of stage and `clock.show` refuses a
+  tick outside 0 … ticks swum; its digest is the level number and the play's fingerprint (never the record history or
+  the shown tick, so undo restores the earlier digest); snapshot schema 1 `{level, records}`. Impact: FR-R02G1903-005,
+  008, 009; SC-R02G1903-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
