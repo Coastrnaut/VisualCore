@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G18-04: Apsides Workshop gestures).
+Last updated: 2026-11-25 (R02-G18-05: Apsides Workshop teaching and progression).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop teaching and progression** (R02-G18-05, 2026-11-25). Host: `ApsidesWorkshopHintsTests` (exact
+  hints from every opening win all 100 levels and equal the witness's tunings, `plan(_:)` equal to `plan(_:from:)` at
+  the opening with the same proof and work; 200 seeded states whose hints the kernel accepts; 500 seeded failures
+  explained against a judge written in the test), `ApsidesWorkshopProgressTests` (17: a 100-level script, tutorial
+  walks, the daily level over 2026 … 2036 and 100 consecutive days, impossible dates) and
+  `ApsidesWorkshopProgressionCoreTests` (10: new controls and refusals, practice and daily rules, schema 2 and the
+  migration from 1); the scenario manifest regenerated with `UPDATE_SCENARIO_MANIFEST=1`; the `ApsidesWorkshop` filter
+  runs 194 tests. Simulator: `ApsidesWorkshopTeachingTests` (10; the suite now runs 47). Lesson: four agents drafted the
+  solver entry, progress, adapter and panel in parallel isolated copies against one contract, and every suite passed at
+  its first lead run; the contract file (`contracts/api.md`) named each signature, which is what made that work.
 - **Apsides Workshop gestures** (R02-G18-04, 2026-11-25). Host: `ApsidesWorkshopPickerTests` (seeded touches against
   an independent pick order: orbiter +8, size handle and knob +12, loop band 10 points),
   `ApsidesWorkshopGestureControllerTests` (6 tests: 500 seeded scripts of knob, size and crank drags, taps and orbits

@@ -960,4 +960,6 @@ snapshot, the compass geometry with its CPU reference, the GLSL compass and glow
 `ApsidesWorkshopExperienceCore`, the presenter, scene and minimal controls, the scenario manifest and the candidate
 registration in the one app. Feature 474 (R02-G18-04) adds `ApsidesWorkshopPicker`, `ApsidesWorkshopGestureController`,
 `ApsidesWorkshopViewOrbit`, the periapsis-knob and size-handle drags with their ghost preview, the time crank and the
-panel's pending orbit with "Set periapsis" and "Set size".
+panel's pending orbit with "Set periapsis" and "Set size". Feature 475 (R02-G18-05) adds `ApsidesWorkshopHints`
+(three hint levels from a solver entry at the current orbit), `ApsidesWorkshopFailureExplanation`,
+`ApsidesWorkshopProgress` (tutorial, stars, daily × 23, practice) and snapshot schema 2.

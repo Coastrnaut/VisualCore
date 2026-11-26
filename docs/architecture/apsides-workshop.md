@@ -106,3 +106,22 @@ in deterministic integer fixed point and every rule is then decided exactly on i
   action spent; "Set periapsis" and "Set size" commit it as one action each, only when valid and different. The
   pending orbit follows the current orbit after every accepted action. A host test wins all 100 certified levels
   through the panel within their budgets.
+
+## Teaching and progression (feature 475, R02-G18-05)
+
+- **Hints.** From the current orbit the solver searches the fewest tunings that win within the actions left
+  (`plan(_:from:)`; the certifying search is the same entry at the starting orbit). The hint escalates from the lever
+  ("Turn the periapsis knob next", "Change the size next") to the way and distance ("Raise the eccentricity by n steps
+  and turn the periapsis m steps counterclockwise", the shorter turn, counterclockwise on a tie; "Grow the orbit by n
+  units") to the exact setting ("Set the periapsis to eccentricity k, direction d°", "Set the size to a"); a winning
+  orbit says "play the revolution"; no plan says so and suggests undo or retry. Following exact hints from every
+  opening and then playing wins all 100 levels within their budgets.
+- **Failure text.** The play's failure is put in words in the level's own terms: the planet struck and the tick, the
+  target reached out of order, the share swept outside its band (one decimal of a percent), or the apsis in the wrong
+  sector or at the wrong distance (hundredths of a unit), targets numbered from 1.
+- **Tutorial.** Levels 1 … 3 show three instructions (shape and aim the orbit with the knob; bring every target into
+  its band and play; what fails a revolution), each advancing when done; dismissible; undo never moves it back.
+- **Progress.** Stars by actions spent against the certified plan (3 at most, 2 within two more, else 1), level 1 open
+  and a campaign win opening the next, five bands of 20; the daily level is (days since 2026-01-01 × 23) mod 100 + 1;
+  practice raises the budget to 24 without stars or unlocks. The snapshot is schema 2 (digest domain
+  `r02-g18.apsides-workshop.v2`) with a migration from schema 1.
