@@ -51,7 +51,7 @@ fewer placements wins.
 
 **Independent test**: building the catalog twice gives identical levels and the pinned digest.
 
-- [ ] T-R02G1902-004 [US2] Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraGenerator.swift`
+- [X] T-R02G1902-004 [US2] Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraGenerator.swift` — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraGenerator (committed with T-003, which its solver tests use) and MicroscopicAuroraGeneratorTests pass (host-3 exit 0, 10 tests): manifest shape, determinism, the clarified drawing order re-derived independently, band and kernel ranges, the filters, the neighbour rule, a forced generation refusal
   (lead: band profiles "band 1 (4 … 5, 120, 3, 1, 6 … 24, 600 … 800), 2 (5 … 6, 120 … 140, 4, 1, 10 … 32, 700 … 850),
   3 (6 … 7, 140, 4, 2, 14 … 40, 750 … 900), 4 (7 … 8, 140 … 160, 5, 2, 18 … 50, 800 … 950), 5 (8, 160, 6, 2, 20 … 60,
   850 … 1000)" (swarm, swim length, sites, plan, stencil, coverage); candidates from `SeedDerivation.derive(plannedSeed,
