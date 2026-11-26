@@ -78,7 +78,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 - [X] T-R02G1908-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-26: 2026-11-26 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G19-08.*.json)
   host-full`, `--name app-unit`
 - [X] T-R02G1908-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-26: 2026-11-26 reference-1 exit 0 (.autonomy/migration/checks/R02-G19-08.reference-1.json)
-- [ ] T-R02G1908-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G1908-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-26: 2026-11-26 reference-2 exit 0 (.autonomy/migration/checks/R02-G19-08.reference-2.json)
 - [ ] T-R02G1908-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1908-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden
   levels. Not run before the lock.
