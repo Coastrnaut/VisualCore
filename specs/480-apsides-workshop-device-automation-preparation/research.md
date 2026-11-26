@@ -4,8 +4,8 @@
   needs data, the owner needs prose; the check keeps them tied. Alternatives: a new format (rejected: one campaign
   script must read every experience alike).
 - **R2 — Coverage source.** Decision: the open `{device}` task lines of `specs/47[1-9]-apsides-workshop-*/tasks.md`
-  plus the six UA-F13 measurement names, as the check already computes for R02-G18. Rationale: every Celestial Eclipse
-  Lab device promise, including R02-G18-06's hearing, feeling and VoiceOver, is a task line (T-R02G1806-011), so no
+  plus the six UA-F13 measurement names, as the check already computes for R02-G18. Rationale: every Apsides Workshop
+  device promise, including R02-G18-06's hearing, feeling and VoiceOver, is a task line (T-R02G1806-011), so no
   extra items are added to the check's table.
 - **R3 — Scenario set.** Decision: 11 standard and game scenarios plus `fixture-level-1-solved`. Rationale: they
   exercise launch, input, persistence, lifecycle and the full game on hardware, and the fixture proves a stored win
