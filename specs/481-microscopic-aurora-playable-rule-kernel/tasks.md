@@ -16,7 +16,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1901-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `MicroscopicAuroraCore` depending on
+- [X] T-R02G1901-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `MicroscopicAuroraCore` depending on — Verified 2026-11-26: 2026-11-26: Package.swift gains MicroscopicAuroraCore and its tests; Error, Swim, Level, fixtures and MicroscopicAuroraLevelTests pass (host exit 0, 7 tests); the Codable path refuses schema 0 (found by agent D's save invariant)
   VisualCoreSimulation and VisualCoreMath, `MicroscopicAuroraCoreTests`, product); create
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraError.swift` (codes "r02-g19.level, .action,
   .budget, .stage, .stale, .newer-schema, .malformed"),

@@ -60,6 +60,8 @@ let package = Package(
         .library(name: "ApsidesWorkshopCore", targets: ["ApsidesWorkshopCore"]),
         // Feature 473 (R02-G18-03): Apsides Workshop's experience (iOS only; a registered candidate until X-R02-G18).
         .library(name: "ApsidesWorkshopExperience", targets: ["ApsidesWorkshopExperience"]),
+        // Feature 481 (R02-G19-01): Microscopic Aurora's rule kernel, a candidate until X-R02-G19.
+        .library(name: "MicroscopicAuroraCore", targets: ["MicroscopicAuroraCore"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -816,6 +818,16 @@ let package = Package(
                                    .product(name: "VisualCoreAudioDSP", package: visualCore),
                                    .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "ApsidesWorkshop/ExperienceTests"),
+        // Feature 481 (R02-G19-01): Microscopic Aurora's pure rule kernel.
+        .target(name: "MicroscopicAuroraCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "MicroscopicAurora/Core"),
+        .testTarget(name: "MicroscopicAuroraCoreTests",
+                    dependencies: ["MicroscopicAuroraCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "MicroscopicAurora/CoreTests"),
         // Feature 463 (R02-G17-03): Celestial Eclipse Lab's experience (presenter, scene, controls).
         .target(name: "CelestialEclipseLabExperience",
                 dependencies: ["CelestialEclipseLabCore",
