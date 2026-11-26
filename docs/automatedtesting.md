@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G18-06: Apsides Workshop polish and accessibility).
+Last updated: 2026-11-26 (R02-G18-07: Apsides Workshop persistence and replay).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,17 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop persistence and replay** (R02-G18-07, 2026-11-26). Host: `ApsidesWorkshopReconciliationTests`
+  (13 tests: every certified witness trace verifies; edited stars, actions spent, trace steps, play-less and overlong
+  traces are dropped and counted), `ApsidesWorkshopReplayCoreTests` (8 tests: stored traces, replay rules and codes, a
+  mid-replay save restored or refused `damaged`, migrations 1 → 3 and 2 → 3, the sound setting never digested),
+  `ApsidesWorkshopPersistenceTests` (500 round trips, 100 migrations, 200 reconciled saves) and
+  `ApsidesWorkshopReplayCatalogTests` (all 100 levels won then replayed against their witness fingerprints); the
+  `ApsidesWorkshop` filter runs 253 tests. Simulator: `ApsidesWorkshopReplayTests` (4 tests through the presenter; the
+  suite now runs 64). Lesson: with the adapter drafted first in a scratch copy, four agents (traces and
+  reconciliation, schema-3 core tests, persistence and catalog tests, simulator replay tests) worked against it and the
+  contract at once, and every suite passed at its first lead run; a parameterised catalog test that finishes in a
+  fraction of a second is checked in its log for every case before it is trusted.
 - **Apsides Workshop polish and accessibility** (R02-G18-06, 2026-11-26). Host: `ApsidesWorkshopFeedbackPlanTests`
   (7 tests: plans compared word for word over periapsis and size tunings, undos, redos, every refusal code bare and
   prefixed, all five failure kinds from real level openings, campaign, practice and daily wins, level and mode
