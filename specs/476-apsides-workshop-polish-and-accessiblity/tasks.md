@@ -15,7 +15,7 @@ lives in the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Apsides 
 - [X] T-R02G1806-001 Baselines on the committed tree after R02-G18-05 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: 2026-11-26 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 on the committed tree (.autonomy/migration/checks/R02-G18-06.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters); the rendering
   baseline is R02-G18-05's rendering runs (exit 0)
-- [ ] T-R02G1806-002 Edit `Packages/ExperiencesRound02/Package.swift` (`ApsidesWorkshopCore` and its tests gain
+- [X] T-R02G1806-002 Edit `Packages/ExperiencesRound02/Package.swift` (`ApsidesWorkshopCore` and its tests gain — Verified 2026-11-26: 2026-11-26 host exit 0 (.autonomy/migration/checks/R02-G18-06.host.json); Core and tests gain VisualCoreAudioDSP (tests also VisualCoreExperience), experience and tests gain VisualCoreAudioDSP and VisualCoreAudio (iOS)
   VisualCoreAudioDSP (the tests also VisualCoreExperience); `ApsidesWorkshopExperience` and its tests gain
   VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as Celestial Eclipse Lab's targets have); `--name host --
   swift test --package-path Packages/ExperiencesRound02 --filter ApsidesWorkshopCoreTests`
