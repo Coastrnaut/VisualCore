@@ -9,7 +9,7 @@ change (the shaders and reference of R02-G18-03 are unchanged and re-proven by t
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1809-001 Baselines on the committed tree after R02-G18-08 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G1809-001 Baselines on the committed tree after R02-G18-08 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: 2026-11-26 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 on the committed tree (.autonomy/migration/checks/R02-G18-09.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two chunks, 3f with
   `ApsidesWorkshop`); the rendering baseline is R02-G18-08's rendering runs (exit 0)
 
