@@ -28,7 +28,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G1908-003 [US2] Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraGolden.swift`
+- [X] T-R02G1908-003 [US2] Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraGolden.swift` — Verified 2026-11-26: 2026-11-26 golden-frames.json (schema 1, 16 frames) regenerated with MICROSCOPIC_AURORA_WRITE_GOLDEN=1 byte-identical (sha256 043508d5…); MicroscopicAuroraGolden added to RELEASE_FORBIDDEN; host-2 exit 0 (.autonomy/migration/checks/R02-G19-08.host-2.json)
   (DEBUG or VISUALCORE_AUTOMATION; "16 frames: levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all
   of the witness's placements but not the play, with no preview and no freeze, shown at the tick half the ticks swum,
   plus the hero frame of `scenario-manifest.json` at tier 0; at 1,152 × 768 with the authored camera: the dish centre,

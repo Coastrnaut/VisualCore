@@ -370,7 +370,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 468 (R02-G17-08): Celestial Eclipse Lab's golden frames, test builds only.
                      "CelestialEclipseLabGolden",
                      # Feature 478 (R02-G18-08): Apsides Workshop's golden frames, test builds only.
-                     "ApsidesWorkshopGolden"]
+                     "ApsidesWorkshopGolden",
+                     # Feature 488 (R02-G19-08): Microscopic Aurora's golden frames, test builds only.
+                     "MicroscopicAuroraGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:
