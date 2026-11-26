@@ -144,11 +144,13 @@ enum ExperienceRegistry {
     static let candidates: [ExperienceRegistration] = [apsidesWorkshop].compactMap { $0 }
 
     /// R02-G18 Apsides Workshop (feature 473, R02-G18-03): a candidate until X-R02-G18. Snapshot schema 3 since
-    /// feature 477 (R02-G18-07); its schema-1 and schema-2 examples are registered at its in-app integration
-    /// (R02-G18-09).
+    /// feature 477 (R02-G18-07); its schema-1 and schema-2 examples are registered since feature 479 (R02-G18-09).
     fileprivate static var apsidesWorkshop: ExperienceRegistration? {
         guard let id = ApsidesWorkshopExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: ApsidesWorkshopExperienceCore.self) { launch in
+        let examples = [ApsidesWorkshopExperienceCore.schemaOneExample(),
+                        ApsidesWorkshopExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: ApsidesWorkshopExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return ApsidesWorkshopExperience.make(
                 id: id, storage: launch.storage,
