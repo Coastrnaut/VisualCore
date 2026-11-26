@@ -183,12 +183,14 @@ enum MicroscopicAuroraA11y {
 
     /// The controls of the panel by identifier name: each needs a label and a value (clarification Q5). The plain
     /// texts (actions, status, failure, progress, message, wells and tick detail lines, the bare tick, the selection
-    /// line, tutorial, hint text, band, stars, goal) are read as text, not controls.
+    /// line, tutorial, hint text, band, stars, goal, the replay position) are read as text, not controls; since
+    /// feature 487 the replay controls (Replay, Step, Stop) are listed too.
     static let controlNames: [String] = ["sound", "summary", "dismiss-tutorial", "hint", "slot-minus", "slot",
                                          "slot-plus", "site-minus", "site", "site-plus", "strength-minus", "strength",
                                          "strength-plus", "sense", "place", "remove", "tick-minus", "tick-plus",
                                          "play", "undo", "redo", "next-level", "campaign", "daily", "practice",
-                                         "level-picker", "play-level", "freeze", "reset-view"]
+                                         "level-picker", "play-level", "freeze", "reset-view", "replay",
+                                         "replay-step", "replay-stop"]
     /// The adjustable elements (increment and decrement).
     static let adjustableNames: [String] = ["slot", "site", "strength"]
 

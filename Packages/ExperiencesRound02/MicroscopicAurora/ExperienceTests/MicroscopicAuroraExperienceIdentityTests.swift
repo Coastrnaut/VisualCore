@@ -1,10 +1,11 @@
 // MicroscopicAuroraExperienceIdentityTests — feature 483 (R02-G19-03) T-R02G1903-006 (FR-R02G1903-005, 007, 008,
 // 009). The experience's id is the catalog id; the registry's factory (`make(id:storage:reduceMotion:reduceFlashing:)`,
 // which does not depend on the registration) builds a shell around the presenter with the accessibility settings
-// passed through, as does the tests' factory; the controls are the seven declared actions in order; the registration
-// facts hold (100 certified levels, schema 2, the tiers level-0 … level-2, the palette); the presenter's quality
-// levels equal the Core's `qualityTiers`; the presenter holds no GPU object and no snapshot before setup; and it
-// declares its two frame probes (the backdrop corners) once a frame was drawn. iOS only, as the target.
+// passed through, as does the tests' factory; the controls are the declared actions in order (twelve since feature
+// 485, sixteen since 487); the registration facts hold (100 certified levels, schema 3 since feature 487, the tiers
+// level-0 … level-2, the palette); the presenter's quality levels equal the Core's `qualityTiers`; the presenter holds
+// no GPU object and no snapshot before setup; and it declares its two frame probes (the backdrop corners) once a frame
+// was drawn. iOS only, as the target.
 #if os(iOS)
 import Foundation
 import MicroscopicAuroraCore
@@ -21,11 +22,13 @@ import VisualCoreExperienceHost
         #expect(MicroscopicAuroraExperienceCore.experienceID == "r02-g19.microscopic-aurora")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 2 (feature 485), three tiers, the five-colour palette.
+    /// The registration's content facts: 100 certified levels, schema 3 (feature 487), three tiers, the five-colour
+    /// palette.
     @Test func theRegistrationFactsHold() {
         #expect(MicroscopicAuroraExperienceCore.levelNumbers == 1...100)
         #expect(MicroscopicAuroraExperienceCore.certifiedCandidates.count == 100)
-        #expect(MicroscopicAuroraExperienceCore.schemaVersion == 2)
+        // Schema 3 since feature 487 (R02-G19-07) T-R02G1907-003: results with traces and the sound choice.
+        #expect(MicroscopicAuroraExperienceCore.schemaVersion == 3)
         var names: [String] = []
         for level in MicroscopicAuroraExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -40,7 +43,7 @@ import VisualCoreExperienceHost
         #expect(ids == MicroscopicAuroraExperienceCore.actionIDs)
         #expect(ids == ["well.place", "well.remove", "swim.play", "play.undo", "play.redo", "level.next",
                         "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                        "tutorial.dismiss"])
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers`, named as the tiers.

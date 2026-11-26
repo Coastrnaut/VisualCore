@@ -69,7 +69,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G1907-006 [US3] Edit
+- [X] T-R02G1907-006 [US3] Edit — Verified 2026-11-26: presenter: replay availability and position, startReplay/stepReplay/stopReplay, saveSound through settings.sound, restored sound applied on open, dropped results announced once; panel: Replay best solution, position, Step, Stop with labels and values, Sound saved; MicroscopicAuroraReplayTests (4), identity (16 controls, schema 3) and accessibility control names updated; sim-27 exit 0 (62 tests)
   `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraPresenter.swift` and
   `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraControls.swift` (Replay for a verified
   solved level, Step and Stop with labels and values, the replay position; the Sound toggle sends `settings.sound` and
