@@ -58,7 +58,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
   100 seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
   dropped and counted; FR-R02G1807-005: the same save restores to an equal digest twice and the daily level depends only
   on the date given); `--name host-3`
-- [ ] T-R02G1807-005 [P] [US3] Create
+- [X] T-R02G1807-005 [P] [US3] Create — Verified 2026-11-26: 2026-11-26 host-4 exit 0, 10 groups of 10 levels (.autonomy/migration/checks/R02-G18-07.host-4.json): every certified level won then replayed against its witness fingerprints, progress unchanged
   `Packages/ExperiencesRound02/ApsidesWorkshop/CoreTests/ApsidesWorkshopReplayCatalogTests.swift`: for each of
   the 100 certified levels (10 groups of 10, each under 10 s) win the level in campaign through the adapter with its
   certified tunings and the play, then `replay.start [level]` and `replay.step` to the end, checking each step's play
