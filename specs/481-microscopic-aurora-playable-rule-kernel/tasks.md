@@ -43,7 +43,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 3: Story 1 — steer the swimmers so their trails draw the pattern (P1) 🎯
 
-- [ ] T-R02G1901-003 [P] [US1] Create
+- [X] T-R02G1901-003 [P] [US1] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraSwimTests pass (host-2 exit 0, 10 tests): 1,000 swims of 500 fixtures equal an independent reimplementation at every tick; rim, coincident swimmers, threshold, coverage, coherence, no well, sense mirror, groups
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraSwimTests.swift` (agent A: an independent
   reimplementation of the tick law, trails, coverage, four-neighbour groups, coherence and the judge, written from the
   spec's clarifications only, compared with the kernel on 500 seeded swims: every position at every tick, every
