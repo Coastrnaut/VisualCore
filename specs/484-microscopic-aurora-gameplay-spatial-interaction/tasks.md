@@ -105,7 +105,7 @@ R02-G18-04 (`git show <R02-G18-04 record commit>:<path>`).
 - [X] T-R02G1904-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-26: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [X] T-R02G1904-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-26: reference-1 exit 0
-- [ ] T-R02G1904-009 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G1904-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-26: reference-2 exit 0 (7 of 7 with chunk 1)
 - [ ] T-R02G1904-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1904-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G1904-007)
 - [ ] T-R02G1904-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
