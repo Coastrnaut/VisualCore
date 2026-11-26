@@ -16,7 +16,8 @@
 // daily level 24 in daily mode although it is locked in the campaign, Campaign returns to the frontier); a locked
 // level, `level.next` on the last open level and an impossible date (2026-02-30) are refused in words and change
 // nothing. Explicit dates (no clock), no wall-clock assertion; each test short. Explicit types and plain loops (CI
-// type-check rule). Synthetic data only.
+// type-check rule). Synthetic data only. Since feature 476 (R02-G18-06) the refusal lines are the feedback plan's
+// sentences ("That level is not open yet.", "That date cannot be used.").
 #if os(iOS)
 import ApsidesWorkshopCore
 import CoreGraphics
@@ -48,9 +49,9 @@ enum ApsidesWorkshopTeaching {
     /// The most hint-guided steps tried when following the hints (at most 2 tunings, then the play).
     static let followLimit: Int = 4
 
-    /// The panel message of a refusal with reason `code`.
+    /// The panel message of a refusal with reason `code` (since feature 476 the feedback plan's sentence).
     static func refusalMessage(_ code: String) -> String {
-        "That change was refused: " + ApsidesWorkshopMirror.refusalText(code: code) + "."
+        ApsidesWorkshopMirror.refusalMessage(code: code)
     }
 
     /// Opens level `number` (seed `number − 1`) at a small view (one frame drawn, tick 0 shown) and describes the
@@ -409,7 +410,7 @@ enum ApsidesWorkshopTeaching {
         let code: String = ApsidesWorkshopExperienceRule.locked
         #expect(Teaching.isRefusal(locked, code), "\(locked.code)")
         let message: String = Teaching.refusalMessage(code)
-        #expect(message == "That change was refused: that level is locked: win the level before it to open it.")
+        #expect(message == "That level is not open yet.")
         #expect(presenter.mirror.message == message, "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused pick changes nothing")
@@ -432,7 +433,7 @@ enum ApsidesWorkshopTeaching {
         #expect(Teaching.isRefusal(refused, code), "\(refused.code)")
         let message: String = try #require(presenter.mirror.message)
         #expect(message == Teaching.refusalMessage(code))
-        #expect(message.contains("locked"), "\(message)")
+        #expect(message == "That level is not open yet.", "\(message)")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused next level changes nothing")
         #expect(try ApsidesWorkshopTest.digest(shell) == digest)
@@ -452,7 +453,7 @@ enum ApsidesWorkshopTeaching {
         let code: String = ApsidesWorkshopExperienceRule.date
         #expect(Teaching.isRefusal(refused, code), "\(refused.code)")
         let message: String = Teaching.refusalMessage(code)
-        #expect(message == "That change was refused: that is not a calendar date.")
+        #expect(message == "That date cannot be used.")
         #expect(presenter.mirror.message == message, "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused date changes nothing")

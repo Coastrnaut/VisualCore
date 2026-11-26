@@ -18,6 +18,14 @@
 // orbit:)`, and the meshes are built with the camera-taking overloads (the backdrop, discs and glow bands face the drawn
 // eye). The eye and view basis do not depend on the aspect, so an orbit change or a preview change (the previewed orbit,
 // which draws the ghost and the previewed gauges) rebuilds the meshes, a resize alone does not.
+//
+// Feature 476 (R02-G18-06) T-R02G1806-005 (FR-R02G1806-004; clarification Q3): the presenter's eased lights
+// (`ApsidesWorkshopLights`) are drawn: the glow gain is multiplied by the glow level and `u_won` is the won level; the
+// star pulse is asked with Reduce Motion or Reduce Flashing set, so under either the star holds at 1 and the sky is
+// still between actions. The unlit fallback's geometry takes a won flag, not a level, so the fallback compass blends
+// the colours of the not-won and the won compass part by the won level (`blendedColours(off:on:level:)`; the two parts
+// share their positions, the won look changes colours only) and is rebuilt when that level moves by a tenth or more.
+// Without lights the snapshot's levels are drawn at once.
 #if os(iOS)
 import ApsidesWorkshopCore
 import Foundation
@@ -42,6 +50,14 @@ final class ApsidesWorkshopCompassScene {
     private(set) var glowBuilds = 0
     /// The star pulse passed as `u_pulse` on the last draw (tests).
     private(set) var lastPulse: Double = 1
+    /// The eased light levels the presenter steps every frame (feature 476): the glow gain is multiplied by
+    /// `lights.glow`, `u_won` is `lights.won`, and the fallback compass's won colours are blended by `lights.won`
+    /// (rebuilt when it moves by a tenth or more). Nil draws the snapshot's levels at once (the renderer tests'
+    /// default).
+    var lights: ApsidesWorkshopLights?
+
+    /// Whether the star holds still: Reduce Motion or Reduce Flashing (feature 476).
+    var starStill: Bool { reduceMotion || reducedFlash }
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the fallback.
     private struct GeometryKey: Equatable {
@@ -56,6 +72,8 @@ final class ApsidesWorkshopCompassScene {
         let actionsLeft: Int
         let tier: Int
         let fallback: Bool
+        /// The won level in tenths, in the fallback only (feature 476): the fallback's colours depend on it.
+        let wonTenths: Int
     }
 
     /// The view orbit the camera is drawn at (feature 474, presentation only; the gesture controller's). The meshes
@@ -121,12 +139,13 @@ final class ApsidesWorkshopCompassScene {
             try drawFallback(camera)
             return
         }
-        let won: Float = snapshot.isWon ? 1 : 0
-        let pulse: Double = ApsidesWorkshopShaders.starPulse(time: snapshot.time, reduceMotion: reduceMotion)
+        let won = Float(wonLevel(snapshot))
+        let pulse: Double = ApsidesWorkshopShaders.starPulse(time: snapshot.time, reduceMotion: starStill)
         lastPulse = pulse
         try drawCompass(camera, won: won)
-        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
-        let gain = ApsidesWorkshopShaders.glowGain(for: tier)
+        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty; feature 476 eases it by
+        // the glow level.
+        let gain = ApsidesWorkshopShaders.glowGain(for: tier) * (lights?.glow ?? 1)
         guard gain > 0 else { return }
         try drawGlow(camera, gain: gain, won: won, pulse: Float(pulse))
     }
@@ -137,7 +156,24 @@ final class ApsidesWorkshopCompassScene {
         for gauge in s.gauges { met.append(gauge.met) }
         return GeometryKey(levelNumber: s.levelNumber, kernelOrbit: s.orbit, shownTick: s.shownTick, stage: s.stage,
                            failure: s.failure, met: met, previewOrbit: s.previewOrbit, orbit: orbit,
-                           actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil)
+                           actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil,
+                           wonTenths: fallbackReason != nil ? Int((wonLevel(s) * 10).rounded(.down)) : 0)
+    }
+
+    /// The won level drawn (feature 476): the eased `lights.won`, or 1 on a won snapshot and 0 otherwise without
+    /// lights.
+    private func wonLevel(_ snapshot: ApsidesWorkshopSceneSnapshot) -> Double {
+        lights?.won ?? (snapshot.isWon ? 1 : 0)
+    }
+
+    /// The colours of the fallback compass at won level `level` (feature 476): each colour of `off` (the not-won part)
+    /// moved toward the same vertex's colour of `on` (the won part) by `level`, clamped to 0 … 1 (a non-finite level
+    /// reads 0). Parts of different sizes cannot be blended vertex by vertex: then `on`'s colours from a level of 0.5
+    /// up, `off`'s below. Pure.
+    static func blendedColours(off: [Vec4], on: [Vec4], level: Double) -> [Vec4] {
+        let t: Double = level.isFinite ? min(max(level, 0), 1) : 0
+        guard off.count == on.count else { return t >= 0.5 ? on : off }
+        return zip(off, on).map { a, b in a + (b - a) * t }
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier` seen from `camera`: the two programs, or the unlit fallback.
@@ -171,9 +207,17 @@ final class ApsidesWorkshopCompassScene {
         // included; level-2 has no glow).
         let minimal = ApsidesWorkshopTier.of(ApsidesWorkshopTier.all.count - 1)
         let up = Vec3(0, 0, 1)
-        let parts: [ApsidesWorkshopColouredMesh] = [
-            try ApsidesWorkshopSceneGeometry.compassPart(snapshot, tier: minimal, camera: camera),
-            try ApsidesWorkshopSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
+        // Feature 476: the compass's won colours blended by the won level (the won look changes colours, not
+        // positions).
+        let off = try ApsidesWorkshopSceneGeometry.compassPart(snapshot, tier: minimal, wonLevel: false, camera: camera)
+        let on = try ApsidesWorkshopSceneGeometry.compassPart(snapshot, tier: minimal, wonLevel: true, camera: camera)
+        let level: Double = wonLevel(snapshot)
+        // Parts of different sizes switch whole at a level of 0.5 (see `blendedColours(off:on:level:)`).
+        let compassMesh: Mesh = off.colours.count == on.colours.count || level < 0.5 ? off.mesh : on.mesh
+        let glow = try ApsidesWorkshopSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera)
+        let parts: [(mesh: Mesh, colours: [Vec4])] = [
+            (compassMesh, Self.blendedColours(off: off.colours, on: on.colours, level: level)),
+            (glow.mesh, glow.colours),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

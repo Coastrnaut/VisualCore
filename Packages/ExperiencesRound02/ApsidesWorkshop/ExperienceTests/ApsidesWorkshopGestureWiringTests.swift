@@ -23,7 +23,7 @@
 //      orbit follows the current orbit;
 //   h. an invalid pending orbit says why in words and draws no preview;
 //   i. a refused action (undo with nothing to undo, a knob drag with no action left) logs its bare code in
-//      `refusalLog` and the mirror shows "That change was refused: …";
+//      `refusalLog` and the mirror shows the feedback plan's sentence (since feature 476);
 //   j. a tap on the knob explains the handles and sends nothing; the gestures' actions are among the native ones.
 // Explicit synthetic timestamps (no clock, no sleep, no wall-clock assertion). Explicit types and plain loops (CI
 // type-check rule); no nested closure literals. Synthetic data only. Each test well under 10 s.
@@ -786,7 +786,7 @@ enum ApsidesWorkshopGestureScript {
         #expect(shell.presenter.refusalLog == [Script.actionCode], "the bare code is logged")
         let undoMessage: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
         #expect(undoMessage == Mirror.refusalMessage(code: Script.actionCode), "\(undoMessage)")
-        #expect(undoMessage.hasPrefix("That change was refused: "), "\(undoMessage)")
+        #expect(undoMessage == ApsidesWorkshopFeedbackPlan.refusalText(code: Script.actionCode), "\(undoMessage)")
         #expect(Mirror.refusalText(code: Mirror.rulePrefix + Script.actionCode)
                     == Mirror.refusalText(code: Script.actionCode), "codes are read with or without the prefix")
         #expect(try T.core(shell).play == opening.play, "a refused undo changes nothing")

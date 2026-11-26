@@ -49,7 +49,7 @@ lives in the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Apsides 
 
 ## Phase 3: Wiring — presenter, scene, sound and panel
 
-- [ ] T-R02G1806-005 [US1] [US2] [US3] Create
+- [X] T-R02G1806-005 [US1] [US2] [US3] Create — Verified 2026-11-26: 2026-11-26 sim-27 exit 0, 60 simulator tests incl. 13 accessibility tests (.autonomy/migration/checks/R02-G18-06.sim-27.json); first lead run failed only the fallback won-pixel check: a winning orbit's marks are already met, so the unlit won look draws the same pixels (assertion corrected); teaching and gesture tests take the new refusal words
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopSound.swift` (the ambient loop over
   `AmbientLoopPlayer` and the audition, playing exactly while wanted, on screen and active); edit
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopPresenter.swift` (feedback through
