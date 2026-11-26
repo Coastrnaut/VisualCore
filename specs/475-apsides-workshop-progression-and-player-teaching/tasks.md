@@ -75,14 +75,15 @@ campaign covers the game).
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it,
   the search off the main actor and a stale search never owning the hint state — and the failure explanation as panel
   text, replacing the mirror's own failure words, with the level's difficulty band (of the five bands of 20), its goal
-  and its best stars (FR-R02G1805-004); the description includes them) and
+  (the targets in words and the tuning count that earns 3 stars, the certified witness's) and its best stars
+  (FR-R02G1805-004); the description includes them) and
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopControls.swift` (Hint, Dismiss tutorial, level
   picker for open levels, Practice, Daily (today's local date from the presenter), Campaign); agent D writes
   `Packages/ExperiencesRound02/ApsidesWorkshop/ExperienceTests/ApsidesWorkshopTeachingTests.swift` (the panel shows the
   tutorial, the three hint levels, the failure text, the band and the stars; mode and level controls reach the adapter;
-  a refusal reads in words), given the presenter's exact texts; `--name sim-27 -- python3
-  scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination
-  sim-27.2 --action test --only-testing ApsidesWorkshopExperienceTests`
+  a refusal reads in words), given the presenter's exact texts; `--name sim-27 -- python3 scripts/xcodebuild_package.py
+  --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test
+  --only-testing ApsidesWorkshopExperienceTests`
 
 ## Phase 5: Regression, documentation and close
 
