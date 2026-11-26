@@ -52,7 +52,7 @@ change (the shaders and reference of R02-G18-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G1809-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G1809-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-26: 2026-11-26 app-unit exit 0 (.autonomy/migration/checks/R02-G18-09.app-unit.json): 151 app unit tests, up from 147 at R02-G18-08 by the 4 Apsides tests (examples restore, candidate not available without the argument, level 1 won through the registry and engine, AW pins equal the Core)
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `AW`'s pinned level 1 certified plan and budget equal the
   Core's); `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`

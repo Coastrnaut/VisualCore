@@ -4,6 +4,7 @@
 // is applied when an experience opens. The storage helper `TestStorage` is in StoreTests.swift.
 import AcousticConstellatorCore
 import AmethystEscapeCore
+import ApsidesWorkshopCore
 import AuroraLoomCore
 import BackwardsAuroraCore
 import CelestialEclipseLabCore
@@ -3520,6 +3521,187 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(opening.play.stage, CelestialEclipseLabStage.playing, "the opening accepts actions")
         XCTAssertEqual(opening.certifiedChanges, certifiedChanges.count, "stars are counted against the witness")
         XCTAssertEqual(CelestialEclipseLabExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Apsides Workshop in the app (feature 479, R02-G18-09; T-R02G1809-005, FR-R02G1809-003, 006;
+    // SC-R02G1809-002)
+
+    /// Apsides Workshop's registration: a candidate until X-R02-G18.
+    private func apsidesWorkshopRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(ApsidesWorkshopExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Apsides Workshop is a candidate")
+    }
+
+    /// FR-R02G1809-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheApsidesWorkshopRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try apsidesWorkshopRegistration()
+        XCTAssertEqual(ApsidesWorkshopExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(ApsidesWorkshopExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(ApsidesWorkshopExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1809-006: without `-vcCandidates` Apsides Workshop is a candidate only: in `candidates`, outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testApsidesWorkshopIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(ApsidesWorkshopExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g18.apsides-workshop")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1809-003, SC-R02G1809-002: with `-vcCandidates` Apsides Workshop is shown, opens through the registry and
+    /// engine with seed 0 (level 1), and level 1 is won by its certified tuning
+    /// (`ApsidesWorkshopExperienceCore.certifiedActions(1)`: one periapsis tuning to eccentricity 0, direction 0) sent
+    /// as `orbit.periapsis [eccentricity, direction]`, then `orbit.play`, with three stars (the opening play is already
+    /// past the kernel's tutorial stage; the tutorial step is presentation and blocks no action, so no
+    /// `tutorial.dismiss` is needed); the win is recorded verified with its trace (the tuning, then the play), opens
+    /// level 2, and `level.next` plays it.
+    func testApsidesWorkshopOpensAsACandidateAndLevelOneIsWonByItsCertifiedPlan() async throws {
+        let registration = try apsidesWorkshopRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls: [String] = registration.controls.map(\.id)
+        for control in ApsidesWorkshopExperienceCore.actionIDs {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        for control in ["orbit.periapsis", "orbit.size", "orbit.play", "play.undo", "play.redo", "level.next",
+                        "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(ApsidesWorkshopExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<ApsidesWorkshopExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, ApsidesWorkshopStage.playing, "the opening play accepts actions")
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9, "level 1's budget")
+        let tunings: [ApsidesWorkshopAction] = ApsidesWorkshopExperienceCore.certifiedActions(1)
+        XCTAssertEqual(tunings, [.periapsis(0, 0)], "level 1's certified tuning")
+        for tuning in tunings {
+            switch tuning {
+            case .periapsis(let eccentricity, let direction):
+                let values: [Double] = [Double(eccentricity), Double(direction)]
+                XCTAssertEqual(engine.handle(control: "orbit.periapsis", values: values), .accepted,
+                               "tuning \(values)")
+            case .size(let size):
+                let values: [Double] = [Double(size)]
+                XCTAssertEqual(engine.handle(control: "orbit.size", values: values), .accepted, "tuning \(values)")
+            case .play:
+                XCTFail("a certified plan holds tunings only")
+            }
+        }
+        XCTAssertNil(engine.outcome, "the tunings alone do not end the level")
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9 - tunings.count, "each tuning spends one action")
+        XCTAssertEqual(engine.handle(control: "orbit.play"), .accepted)
+        XCTAssertEqual(engine.outcome?.code, ApsidesWorkshopExperienceCore.wonCode)
+        XCTAssertEqual(ApsidesWorkshopExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, ApsidesWorkshopStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified plan earns three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        let trace: [ApsidesWorkshopAction] = tunings + [.play]
+        XCTAssertEqual(engine.core?.progress.solved[1]?.trace, trace,
+                       "the trace is the certified plan, then the play")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `AW` (their own literals in
+    /// Tests/UI/ApsidesWorkshop/AWSupport.swift, which this target cannot import); the same literals equal the Core's
+    /// certified level 1: the orbit starts at size 18, eccentricity 10, direction 6; the plan is one periapsis tuning to
+    /// eccentricity 0, direction 0, then the play; the budget is 9; each tuning lies in the declared eccentricity and
+    /// direction ranges, and the tuned orbit is the plan's winning orbit. Seed 0 opens level 1.
+    func testApsidesWorkshopLevelOnePinsInAWEqualTheCore() throws {
+        // The same literals as `AW.levelOneStart`, `AW.levelOnePlan` and `AW.levelOneBudget` in AWSupport.swift.
+        let levelOneStart: (size: Int, eccentricity: Int, direction: Int) = (18, 10, 6)
+        let levelOnePlan: [(eccentricity: Int, direction: Int)] = [(0, 0)]
+        let levelOneBudget = 9
+
+        let certified = try ApsidesWorkshopExperienceCore.generated(number: 1)
+        let certifiedTunings: [ApsidesWorkshopAction] = certified.plan.actions
+        XCTAssertEqual(ApsidesWorkshopExperienceCore.certifiedActions(1), certifiedTunings,
+                       "the certified plan's tunings")
+        XCTAssertEqual(certifiedTunings, [.periapsis(0, 0)], "level 1's certified tuning")
+        var coreEccentricities: [Int] = []
+        var coreDirections: [Int] = []
+        for tuning in certifiedTunings {
+            switch tuning {
+            case .periapsis(let eccentricity, let direction):
+                coreEccentricities.append(eccentricity)
+                coreDirections.append(direction)
+            case .size, .play:
+                XCTFail("level 1's certified plan holds periapsis tunings only")
+            }
+        }
+        var pinnedEccentricities: [Int] = []
+        var pinnedDirections: [Int] = []
+        for tuning in levelOnePlan {
+            pinnedEccentricities.append(tuning.eccentricity)
+            pinnedDirections.append(tuning.direction)
+        }
+        XCTAssertEqual(coreEccentricities, pinnedEccentricities, "level 1 certified tuning eccentricities")
+        XCTAssertEqual(coreDirections, pinnedDirections, "level 1 certified tuning directions")
+
+        let level: ApsidesWorkshopLevel = certified.level
+        XCTAssertEqual(level.orbit.size, levelOneStart.size, "level 1's starting size")
+        XCTAssertEqual(level.orbit.eccentricity, levelOneStart.eccentricity, "level 1's starting eccentricity")
+        XCTAssertEqual(level.orbit.direction, levelOneStart.direction, "level 1's starting direction")
+        XCTAssertEqual(level.budget, levelOneBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, certifiedTunings.count, "the witness fits the budget")
+        for tuning in levelOnePlan {
+            XCTAssertTrue(ApsidesWorkshopOrbit.eccentricities.contains(tuning.eccentricity),
+                          "a declared eccentricity \(tuning)")
+            XCTAssertTrue(ApsidesWorkshopOrbit.directions.contains(tuning.direction), "a declared direction \(tuning)")
+        }
+        let last = try XCTUnwrap(levelOnePlan.last, "a pinned tuning")
+        XCTAssertEqual(certified.plan.orbit.size, levelOneStart.size, "a periapsis tuning keeps the size")
+        XCTAssertEqual(certified.plan.orbit.eccentricity, last.eccentricity, "the winning orbit's eccentricity")
+        XCTAssertEqual(certified.plan.orbit.direction, last.direction, "the winning orbit's direction")
+
+        let opening = try ApsidesWorkshopExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, levelOneBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, ApsidesWorkshopStage.playing, "the opening accepts actions")
+        XCTAssertEqual(opening.play.orbit.size, levelOneStart.size, "the opening orbit's size")
+        XCTAssertEqual(opening.play.orbit.eccentricity, levelOneStart.eccentricity, "the opening orbit's eccentricity")
+        XCTAssertEqual(opening.play.orbit.direction, levelOneStart.direction, "the opening orbit's direction")
+        XCTAssertEqual(opening.certifiedTunings, certifiedTunings.count, "stars are counted against the witness")
+        XCTAssertEqual(ApsidesWorkshopExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
