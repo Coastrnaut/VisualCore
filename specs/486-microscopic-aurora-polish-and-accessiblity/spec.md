@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G19-06 (migration ledger, game feature of experience R02-G19) · ID namespace FR-R02G1906-###,
 SC-R02G1906-###, T-R02G1906-###
@@ -26,6 +26,81 @@ Canonical overrides:
   player, and the kernel, content, adapter, renderer, gestures and teaching of R02-G19-01 … 05.
 - **Model:** feature 476 (Apsides Workshop's polish and accessibility), adapted to well placements on sites, the play
   of one swim, the stencil's coverage and connectedness, and the swarm's exits and splits.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+476's answers where the games agree. Facts checked in code (read-only, 2026-11-26): the shared `ExperienceFeedback`
+route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`, `success`, `warning`,
+`error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` are those feature 476 used; the kernel names cells
+"row r, column c", a well "well n at row r, column c, strength s, clockwise" (or "counterclockwise", or "well n empty"),
+the coverage "stencil l of S cells lit, x.x %, needs y.y %" and the progress as "<the wells>; <the coverage>; playing
+now would win (or fail: <reason>); a actions left"; a placement (`well.place`) or removal (`well.remove`) spends one
+action and never ends the level, the play (`swim.play`) always ends it, won or failed; nothing in the dish moves by
+time (the shown tick is presentation state, never advanced by a clock); the won look is `u_won`, switched at once today,
+brightening the ribbons and lighting every stencil cell, and the fallback draws the won marks in its colours; the glow
+gain is capped by `u_glowLimit` (lower under Reduce Flashing); a well can be placed on a level site no other well holds;
+the refusal codes are `r02-g19.level`, `action`, `budget`, `stage`, `stale`, `not-whole`, `tick`, `locked` and `date`
+(reported by the engine as `action.rule.<code>`).
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted action (`state`), the change then the
+  progress: "Well n placed at row r, column c, strength s, clockwise." (or "counterclockwise") / "Well n removed.";
+  undo and redo "Undone." / "Redone."; each followed by " l of S stencil cells lit, playing now would win (or fail), a
+  actions left." ("1 action left" singular); a win (`outcome`): "The trails covered the stencil as one pattern. Level won
+  spending a actions, k of 3 stars." (without the stars in practice); a failure (`outcome`): the failure explanation of
+  feature 485; a level or mode change (`level`): "Level n, band b, <mode>." with the tutorial instruction when shown; a
+  refusal (`rejection`) in words: `r02-g19.locked` "That level is not open yet.", `r02-g19.date` "That date cannot be
+  used.", `r02-g19.action` "That well cannot be placed there, or there is nothing to remove, undo or redo.",
+  `r02-g19.budget` "No actions are left: undo or retry.", `r02-g19.stage` "The level has ended.", `r02-g19.stale` "The
+  play changed before the action arrived.", `r02-g19.level` "That level could not be made.", `r02-g19.not-whole` "That
+  value must be a whole number.", `r02-g19.tick` "That tick is outside the swim.", any other code "That action was
+  refused." (the engine's `action.rule.` prefix read as the bare code). A revealed hint is announced (`state`) with its
+  text. Changing the panel's selection, drag previews, the shown tick, the freeze, the view, dismissing the tutorial and
+  the Sound toggle are not announced (the controls speak their own values). Texts are a pure function of the old and new
+  core (and the refusal code), so tests compare them exactly; the panel shows the same refusal text. Impact:
+  FR-R02G1906-002; SC-R02G1906-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted placement, removal, undo or redo;
+  `success` for a won play; `warning` for a failed play; `error` for a refusal; changing the selection, previews, the
+  shown tick, the freeze, the view and level changes play none. The play plays only its outcome. The shared planners'
+  intervals apply. Impact: FR-R02G1906-003; SC-R02G1906-002.
+- Q: How are fades done and measured under Reduce Flashing? → A: as feature 476: the presenter keeps light levels for
+  the glow (0.7 while playing, 1 once won, 0.35 once failed) and the won look (1 once won, else 0), each easing toward
+  its target by the frame clock's elapsed time between drawn frames (0.15 s normally, 0.45 s under Reduce Flashing,
+  linear; under Reduce Flashing a fade that has started finishes before it may turn back); the scene draws the eased
+  levels (the glow gain times the glow level, `u_won` the won level, and in the fallback the won colours by the won
+  level, rebuilt when the level moves by a tenth or more); the state and digest never see them. The wells, ribbons,
+  swimmers, lit cells and gauges change only with the player's actions and are not faded. Nothing else moves by time,
+  so the dish is still between actions under Reduce Motion and under Reduce Flashing. The measure: sampling the drawn
+  levels every 1/60 s through a scripted win and adversarial flicker (a placement undone and redone every frame, retry,
+  level changes), no element crosses half its range more than 3 times per second, and every complete one-way fade of
+  more than half the range takes at least 0.4 s under Reduce Flashing. Impact: FR-R02G1906-004; SC-R02G1906-003.
+- Q: Where does the sound choice live, and what are the audition and ambient recipes? → A: a Sound toggle in the panel,
+  off by default, held by the presenter (presentation only; saving it is R02-G19-07). The selected well's tone is
+  220 Hz × 2^(n / 12) with n = 3 × (strength − 1) (0, 3, 6, 9: a stronger well sounds higher); the sense sets the second
+  partial: a well that can be placed sounds its tone and the tone × (3/2 clockwise, 4/3 counterclockwise) at gain 0.04
+  each, a clean interval; one that cannot be placed (its site held by another well, or no site) sounds its tone with a
+  second partial detuned upward by 3 Hz, so it beats audibly; 0.6 s with a linear decay to silence; played once per
+  change of the panel's selection (slot, site, strength or sense), a new one replacing the last; never for drag
+  previews. The audition is a pure function of (strength, sense, can be placed). The ambient recipe is a pure function
+  of the stencil cells lit, the cells the coverage needs, the actions left as a share of the budget and the stage: a
+  root at 110 Hz times (1, 9/8, 5/4, 4/3) for more than three quarters of the actions left, more than half, more than a
+  quarter, or less; one partial per quarter of the needed cells lit (floor of four times lit over needed, up to four),
+  at the root times (5/4, 3/2, 2, 5/2)[q − 1] for q = 1 … quarters, each with the base gain; the root alone when less
+  than a quarter is lit; an added octave when won and halved gains when failed; the loop's length is the longest the
+  shared player accepts at which every partial has a whole number of cycles (tested). The presenter rebuilds the loop
+  only when the level opens, a placement, removal, undo, redo or the play changes the quarters, the root step or the
+  stage, or the toggle turns on, never per frame. Sound plays exactly while the choice is on, the controls are on screen
+  and the scene is active. Impact: FR-R02G1906-006; SC-R02G1906-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the panel's slot,
+  site and strength are accessibility-adjustable elements with their labels and values in words ("well n", "site at row
+  r, column c", "strength s") and the sense a toggle with its value ("clockwise" or "counterclockwise"); a summary
+  element reads "a actions left. <the progress in words>. Selected: well n at row r, column c, strength s, <sense>.
+  Level: <the level in words>." (no site when the level has none); on iPad the panel keeps a readable width (at most 520
+  points). Impact: FR-R02G1906-001, 005; SC-R02G1906-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
