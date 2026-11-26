@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G19-07 (migration ledger, game feature of experience R02-G19) · ID namespace FR-R02G1907-###,
 SC-R02G1907-###, T-R02G1907-###
@@ -28,6 +28,60 @@ Canonical overrides:
 - **Model:** feature 477 (Apsides Workshop's persistence and replay), adapted to well placements and removals and the
   play, including the lesson carried since feature 327: the saved frontier is restored as saved (raising it from the
   kept results would open levels for an honest daily win).
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+477's answers where the games agree. Facts checked in code (read-only, 2026-11-26): the shared `SavedStateStore` keeps
+one `state.json` per experience, writes it atomically, moves an unreadable file aside and refuses a newer schema; the
+engine applies the experience's `MigrationChain`; Microscopic Aurora's adapter writes snapshot schema 2 `{level, mode,
+progress, records, tutorial}` with a 1 → 2 step; `MicroscopicAuroraProgress.Result` keeps `actionsSpent` (every
+accepted placement and removal record, undone ones included) and `stars`; the play's records have kinds place, remove,
+play, undo, redo, begin and dismissTutorial (plus pause, resume and showResult); the controls are `well.place`,
+`well.remove`, `swim.play`, `play.undo`, `play.redo`, `level.next`, `clock.show`, `level.select`, `mode.daily`,
+`mode.practice`, `mode.campaign` and `tutorial.dismiss`; the shown tick is presentation state of the adapter and the
+panel's selection, the freeze, drag preview, hint level and camera are presenter state; the presenter holds the sound
+choice (off by default) since R02-G19-06; a play is won only by the play (`swim.play`), so a winning play's last
+effective action is its play.
+
+- Q: What is stored for each result, and when is it written? → A: each result keeps its least actions spent, its stars
+  and the winning trace — the ordered effective placements and removals of the play that earned it (a placement
+  with its slot and well — site, strength and sense — or a removal with its slot), each as the kernel applied it,
+  followed by the play; an action that was undone and not redone is left out, so the trace never contains an undo or a redo — plus `verified`.
+  Actions spent still count every placement and removal record, undone ones included, as since R02-G19-05, so they are
+  at least the actions the trace spends (the play spends none). A campaign or daily win replaces the stored result only when it is
+  better (ties keep the earlier trace); practice records nothing. The shared store writes at the app's save points; this
+  feature does not change when. Impact: FR-R02G1907-001, 003; SC-R02G1907-001.
+- Q: How are scores reconciled on restore? → A: for every result with a trace: the certified level is generated, a fresh
+  play (campaign budget) replays the trace (each placement and removal accepted, then the play), and the result is kept only
+  if the play ends won, the actions the trace spends are at most `actionsSpent`, and `stars` equals the stars rule for
+  `actionsSpent` and the level's certified placement count; otherwise it is dropped. The adapter exposes the number dropped
+  (never in the digest) and the presenter announces it once as `state` ("n saved results could not be checked and were
+  removed.", "1 saved result could not be checked and was removed."). Results without a trace (schema 1 or 2) are kept,
+  marked unverified. The frontier is restored as saved. Impact: FR-R02G1907-003; SC-R02G1907-003.
+- Q: How do migrations work? → A: schema 3 adds the trace and `verified` to each result, the mode `replay(level)` and
+  the sound choice. 1 → 2 is the existing step; 2 → 3 copies results with an empty trace and `verified: false` and sets
+  the sound choice off. Schema 4 or newer is refused by the shared store; a damaged payload is refused with `damaged`
+  and the opening state is used. Impact: FR-R02G1907-002, 007; SC-R02G1907-002.
+- Q: How does replay work? → A: `replay.start [level]` opens mode `replay(level)` with a fresh play of that level when a
+  verified result with a trace exists (`r02-g19.no-replay` otherwise); `replay.step` applies the next action of the
+  trace — a placement or removal, or finally the play (`r02-g19.replay-end` after the last or once the play ended); `replay.stop`
+  returns to campaign at that level (the frontier when it is not open). During replay every other play control except
+  `tutorial.dismiss` and `clock.show` (presentation) and `settings.sound` is refused with `r02-g19.replay` (the panel's
+  selection, the freeze, drag previews and the camera are presentation only and stay allowed, but a placement or removal
+  they would send is refused);
+  replay never changes progress; the tutorial is done during replay. The refusals are shown and announced in words:
+  "There is no saved solution to replay for this level.", "The replay is over." and "Stop the replay first."; a replayed
+  win claims no stars. A save taken during a replay restores the replay only when its records are exactly the first
+  actions of that level's verified trace; otherwise it is refused as `damaged`. Impact: FR-R02G1907-004;
+  SC-R02G1907-004.
+- Q: Which inputs make the state deterministic, and how is the sound choice changed? → A: the seed (opening level), the
+  certified catalog (fixed planned seeds), the calendar date given to `mode.daily` and the recorded actions; the state
+  reads no clock and no random source. The sound choice is changed by `settings.sound [0 … 1]` (whole numbers; 1 on),
+  stored in the snapshot, never in the digest, and applied by the presenter when the experience opens or the value
+  changes (replacing R02-G19-06's presenter-only choice). Impact: FR-R02G1907-005, 007.
 
 ## User Scenarios & Testing *(mandatory)*
 
