@@ -53,8 +53,8 @@ lives in the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Apsides 
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopSound.swift` (the ambient loop over
   `AmbientLoopPlayer` and the audition, playing exactly while wanted, on screen and active); edit
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopPresenter.swift` (feedback through
-  `ExperienceFeedback` with a feedback log; lights stepped per frame by the frame clock; moving the pending orbit plays
-  its audition when the sound is on, never drag previews; the refusal words from the feedback plan),
+  `ExperienceFeedback` with a feedback log; lights stepped per frame by the frame clock; moving the pending orbit (the panel's −
+  and + and the adjustable values) plays its audition when the sound is on, never drag previews; the refusal words from the feedback plan),
   `Packages/ExperiencesRound02/ApsidesWorkshop/Experience/ApsidesWorkshopCompassScene.swift` (the glow gain times the
   glow level, `u_won` the won level, the star pulse asked with Reduce Motion or Reduce Flashing set; in the fallback path
   the not-won and won parts' colours blended by `lights.won`, the fallback rebuilt when the level moves by a tenth or

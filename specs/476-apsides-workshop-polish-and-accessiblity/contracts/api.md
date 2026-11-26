@@ -25,7 +25,7 @@ public struct ApsidesWorkshopAudition: Sendable, Equatable {
     public static let duration = 0.6
     public static func step(size: Int) -> Int                 // (48 − a) / 4 rounded down, 0 … 10
     public static func tone(size: Int) -> Double              // 220 Hz × 2^(step / 12)
-    public static func of(_ orbit: ApsidesWorkshopOrbit, level: ApsidesWorkshopLevel) -> ApsidesWorkshopAudition }
+    public static func of(_ orbit: ApsidesWorkshopOrbit) -> ApsidesWorkshopAudition }  // (n, k ≤ 7, isValid)
 public enum ApsidesWorkshopSoundRecipe {
     public static func rootStep(actionsLeft: Int, budget: Int) -> Int        // 0 … 3
     public static func metQuarters(_ play: ApsidesWorkshopPlay) -> Int       // 0 … 4
