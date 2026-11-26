@@ -75,7 +75,7 @@ the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Microscopic Auror
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1906-006 Docs: `docs/architecture/microscopic-aurora.md` (polish and accessibility),
+- [X] T-R02G1906-006 Docs: `docs/architecture/microscopic-aurora.md` (polish and accessibility), — Verified 2026-11-26: docs updated (architecture polish and accessibility, round-two README, automatedtesting); round02-host-1, -2, -3c, -3e, -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the five round-two filters)
 - [ ] T-R02G1906-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

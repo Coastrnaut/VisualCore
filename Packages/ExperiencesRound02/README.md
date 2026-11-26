@@ -996,5 +996,8 @@ entry; the panel gains "Freeze" and "Reset view". Feature 485 (R02-G19-05) adds 
 `MicroscopicAuroraHints` (three hint levels from the current wells, the certified plan's next placement first, at most
 1,200 sets judged), `MicroscopicAuroraFailureExplanation`, `MicroscopicAuroraProgress` (tutorial steps, stars, the
 daily level × 19, campaign, practice with budget 24, daily modes) and adapter snapshot schema 2 with a migration from
-schema 1. See
+schema 1. Feature 486 (R02-G19-06) adds polish and accessibility: `MicroscopicAuroraFeedbackPlan` (announcements and
+haptics through the shared route), `MicroscopicAuroraLights` (eased glow and won look, fades of at least 0.4 s under
+Reduce Flashing), `MicroscopicAuroraSoundRecipe` (the selected well's audition and an ambient loop, both synthesized,
+off by default) and an accessible panel (a summary element, adjustable selection, values in words). See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).

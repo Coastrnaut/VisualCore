@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-05: Microscopic Aurora progression and player teaching).
+Last updated: 2026-11-26 (R02-G19-06: Microscopic Aurora polish and accessibility).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Microscopic Aurora polish and accessibility** (R02-G19-06, 2026-11-26). Host: `MicroscopicAuroraFeedbackPlanTests`
+  (7: announcement texts, kinds and haptics exact for placements, removals, undo, redo, every refusal code bare and
+  prefixed, wins and failures of all four kinds, level and mode changes), `…LightsTests` (10: a scripted win and
+  adversarial flicker sampled at 1/60 s stay within 3 half-range crossings per second and fade over at least 0.4 s
+  under Reduce Flashing) and `…SoundRecipeTests` (10: pure recipes, whole-cycle loops, consonant intervals against a
+  3 Hz beat). Simulator: `…AccessibilityTests` (labels and values, adjustable selection, level 1 won through
+  accessibility operations with every step announced, still frames, the sound state table, the fallback's won fade).
+  Lesson: the won look now fades in by the frame clock, so a render test that draws every frame at time 0 needs one
+  settling frame a second later before it checks the won frame.
 - **Microscopic Aurora progression and player teaching** (R02-G19-05, 2026-11-26). Host:
   `MicroscopicAuroraHintsTests` (5 functions, 261 cases: exact hints win all 100 levels from the start, 200 seeded
   reachable states get hints the kernel accepts, off-path states agree with an unbounded brute force, 500 seeded
