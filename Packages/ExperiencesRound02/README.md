@@ -980,5 +980,9 @@ alignment and cohesion plus the curl of up to three magnetic wells per tick with
 and per-axis clamps, trail density per cell, the stencil's coverage, four-neighbour groups and the swarm's coherence),
 the judge (`exit`, `coherence`, `coverage`, `connectedness`), `MicroscopicAuroraLevel` (immutable, fingerprinted, JSON
 schema 1, with names in words), the play state `MicroscopicAuroraPlay` with stages, placements, removals and the play,
-records, undo and redo, and `MicroscopicAuroraPuzzle` (an R02-F23 `PuzzleRules` over well placements). See
+records, undo and redo, and `MicroscopicAuroraPuzzle` (an R02-F23 `PuzzleRules` over well placements). Feature 482
+(R02-G19-02) adds well sites and budgets up to 24 to the level, then the content pipeline: `MicroscopicAuroraManifest`
+(100 planned levels), `MicroscopicAuroraGenerator`, `MicroscopicAuroraSolver` (minimal well sets with a full proof over
+the sites), `MicroscopicAuroraDifficulty` and `MicroscopicAuroraWitness` (the 100 files in
+`docs/games/microscopic-aurora/levels/`). See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).

@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-01: Microscopic Aurora rule kernel).
+Last updated: 2026-11-26 (R02-G19-02: Microscopic Aurora content pipeline).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Microscopic Aurora content pipeline** (R02-G19-02, 2026-11-26). The `MicroscopicAurora` filter adds
+  `MicroscopicAuroraSitesTests` (7), `…SolverTests` (9, an independent enumeration agreeing with each plan's depth, set
+  counts and nearest miss), `…GeneratorTests` (10, the drawing order re-derived independently), `…WitnessTests` (7) and
+  `…CatalogTests` (8: the 100 witness files byte for byte in 20 groups of 5, pinned digest, progression, the independent
+  enumeration on two levels per band); regenerate the files only with `MICROSCOPIC_AURORA_WRITE_WITNESSES=1 swift test
+  --no-parallel`. Lessons: the generator's ranges were measured on a prototype over the real manifest first (a
+  three-well band 5 cost up to 11.5 s per level and was replaced by two wells over six sites); the solver tests found
+  the nearest miss counting the winning depth's misses (fixed before any witness was written); well sites were added to
+  the kernel because the full placement space (about 9,100 per slot) cannot be proved minimal within any test budget.
 - **Microscopic Aurora rule kernel** (R02-G19-01, 2026-11-26). `swift test --package-path Packages/ExperiencesRound02
   --filter MicroscopicAurora` (38 tests in six suites): level checks and the stored form, the swim against an
   independent reimplementation of the tick law on 500 seeded swims (every position at every tick, densities, lit cells,

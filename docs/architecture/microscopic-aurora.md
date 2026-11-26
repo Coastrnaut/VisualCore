@@ -37,3 +37,29 @@ decided exactly on integer positions; the catalog's 0.008333 s timestep is a pre
   re-checked on decode (damaged, edited, newer and older forms refused; a swimmer outside, an incoherent start, a
   repeated or outside stencil cell, wells outside or sharing a cell and starting wells that already win are refused).
   The rules are an R02-F23 `PuzzleRules` (`MicroscopicAuroraPuzzle`) over well placements.
+
+## Content pipeline (feature 482, R02-G19-02)
+
+- **Kernel extension.** The budget range widens to 1 … 24 (the manifest's budgets reach 19), and a level may list 2 … 8
+  well sites: with sites every well, starting or placed, must stand on one (the play refuses "not a site"; the puzzle
+  contract lists placements on sites only, at most 3 × 8 × 8 = 192). A level without sites omits the field, so feature
+  481's levels keep their stored form and fingerprints.
+- **Manifest.** `MicroscopicAuroraManifest` holds the 100 planned levels of the archived design (number, planned seed,
+  band 1 … 5, moves budget 8 … 19, control emphasis), 20 per band.
+- **Generator.** Candidate c of an entry draws from `SeededRandom(seed: SeedDerivation.derive(seed, index: c))`: the
+  swim length, the swarm rules, a bunched swarm with a small drift, the sites (usable within radius 8), the winning
+  wells on a partial shuffle of the sites and the threshold; the winning wells are swum and the stencil is the largest
+  lit group, trimmed breadth-first to the band's maximum; then the coverage and coherence requirements. Band profiles
+  grow from 4 … 5 swimmers, 3 sites and one well (band 1) to 8 swimmers, 6 sites and two wells over larger stencils and
+  stricter coverage (band 5). Levels start with no well; adjacent levels never share their stencil; at most 64
+  candidates per entry (the catalog needs at most index 11).
+- **Solver.** A report depends only on the set of wells, so from no well the settings reachable in d placements are the
+  sets of at most d wells on distinct sites (8 options per site). The solver judges depth 0, 1, 2 …, each depth ordered
+  by the shape loss (stencil cells unlit plus cells lit outside the stencil) of each set's prefix; the first win is
+  minimal and every smaller depth, judged in full, is the proof. Work is counted (at most 830 sets per level, bound
+  1,200). The nearest miss is the smallest loss among the smaller depths.
+- **Certificates.** `docs/games/microscopic-aurora/levels/NNN.witness.json` (schema 1) holds each level with its sites,
+  its placements and the play, a state digest after every action, the play fingerprints, the terminal report (lit
+  stencil cells, coverage, groups, the smallest coherence) and the counterexample; the tests rebuild all 100 byte for
+  byte in 20 groups of 5 and pin the catalog digest. Witness lengths are 1, 1, 2, 2 and 2 by band, under R02-F24's
+  progression rule.
