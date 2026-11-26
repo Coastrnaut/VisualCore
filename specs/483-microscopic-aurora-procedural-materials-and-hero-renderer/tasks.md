@@ -31,7 +31,7 @@ R02-G18-03 (`git show <R02-G18-03 record commit>:<path>`).
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G1903-003 [P] [US1] Create
+- [X] T-R02G1903-003 [P] [US1] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraShaders (dish and glow programs, 20 material codes, palette constants) and MicroscopicAuroraShaderSourceTests pass (host-2 exit 0, 17 tests)
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraShaders.swift` (dish and glow sources, GLSL ES
   3.00; capsule shading (core, rim light) from the normal; signed-distance shading of the rim, stencil outlines, lit
   cells, site rings, well spirals and arrows, gauge tracks, requirement ticks, filled or hollow marks and bars from
