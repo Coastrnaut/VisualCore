@@ -76,7 +76,7 @@ edited file is refused.
   smallest coherence and its tick, ticks swum); counterexample (the depth one below, the count of sets at it, the
   nearest miss); difficulty; skipped; decode refuses newer, damaged and non-replaying files) with
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G1902-006 [US2] [US3] [US4] Create
+- [X] T-R02G1902-006 [US2] [US3] [US4] Create — Verified 2026-11-26: 2026-11-26: MicroscopicAuroraCatalogTests pass (host-5 exit 0, 8 tests): 100 witness files byte for byte in 20 groups of 5, pinned digest 03c1dc19…, every witness wins within its budget, plan lengths 1, 1, 2, 2, 2 by band with the progression rule, the independent enumeration on two levels per band, one full decode per band
   `Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraCatalogTests.swift` (lead: 100 entries, 20
   per band; every level generated, won by its witness within the budget, and no set with fewer placements wins; the
   independent enumeration without the loss order on the two levels with the fewest sites, then fewest swimmers, in each

@@ -1,0 +1,352 @@
+{
+  "actions" : [
+    {
+      "place" : {
+        "slot" : 0,
+        "well" : {
+          "cell" : {
+            "column" : 13,
+            "row" : 10
+          },
+          "sense" : "clockwise",
+          "strength" : 3
+        }
+      }
+    },
+    {
+      "place" : {
+        "slot" : 1,
+        "well" : {
+          "cell" : {
+            "column" : 17,
+            "row" : 11
+          },
+          "sense" : "counterclockwise",
+          "strength" : 1
+        }
+      }
+    },
+    {
+      "play" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "depth" : 1,
+    "nearestMiss" : 5,
+    "sets" : 40
+  },
+  "difficulty" : {
+    "coverage" : 946,
+    "nearestMiss" : 5,
+    "placements" : 2,
+    "setsSearched" : 41,
+    "sites" : 5,
+    "stencil" : 18,
+    "swarm" : 8,
+    "work" : 139
+  },
+  "digests" : [
+    "f923f4262d468bf0",
+    "65ddaf4ef11ce283",
+    "65ddaf4ef11ce283"
+  ],
+  "fingerprints" : [
+    "ddfd860a8730aaf9a3b9584c391a79171ba7d58ed9559c08ae97fd37fd6281b9",
+    "753b54952581109dd94ad91c7d9ebf7e01938ef1bc205104ccc10b69906c9261",
+    "24bbc8ce5884bc65ddc90fdb722f98d2e32b85bf83684892e66c7a6e4174ee53",
+    "1bda4c4e0c52f47b1b3e34cebe152013295316568cf365f8c7b9d2f7bc05c2e0"
+  ],
+  "level" : {
+    "budget" : 14,
+    "coherence" : 6,
+    "coverage" : 946,
+    "difficulty" : 4,
+    "fingerprint" : "eabd5f96e5d04367a485472491db3cd7f5598be3bf9a02093fac67d55802afa5",
+    "id" : "microscopic-aurora-076",
+    "length" : 147,
+    "radius" : 11,
+    "rules" : {
+      "alignmentWeight" : 1,
+      "coherenceRadius" : 7,
+      "cohesionWeight" : 4,
+      "maxAcceleration" : 7,
+      "maxSpeed" : 17,
+      "neighbourRadius" : 3,
+      "separationRadius" : 2,
+      "separationWeight" : 0
+    },
+    "schema" : 1,
+    "seed" : 17024299996235693057,
+    "sites" : [
+      {
+        "column" : 6,
+        "row" : 9
+      },
+      {
+        "column" : 13,
+        "row" : 10
+      },
+      {
+        "column" : 17,
+        "row" : 11
+      },
+      {
+        "column" : 9,
+        "row" : 13
+      },
+      {
+        "column" : 12,
+        "row" : 19
+      }
+    ],
+    "stencil" : [
+      {
+        "column" : 11,
+        "row" : 8
+      },
+      {
+        "column" : 12,
+        "row" : 8
+      },
+      {
+        "column" : 13,
+        "row" : 8
+      },
+      {
+        "column" : 11,
+        "row" : 9
+      },
+      {
+        "column" : 12,
+        "row" : 9
+      },
+      {
+        "column" : 13,
+        "row" : 9
+      },
+      {
+        "column" : 14,
+        "row" : 9
+      },
+      {
+        "column" : 10,
+        "row" : 10
+      },
+      {
+        "column" : 11,
+        "row" : 10
+      },
+      {
+        "column" : 12,
+        "row" : 10
+      },
+      {
+        "column" : 13,
+        "row" : 10
+      },
+      {
+        "column" : 14,
+        "row" : 10
+      },
+      {
+        "column" : 11,
+        "row" : 11
+      },
+      {
+        "column" : 12,
+        "row" : 11
+      },
+      {
+        "column" : 13,
+        "row" : 11
+      },
+      {
+        "column" : 14,
+        "row" : 11
+      },
+      {
+        "column" : 12,
+        "row" : 12
+      },
+      {
+        "column" : 13,
+        "row" : 12
+      }
+    ],
+    "swimmers" : [
+      {
+        "position" : {
+          "x" : 3261,
+          "y" : 2635
+        },
+        "velocity" : {
+          "x" : -4,
+          "y" : 2
+        }
+      },
+      {
+        "position" : {
+          "x" : 3333,
+          "y" : 2520
+        },
+        "velocity" : {
+          "x" : -1,
+          "y" : 2
+        }
+      },
+      {
+        "position" : {
+          "x" : 3457,
+          "y" : 2507
+        },
+        "velocity" : {
+          "x" : -2,
+          "y" : 2
+        }
+      },
+      {
+        "position" : {
+          "x" : 3419,
+          "y" : 2570
+        },
+        "velocity" : {
+          "x" : 0,
+          "y" : 0
+        }
+      },
+      {
+        "position" : {
+          "x" : 3173,
+          "y" : 2582
+        },
+        "velocity" : {
+          "x" : -4,
+          "y" : -1
+        }
+      },
+      {
+        "position" : {
+          "x" : 3057,
+          "y" : 2464
+        },
+        "velocity" : {
+          "x" : -2,
+          "y" : 1
+        }
+      },
+      {
+        "position" : {
+          "x" : 3411,
+          "y" : 2969
+        },
+        "velocity" : {
+          "x" : 0,
+          "y" : -2
+        }
+      },
+      {
+        "position" : {
+          "x" : 3479,
+          "y" : 2697
+        },
+        "velocity" : {
+          "x" : 0,
+          "y" : -1
+        }
+      }
+    ],
+    "threshold" : 1,
+    "tutorial" : false,
+    "wells" : [
+      null,
+      null,
+      null
+    ]
+  },
+  "number" : 76,
+  "report" : {
+    "coverage" : 1000,
+    "groups" : 1,
+    "litStencil" : [
+      {
+        "column" : 11,
+        "row" : 8
+      },
+      {
+        "column" : 12,
+        "row" : 8
+      },
+      {
+        "column" : 13,
+        "row" : 8
+      },
+      {
+        "column" : 11,
+        "row" : 9
+      },
+      {
+        "column" : 12,
+        "row" : 9
+      },
+      {
+        "column" : 13,
+        "row" : 9
+      },
+      {
+        "column" : 14,
+        "row" : 9
+      },
+      {
+        "column" : 10,
+        "row" : 10
+      },
+      {
+        "column" : 11,
+        "row" : 10
+      },
+      {
+        "column" : 12,
+        "row" : 10
+      },
+      {
+        "column" : 13,
+        "row" : 10
+      },
+      {
+        "column" : 14,
+        "row" : 10
+      },
+      {
+        "column" : 11,
+        "row" : 11
+      },
+      {
+        "column" : 12,
+        "row" : 11
+      },
+      {
+        "column" : 13,
+        "row" : 11
+      },
+      {
+        "column" : 14,
+        "row" : 11
+      },
+      {
+        "column" : 12,
+        "row" : 12
+      },
+      {
+        "column" : 13,
+        "row" : 12
+      }
+    ],
+    "smallestCoherence" : 8,
+    "smallestCoherenceTick" : 0,
+    "ticks" : 147
+  },
+  "schema" : 1,
+  "skipped" : 1
+}
