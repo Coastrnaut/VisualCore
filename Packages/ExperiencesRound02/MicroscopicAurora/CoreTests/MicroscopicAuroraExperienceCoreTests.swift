@@ -19,6 +19,10 @@
 // loops, single-literal comments. Modelled on ApsidesWorkshopExperienceCoreTests (feature 473).
 // Feature 485 (R02-G19-05) T-R02G1905-004: schema 2 and digest v2, twelve controls, `level.next` to the next open level
 // (no wrap; `r02-g19.locked` when none); the progression itself is tested in `MicroscopicAuroraProgressionCoreTests`.
+// Feature 487 (R02-G19-07) T-R02G1907-003: schema 3 and digest v3, sixteen controls (`replay.start` 1 … 100,
+// `replay.step`, `replay.stop`, `settings.sound` 0 … 1), the replay and sound controls refused without a verified
+// result or with wrong values, an opening with the sound off and nothing dropped, and the refusal of schema 4; the
+// replay, reconciliation and sound rules are in `MicroscopicAuroraReconciliationTests`.
 @testable import MicroscopicAuroraCore
 import Foundation
 import Testing
@@ -120,7 +124,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
                                           ScriptedAction("mode.daily", [2026, 13, 1]),
                                           ScriptedAction("mode.daily", [2026, 1]),
                                           ScriptedAction("mode.practice", [1]), ScriptedAction("mode.campaign", [1]),
-                                          ScriptedAction("tutorial.dismiss", [1]), ScriptedAction("bogus")]
+                                          ScriptedAction("tutorial.dismiss", [1]),
+                                          // Feature 487: no replay without a verified result; sound whole 0 … 1.
+                                          ScriptedAction("replay.start", [1]), ScriptedAction("replay.start", [0]),
+                                          ScriptedAction("replay.step"), ScriptedAction("replay.step", [1]),
+                                          ScriptedAction("replay.stop"), ScriptedAction("replay.stop", [1]),
+                                          ScriptedAction("settings.sound", [2]),
+                                          ScriptedAction("settings.sound", [0.5]), ScriptedAction("settings.sound"),
+                                          ScriptedAction("bogus")]
         let plan = ConformancePlan(seeds: [0, 2], stepsPerSegment: 2, actions: actions, rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
         #expect(report.entries.count == ConformanceCheck.allCases.count)
@@ -131,22 +142,23 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g19.microscopic-aurora" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g19.microscopic-aurora.v2")
+        #expect(Core.experienceID == "r02-g19.microscopic-aurora" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g19.microscopic-aurora.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["well.place", "well.remove", "swim.play", "play.undo", "play.redo", "level.next",
                              "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                             "tutorial.dismiss"]
-        #expect(Core.actionIDs == ids)
+                             "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"]
+        #expect(Core.actionIDs == ids && Core.controls.count == 16)
+        #expect(Core.controls[12].ranges == [1...100] && Core.controls[15].ranges == [0...1])
         #expect(Core.controls[0].ranges == [0...2, 0...23, 0...23, 1...4, 0...1])
         #expect(Core.controls[1].ranges == [0...2])
         #expect(Core.controls[6].ranges == [0...480])
         #expect(Core.controls[7].ranges == [1...100])
         #expect(Core.controls[8].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [2, 3, 4, 5, 9, 10, 11]
+        let plainIndices: [Int] = [2, 3, 4, 5, 9, 10, 11, 13, 14]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == MicroscopicAuroraTier.all.count)
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == MicroscopicAuroraTier.all.map(\.name))
@@ -162,6 +174,9 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(MicroscopicAuroraExperienceRule.tick == "r02-g19.tick")
         #expect(MicroscopicAuroraExperienceRule.locked == "r02-g19.locked")
         #expect(MicroscopicAuroraExperienceRule.date == "r02-g19.date")
+        #expect(MicroscopicAuroraExperienceRule.noReplay == "r02-g19.no-replay")
+        #expect(MicroscopicAuroraExperienceRule.replayEnd == "r02-g19.replay-end")
+        #expect(MicroscopicAuroraExperienceRule.replay == "r02-g19.replay")
         #expect(Core.practiceBudget == 24)
         #expect(Core.wonCode == "won" && Core.failedCode == "failed")
     }
@@ -183,6 +198,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
             let opening: Int = expected.tutorial ? 2 : 1
             #expect(first.play.records.count == opening && !first.play.canUndo)
             #expect(first.play.actionsLeft == expected.budget && first.qualityTier == 0 && first.shownTick == 0)
+            // Feature 487: sound off and nothing dropped at an opening.
+            #expect(!first.soundOn && first.reconciliationDropped == 0)
         }
         #expect(try Core.level(number: 1).tutorial && !(try Core.level(number: 100).tutorial))
         #expect(throws: MicroscopicAuroraError.level("number")) { try Core.level(number: 0) }
@@ -340,6 +357,13 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(probe.apply(Self.act("play.undo", [1])) == noValues)
         #expect(probe.apply(Self.act("play.redo", [1])) == noValues)
         #expect(probe.apply(Self.act("level.next", [1])) == noValues)
+        // Feature 487: replay.step and replay.stop take no values; replay.start and settings.sound one.
+        #expect(probe.apply(Self.act("replay.step", [1])) == noValues)
+        #expect(probe.apply(Self.act("replay.stop", [1])) == noValues)
+        #expect(probe.apply(Self.act("replay.start")) == .rejected(.wrongValueCount(expected: 1, found: 0)))
+        #expect(probe.apply(Self.act("replay.start", [101])) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.act("settings.sound", [2])) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.act("settings.sound")) == .rejected(.wrongValueCount(expected: 1, found: 0)))
         let notWhole: ActionResult = .rejected(.rule(code: MicroscopicAuroraExperienceRule.notWhole))
         #expect(probe.apply(Self.act("well.place", [0, 9.5, 7, 1, 0])) == notWhole)
         #expect(probe.apply(Self.act("well.place", [0, 9, 7, 1.5, 0])) == notWhole)
@@ -593,14 +617,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "well.place", values: [0, 11, 18, 2, 0]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)

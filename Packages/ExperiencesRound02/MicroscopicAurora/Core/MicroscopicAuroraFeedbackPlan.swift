@@ -104,7 +104,9 @@ public struct MicroscopicAuroraFeedbackPlan: Sendable, Equatable {
     /// (`r02-g19.stage`), "The play changed before the action arrived." (`r02-g19.stale`), "That level could not be
     /// made." (`r02-g19.level`), "That value must be a whole number." (`r02-g19.not-whole`), "That tick is outside the
     /// swim." (`r02-g19.tick`); any other code (the kernel's `r02-g19.malformed`, the engine's own codes such as
-    /// `action.out-of-range`) "That action was refused.".
+    /// `action.out-of-range`) "That action was refused."; since feature 487 "There is no saved solution to replay for
+    /// this level." (`r02-g19.no-replay`), "The replay is over." (`r02-g19.replay-end`) and "Stop the replay first."
+    /// (`r02-g19.replay`).
     public static func refusalText(code: String) -> String {
         let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
         switch bare {
@@ -118,6 +120,10 @@ public struct MicroscopicAuroraFeedbackPlan: Sendable, Equatable {
         case MicroscopicAuroraError.level("").reasonCode: return "That level could not be made."
         case MicroscopicAuroraExperienceRule.notWhole: return "That value must be a whole number."
         case MicroscopicAuroraExperienceRule.tick: return "That tick is outside the swim."
+        // Feature 487: the replay refusals.
+        case MicroscopicAuroraExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case MicroscopicAuroraExperienceRule.replayEnd: return "The replay is over."
+        case MicroscopicAuroraExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }
@@ -237,7 +243,7 @@ public struct MicroscopicAuroraFeedbackPlan: Sendable, Equatable {
     }
 
     /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars in campaign and daily,
-    /// never in practice), haptic `success`; or the failure explanation, haptic `warning`.
+    /// never in practice or replay, feature 487), haptic `success`; or the failure explanation, haptic `warning`.
     static func outcomePlan(_ core: MicroscopicAuroraExperienceCore) -> MicroscopicAuroraFeedbackPlan {
         let play: MicroscopicAuroraPlay = core.play
         if play.stage == .won {

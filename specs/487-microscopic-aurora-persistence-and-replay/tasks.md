@@ -35,7 +35,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G1907-003 [US1] [US2] [US3] Edit
+- [X] T-R02G1907-003 [US1] [US2] [US3] Edit — Verified 2026-11-26: host-2 exit 0 (MicroscopicAurora filter): adapter schema 3 and digest v3, sixteen controls, wins store verified traces, migrations 1 -> 2 -> 3, reconciliation on restore with reconciliationDropped, replay.start/step/stop with no-replay, replay-end and replay codes, settings.sound; scenarios with the new rejections and the regenerated manifest; ExperienceCore and ProgressionCore tests updated (replay rules and the saved-replay prefix rule are exercised in MicroscopicAuroraReplayCatalogTests, T-005)
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraExperienceCore.swift` (schema 3, migration 2 → 3
   "results with an empty trace and verified false, sound off", digest v3; a campaign or daily win records the winning
   effective-action trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start

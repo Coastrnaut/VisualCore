@@ -16,6 +16,10 @@
 // starting wells never win), levels 1 … 3 carry the tutorial; the daily level of 2026-11-26 is 52 (329 days × 19 mod
 // 100 + 1) and of 2026-01-01 level 1. Explicit types, plain loops, no wall-clock asserts. Modelled on feature 475's
 // ApsidesWorkshopProgressionCoreTests.
+// Feature 487 (R02-G19-07) T-R02G1907-003: schema 3 and digest v3, sixteen controls, wins store their trace (the
+// effective placements and removals, an undone placement left out, then `.play`) as a verified result, the schema-3
+// payload carries the traces and the sound choice, the migration 1 → 2 → 3 (sound off, nothing to reconcile), and
+// the refusal of schema 4; the replay, reconciliation and sound rules are in `MicroscopicAuroraReconciliationTests`.
 @testable import MicroscopicAuroraCore
 import Foundation
 import Testing
@@ -86,20 +90,21 @@ import VisualCoreSimulation
         return ["level": core.levelNumber, "records": recordsObject]
     }
 
-    @Test func theTwelveControlsAreDeclaredInOrder() {
-        #expect(Core.schemaVersion == 2 && Core.digestDomain == "r02-g19.microscopic-aurora.v2")
+    @Test func theSixteenControlsAreDeclaredInOrder() {
+        #expect(Core.schemaVersion == 3 && Core.digestDomain == "r02-g19.microscopic-aurora.v3")
         let ids: [String] = ["well.place", "well.remove", "swim.play", "play.undo", "play.redo", "level.next",
                              "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                             "tutorial.dismiss"]
-        #expect(Core.actionIDs == ids && Core.controls.map(\.id) == ids && Core.controls.count == 12)
+                             "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"]
+        #expect(Core.actionIDs == ids && Core.controls.map(\.id) == ids && Core.controls.count == 16)
+        #expect(Core.controls[12].ranges == [1...100] && Core.controls[15].ranges == [0...1])
         #expect(Core.controls[0].ranges == [0...2, 0...23, 0...23, 1...4, 0...1])
         #expect(Core.controls[1].ranges == [0...2])
         #expect(Core.controls[6].ranges == [0...480])
         #expect(Core.controls[7].ranges == [1...100])
         #expect(Core.controls[8].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [2, 3, 4, 5, 9, 10, 11]
+        let plainIndices: [Int] = [2, 3, 4, 5, 9, 10, 11, 13, 14]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty, "\(Core.controls[index].id)") }
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
         #expect(MicroscopicAuroraExperienceRule.locked == "r02-g19.locked")
         #expect(MicroscopicAuroraExperienceRule.date == "r02-g19.date")
         #expect(Core.practiceBudget == 24 && MicroscopicAuroraMode.practiceBudget == 24)
@@ -170,7 +175,9 @@ import VisualCoreSimulation
         #expect(core.progress.solved.isEmpty && core.progress.frontier == 1)
         #expect(core.apply(Self.act("swim.play")) == .accepted)
         #expect(core.play.stage == .won && MicroscopicAuroraProgress.actionsSpent(core.play) == certified)
-        let best = MicroscopicAuroraProgress.Result(actionsSpent: certified, stars: 3)
+        // Feature 487: the result carries the winning trace (the placement, then the play), verified.
+        let best = MicroscopicAuroraProgress.Result(actionsSpent: certified, stars: 3, trace: actions + [.play],
+                                                    verified: true)
         #expect(core.progress.solved[1] == best && core.progress.stars(of: 1) == 3)
         #expect(core.progress.frontier == 2 && core.progress.isOpen(2) && !core.progress.isOpen(3))
         // level.next goes to the newly opened level 2, fresh, with its tutorial and certified wells.
@@ -202,7 +209,9 @@ import VisualCoreSimulation
         #expect(undone.apply(Self.act("play.undo")) == .accepted)
         #expect(try Self.win(&undone))
         #expect(MicroscopicAuroraProgress.actionsSpent(undone.play) == certified + 1)
-        let twoStars = MicroscopicAuroraProgress.Result(actionsSpent: certified + 1, stars: 2)
+        // Feature 487: the undone placement is left out of the trace.
+        let twoStars = MicroscopicAuroraProgress.Result(actionsSpent: certified + 1, stars: 2,
+                                                        trace: actions + [.play], verified: true)
         #expect(undone.progress.solved[1] == twoStars && undone.progress.frontier == 2)
         // A placement and its removal: two actions more than the plan, still 2 stars.
         var removed: Core = try await Core.prepare(seed: 0)
@@ -210,7 +219,12 @@ import VisualCoreSimulation
         #expect(removed.apply(Self.act("well.remove", [1])) == .accepted)
         #expect(try Self.win(&removed))
         #expect(MicroscopicAuroraProgress.actionsSpent(removed.play) == certified + 2)
-        let removedResult = MicroscopicAuroraProgress.Result(actionsSpent: certified + 2, stars: 2)
+        // Feature 487: an effective placement and removal stay in the trace.
+        let detourWell = MicroscopicAuroraWell(cell: MicroscopicAuroraCell(row: 9, column: 7), strength: 1,
+                                               sense: .counterclockwise)
+        let detourTrace: [MicroscopicAuroraAction] = [.place(slot: 1, well: detourWell), .remove(slot: 1)]
+        let removedResult = MicroscopicAuroraProgress.Result(actionsSpent: certified + 2, stars: 2,
+                                                             trace: detourTrace + actions + [.play], verified: true)
         #expect(removed.progress.solved[1] == removedResult)
         // Four undone placements more than the plan: 1 star.
         var many: Core = try await Core.prepare(seed: 0)
@@ -220,12 +234,14 @@ import VisualCoreSimulation
         }
         #expect(try Self.win(&many))
         #expect(MicroscopicAuroraProgress.actionsSpent(many.play) == certified + 4)
-        let oneStar = MicroscopicAuroraProgress.Result(actionsSpent: certified + 4, stars: 1)
+        let oneStar = MicroscopicAuroraProgress.Result(actionsSpent: certified + 4, stars: 1,
+                                                       trace: actions + [.play], verified: true)
         #expect(many.progress.solved[1] == oneStar)
         // A better result replaces the stored one; a worse one keeps it.
         #expect(many.apply(Self.act("level.select", [1])) == .accepted)
         #expect(try Self.win(&many))
-        let best = MicroscopicAuroraProgress.Result(actionsSpent: certified, stars: 3)
+        let best = MicroscopicAuroraProgress.Result(actionsSpent: certified, stars: 3, trace: actions + [.play],
+                                                    verified: true)
         #expect(many.progress.solved[1] == best)
         #expect(many.apply(Self.act("level.select", [1])) == .accepted)
         #expect(many.apply(Self.detour) == .accepted)
@@ -281,7 +297,8 @@ import VisualCoreSimulation
         #expect(try Self.win(&core))
         #expect(core.progress.frontier == 1 && !core.progress.isOpen(daily))
         let result: MicroscopicAuroraProgress.Result = try #require(core.progress.solved[daily])
-        #expect(result == MicroscopicAuroraProgress.Result(actionsSpent: dailyActions.count, stars: 3))
+        #expect(result == MicroscopicAuroraProgress.Result(actionsSpent: dailyActions.count, stars: 3,
+                                                            trace: dailyActions + [.play], verified: true))
         // Campaign from a level that is not open goes to the frontier.
         #expect(core.apply(Self.act("mode.campaign")) == .accepted)
         #expect(core.mode == .campaign && core.levelNumber == 1 && core.play.level == certified)
@@ -387,7 +404,7 @@ import VisualCoreSimulation
         #expect(restored == saved && restored.tutorial == .cover)
     }
 
-    @Test func theSchemaTwoPayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
+    @Test func theSchemaThreePayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
         // Campaign with progress: level 1 won, level 2 reached with level.next.
         var campaign: Core = try await Core.prepare(seed: 0)
         #expect(try Self.win(&campaign))
@@ -424,9 +441,14 @@ import VisualCoreSimulation
         #expect(restoredPractice.play.level.budget == 24 && restoredPractice.mode == .practice)
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
         let certified: Int = try Self.plan(1).count
+        // Feature 487: each result carries its trace (the certified placement, then the play) and its verification.
+        let traceText: String = String(decoding: try Core.payloadEncoder().encode(try Self.plan(1) + [.play]),
+                                       as: UTF8.self)
         let progressText: String = "\"progress\":{\"frontier\":2,"
-            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3}]}"
+            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3,\"trace\":" + traceText
+            + ",\"verified\":true}]}"
         #expect(campaignText.contains(progressText))
+        #expect(campaignText.contains(",\"sound\":false,\"tutorial\":\"place\"}"))
         #expect(campaignText.hasPrefix("{\"level\":2,\"mode\":{\"mode\":\"campaign\"},"))
         #expect(campaignText.hasSuffix(",\"tutorial\":\"place\"}"))
         let dailyText: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
@@ -477,7 +499,7 @@ import VisualCoreSimulation
         #expect(core.apply(Self.act(plan[0])) == .accepted)
         #expect(core.tutorial == .cover)
         let schemaOne: [String: Any] = try Self.schemaOne(core)
-        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(schemaOne))
         let chained: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
         let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
         let chainedData: Data = try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])
@@ -487,6 +509,8 @@ import VisualCoreSimulation
         #expect(restored.progress.frontier == 3 && restored.progress.solved.isEmpty)
         #expect(restored.progress.isOpen(1) && restored.progress.isOpen(3) && !restored.progress.isOpen(4))
         #expect(restored.tutorial == .place && restored.tutorial == MicroscopicAuroraTutorialStep.initial(level: 3))
+        // Feature 487: the migration 2 → 3 sets the sound off; nothing to reconcile.
+        #expect(migrated["sound"] as? Bool == false && !restored.soundOn && restored.reconciliationDropped == 0)
         // The tutorial step is not digested, so the migrated state digests as the saved one.
         #expect(try Self.digest(restored) == Self.digest(core))
         // A level without the tutorial migrates with it done: the fresh opening of level 7.
@@ -499,7 +523,8 @@ import VisualCoreSimulation
         #expect(throws: MicroscopicAuroraRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "3"]) }
         #expect(throws: MicroscopicAuroraRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
         // A newer schema is refused by the chain.
-        #expect(throws: MigrationError.newerVersion(3)) { try Core.migrations.migrate(schemaOne, from: 3) }
+        #expect(Core.schemaVersion == 3)
+        #expect(throws: MigrationError.newerVersion(4)) { try Core.migrations.migrate(schemaOne, from: 4) }
     }
 
     @Test func theEngineMigratesASchemaOneEnvelopeAndRefusesANewerOne() async throws {
@@ -521,17 +546,17 @@ import VisualCoreSimulation
         let migrated: Core = try #require(engine.core)
         #expect(migrated.levelNumber == 3 && migrated.play == played.play && migrated.mode == .campaign)
         #expect(migrated.progress.frontier == 3 && migrated.progress.solved.isEmpty)
-        #expect(migrated.tutorial == .place && played.tutorial == .cover)
+        #expect(migrated.tutorial == .place && played.tutorial == .cover && !migrated.soundOn)
         #expect(try engine.digest() == saved.digest)
-        // An envelope of schema 3 is refused and changes nothing.
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        // An envelope of schema 4 is refused and changes nothing.
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(engine.core == migrated)

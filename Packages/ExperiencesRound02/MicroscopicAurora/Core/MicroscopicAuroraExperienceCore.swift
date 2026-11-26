@@ -81,6 +81,28 @@
 // step or the shown tick). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys;
 // schema-1 payloads migrate (no won levels, level 1 open plus the levels up to the restored level, campaign mode, the
 // tutorial at its first step — `place` on the tutorial levels, else `done`); an envelope of a newer schema is refused.
+//
+// Feature 487 (R02-G19-07) T-R02G1907-003 (FR-R02G1907-001 … 007; clarifications Q1–Q5): a campaign or daily win
+// records its winning trace (`MicroscopicAuroraReconciliation.netTrace` of the play's records: the effective placements
+// and removals, an undone action left out unless redone, then the play) as a verified result; restore reconciles every
+// result (`MicroscopicAuroraReconciliation.reconcile`, the frontier as saved) and exposes `reconciliationDropped` (not
+// digested, not in `==`); the replay mode `replay(level)` plays a verified trace action by action:
+//   replay.start [1…100]  a fresh play of that level in mode `replay(level)` (campaign budget) with the tutorial done
+//                         (`r02-g19.no-replay` without a verified result with a trace); during a replay it restarts it;
+//   replay.step           the next action of the trace, a placement or removal or finally the play
+//                         (`r02-g19.replay-end` after the last or once the play ended; `r02-g19.no-replay` outside
+//                         replay);
+//   replay.stop           campaign at that level, the frontier when it is not open (`r02-g19.no-replay` outside
+//                         replay);
+//   settings.sound [0…1]  the sound choice: 1 on, 0 off; whole; allowed in every mode.
+// In replay every other action except `tutorial.dismiss` and `clock.show` (presentation) and `settings.sound` is
+// refused with `r02-g19.replay`, and nothing is recorded. A restored replay whose placement, removal and play records
+// are not exactly the first actions of its level's verified trace (in order, no undo or redo) is refused as `damaged`;
+// a restored replay whose result did not survive reconciliation, or was never verified, returns to campaign at that
+// level (the frontier when it is not open). Digest "r02-g19.microscopic-aurora.v3" (the same parts as v2, the progress
+// now with traces; never the sound choice or the dropped count); snapshot schema 3 `{"level", "mode", "progress",
+// "records", "sound", "tutorial"}` (results carry `trace` and `verified`), migrating 1 → 2 → 3 (2 → 3: every result an
+// empty trace and `verified` false, sound off).
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -97,6 +119,12 @@ public enum MicroscopicAuroraExperienceRule {
     public static let locked = "r02-g19.locked"
     /// An impossible calendar date (`mode.daily`, feature 485).
     public static let date = "r02-g19.date"
+    /// No verified result with a trace to replay, or a replay control outside replay (feature 487).
+    public static let noReplay = "r02-g19.no-replay"
+    /// The replay has no further action: the trace is over or the play ended (feature 487).
+    public static let replayEnd = "r02-g19.replay-end"
+    /// An action that is not allowed during replay (feature 487).
+    public static let replay = "r02-g19.replay"
 }
 
 /// Why a saved Microscopic Aurora state was refused on restore (feature 483). A refused restore changes nothing.
@@ -110,18 +138,20 @@ public enum MicroscopicAuroraRestoreRefusal: Error, Equatable, Sendable {
     case kernel(MicroscopicAuroraError)
 }
 
-/// The state of Microscopic Aurora as an experience (see the file header). Snapshot schema 2.
+/// The state of Microscopic Aurora as an experience (see the file header). Snapshot schema 3.
 public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g19.microscopic-aurora"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g19.microscopic-aurora.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g19.microscopic-aurora.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["well.place", "well.remove", "swim.play", "play.undo", "play.redo", "level.next",
                                    "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                                   "tutorial.dismiss"]
+                                   "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"]
+    /// The declared range of `settings.sound`: 0 off, 1 on (feature 487).
+    public static let soundRange: ClosedRange<Int> = 0...1
     /// The budget of a practice play: the kernel's maximum (`MicroscopicAuroraMode.practiceBudget`, 24).
     public static let practiceBudget: Int = MicroscopicAuroraMode.practiceBudget
     /// The level numbers of the catalog.
@@ -162,6 +192,12 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
+    /// How many saved results the last restore dropped because they did not verify (feature 487); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
+    /// The player's sound choice (feature 487), set by `settings.sound`: in the snapshot (key `"sound"`) and `==`,
+    /// never in the digest; off at an opening, after a reset and in a migrated save.
+    public private(set) var soundOn = false
 
     /// What a reset restores (feature 485).
     struct Opening: Sendable {
@@ -362,18 +398,45 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown tick, the
-    /// quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode, the tutorial step and the sound choice (not
+    /// the shown tick, the quality tier, the dropped count or the opening level).
     public static func == (lhs: MicroscopicAuroraExperienceCore, rhs: MicroscopicAuroraExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial && lhs.soundOn == rhs.soundOn
     }
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object (feature 487): every won result gains an empty `trace` and `verified`
+    /// false, and the sound choice is off.
+    ///
+    /// - Throws: ``MicroscopicAuroraRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw MicroscopicAuroraRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated: [String: Any] = object
+        migrated["progress"] = progress
+        migrated["sound"] = false
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 485): no won levels with level 1 open
@@ -417,6 +480,10 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
+        ExperienceControl(id: "settings.sound", ranges: [declared(soundRange)]),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -424,8 +491,9 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The twelve controls with their declared ranges (see the file header); `swim.play`, `play.undo`, `play.redo`,
-    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
+    /// The sixteen controls with their declared ranges (see the file header); `swim.play`, `play.undo`, `play.redo`,
+    /// `level.next`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`, `replay.step` and `replay.stop` take no
+    /// values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with tick 0 shown; no clock is read.
@@ -465,6 +533,9 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
                 return .rejected(.rule(code: MicroscopicAuroraExperienceRule.notWhole))
             }
             values.append(whole)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: MicroscopicAuroraExperienceRule.replay))
         }
         do throws(MicroscopicAuroraError) {
             switch action.control {
@@ -517,6 +588,33 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
             case "mode.campaign":
                 try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
                 return .accepted
+            case "replay.start":
+                guard let result = progress.solved[values[0]], result.verified, !result.trace.isEmpty else {
+                    return .rejected(.rule(code: MicroscopicAuroraExperienceRule.noReplay))
+                }
+                try open(number: values[0], mode: .replay(level: values[0]))
+                tutorial = .done
+                return .accepted
+            case "replay.step":
+                guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                    return .rejected(.rule(code: MicroscopicAuroraExperienceRule.noReplay))
+                }
+                // Replay never undoes, so each trace action made exactly one placement, removal or play record (a
+                // fresh play also holds its begin and tutorial records, which are not counted).
+                let index: Int = Self.actionRecordCount(play.records)
+                guard play.stage == .playing, index < result.trace.count else {
+                    return .rejected(.rule(code: MicroscopicAuroraExperienceRule.replayEnd))
+                }
+                try play.apply(result.trace[index], expecting: play.fingerprint)
+            case "replay.stop":
+                guard case .replay(let level) = mode else {
+                    return .rejected(.rule(code: MicroscopicAuroraExperienceRule.noReplay))
+                }
+                try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
+                return .accepted
+            case "settings.sound":
+                soundOn = values[0] == 1
+                return .accepted
             default:   // tutorial.dismiss
                 tutorial = tutorial.dismissed()
                 return .accepted
@@ -565,12 +663,31 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
     /// nothing). A won play is final, so a win is recorded once.
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
+        if case .replay = mode { return }
         progress.record(level: levelNumber, actionsSpent: MicroscopicAuroraProgress.actionsSpent(play),
-                        certified: certifiedPlacements, mode: mode)
+                        certified: certifiedPlacements, mode: mode, trace: winningTrace)
     }
 
-    /// Back to the opening state the seed chose (progress included, campaign mode, tick 0 shown); the quality tier,
-    /// which is not state, is kept.
+    /// The controls accepted during replay (feature 487).
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "clock.show", "settings.sound"]
+
+    /// The winning trace of the current play (feature 487): its effective placements and removals in order, then the
+    /// play (``MicroscopicAuroraReconciliation/netTrace(_:)``), never an undo or a redo.
+    var winningTrace: [MicroscopicAuroraAction] { MicroscopicAuroraReconciliation.netTrace(play.records) }
+
+    /// The number of placement, removal and play records among `records` (feature 487): the trace actions a replay
+    /// applied.
+    static func actionRecordCount(_ records: [MicroscopicAuroraRecord]) -> Int {
+        var count: Int = 0
+        for record in records where record.kind == .place || record.kind == .remove || record.kind == .play {
+            count += 1
+        }
+        return count
+    }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode, tick 0 shown, sound off); the
+    /// quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
         play = opening.play
@@ -579,6 +696,7 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         tutorial = opening.tutorial
         certifiedWells = opening.certifiedWells
         shownTick = 0
+        soundOn = false
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -590,8 +708,9 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g19.microscopic-aurora.v2", then the level number, the play's fingerprint (actions spent, failure, level,
-    /// stage, wells), the progress and the mode (their sorted JSON); never the tutorial step or the shown tick.
+    /// "r02-g19.microscopic-aurora.v3", then the level number, the play's fingerprint (actions spent, failure, level,
+    /// stage, wells), the progress (with its traces) and the mode (their sorted JSON); never the tutorial step, the shown
+    /// tick, the sound choice or the dropped count.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
@@ -605,7 +724,7 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
@@ -617,12 +736,15 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         var records: [MicroscopicAuroraRecord]
         /// The tutorial step; nil in a migrated schema-1 payload.
         var tutorial: MicroscopicAuroraTutorialStep?
+        /// The sound choice; nil (off) in a payload written before schema 3.
+        var sound: Bool?
     }
 
-    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "sound", "tutorial"}` with sorted keys and unescaped
+    /// slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
-                                                 records: play.records, tutorial: tutorial))
+                                                 records: play.records, tutorial: tutorial, sound: soundOn))
     }
 
     /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
@@ -642,6 +764,28 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw MicroscopicAuroraRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw MicroscopicAuroraRestoreRefusal.damaged
+        }
+        // Feature 487: a saved replay's placement, removal and play records are exactly the first actions of its
+        // level's saved trace — in order, no undo or redo — or the payload is damaged.
+        if case .replay(let replayed) = decoded.mode, let saved = decoded.progress.solved[replayed], saved.verified {
+            var applied: [MicroscopicAuroraAction] = []
+            for record in decoded.records {
+                switch record.kind {
+                case .place, .remove, .play:
+                    guard let action = record.action else { throw MicroscopicAuroraRestoreRefusal.damaged }
+                    applied.append(action)
+                case .undo, .redo:
+                    throw MicroscopicAuroraRestoreRefusal.damaged
+                default:
+                    continue
+                }
+            }
+            guard applied.count <= saved.trace.count, Array(saved.trace.prefix(applied.count)) == applied else {
+                throw MicroscopicAuroraRestoreRefusal.damaged
+            }
+        }
         do throws(MicroscopicAuroraError) {
             let certified: MicroscopicAuroraGenerated = try generated(number: decoded.level)
             let play: MicroscopicAuroraPlay = try MicroscopicAuroraPlay.replay(
@@ -649,11 +793,19 @@ public struct MicroscopicAuroraExperienceCore: ExperienceCore, Equatable {
             let tutorial: MicroscopicAuroraTutorialStep = decoded.tutorial
                 ?? MicroscopicAuroraTutorialStep.initial(level: decoded.level)
             let openingCore: MicroscopicAuroraExperienceCore = try opening(number: levelNumber(forSeed: seed))
-            return MicroscopicAuroraExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                                   mode: decoded.mode, tutorial: tutorial,
-                                                   certifiedWells: certified.plan.wells,
-                                                   openingNumber: openingCore.openingNumber,
-                                                   opening: openingCore.opening)
+            // Feature 487: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = MicroscopicAuroraReconciliation.reconcile(decoded.progress)
+            var core: MicroscopicAuroraExperienceCore = MicroscopicAuroraExperienceCore(
+                levelNumber: decoded.level, play: play, progress: reconciled.progress, mode: decoded.mode,
+                tutorial: tutorial, certifiedWells: certified.plan.wells, openingNumber: openingCore.openingNumber,
+                opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            core.soundOn = decoded.sound ?? false
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw MicroscopicAuroraRestoreRefusal.kernel(error)
         }
