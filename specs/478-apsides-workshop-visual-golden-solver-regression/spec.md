@@ -103,7 +103,7 @@ level; any difference from the certified solution fails with the level number.
 
 1. **Given** the 100 certified levels and their witness files, **When** the regression runs, **Then** each witness
    replays to a win on exactly its final play and the search finds exactly the certified tunings, with the same
-   count of plans tried one tuning short, within its work bound.
+   count of orbits judged one tuning short, within its work bound.
 2. **Given** a level or witness that was altered, **When** the regression runs, **Then** it fails and names the level
    and the part that differs.
 
@@ -166,7 +166,7 @@ simulator parts and reports one summary.
 - **Frames at a tier whose detail differs:** each tier has its own description; positions shared by all tiers are
   checked against the same reference.
 - **Memory measurement noise:** the bound applies after a warm-up cycle, not to a single sample.
-- **A slower CI runner:** no wall-clock assertion runs on CI; time bounds are counted in solver work (plans tried),
+- **A slower CI runner:** no wall-clock assertion runs on CI; time bounds are counted in solver work (orbits judged),
   not seconds.
 - **A missing, unreadable or incomplete golden manifest:** the regression fails naming the file and the frame; it is
   never regenerated without the explicit switch.
@@ -178,8 +178,8 @@ simulator parts and reports one summary.
 ### Functional Requirements
 
 - **FR-R02G1808-001**: The regression MUST replay every certified level's witness to a win on exactly its final play
-  and MUST re-run the certifying search on every level, requiring the certified tunings and the recorded count of plans
-  tried one tuning short within the search's work bound.
+  and MUST re-run the certifying search on every level, requiring the certified tunings and the recorded count of orbits
+  judged one tuning short within the search's work bound.
 - **FR-R02G1808-002**: An altered level, plan or witness MUST make the regression fail, naming the level and the
   differing part.
 - **FR-R02G1808-003**: A golden set of frames (levels, tiers, frame times, including the hero frame) MUST have a
