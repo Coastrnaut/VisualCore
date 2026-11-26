@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G18-10 (migration ledger, game feature of experience R02-G18) · ID namespace FR-R02G1810-###,
 SC-R02G1810-###, T-R02G1810-###
@@ -25,6 +25,54 @@ Canonical overrides:
 - **Device rules:** devices in fixed order D1 iPhone 15, D2 iPad Pro 13-inch (M5), D3 iPad (A16) on iPadOS 26.5 (never
   updated); manual VoiceOver testing is non-gating (P-08). **Owner-only items:** every device handling step (unlock,
   trust, signing, settings, charging) is the owner's, written as such in the plan.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+470's answers (the games agree on the scenario set, the definition, the check and the pass conditions; only the gestures
+and the panel journey differ). Facts checked (read-only, 2026-11-26): the ledger holds DEV1-R02-G18 (D1 iPhone 15),
+DEV2-R02-G18 (D2 iPad Pro 13-inch (M5)) and DEV3-R02-G18 (D3 iPad (A16), iPadOS 26.5), each pending until after
+ImplementationLock-100 and UA-F13; Apsides Workshop's manifest has 94 scenarios (11 standard and game scenarios, 3
+fixtures `fixture-level-1-solved`, `fixture-run-fails`, `fixture-undo-redo`, 80 acceptance rows); the open {device}
+tasks are T-R02G1803-012 (frame time per tier), T-R02G1804-011 (touch feel and latency), T-R02G1806-011 (sound, haptics
+and VoiceOver), T-R02G1807-012 (a save across a real termination), T-R02G1808-012 (frame time and memory of the golden
+levels) and T-R02G1809-011 (the journeys); features 471, 472 and 475 have no {device} task;
+`scripts/check_device_rows.py` (feature 310) is generic over experience ids; `release_check.py` runs it as `device-rows`
+… `device-rows-r02-g17`; feature 470's plan is `docs/apps/celestial-eclipse-lab/device-campaign.md` (rows CEL-D1 …
+CEL-D8); the gestures of feature 474 are a drag of the periapsis knob (preview the eccentricity and direction with the
+ghost orbit, set on release), a drag of the size handle (preview the size, set on release), a drag of the orbiter (crank
+the shown tick), a double tap on empty space (Reset view) and two-finger orbit; the interface namespace of feature 479
+is `AW`, so the rows are AW-D1 … AW-D8.
+
+- Q: Which device rows exist and which tasks does each cover? → A: AW-D1 launch and first frame (UA-F13 launch,
+  first-frame); AW-D2 frame pacing and frame time per tier (T-R02G1803-012, T-R02G1808-012, UA-F13 frame-pacing); AW-D3
+  memory per tier and thermal state with the round-two stress session (T-R02G1808-012, UA-F13 memory, thermal, stress);
+  AW-D4 touch feel and touch-to-frame latency of a periapsis-knob drag that previews and sets the periapsis, a
+  size-handle drag that previews and sets the size, an orbiter drag that cranks the shown tick, a double tap on empty
+  space that resets the view and two-finger orbit (T-R02G1804-011); AW-D5 sound and haptics heard and felt
+  (T-R02G1806-011); AW-D6 VoiceOver walk-through at the largest text size, non-gating (T-R02G1806-011, P-08); AW-D7
+  progress across a real termination (T-R02G1807-012); AW-D8 panel journeys: win level 1 with its periapsis set and the
+  play, replay, relaunch (T-R02G1809-011). All rows run on D1, D2, D3 in that order. Impact: FR-R02G1810-001, 003;
+  SC-R02G1810-001.
+- Q: What is the device scenario set? → A: the 11 standard and game scenarios (`launch-first-frame`, `input-response`,
+  `completion`, `rejection`, `save-restore`, `reset`, `suspend-resume`, `teardown-reentry`, `cancel-prepare`,
+  `full-playthrough`, `hero`) and `fixture-level-1-solved`; the 80 acceptance rows and the other two fixtures stay
+  simulator-only. Impact: FR-R02G1810-001.
+- Q: What does the machine-readable definition look like? → A: `docs/apps/apsides-workshop/device-rows.json`, the schema
+  of feature 310 (schema 1, sorted keys: `experience`, `devices` with the ledger row of each, `scenarios`, `rows` with
+  `id`, `title`, `devices`, `procedure`, `measurements`, `pass`, `gating` (true except AW-D6), `covers`, `owner_steps`,
+  `status` "pending device campaign"). Impact: FR-R02G1810-001; data model.
+- Q: Where does the check run? → A: the existing `scripts/check_device_rows.py --experience r02-g18.apsides-workshop`
+  unchanged in its rules; `release_check.py` gains the step `device-rows-r02-g18`; `scripts/test_scripts.py` gains a
+  test that the real Apsides Workshop definition passes and that removing a covered task or a scenario fails with a
+  named reason. Impact: FR-R02G1810-004; SC-R02G1810-001, 002.
+- Q: What pass conditions do the rows use? → A: those of features 310 … 470: the app's proposed budgets where they exist
+  (no shader compiled after interaction; 60 fps with automatic levels, 30 fps acceptable on the last level; memory flat
+  over the stress session; 200 samples per device), otherwise "recorded" or a stated observation (sound audible, haptic
+  felt, VoiceOver reads every control, progress kept, level 1 won with 3 stars). Every row stays "pending device
+  campaign". Impact: FR-R02G1810-002; SC-R02G1810-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
