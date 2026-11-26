@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G19-09 (migration ledger, game feature of experience R02-G19) · ID namespace FR-R02G1909-###,
 SC-R02G1909-###, T-R02G1909-###
@@ -26,6 +26,68 @@ Canonical overrides:
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 479 (Apsides Workshop's simulator integration and full app lock), adapted to placing magnetic
   wells and letting the swarm swim.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+479's answers where the games agree. Facts checked in code (read-only, 2026-11-26): feature 479 (Apsides Workshop) is the
+model (`Apps/VisualCore/Tests/UI/ApsidesWorkshop` with `AWSupport.swift`, `AWPlayUITests.swift`,
+`AWReplayUITests.swift`, serial chunk `a4`; `ApsidesWorkshopControls.identifierNames`;
+`ApsidesWorkshopSchemaExamples.swift`); Microscopic Aurora's panel (`MicroscopicAuroraControls`) already gives every
+control a label, a value and an identifier through `port.identifier(name)` (features 484–487): `slot`, `slot-minus`,
+`slot-plus`, `selection`, `wells-detail`, `site`, `site-minus`, `site-plus`, `strength`, `strength-minus`,
+`strength-plus`, `sense`, `place`, `remove`, `freeze`, `reset-view`, `tick`, `tick-minus`, `tick-plus`, `tick-detail`,
+`play`, `undo`, `redo`, `next-level`, `dismiss-tutorial`, `hint`, `campaign`, `daily`, `practice`, `level-picker`,
+`play-level`, `replay`, `replay-step`, `replay-stop`, `sound`, and the text elements `actions`, `status`, `failure` (used
+twice: the short failure line and the failure explanation), `progress`, `summary`, `message`, `tutorial`, `hint-text`,
+`band`, `stars`, `goal`, `replay-position` — 47 distinct names, but no list of them is pinned; the registration in
+`Apps/VisualCore/App/ExperienceRegistry.swift` stores no examples and its comment still says "Snapshot schema 1" (the
+snapshot is schema 3 since feature 487; schema 1 is `{level, records}`, migration 1 → 2 adds the mode, progress and the
+tutorial, 2 → 3 adds the sound choice and traces); the canvas description of a won level says "The trails covered the
+stencil as one pattern." and the panel's `stars` text reads "Best: 3 of 3 stars" once a level is won with its certified
+count; the panel chooses a well with Well − / Well +, its site with Site − / Site +, its strength (1 … 4) with Strength −
+/ Strength +, its turning sense with the Clockwise / Counterclockwise toggle, and spends one action with Place; Play
+lets the swarm swim; the `actions` text reads "Level n · a of b actions left"; the tutorial shows on levels 1 … 3; the UI
+chunk keys in `release_check.py` end at `a4` (`b4` is free); no UI test class uses the prefix `MA`.
+
+- Q: How do the interface tests find controls and what do they read? → A: through the identifiers the panel already
+  carries (`experience.r02-g19.microscopic-aurora.<name>`); the failure explanation, which today shares `failure` with
+  the short failure line, gets its own identifier `explanation` (as in features 469 and 479), and this feature pins the
+  full list as `MicroscopicAuroraControls.identifierNames` (the 47 names above plus `explanation`: 48) with a test that
+  every name is unique and used once in the panel. The tests read the canvas description for the level and the win, the
+  `stars` text for the stars, the `actions` text to confirm each placement took effect, the site, strength and sense
+  controls' values before Place is pressed, and the replay step's value for the replay position. Impact:
+  FR-R02G1909-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `MA` in
+  `Apps/VisualCore/Tests/UI/MicroscopicAurora/MASupport.swift`; `MAPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g19.microscopic-aurora`: dismiss the tutorial, place level 1's
+  certified wells one by one — choose the well slot, move the site with Site − / Site + and the strength with
+  Strength − / Strength + to the target (reading each control's value after a press so a lost tap is retried), set the
+  sense, press Place (counting it only when the actions-left count moves) — then Play; read "The trails covered the
+  stencil as one pattern." and "Best: 3 of 3 stars", the level picker shows level 2 open; relaunch without reset after
+  sending the app to the background: the stars and level 2 are kept) and `MAReplayUITests` (after the win, Replay best
+  solution, Step until the replay ends won, Stop back to the campaign). They run as a new serial chunk `b4` of
+  `release_check.py` (its key checked unique); each test stays under 90 s apart from the simulator's automation-session
+  setup of each app launch (about 30 s per launch, and a relaunch test launches twice). Level 1's certified plan (its
+  wells: slot, site, strength, sense) is pinned in `MA` and checked against the Core by an app unit test. Impact:
+  FR-R02G1909-002, 007; SC-R02G1909-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `MicroscopicAuroraExperienceCore.schemaOneExample()` (the schema-1 saved state `{level: 1, records}` of a play of
+  level 1 with one well placed that does not win, so it is still playing and not won) and `schemaTwoExample()` (schema 2
+  with progress, the campaign mode, the tutorial done and level 1 solved with its stars at one action above the
+  certified count, no trace), both `MigrationExample`s built in the Core (`MicroscopicAuroraSchemaExamples.swift`,
+  modelled on `ApsidesWorkshopSchemaExamples`), registered with `examples:`; the app's migration check restores both
+  into schema 3 with progress kept (a schema-2 result without a trace keeps its stars unverified, as feature 487
+  reconciles). The registration's comment is corrected. Impact: FR-R02G1909-003; SC-R02G1909-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `MicroscopicAuroraGolden` is forbidden by feature 488, and the scenarios exist only
+  under `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact:
+  FR-R02G1909-004; SC-R02G1909-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g19.microscopic-aurora` as not available and the launcher cannot open it; the registry's candidates list
+  contains it and `all` does not. Impact: FR-R02G1909-006; SC-R02G1909-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
