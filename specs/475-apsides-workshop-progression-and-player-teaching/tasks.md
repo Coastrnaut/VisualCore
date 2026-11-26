@@ -95,7 +95,7 @@ campaign covers the game).
 - [X] T-R02G1805-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-25: 2026-11-25 reference-1 exit 0
 - [X] T-R02G1805-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-25: 2026-11-25 reference-2 exit 0 (7 of 7 with chunk 1)
 - [X] T-R02G1805-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-25: 2026-11-25 script-tests exit 0, run alone
-- [ ] T-R02G1805-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1805-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-25: 2026-11-25 /speckit-converge converged (nothing appended); README row R02-G18-05 pass, 175 round-two features, gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
