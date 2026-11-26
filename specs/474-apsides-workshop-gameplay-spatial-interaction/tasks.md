@@ -103,7 +103,7 @@ of R02-G17-04's CHK013).
 - [X] T-R02G1804-006 Docs: `docs/architecture/apsides-workshop.md` (gestures and the tuning preview), — Verified 2026-11-25: 2026-11-25 docs/architecture/apsides-workshop.md (gameplay spatial interaction), round-two README, docs/automatedtesting.md; round02-host-1, -2, -3c, -3e, -3f exit 0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
-- [ ] T-R02G1804-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G1804-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G1804-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1804-009 Reference regression chunk 2 (`--name reference-2`)
