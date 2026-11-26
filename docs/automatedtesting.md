@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-25 (R02-G18-03: Apsides Workshop hero renderer).
+Last updated: 2026-11-25 (R02-G18-04: Apsides Workshop gestures).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Apsides Workshop gestures** (R02-G18-04, 2026-11-25). Host: `ApsidesWorkshopPickerTests` (seeded touches against
+  an independent pick order: orbiter +8, size handle and knob +12, loop band 10 points),
+  `ApsidesWorkshopGestureControllerTests` (6 tests: 500 seeded scripts of knob, size and crank drags, taps and orbits
+  at playing, won and failed plays, 3 view sizes and 3 orbits against an independent expectation; thresholds at their
+  edges; invalid orbits explained once per turn) and `ApsidesWorkshopPanelWinTests` (all 100 levels won through the
+  pending orbit, Set periapsis and Set size within each budget). Simulator: `ApsidesWorkshopGestureWiringTests` (11
+  tests through the presenter's pointer entry; the suite now runs 37). Lessons: the orbiter is drawn last and covers
+  the handle it sits on, so a knob gesture is tested with tick T/2 shown and a size gesture with tick 0; the wiring
+  review found the panel explaining an invalid Set result while the other Set button was enabled, so the reason now
+  describes only the pending orbit and each Set button is enabled on its own resulting orbit.
 - **Apsides Workshop hero renderer** (R02-G18-03, 2026-11-25). Host: shader sources (17), scene geometry (12), adapter
   and renderer purity (17) and scenarios (6, the 94-scenario manifest regenerated with `UPDATE_SCENARIO_MANIFEST=1`).
   Simulator (`--only-testing ApsidesWorkshopExperienceTests`, 26 tests): frames of levels 1, 21, 41, 61, 81 at three

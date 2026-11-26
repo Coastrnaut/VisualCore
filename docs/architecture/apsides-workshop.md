@@ -86,3 +86,23 @@ in deterministic integer fixed point and every rule is then decided exactly on i
   direction, size and shown tick and plays, undoes, redoes and moves to the next level. The candidate is registered in
   the one app (not available until X-R02-G18) with its scenario manifest (standard scenarios, fixtures and the 80
   acceptance rows R2-G18-QA-001 … 080).
+
+## Gameplay spatial interaction (feature 474, R02-G18-04)
+
+- **Picking.** At touch-down the parts are projected through the drawn camera and tried in order: the orbiter within
+  its projected disc grown by 8 points, then the size handle (the apoapsis square) and the periapsis knob (the
+  diamond) each grown by 12 points, then the orbit loop within a 10-point band; anything else is empty space.
+- **Gestures.** Dragging the knob (16 points or more, while playing) previews the periapsis under the finger: the
+  direction is the nearest 15° step of the finger's bearing from the star, and the eccentricity is the step that
+  puts the periapsis at the finger's distance (a finger on the star keeps the current direction). Dragging the size
+  handle previews the size that puts the apoapsis at the finger's distance. The preview is a dashed ghost loop with
+  its gauges, drawn only for a valid orbit; an invalid one says why ("The periapsis would dip into the star", "The
+  apoapsis would leave the sky"). Lifting sends one `orbit.periapsis [k, d]` or `orbit.size [a]` when the orbit is
+  valid and differs, otherwise nothing. Dragging the orbiter cranks the shown tick to the nearest projected position
+  (presentation only, in any stage). Two fingers orbit the view within yaw ±60° and pitch −20° … +35°; an empty
+  double tap or "Reset view" returns to the authored view. A finished play explains itself in words; second fingers
+  and cancels send no kernel action.
+- **Panel parity.** Eccentricity, direction and size − and + move a pending orbit, previewed like a drag, with no
+  action spent; "Set periapsis" and "Set size" commit it as one action each, only when valid and different. The
+  pending orbit follows the current orbit after every accepted action. A host test wins all 100 certified levels
+  through the panel within their budgets.

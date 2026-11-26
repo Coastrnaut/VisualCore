@@ -958,4 +958,6 @@ depth-search solver with its minimality proof, difficulty metrics and the witnes
 Feature 473 (R02-G18-03) adds the hero renderer and the experience target `ApsidesWorkshopExperience`: the scene
 snapshot, the compass geometry with its CPU reference, the GLSL compass and glow programs, three tiers, the adapter
 `ApsidesWorkshopExperienceCore`, the presenter, scene and minimal controls, the scenario manifest and the candidate
-registration in the one app.
+registration in the one app. Feature 474 (R02-G18-04) adds `ApsidesWorkshopPicker`, `ApsidesWorkshopGestureController`,
+`ApsidesWorkshopViewOrbit`, the periapsis-knob and size-handle drags with their ghost preview, the time crank and the
+panel's pending orbit with "Set periapsis" and "Set size".
