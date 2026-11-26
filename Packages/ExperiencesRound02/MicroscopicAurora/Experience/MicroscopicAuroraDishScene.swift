@@ -11,6 +11,14 @@
 // its triangles in painter's order. If a program fails, the scene falls back to the level-2 geometry drawn unlit with
 // the shared `MeshRenderer` (ambient 1, the geometry's fallback colours, the won look included) and keeps the reason;
 // nothing here can reach the kernel. A zero-sized drawable is cleared and nothing else is drawn.
+//
+// Feature 486 (R02-G19-06) T-R02G1906-005 (FR-R02G1906-004; clarification Q3): the presenter's eased lights
+// (`MicroscopicAuroraLights`) are drawn: the glow gain is multiplied by the glow level and `u_won` is the won level.
+// Nothing in the dish moves by time, so under Reduce Motion or Reduce Flashing the dish is still between actions. The
+// unlit fallback's geometry takes a won flag, not a level, so the fallback dish blends the colours of the not-won and
+// the won dish part by the won level (`blendedColours(off:on:level:)`; the two parts share their positions, the won
+// look changes colours only) and is rebuilt when that level moves by a tenth or more. Without lights the snapshot's
+// levels are drawn at once.
 #if os(iOS)
 import MicroscopicAuroraCore
 import Foundation
@@ -50,6 +58,8 @@ final class MicroscopicAuroraDishScene {
         let preview: MicroscopicAuroraPreview?
         /// Whether the freeze is on (feature 484; presentation only).
         let frozen: Bool
+        /// The won level in tenths, in the fallback only (feature 486): the fallback's colours depend on it.
+        let wonTenths: Int
     }
 
     private var registry: ResourceRegistry?
@@ -61,6 +71,11 @@ final class MicroscopicAuroraDishScene {
     /// The camera's orbit (feature 484; presentation only, the presenter's gesture controller's). A changed orbit
     /// rebuilds the meshes on the next draw.
     var orbit: MicroscopicAuroraViewOrbit = .authored
+    /// The eased light levels the presenter steps every frame (feature 486): the glow gain is multiplied by
+    /// `lights.glow`, `u_won` is `lights.won`, and the fallback dish's won colours are blended by `lights.won`
+    /// (rebuilt when it moves by a tenth or more). Nil draws the snapshot's levels at once (the renderer tests'
+    /// default).
+    var lights: MicroscopicAuroraLights?
 
     /// Records the registry and the view's aspect.
     func setup(_ context: RenderContext) {
@@ -116,10 +131,11 @@ final class MicroscopicAuroraDishScene {
             try drawFallback(camera)
             return
         }
-        let won: Float = snapshot.isWon ? 1 : 0
+        let won = Float(wonLevel(snapshot))
         try drawDish(camera, won: won)
         // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
-        let gain = MicroscopicAuroraShaders.glowGain(for: tier)
+        // Feature 486 eases the glow gain by the glow level.
+        let gain = MicroscopicAuroraShaders.glowGain(for: tier) * (lights?.glow ?? 1)
         guard gain > 0 else { return }
         try drawGlow(camera, gain: gain, won: won)
     }
@@ -128,7 +144,24 @@ final class MicroscopicAuroraDishScene {
     private func key(_ s: MicroscopicAuroraSceneSnapshot, tier: MicroscopicAuroraTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, wells: s.wells, shownTick: s.shownTick, stage: s.stage,
                     failure: s.failure, actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil,
-                    orbit: orbit, aspect: aspect, preview: s.preview, frozen: s.frozen)
+                    orbit: orbit, aspect: aspect, preview: s.preview, frozen: s.frozen,
+                    wonTenths: fallbackReason != nil ? Int((wonLevel(s) * 10).rounded(.down)) : 0)
+    }
+
+    /// The won level drawn (feature 486): the eased `lights.won`, or 1 on a won snapshot and 0 otherwise without
+    /// lights.
+    private func wonLevel(_ snapshot: MicroscopicAuroraSceneSnapshot) -> Double {
+        lights?.won ?? (snapshot.isWon ? 1 : 0)
+    }
+
+    /// The colours of the fallback dish at won level `level` (feature 486): each colour of `off` (the not-won part)
+    /// moved toward the same vertex's colour of `on` (the won part) by `level`, clamped to 0 … 1 (a non-finite level
+    /// reads 0). Parts of different sizes cannot be blended vertex by vertex: then `on`'s colours from a level of 0.5
+    /// up, `off`'s below. Pure.
+    static func blendedColours(off: [Vec4], on: [Vec4], level: Double) -> [Vec4] {
+        let t: Double = level.isFinite ? min(max(level, 0), 1) : 0
+        guard off.count == on.count else { return t >= 0.5 ? on : off }
+        return zip(off, on).map { a, b in a + (b - a) * t }
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier` facing `camera`: the two programs, or the unlit fallback.
@@ -162,9 +195,16 @@ final class MicroscopicAuroraDishScene {
         // included; level-2 has no glow).
         let minimal = MicroscopicAuroraTier.of(MicroscopicAuroraTier.all.count - 1)
         let up = Vec3(0, 0, 1)
-        let parts: [MicroscopicAuroraColouredMesh] = [
-            try MicroscopicAuroraSceneGeometry.dishPart(snapshot, tier: minimal, camera: camera),
-            try MicroscopicAuroraSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
+        // Feature 486: the dish's won colours blended by the won level (the won look changes colours, not positions).
+        let off = try MicroscopicAuroraSceneGeometry.dishPart(snapshot, tier: minimal, wonLevel: false, camera: camera)
+        let on = try MicroscopicAuroraSceneGeometry.dishPart(snapshot, tier: minimal, wonLevel: true, camera: camera)
+        let level: Double = wonLevel(snapshot)
+        // Parts of different sizes switch whole at a level of 0.5 (see `blendedColours(off:on:level:)`).
+        let dishMesh: Mesh = off.colours.count == on.colours.count || level < 0.5 ? off.mesh : on.mesh
+        let glow = try MicroscopicAuroraSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera)
+        let parts: [(mesh: Mesh, colours: [Vec4])] = [
+            (dishMesh, Self.blendedColours(off: off.colours, on: on.colours, level: level)),
+            (glow.mesh, glow.colours),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

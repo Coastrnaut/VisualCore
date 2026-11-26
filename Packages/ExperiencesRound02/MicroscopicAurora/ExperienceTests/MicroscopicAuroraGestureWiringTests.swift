@@ -18,8 +18,9 @@
 //   e. a tap on the field toggles the freeze (drawn), and `toggleFreeze()` likewise; nothing sent (FR-R02G1904-005);
 //   f. a two-finger orbit changes the orbit and never the digest; `resetView()` and a double tap on empty space return
 //      to the authored orbit with no kernel action (FR-R02G1904-007);
-//   g. a refused change (a site tap with no action left) is sent, refused, shown in the mirror message and logged
-//      with its bare code (FR-R02G1904-008);
+//   g. a refused change (a site tap with no action left) is sent, refused, shown in the mirror message (since feature
+//      486 exactly the feedback plan's sentence, "No actions are left: undo or retry.") and logged with its bare code
+//      (FR-R02G1904-008);
 //   h. a well drag on a won play sends nothing and says "The play is over: undo or go to the next level"
 //      (FR-R02G1904-008);
 //   i. a tap on a well selects its slot and explains the drag; a site tap with every slot used explains and sends
@@ -40,8 +41,10 @@
 //     frame is drawn;
 //   - the gesture controller takes its strength and sense from the panel: `mirror.strength` and
 //     `mirror.counterclockwise`; a tapped well sets `mirror.slot`;
-//   - `MicroscopicAuroraMirror.message` holds the explain texts verbatim and a refusal as a line containing
-//     `MicroscopicAuroraMirror.refusalText(code:)`; `refusalText(code:)` reads codes with or without `action.rule.`;
+//   - `MicroscopicAuroraMirror.message` holds the explain texts verbatim and a refusal as exactly
+//     `MicroscopicAuroraFeedbackPlan.refusalText(code:)` (since feature 486;
+//     `MicroscopicAuroraMirror.refusalText(code:)` forwards to it); `refusalText(code:)` reads codes with or without
+//     `action.rule.`;
 //   - the explain texts: a well tap "Drag a well to move it, or off the dish to remove it"; all slots used "Every well
 //     slot is used: drag a well or remove one"; a finished play "The play is over: undo or go to the next level".
 // Core API used from the contract (contracts/api.md): `MicroscopicAuroraViewOrbit` (`authored`, `clamped()`),
@@ -832,7 +835,9 @@ enum MicroscopicAuroraGestureScript {
         #expect(sentAfter.accepted == sentBefore.accepted, "nothing was accepted")
         #expect(sentAfter.rejected == sentBefore.rejected + 1, "the well.place was sent and refused")
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
-        #expect(message.contains(Mirror.refusalText(code: Script.budgetCode)), "\(message)")
+        #expect(message == MicroscopicAuroraFeedbackPlan.refusalText(code: Script.budgetCode), "\(message)")
+        #expect(message == "No actions are left: undo or retry.", "\(message)")
+        #expect(message == Mirror.refusalText(code: Script.budgetCode), "\(message)")
         #expect(Mirror.refusalText(code: Script.rulePrefix + Script.budgetCode)
                     == Mirror.refusalText(code: Script.budgetCode), "codes are read with or without the prefix")
         #expect(shell.presenter.refusalLog.last == Script.budgetCode, "the bare code is logged")

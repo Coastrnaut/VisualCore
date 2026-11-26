@@ -20,6 +20,17 @@
 // presenter) and "Practice" (`mode.practice`), and a picker of the open levels (1 … the frontier, with their bands and
 // stars) with "Play level" (`level.select [n]`). All wrapping text in the panel, never over the dish; refusals read in
 // words. The existing rows are unchanged.
+//
+// Feature 486 (R02-G19-06) T-R02G1906-005 (FR-R02G1906-001, 005, 006; clarification Q5): the summary element ("Dish",
+// identifier `summary`), the adjustable slot, site and strength (`accessibilityAdjustableAction`: increment and
+// decrement move the selection like the − and + buttons, through the presenter, which plays the selected well's
+// audition when the sound is on; their values are "well n", "site at row r, column c" and "strength s") and the sense
+// toggle ("clockwise" or "counterclockwise"), a value in words on every control (Place the selected well, Remove the
+// slot's well, Play the progress, Undo and Redo the actions made, Next level the next open level, Play level the picked
+// level, Freeze "frozen" or "not frozen", Reset view "authored" or "orbited", Dismiss the instruction, Campaign / Daily
+// / Practice "selected" or "not selected", Hint the level shown, Sound "on" or "off"), refusals in the feedback plan's
+// words, the Sound toggle (off by default, identifier `sound`), rows that become columns at accessibility text sizes,
+// wrapping text and a 520-point readable width (iPad).
 #if os(iOS)
 import MicroscopicAuroraCore
 import SwiftUI
@@ -39,6 +50,13 @@ struct MicroscopicAuroraControls: View {
     let freeze: () -> Void
     /// Returns the camera to the authored view (feature 484).
     let resetView: () -> Void
+    /// The text size: rows become columns at accessibility sizes (feature 486).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the sound plays only while it is (feature 486).
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 486).
+    static let readableWidth: CGFloat = 520
 
     /// The panel.
     var body: some View {
@@ -54,9 +72,59 @@ struct MicroscopicAuroraControls: View {
                 playRow
                 viewRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter?.controlsAppeared() }
+        .onDisappear { presenter?.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter?.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 486).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 486; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter?.setSound(on: $0) }))
+            .disabled(presenter == nil)
+            .accessibilityLabel("Sound of the dish")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
+    }
+
+    /// The actions made of the budget, in words (feature 486): the value of Undo and Redo.
+    private var actionsMade: String {
+        let made: Int = max(mirror.budget - mirror.actionsLeft, 0)
+        return made == 1 ? "1 action made" : "\(made) actions made"
+    }
+
+    /// Changes the panel's selection through the presenter (which plays the audition when the sound is on), or
+    /// directly without one (feature 486).
+    private func select(_ change: @escaping (MicroscopicAuroraMirror) -> Void) {
+        if let presenter { presenter.changeSelection(change) } else { change(mirror) }
+    }
+
+    /// An adjustable selection value's action (feature 486): increment and decrement move the slot, the site or the
+    /// strength like the + and − buttons (presentation only; Place spends the action).
+    private func adjust(_ adjustment: AccessibilityAdjustmentDirection, slot: Bool = false, site: Bool = false,
+                        strength: Bool = false) {
+        let step: Int
+        switch adjustment {
+        case .increment: step = 1
+        case .decrement: step = -1
+        @unknown default: return
+        }
+        if slot { select { mirror in mirror.slot = ((mirror.slot + step) % 3 + 3) % 3 } }
+        if site { moveSite(step) }
+        if strength { select { mirror in mirror.strength = min(4, max(1, mirror.strength + step)) } }
     }
 
     /// The level, actions, status, tutorial, failure and refusal lines.
@@ -72,7 +140,13 @@ struct MicroscopicAuroraControls: View {
         }
         Text(mirror.measureLabel).font(.footnote)
             .accessibilityIdentifier(port.identifier("progress"))
-        Text(mirror.targetLabel).font(.footnote)
+        Text(mirror.summary).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Dish")
+            .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
             Text(message).font(.footnote)
                 .accessibilityIdentifier(port.identifier("message"))
@@ -81,14 +155,17 @@ struct MicroscopicAuroraControls: View {
 
     /// Choose the well slot the panel edits.
     @ViewBuilder private var slotRow: some View {
-        HStack(spacing: 16) {
-            Button("Well −") { mirror.slot = (mirror.slot + 2) % 3 }
+        row {
+            Button("Well −") { select { mirror in mirror.slot = (mirror.slot + 2) % 3 } }
                 .accessibilityLabel("Edit the previous well")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("slot-minus"))
             Text("well \(mirror.slot + 1)")
+                .accessibilityLabel("Well slot")
+                .accessibilityValue("well \(mirror.slot + 1)")
+                .accessibilityAdjustableAction { direction in adjust(direction, slot: true) }
                 .accessibilityIdentifier(port.identifier("slot"))
-            Button("Well +") { mirror.slot = (mirror.slot + 1) % 3 }
+            Button("Well +") { select { mirror in mirror.slot = (mirror.slot + 1) % 3 } }
                 .accessibilityLabel("Edit the next well")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("slot-plus"))
@@ -99,12 +176,16 @@ struct MicroscopicAuroraControls: View {
 
     /// Choose the site the well would stand on.
     @ViewBuilder private var siteRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Site −") { moveSite(-1) }
                 .accessibilityLabel("Choose the previous site")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("site-minus"))
             Text(mirror.selectedSite.map { MicroscopicAuroraLevel.cellWords($0) } ?? "no site")
+                .accessibilityLabel("Site")
+                .accessibilityValue(mirror.selectedSite.map { "site at " + MicroscopicAuroraLevel.cellWords($0) }
+                                    ?? "no site")
+                .accessibilityAdjustableAction { direction in adjust(direction, site: true) }
                 .accessibilityIdentifier(port.identifier("site"))
             Button("Site +") { moveSite(1) }
                 .accessibilityLabel("Choose the next site")
@@ -115,29 +196,32 @@ struct MicroscopicAuroraControls: View {
 
     /// Choose the strength and the turning sense.
     @ViewBuilder private var strengthRow: some View {
-        HStack(spacing: 16) {
-            Button("Strength −") { mirror.strength = max(1, mirror.strength - 1) }
+        row {
+            Button("Strength −") { select { mirror in mirror.strength = max(1, mirror.strength - 1) } }
                 .accessibilityLabel("Weaken the well")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("strength-minus"))
             Text("strength \(mirror.strength)")
+                .accessibilityLabel("Strength")
+                .accessibilityValue("strength \(mirror.strength)")
+                .accessibilityAdjustableAction { direction in adjust(direction, strength: true) }
                 .accessibilityIdentifier(port.identifier("strength"))
-            Button("Strength +") { mirror.strength = min(4, mirror.strength + 1) }
+            Button("Strength +") { select { mirror in mirror.strength = min(4, mirror.strength + 1) } }
                 .accessibilityLabel("Strengthen the well")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("strength-plus"))
             Button(mirror.counterclockwise ? "Counterclockwise" : "Clockwise") {
-                mirror.counterclockwise.toggle()
+                select { mirror in mirror.counterclockwise.toggle() }
             }
             .accessibilityLabel("Switch the turning sense")
-            .accessibilityValue(mirror.selectionLabel)
+            .accessibilityValue(mirror.counterclockwise ? "counterclockwise" : "clockwise")
             .accessibilityIdentifier(port.identifier("sense"))
         }
     }
 
     /// Place the selected well, or remove the slot's well.
     @ViewBuilder private var placeRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Place") { place() }
                 .accessibilityLabel("Place the well")
                 .accessibilityValue(mirror.selectionLabel)
@@ -153,7 +237,7 @@ struct MicroscopicAuroraControls: View {
 
     /// Show an earlier or later tick of the swim, and play it.
     @ViewBuilder private var tickRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Tick −") { show(tick: mirror.shownTick - 1) }
                 .accessibilityLabel("Show the swim one tick earlier")
                 .accessibilityValue(mirror.tickLabel)
@@ -175,15 +259,19 @@ struct MicroscopicAuroraControls: View {
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last placement, removal or play")
+                .accessibilityValue(actionsMade)
                 .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the placement, removal or play")
+                .accessibilityValue(actionsMade)
                 .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue(mirror.levelNumber < mirror.frontier ? "level \(mirror.levelNumber + 1)"
+                                    : "no further level open")
                 .accessibilityIdentifier(port.identifier("next-level"))
         }
     }
@@ -196,6 +284,7 @@ struct MicroscopicAuroraControls: View {
                 .accessibilityIdentifier(port.identifier("tutorial"))
             Button("Dismiss tutorial") { dismissTutorial() }
                 .accessibilityLabel("Dismiss the tutorial")
+                .accessibilityValue(tutorial)
                 .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
         }
         Button("Hint") { presenter?.showHint() }
@@ -211,7 +300,7 @@ struct MicroscopicAuroraControls: View {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("failure"))
         }
-        HStack(spacing: 12) {
+        row {
             Text(mirror.bandLabel).font(.footnote)
                 .accessibilityIdentifier(port.identifier("band"))
             Text(mirror.starsLabel).font(.footnote)
@@ -223,7 +312,7 @@ struct MicroscopicAuroraControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 485).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { campaign() }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(modeValue("campaign"))
@@ -237,7 +326,7 @@ struct MicroscopicAuroraControls: View {
                 .accessibilityValue(modeValue("practice"))
                 .accessibilityIdentifier(port.identifier("practice"))
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(mirror.levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -287,27 +376,30 @@ struct MicroscopicAuroraControls: View {
 
     /// Freeze the field and reset the view (feature 484; presentation only).
     @ViewBuilder private var viewRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button(mirror.frozen ? "Unfreeze" : "Freeze") { freeze() }
                 .accessibilityLabel(mirror.frozen ? "Unfreeze the swim" : "Freeze the swim")
                 .accessibilityValue(mirror.frozen ? "frozen" : "not frozen")
                 .accessibilityIdentifier(port.identifier("freeze"))
             Button("Reset view") { resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue((presenter?.gestures.orbit ?? .authored) == .authored ? "authored" : "orbited")
                 .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 
     /// Moves the site selection by `step`, wrapping over the level's sites.
     private func moveSite(_ step: Int) {
-        let count: Int = max(1, mirror.sites.count)
-        mirror.siteIndex = ((mirror.siteIndex + step) % count + count) % count
+        select { mirror in
+            let count: Int = max(1, mirror.sites.count)
+            mirror.siteIndex = ((mirror.siteIndex + step) % count + count) % count
+        }
     }
 
     /// Sends the selected well's placement.
     private func place() {
         guard let site = mirror.selectedSite else {
-            mirror.message = "That change was refused: this level has no sites."
+            mirror.message = MicroscopicAuroraFeedbackPlan.refusalText(code: "r02-g19.action")
             return
         }
         send("well.place", [Double(mirror.slot), Double(site.row), Double(site.column), Double(mirror.strength),

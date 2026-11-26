@@ -29,10 +29,28 @@
 // level is asked for with today's local calendar date read here (`playDaily(port:date:)`); the core never reads a
 // clock. A refused `level.select` or `level.next` (`r02-g19.locked`) and an impossible date (`r02-g19.date`) read in
 // words.
+//
+// Feature 486 (R02-G19-06) T-R02G1906-005 (FR-R02G1906-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `MicroscopicAuroraFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route
+// (`feedback`, injectable; the shared `ExperienceFeedback` by default) once for every new core it takes in, from the
+// frame or the description, and keeps a feedback log (`feedbackLog`); refusals are shown and announced in words
+// (`refused(code:)`; the panel shows exactly the plan's text), and a revealed hint is announced as `state`. Changing the
+// panel's selection, drag previews, the shown tick, the freeze, the view, dismissing the tutorial and the Sound toggle
+// are not announced (the controls speak their own values). The scene's lights (`MicroscopicAuroraLights`: the glow and
+// the won look) step toward the drawn snapshot every frame by the frame clock's elapsed time (0.15 s fades, 0.45 s
+// under Reduce Flashing; the first frame settles them). The ambient loop (`MicroscopicAuroraSound`) is offered the
+// recipe of the actions left, the quarters of the needed stencil cells lit and the stage when the first core is taken
+// in, when a level or mode opens and when that recipe changes; a change of the panel's selection
+// (`changeSelection(_:)`: slot, site, strength and sense, from the buttons and the adjustable values) plays the
+// selected well's audition (`MicroscopicAuroraAudition.of(_:placeable:)`) when the sound is on, on screen and active;
+// drag previews play none. The mirror carries the summary element's text
+// (`MicroscopicAuroraFeedbackPlan.summaryText(core:selected:slot:)`) and the sound choice (off by default).
+// Presentation only.
 #if os(iOS)
 import Foundation
 import MicroscopicAuroraCore
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -197,9 +215,10 @@ final class MicroscopicAuroraMirror {
         code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
     }
 
-    /// The panel line of a refusal: "That change was refused: " and the reason in words.
+    /// The panel line of a refusal: since feature 486 exactly the feedback plan's sentence
+    /// (`MicroscopicAuroraFeedbackPlan.refusalText(code:)`, clarification Q1), the words that are announced.
     static func refusalMessage(code: String) -> String {
-        "That change was refused: \(refusalText(code: code))."
+        MicroscopicAuroraFeedbackPlan.refusalText(code: code)
     }
 
     /// Records the result of sending a control (feature 484): a refusal is shown in words; an accepted action clears
@@ -208,20 +227,40 @@ final class MicroscopicAuroraMirror {
         message = accepted ? nil : Self.refusalMessage(code: code)
     }
 
-    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``.
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``. Since feature 486
+    /// it forwards to `MicroscopicAuroraFeedbackPlan.refusalText(code:)` (clarification Q1's sentences, e.g. "That level
+    /// is not open yet.").
     static func refusalText(code: String) -> String {
-        switch bareCode(code) {
-        case "r02-g19.stage": "the play is over: undo a failed play or go to the next level"
-        case "r02-g19.action": "that well cannot be placed there, or there is nothing to undo, redo or remove"
-        case "r02-g19.budget": "no actions are left: play the swim or undo a placement"
-        case "r02-g19.stale": "the play changed before the action arrived"
-        case "r02-g19.level": "the next level could not be made"
-        case MicroscopicAuroraExperienceRule.locked: "that level is locked: win the level before it to open it"
-        case MicroscopicAuroraExperienceRule.date: "that is not a calendar date"
-        case MicroscopicAuroraExperienceRule.notWhole: "the slot, cell, strength, sense and tick must be whole numbers"
-        case MicroscopicAuroraExperienceRule.tick: "that tick is past the end of the swim"
-        default: "that action is not available now"
+        MicroscopicAuroraFeedbackPlan.refusalText(code: code)
+    }
+
+    /// The latest core taken in, for the summary element (feature 486); nil before the first.
+    var summaryCore: MicroscopicAuroraExperienceCore?
+    /// Whether the sound is on (feature 486; off by default; presentation only).
+    var soundOn = false
+
+    /// The panel's selected well: the selected site with the selected strength and sense; nil without sites
+    /// (feature 486).
+    var selectedWell: MicroscopicAuroraWell? {
+        guard let site = selectedSite else { return nil }
+        return MicroscopicAuroraWell(cell: site, strength: strength,
+                                     sense: counterclockwise ? .counterclockwise : .clockwise)
+    }
+
+    /// Whether the selected well can be placed: a site no other slot's well holds (feature 486).
+    var selectedPlaceable: Bool {
+        guard let well = selectedWell, let play else { return false }
+        for (index, other) in play.wells.enumerated() where index != slot {
+            if other?.cell == well.cell { return false }
         }
+        return true
+    }
+
+    /// The summary element's text (feature 486): `MicroscopicAuroraFeedbackPlan.summaryText(core:selected:slot:)` of the
+    /// latest core and the panel's selection.
+    var summary: String {
+        guard let core = summaryCore else { return "" }
+        return MicroscopicAuroraFeedbackPlan.summaryText(core: core, selected: selectedWell, slot: slot)
     }
 }
 
@@ -264,6 +303,16 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The feedback route of announcements and haptics (feature 486; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 486; tests and diagnostics).
+    private(set) var feedbackLog: [MicroscopicAuroraFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 486).
+    private(set) var lights: MicroscopicAuroraLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the selected well's audition (feature 486).
+    let sound: MicroscopicAuroraSound
     /// The latest core seen (feature 485): hints, the daily date and the progress lines read it.
     private(set) var latestCore: MicroscopicAuroraExperienceCore?
     /// The play the shown hint belongs to; nil while no hint is shown (feature 485).
@@ -286,6 +335,9 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
         self.reduceMotion = reduceMotion
         self.reduceFlashing = reduceFlashing
         scene.reducedFlash = reduceFlashing
+        lights = MicroscopicAuroraLights(reducedFlash: reduceFlashing)
+        sound = MicroscopicAuroraSound(recipe: MicroscopicAuroraSoundRecipe.recipe(rootStep: 0, quarters: 0,
+                                                                                  stage: .loading))
     }
 
     /// The tests' seam: before `setup`, replaces the dish program's fragment source with one that does not compile.
@@ -328,13 +380,25 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
             tierLog.append(MicroscopicAuroraTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
-        if latestCore != core { absorbProgress(core) }
+        if latestCore != core {
+            absorbFeedback(core)
+            absorbProgress(core)
+        }
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         let base: MicroscopicAuroraSceneSnapshot = core.snapshot(time: time)
         lastBase = (snapshot: base, level: core.play.level)
         let snapshot = presented(base, level: core.play.level)
         lastSnapshot = snapshot
         scene.orbit = gestures.orbit
+        // The lights settle on the very first frame only; every later change, a level change included, fades, stepped
+        // by the frame clock (feature 486).
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
 
@@ -363,7 +427,9 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbFeedback(core)
         absorbProgress(core)
+        mirror.summaryCore = core
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -517,6 +583,7 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
         let result = port.send(control, values)
         mirror.record(accepted: result.isAccepted, code: result.code)
         if !result.isAccepted {
+            route(MicroscopicAuroraFeedbackPlan.refused(code: result.code))   // feature 486: announced and felt
             refusalLog.append(MicroscopicAuroraMirror.bareCode(result.code))
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
@@ -617,13 +684,18 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
     /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
     private func reveal(_ texts: [String]?, level: Int, play: MicroscopicAuroraPlay) {
         hintPlay = play
-        guard let texts, texts.indices.contains(level - 1) else {
+        let before: (Int, String?) = (mirror.hintLevel, mirror.hintText)
+        if let texts, texts.indices.contains(level - 1) {
+            mirror.hintLevel = level
+            mirror.hintText = texts[level - 1]
+        } else {
             mirror.hintLevel = 0
             mirror.hintText = Self.noHintText
-            return
         }
-        mirror.hintLevel = level
-        mirror.hintText = texts[level - 1]
+        // Feature 486: a newly shown hint (or the no-hint line) is announced as `state`.
+        if let text = mirror.hintText, before.0 != mirror.hintLevel || before.1 != text {
+            route(MicroscopicAuroraFeedbackPlan.hint(text: text))
+        }
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -667,5 +739,63 @@ final class MicroscopicAuroraPresenter: ExperiencePresenter {
     static func dateValues(_ date: DateComponents) -> [Double] {
         [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
+
+    // MARK: Feedback and sound (feature 486, R02-G19-06)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: MicroscopicAuroraFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// Takes a new core into the feedback and the sound, once per core (from the frame or the description): routes the
+    /// plan of the change from the latest core and offers the ambient recipe when a level or mode opened or the recipe
+    /// changed. The first core only offers its recipe, so the sound never holds a placeholder.
+    private func absorbFeedback(_ core: MicroscopicAuroraExperienceCore) {
+        guard let previous = latestCore else {
+            sound.offer(Self.recipe(core))
+            return
+        }
+        route(MicroscopicAuroraFeedbackPlan.after(old: previous, new: core))
+        let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+        if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+    }
+
+    /// The ambient recipe of `core`: its actions left, the quarters of the needed cells lit and its stage.
+    static func recipe(_ core: MicroscopicAuroraExperienceCore) -> AmbientLoopRecipe {
+        MicroscopicAuroraSoundRecipe.recipe(play: core.play)
+    }
+
+    /// Changes the panel's selection (slot, site, strength or sense; presentation only; the buttons and the adjustable
+    /// values); when the selection changed (clarification Q4: once per change of slot, site, strength or sense) and the
+    /// sound is on, plays the selected well's audition (feature 486).
+    func changeSelection(_ change: (MicroscopicAuroraMirror) -> Void) {
+        let before: [Int] = [mirror.slot, mirror.siteIndex, mirror.strength, mirror.counterclockwise ? 1 : 0]
+        change(mirror)
+        let after: [Int] = [mirror.slot, mirror.siteIndex, mirror.strength, mirror.counterclockwise ? 1 : 0]
+        guard mirror.soundOn, after != before else { return }
+        let well: MicroscopicAuroraWell = mirror.selectedWell ?? MicroscopicAuroraWell(
+            cell: MicroscopicAuroraCell(row: 0, column: 0), strength: mirror.strength,
+            sense: mirror.counterclockwise ? .counterclockwise : .clockwise)
+        sound.audition(MicroscopicAuroraAudition.of(well, placeable: mirror.selectedPlaceable))
+    }
+
+    /// Turns the sound on or off; turning it on plays the recipe of the current play.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 }
 #endif

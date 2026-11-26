@@ -50,7 +50,7 @@ the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Microscopic Auror
 
 ## Phase 3: Wiring — presenter, scene, sound and panel
 
-- [ ] T-R02G1906-005 [US1] [US2] [US3] Create
+- [X] T-R02G1906-005 [US1] [US2] [US3] Create — Verified 2026-11-26: sound player (ambient loop and audition, wanted x on screen x active), presenter feedback route with log, lights by the frame clock, selection auditions, refusal words from the feedback plan; scene eased glow, u_won and fallback colour blend; panel labels and values, adjustable slot, site and strength, summary, Sound toggle, Dynamic Type rows, 520-point width; MicroscopicAuroraAccessibilityTests (12) and refusal sentences in the teaching and wiring tests; won render test settles the fade; sim-27 exit 0 (58 tests)
   `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraSound.swift` (the ambient loop over
   `AmbientLoopPlayer` and the audition, playing exactly while wanted, on screen and active); edit
   `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraPresenter.swift` (feedback through
