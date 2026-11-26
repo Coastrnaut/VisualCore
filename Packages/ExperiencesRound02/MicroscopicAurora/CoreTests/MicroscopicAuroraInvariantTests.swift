@@ -11,7 +11,7 @@
 //   kernel sources hold no clock, time interval or floating-point value.
 // - INV-02 Input budget: a placement or removal spends exactly 1 action, the play none; the action that spends the
 //   last one is accepted and the next refused `budget` while the play is still accepted; action before budget; stale
-//   before action; refusals change nothing; budgets 0 and 13 are refused, b − 1, b and b + 1 give exactly that many.
+//   before action; refusals change nothing; budgets 0 and 25 are refused, b − 1, b and b + 1 give exactly that many.
 // - INV-03 Goal: a swim wins exactly when no swimmer leaves, the swarm stays coherent, the coverage reaches the
 //   requirement and the lit stencil is one group (judged by an independent judge); a requirement one cell above the
 //   lit count fails `coverage`; a stencil cut in two fails `connectedness`; the known fixture actions win.
@@ -475,8 +475,8 @@ import VisualCoreSimulation
         #expect(play == spent && play.records.count == spent.records.count)
         try play.apply(.play, expecting: play.fingerprint)
         #expect(play.actionsSpent == 2 && (play.stage == .won || play.stage == .failed))
-        // Budgets outside 1 … 12 are refused.
-        for budget in [0, 13] {
+        // Budgets outside 1 … 24 are refused (1 … 12 until feature 482 widened the range).
+        for budget in [0, 25] {
             #expect(Inv.refusal { () throws(Refusal) in _ = try Inv.hand(budget: budget) } == .level("budget"))
         }
 

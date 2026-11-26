@@ -41,7 +41,7 @@ public struct MicroscopicAuroraPuzzle: PuzzleRules {
 
     /// The level whose enclosure, swarm, stencil, targets and budget decide the results.
     public let level: MicroscopicAuroraLevel
-    /// The usable cells of the level's enclosure, row-major.
+    /// The cells a well may stand on, row-major: the usable cells, or the level's sites (feature 482).
     let usableCells: [MicroscopicAuroraCell]
 
     /// The rules of `level`.
@@ -51,7 +51,7 @@ public struct MicroscopicAuroraPuzzle: PuzzleRules {
         for row in 0..<MicroscopicAuroraDish.cells {
             for column in 0..<MicroscopicAuroraDish.cells {
                 let cell: MicroscopicAuroraCell = MicroscopicAuroraCell(row: row, column: column)
-                if MicroscopicAuroraLevel.isUsable(cell, radius: level.radius) { cells.append(cell) }
+                if level.allows(cell) { cells.append(cell) }
             }
         }
         self.usableCells = cells
@@ -119,7 +119,7 @@ public struct MicroscopicAuroraPuzzle: PuzzleRules {
             return nil
         case .place(let slot, let well):
             guard slots.contains(slot), MicroscopicAuroraWell.strengths.contains(well.strength),
-                  MicroscopicAuroraLevel.isUsable(well.cell, radius: level.radius),
+                  level.allows(well.cell),
                   !isOccupied(well.cell, otherThan: slot, in: wells), wells[slot] != well else { return nil }
             wells[slot] = well
         case .remove(let slot):

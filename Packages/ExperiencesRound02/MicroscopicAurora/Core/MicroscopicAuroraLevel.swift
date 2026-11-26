@@ -7,6 +7,9 @@
 // action budget 1 … 12; a difficulty 1 … 5 and whether a tutorial precedes play. Its fingerprint is the SHA-256 hex of
 // its canonical JSON (schema 1, sorted keys, fingerprint excluded); the stored form is re-checked on decode. Wells,
 // coverage and progress are named in words (FR-R02G1901-013). Modelled on `ApsidesWorkshopLevel` (feature 471).
+// Feature 482 (R02-G19-02) T-R02G1902-002 (clarification Q1): the budget range widens to 1 … 24 and a level may list
+// 2 … 8 well sites; with sites every well, starting or placed, must lie on one. A level without sites omits the field,
+// so its stored form and fingerprint are those of feature 481.
 import Foundation
 import VisualCoreMath
 
@@ -30,8 +33,10 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
     public static let coverages: ClosedRange<Int> = 500...1000
     /// The number of well slots.
     public static let slots: Int = 3
-    /// The action budgets.
-    public static let budgets: ClosedRange<Int> = 1...12
+    /// The action budgets (1 … 12 in feature 481; widened by feature 482 for the manifest's budgets 8 … 19).
+    public static let budgets: ClosedRange<Int> = 1...24
+    /// The number of well sites a level may list (feature 482).
+    public static let siteCounts: ClosedRange<Int> = 2...8
 
     /// The level's id, a lowercase slug.
     public let id: String
@@ -59,6 +64,8 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
     public let wells: [MicroscopicAuroraWell?]
     /// The action budget.
     public let budget: Int
+    /// The well sites, row-major, or nil when wells may be placed on any usable cell (feature 482).
+    public let sites: [MicroscopicAuroraCell]?
     /// Whether a tutorial precedes play.
     public let tutorial: Bool
     /// The SHA-256 hex of the canonical JSON content.
@@ -70,10 +77,12 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
     public init(id: String, seed: UInt64, difficulty: Int, radius: Int, length: Int,
                 rules: MicroscopicAuroraSwarmRules, swimmers: [MicroscopicAuroraSwimmer],
                 stencil: [MicroscopicAuroraCell], threshold: Int, coverage: Int, coherence: Int,
-                wells: [MicroscopicAuroraWell?], budget: Int, tutorial: Bool = false) throws(MicroscopicAuroraError) {
+                wells: [MicroscopicAuroraWell?], budget: Int, tutorial: Bool = false,
+                sites: [MicroscopicAuroraCell]? = nil) throws(MicroscopicAuroraError) {
         try self.init(id: id, seed: seed, difficulty: difficulty, radius: radius, length: length, rules: rules,
                       swimmers: swimmers, stencil: stencil, threshold: threshold, coverage: coverage,
-                      coherence: coherence, wells: wells, budget: budget, tutorial: tutorial, refusingAWin: true)
+                      coherence: coherence, wells: wells, budget: budget, tutorial: tutorial, sites: sites,
+                      refusingAWin: true)
     }
 
     /// A level of the given values, checked; the "already won" rule only when `refusingAWin` (a probe that only reads
@@ -81,7 +90,7 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
     init(id: String, seed: UInt64, difficulty: Int, radius: Int, length: Int, rules: MicroscopicAuroraSwarmRules,
          swimmers: [MicroscopicAuroraSwimmer], stencil: [MicroscopicAuroraCell], threshold: Int, coverage: Int,
          coherence: Int, wells: [MicroscopicAuroraWell?], budget: Int, tutorial: Bool,
-         refusingAWin: Bool) throws(MicroscopicAuroraError) {
+         sites: [MicroscopicAuroraCell]? = nil, refusingAWin: Bool) throws(MicroscopicAuroraError) {
         guard Self.isSlug(id) else { throw .level("id") }
         guard Self.difficulties.contains(difficulty) else { throw .level("difficulty") }
         guard Self.radii.contains(radius) else { throw .level("radius") }
@@ -112,6 +121,16 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
         }
         guard Set(placed.map(\.cell)).count == placed.count else { throw .level("wells share a cell") }
         guard Self.budgets.contains(budget) else { throw .level("budget") }
+        var sortedSites: [MicroscopicAuroraCell]?
+        if let sites {
+            guard Self.siteCounts.contains(sites.count) else { throw .level("sites") }
+            guard Set(sites).count == sites.count else { throw .level("sites duplicate") }
+            for site in sites {
+                guard Self.isUsable(site, radius: radius) else { throw .level("site outside") }
+            }
+            for well in placed where !sites.contains(well.cell) { throw .level("well not on a site") }
+            sortedSites = sites.sorted()
+        }
         guard MicroscopicAuroraDish.coherence(swimmers, radius: rules.coherenceRadius) >= coherence else {
             throw .level("start incoherent")
         }
@@ -119,7 +138,7 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
         let content = Content(schema: Self.schema, id: id, seed: seed, difficulty: difficulty, radius: radius,
                               length: length, rules: rules, swimmers: swimmers, stencil: sorted,
                               threshold: threshold, coverage: coverage, coherence: coherence, wells: wells,
-                              budget: budget, tutorial: tutorial)
+                              budget: budget, tutorial: tutorial, sites: sortedSites)
         guard let data = try? Self.encoder.encode(content) else { throw .malformed("encode") }
         self.id = id
         self.seed = seed
@@ -135,6 +154,7 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
         self.wells = wells
         self.budget = budget
         self.tutorial = tutorial
+        self.sites = sortedSites
         self.fingerprint = StableHash.sha256Hex(Array(data))
         if refusingAWin {
             guard !MicroscopicAuroraDish.report(self, wells: placed).wins else { throw .level("already won") }
@@ -158,6 +178,13 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
         let range: Range<Int> = 0..<MicroscopicAuroraDish.cells
         return range.contains(cell.row) && range.contains(cell.column)
             && MicroscopicAuroraDish.isInside(cell.centre, radius: radius)
+    }
+
+    /// Whether a well may stand on `cell`: a usable cell, and one of the sites when the level lists sites.
+    public func allows(_ cell: MicroscopicAuroraCell) -> Bool {
+        guard Self.isUsable(cell, radius: radius) else { return false }
+        guard let sites else { return true }
+        return sites.contains(cell)
     }
 
     /// The placed starting wells, in slot order.
@@ -283,11 +310,13 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
         let wells: [MicroscopicAuroraWell?]
         let budget: Int
         let tutorial: Bool
+        /// Omitted from the JSON when nil (synthesized `encodeIfPresent`), so a level without sites keeps its form.
+        let sites: [MicroscopicAuroraCell]?
 
         init(schema: Int, id: String, seed: UInt64, difficulty: Int, radius: Int, length: Int,
              rules: MicroscopicAuroraSwarmRules, swimmers: [MicroscopicAuroraSwimmer],
              stencil: [MicroscopicAuroraCell], threshold: Int, coverage: Int, coherence: Int,
-             wells: [MicroscopicAuroraWell?], budget: Int, tutorial: Bool) {
+             wells: [MicroscopicAuroraWell?], budget: Int, tutorial: Bool, sites: [MicroscopicAuroraCell]? = nil) {
             self.schema = schema
             self.id = id
             self.seed = seed
@@ -303,6 +332,7 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
             self.wells = wells
             self.budget = budget
             self.tutorial = tutorial
+            self.sites = sites
         }
 
         init(level: MicroscopicAuroraLevel) {
@@ -310,7 +340,7 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
                       difficulty: level.difficulty, radius: level.radius, length: level.length, rules: level.rules,
                       swimmers: level.swimmers, stencil: level.stencil, threshold: level.threshold,
                       coverage: level.coverage, coherence: level.coherence, wells: level.wells,
-                      budget: level.budget, tutorial: level.tutorial)
+                      budget: level.budget, tutorial: level.tutorial, sites: level.sites)
         }
 
         /// The level of this content, re-checked.
@@ -318,7 +348,7 @@ public struct MicroscopicAuroraLevel: Sendable, Equatable {
             try MicroscopicAuroraLevel(id: id, seed: seed, difficulty: difficulty, radius: radius, length: length,
                                        rules: rules, swimmers: swimmers, stencil: stencil, threshold: threshold,
                                        coverage: coverage, coherence: coherence, wells: wells, budget: budget,
-                                       tutorial: tutorial)
+                                       tutorial: tutorial, sites: sites)
         }
     }
 

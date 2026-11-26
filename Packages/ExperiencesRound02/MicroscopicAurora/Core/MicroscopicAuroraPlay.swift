@@ -271,6 +271,8 @@ public struct MicroscopicAuroraPlay: Sendable, Equatable {
             guard MicroscopicAuroraLevel.isUsable(well.cell, radius: level.radius) else {
                 throw .action("outside cell")
             }
+            // Feature 482 (R02-G19-02): a level that lists sites allows wells on its sites only.
+            guard level.allows(well.cell) else { throw .action("not a site") }
             for other in wells.indices where other != slot {
                 if let placed = wells[other], placed.cell == well.cell { throw .action("occupied cell") }
             }

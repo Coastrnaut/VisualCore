@@ -19,6 +19,10 @@ public enum MicroscopicAuroraError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of manifest entry `number` qualified within the generator's candidate bound (feature 482).
+    case generation(Int)
+    /// A witness file is damaged, newer than its schema or no longer replays; the payload describes it (feature 482).
+    case witness(String)
 
     /// The stable reason code, `r02-g19.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +34,8 @@ public enum MicroscopicAuroraError: Error, Equatable, Sendable {
         case .stale: "r02-g19.stale"
         case .newerSchema: "r02-g19.newer-schema"
         case .malformed: "r02-g19.malformed"
+        case .generation: "r02-g19.generation"
+        case .witness: "r02-g19.witness"
         }
     }
 }

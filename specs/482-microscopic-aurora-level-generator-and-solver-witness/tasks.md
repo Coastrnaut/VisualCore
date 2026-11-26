@@ -15,7 +15,7 @@ on CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1902-002 Kernel extension and shared types (lead): in
+- [X] T-R02G1902-002 Kernel extension and shared types (lead): in — Verified 2026-11-26: 2026-11-26: budgets 1 … 24, optional sites (refusals by name, omitted when absent so feature 481's levels keep their fingerprints), the play's 'not a site' refusal, the puzzle's moves on sites only, generation and witness errors, the 100-entry manifest, plan and difficulty; MicroscopicAuroraSitesTests and all feature 481 suites pass (host exit 0, 45 tests); the budget-13 cases moved to 25
   `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraLevel.swift` widen `budgets` to "1 … 24" and add
   optional `sites` ("2 … 8 distinct usable cells, row-major"; refusals "sites", "site outside", "sites duplicate", "well
   not on a site"; omitted from the stored form when absent, so every level without sites keeps its fingerprint;

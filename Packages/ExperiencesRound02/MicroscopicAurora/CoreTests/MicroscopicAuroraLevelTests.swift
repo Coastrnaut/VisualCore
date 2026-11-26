@@ -120,7 +120,7 @@ import Testing
                                                               MicroscopicAuroraWell(cell: l.stencil[0], strength: 2,
                                                                                     sense: .clockwise), nil]) }),
             ("budget", { try Self.variant(budget: 0) }),
-            ("budget", { try Self.variant(budget: 13) }),
+            ("budget", { try Self.variant(budget: 25) }),
         ]
         for (name, build) in cases {
             #expect(Self.refusal(build) == name, "expected \(name)")
