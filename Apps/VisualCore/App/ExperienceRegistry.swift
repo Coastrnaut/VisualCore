@@ -143,8 +143,8 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [apsidesWorkshop].compactMap { $0 }
 
-    /// R02-G18 Apsides Workshop (feature 473, R02-G18-03): a candidate until X-R02-G18. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G18 Apsides Workshop (feature 473, R02-G18-03): a candidate until X-R02-G18. Snapshot schema 2 since
+    /// feature 475 (R02-G18-05); the schema-1 example is registered at its in-app integration (R02-G18-09).
     fileprivate static var apsidesWorkshop: ExperienceRegistration? {
         guard let id = ApsidesWorkshopExperience.id else { return nil }
         var registration = ExperienceRegistration(id: id, core: ApsidesWorkshopExperienceCore.self) { launch in

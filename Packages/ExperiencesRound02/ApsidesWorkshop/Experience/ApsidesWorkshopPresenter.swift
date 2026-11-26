@@ -4,9 +4,10 @@
 // tier change with its reason, and caps the glow under Reduce Flashing. One clock feeds the picture, presentation only:
 // the star's glow pulses with the frame time (`u_pulse`, held at 1 under Reduce Motion); the shown tick is the
 // adapter's presentation state (`clock.show`) and is never advanced by time. The tutorial of levels 1 … 3 is shown in
-// words, as presentation, not as a kernel stage. A refused action is shown in words. A memory warning releases the GPU
-// objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the kernel
-// (renderer purity). Its probes (two backdrop corners) let the verification runner check a frame.
+// words (since feature 475 the core's tutorial step), not as a kernel stage. A refused action is shown in words. A
+// memory warning releases the GPU objects; the next frame rebuilds them. The presenter only reads `core.snapshot`: no
+// drawing result reaches the kernel (renderer purity). Its probes (two backdrop corners) let the verification runner
+// check a frame.
 //
 // Feature 474 (R02-G18-04) T-R02G1804-005 (FR-R02G1804-001 … 009; clarifications Q1 … Q5) wires touch: a canvas touch
 // goes through the presenter's `ApsidesWorkshopGestureController` with the drawn snapshot (`pointer`); a knob drag
@@ -18,6 +19,19 @@
 // meshes). The panel's − and + move a pending orbit, drawn as the same preview, and "Set periapsis" and "Set size"
 // commit it as one action each. A refused action is shown in words and its code logged (`refusalLog`), read with or
 // without the engine's `action.rule.` prefix.
+//
+// Feature 475 (R02-G18-05) T-R02G1805-005 (FR-R02G1805-001 … 005, 007; clarifications Q1 … Q5) adds teaching and
+// progression to the panel: the tutorial instruction (`core.tutorial.text` until the step is `done`, replacing the
+// presenter's own tutorial sentence), the hint at its current level (`showHint()`: each press raises the level
+// 1 → 2 → 3; any change of the play hides it, so the next press shows level 1; one search per play through
+// `ApsidesWorkshopHints.hint(level:play:)`, run off the main actor in a detached task, with a generation counter so
+// that a stale search never owns the hint state; hints never send an action), the failure explanation
+// (`ApsidesWorkshopFailureExplanation(play:)`, shown in the panel in place of the mirror's short `failureText`, which
+// stays the status line), the mode, the open levels, the level's band (of the five bands of 20), its goal (the targets
+// in words and the certified witness's tuning count that earns 3 stars, `core.certifiedTunings`) and its best stars
+// (`core.progress.stars(of:)`). The description includes them. The daily level is asked for with today's local
+// calendar date read here (`playDaily(port:date:)`); the core never reads a clock. A refused `level.select` or
+// `level.next` (`r02-g18.locked`) and an impossible date (`r02-g18.date`) read in words.
 #if os(iOS)
 import ApsidesWorkshopCore
 import Foundation
@@ -46,7 +60,7 @@ final class ApsidesWorkshopMirror {
     var measureLabel = ""
     /// The level in words.
     var targetLabel = ""
-    /// The tutorial in words on levels that have one; nil otherwise.
+    /// The tutorial instruction of the current step (`core.tutorial.text`, feature 475); nil once the step is `done`.
     var tutorialText: String?
     /// The shown tick, the adapter's.
     var shownTick = 0
@@ -59,6 +73,83 @@ final class ApsidesWorkshopMirror {
     var pendingOrbit: ApsidesWorkshopOrbit?
     /// A drag's preview (feature 474; presentation only), nil when no drag previews.
     var preview: ApsidesWorkshopOrbit?
+    /// The hint level shown, 1 … 3; 0 while no hint is shown (feature 475; presentation only).
+    var hintLevel = 0
+    /// The hint shown at ``hintLevel``, ``ApsidesWorkshopPresenter/searchingText`` while its search runs, or
+    /// ``ApsidesWorkshopPresenter/noHintText`` when the play has no hint; nil while no hint is shown (feature 475).
+    var hintText: String?
+    /// The failure explanation (`ApsidesWorkshopFailureExplanation`: what went wrong, then the advice), nil without a
+    /// failure (feature 475).
+    var explanation: String?
+    /// The mode (feature 475).
+    var mode: ApsidesWorkshopMode = .campaign
+    /// The highest open level (feature 475).
+    var frontier = 1
+    /// The level's difficulty band, 1 … 5 (the five bands of 20; feature 475).
+    var band = 1
+    /// The best stars of the current level, 0 … 3 (0 while it has not been won; feature 475).
+    var bestStars = 0
+    /// The stars of each won level, by level number (the level picker; feature 475).
+    var stars: [Int: Int] = [:]
+    /// The goal in words: the targets in order and the certified tuning count that earns 3 stars (feature 475).
+    var goalLabel = ""
+    /// The level the picker holds, 1 … ``frontier`` (presentation only; feature 475).
+    var pickedLevel = 1
+
+    /// "Band b of 5" (feature 475).
+    var bandLabel: String { "Band \(band) of 5" }
+
+    /// "Best: s of 3 stars", or "Best: not won yet" while the level has not been won (feature 475).
+    var starsLabel: String {
+        bestStars > 0 ? "Best: \(bestStars) of 3 stars" : "Best: not won yet"
+    }
+
+    /// "Mode: campaign", "Mode: practice" or "Mode: daily" (feature 475).
+    var modeLabel: String { "Mode: " + Self.modeName(mode) }
+
+    /// The mode's name: campaign, practice or daily (feature 475).
+    static func modeName(_ mode: ApsidesWorkshopMode) -> String {
+        switch mode {
+        case .campaign: "campaign"
+        case .practice: "practice"
+        case .daily: "daily"
+        }
+    }
+
+    /// The picker's line for level `level`: "Level n, band b", with ", s of 3 stars" once it has been won
+    /// (feature 475).
+    func levelLabel(_ level: Int) -> String {
+        let band: Int = ApsidesWorkshopProgress.band(of: level)
+        if let won = stars[level] { return "Level \(level), band \(band), \(won) of 3 stars" }
+        return "Level \(level), band \(band)"
+    }
+
+    /// Target `target` of `level` as a goal in words (feature 475): "sector s swept l to h" for a sweep, "periapsis
+    /// in sector s at l to h" (or "apoapsis") for an apsis target, in the level's words.
+    static func targetGoal(_ target: ApsidesWorkshopTarget, of level: ApsidesWorkshopLevel) -> String {
+        switch target.kind {
+        case .sweep:
+            return level.sectorName(target.sector) + " swept " + ApsidesWorkshopLevel.shareWords(target.low) + " to "
+                + ApsidesWorkshopLevel.shareWords(target.high)
+        case .periapsis, .apoapsis:
+            return target.kind.rawValue + " in " + level.sectorName(target.sector) + " at "
+                + ApsidesWorkshopLevel.distanceWords(target.low) + " to "
+                + ApsidesWorkshopLevel.distanceWords(target.high)
+        }
+    }
+
+    /// The goal of `level` with `certified` tunings in the certified witness (feature 475): "Goal: target 1, sector s
+    /// swept l to h; target 2, periapsis in sector s at l to h; …; in order without striking a planet, then play the
+    /// revolution. 3 stars within C tunings" ("1 tuning" singular).
+    static func goalText(_ level: ApsidesWorkshopLevel, certified: Int) -> String {
+        var parts: [String] = []
+        for (index, target) in level.targets.enumerated() {
+            parts.append("target \(index + 1), " + targetGoal(target, of: level))
+        }
+        let unit: String = certified == 1 ? "tuning" : "tunings"
+        return "Goal: " + parts.joined(separator: "; ") + "; in order without striking a planet, then play the "
+            + "revolution. 3 stars within \(certified) \(unit)"
+    }
 
     /// The current orbit of the followed play (a mid-range orbit while no play is followed).
     var orbit: ApsidesWorkshopOrbit { play?.orbit ?? ApsidesWorkshopOrbit(size: 24, eccentricity: 0, direction: 0) }
@@ -212,6 +303,8 @@ final class ApsidesWorkshopMirror {
         case "r02-g18.budget": "no actions are left: play the orbit or undo a tuning"
         case "r02-g18.stale": "the play changed before the action arrived"
         case "r02-g18.level": "the next level could not be made"
+        case ApsidesWorkshopExperienceRule.locked: "that level is locked: win the level before it to open it"
+        case ApsidesWorkshopExperienceRule.date: "that is not a calendar date"
         case ApsidesWorkshopExperienceRule.notWhole: "the orbit's steps and the tick must be whole numbers"
         case ApsidesWorkshopExperienceRule.tick: "that tick is past the end of the revolution"
         default: "that action is not available now"
@@ -233,10 +326,6 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
     /// The pure core this presenter draws.
     typealias Core = ApsidesWorkshopExperienceCore
 
-    /// The tutorial shown on levels that have one (presentation, not a kernel stage).
-    static let tutorial = "Tune the orbit with the periapsis knob and the size so it sweeps the target sectors and "
-        + "puts its apsides where the gauges ask, in order, without striking a planet; then play the revolution."
-
     /// Whether the star is still (Reduce Motion).
     let reduceMotion: Bool
     /// Whether the glow gain is capped (Reduce Flashing).
@@ -256,6 +345,22 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// How many refusal codes ``refusalLog`` keeps.
     static let refusalLogLimit = 64
+    /// The latest core seen (feature 475): hints, the daily date and the progress lines read it.
+    private(set) var latestCore: ApsidesWorkshopExperienceCore?
+    /// The play the shown hint belongs to; nil while no hint is shown (feature 475).
+    private var hintPlay: ApsidesWorkshopPlay?
+    /// The hint texts of levels 1 … 3 searched for a play (nil texts: the play has no hint), one search per play
+    /// (feature 475).
+    private var hintCache: (play: ApsidesWorkshopPlay, texts: [String]?)?
+    /// The search under way, off the main actor, for ``hintPlay`` (feature 475); tests may await its end.
+    private(set) var hintSearch: Task<Void, Never>?
+    /// The hint generation (feature 475): raised by every new search and every hidden hint; a search whose generation
+    /// is no longer current owns nothing.
+    private(set) var hintGeneration = 0
+    /// What the hint line shows while the search runs (feature 475).
+    static let searchingText = "Finding a hint…"
+    /// What the hint line shows when the play has no hint (won, or not under way; feature 475).
+    static let noHintText = "No hint now: the level is not being played."
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -305,6 +410,7 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
             tierLog.append(ApsidesWorkshopTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
+        if latestCore != core { absorbProgress(core) }
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         let snapshot = presented(core.snapshot(time: time))
         lastSnapshot = snapshot
@@ -337,10 +443,10 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbProgress(core)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
-        mirror.tutorialText = level.tutorial ? Self.tutorial : nil
         mirror.targetLabel = "Level: \(level.targets.count) targets in order, \(level.planets.count) planets, "
             + "\(level.period) ticks per revolution"
         let measure: String = level.progressDescription(report: play.report, orbit: play.orbit,
@@ -357,6 +463,8 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
         case .failed, .result:
             let reason: String = ApsidesWorkshopMirror.failureText(play.failure) ?? "The play failed."
             text += reason
+            // Since feature 475 the failure explanation too (what went wrong, then the advice).
+            if let explanation = mirror.explanation { text += " " + explanation }
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         default:
@@ -369,7 +477,23 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
         if play.stage == .won || play.stage == .failed || play.stage == .result {
             text += " " + Self.finishedMessage + "."
         }
+        text += " " + teachingText()
         return text
+    }
+
+    /// The teaching and progress sentences of the description (feature 475): the mode, the band, the goal, the best
+    /// stars, then the tutorial instruction and the hint when shown; each ends in a full stop, joined by spaces.
+    private func teachingText() -> String {
+        var parts: [String] = [mirror.modeLabel, mirror.bandLabel, mirror.goalLabel, mirror.starsLabel]
+        if let tutorial = mirror.tutorialText { parts.append("Tutorial: " + tutorial) }
+        if let hint = mirror.hintText {
+            parts.append((mirror.hintLevel > 0 ? "Hint \(mirror.hintLevel) of 3: " : "Hint: ") + hint)
+        }
+        var sentences: [String] = []
+        for part in parts {
+            sentences.append(part.hasSuffix(".") || part.hasSuffix("…") ? part : part + ".")
+        }
+        return sentences.joined(separator: " ")
     }
 
     /// The drag's preview or the pending orbit in words (feature 474), each followed by ". "; empty without either.
@@ -412,7 +536,7 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
 
     /// The control panel: "Reset view" returns to the authored orbit; every button sends through ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(ApsidesWorkshopControls(port: port, mirror: mirror,
+        AnyView(ApsidesWorkshopControls(port: port, mirror: mirror, presenter: self,
                                         resetView: { [weak self] in self?.resetView() },
                                         sender: { [weak self] control, values in
                                             self?.send(control, values, port: port)
@@ -498,5 +622,146 @@ final class ApsidesWorkshopPresenter: ExperiencePresenter {
         refreshPreview()
         return result
     }
+
+    // MARK: Teaching and progression (feature 475, R02-G18-05)
+
+    /// Takes the core's teaching and progress state into the mirror (feature 475): the tutorial instruction, the
+    /// failure explanation, the mode, the open levels with their stars, the band, the goal and the best stars; a change
+    /// of the play hides the hint (the next press shows level 1).
+    private func absorbProgress(_ core: ApsidesWorkshopExperienceCore) {
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let shown = hintPlay, shown != core.play { clearHint() }
+        mirror.tutorialText = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.explanation = ApsidesWorkshopFailureExplanation(play: core.play)?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        mirror.pickedLevel = min(max(mirror.pickedLevel, 1), core.progress.frontier)
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.band = core.band
+        mirror.bestStars = core.progress.stars(of: core.levelNumber)
+        mirror.goalLabel = ApsidesWorkshopMirror.goalText(core.play.level, certified: core.certifiedTunings)
+    }
+
+    /// Hides the hint shown and drops a search under way; the generation is raised so that search owns nothing.
+    private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hintGeneration += 1
+        hintPlay = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// The hint texts of levels 1 … 3 of `play` from one search (`ApsidesWorkshopHints.hint(level:play:)` at level 1):
+    /// a tuning hint gives each level's text (`ApsidesWorkshopHint.tuneText(level:action:orbit:)` from the play's
+    /// orbit); a play, stuck or failed hint reads the same at every level; nil when the play has no hint (won, or not
+    /// under way). Runs off the main actor.
+    nonisolated static func hintTexts(_ play: ApsidesWorkshopPlay) -> [String]? {
+        guard let first = ApsidesWorkshopHints.hint(level: 1, play: play) else { return nil }
+        guard first.kind == .tune, let action = first.action else {
+            return [first.text, first.text, first.text]
+        }
+        var texts: [String] = []
+        for level in 1...3 {
+            let text: String? = ApsidesWorkshopHint.tuneText(level: level, action: action, orbit: play.orbit)
+            texts.append(text ?? first.text)
+        }
+        return texts
+    }
+
+    /// Shows the next hint level (1 → 2 → 3, then 3 again) for the current play; never sends an action. The search
+    /// runs once per play in a detached task, never on the frame: meanwhile the hint line reads ``searchingText`` (a
+    /// press during the search raises the level it will show); the result is shown only when its generation is still
+    /// current, and later levels come from the cache.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let play: ApsidesWorkshopPlay = core.play
+        let next: Int = hintPlay == play ? min(mirror.hintLevel + 1, 3) : 1
+        if let cached = hintCache, cached.play == play {
+            reveal(cached.texts, level: next, play: play)
+            return
+        }
+        if hintSearch != nil, hintPlay == play {
+            mirror.hintLevel = next   // the search for this play is running; it shows this level
+            return
+        }
+        hintSearch?.cancel()
+        hintGeneration += 1
+        let generation: Int = hintGeneration
+        hintPlay = play
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            let texts: [String]? = ApsidesWorkshopPresenter.hintTexts(play)
+            await self?.finishSearch(texts, play: play, generation: generation)
+        }
+    }
+
+    /// Takes the hint texts searched for `play` by the search of `generation`: cached and shown when that generation
+    /// is still current (a stale search changes nothing, not even the handle of a newer search).
+    private func finishSearch(_ texts: [String]?, play: ApsidesWorkshopPlay, generation: Int) {
+        guard generation == hintGeneration, hintPlay == play else { return }
+        hintSearch = nil
+        hintCache = (play, texts)
+        reveal(texts, level: mirror.hintLevel, play: play)
+    }
+
+    /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
+    private func reveal(_ texts: [String]?, level: Int, play: ApsidesWorkshopPlay) {
+        hintPlay = play
+        guard let texts, texts.indices.contains(level - 1) else {
+            mirror.hintLevel = 0
+            mirror.hintText = Self.noHintText
+            return
+        }
+        mirror.hintLevel = level
+        mirror.hintText = texts[level - 1]
+    }
+
+    /// Ends the tutorial of the current level (`tutorial.dismiss`).
+    @discardableResult
+    func dismissTutorial(port: ExperienceActionPort) -> ActionResult {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Plays open level `level` in campaign mode (`level.select [level]`; a closed level is refused in words).
+    @discardableResult
+    func selectLevel(_ level: Int, port: ExperienceActionPort) -> ActionResult {
+        send("level.select", [Double(level)], port: port)
+    }
+
+    /// Plays the daily level of `date` (`mode.daily [year, month, day]`; the local calendar date by default; the core
+    /// never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = ApsidesWorkshopPresenter.today()) -> ActionResult {
+        send("mode.daily", Self.dateValues(date), port: port)
+    }
+
+    /// Replays the current level with the practice budget (`mode.practice`).
+    @discardableResult
+    func playPractice(port: ExperienceActionPort) -> ActionResult {
+        send("mode.practice", [], port: port)
+    }
+
+    /// Returns to the campaign (`mode.campaign`).
+    @discardableResult
+    func playCampaign(port: ExperienceActionPort) -> ActionResult {
+        send("mode.campaign", [], port: port)
+    }
+
+    /// The local calendar date now: Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the core refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
+    }
 }
 #endif
+
