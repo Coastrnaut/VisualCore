@@ -90,3 +90,25 @@ decided exactly on integer positions; the catalog's 0.008333 s timestep is a pre
   strength and a sense, places and removes wells, steps the shown tick and plays, undoes, redoes and moves to the next
   level. The candidate is registered in the one app (not available until X-R02-G19) with its scenario manifest (the
   standard scenarios, a three-level playthrough, fixtures and the 80 acceptance rows R2-G19-QA-001 … 080).
+
+## Gameplay spatial interaction (feature 484, R02-G19-04)
+
+- **Picking.** `MicroscopicAuroraPicker` projects the parts through the drawn camera (the view orbit included) and tries
+  them in order: a well within its projected spiral radius grown by 12 points (later slots first), then a site within
+  its projected ring radius grown by 12 points, then the swim scrubber (a track at y −1.31 under the gauges) within a
+  14-point band, then the dish field inside the projected enclosure; anything else is empty space.
+- **Gestures.** `MicroscopicAuroraGestureController` turns touches into actions. A tap on an empty site while playing
+  places a well with the panel's strength and sense in the first free slot (`well.place`), or says that every slot is
+  used. Dragging a well (16 points or more, while playing) previews the swim with the well on the site nearest the
+  finger within 24 points, or removed when the finger leaves the dish: the previewed ribbons, lit cells and gauges come
+  from the kernel's own swim, and the dragged well is drawn as a ghost (material 20). Lifting sends one `well.place`
+  (same strength and sense) or one `well.remove` when the target is a change, otherwise nothing. Dragging the scrubber
+  shows the tick nearest the finger (`clock.show`, presentation only, in any stage). A tap on the dish field toggles
+  the freeze: the committed swim stays drawn and only the gauges preview. Two fingers orbit the view within yaw ±60°
+  and pitch −20° … +35°; a double tap outside the dish or "Reset view" returns to the authored view. A finished play
+  explains itself in words; second fingers and cancels send no kernel action; the preview, the freeze and the orbit
+  never enter the digest.
+- **Panel parity.** The panel keeps every action (slot, site, strength, sense, Place, Remove, ticks, Play, Undo, Redo,
+  Next level) and gains "Freeze" and "Reset view"; its kernel buttons send through the presenter, which logs refusal
+  codes with or without the engine's prefix. A host test wins all 100 certified levels through the panel within their
+  budgets.

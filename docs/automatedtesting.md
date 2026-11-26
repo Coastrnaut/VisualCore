@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-03: Microscopic Aurora hero renderer).
+Last updated: 2026-11-26 (R02-G19-04: Microscopic Aurora gameplay spatial interaction).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Microscopic Aurora gameplay spatial interaction** (R02-G19-04, 2026-11-26). Host: `MicroscopicAuroraPickerTests`
+  (5; an independent pick, drop and tick rule on 500 seeded points over certified levels and three orbits),
+  `…GestureControllerTests` (6; 500 seeded scripted taps, well drags and scrubs against an independent expectation at
+  playing, won and failed plays), `…PanelWinTests` (2; all 100 certified levels won through panel placements in 20
+  groups of 5, plus panel undo and redo), and the scene geometry (19) and shader source (18) suites, which add the orbit
+  camera, the scrubber, the previewed swim and materials 20 and 21. Simulator: `…GestureWiringTests` (10) drive the
+  presenter's pointer entry. Lesson: levels 1 … 20 have at most three sites, so a test that fills every slot and still
+  needs a free site searches levels 21 … 30.
 - **Microscopic Aurora hero renderer** (R02-G19-03, 2026-11-26). Host: shader sources (17), scene geometry (12),
   adapter and renderer purity (17), scenarios (7; regenerate the manifest with `UPDATE_SCENARIO_MANIFEST=1`).
   Simulator (`--only-testing MicroscopicAuroraExperienceTests`): frames of levels 1, 21, 41, 61, 81 at three tiers

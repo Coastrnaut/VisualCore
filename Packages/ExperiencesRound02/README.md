@@ -987,5 +987,10 @@ the sites), `MicroscopicAuroraDifficulty` and `MicroscopicAuroraWitness` (the 10
 `docs/games/microscopic-aurora/levels/`). Feature 483 (R02-G19-03) adds the hero renderer and the experience:
 `MicroscopicAuroraSceneSnapshot`, `MicroscopicAuroraSceneGeometry` (the dish, the swimmers' capsules and ribbons, the
 CPU reference), `MicroscopicAuroraShaders`, the adapter `MicroscopicAuroraExperienceCore`, the scenario manifest and
-the iOS target `MicroscopicAuroraExperience` (presenter, scene, controls), registered as a candidate. See
+the iOS target `MicroscopicAuroraExperience` (presenter, scene, controls), registered as a candidate. Feature 484
+(R02-G19-04) adds gameplay spatial interaction: `MicroscopicAuroraViewOrbit`, `MicroscopicAuroraPicker` (wells, sites,
+the swim scrubber and the dish field picked through the drawn camera) and `MicroscopicAuroraGestureController` (tap a
+site to place a well, drag a well to another site or off the dish with a preview of the kernel's swim, scrub the shown
+tick, tap the field to freeze, two-finger orbit, double-tap or "Reset view"), wired through the presenter's pointer
+entry; the panel gains "Freeze" and "Reset view". See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).
