@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G19-02 (migration ledger, game feature of experience R02-G19) · ID namespace FR-R02G1902-###,
 SC-R02G1902-###, T-R02G1902-###
@@ -32,6 +32,83 @@ Canonical overrides:
 - **Model:** feature 472 (Apsides Workshop's content pipeline) for manifest, generator, solver, witness files, digest and
   progression, adapted to the swarm rules of feature 481: a move places, changes or removes a well, and the play ends
   the level.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+472's answers where the games agree. Facts checked (read-only, 2026-11-26): R02-G19-01's `MicroscopicAuroraLevel`
+(enclosure 6 … 11, swim 120 … 480 ticks, 4 … 16 swimmers, stencil 4 … 120, threshold 1 … 64, coverage 500 … 1000,
+three well slots, budget 1 … 12, starting wells that must not win), `MicroscopicAuroraDish` (the exact swim and judge;
+a report depends only on the set of wells, since each well's curl is added independently), `MicroscopicAuroraPlay` and
+`MicroscopicAuroraPuzzle` (its full move list reaches about 9,100 placements, above R02-F23's branching budget of
+1,024); R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most 1, jump at
+most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (bands 1 … 5 × 20,
+budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19 by band, five control emphases, 20 each). The ranges below were
+measured before they were written down: a prototype of this generator and solver on the real kernel, run over the real
+100 manifest entries, certified every entry within candidate index 11, with at most 830 settings judged per level and
+11,343 for the whole catalog (20.7 s in a debug build, at most 1.64 s for one level); witness lengths by band were 1, 1,
+2, 2 and 2, with no progression drop or jump. A first profile with three-well plans in band 5 cost up to 11.5 s per
+level and was rejected.
+
+- Q: How does the kernel change, and how is a level built from its manifest entry? → A: the kernel widens the budget
+  range to 1 … 24 and gains optional well sites: a level may list 2 … 8 distinct usable cells as its sites; with sites,
+  a placement on any other cell is refused `r02-g19.action` ("not a site") by the play and is not a move of the puzzle
+  contract; a level without sites encodes, fingerprints and plays exactly as in feature 481 (the field is omitted). The
+  100 entries (number, planned seed, band, budget, control emphasis) are a table in `MicroscopicAuroraManifest` with
+  their provenance. Candidate c of entry n draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index:
+  c))`, in this order: the swim length; the swarm rules (ρ 2 … 4, σ 1 … ρ, κ 6 … 8, wₛ 0 … 3, wₐ 1 … 6, w_c 1 … 6, a_max
+  4 … 12, v_max 12 … 24); the swarm size; the swarm centre (the dish centre ± 384 on each axis) and drift (−2 … 2 on each
+  axis); each swimmer's offset (± 384) and velocity (drift ± 2); the sites (cells usable within radius 8, redrawn until
+  distinct, then sorted row-major); the winning wells (a partial shuffle picks the plan's sites; each well a strength
+  1 … 4 and a sense); the threshold (1 … 3). The enclosure radius is 11. The winning wells are swum; the stencil is the
+  largest four-neighbour group of usable cells lit at the threshold, trimmed when larger than the band's maximum to the
+  breadth-first prefix from its densest cell (first in row-major order among equals), which stays connected; then the
+  required coverage is drawn, and the required coherence is max(2, min(the winning swim's smallest coherence, a draw
+  2 … N)). Band profiles (swarm, swim length, sites, plan, stencil, coverage): band 1 (4 … 5, 120, 3, 1, 6 … 24,
+  600 … 800), band 2 (5 … 6, 120 … 140, 4, 1, 10 … 32, 700 … 850), band 3 (6 … 7, 140, 4, 2, 14 … 40, 750 … 900),
+  band 4 (7 … 8, 140 … 160, 5, 2, 18 … 50, 800 … 950), band 5 (8, 160, 6, 2, 20 … 60, 850 … 1000). The level starts
+  with no well; budget = the manifest's; ids `microscopic-aurora-NNN`; tutorial on levels 1 … 3; difficulty = band. A
+  candidate is skipped when the winning swim exits or loses coherence, when the lit group is smaller than the band's
+  minimum stencil, when the level rules refuse it (including starting wells that already win), when its stencil equals
+  the previous level's (FR-R02G1902-007), or when the solver's minimal plan is not the band's plan length; at most 64
+  candidates, then `generation(n)`. Impact: FR-R02G1902-001, 007; SC-R02G1902-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing shorter wins? → A: a placement changes or fills
+  one slot and a removal empties one, and a report depends only on the set of wells, so the settings reachable with at
+  most d actions from a start with no well are exactly the sets of at most d wells on distinct sites (8 options per
+  site: strength 1 … 4 × sense). The solver judges depth 0 (no well), then every set of one well, then of two, …; each
+  set is a list of wells in site order, enumerated by site, then strength, then sense (clockwise first). Depths below
+  the last are judged in that fixed order; the last depth is ordered by a shape loss, the loss of the set's prefix (the
+  set without its last well) judged one depth earlier, ties keeping the fixed order: loss = the stencil cells left unlit
+  plus the cells lit outside the stencil. The first winning set ends the search; the plan is its placements in slot
+  order (slot 0, 1, …), then `play`, replayed through the kernel's play, whose report must agree. Work = sets judged,
+  counted and bounded at 1,200, above the largest search space (1 + 48 + 960 = 1,009 for six sites and two wells), as
+  a guard. The minimality proof is the count of sets at each smaller depth, every one judged and none winning. Impact:
+  FR-R02G1902-002; SC-R02G1902-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `MicroscopicAuroraDifficulty` holds the
+  witness length (placements), the stencil size, the required coverage, the swarm size, the sites, the settings judged
+  at smaller depths, the solver work and the nearest miss (the smallest shape loss among the settings judged at smaller
+  depths). The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at most 3) on
+  the witness length; band means must not fall (measured above: 1, 1, 2, 2, 2). Impact: FR-R02G1902-003, 005;
+  SC-R02G1902-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/microscopic-aurora/levels/NNN.witness.json`,
+  JSON schema 1 with sorted keys: number, the level's stored form (with its sites), the actions (the placements, then
+  `play`), the state digest after every action (16 hex characters of the SHA-256 of the wells and the actions spent),
+  the play fingerprints after `begin` (and `dismissTutorial` when the level has one) and after each action, the terminal
+  report (the lit stencil cells, the coverage, the group count, the smallest coherence and its tick, the ticks swum), the
+  counterexample (the depth one below the plan, the number of sets at that depth, none winning, and the nearest miss),
+  the difficulty and the candidates skipped. A test rebuilds every witness and compares bytes; it writes the files only
+  with `MICROSCOPIC_AURORA_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. Impact: FR-R02G1902-004; SC-R02G1902-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<MicroscopicAuroraPuzzle>.digest(id: "microscopic-aurora", identities:)` over the 100 level fingerprints
+  in manifest order, pinned in a test. Certification tests are split into 20 groups of 5 levels so each runs under 10
+  seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process. New
+  refusals: `generation(Int)` (`r02-g19.generation`) and `witness(String)` (`r02-g19.witness`). The independent check of
+  SC-R02G1902-002 judges, with the kernel's own swim and no loss ordering, every setting reachable with fewer placements
+  than the plan on the two levels with the fewest sites, then fewest swimmers, in each band (ties by level number): none
+  wins. Impact: FR-R02G1902-006; SC-R02G1902-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
