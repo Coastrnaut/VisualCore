@@ -82,7 +82,7 @@ lives in the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Apsides 
 - [X] T-R02G1806-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-26: 2026-11-26 reference-2 exit 0 (.autonomy/migration/checks/R02-G18-06.reference-2.json)
 - [X] T-R02G1806-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-26: 2026-11-26 script-tests exit 0, run alone (.autonomy/migration/checks/R02-G18-06.script-tests.json)
 - [ ] T-R02G1806-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G1806-006)
-- [ ] T-R02G1806-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1806-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-26: 2026-11-26 /speckit-converge: converged (nothing appended); README row, feature count 176, gate list and date updated
   README row and gate list updated
 
 ## Dependencies and parallel work
