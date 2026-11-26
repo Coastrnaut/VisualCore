@@ -92,7 +92,7 @@ campaign covers the game).
   `-3f`
 - [X] T-R02G1805-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-25: 2026-11-25 rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G1805-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G1805-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-25: 2026-11-25 reference-1 exit 0
 - [ ] T-R02G1805-009 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G1805-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G1805-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
