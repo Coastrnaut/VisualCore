@@ -61,7 +61,7 @@ Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraProgress.swi
 Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraExperienceCore.swift  edit  actions, modes, schema 2, migration (lead)
 Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraScenarios.swift       edit  new controls, regenerated manifest (lead)
 Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/{MicroscopicAuroraHintsTests (B), MicroscopicAuroraProgressTests (C)}.swift   new
-Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraExperienceCoreTests.swift                                  edit (lead)
+Packages/ExperiencesRound02/MicroscopicAurora/CoreTests/MicroscopicAuroraProgressionCoreTests.swift                              new (lead)
 Packages/ExperiencesRound02/MicroscopicAurora/Experience/{MicroscopicAuroraPresenter, MicroscopicAuroraControls}.swift              edit (lead)
 Packages/ExperiencesRound02/MicroscopicAurora/ExperienceTests/MicroscopicAuroraTeachingTests.swift                                  new (agent D)
 docs/architecture/microscopic-aurora.md, Packages/ExperiencesRound02/README.md, docs/automatedtesting.md   edit (lead)
