@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G19-01 (migration ledger, game feature of experience R02-G19) · ID namespace FR-R02G1901-###,
 SC-R02G1901-###, T-R02G1901-###
@@ -33,6 +33,69 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract,
   so R02-G19-02 can certify levels).
 - **Model:** feature 471 (Apsides Workshop's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+471's answers where the games agree (stages, stored form, records, refusal codes, puzzle contract). Facts checked in
+code (read-only, 2026-11-26): Apsides Workshop's kernel (`ApsidesWorkshopLevel`, `ApsidesWorkshopPlay`,
+`ApsidesWorkshopError` with codes `r02-g18.level`, `.action`, `.budget`, `.stage`, `.stale`, `.newer-schema`,
+`.malformed`) keeps every limit as an integer range, fingerprints levels with SHA-256 of a canonical text and
+implements R02-F23's `PuzzleRules` (`ApsidesWorkshopRules`, `VisualCoreSimulation`).
+
+- Q: What are the dish, the enclosure and the swimmers, in which units? → A: the dish is a square of 24 × 24 cells
+  (rows and columns 0 … 23); one cell is 256 dish units, so positions run 0 … 6143 on each axis and a position's cell is
+  (⌊y/256⌋, ⌊x/256⌋). The enclosure is the circle about the dish centre (3072, 3072) of radius R cells, R 6 … 11; a
+  swimmer is inside when (x − 3072)² + (y − 3072)² ≤ (256R)², so the rim itself is inside. The swarm has 4 … 16
+  swimmers, each an integer position and an integer velocity in dish units per tick; the swim lasts T ticks, 120 … 480.
+  Impact: FR-R02G1901-001, 002; SC-R02G1901-004.
+- Q: What exactly happens in one tick, so every device agrees? → A: all accelerations are computed from the state at
+  tick t, then every swimmer is updated (a synchronous step, so swimmer order cannot change the result). For swimmer i,
+  its neighbours are the other swimmers within the neighbour radius ρ (2 … 6 cells, compared as squared distances in
+  dish units). Separation sums pᵢ − pⱼ over neighbours within the separation radius σ (1 cell … ρ); two swimmers at the
+  same point push along +x for the lower index and −x for the higher, by one dish unit. Alignment is the neighbours'
+  mean velocity minus vᵢ, cohesion their mean position minus pᵢ (means by integer division truncating toward zero).
+  The swarm acceleration is (wₛ·separation)/64 + (wₐ·alignment)/16 + (w_c·cohesion)/256 with weights 0 … 8 each.
+  Each well at the centre q of its cell, with strength s 1 … 4 and sense ±1 (+1 counterclockwise), adds the curl
+  acceleration sense·s·4096·(−dy, dx)/(dx² + dy² + 65536) with (dx, dy) = p − q. Every division truncates toward zero.
+  The total acceleration is clamped to ±a_max per axis (2 … 16), then v ← v + a clamped to ±v_max per axis (8 … 48),
+  then p ← p + v (semi-implicit Euler). All values fit in 64-bit integers. Impact: FR-R02G1901-003; SC-R02G1901-003.
+- Q: How are trails, lit cells, coverage and connectedness decided? → A: a cell's trail density is the number of
+  (swimmer, tick) pairs for ticks 1 … T whose position lies in the cell; the cell is lit when its density is at least
+  the threshold (1 … 64). The stencil is 4 … 120 distinct cells whose centres lie inside the enclosure. Coverage is the
+  number of lit stencil cells over the stencil's size in tenths of a percent, rounded down (0 … 1000), against a
+  required coverage of 500 … 1000. Connectedness holds when the lit stencil cells form exactly one group under
+  four-neighbour adjacency (up, down, left, right). Impact: FR-R02G1901-004, 005, 014.
+- Q: What is coherence, and in which order are the failures judged? → A: two swimmers are linked when their squared
+  distance is at most the square of the coherence radius κ (2 … 8 cells); the swarm's coherence at a tick is the size
+  of its largest linked group; the required coherence is 2 … N. Playing walks ticks 1 … T, after each tick's move:
+  the lowest-index swimmer outside the enclosure fails `exit` (swimmer, tick); otherwise a coherence below the
+  requirement fails `coherence` (tick, largest group). After the swim, a coverage below the requirement fails
+  `coverage` (lit and needed cells); otherwise more than one group fails `connectedness`, naming the first lit stencil
+  cell in row-major order that is not in the group of the first one; otherwise the level is won. A level is refused
+  when a swimmer starts outside the enclosure or the start's coherence is below the requirement. Impact:
+  FR-R02G1901-005; SC-R02G1901-004.
+- Q: Which actions exist, how does a level live and how is it stored? → A: three well slots 0 … 2. `place(slot, row,
+  column, strength, sense)` puts a well into a slot or changes it (the result must differ from the slot's current
+  well), on a cell whose centre is inside the enclosure and that no other well occupies; `remove(slot)` empties an
+  occupied slot. Each spends one action and is refused `r02-g19.action` when out of range, unchanged or on an
+  occupied or outside cell, `r02-g19.budget` when no action is left. `play` spends nothing and ends the level (won or
+  failed); undo and redo restore placements and, from failed, undo returns to playing with the wells before the play.
+  The budget is 1 … 12. As feature 471: stages loading → tutorial → playing ⇄ paused → won or failed → result; begin,
+  dismissTutorial, pause and resume are their own record kinds; each record carries the schema, the level seed, an
+  index, the kind, the action and the fingerprints before and after; replay refuses a record of another level or a
+  broken chain (`r02-g19.malformed`); `.stage` and `.stale` as there. The stored form is JSON schema 1 with sorted keys
+  (id, seed, difficulty 1 … 5, enclosure radius, swim length, swarm rules, swimmers, stencil, threshold, coverage,
+  coherence, starting wells, budget, tutorial, fingerprint = SHA-256 of a canonical text); a damaged or edited form is
+  refused `r02-g19.malformed`, a newer one `r02-g19.newer-schema`, an invalid level `r02-g19.level`. The report after
+  every action holds the positions by tick, every cell's density, the lit cells, the coverage, the groups, the
+  smallest coherence and its tick, the first failure and the predicted outcome, with words for each ("well 2 at row 7,
+  column 12, strength 3, counterclockwise", "stencil 34 of 40 cells lit, 85.0 %, needs 80.0 %"). The puzzle contract
+  (R02-F23): the position is the wells, the moves are the placements legal from it, the goal test is that the
+  predicted play wins; certifying levels (R02-G19-02) searches well strengths and positions. Impact:
+  FR-R02G1901-006, 007, 008, 009, 010, 011, 013, 014.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -77,7 +140,8 @@ refused.
 
 ### Edge Cases
 
-- **A well placed outside the dish, on another well or with a strength out of range:** refused without cost.
+- **A well placed outside the enclosure, on another well's cell or with a strength out of range:** refused without
+  cost.
 - **A placement equal to the current one:** refused without cost.
 - **A swimmer exactly on the enclosure's rim:** still inside; leaving needs a strictly greater distance.
 - **Two swimmers at the same point:** separation has a fixed, defined direction, so the swim stays deterministic.
