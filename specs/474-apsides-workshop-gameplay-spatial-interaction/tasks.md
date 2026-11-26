@@ -51,7 +51,7 @@ of R02-G17-04's CHK013).
 
 ## Phase 3: Stories 1, 2 and 3 — knob, size and crank (P1) 🎯
 
-- [ ] T-R02G1804-003 [US1] [US2] [US3] Create
+- [X] T-R02G1804-003 [US1] [US2] [US3] Create — Verified 2026-11-25: 2026-11-25 ApsidesWorkshopGestureController (pick order, knob/size drags with preview, invalid-orbit explanations, crank, orbit, double tap) and ApsidesWorkshopGestureControllerTests (6 tests, 500 seeded scripts against an independent expectation, thresholds at their edges); host-3 exit 0 (ApsidesWorkshopCoreTests)
   `Packages/ExperiencesRound02/ApsidesWorkshop/Core/ApsidesWorkshopGestureController.swift` (FR-R02G1804-001 … 004,
   006, 007; SC-R02G1804-001 … 003; `ApsidesWorkshopGestureAction` tunePeriapsis(k, d), tuneSize(a), showTick(tick),
   preview(orbit), clearPreview, resetView, explain(reason); states idle, knobPress, knobDrag, handlePress, handleDrag,
