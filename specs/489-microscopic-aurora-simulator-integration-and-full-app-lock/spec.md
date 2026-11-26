@@ -94,8 +94,8 @@ chunk keys in `release_check.py` end at `a4` (`b4` is free); no UI test class us
 ### User Story 1 - The game works inside the real app (Priority: P1) 🎯
 
 A tester opens Microscopic Aurora from the one app on the simulator, plays level 1 with the panel's well, site,
-strength, sense, Place and Swim buttons to a win, sees the stars, opens the next level, replays the best solution and
-returns after closing the app to find the progress kept.
+strength and sense controls and its Place and Play buttons to a win, sees the stars, opens the next level, replays the
+best solution and returns after closing the app to find the progress kept.
 
 **Why this priority**: the game only matters as part of the shipped app; this is the first end-to-end proof there.
 
@@ -105,8 +105,8 @@ visible, labelled controls and read the experience's spoken texts.
 **Acceptance Scenarios**:
 
 1. **Given** a fresh app on the simulator, **When** the tester opens Microscopic Aurora and plays level 1's certified
-   solution (its well placements, then the swim) with the panel's buttons, **Then** the experience says "The trails
-   covered the stencil as one pattern.", the stars read "Best: 3 of 3 stars", and level 2 is open in the level picker.
+   solution (its well placements, then the play that lets the swarm swim) with the panel's buttons, **Then** the
+   experience says "The trails covered the stencil as one pattern.", the stars read "Best: 3 of 3 stars", and level 2 is open in the level picker.
 2. **Given** a won level, **When** the app is relaunched, **Then** the same progress, stars and open levels are shown.
 3. **Given** a solved level, **When** the tester starts the replay and steps through it, **Then** the replay ends won
    and stopping it returns to the campaign.
@@ -134,7 +134,7 @@ solver regression proves all 100 levels solvable as certified.
 - **Release builds:** test-only code (scenarios, golden descriptions) is excluded from the release configuration, which
   must still compile.
 - **Interface lookup:** every control the tests use has a stable identifier, so tests do not depend on wording; the
-  chosen well's site, strength and sense are read from their controls' values before Place is pressed, and Swim is
+  chosen well's site, strength and sense are read from their controls' values before Place is pressed, and Play is
   pressed only after every placement shows in the actions count.
 - **Relaunch:** the interface test sends the app to the background before terminating it, so the save point runs (the
   lesson of feature 309).
