@@ -74,7 +74,7 @@ change (the shaders and reference of R02-G18-03 are unchanged and re-proven by t
 - [X] T-R02G1809-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-26: 2026-11-26 reference-2 exit 0 (.autonomy/migration/checks/R02-G18-09.reference-2.json)
 - [ ] T-R02G1809-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G1809-006; feature 480
   prepares them)
-- [ ] T-R02G1809-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1809-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-26: 2026-11-26 /speckit-converge: converged (nothing appended); README row, feature count 179 and gate list updated
   README row and gate list updated; after the record push, check its CI run with `gh run list`
 
 ## Dependencies and parallel work
