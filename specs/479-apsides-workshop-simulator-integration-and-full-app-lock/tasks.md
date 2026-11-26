@@ -39,7 +39,7 @@ change (the shaders and reference of R02-G18-03 are unchanged and re-proven by t
   name of Q1 is listed once, has the prefix `experience.r02-g18.apsides-workshop.`, and the panel source uses each
   exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing ApsidesWorkshopExperienceTests`
-- [ ] T-R02G1809-004 [US1] Create `Apps/VisualCore/Tests/UI/ApsidesWorkshop/AWSupport.swift`, `AWPlayUITests.swift`,
+- [X] T-R02G1809-004 [US1] Create `Apps/VisualCore/Tests/UI/ApsidesWorkshop/AWSupport.swift`, `AWPlayUITests.swift`, — Verified 2026-11-26: 2026-11-26 app-ui exit 0 (.autonomy/migration/checks/R02-G18-09.app-ui.json): AWPlayUITests and AWReplayUITests, 3 tests in 289.9 s in serial chunk a4 (level 1 won with 3 stars, progress kept over a relaunch, replay ends won); xcodegen regenerated; a4 key checked unique
   `AWReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified plan (one periapsis tuning to
   eccentricity 0, direction 0, from size 18, eccentricity 10, direction 6) and the budget (9) pinned in `AW`; the
   pending eccentricity and direction moved with Eccentricity − or + and Direction − or + by their controls' values, Set
