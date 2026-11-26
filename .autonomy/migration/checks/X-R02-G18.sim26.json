@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g18.apsides-workshop",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g18.apsides-workshop --runtime 26",
+  "elapsed_seconds": 349.906,
+  "exit_code": 0,
+  "finished": "2026-11-26T17:26:46+00:00",
+  "gate": "X-R02-G18",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G18.sim26.log",
+  "log_sha256": "cd6536de65b8c3755fc7db43975fdf069f2850a2e1d291e1fd1e5c2f6ef0b9b7",
+  "name": "sim26",
+  "started": "2026-11-26T17:20:56+00:00",
+  "timed_out": false
+}
