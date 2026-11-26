@@ -828,7 +828,9 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               // Feature 486 (R02-G19-06): the ambient sound recipe.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
                 path: "MicroscopicAurora/Core"),
         .testTarget(name: "MicroscopicAuroraCoreTests",
                     dependencies: ["MicroscopicAuroraCore",
@@ -836,7 +838,9 @@ let package = Package(
                                    .product(name: "VisualCoreMath", package: visualCore),
                                    // Feature 483 (R02-G19-03): meshes and the experience contract in tests.
                                    .product(name: "VisualCoreScenes", package: visualCore),
-                                   .product(name: "VisualCoreExperience", package: visualCore)],
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   // Feature 486 (R02-G19-06): the ambient recipe in tests.
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "MicroscopicAurora/CoreTests"),
         // Feature 483 (R02-G19-03): Microscopic Aurora's experience (presenter, scene, controls).
         .target(name: "MicroscopicAuroraExperience",
@@ -846,7 +850,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 486 (R02-G19-06): the ambient loop and the audition.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "MicroscopicAurora/Experience"),
         // Feature 483 (R02-G19-03): the simulator tests of Microscopic Aurora's experience.
         .testTarget(name: "MicroscopicAuroraExperienceTests",
@@ -857,7 +864,9 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore),
+                                   .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "MicroscopicAurora/ExperienceTests"),
         // Feature 463 (R02-G17-03): Celestial Eclipse Lab's experience (presenter, scene, controls).
         .target(name: "CelestialEclipseLabExperience",

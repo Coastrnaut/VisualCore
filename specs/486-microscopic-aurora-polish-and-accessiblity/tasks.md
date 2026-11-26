@@ -15,7 +15,7 @@ the mirror) and round02-host in five chunks (1, 2, 3c, 3e, 3f; Microscopic Auror
 - [X] T-R02G1906-001 Baselines on the committed tree after R02-G19-05 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: baselines exit 0 on the committed tree after the R02-G19-05 record (host, timing, round02-1, -2, -3c, -3e, -3f); rendering baseline is R02-G19-05's rendering runs
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters); the rendering
   baseline is R02-G19-05's rendering runs (exit 0)
-- [ ] T-R02G1906-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MicroscopicAuroraCore` and its tests gain
+- [X] T-R02G1906-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MicroscopicAuroraCore` and its tests gain — Verified 2026-11-26: Package.swift: MicroscopicAuroraCore and its tests gain VisualCoreAudioDSP; the experience and its tests gain VisualCoreAudioDSP and VisualCoreAudio (iOS); host exit 0 (MicroscopicAuroraCoreTests)
   VisualCoreAudioDSP (the tests also VisualCoreExperience); `MicroscopicAuroraExperience` and its tests gain
   VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as Apsides Workshop's targets have); `--name host -- swift
   test --package-path Packages/ExperiencesRound02 --filter MicroscopicAuroraCoreTests`
