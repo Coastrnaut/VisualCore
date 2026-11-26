@@ -160,8 +160,9 @@ refused.
   starting position and velocity), the swim's length in ticks, the swarm rules' strengths and radii, the target
   stencil (a set of dish cells), the trail threshold, the required coverage and connectedness, the required coherence,
   the starting wells, the action budget and whether it shows a tutorial. A level is refused when a value is out of
-  range, a swimmer starts outside the enclosure, a stencil cell lies outside it, the stencil is empty, or the starting
-  wells already win.
+  range, the separation radius exceeds the neighbour radius, a swimmer starts outside the enclosure, the start's
+  coherence is below the requirement, a stencil cell lies outside it or appears twice, the stencil is empty, a starting
+  well lies outside the enclosure or shares a cell with another, or the starting wells already win.
 - **FR-R02G1901-002**: A magnetic well MUST be given by its dish position, its strength and its turning sense, each
   chosen from fixed steps; at most three wells exist, never two on the same position, never outside the enclosure.
 - **FR-R02G1901-003**: Every tick of the swim MUST move every swimmer by a fixed-step integration of bounded
