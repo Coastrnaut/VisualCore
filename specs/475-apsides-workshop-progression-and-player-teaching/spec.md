@@ -49,12 +49,12 @@ are 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89 and 97.
   failed play's hint is "Undo the last action or retry the level." While playing: when the current orbit already wins,
   the hint is "Every target reads in its band: play the revolution"; otherwise the solver searches from the current
   orbit through a solver entry that starts from it (`plan(_:from:)`, the certifying `plan(_:)` being that entry at the
-  level's starting orbit) within min(actions left, 2) tunings; its first tuning is the hint; when no plan is found (none,
-  or the work bound exceeded): "No way to win was found in the actions left: undo the last action or retry the level."
-  Level 1 names the lever ("Turn the periapsis knob next" or "Change the size next"); level 2 the way and distance
-  ("Raise the eccentricity by n steps and turn the periapsis m steps counterclockwise" or "clockwise", the shorter way
-  around, counterclockwise on a tie, a lever part that does not change left out; "Grow the orbit by n units" or
-  "Shrink"); level 3 the exact setting ("Set the periapsis to eccentricity k, direction d°" or "Set the size to a").
+  level's starting orbit) within min(actions left, 2) tunings; its first tuning is the hint; when no plan is found
+  (none, or the work bound exceeded): "No way to win was found in the actions left: undo the last action or retry the
+  level." Level 1 names the lever ("Turn the periapsis knob next" or "Change the size next"); level 2 the way and
+  distance ("Raise the eccentricity by n steps and turn the periapsis m steps counterclockwise" or "clockwise", the
+  shorter way around, counterclockwise on a tie, a lever part that does not change left out; "Grow the orbit by n units"
+  or "Shrink"); level 3 the exact setting ("Set the periapsis to eccentricity k, direction d°" or "Set the size to a").
   Hints never change the state, are unlimited, do not affect stars and reset to level 1 after any change of the play.
   Impact: FR-R02G1805-002; SC-R02G1805-002.
 - Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
