@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/apsides_workshop_regression.py"
+  ],
+  "command": "python3 scripts/apsides_workshop_regression.py",
+  "elapsed_seconds": 17.771,
+  "exit_code": 0,
+  "finished": "2026-11-26T16:15:15+00:00",
+  "gate": "R02-G18-09",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G18-09.regression.log",
+  "log_sha256": "d7dc31a4dd9c4f118ef178cb1e75f51fe4d70f0c630565a4579839c381e60d3b",
+  "name": "regression",
+  "started": "2026-11-26T16:14:57+00:00",
+  "timed_out": false
+}
