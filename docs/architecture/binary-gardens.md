@@ -112,3 +112,29 @@ presentation of later features.
   view"; each choice sends one action through the presenter, which shows refusals in words and keeps their bare codes in
   `refusalLog` (at most 64). A host test wins all 100 certified levels through the panel, one panel action per witness
   action.
+
+## Teaching and progression (feature 505, R02-G21-05)
+
+- **Hints.** `BinaryGardensHints` gives the certified witness's remaining actions while every one of the seven controls
+  holds its starting or its certified value and the actions left cover them, so exact hints from every opening replay
+  the witness (1 … 4 actions) and win all 100 levels with the certified count; otherwise it searches at most two legal
+  arrangement moves from the current arrangement in the puzzle's fixed order, one before two, at most 2,000 arrangements
+  judged. The hint escalates from the kind of change ("Move a star to another ring", "Shift a star's phase", "Change a
+  star's brightness", "Tilt the orbit plane") to which star and which way ("Move star n outward", "Shift star n's phase
+  forward", "Make star n dimmer", "Tilt the orbit plane less") to the exact action ("Move star n to ring r (ρ units)",
+  "Set star n's luminosity to L", "Set the tilt to t of T steps"); a winning arrangement says to run the cycle; no plan
+  says so and suggests undo or retry. The presenter runs the search off the main actor, once per play, with a
+  generation counter so a stale search never owns the hint.
+- **Failure text.** `BinaryGardensFailureExplanation` puts the run's failure in words: the world that froze or scorched
+  and the tick (in the level's tick words), the world whose comfortable window was too short with the ticks needed, or
+  the world that wilted or bleached with its total light and bloom band, worlds numbered from 1, each followed by
+  "Undo the last action or retry the level."
+- **Tutorial.** Levels 1 … 3 show three instructions (adjust a star; balance every world's light, then run; what fails
+  a run), each advancing when done (an accepted arrangement action, then a second one or the level's end, then the
+  level's end); dismissible; undo, redo and showing a tick never move it back.
+- **Progress.** Stars by actions spent (undone ones included) against the certified plan's actions (3 at most, 2
+  within two more, else 1), level 1 open and a campaign win opening the next (no wrap after 100; a fresh opening of
+  level N opens 1 … N), five bands of 20; the daily level is (days since 2026-01-01 × 13) mod 100 + 1 and is playable
+  while still locked without opening it; practice raises the budget to 24 without stars or unlocks. The panel shows the
+  band, the goal, the best stars, the modes and a stepper over the open levels. The snapshot is schema 2 (digest domain
+  `r02-g21.binary-gardens.v2`) with a migration from schema 1; locked means not yet won, never paid for.

@@ -1064,5 +1064,8 @@ the adapter `BinaryGardensExperienceCore`, the scenario manifest and the iOS tar
 interaction: `BinaryGardensViewOrbit`, `BinaryGardensPicker` (gauge rows, stars, luminosity pips, worlds, rings, the
 tilt dial and the system disc picked through the drawn camera), `BinaryGardensGestureController` (drag a star across
 its rings or along its orbit with a previewed report, tap or drag pips and the tilt dial, inspect worlds, scrub ticks,
-orbit and reset the view) and the panel's direct ring, luminosity, phase and tilt choices.
+orbit and reset the view) and the panel's direct ring, luminosity, phase and tilt choices. Feature 505 (R02-G21-05) adds
+teaching and progression: `BinaryGardensHints` (three hint levels from the certified witness or a bounded search),
+`BinaryGardensFailureExplanation`, the tutorial, progress with stars, the daily level (× 13) and practice (budget 24),
+and snapshot schema 2 with a migration from schema 1.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).
