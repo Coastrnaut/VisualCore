@@ -21,7 +21,7 @@
 // colour of anything a failure names (any material, keeping its shape).
 //
 // Vertex streams (the geometry states the same contract; the shared renderer binds only position, normal and uv):
-// - `a_uv.x` = material code (``BinaryGardensMaterial``, 0 … 37) + ``BinaryGardensShaders/valueScale`` · value
+// - `a_uv.x` = material code (``BinaryGardensMaterial``, 0 … 41) + ``BinaryGardensShaders/valueScale`` · value
 //   (0 … 1; only for the valued materials below, otherwise 0) + ``BinaryGardensShaders/brokenOffset`` (64) when the
 //   element is drawn in the broken colour. Write it with ``BinaryGardensShaders/encode(_:value:broken:)``.
 //   Valued materials: the five world materials — star 1's share of the world's flux at the shown tick over 64 000;
@@ -70,12 +70,23 @@
 // milliflux (well under 1 % of 64 000), so a light linear in share / 64 000 would leave every lit side black; the
 // shaders therefore light each side by ``lightResponse(share:)``, a logarithmic response of the carried share that
 // reaches 1 at ``lightReference`` milliflux (still monotonic in the kernel's share).
+//
+// Feature 504 (R02-G21-04) T-R02G2104-002 (FR-R02G2104-002, 008, 015; research R5, R6) appends four materials after
+// code 37, keeping every earlier code, the value scale and the broken offset (64, still above 41 + 0.4): 38
+// ``BinaryGardensMaterial/ghostStar`` — a preview's ghost star (quad, a ring cut into ``ghostDashes`` dashes around
+// its circle by a new angular dash rule; the star's colour chosen by `a_normal.z` = star as for ringShared and corona;
+// the broken colour when the change is refused); 39 ``BinaryGardensMaterial/ghostCell`` — a committed gauge cell's
+// outline strip behind a preview (quad, square; a valued material whose value, the committed band's index / 4, selects
+// BG_LETHAL_LOW … BG_LETHAL_HIGH in the vertex shader); 40 ``BinaryGardensMaterial/inspectRing`` — the inspected
+// world's ring (quad, ring, marker colour); 41 ``BinaryGardensMaterial/inspectBracket`` — the inspected row's bracket
+// strips (quad, square, marker colour).
 
 import Foundation
 
 /// The material code a system-program vertex carries in `a_uv.x` (FR-R02G2103-001, 002): one per kind of element the
-/// geometry draws, contiguous from 0 to 37. The geometry writes ``BinaryGardensShaders/encode(_:value:broken:)``; the
-/// system vertex shader selects ``paletteConstant``. The comment of each case names its coverage rule.
+/// geometry draws, contiguous from 0 to 41 (38 … 41 added by feature 504). The geometry writes
+/// ``BinaryGardensShaders/encode(_:value:broken:)``; the system vertex shader selects ``paletteConstant``. The comment
+/// of each case names its coverage rule.
 public enum BinaryGardensMaterial: Int, Sendable, CaseIterable, Hashable {
     /// The backdrop quad (opaque; `a_uv.y` height h 0 … 1; `a_normal.xy` its plane offsets): the still gradient from
     /// space to space top with the hashed starfield.
@@ -158,6 +169,16 @@ public enum BinaryGardensMaterial: Int, Sendable, CaseIterable, Hashable {
     case mote = 36
     /// The broken ring around a world a frozen or scorched failure names (quad, ring), broken colour.
     case brokenRing = 37
+    /// A preview's ghost star (quad, ring cut into ``BinaryGardensShaders/ghostDashes`` dashes around its circle;
+    /// `a_normal.z` its star), the star's colour, the broken colour when the change is refused (feature 504).
+    case ghostStar = 38
+    /// A committed gauge cell's outline strip behind a preview (quad, square; value its committed band's index / 4),
+    /// that band's cell colour (feature 504).
+    case ghostCell = 39
+    /// The ring around the inspected world (quad, ring), marker colour (feature 504).
+    case inspectRing = 40
+    /// A bracket strip beside the inspected world's gauge row (quad, square), marker colour (feature 504).
+    case inspectBracket = 41
 
     /// The plain code (no value, not broken), as `Float` for the uv stream.
     public var code: Float { Float(rawValue) }
@@ -171,20 +192,20 @@ public enum BinaryGardensMaterial: Int, Sendable, CaseIterable, Hashable {
         case .ringIdle: return "BG_RING_IDLE"
         case .ringStarOne, .starOne: return "BG_STAR_ONE"
         case .ringStarTwo, .starTwo: return "BG_STAR_TWO"
-        case .ringShared, .corona: return "BG_STAR_ONE"
+        case .ringShared, .corona, .ghostStar: return "BG_STAR_ONE"
         case .orbit: return "BG_ORBIT"
         case .trail: return "BG_STARFIELD"
         case .worldLethalLow, .worldDim, .worldComfortable, .worldBright, .worldLethalHigh, .worldPip:
             return "BG_WORLD"
         case .luminosityPipLit: return "BG_CORE"
         case .gaugePlate: return "BG_GAUGE_PLATE"
-        case .cellLethalLow: return "BG_LETHAL_LOW"
+        case .cellLethalLow, .ghostCell: return "BG_LETHAL_LOW"
         case .cellDim: return "BG_DIM"
         case .cellComfortable: return "BG_COMFORTABLE"
         case .cellBright: return "BG_BRIGHT"
         case .cellLethalHigh: return "BG_LETHAL_HIGH"
         case .guide, .windowBracket, .windowBracketShort, .bloomBracket: return "BG_WINDOW"
-        case .requiredTick, .tickMarker, .bloomMarker: return "BG_MARKER"
+        case .requiredTick, .tickMarker, .bloomMarker, .inspectRing, .inspectBracket: return "BG_MARKER"
         case .actionsLit: return "BG_ACTIONS_LIT"
         case .actionsUnlit: return "BG_ACTIONS_UNLIT"
         case .mote: return "BG_POLLEN"
@@ -201,11 +222,11 @@ public enum BinaryGardensMaterial: Int, Sendable, CaseIterable, Hashable {
     }
 
     /// Whether the material carries a value in the fraction of `a_uv.x` (the worlds, the trail, the cells, the
-    /// corona and the mote).
+    /// corona, the mote and the ghost cell).
     public var isValued: Bool {
         switch self {
         case .worldLethalLow, .worldDim, .worldComfortable, .worldBright, .worldLethalHigh, .trail, .cellLethalLow,
-             .cellDim, .cellComfortable, .cellBright, .cellLethalHigh, .corona, .mote:
+             .cellDim, .cellComfortable, .cellBright, .cellLethalHigh, .corona, .mote, .ghostCell:
             return true
         default:
             return false
@@ -287,7 +308,7 @@ public enum BinaryGardensShaders {
         (name: "a_uv", location: 2),
     ]
 
-    /// Every material as (Swift name, code, GLSL palette constant the system vertex shader selects), codes 0 … 37.
+    /// Every material as (Swift name, code, GLSL palette constant the system vertex shader selects), codes 0 … 41.
     public static var materials: [(name: String, code: Float, constant: String)] {
         var result: [(name: String, code: Float, constant: String)] = []
         for material in BinaryGardensMaterial.allCases {
@@ -355,9 +376,9 @@ public enum BinaryGardensShaders {
         return result
     }
 
-    /// The highest material code (the broken ring).
-    public static let maxMaterial: Int = BinaryGardensMaterial.brokenRing.rawValue
-    /// What `a_uv.x` adds for an element drawn in the broken colour (64: above every code 0 … 37 and its value, so the
+    /// The highest material code (the inspection bracket, feature 504).
+    public static let maxMaterial: Int = BinaryGardensMaterial.inspectBracket.rawValue
+    /// What `a_uv.x` adds for an element drawn in the broken colour (64: above every code 0 … 41 and its value, so the
     /// shape is kept).
     public static let brokenOffset: Double = 64
     /// How much of `a_uv.x` above its code is the value: x = code + valueScale · value. Below 0.5, so the code still
@@ -429,6 +450,8 @@ public enum BinaryGardensShaders {
     public static let dashDuty: Double = 0.55
     /// The soft edge of a dash in units of its period.
     public static let dashFeather: Double = 0.04
+    /// The dashes around a ghost star's ring (feature 504; each drawn over ``dashDuty`` of its period).
+    public static let ghostDashes: Double = 12
     /// The share of a star disc's radius that is its white-hot core.
     public static let coreShare: Double = 0.5
     /// A corona ray's shortest reach as a share of its quad (its reach pulses between this and 1).
@@ -543,7 +566,13 @@ public enum BinaryGardensShaders {
         vec3 base = BG_SPACE;
         \(selectionBlock())
         float second = step(0.5, a_normal.z);
-        base = mix(base, BG_STAR_TWO, (isCode(m, 6.0) + isCorona) * second);
+        base = mix(base, BG_STAR_TWO, (isCode(m, 6.0) + isCorona + isCode(m, 38.0)) * second);
+        float isGhostCell = isCode(m, 39.0);
+        float ghostBand = floor(value * 4.0 + 0.5);
+        base = mix(base, BG_DIM, isGhostCell * isCode(ghostBand, 1.0));
+        base = mix(base, BG_COMFORTABLE, isGhostCell * isCode(ghostBand, 2.0));
+        base = mix(base, BG_BRIGHT, isGhostCell * isCode(ghostBand, 3.0));
+        base = mix(base, BG_LETHAL_HIGH, isGhostCell * isCode(ghostBand, 4.0));
         base = mix(base, BG_BROKEN, marked);
         v_base = base;
         v_aux = a_normal;
@@ -610,6 +639,7 @@ public enum BinaryGardensShaders {
     const float BG_DASH_COUNT = \(decimals(dashCount));
     const float BG_DASH_DUTY = \(decimals(dashDuty));
     const float BG_DASH_FEATHER = \(decimals(dashFeather));
+    const float BG_GHOST_DASHES = \(decimals(ghostDashes));
     const float BG_CORE_SHARE = \(decimals(coreShare));
     const float BG_CORONA_MIN = \(decimals(coronaMin));
     const float BG_CORONA_TAPER = \(decimals(coronaTaper));
@@ -632,11 +662,13 @@ public enum BinaryGardensShaders {
         float sky = isCode(m, 0.0);
         float disc = isCode(m, 1.0) + isCode(m, 14.0) + isCode(m, 18.0) + isCode(m, 30.0);
         disc = disc + isCode(m, 33.0) + isCode(m, 36.0);
-        float ring = isCode(m, 2.0) + isCode(m, 19.0) + isCode(m, 37.0);
+        float ring = isCode(m, 2.0) + isCode(m, 19.0) + isCode(m, 37.0) + isCode(m, 40.0);
         float square = isCode(m, 3.0) + isCode(m, 4.0) + isCode(m, 5.0) + isCode(m, 6.0) + isCode(m, 7.0);
         square = square + isCode(m, 23.0) + isCode(m, 26.0) + isCode(m, 29.0);
         float plate = isCode(m, 20.0);
         square = square + isCode(m, 31.0) + isCode(m, 34.0) + isCode(m, 35.0);
+        square = square + isCode(m, 39.0) + isCode(m, 41.0);
+        float ghost = isCode(m, 38.0);
         float isTrail = isCode(m, 8.0);
         float isWorld = step(8.5, m) * step(m, 13.5);
         float isStar = isCode(m, 15.0) + isCode(m, 16.0);
@@ -698,6 +730,8 @@ public enum BinaryGardensShaders {
         float bracketCover = squareCover * arm;
         float t = fract((p.x + 1.0) * 0.5 * BG_DASH_COUNT);
         float dash = smoothstep(-BG_DASH_FEATHER, BG_DASH_FEATHER, BG_DASH_DUTY * 0.5 - abs(t - 0.5));
+        float turn = fract(atan(p.y, p.x + 0.00001) / BG_TAU * BG_GHOST_DASHES);
+        float arc = smoothstep(-BG_DASH_FEATHER, BG_DASH_FEATHER, BG_DASH_DUTY * 0.5 - abs(turn - 0.5));
         float reach = -1.0 + 2.0 * mix(BG_CORONA_MIN, 1.0, value);
         float width = 1.0 - BG_CORONA_TAPER * (clamp(p.y, -1.0, 1.0) + 1.0) * 0.5;
         float rayCover = cover(width - abs(p.x)) * cover(reach - p.y) * cover(p.y + 1.0);
@@ -711,6 +745,7 @@ public enum BinaryGardensShaders {
         coverage = coverage + outline * hollow + crossCover * crossed;
         coverage = coverage + bracketCover * bracket + bracketCover * dash * dashedBracket;
         coverage = coverage + rayCover * isCorona;
+        coverage = coverage + ringCover * arc * ghost;
         float alpha = clamp(coverage, 0.0, 1.0);
         rgb = clamp(rgb, 0.0, 1.0);
         color = vec4(rgb * alpha, alpha);
@@ -843,14 +878,26 @@ public enum BinaryGardensShaders {
     // MARK: CPU twins
 
     /// The base colour the system vertex shader selects for `material` with `value`, `broken`, won light `won` and
-    /// shape parameter `shape` (`a_normal.z`): the broken colour when broken; star 2's colour for a ring-shared dash
-    /// or a corona ray whose shape parameter is at least 0.5; else the material's palette colour. (The won light
+    /// shape parameter `shape` (`a_normal.z`): the broken colour when broken; star 2's colour for a ring-shared dash,
+    /// a corona ray or a ghost star whose shape parameter is at least 0.5; a ghost cell's committed band colour
+    /// (``ghostCellColour(value:)``); else the material's palette colour. (The won light
     /// changes no base colour; it makes the worlds bloom in the fragment stage.)
     public static func baseColour(of material: BinaryGardensMaterial, value: Double, broken: Bool, won: Double,
                                   shape: Double = 0) -> SIMD3<Double> {
         if broken { return BinaryGardensPalette.broken }
-        if (material == .ringShared || material == .corona) && shape >= 0.5 { return BinaryGardensPalette.starTwo }
+        if (material == .ringShared || material == .corona || material == .ghostStar) && shape >= 0.5 {
+            return BinaryGardensPalette.starTwo
+        }
+        if material == .ghostCell { return ghostCellColour(value: value) }
         return material.baseColour
+    }
+
+    /// The colour of a ghost cell of value `value` (feature 504): the cell colour of band index round(4 · value)
+    /// (clamped; lethal low, dim, comfortable, bright, lethal high), as the vertex shader selects it.
+    public static func ghostCellColour(value: Double) -> SIMD3<Double> {
+        let index: Int = Int((unit(value) * 4).rounded(.toNearestOrAwayFromZero))
+        let bands: [BinaryGardensBand] = BinaryGardensBand.allCases
+        return BinaryGardensMaterial.cell(bands[min(max(index, 0), bands.count - 1)]).baseColour
     }
 
     /// The still backdrop gradient at height `height` (0 bottom … 1 top; clamped, non-finite counts as 0): from space
@@ -994,8 +1041,8 @@ public enum BinaryGardensShaders {
 
     /// The coverage of quad material `material` at quad-local (`u`, `v`) with value `value` (the trail's freshness or
     /// the corona's pulse): smoothstep(−``markFeather``, ``markFeather``, distance) of its shape (disc, ring, square,
-    /// plate band, hollow, crossed, bracket, dashed bracket, tapered ray); a trail's disc times its freshness. 0 for
-    /// a world, the backdrop or non-finite input.
+    /// plate band, hollow, crossed, bracket, dashed bracket, tapered ray, the ghost star's dashed ring); a trail's disc
+    /// times its freshness. 0 for a world, the backdrop or non-finite input.
     public static func quadCoverage(_ material: BinaryGardensMaterial, u: Double, v: Double,
                                     value: Double = 1) -> Double {
         guard u.isFinite, v.isFinite else { return 0 }
@@ -1009,10 +1056,15 @@ public enum BinaryGardensShaders {
             return cover(1 - r)
         case .trail:
             return cover(1 - r) * unit(value)
-        case .tiltPipUnlit, .luminosityPipUnlit, .brokenRing:
+        case .tiltPipUnlit, .luminosityPipUnlit, .brokenRing, .inspectRing:
             return cover(ringHalf - abs(r - (1 - ringHalf)))
+        case .ghostStar:
+            let x: Double = angle(u: u, v: v) / (2 * Double.pi) * ghostDashes
+            let turn: Double = x - x.rounded(.down)
+            let arc: Double = smoothstep(-dashFeather, dashFeather, dashDuty * 0.5 - abs(turn - 0.5))
+            return cover(ringHalf - abs(r - (1 - ringHalf))) * arc
         case .ringIdle, .ringStarOne, .ringStarTwo, .ringShared, .orbit, .cellComfortable, .guide, .requiredTick,
-             .bloomTrack, .actionsLit, .actionsUnlit:
+             .bloomTrack, .actionsLit, .actionsUnlit, .ghostCell, .inspectBracket:
             return squareCover
         case .gaugePlate:
             return cover(1 - abs(v))

@@ -74,6 +74,40 @@
 // tessellation, the coronas, the trails, the motes and the glow: every body, orbit, pip, gauge and bar is the same at
 // every tier. Nothing here depends on the presentation time. Doubles are used for drawing only. Modelled on
 // `MushroomWeatherSceneGeometry` (feature 493).
+//
+// Feature 504 (R02-G21-04) T-R02G2104-002 (FR-R02G2104-001 … 010, 015; SC-R02G2104-001, 003, 004, 006;
+// clarifications Q1, Q3, Q4; research R5, R6, R9) adds, modelled on feature 494:
+//   * the player's view orbit (``BinaryGardensViewOrbit``) and `camera(aspect:orbit:)`: the authored camera frame (eye,
+//     look-at point and up direction) is turned rigidly by the pitch about the authored right axis (+x) through the
+//     look-at point (positive raises the eye), then by the yaw about the vertical axis (+z) through the authored box
+//     centre (0, −0.35, 0) — the look-at point itself, so the camera always looks at it; the field of view stays the
+//     authored one for the aspect and the eye moves along the view axis to the larger of the authored distance (≈ 3.60)
+//     and the distance at which every corner of the authored box (which already holds every ring at tilt 6, the dial,
+//     the gauges and the bars) lies inside the view with ``refitMargin`` per side, so everything inside the box keeps a
+//     margin of at least 5 % at every orbit and aspect 0.4 … 2.5 and the eye stays outside the box. At the authored
+//     orbit `camera(aspect:)` (which calls it) is the fixed camera of R02-G21-03, bit for bit;
+//   * the drawn eye: every part facing the eye (tilt pips, trail dots, world and luminosity pips, broken rings, motes,
+//     star discs, corona rays, glow shells, the ghost star and the inspection ring) faces the camera's eye, the bodies
+//     sort back to front from it (`paintOrder(_:eye:)`), a cube-sphere emits its quads far-first from it and the
+//     backdrop stands perpendicular to its view axis behind the box (`backdropCentre(eye:)`); the camera-taking
+//     `systemMesh`, `glowMesh`, `systemPart` and `glowPart` build for a camera, and the overloads without one use the
+//     authored camera;
+//   * the preview (`snapshot.preview`, research R5): an accepted preview draws the worlds and gauges from the previewed
+//     report (``drawnSnapshot(_:)``) — for a luminosity or tilt change also the previewed arrangement and star positions
+//     (the star's disc and pips at the previewed level; the rings, stars and dial at the previewed tilt) — and, behind
+//     every previewed gauge cell, the committed cell as an outline of four strips ``ghostCellWidth`` wide (the ghost
+//     bands, material 39 `ghostCell`, valued by the committed band's index / 4); a ring or phase change keeps the
+//     committed stars and rings and adds the ghost star (``ghostStars(_:)``: a dashed ring of the star's disc radius
+//     facing the eye, material 38 `ghostStar`, `a_normal.z` the star) at the target's position at the shown tick, right
+//     after its star's disc and pips inside that star's element. A refused preview keeps the committed drawing and adds
+//     the ghost in the broken colour: at the target for a ring or phase change, at the star with its previewed radius
+//     for a luminosity change, at both stars' positions at the previewed tilt for a tilt change;
+//   * the inspection marks (research R6): the inspected world gets an `inspectRing` (material 40, ring shape of outer
+//     radius ``inspectRingRadius`` facing the eye) after its broken ring, and its gauge row two `inspectBracket` strips
+//     (material 41, ``bracketWidth`` wide over y ± ``bracketHalf``) at x ``bracketLeft`` and ``bracketRight`` after
+//     the rest of the row.
+// Without a preview and an inspection, at the authored camera, every mesh is R02-G21-03's. The orbit, the preview and
+// the inspection are presentation only: never saved, never read by the rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -334,6 +368,21 @@ public enum BinaryGardensSceneGeometry {
     public static let backdropAspects: ClosedRange<Double> = 0.25...4
     /// The backdrop's distance from the eye along the view axis.
     public static let backdropDistance: Double = 7
+    /// The margin per side in view coordinates an orbiting camera refits the authored box to (feature 504; equal to
+    /// ``fitMargin``, so the refit is continuous at the authored orbit).
+    public static let refitMargin: Double = 0.06
+    /// The inspection ring's outer radius around the inspected world (feature 504; outside the 0.1 broken ring).
+    public static let inspectRingRadius: Double = 0.115
+    /// The width of an inspection bracket strip (feature 504).
+    public static let bracketWidth: Double = 0.006
+    /// The half height of an inspection bracket strip around its row's centre line (feature 504).
+    public static let bracketHalf: Double = 0.05
+    /// The x of the left inspection bracket (feature 504), just left of the plate.
+    public static let bracketLeft: Double = -0.962
+    /// The x of the right inspection bracket (feature 504), just right of the plate.
+    public static let bracketRight: Double = 1.232
+    /// The width of a ghost cell's outline strips (feature 504).
+    public static let ghostCellWidth: Double = 0.003
 
     // MARK: Material codes and colours
 
@@ -406,8 +455,8 @@ public enum BinaryGardensSceneGeometry {
         starBaseRadius + starRadiusStep * Double(min(max(luminosityIndex, 0), 3))
     }
 
-    /// Star `star`'s disc radius in `snapshot` (its current luminosity index).
-    static func starRadius(_ star: Int, _ snapshot: BinaryGardensSceneSnapshot) -> Double {
+    /// Star `star`'s disc radius in `snapshot` (its current luminosity index; public since feature 504).
+    public static func starRadius(_ star: Int, _ snapshot: BinaryGardensSceneSnapshot) -> Double {
         let lums: [Int] = snapshot.arrangement.luminosities
         return starRadius(luminosityIndex: lums.indices.contains(star) ? lums[star] : 0)
     }
@@ -549,13 +598,165 @@ public enum BinaryGardensSceneGeometry {
     /// The backdrop's centre: on the view axis at ``backdropDistance`` from the eye.
     public static func backdropCentre() -> SIMD3<Double> { eye + viewBasis().forward * backdropDistance }
 
+    /// The backdrop's centre seen from `viewer` (feature 504): on the view axis from `viewer` to the look-at point (the
+    /// target of every orbit camera) at ``facingBackdropDistance(eye:)``; ``backdropCentre()`` for the authored eye.
+    public static func backdropCentre(eye viewer: SIMD3<Double>) -> SIMD3<Double> {
+        guard viewer != eye else { return backdropCentre() }
+        return viewer + unit(lookAt - viewer) * facingBackdropDistance(eye: viewer)
+    }
+
+    /// The distance from `viewer` along its view axis (towards the look-at point) at which the backdrop stands (feature
+    /// 504): the larger of ``backdropDistance`` and the farthest box corner's depth plus 1 (``backdropDistance`` for the
+    /// authored eye).
+    public static func facingBackdropDistance(eye viewer: SIMD3<Double>) -> Double {
+        guard viewer != eye else { return backdropDistance }
+        let forward: SIMD3<Double> = unit(lookAt - viewer)
+        var farthest: Double = 0
+        for index in 0..<8 { farthest = max(farthest, dot(corner(index) - viewer, forward)) }
+        return max(backdropDistance, farthest + 1)
+    }
+
+    // MARK: Preview (feature 504)
+
+    /// The snapshot the system is drawn from (feature 504, research R5): `snapshot` itself without a preview or with a
+    /// refused one (the committed drawing), keeping its inspection; with an accepted preview, a copy whose worlds carry
+    /// the previewed report's light (flux, shares, bands, lethal run, window and its start, integral and bloom) and,
+    /// while the play has not failed, the previewed failure; for a luminosity or tilt change also the previewed
+    /// arrangement and star positions; for a ring or phase change the committed arrangement and stars (the ghost star
+    /// shows the target). The copy carries no preview and the same inspection.
+    public static func drawnSnapshot(_ snapshot: BinaryGardensSceneSnapshot) -> BinaryGardensSceneSnapshot {
+        guard let preview = snapshot.preview else { return snapshot }
+        guard case .accepted(let arrangement, let report) = preview.outcome,
+              report.worlds.count == snapshot.worlds.count else { return snapshot.clearingPreview() }
+        let s: BinaryGardensSceneSnapshot = snapshot
+        var worlds: [BinaryGardensSceneWorld] = []
+        for (index, world) in s.worlds.enumerated() {
+            let light: BinaryGardensWorldLight = report.worlds[index]
+            worlds.append(BinaryGardensSceneWorld(radius: world.radius, phase: world.phase, speed: world.speed,
+                                                  lethalLow: world.lethalLow, comfortLow: world.comfortLow,
+                                                  comfortHigh: world.comfortHigh, lethalHigh: world.lethalHigh,
+                                                  window: world.window, bloomLow: world.bloomLow,
+                                                  bloomHigh: world.bloomHigh, positions: world.positions,
+                                                  flux: light.flux, shares: light.shares, bands: light.bands,
+                                                  longestLethalRun: light.longestLethalRun,
+                                                  longestWindow: light.window, windowStart: light.windowStart,
+                                                  integral: light.integral, bloom: light.bloom))
+        }
+        var drawnArrangement: BinaryGardensArrangement = s.arrangement
+        var stars: [[BinaryGardensPoint]] = s.starPositions
+        switch preview.change {
+        case .luminosity, .tilt:
+            drawnArrangement = arrangement
+            stars = report.starPositions
+        default:
+            break
+        }
+        let failure: BinaryGardensFailure? = marksFailure(s) ? s.failure : report.failure
+        let drawn: BinaryGardensSceneSnapshot = BinaryGardensSceneSnapshot(
+            ringRadii: s.ringRadii, luminosityLevels: s.luminosityLevels, maxTilt: s.maxTilt, phaseStep: s.phaseStep,
+            lethalTolerance: s.lethalTolerance, worlds: worlds, arrangement: drawnArrangement, starPositions: stars,
+            shownTick: s.shownTick, failure: failure, stage: s.stage, actionsLeft: s.actionsLeft, budget: s.budget,
+            levelNumber: s.levelNumber, time: s.time, starSpeed: s.starSpeed, freedoms: s.freedoms)
+        return drawn.inspecting(s.inspectedWorld)
+    }
+
+    /// The ghost stars of `snapshot`'s preview (feature 504, research R5), each with its star, centre, radius and
+    /// whether the change is refused (drawn in the broken colour): for a ring change the star at its drawn table step
+    /// (``BinaryGardensSceneSnapshot/starStep(_:tick:)`` at the shown tick) on the target ring, for a phase change at
+    /// the target phase's table step (p + ω · t) mod 48 on its ring, both at the current tilt with the star's current
+    /// disc radius; for a refused luminosity change the star with its previewed radius; for a refused tilt change both
+    /// stars at their drawn table steps at the previewed tilt. Empty without a preview, for an accepted luminosity or
+    /// tilt change (the star itself is drawn previewed) and for a target out of the level's range.
+    public static func ghostStars(_ snapshot: BinaryGardensSceneSnapshot)
+        -> [(star: Int, centre: SIMD3<Double>, radius: Double, refused: Bool)] {
+        guard let preview = snapshot.preview else { return [] }
+        let refused: Bool = preview.refusal != nil
+        let s: BinaryGardensSceneSnapshot = snapshot
+        let t: Int = s.shownTick
+        let rings: [Int] = s.arrangement.rings
+        func ringRadius(_ star: Int) -> Int? {
+            guard rings.indices.contains(star), s.ringRadii.indices.contains(rings[star]) else { return nil }
+            return s.ringRadii[rings[star]]
+        }
+        switch preview.change {
+        case .ring(let star, let index):
+            guard (0..<2).contains(star), s.ringRadii.indices.contains(index) else { return [] }
+            let centre: SIMD3<Double> = ringVertex(radius: s.ringRadii[index], step: s.starStep(star, tick: t),
+                                                   tilt: s.arrangement.tilt, scale: s.fitScale)
+            return [(star: star, centre: centre, radius: starRadius(star, s), refused: refused)]
+        case .phase(let star, let step):
+            guard (0..<2).contains(star), (0..<BinaryGardensSky.cycle).contains(step),
+                  let radius = ringRadius(star) else { return [] }
+            let drawnStep: Int = BinaryGardensSky.phase(step, speed: s.starSpeed, tick: t)
+            let centre: SIMD3<Double> = ringVertex(radius: radius, step: drawnStep, tilt: s.arrangement.tilt,
+                                                   scale: s.fitScale)
+            return [(star: star, centre: centre, radius: starRadius(star, s), refused: refused)]
+        case .luminosity(let star, let index):
+            guard refused, (0..<2).contains(star), s.luminosityLevels.indices.contains(index) else { return [] }
+            return [(star: star, centre: starCentre(star, s), radius: starRadius(luminosityIndex: index),
+                     refused: true)]
+        case .tilt(let step):
+            guard refused, (0...max(s.maxTilt, 0)).contains(step) else { return [] }
+            var ghosts: [(star: Int, centre: SIMD3<Double>, radius: Double, refused: Bool)] = []
+            for star in 0..<2 {
+                guard let radius = ringRadius(star) else { continue }
+                let centre: SIMD3<Double> = ringVertex(radius: radius, step: s.starStep(star, tick: t), tilt: step,
+                                                       scale: s.fitScale)
+                ghosts.append((star: star, centre: centre, radius: starRadius(star, s), refused: true))
+            }
+            return ghosts
+        case .run:
+            return []
+        }
+    }
+
+    /// The ghost cells of world `world`'s committed light `committed` (feature 504): per tick 1 … 48 its committed
+    /// cell's outline as four strips ``ghostCellWidth`` wide inside the cell's rectangle (bottom, top, left, right) and
+    /// the value of the committed band (its index in `BinaryGardensBand.allCases`, lethal low 0 … lethal high 4, over
+    /// 4), which selects its colour.
+    public static func ghostCells(_ committed: BinaryGardensSceneWorld, world: Int)
+        -> [(value: Double, strips: [(left: Double, right: Double, low: Double, high: Double)])] {
+        let base: Double = baseline(world)
+        let cellHalf: Double = barFill * cellPitch / 2
+        let w: Double = ghostCellWidth
+        let bands: [BinaryGardensBand] = BinaryGardensBand.allCases
+        var cells: [(value: Double, strips: [(left: Double, right: Double, low: Double, high: Double)])] = []
+        for tick in 1...BinaryGardensSky.cycle {
+            let index: Int = tick - 1
+            let flux: Int = index < committed.flux.count ? committed.flux[index] : 0
+            let band: BinaryGardensBand = index < committed.bands.count ? committed.bands[index] : .comfortable
+            let top: Double = base + cellHeight(flux: flux, lethalHigh: committed.lethalHigh)
+            let x: Double = cellX(tick)
+            let left: Double = x - cellHalf
+            let right: Double = x + cellHalf
+            let strips: [(left: Double, right: Double, low: Double, high: Double)] = [
+                (left: left, right: right, low: base, high: base + w),
+                (left: left, right: right, low: top - w, high: top),
+                (left: left, right: left + w, low: base, high: top),
+                (left: right - w, right: right, low: base, high: top),
+            ]
+            let value: Double = Double(bands.firstIndex(of: band) ?? 2) / Double(bands.count - 1)
+            cells.append((value: value, strips: strips))
+        }
+        return cells
+    }
+
     // MARK: Elements
 
-    /// Every element with its centre, in drawing order (research R4). The same for every tier.
+    /// Every element with its centre, in drawing order (research R4), seen from the authored eye. The same for every
+    /// tier.
     public static func paintOrder(_ snapshot: BinaryGardensSceneSnapshot) -> [BinaryGardensElement] {
+        paintOrder(snapshot, eye: eye)
+    }
+
+    /// Every element with its centre, in drawing order, seen from `viewer` (feature 504): the bodies sorted back to front
+    /// by their distance from `viewer` (ties: worlds before stars, then index), the backdrop behind the box on its view
+    /// axis. Equal to ``paintOrder(_:)`` for the authored eye.
+    public static func paintOrder(_ snapshot: BinaryGardensSceneSnapshot,
+                                  eye viewer: SIMD3<Double>) -> [BinaryGardensElement] {
         typealias E = BinaryGardensElement
         let origin: SIMD3<Double> = SIMD3(0, 0, 0)
-        var list: [E] = [E(kind: .backdrop, index: 0, item: 0, centre: backdropCentre())]
+        var list: [E] = [E(kind: .backdrop, index: 0, item: 0, centre: backdropCentre(eye: viewer))]
         if snapshot.maxTilt > 0 {
             list.append(E(kind: .tiltDial, index: 0, item: 0, centre: tiltPipCentre(snapshot.maxTilt / 2)))
         }
@@ -584,7 +785,6 @@ public enum BinaryGardensSceneGeometry {
             list.append(E(kind: .glow, index: glow, item: 2 + world, centre: worldCentre(world, snapshot)))
             glow += 1
         }
-        let viewer: SIMD3<Double> = eye
         list.sort { E.drawsBefore($0, $1, eye: viewer) }
         return list
     }
@@ -648,35 +848,81 @@ public enum BinaryGardensSceneGeometry {
 
     // MARK: Meshes
 
-    /// The system mesh for the system program, in drawing order (see the header).
+    /// The system mesh for the system program, in drawing order (see the header), seen from the authored camera.
     public static func systemMesh(_ snapshot: BinaryGardensSceneSnapshot,
                                   tier: BinaryGardensTier) throws(MeshError) -> Mesh {
         try systemPart(snapshot, tier: tier).mesh
     }
 
-    /// The glow mesh for the glow program (``glowPart(_:tier:wonLevel:)`` without colours); empty at level-2.
+    /// The system mesh seen from `camera` (feature 504): every eye-facing part facing its eye, the bodies sorted back to
+    /// front from it and the backdrop behind the box on its view axis (``systemPart(_:tier:wonLevel:camera:)`` without
+    /// colours); equal to ``systemMesh(_:tier:)`` for a camera at the authored eye.
+    public static func systemMesh(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                                  camera: BinaryGardensCamera) throws(MeshError) -> Mesh {
+        try systemPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
+    /// The glow mesh for the glow program (``glowPart(_:tier:wonLevel:)`` without colours); empty at level-2. Seen
+    /// from the authored camera.
     public static func glowMesh(_ snapshot: BinaryGardensSceneSnapshot,
                                 tier: BinaryGardensTier) throws(MeshError) -> Mesh {
         try glowPart(snapshot, tier: tier).mesh
     }
 
+    /// The glow mesh seen from `camera` (feature 504): every shell facing its eye (``glowPart(_:tier:wonLevel:camera:)``
+    /// without colours); empty at level-2; equal to ``glowMesh(_:tier:)`` for a camera at the authored eye.
+    public static func glowMesh(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                                camera: BinaryGardensCamera) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
     /// The whole system with fallback colours for the shared unlit renderer: each vertex in its fallback colour
     /// (``colour(of:won:)``: worlds tinted by their band, broken parts in the broken colour, a shared ring's dashes
     /// and a corona ray in their star's colour), the backdrop from space at its bottom to space top at its top. The
-    /// mesh is ``systemMesh(_:tier:)``; `wonLevel` (default `snapshot.isWon`) changes only the colours.
+    /// mesh is ``systemMesh(_:tier:)``; `wonLevel` (default `snapshot.isWon`) changes only the colours. Seen from the
+    /// authored camera; the preview, the ghosts and the inspection marks as in the header (feature 504).
     public static func systemPart(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
                                   wonLevel: Bool? = nil) throws(MeshError) -> BinaryGardensColouredMesh {
-        var parts: Parts = Parts()
+        try system(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts())
+    }
+
+    /// The whole system with fallback colours seen from `camera` (feature 504): every eye-facing part facing its eye,
+    /// the bodies sorted back to front from it and the backdrop perpendicular to its view axis behind the box; otherwise
+    /// as ``systemPart(_:tier:wonLevel:)``, which it equals for a camera at the authored eye.
+    public static func systemPart(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                                  wonLevel: Bool? = nil,
+                                  camera: BinaryGardensCamera) throws(MeshError) -> BinaryGardensColouredMesh {
+        try system(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(camera: camera))
+    }
+
+    /// Builds the system into `parts` (empty, with the eye to face): every element of the drawn snapshot
+    /// (``drawnSnapshot(_:)``) in drawing order from the parts' eye but the glow, with the ghost stars of `snapshot`'s
+    /// preview, the ghost bands of an accepted preview and the inspection marks (see the header).
+    static func system(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier, wonLevel: Bool?,
+                       parts start: Parts) throws(MeshError) -> BinaryGardensColouredMesh {
+        var parts: Parts = start
         parts.won = (wonLevel ?? snapshot.isWon) ? 1 : 0
-        for element in paintOrder(snapshot) where element.kind != .glow {
-            try draw(element, into: &parts, snapshot, tier: tier)
+        let drawn: BinaryGardensSceneSnapshot = drawnSnapshot(snapshot)
+        let extras: Extras = Extras(ghosts: ghostStars(snapshot),
+                                    committed: snapshot.preview?.report == nil ? nil : snapshot.worlds)
+        for element in paintOrder(drawn, eye: parts.eye) where element.kind != .glow {
+            try draw(element, into: &parts, drawn, tier: tier, extras: extras)
         }
         return parts.built()
     }
 
-    /// Draws one element into `parts` (see the header).
+    /// What feature 504 adds to the elements: the ghost stars (drawn in their star's element) and, for an accepted
+    /// preview, the committed worlds whose cells the ghost bands outline.
+    struct Extras {
+        /// The ghost stars (``ghostStars(_:)``).
+        var ghosts: [(star: Int, centre: SIMD3<Double>, radius: Double, refused: Bool)] = []
+        /// The committed worlds behind an accepted preview; nil without one.
+        var committed: [BinaryGardensSceneWorld]? = nil
+    }
+
+    /// Draws one element into `parts` (see the header), with feature 504's `extras`.
     static func draw(_ element: BinaryGardensElement, into parts: inout Parts, _ snapshot: BinaryGardensSceneSnapshot,
-                     tier: BinaryGardensTier) throws(MeshError) {
+                     tier: BinaryGardensTier, extras: Extras = Extras()) throws(MeshError) {
         let i: Int = element.item
         switch element.kind {
         case .backdrop:
@@ -702,8 +948,14 @@ public enum BinaryGardensSceneGeometry {
             try world(&parts, i, snapshot, tier: tier)
         case .star:
             try star(&parts, i, snapshot, tier: tier)
+            for ghost in extras.ghosts where ghost.star == i {
+                try parts.billboardQuad(centre: ghost.centre, half: ghost.radius,
+                                        code: code(.ghostStar, broken: ghost.refused), w: Double(ghost.star))
+            }
         case .gauge:
-            try gauge(&parts, i, snapshot)
+            var committed: BinaryGardensSceneWorld? = nil
+            if let worlds = extras.committed, worlds.indices.contains(i) { committed = worlds[i] }
+            try gauge(&parts, i, snapshot, committed: committed)
         case .actions:
             let half: SIMD2<Double> = SIMD2(barFill * actionsSlot(snapshot) / 2, actionsHeight / 2)
             let material: BinaryGardensMaterial = i < litActions(snapshot) ? .actionsLit : .actionsUnlit
@@ -714,11 +966,15 @@ public enum BinaryGardensSceneGeometry {
     }
 
     /// Draws the backdrop: a quad on the view axis at ``backdropDistance``, perpendicular to it (a_normal its plane
-    /// offsets, a_uv.y the height).
+    /// offsets, a_uv.y the height); seen from an orbit camera (feature 504), on its view axis at
+    /// ``facingBackdropDistance(eye:)`` with ``backdropHalf()`` scaled by that distance over ``backdropDistance`` (the
+    /// orbit cameras keep the authored field of view, so it fills the view at aspects 0.25 … 4).
     static func backdrop(_ parts: inout Parts) throws(MeshError) {
-        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis()
-        let half: SIMD2<Double> = backdropHalf()
-        let c: SIMD3<Double> = backdropCentre()
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) =
+            parts.camera.map { viewBasis($0) } ?? viewBasis()
+        let distance: Double = facingBackdropDistance(eye: parts.eye)
+        let half: SIMD2<Double> = parts.camera == nil ? backdropHalf() : backdropHalf() * (distance / backdropDistance)
+        let c: SIMD3<Double> = parts.camera == nil ? backdropCentre() : parts.eye + basis.forward * distance
         let w: SIMD3<Double> = basis.right * half.x
         let h: SIMD3<Double> = basis.up * half.y
         let low: SIMD3<Double> = BinaryGardensShaders.backdropColour(height: 0)
@@ -788,31 +1044,51 @@ public enum BinaryGardensSceneGeometry {
         }
     }
 
-    /// The centre of pip `index` of `count` pips standing `drop` below `centre` in the eye-facing plane, 0.022 apart.
-    static func pipCentre(_ index: Int, of count: Int, below centre: SIMD3<Double>, drop: Double) -> SIMD3<Double> {
-        let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) = billboardBasis(centre)
+    /// The centre of pip `index` of `count` pips standing `drop` below `centre` in the plane facing `viewer`, 0.022
+    /// apart.
+    static func pipCentre(_ index: Int, of count: Int, below centre: SIMD3<Double>, drop: Double,
+                          eye viewer: SIMD3<Double> = eye) -> SIMD3<Double> {
+        let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) = billboardBasis(centre, eye: viewer)
         let offset: Double = (Double(index) - Double(count - 1) / 2) * pipStep
         return centre - b.up * drop + b.right * offset
     }
 
-    /// World `world`'s pip centres (j + 1 of them).
+    /// World `world`'s pip centres (j + 1 of them), facing the authored eye.
     public static func worldPips(_ world: Int, _ snapshot: BinaryGardensSceneSnapshot) -> [SIMD3<Double>] {
+        worldPips(world, snapshot, eye: eye)
+    }
+
+    /// World `world`'s pip centres in the plane facing `viewer` (feature 504).
+    public static func worldPips(_ world: Int, _ snapshot: BinaryGardensSceneSnapshot,
+                                 eye viewer: SIMD3<Double>) -> [SIMD3<Double>] {
         let centre: SIMD3<Double> = worldCentre(world, snapshot)
         var pips: [SIMD3<Double>] = []
-        for k in 0...max(world, 0) { pips.append(pipCentre(k, of: world + 1, below: centre, drop: worldPipDrop)) }
+        for k in 0...max(world, 0) {
+            pips.append(pipCentre(k, of: world + 1, below: centre, drop: worldPipDrop, eye: viewer))
+        }
         return pips
     }
 
-    /// Star `star`'s luminosity pip centres with their lit flags: one per luminosity level, lit up to its current one.
+    /// Star `star`'s luminosity pip centres with their lit flags: one per luminosity level, lit up to its current one;
+    /// facing the authored eye.
     public static func luminosityPips(_ star: Int,
                                       _ snapshot: BinaryGardensSceneSnapshot) -> [(centre: SIMD3<Double>, lit: Bool)] {
+        luminosityPips(star, snapshot, eye: eye)
+    }
+
+    /// Star `star`'s luminosity pip centres with their lit flags in the plane facing `viewer` (feature 504; the picker
+    /// reads the drawn eye's).
+    public static func luminosityPips(_ star: Int, _ snapshot: BinaryGardensSceneSnapshot,
+                                      eye viewer: SIMD3<Double>) -> [(centre: SIMD3<Double>, lit: Bool)] {
         let centre: SIMD3<Double> = starCentre(star, snapshot)
         let count: Int = snapshot.luminosityLevels.count
         let lums: [Int] = snapshot.arrangement.luminosities
         let current: Int = lums.indices.contains(star) ? lums[star] : 0
         let drop: Double = starRadius(star, snapshot) + starPipGap
         var pips: [(centre: SIMD3<Double>, lit: Bool)] = []
-        for k in 0..<count { pips.append((pipCentre(k, of: count, below: centre, drop: drop), k <= current)) }
+        for k in 0..<count {
+            pips.append((pipCentre(k, of: count, below: centre, drop: drop, eye: viewer), k <= current))
+        }
         return pips
     }
 
@@ -845,7 +1121,7 @@ public enum BinaryGardensSceneGeometry {
             let other: SIMD3<Int> = sphere.triangles[t + 1]
             let mid: SIMD3<Double> = (sphere.positions[tri.x] + sphere.positions[tri.y] + sphere.positions[tri.z]
                                       + sphere.positions[other.z]) / 4
-            quads.append((distance: length(centre + mid * worldRadius - eye), first: t))
+            quads.append((distance: length(centre + mid * worldRadius - parts.eye), first: t))
             t += 2
         }
         quads.sort { $0.distance != $1.distance ? $0.distance > $1.distance : $0.first < $1.first }
@@ -864,12 +1140,15 @@ public enum BinaryGardensSceneGeometry {
                 try parts.triangle((ids[0], ids[1], ids[2]), points[0], points[1], points[2], facing: facing)
             }
         }
-        for pip in worldPips(world, snapshot) {
+        for pip in worldPips(world, snapshot, eye: parts.eye) {
             try parts.billboardQuad(centre: pip, half: pipRadius, code: code(.worldPip), w: 0)
         }
         if lethalMark(snapshot)?.world == world {
             try parts.billboardQuad(centre: centre, half: brokenRingRadius, code: code(.brokenRing, broken: true),
                                     w: 0)
+        }
+        if snapshot.inspectedWorld == world {
+            try parts.billboardQuad(centre: centre, half: inspectRingRadius, code: code(.inspectRing), w: 0)
         }
         let radius: Double = BinaryGardensShaders.moteLoopRadius
         for mote in motes(world, snapshot, tier: tier, won: snapshot.isWon) {
@@ -879,14 +1158,22 @@ public enum BinaryGardensSceneGeometry {
     }
 
     /// Star `star`'s corona rays: `tier.coronaRays` rays k at angle 2π k / n in the eye-facing plane, each as
-    /// (centre, along (unit, root → tip), across (unit), half (across, along), phase k / n).
+    /// (centre, along (unit, root → tip), across (unit), half (across, along), phase k / n); facing the authored eye.
     public static func coronaRays(_ star: Int, _ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier)
+        -> [(centre: SIMD3<Double>, along: SIMD3<Double>, across: SIMD3<Double>, half: SIMD2<Double>,
+             phase: Double)] {
+        coronaRays(star, snapshot, tier: tier, eye: eye)
+    }
+
+    /// Star `star`'s corona rays in the plane facing `viewer` (feature 504).
+    public static func coronaRays(_ star: Int, _ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                                  eye viewer: SIMD3<Double>)
         -> [(centre: SIMD3<Double>, along: SIMD3<Double>, across: SIMD3<Double>, half: SIMD2<Double>,
              phase: Double)] {
         let n: Int = max(tier.coronaRays, 0)
         let centre: SIMD3<Double> = starCentre(star, snapshot)
         let r: Double = starRadius(star, snapshot)
-        let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) = billboardBasis(centre)
+        let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) = billboardBasis(centre, eye: viewer)
         var rays: [(centre: SIMD3<Double>, along: SIMD3<Double>, across: SIMD3<Double>, half: SIMD2<Double>,
                     phase: Double)] = []
         for k in 0..<n {
@@ -905,20 +1192,23 @@ public enum BinaryGardensSceneGeometry {
                      tier: BinaryGardensTier) throws(MeshError) {
         let centre: SIMD3<Double> = starCentre(star, snapshot)
         let colour: SIMD3<Double> = star == 0 ? BinaryGardensPalette.starOne : BinaryGardensPalette.starTwo
-        for ray in coronaRays(star, snapshot, tier: tier) {
+        for ray in coronaRays(star, snapshot, tier: tier, eye: parts.eye) {
             try parts.shapeQuad(centre: ray.centre, u: ray.across, v: ray.along, half: ray.half,
                                 code: code(.corona, value: ray.phase), w: Double(star), colour: colour)
         }
         let disc: BinaryGardensMaterial = star == 0 ? .starOne : .starTwo
         try parts.billboardQuad(centre: centre, half: starRadius(star, snapshot), code: code(disc), w: 0)
-        for pip in luminosityPips(star, snapshot) {
+        for pip in luminosityPips(star, snapshot, eye: parts.eye) {
             try parts.billboardQuad(centre: pip.centre, half: pipRadius,
                                     code: code(pip.lit ? .luminosityPipLit : .luminosityPipUnlit), w: 0)
         }
     }
 
-    /// Draws world `world`'s gauge row (see the header).
-    static func gauge(_ parts: inout Parts, _ world: Int, _ snapshot: BinaryGardensSceneSnapshot) throws(MeshError) {
+    /// Draws world `world`'s gauge row (see the header): with `committed` (an accepted preview's committed world,
+    /// feature 504) its cells' outlines right after the plate, behind the previewed cells; the inspection brackets last
+    /// when the world is inspected.
+    static func gauge(_ parts: inout Parts, _ world: Int, _ snapshot: BinaryGardensSceneSnapshot,
+                      committed: BinaryGardensSceneWorld? = nil) throws(MeshError) {
         let y: Double = gaugeY(world)
         try parts.plate(left: plateLeft, right: plateRight, low: y - plateHalf, high: y + plateHalf,
                         code: code(.gaugePlate))
@@ -927,6 +1217,14 @@ public enum BinaryGardensSceneGeometry {
         let base: Double = baseline(world)
         let lethal: (world: Int, column: Int)? = lethalMark(snapshot)
         let cellHalf: Double = barFill * cellPitch / 2
+        if let ghost = committed {
+            for cell in ghostCells(ghost, world: world) {
+                for strip in cell.strips {
+                    try parts.span(left: strip.left, right: strip.right, low: strip.low, high: strip.high,
+                                   code: code(.ghostCell, value: cell.value))
+                }
+            }
+        }
         for tick in 1...BinaryGardensSky.cycle {
             let index: Int = tick - 1
             let flux: Int = index < entry.flux.count ? entry.flux[index] : 0
@@ -968,6 +1266,12 @@ public enum BinaryGardensSceneGeometry {
         try parts.flatQuad(centre: SIMD3(bloomX(marker, bloomHigh: entry.bloomHigh), y, 0),
                            half: SIMD2(bloomMarkerRadius, bloomMarkerRadius),
                            code: code(.bloomMarker, broken: bloomWorld(snapshot) == world))
+        if snapshot.inspectedWorld == world {
+            for x in [bracketLeft, bracketRight] {
+                try parts.span(left: x - bracketWidth / 2, right: x + bracketWidth / 2, low: y - bracketHalf,
+                               high: y + bracketHalf, code: code(.inspectBracket))
+            }
+        }
     }
 
     /// The glow with fallback colours (a star's colour; the world colour times its factor, or 1 on a won level) for
@@ -978,11 +1282,28 @@ public enum BinaryGardensSceneGeometry {
     /// Empty at level-2. `wonLevel` (default `snapshot.isWon`) changes only the colours.
     public static func glowPart(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
                                 wonLevel: Bool? = nil) throws(MeshError) -> BinaryGardensColouredMesh {
+        try glow(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts())
+    }
+
+    /// The glow with fallback colours seen from `camera` (feature 504): every shell facing its eye; otherwise as
+    /// ``glowPart(_:tier:wonLevel:)``, which it equals for a camera at the authored eye. Drawn from
+    /// ``drawnSnapshot(_:)`` (the previewed light while an accepted preview is drawn).
+    public static func glowPart(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                                wonLevel: Bool? = nil,
+                                camera: BinaryGardensCamera) throws(MeshError) -> BinaryGardensColouredMesh {
+        try glow(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(camera: camera))
+    }
+
+    /// Builds the glow into `parts` (empty, with the eye to face; see ``glowPart(_:tier:wonLevel:)``) from the drawn
+    /// snapshot (``drawnSnapshot(_:)``).
+    static func glow(_ source: BinaryGardensSceneSnapshot, tier: BinaryGardensTier, wonLevel: Bool?,
+                     parts start: Parts) throws(MeshError) -> BinaryGardensColouredMesh {
         typealias K = BinaryGardensShaders.GlowKind
-        var parts: Parts = Parts()
+        var parts: Parts = start
+        let snapshot: BinaryGardensSceneSnapshot = drawnSnapshot(source)
         let shells: Int = max(tier.glowShells, 0)
         guard shells > 0 else { return parts.built() }
-        let won: Bool = wonLevel ?? snapshot.isWon
+        let won: Bool = wonLevel ?? source.isWon
         for k in stride(from: shells, through: 1, by: -1) {
             for star in 0..<2 {
                 let r: Double = starRadius(star, snapshot)
@@ -1010,11 +1331,28 @@ public enum BinaryGardensSceneGeometry {
         return (forward: f, right: r, up: cross(r, f))
     }
 
+    /// `camera`'s unit forward, right and up vectors, read from its view matrix (feature 504): for the authored camera
+    /// those of ``viewBasis()`` within rounding.
+    public static func viewBasis(_ camera: BinaryGardensCamera)
+        -> (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) {
+        let v: Mat4 = camera.view
+        let right: SIMD3<Double> = SIMD3(v.c0.x, v.c1.x, v.c2.x)
+        let up: SIMD3<Double> = SIMD3(v.c0.y, v.c1.y, v.c2.y)
+        let forward: SIMD3<Double> = SIMD3(-v.c0.z, -v.c1.z, -v.c2.z)
+        return (forward: forward, right: right, up: up)
+    }
+
     /// The basis of a part facing the eye at `centre`: right (+z × towards-eye, +x when degenerate), up and the unit
     /// direction towards the eye (right × up).
     static func billboardBasis(_ centre: SIMD3<Double>)
         -> (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) {
-        let w: SIMD3<Double> = unit(eye - centre)
+        billboardBasis(centre, eye: eye)
+    }
+
+    /// The basis of a part at `centre` facing `viewer` (feature 504; ``billboardBasis(_:)`` for the authored eye).
+    static func billboardBasis(_ centre: SIMD3<Double>, eye viewer: SIMD3<Double>)
+        -> (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) {
+        let w: SIMD3<Double> = unit(viewer - centre)
         let raw: SIMD3<Double> = cross(SIMD3(0, 0, 1), w)
         let size: Double = length(raw)
         let right: SIMD3<Double> = size > 1e-9 ? raw / size : SIMD3(1, 0, 0)
@@ -1036,8 +1374,97 @@ public enum BinaryGardensSceneGeometry {
     /// The fixed camera for `aspect`: from (0, −2.0, 3.2) looking at (0, −0.35, 0) with +y up; the vertical field of
     /// view is the smallest that holds every corner of the box x −1.3 … 1.3, y −1.85 … 1.15, z −0.85 … 0.85 inside the
     /// view with ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it keeps a
-    /// margin of at least 5 % for aspect 0.4 … 2.5). Independent of the snapshot, the tier and the time.
+    /// margin of at least 5 % for aspect 0.4 … 2.5). Independent of the snapshot, the tier and the time. Equals
+    /// ``camera(aspect:orbit:)`` at ``BinaryGardensViewOrbit/authored`` bit for bit (feature 504).
     public static func camera(aspect: Double) -> BinaryGardensCamera {
+        camera(aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `orbit` (clamped, see ``BinaryGardensViewOrbit/clamped()``) and `aspect` (feature 504,
+    /// T-R02G2104-002; research R9): the authored frame turned by the orbit (``orbitFrame(_:)``), the authored field of
+    /// view for the aspect, and the eye on the turned view axis at the larger of the authored distance (≈ 3.60) and the
+    /// distance at which every corner of the authored box lies inside the view with ``refitMargin`` per side, so
+    /// everything inside the box keeps a margin of at least 5 % at every orbit and aspect 0.4 … 2.5; the eye stays
+    /// outside the box. The target is always the look-at point (the yaw pivot). Near half the nearest corner's depth
+    /// (at least 0.001), far past the facing backdrop. At the authored orbit it is the fixed camera of R02-G21-03, bit
+    /// for bit. Presentation only; independent of the snapshot, the tier and the time.
+    public static func camera(aspect: Double, orbit: BinaryGardensViewOrbit) -> BinaryGardensCamera {
+        let o: BinaryGardensViewOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return authoredCamera(aspect: aspect) }
+        let a: Double = usableAspect(aspect)
+        let fovY: Double = authoredCamera(aspect: a).fovY
+        let frame: (target: SIMD3<Double>, back: SIMD3<Double>, up: SIMD3<Double>) = orbitFrame(o)
+        let forward: SIMD3<Double> = -frame.back
+        let right: SIMD3<Double> = unit(cross(forward, frame.up))
+        let up: SIMD3<Double> = cross(right, forward)
+        let tanHalf: Double = tan(fovY / 2)
+        let limit: Double = 1 - 2 * refitMargin
+        var distance: Double = authoredDistance
+        for index in 0..<8 {
+            let r: SIMD3<Double> = corner(index) - frame.target
+            let along: Double = dot(r, forward)
+            let vertical: Double = abs(dot(r, up)) / (limit * tanHalf) - along
+            let horizontal: Double = abs(dot(r, right)) / (limit * tanHalf * a) - along
+            distance = max(distance, vertical, horizontal)
+        }
+        let eyePoint: SIMD3<Double> = frame.target + frame.back * distance
+        var nearest: Double = Double.infinity
+        var farthest: Double = 0
+        for index in 0..<8 {
+            let depth: Double = dot(corner(index) - eyePoint, forward)
+            nearest = min(nearest, depth)
+            farthest = max(farthest, depth)
+        }
+        let near: Double = max(nearest * 0.5, 1e-3)
+        let far: Double = max(farthest + 1, backdropDistance) + 2
+        let view: Mat4 = Mat4.lookAt(eye: vec(eyePoint), target: vec(frame.target), up: vec(up))
+        let projection: Mat4 = Mat4.perspective(fovY: fovY, aspect: a, near: near, far: far)
+        return BinaryGardensCamera(eye: eyePoint, target: frame.target, fovY: fovY, aspect: a, near: near, far: far,
+                                   view: view, projection: projection, viewProjection: projection * view)
+    }
+
+    /// The authored distance from the eye to the look-at point, |(0, −1.65, 3.2)| ≈ 3.60 (feature 504).
+    static var authoredDistance: Double {
+        let d: SIMD3<Double> = eye - lookAt
+        return dot(d, d).squareRoot()
+    }
+
+    /// The point the orbit yaws about (feature 504): the authored box centre (0, −0.35, 0), the look-at point.
+    static var orbitPivot: SIMD3<Double> { (boxLow + boxHigh) / 2 }
+
+    /// `v` turned by `angle` radians about +x (the authored right axis), counter-clockwise seen from +x.
+    static func pitched(_ v: SIMD3<Double>, _ angle: Double) -> SIMD3<Double> {
+        let c: Double = cos(angle)
+        let s: Double = sin(angle)
+        return SIMD3(v.x, v.y * c - v.z * s, v.y * s + v.z * c)
+    }
+
+    /// `v` turned by `angle` radians about +z, counter-clockwise seen from above.
+    static func yawed(_ v: SIMD3<Double>, _ angle: Double) -> SIMD3<Double> {
+        let c: Double = cos(angle)
+        let s: Double = sin(angle)
+        return SIMD3(v.x * c - v.y * s, v.x * s + v.y * c, v.z)
+    }
+
+    /// The frame of `orbit` (clamped): the look-at point, the unit direction from it back towards the eye and the unit
+    /// up direction. The authored frame (look-at (0, −0.35, 0), back along (0, −1.65, 3.2), up ``viewBasis()``'s) is
+    /// turned rigidly by −pitch about +x through the look-at point (so a positive pitch raises the eye; the frame never
+    /// rolls, even with the eye past the vertical at pitch +35°), then by the yaw about the vertical axis through
+    /// ``orbitPivot`` (the look-at point, which therefore stays put).
+    static func orbitFrame(_ orbit: BinaryGardensViewOrbit)
+        -> (target: SIMD3<Double>, back: SIMD3<Double>, up: SIMD3<Double>) {
+        let o: BinaryGardensViewOrbit = orbit.clamped()
+        let back0: SIMD3<Double> = unit(eye - lookAt)
+        let up0: SIMD3<Double> = viewBasis().up
+        let back1: SIMD3<Double> = pitched(back0, -o.pitch)
+        let up1: SIMD3<Double> = pitched(up0, -o.pitch)
+        let pivot: SIMD3<Double> = SIMD3(orbitPivot.x, orbitPivot.y, 0)
+        let target: SIMD3<Double> = pivot + yawed(lookAt - pivot, o.yaw)
+        return (target: target, back: unit(yawed(back1, o.yaw)), up: unit(yawed(up1, o.yaw)))
+    }
+
+    /// The fixed camera of R02-G21-03 for `aspect` (see ``camera(aspect:)``), unchanged.
+    static func authoredCamera(aspect: Double) -> BinaryGardensCamera {
         let a: Double = usableAspect(aspect)
         let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis()
         let limit: Double = 1 - 2 * fitMargin
@@ -1120,6 +1547,22 @@ public enum BinaryGardensSceneGeometry {
         var colours: [Vec4] = []
         /// The won light the fallback colours use (0 or 1).
         var won: Double = 0
+        /// The eye the eye-facing parts face (feature 504): the authored eye unless an orbit camera is given.
+        var eye: SIMD3<Double> = BinaryGardensSceneGeometry.eye
+        /// The orbit camera whose view the backdrop faces, nil for the authored camera (feature 504).
+        var camera: BinaryGardensCamera? = nil
+
+        /// Parts seen from the authored camera.
+        init() {}
+
+        /// Parts seen from `camera` (feature 504): its eye faced; a camera at the authored eye counts as the authored
+        /// camera (every orbit camera looks at the look-at point), so its meshes equal the authored ones.
+        init(camera: BinaryGardensCamera) {
+            if camera.eye != BinaryGardensSceneGeometry.eye {
+                eye = camera.eye
+                self.camera = camera
+            }
+        }
         /// The side flats in the base plane face: up, towards the eye.
         static let up: SIMD3<Double> = SIMD3(0, 0, 1)
         /// The zero vector.
@@ -1184,7 +1627,7 @@ public enum BinaryGardensSceneGeometry {
         /// the eye-facing basis).
         mutating func billboardQuad(centre: SIMD3<Double>, half: Double, code: Double, w: Double) throws(MeshError) {
             let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) =
-                BinaryGardensSceneGeometry.billboardBasis(centre)
+                BinaryGardensSceneGeometry.billboardBasis(centre, eye: eye)
             try shapeQuad(centre: centre, u: b.right, v: b.up, half: SIMD2(half, half), code: code, w: w)
         }
 
@@ -1235,7 +1678,7 @@ public enum BinaryGardensSceneGeometry {
         mutating func glowBand(centre: SIMD3<Double>, inner: Double, outer: Double, code: Double,
                                slot: SIMD3<Double>, colour: SIMD3<Double>) throws(MeshError) {
             let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) =
-                BinaryGardensSceneGeometry.billboardBasis(centre)
+                BinaryGardensSceneGeometry.billboardBasis(centre, eye: eye)
             let n: Int = BinaryGardensSceneGeometry.glowSides
             for k in 0..<n {
                 let a0: Double = 2 * Double.pi * Double(k) / Double(n)

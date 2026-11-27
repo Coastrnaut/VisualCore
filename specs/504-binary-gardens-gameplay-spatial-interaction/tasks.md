@@ -78,7 +78,7 @@ modelled on feature 484).
 
 ## Phase 3: Stories 1 … 5 — ring and phase drags, luminosity, tilt, inspection and the scrub (P1) 🎯
 
-- [ ] T-R02G2104-003 [US1] [US2] [US3] [US4] [US5] Create
+- [X] T-R02G2104-003 [US1] [US2] [US3] [US4] [US5] Create — Verified 2026-11-27: host-2 exit 0 covers it (same command on the tree with T-003 installed; no duplicate run on an unchanged tree): view orbit, drawn-eye geometry, materials 38 … 41, picker, gesture controller
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensGestureController.swift` (FR-R02G2104-001 … 008, 010,
   011, 012; SC-R02G2104-001 … 003; `BinaryGardensGestureAction` setRing(star, index), setPhase(star, step),
   setLuminosity(star, index), setTilt(step), showTick(tick), inspectWorld(world?), selectStar(star), preview(change),

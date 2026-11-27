@@ -12,6 +12,16 @@
 // `BinaryGardensShaders` (encoded codes, quad-local normals at ±1.25, world normals and shares, the backdrop's plane
 // offsets and height); the backdrop filling the view and its gradient coordinate; the fallback colours. Explicit
 // types, plain loops.
+//
+// Feature 504 (R02-G21-04) T-R02G2104-002 (FR-R02G2104-001, 002, 005, 006, 008, 010, 015; SC-R02G2104-003, 004, 006;
+// research R5, R6, R9) adds: the orbit camera equal to the authored camera at orbit 0 (bit for bit), continuous next to
+// it, always looking at the look-at point; every element, ghost and mark inside the view with a 5 % margin at the
+// authored orbit, the four orbit corners and two inner orbits × 7 aspects, the eye outside the box and the facing
+// backdrop filling the view; the drawn snapshot equal to the kernel's previewed report (worlds and gauges; the star at
+// a previewed luminosity or tilt), the ghost star at the target (broken when refused), the ghost bands outlining the
+// committed cells, the inspection ring and brackets; without a preview and an inspection every mesh is R02-G21-03's
+// element loop, the camera-taking meshes equal the authored ones at the authored camera, and orbit meshes face the
+// drawn eye.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -60,7 +70,7 @@ import VisualCoreScenes
                  arrangement: base.arrangement, starPositions: base.starPositions,
                  shownTick: shownTick ?? base.shownTick, failure: failure ?? base.failure, stage: stage ?? base.stage,
                  actionsLeft: actionsLeft ?? base.actionsLeft, budget: base.budget, levelNumber: base.levelNumber,
-                 time: base.time)
+                 time: base.time, starSpeed: base.starSpeed, freedoms: base.freedoms)
     }
 
     /// `world` with its light replaced (flux, bands, window, start, integral).
@@ -220,6 +230,7 @@ import VisualCoreScenes
                 switch d.material {
                 case .ringShared: #expect(n.z == 0 || n.z == 1)
                 case .corona: #expect(n.z == 0 || n.z == 1)
+                case .ghostStar: #expect(n.z == 0 || n.z == 1)
                 case .mote: #expect(n.z == BinaryGardensShaders.moteLoopRadius)
                 default: #expect(n.z == 0, "\(d.material)")
                 }
@@ -743,5 +754,379 @@ import VisualCoreScenes
         // The first actions bar is lit (red above blue, the frame check's vermilion).
         #expect(BinaryGardensPalette.actionsLit.x - BinaryGardensPalette.actionsLit.z >= 0.08)
         #expect(G.litActions(snapshot) == snapshot.actionsLeft)
+    }
+
+    // MARK: Feature 504 — orbit, preview, ghosts and inspection
+
+    /// The orbits checked (feature 504): the authored one, the four corners of the bounds and two inner orbits.
+    static let orbitsChecked: [BinaryGardensViewOrbit] = {
+        var result: [BinaryGardensViewOrbit] = [BinaryGardensViewOrbit.authored]
+        for corner in BinaryGardensViewOrbit.corners { result.append(corner) }
+        result.append(BinaryGardensViewOrbit(yaw: 0.5, pitch: 0.3))
+        result.append(BinaryGardensViewOrbit(yaw: -0.3, pitch: -0.2))
+        return result
+    }()
+
+    /// The first change of `snapshot` in `level` whose preview the kernel accepts, among ring changes (then phase,
+    /// luminosity and tilt changes) of either star; nil when none is accepted.
+    static func acceptedChange(_ snapshot: Snapshot, _ level: BinaryGardensLevel,
+                               kind: Int) -> BinaryGardensAction? {
+        var candidates: [BinaryGardensAction] = []
+        for star in 0..<2 {
+            switch kind {
+            case 0: for index in level.ringRadii.indices { candidates.append(.ring(star: star, index: index)) }
+            case 1:
+                for step in stride(from: 0, to: 48, by: level.phaseStep) {
+                    candidates.append(.phase(star: star, step: step))
+                }
+            case 2:
+                for index in level.luminosityLevels.indices { candidates.append(.luminosity(star: star, index: index)) }
+            default:
+                if star == 0 { for step in 0...level.maxTilt { candidates.append(.tilt(step: step)) } }
+            }
+        }
+        for change in candidates where snapshot.previewing(change, level: level).preview?.report != nil {
+            return change
+        }
+        return nil
+    }
+
+    /// R02-G21-03's element loop (the reference): every element of `snapshot` in authored drawing order, without
+    /// ghosts, ghost bands or marks.
+    static func elementsPart(_ snapshot: Snapshot, tier: BinaryGardensTier) throws -> BinaryGardensColouredMesh {
+        var parts: G.Parts = G.Parts()
+        parts.won = snapshot.isWon ? 1 : 0
+        for element in G.paintOrder(snapshot) where element.kind != .glow {
+            try G.draw(element, into: &parts, snapshot, tier: tier)
+        }
+        return parts.built()
+    }
+
+    /// The quad corners of a flat strip spanning x `left` … `right`, y `low` … `high` at z 0.
+    static func stripCorners(left: Double, right: Double, low: Double, high: Double) -> [SIMD3<Double>] {
+        let e: Double = BinaryGardensShaders.quadExtent
+        let cx: Double = (left + right) / 2
+        let cy: Double = (low + high) / 2
+        let hx: Double = e * abs(right - left) / 2
+        let hy: Double = e * abs(high - low) / 2
+        return [SIMD3(cx - hx, cy - hy, 0), SIMD3(cx + hx, cy - hy, 0), SIMD3(cx + hx, cy + hy, 0),
+                SIMD3(cx - hx, cy + hy, 0)]
+    }
+
+    /// The number of vertices of `mesh` (every one but the backdrop's; a mote on its loop too) outside the view of
+    /// `camera` with a 5 % margin.
+    static func outsideView(_ mesh: Mesh, _ camera: BinaryGardensCamera) -> Int {
+        var outside: Int = 0
+        for k in mesh.positions.indices {
+            let d = decoded(mesh, k)
+            if d.material == .backdrop { continue }
+            let p: Vec3 = mesh.positions[k]
+            let point: SIMD3<Double> = SIMD3(p.x, p.y, p.z)
+            if !inView(point, camera) { outside += 1 }
+            if d.material == .mote {
+                let r: Double = mesh.normals[k].z
+                if !inView(point + SIMD3(-2 * r, 0, 0), camera) { outside += 1 }
+            }
+        }
+        return outside
+    }
+
+    @Test func orbitCameraIsTheAuthoredCameraAtOrbitZero() {
+        var aspects: [Double] = Self.aspects
+        aspects.append(Double.nan)
+        aspects.append(-2)
+        aspects.append(50)
+        aspects.append(0.1)
+        for aspect in aspects {
+            let authored: BinaryGardensCamera = G.camera(aspect: aspect)
+            #expect(G.camera(aspect: aspect, orbit: .authored) == authored)
+            #expect(G.authoredCamera(aspect: aspect) == authored)
+            #expect(authored.eye == G.eye && authored.target == G.lookAt)
+            let nudged: BinaryGardensCamera = G.camera(aspect: aspect,
+                                                       orbit: BinaryGardensViewOrbit(yaw: 1e-9, pitch: -1e-9))
+            #expect(Self.distance(nudged.eye, authored.eye) < 1e-6)
+            #expect(Self.distance(nudged.target, authored.target) < 1e-9)
+            #expect(nudged.fovY == authored.fovY && nudged.aspect == authored.aspect)
+            let wild: BinaryGardensViewOrbit = BinaryGardensViewOrbit(yaw: 5, pitch: -3)
+            let limit: BinaryGardensViewOrbit = BinaryGardensViewOrbit(
+                yaw: BinaryGardensViewOrbit.yawLimit, pitch: BinaryGardensViewOrbit.pitchRange.lowerBound)
+            #expect(G.camera(aspect: aspect, orbit: wild) == G.camera(aspect: aspect, orbit: limit))
+        }
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = G.viewBasis(G.camera(aspect: 1))
+        let authoredBasis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = G.viewBasis()
+        #expect(Self.distance(basis.forward, authoredBasis.forward) < 1e-12)
+        #expect(Self.distance(basis.right, authoredBasis.right) < 1e-12)
+        #expect(Self.distance(basis.up, authoredBasis.up) < 1e-12)
+        // The yaw pivots about the look-at point, so every orbit camera looks at it.
+        #expect(Self.distance(G.orbitPivot, G.lookAt) < 1e-12)
+        for orbit in Self.orbitsChecked {
+            #expect(Self.distance(G.camera(aspect: 1.3, orbit: orbit).target, G.lookAt) < 1e-12, "\(orbit)")
+            #expect(orbit.isWithinBounds && orbit.clamped() == orbit)
+        }
+        let yawed: BinaryGardensCamera = G.camera(aspect: 1, orbit: BinaryGardensViewOrbit(yaw: 0.5, pitch: 0))
+        #expect(yawed.eye.x > 0.5)
+        let raised: BinaryGardensCamera = G.camera(aspect: 1, orbit: BinaryGardensViewOrbit(yaw: 0, pitch: 0.3))
+        let lowered: BinaryGardensCamera = G.camera(aspect: 1, orbit: BinaryGardensViewOrbit(yaw: 0, pitch: -0.3))
+        #expect(raised.eye.z - raised.target.z > G.eye.z - G.lookAt.z)
+        #expect(lowered.eye.z - lowered.target.z < G.eye.z - G.lookAt.z)
+        #expect(!BinaryGardensViewOrbit(yaw: 1.1, pitch: 0).isWithinBounds)
+        #expect(BinaryGardensViewOrbit(yaw: .nan, pitch: .infinity).clamped() == .authored)
+        #expect(abs(G.authoredDistance - (1.65 * 1.65 + 3.2 * 3.2).squareRoot()) < 1e-12)
+        #expect(G.refitMargin == 0.06 && G.refitMargin >= 0.05)
+    }
+
+    @Test func sceneInsideTheViewAtOrbitCornersAndSevenAspects() throws {
+        var snaps: [Snapshot] = []
+        for n in [2, 9] {
+            let level: BinaryGardensLevel = Self.levels[n]
+            let base: Snapshot = try Self.snapshot(level, tick: 13)
+            let change: BinaryGardensAction = try #require(Self.acceptedChange(base, level, kind: 0)
+                                                           ?? Self.acceptedChange(base, level, kind: 1))
+            snaps.append(base.previewing(change, level: level).inspecting(base.worlds.count - 1))
+        }
+        snaps.append(Self.extreme(rings: 8, worlds: 5, worldRadius: 40, tilt: 6, budget: 24).inspecting(4))
+        let tier: BinaryGardensTier = BinaryGardensTier.of(1)
+        for orbit in Self.orbitsChecked {
+            for aspect in Self.aspects {
+                let camera: BinaryGardensCamera = G.camera(aspect: aspect, orbit: orbit)
+                #expect(camera.aspect == aspect)
+                for index in 0..<8 { #expect(Self.inView(G.corner(index), camera), "corner \(index) \(orbit)") }
+                #expect(!Self.inBox(camera.eye), "\(orbit) \(aspect)")
+                #expect(Self.distance(camera.eye, camera.target) >= G.authoredDistance - 1e-9)
+                for snap in snaps {
+                    let system: Mesh = try G.systemMesh(snap, tier: tier, camera: camera)
+                    #expect(Self.outsideView(system, camera) == 0, "system \(orbit) \(aspect)")
+                    let glow: Mesh = try G.glowMesh(snap, tier: tier, camera: camera)
+                    #expect(Self.outsideView(glow, camera) == 0, "glow \(orbit) \(aspect)")
+                    #expect(!Self.positions(system, [.inspectRing]).isEmpty)
+                    #expect(Self.positions(system, [.inspectBracket]).count == 8)
+                }
+            }
+        }
+        // The facing backdrop fills the view from every orbit corner at aspects 0.25 … 4.
+        for orbit in BinaryGardensViewOrbit.corners {
+            for aspect in [0.25, 0.4, 1.0, 2.5, 4.0] {
+                let camera: BinaryGardensCamera = G.camera(aspect: aspect, orbit: orbit)
+                let mesh: Mesh = try G.systemMesh(snaps[0], tier: BinaryGardensTier.of(2), camera: camera)
+                let corners: [SIMD3<Double>] = Self.positions(mesh, [.backdrop])
+                #expect(corners.count == 4)
+                var xs: [Double] = []
+                var ys: [Double] = []
+                for corner in corners {
+                    guard let p = G.project(corner, camera: camera) else {
+                        Issue.record("backdrop corner behind the eye")
+                        continue
+                    }
+                    xs.append(p.x)
+                    ys.append(p.y)
+                }
+                #expect((xs.min() ?? 0) < 0 && (xs.max() ?? 0) > 1 && (ys.min() ?? 0) < 0 && (ys.max() ?? 0) > 1)
+                let middle: SIMD3<Double> = (corners[0] + corners[1] + corners[2] + corners[3]) / 4
+                let centre: SIMD2<Double> = try #require(G.project(middle, camera: camera))
+                #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9)
+                #expect(Self.distance(middle, G.backdropCentre(eye: camera.eye)) < 1e-9)
+            }
+        }
+    }
+
+    @Test func previewDrawsTheKernelsReportWithTheGhostsAndTheBands() throws {
+        let tier: BinaryGardensTier = BinaryGardensTier.of(1)
+        for n in [0, 3, 5, 8] {
+            let level: BinaryGardensLevel = Self.levels[n]
+            let base: Snapshot = try Self.snapshot(level, tick: 31)
+            // A ring or phase change: the previewed light, the committed stars, a ghost star at the target.
+            for kind in [0, 1] {
+                guard let change = Self.acceptedChange(base, level, kind: kind) else { continue }
+                let previewed: Snapshot = base.previewing(change, level: level)
+                let preview: BinaryGardensPreview = try #require(previewed.preview)
+                let report: BinaryGardensReport = try #require(preview.report)
+                let drawn: Snapshot = G.drawnSnapshot(previewed)
+                #expect(drawn.preview == nil && drawn.arrangement == base.arrangement)
+                #expect(drawn.starPositions == base.starPositions)
+                for (j, world) in drawn.worlds.enumerated() {
+                    #expect(world.flux == report.worlds[j].flux && world.bands == report.worlds[j].bands)
+                    #expect(world.shares == report.worlds[j].shares && world.integral == report.worlds[j].integral)
+                    #expect(world.longestWindow == report.worlds[j].window && world.bloom == report.worlds[j].bloom)
+                    #expect(world.positions == base.worlds[j].positions)
+                }
+                #expect(drawn.failure == report.failure)
+                let ghosts = G.ghostStars(previewed)
+                try #require(ghosts.count == 1)
+                let ghost = ghosts[0]
+                var expected: SIMD3<Double> = SIMD3(0, 0, 0)
+                switch change {
+                case .ring(let star, let index):
+                    #expect(ghost.star == star)
+                    expected = G.ringVertex(radius: base.ringRadii[index], step: base.starStep(star, tick: 31),
+                                            tilt: base.arrangement.tilt, scale: base.fitScale)
+                case .phase(let star, let step):
+                    #expect(ghost.star == star)
+                    let radius: Int = base.ringRadii[base.arrangement.rings[star]]
+                    expected = G.ringVertex(radius: radius, step: (step + base.starSpeed * 31) % 48,
+                                            tilt: base.arrangement.tilt, scale: base.fitScale)
+                    #expect(Self.distance(expected, G.position(report.starPositions[30][star], scale: base.fitScale))
+                            < 1e-12, "the ghost stands where the kernel would draw the star")
+                default:
+                    Issue.record("unexpected change \(change)")
+                }
+                #expect(Self.distance(ghost.centre, expected) < 1e-12 && !ghost.refused)
+                #expect(ghost.radius == G.starRadius(ghost.star, base))
+                let mesh: Mesh = try G.systemMesh(previewed, tier: tier)
+                Self.checkSystem(mesh)
+                let ghostCorners: [SIMD3<Double>] = Self.positions(mesh, [.ghostStar])
+                try #require(ghostCorners.count == 4)
+                let centre: SIMD3<Double> = (ghostCorners[0] + ghostCorners[1] + ghostCorners[2] + ghostCorners[3]) / 4
+                #expect(Self.distance(centre, expected) < 1e-12)
+                #expect(Self.brokenMaterials(mesh).isDisjoint(with: [.ghostStar]))
+                // The ghost bands: the committed cells' outlines, valued by the committed band.
+                var outline: [SIMD3<Double>] = []
+                for j in base.worlds.indices {
+                    for cell in G.ghostCells(base.worlds[j], world: j) {
+                        for strip in cell.strips {
+                            outline += Self.stripCorners(left: strip.left, right: strip.right, low: strip.low,
+                                                         high: strip.high)
+                        }
+                    }
+                }
+                #expect(Self.key(Self.positions(mesh, [.ghostCell])) == Self.key(outline))
+                for k in mesh.positions.indices where Self.decoded(mesh, k).material == .ghostCell {
+                    let value: Double = Self.decoded(mesh, k).value
+                    #expect(abs(value * 4 - (value * 4).rounded()) < 1e-6)
+                }
+                // The previewed cells are the drawn snapshot's: the reference loop of the drawn snapshot draws the
+                // same cells.
+                let reference: Mesh = try Self.elementsPart(drawn, tier: tier).mesh
+                let cells: Set<Material> = [.cellLethalLow, .cellDim, .cellComfortable, .cellBright, .cellLethalHigh]
+                #expect(Self.key(Self.positions(mesh, cells)) == Self.key(Self.positions(reference, cells)))
+                #expect(Self.key(Self.positions(mesh, [.starOne, .starTwo]))
+                        == Self.key(Self.positions(reference, [.starOne, .starTwo])))
+            }
+            // A luminosity or tilt change: the star drawn previewed, no ghost.
+            for kind in [2, 3] {
+                guard let change = Self.acceptedChange(base, level, kind: kind) else { continue }
+                let previewed: Snapshot = base.previewing(change, level: level)
+                let report: BinaryGardensReport = try #require(previewed.preview?.report)
+                let arrangement: BinaryGardensArrangement = try #require(previewed.preview?.arrangement)
+                let drawn: Snapshot = G.drawnSnapshot(previewed)
+                #expect(drawn.arrangement == arrangement && drawn.starPositions == report.starPositions)
+                #expect(G.ghostStars(previewed).isEmpty)
+                let mesh: Mesh = try G.systemMesh(previewed, tier: tier)
+                #expect(Self.positions(mesh, [.ghostStar]).isEmpty && !Self.positions(mesh, [.ghostCell]).isEmpty)
+                let reference: Mesh = try Self.elementsPart(drawn, tier: tier).mesh
+                #expect(Self.key(Self.positions(mesh, [.starOne, .starTwo, .ringIdle, .ringStarOne, .ringStarTwo,
+                                                       .ringShared, .luminosityPipLit, .luminosityPipUnlit]))
+                        == Self.key(Self.positions(reference, [.starOne, .starTwo, .ringIdle, .ringStarOne,
+                                                               .ringStarTwo, .ringShared, .luminosityPipLit,
+                                                               .luminosityPipUnlit])))
+            }
+            // A refused change (no action left): the committed drawing, the ghost in the broken colour, no bands.
+            let spent: Snapshot = Self.variant(base, actionsLeft: 0)
+            guard let change = Self.acceptedChange(base, level, kind: 0) else { continue }
+            let refused: Snapshot = spent.previewing(change, level: level)
+            #expect(refused.preview?.outcome == .refused(.budget))
+            #expect(G.drawnSnapshot(refused) == spent)
+            let ghosts = G.ghostStars(refused)
+            #expect(ghosts.count == 1 && ghosts.first?.refused == true)
+            let mesh: Mesh = try G.systemMesh(refused, tier: tier)
+            #expect(Self.positions(mesh, [.ghostStar], broken: true).count == 4)
+            #expect(Self.positions(mesh, [.ghostCell]).isEmpty)
+            let committed: Mesh = try G.systemMesh(spent, tier: tier)
+            let cells: Set<Material> = [.cellLethalLow, .cellDim, .cellComfortable, .cellBright, .cellLethalHigh]
+            #expect(Self.key(Self.positions(mesh, cells)) == Self.key(Self.positions(committed, cells)))
+            // A refused luminosity change: the ghost at the star with the previewed radius; a refused tilt: both stars.
+            if level.luminosityLevels.count > 1 {
+                let star: Int = level.stars[0].luminosityAdjustable ? 0 : 1
+                let other: Int = (base.arrangement.luminosities[star] + 1) % level.luminosityLevels.count
+                let lum: Snapshot = spent.previewing(.luminosity(star: star, index: other), level: level)
+                if lum.preview?.refusal != nil {
+                    let lumGhosts = G.ghostStars(lum)
+                    #expect(lumGhosts.count == 1 && lumGhosts.first?.radius == G.starRadius(luminosityIndex: other))
+                    #expect(lumGhosts.first.map { Self.distance($0.centre, G.starCentre(star, base)) } == 0)
+                }
+            }
+            if level.maxTilt > 0 {
+                let tilt: Snapshot = spent.previewing(.tilt(step: (base.arrangement.tilt + 1) % (level.maxTilt + 1)),
+                                                      level: level)
+                if tilt.preview?.refusal != nil { #expect(G.ghostStars(tilt).count == 2) }
+            }
+        }
+    }
+
+    @Test func withoutAPreviewTheMeshesAreR02G2103s() throws {
+        for n in [0, 4, 7, 9] {
+            let level: BinaryGardensLevel = Self.levels[n]
+            let snap: Snapshot = try Self.snapshot(level, tick: 7)
+            #expect(G.drawnSnapshot(snap) == snap && G.ghostStars(snap).isEmpty)
+            for tier in BinaryGardensTier.all {
+                let reference: BinaryGardensColouredMesh = try Self.elementsPart(snap, tier: tier)
+                let part: BinaryGardensColouredMesh = try G.systemPart(snap, tier: tier)
+                #expect(part == reference)
+                let glow: BinaryGardensColouredMesh = try G.glowPart(snap, tier: tier)
+                for aspect in [0.4, 1.0, 2.5] {
+                    let camera: BinaryGardensCamera = G.camera(aspect: aspect)
+                    #expect(try G.systemPart(snap, tier: tier, camera: camera) == part)
+                    #expect(try G.systemMesh(snap, tier: tier, camera: camera) == part.mesh)
+                    #expect(try G.glowPart(snap, tier: tier, camera: camera) == glow)
+                    #expect(try G.glowMesh(snap, tier: tier, camera: camera) == glow.mesh)
+                }
+                #expect(G.paintOrder(snap, eye: G.eye) == G.paintOrder(snap))
+            }
+            // An inspection only adds its marks: the ring round the world and the two brackets beside its row.
+            let world: Int = snap.worlds.count - 1
+            let inspected: Snapshot = snap.inspecting(world)
+            let tier: BinaryGardensTier = BinaryGardensTier.of(2)
+            let marked: Mesh = try G.systemMesh(inspected, tier: tier)
+            let plain: Mesh = try G.systemMesh(snap, tier: tier)
+            let others: Set<Material> = Set(Material.allCases).subtracting([.inspectRing, .inspectBracket])
+            #expect(Self.key(Self.positions(marked, others)) == Self.key(Self.positions(plain, others)))
+            let ring: [SIMD3<Double>] = Self.positions(marked, [.inspectRing])
+            try #require(ring.count == 4)
+            let centre: SIMD3<Double> = (ring[0] + ring[1] + ring[2] + ring[3]) / 4
+            #expect(Self.distance(centre, G.worldCentre(world, snap)) < 1e-12)
+            let y: Double = G.gaugeY(world)
+            var brackets: [SIMD3<Double>] = []
+            for x in [G.bracketLeft, G.bracketRight] {
+                brackets += Self.stripCorners(left: x - G.bracketWidth / 2, right: x + G.bracketWidth / 2,
+                                              low: y - G.bracketHalf, high: y + G.bracketHalf)
+            }
+            #expect(Self.key(Self.positions(marked, [.inspectBracket])) == Self.key(brackets))
+            Self.checkSystem(marked)
+        }
+    }
+
+    @Test func orbitMeshesFaceTheDrawnEye() throws {
+        let snap: Snapshot = try Self.snapshot(Self.levels[4], tick: 20)
+        let tier: BinaryGardensTier = BinaryGardensTier.of(0)
+        let authored: Mesh = try G.systemMesh(snap, tier: tier)
+        for orbit in BinaryGardensViewOrbit.corners {
+            let camera: BinaryGardensCamera = G.camera(aspect: 1, orbit: orbit)
+            let mesh: Mesh = try G.systemMesh(snap, tier: tier, camera: camera)
+            Self.checkSystem(mesh)
+            #expect(mesh != authored)
+            for (star, material) in [(0, Material.starOne), (1, Material.starTwo)] {
+                let disc: [SIMD3<Double>] = Self.positions(mesh, [material])
+                try #require(disc.count == 4)
+                let centre: SIMD3<Double> = (disc[0] + disc[1] + disc[2] + disc[3]) / 4
+                #expect(Self.distance(centre, G.starCentre(star, snap)) < 1e-12)
+                let a: SIMD3<Double> = disc[1] - disc[0]
+                let b: SIMD3<Double> = disc[3] - disc[0]
+                let n: SIMD3<Double> = SIMD3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+                let towards: SIMD3<Double> = camera.eye - centre
+                let lengths: Double = (n * n).sum().squareRoot() * (towards * towards).sum().squareRoot()
+                #expect(abs(abs((n * towards).sum() / lengths) - 1) < 1e-9, "\(orbit)")
+            }
+            // The body order follows the drawn eye.
+            let order: [BinaryGardensElement] = G.paintOrder(snap, eye: camera.eye)
+            var last: Double = Double.infinity
+            for element in order where element.kind.isBody {
+                let d: Double = Self.distance(element.centre, camera.eye)
+                #expect(d <= last + 1e-12)
+                last = d
+            }
+            // Flat parts in the base plane do not move.
+            let flat: Set<Material> = [.orbit, .gaugePlate, .guide, .actionsLit, .actionsUnlit, .bloomTrack]
+            #expect(Self.key(Self.positions(mesh, flat)) == Self.key(Self.positions(authored, flat)))
+            Self.checkGlow(try G.glowMesh(snap, tier: tier, camera: camera))
+        }
     }
 }

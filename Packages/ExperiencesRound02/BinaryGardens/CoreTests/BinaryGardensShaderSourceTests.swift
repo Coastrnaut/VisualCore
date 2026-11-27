@@ -4,7 +4,7 @@
 // its stage, the time input only in the system vertex stage and multiplied by the motion (Reduce Motion), at most 16
 // vec4 uniform slots per program (system 9, glow 7), no texture sampler, no `discard`, no loop (so no unbounded one), no
 // reserved word used as a name, vertex outputs matching fragment inputs, balanced braces, ASCII-only sources, the
-// attribute names and locations (the `ShaderMeshRenderer` streams), the material code table (contiguous 0 … 37, each
+// attribute names and locations (the `ShaderMeshRenderer` streams), the material code table (contiguous 0 … 41, each
 // selected by the vertex shader with its palette colour and handled exactly once by the fragment shader), the value and
 // broken mark (offset 64) carried in uv with an encode/decode round trip, the GLSL palette constants generated from
 // `BinaryGardensPalette` and parsing back within 1e-6, the still backdrop gradient and the hashed starfield covering
@@ -15,6 +15,12 @@
 // level-2) and the Reduce Flashing cap, the source file's own text, and, when `glslangValidator` is installed, a real
 // front-end compile of each source (skipped otherwise). Test data uses explicit types and plain loops (CI type-check
 // rule).
+//
+// Feature 504 (R02-G21-04) T-R02G2104-002 (FR-R02G2104-002, 008, 015): the table now runs 0 … 41 — the ghost star (38,
+// a ring cut into dashes around its circle in its star's colour, broken when refused), the ghost cell (39, a valued
+// square strip whose value, the committed band's index / 4, selects the band's cell colour), the inspection ring (40,
+// a ring in the marker colour) and the inspection bracket (41, a square strip in the marker colour) appended after the
+// broken ring; every earlier code, the value scale and the broken offset unchanged.
 import Foundation
 import Testing
 @testable import BinaryGardensCore
@@ -318,13 +324,14 @@ import Testing
         #expect(Self.gap(world, Palette.world) < 1e-6 && Self.gap(glow, Palette.glow) < 1e-6)
         // The numeric constants the sources are built from.
         let pairs: [(name: String, value: Double, source: String)] = [
-            ("BG_MAX_MATERIAL", 37, Shaders.systemVertex), ("BG_BROKEN_OFFSET", 64, Shaders.systemVertex),
+            ("BG_MAX_MATERIAL", 41, Shaders.systemVertex), ("BG_BROKEN_OFFSET", 64, Shaders.systemVertex),
             ("BG_VALUE_SCALE", 0.4, Shaders.systemVertex), ("BG_AMBIENT", 0.35, Shaders.systemFragment),
             ("BG_LETHAL_CAP", 30, Shaders.systemFragment), ("BG_DIM_CAP", 60, Shaders.systemFragment),
             ("BG_BRIGHT_BELT", 15, Shaders.systemFragment), ("BG_LETHAL_BELT", 40, Shaders.systemFragment),
             ("BG_SHARE_SCALE", 64_000, Shaders.systemFragment), ("BG_CORE_SHARE", 0.5, Shaders.systemFragment),
             ("BG_STAR_PRESENCE", Shaders.starPresence, Shaders.systemFragment),
             ("BG_MAX_GAIN", Shaders.maxGlowGain, Shaders.glowFragment),
+            ("BG_GHOST_DASHES", Shaders.ghostDashes, Shaders.systemFragment),
         ]
         for pair in pairs {
             let parsed: Double = try #require(Self.floatConstant(pair.name, in: pair.source), "\(pair.name)")
@@ -334,16 +341,16 @@ import Testing
 
     @Test func materialCodeTableIsConsistent() {
         let all: [Material] = Material.allCases
-        #expect(all.count == 38)
+        #expect(all.count == 42)
         for (index, material) in all.enumerated() {
             #expect(material.rawValue == index, "contiguous codes from 0")
             #expect(material.code == Float(index))
         }
-        #expect(Shaders.maxMaterial == 37 && Shaders.brokenOffset == 64 && Shaders.brokenOffset > 37 + 0.4)
-        #expect(Shaders.materials.count == 38)
+        #expect(Shaders.maxMaterial == 41 && Shaders.brokenOffset == 64 && Shaders.brokenOffset > 41 + 0.4)
+        #expect(Shaders.materials.count == 42)
         let valued: Set<Material> = [.worldLethalLow, .worldDim, .worldComfortable, .worldBright, .worldLethalHigh,
                                      .trail, .cellLethalLow, .cellDim, .cellComfortable, .cellBright,
-                                     .cellLethalHigh, .corona, .mote]
+                                     .cellLethalHigh, .corona, .mote, .ghostCell]
         for material in all {
             #expect(material.isValued == valued.contains(material), "\(material)")
             // The vertex shader selects the material's palette constant by its code.
@@ -397,7 +404,7 @@ import Testing
         #expect(Shaders.encode(.worldDim, value: 7, broken: false) == 10.4)
         #expect(Shaders.encode(.orbit, value: 0.9, broken: true) == 71)
         #expect(Shaders.decode(.nan).material == .backdrop && Shaders.decode(-5).material == .backdrop)
-        #expect(Shaders.decode(500).material == .brokenRing && Shaders.decode(500).broken)
+        #expect(Shaders.decode(500).material == .inspectBracket && Shaders.decode(500).broken)
         #expect(Shaders.shareValue(64_000) == 1 && Shaders.shareValue(32_000) == 0.5 && Shaders.shareValue(-1) == 0)
         #expect(Shaders.heightShare(flux: 50, lethalHigh: 100) == 0.5)
         #expect(Shaders.heightShare(flux: 128_000, lethalHigh: 100) == 1)
@@ -537,7 +544,8 @@ import Testing
                                  .luminosityPipUnlit, .gaugePlate, .cellLethalLow, .cellDim, .cellComfortable,
                                  .cellBright, .cellLethalHigh, .guide, .windowBracket, .windowBracketShort,
                                  .requiredTick, .tickMarker, .bloomTrack, .bloomBracket, .bloomMarker, .actionsLit,
-                                 .actionsUnlit, .mote, .brokenRing]
+                                 .actionsUnlit, .mote, .brokenRing, .ghostStar, .ghostCell, .inspectRing,
+                                 .inspectBracket]
         for material in quads {
             // Nothing at the quad's corners and edges (the extent leaves room for the feather).
             var corners: [(Double, Double)] = [(e, e), (-e, e), (e, -e), (-e, -e), (0, -e)]
@@ -680,5 +688,64 @@ import Testing
             #expect(process.terminationStatus == 0, "\(file.name): \(output)")
         }
         #endif
+    }
+
+    /// Feature 504 (R02-G21-04) T-R02G2104-002: the ghost star, ghost cell, inspection ring and inspection bracket
+    /// materials appended after code 37.
+    @Test func ghostAndInspectionMaterialsFollowTheEncodingContract() {
+        #expect(Material.ghostStar.rawValue == 38 && Material.ghostCell.rawValue == 39)
+        #expect(Material.inspectRing.rawValue == 40 && Material.inspectBracket.rawValue == 41)
+        #expect(Shaders.maxMaterial == Material.inspectBracket.rawValue)
+        #expect(Double(Shaders.maxMaterial) + Shaders.valueScale < Shaders.brokenOffset - 0.5)
+        #expect(Material.ghostCell.isValued && !Material.ghostStar.isValued)
+        #expect(!Material.inspectRing.isValued && !Material.inspectBracket.isValued)
+        #expect(Shaders.encode(.ghostStar, broken: true) == 102 && Shaders.encode(.inspectBracket) == 41)
+        #expect(Shaders.decode(41).material == .inspectBracket && !Shaders.decode(41).broken)
+        // Colours: the ghost star in its star's colour (a_normal.z) or broken; the ghost cell in its committed band's
+        // cell colour; the marks in the marker colour.
+        #expect(Shaders.baseColour(of: .ghostStar, value: 0, broken: false, won: 0, shape: 0) == Palette.starOne)
+        #expect(Shaders.baseColour(of: .ghostStar, value: 0, broken: false, won: 0, shape: 1) == Palette.starTwo)
+        #expect(Shaders.baseColour(of: .ghostStar, value: 0, broken: true, won: 0, shape: 1) == Palette.broken)
+        let bands: [BinaryGardensBand] = BinaryGardensBand.allCases
+        for (index, band) in bands.enumerated() {
+            let value: Double = Double(index) / 4
+            let expected: SIMD3<Double> = Material.cell(band).baseColour
+            #expect(Shaders.baseColour(of: .ghostCell, value: value, broken: false, won: 0) == expected, "\(band)")
+            // Through the encoding, also as a 32-bit float.
+            let x: Double = Shaders.encode(.ghostCell, value: value)
+            let decoded: (material: Material, value: Double, broken: Bool) = Shaders.decode(Double(Float(x)))
+            #expect(decoded.material == .ghostCell)
+            #expect(Shaders.ghostCellColour(value: decoded.value) == expected, "\(band)")
+            #expect(BinaryGardensSceneGeometry.colour(of: x) == expected)
+        }
+        #expect(Material.inspectRing.baseColour == Palette.marker)
+        #expect(Material.inspectBracket.baseColour == Palette.marker)
+        // Coverage: the ghost star is a ring with gaps around its circle; the cell strip and the bracket are squares;
+        // the inspection ring is a ring.
+        var lit: Int = 0
+        var gaps: Int = 0
+        for k in 0..<96 {
+            let a: Double = 2 * Double.pi * (Double(k) + 0.5) / 96
+            let c: Double = Shaders.quadCoverage(.ghostStar, u: 0.82 * cos(a), v: 0.82 * sin(a))
+            if c > 0.5 { lit += 1 } else { gaps += 1 }
+        }
+        #expect(lit > 30 && gaps > 30, "lit \(lit) gaps \(gaps)")
+        #expect(Shaders.quadCoverage(.ghostStar, u: 0, v: 0) == 0)
+        #expect(Shaders.quadCoverage(.ghostCell, u: 0.9, v: -0.9) == 1)
+        #expect(Shaders.quadCoverage(.inspectBracket, u: 0, v: 0) == 1)
+        #expect(Shaders.quadCoverage(.inspectRing, u: 0, v: 0) == 0)
+        #expect(Shaders.quadCoverage(.inspectRing, u: 0.82, v: 0) == 1)
+        // The sources: the ghost star's second colour, the ghost cell's band selection and the fragment rules.
+        let vertex: String = Shaders.systemVertex
+        let second: String = "base = mix(base, BG_STAR_TWO, (isCode(m, 6.0) + isCorona + isCode(m, 38.0)) * second);"
+        #expect(vertex.contains(second))
+        #expect(vertex.contains("float ghostBand = floor(value * 4.0 + 0.5);"))
+        #expect(vertex.contains("base = mix(base, BG_LETHAL_HIGH, isGhostCell * isCode(ghostBand, 4.0));"))
+        let fragment: String = Shaders.systemFragment
+        let ring: String = "float ring = isCode(m, 2.0) + isCode(m, 19.0) + isCode(m, 37.0) + isCode(m, 40.0);"
+        #expect(fragment.contains(ring))
+        #expect(fragment.contains("square = square + isCode(m, 39.0) + isCode(m, 41.0);"))
+        #expect(fragment.contains("coverage = coverage + ringCover * arc * ghost;"))
+        #expect(!fragment.contains("isCode(m, 42.0)"))
     }
 }
