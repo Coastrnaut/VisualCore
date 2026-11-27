@@ -9,7 +9,7 @@ Packages/ExperiencesRound02 --filter MyceliumArchitect`. New sources go in `Myce
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2202-001 Baselines after R02-G22-01 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G2202-001 Baselines after R02-G22-01 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1 (VoxelOrigami|MyceliumArchitect)/2/3c/3e/3f exit=0
   baseline-round02-1` (`VoxelOrigami|MyceliumArchitect`), `-2`, `-3c`, `-3e`, `-3f` on the committed tree
 
 ## Phase 2: Foundational
