@@ -115,3 +115,19 @@ public struct MyceliumArchitectPuzzle: PuzzleRules {
 `MyceliumArchitectPlay` and `MyceliumArchitectPuzzle` agree: a move is legal in the puzzle exactly when
 `apply(_:expecting:)` accepts it in `playing` with actions left, and both produce the same arrangement. No existing
 module's API changes; no VisualCore API baseline update is needed.
+
+## Public names beyond this contract (feature 511 convergence, T-R02G2201-013)
+
+The implementation exposes these additional public names; each is documented in the source:
+
+- Memberwise initializers of `MyceliumArchitectArrangement` (sorting its lists), `MyceliumArchitectStep`,
+  `MyceliumArchitectReport` and `MyceliumArchitectRecord`: tests, the generator (feature 512) and later features build
+  these values directly, and stored records are decoded.
+- `MyceliumArchitectCell.moved(_:)`, `distance(to:)` (Chebyshev) and `words`, and its `Comparable` order by (row,
+  column): the growth, the field, the words and the sorted stored lists.
+- `MyceliumArchitectDirection.quarterClockwise` (the heading of a tip born at a nutrient) and its `Comparable` order:
+  the growth and the sorted seeds.
+- `MyceliumArchitectReport.terminalsReached`: the progress words and the later panel.
+- `MyceliumArchitectGrowth.weight(_:)`: a segment's weight, named once for the solver and the tests.
+- `MyceliumArchitectLevel` range constants, `contains(_:)`, `startReport` and `grouped(_:)`: the generator draws from
+  the ranges, the play and words test the board and number grouping, and the opening report.

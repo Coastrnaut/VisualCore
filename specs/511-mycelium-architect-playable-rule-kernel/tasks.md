@@ -125,3 +125,14 @@ against the play contract in contracts/api.md; shared files (package, ci.yml, er
 stay with the lead. Agents may draft in isolated copies before 001 (new files only). MVP: Story 1. Requirement
 coverage: FR-001, 002, 010, 014 → 002; FR-003, 004, 005, 006, 015 → 002, 003; FR-007 … 009, 012 → 004; FR-011 → 005;
 FR-013 → 006; SC-001 … 005 → 002 … 006; SC-006 → 007 … 011.
+
+## Phase 7: Convergence
+
+- [X] T-R02G2201-013 Record in `specs/511-mycelium-architect-playable-rule-kernel/contracts/api.md` the public names the — Verified 2026-11-27: contracts/api.md lists the public names beyond the contract with reasons; data-model notes the closed direction type; validate_docs PASS
+  kernel exposes beyond the contract, each with its reason (memberwise initializers of Arrangement, Step, Report and
+  Record; `MyceliumArchitectCell.moved(_:)`, `distance(to:)`, `words`, its `Comparable` order;
+  `MyceliumArchitectDirection.quarterClockwise` and `Comparable`; `MyceliumArchitectReport.terminalsReached`;
+  `MyceliumArchitectGrowth.weight(_:)`; `MyceliumArchitectLevel` range constants, `contains(_:)`, `startReport`,
+  `grouped(_:)`), and note in `data-model.md` that a direction outside 0 … 7 cannot be expressed by the closed
+  direction type (only a damaged decode could produce one, refused `r02-g22.malformed`), per plan: contracts/api.md
+  (unrequested)

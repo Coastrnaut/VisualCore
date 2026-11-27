@@ -28,7 +28,8 @@ Checked in this order, each refusal leaving the play unchanged:
 2. `.stale` — the expected previous fingerprint differs from the play's fingerprint.
 3. `.action` — a cell off the board or not empty (rock, toxin, root, terminal, fixed nutrient, placed item) for
    nutrient or blocker; a count already at its limit; clear of a cell without a placed item; a direction outside
-   0 … 7, already seeded, or the seed limit reached; unseed of a direction not seeded or a starting seed.
+   0 … 7, already seeded, or the seed limit reached; unseed of a direction not seeded or a starting seed. (A direction outside 0 … 7 cannot be expressed by the closed
+   direction type; only a damaged stored form could carry one, and decoding refuses it `r02-g22.malformed`.)
 4. `.budget` — no action left. `run` never checks the budget.
 
 ## State transitions
