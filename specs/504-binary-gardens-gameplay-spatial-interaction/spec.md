@@ -61,9 +61,10 @@ eye (ties: worlds first, then index), a world a cube-sphere of radius 0.07, a st
 row per world from y = −1.2 down in steps of 0.1 (plate x −0.95 … 1.22, 48 tick cells from x −0.9 to 0.9, the bloom
 meter x 0.97 … 1.2, a marker over the shown tick); the actions bars below; painter's order with no depth buffer; the
 authored camera eye (0, −2.0, 3.2) looking at (0, −0.35, 0) fitted to the box x −1.3 … 1.3, y −1.85 … 1.15,
-z −0.85 … 0.85 with a 5 % margin for aspect 0.4 … 2.5. Its adapter declares `star.ring [star, index]`, `star.phase
+z −0.85 … 0.85 with a margin of 0.06 per side (`fitMargin`, at least 5 %) for aspect 0.4 … 2.5. Its adapter declares `star.ring [star, index]`, `star.phase
 [star, step]`, `star.luminosity [star, index]`, `orbit.tilt [step]`, `light.run`, `play.undo`, `play.redo`,
-`level.next` and `clock.show [tick]` (ticks 1 … 48, presentation only, 48 at opening). Its minimal panel (a star
+`level.next` and `clock.show [tick]` (declared 0 … 60, of which 1 … 48 are shown and 0 and 49 … 60 refused with `r02-g21.tick`; presentation only, 48
+  at opening; gestures send only ticks 1 … 48). Its minimal panel (a star
 picker, ring −/+, phase −/+ by g, luminosity −/+, tilt −/+, tick −/+, run, undo, redo, next level) spends one action
 per − or + press, so a witness action that moves a ring, luminosity or tilt by more than one step, or a phase by more
 than one grid step, would cost more than one action through it.
@@ -71,9 +72,9 @@ than one grid step, would cost more than one action through it.
 - Q: How is a touch picked? → A: at touch-down the targets are projected through the drawn camera (orbit included) into
   view points, and the target drawn last wins, in the reverse of the scene's painter's order: (1) the actions bars are
   empty space; (2) a gauge row j: the finger cast onto the plane z = 0 lies inside row j's plate rectangle as the scene
-  draws it, the rows' centre lines deciding between neighbours; (3) the bodies front to back (the reverse of the
+  draws it, the plates (0.09 tall at a 0.1 pitch) never overlapping, and the 0.01 gap between two plates being empty space; (3) the bodies front to back from the drawn eye (the reverse of the
   scene's back-to-front sort): for a star, first its luminosity pip row (within 12 points of the projected segment
-  between its first and last pip centres, as the scene geometry gives them; pips are drawn after their star), then its
+  between its first and last pip centres, as the scene geometry gives them for the drawn eye, orbit included; pips are drawn after their star), then its
   disc (its projected radius grown by 12 points); for a world, its projected radius 0.07 grown by 12 points (a world's
   own pips are part of nothing); (4) a star ring (later ring indices first): within 12 points of its projected 48-gon;
   (5) the tilt dial (only when T_max > 0): within 12 points of the projected segment from its first to its last pip
@@ -105,13 +106,17 @@ than one grid step, would cost more than one action through it.
   and phase are fixed and sends nothing. A ring drag's target is the ring index whose point at the star's drawn table
   step (radius k·ρᵢ, same tilt) projects nearest the finger (lower index on ties); a phase drag's target is the grid
   phase p ∈ {0, g, 2g, …} whose drawn position at the shown tick, table step (p + ω·t) mod 48, projects nearest the
-  finger (lower p on ties). A target equal to the current value is no change. The snapshot gains a preview (the change
+  finger (lower p on ties). A target equal to the current value is no change. The snapshot gains the level's star speed ω and each star's ring, phase and luminosity freedoms (copied from the
+  level, presentation only), and a preview (the change
   as a kernel action, and the previewed report of that arrangement — computed by the kernel's own pure change rule and
   report, never a second implementation — with its verdict, or the kernel's refusal of the change: separation, no
   action left; none of it in the digest). The scene draws a ghost star (a dashed outline of the star's disc) at its
   target, the worlds and gauges from the previewed report, and the committed report's gauge cells as ghost outlines
   behind them (the ghost bands), so the change in each world's light is read cell by cell; a refused preview draws the
-  ghost star in the broken colour, keeps the committed report and names the refusal in words. On release exactly one
+  ghost star in the broken colour, keeps the committed drawing and report and names the refusal in words (the broken ghost stands at the target for a
+  ring or phase change, at the star with its previewed radius for a luminosity change, and at both stars' positions at
+  the previewed tilt for a tilt change; the refusal is the kernel's, in the order the play gives it: the change rule's
+  range, grid, locked or separation refusal first, then no action left). On release exactly one
   `star.ring [star, index]` or `star.phase [star, step]` is sent when the target is a change (a change the kernel will
   refuse is still sent once and its refusal shown with its reason code, as feature 494 does); otherwise nothing. A
   release outside playing, a cancel or a second finger clears the preview and sends nothing. Impact: FR-R02G2104-002,
@@ -130,8 +135,9 @@ than one grid step, would cost more than one action through it.
   fingers as feature 494: a second finger cancels any one-finger gesture (nothing sent beyond clearing a preview) and
   orbits — yaw ±60° about the vertical axis through the authored box centre (90° per view width), pitch −20° … +35°
   (60° per view height); a third finger re-bases the midpoint; a double tap on empty space or "Reset view" returns to
-  orbit (0, 0); the camera refits so the authored box stays inside the view with a 5 % margin at every orbit and aspect
-  0.4 … 2.5 and the eye stays outside the box; meshes are rebuilt when the orbit changes. Impact: FR-R02G2104-005, 006,
+  orbit (0, 0); the camera refits so the authored box stays inside the view with the authored margin of 0.06 per side (at least 5 %) at every orbit and aspect
+  0.4 … 2.5 and the eye stays outside the box; meshes are rebuilt when the orbit changes, every part that faces the eye (star discs, pips, coronas, glow shells,
+  ghost star, inspection ring) facing the drawn eye and the bodies sorted back to front from it. Impact: FR-R02G2104-005, 006,
   007, 010; SC-R02G2104-001, 002, 004.
 - Q: How is it built and tested, and what does the panel gain? → A: a Core gesture controller
   (`BinaryGardensGestureController`) with a picker (`BinaryGardensPicker`) and a view orbit (`BinaryGardensViewOrbit`,
@@ -277,7 +283,7 @@ every certified level within its budget.
   the drawn camera (orbit included), the one drawn last first; the system disc is the cast disc of radius 0.95; anything
   else is empty space.
 - **FR-R02G2104-010**: Two-finger orbit MUST stay within fixed yaw and pitch bounds, keep the scene inside the view with
-  a 5 % margin at every aspect 0.4 … 2.5 and never enter the digest, the snapshot's game state or the kernel; a double
+  a margin of 0.06 per side (at least 5 %) at every aspect 0.4 … 2.5 and never enter the digest, the snapshot's game state or the kernel; a double
   tap on empty space or "Reset view" returns to the authored view.
 - **FR-R02G2104-011**: Gestures outside playing, cancelled touches and second fingers MUST send no kernel action, and a
   gesture that does nothing for a stated reason (finished, not running, locked, single level, unchanged) MUST give that
@@ -304,6 +310,8 @@ every certified level within its budget.
   tilt drag, gauge press, scrub drag, world press, ring press, disc press, empty press, orbiting, cancelled), the touched
   target, the start and last points, the press time and the last tap's time and place.
 - **Orbit**: yaw and pitch offsets from the authored view.
+- **Snapshot additions**: the star speed ω and each star's ring, phase and luminosity freedoms, read by the controller
+  at touch-down; never in the digest.
 - **Preview**: the change as a kernel action (a star's ring, phase or luminosity, or the tilt) and the previewed report
   and verdict, or the kernel's refusal.
 - **Inspection**: the inspected world, if any (presentation only).
@@ -321,7 +329,7 @@ every certified level within its budget.
   case.
 - **SC-R02G2104-003**: Orbit, previews, inspection and scrubbing never change the digest in every scripted case.
 - **SC-R02G2104-004**: At every orbit within bounds and every aspect 0.4 … 2.5 the scene stays inside the view with a
-  5 % margin.
+  margin of 0.06 per side (at least 5 %).
 - **SC-R02G2104-005**: All 100 certified levels are won through panel actions alone, each within its budget.
 - **SC-R02G2104-006**: For 200 scripted previews the previewed report and verdict (or refusal) equal the kernel's for the
   changed arrangement.
