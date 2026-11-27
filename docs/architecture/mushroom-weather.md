@@ -118,3 +118,26 @@ accounts for every unit; the catalog's 0.016667 s timestep is a presentation clo
   moonlight, cycles, Run, Undo, Redo, Next level) and gains "Reset view"; its kernel buttons send through the presenter,
   which shows and logs refusal codes with or without the engine's prefix. A host test wins all 100 certified levels
   through the panel, one panel action per witness action.
+
+## Teaching and progression (feature 495, R02-G20-05)
+
+- **Hints.** `MushroomWeatherHints` gives the certified witness's next remaining action while the arrangement lies on
+  the way to the witness's (pods a subset, toggled vents a subset, the moonlight the start's or the witness's) and the
+  actions left cover the rest, so exact hints from every opening replay the witness (up to 5 actions) and win all 100
+  levels within their budgets; otherwise it searches at most two pod, vent or moonlight actions from the current
+  arrangement, one before two, at most 1,500 arrangements judged. The hint escalates from the kind of change ("Change a
+  spore pod", "Change a vent", "Change the moonlight") to where ("Use the site at row r, column c", "Use vent n",
+  "Make the moonlight brighter") to the exact action ("Put pod n on the site at row r, column c", "Close vent n", "Set
+  the moonlight to level l"); a winning arrangement says to run the weather; no plan says so and suggests undo or retry.
+  The presenter runs the search off the main actor, once per play.
+- **Failure text.** `MushroomWeatherFailureExplanation` puts the run's failure in words: the sensitive colony that dried
+  out and the cycle, the cell that grew mold and the cycle, or the colony with the shortest final run, its length and
+  the cycles required (singular for one), colonies numbered from 1 and cells by row and column.
+- **Tutorial.** Levels 1 … 3 show three instructions (put a pod on a marked site; keep every colony in its band by
+  another pod, a vent or the moonlight, then run; what fails a run), each advancing when done (a placement, then a
+  second action, then the level's end); dismissible; undo never moves it back.
+- **Progress.** Stars by actions spent against the certified plan's actions (3 at most, 2 within two more, else 1),
+  level 1 open and a campaign win opening the next (no wrap after 100), five bands of 20; the daily level is (days since
+  2026-01-01 × 17) mod 100 + 1 and is playable while still locked without opening it; practice raises the budget to 24
+  without stars or unlocks. The panel shows the band, the goal, the best stars, the modes and a picker of open levels.
+  The snapshot is schema 2 (digest domain `r02-g20.mushroom-weather.v2`) with a migration from schema 1.

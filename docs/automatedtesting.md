@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G20-04: Mushroom Weather gameplay spatial interaction).
+Last updated: 2026-11-27 (R02-G20-05: Mushroom Weather teaching and progression).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mushroom Weather teaching and progression** (R02-G20-05, 2026-11-27). Host: hints (exact hints from every opening
+  win all 100 levels; 200 seeded reachable states; an off-path brute force; 500 seeded failures plus constructed mold
+  levels), progress (20), progression core (11: controls, refusals, practice, daily, schema 2, migration 1 → 2), the
+  updated adapter and scenarios (manifest regenerated). Simulator: 10 teaching tests (47 in the suite). Lessons: the
+  witness can be longer than the two-action search, so exact hints follow the witness while on its way; a test's
+  hand-computed daily level was wrong (30 for 13), so daily constants in tests should be derived or checked with a
+  one-line script before pinning.
 - **Mushroom Weather gameplay spatial interaction** (R02-G20-04, 2026-11-27). Host: picker (500 seeded points over three
   orbits against an independent pick, drop, moon and cycle rule), geometry with the orbit camera in view at the orbit
   corners and seven aspects and the preview equal to the kernel's run, the gesture controller (500 seeded scripts at

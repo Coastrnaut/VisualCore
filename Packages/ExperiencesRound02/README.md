@@ -1028,5 +1028,8 @@ certificates (`MushroomWeatherWitness`, `docs/games/mushroom-weather/levels/`, p
 controls), registered as a candidate. Feature 494 (R02-G20-04) adds gameplay spatial interaction:
 `MushroomWeatherViewOrbit`, `MushroomWeatherPicker` (vents, pods, sites, the moon, the cycle scrubber and the floor
 picked through the drawn camera) and `MushroomWeatherGestureController` (tap a site to place a pod, drag a pod with a
-previewed run, tap a vent, drag the moon to set the moonlight, scrub cycles, orbit and reset the view). See
+previewed run, tap a vent, drag the moon to set the moonlight, scrub cycles, orbit and reset the view). Feature 495
+(R02-G20-05) adds teaching and progression: `MushroomWeatherHints` (three hint levels from the certified witness or a
+bounded search), `MushroomWeatherFailureExplanation`, the tutorial, progress with stars, the daily level (× 17) and
+practice (budget 24), and snapshot schema 2 with a migration from schema 1. See
 [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).

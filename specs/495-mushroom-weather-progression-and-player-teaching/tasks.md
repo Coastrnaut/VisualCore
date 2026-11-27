@@ -87,7 +87,7 @@ campaign covers the game). Agents model their files on Microscopic Aurora's (fea
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G2005-006 Docs: `docs/architecture/mushroom-weather.md` (teaching and progression),
+- [X] T-R02G2005-006 Docs: `docs/architecture/mushroom-weather.md` (teaching and progression), — Verified 2026-11-27: 2026-11-27 docs (architecture teaching and progression, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G20-05.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G2005-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
