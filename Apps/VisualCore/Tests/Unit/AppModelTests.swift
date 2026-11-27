@@ -16,6 +16,7 @@ import Foundation
 import HarmonicBridgesCore
 import HueCompassCore
 import LissajousLabyrinthCore
+import MicroscopicAuroraCore
 import MoonlitMechanismCore
 import NocturneGardenCore
 import StarlitCartoucheCore
@@ -3704,6 +3705,177 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(opening.play.orbit.direction, levelOneStart.direction, "the opening orbit's direction")
         XCTAssertEqual(opening.certifiedTunings, certifiedTunings.count, "stars are counted against the witness")
         XCTAssertEqual(ApsidesWorkshopExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Microscopic Aurora in the app (feature 489, R02-G19-09; T-R02G1909-005, FR-R02G1909-003, 006;
+    // SC-R02G1909-002)
+
+    /// Microscopic Aurora's registration: a candidate until X-R02-G19.
+    private func microscopicAuroraRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(MicroscopicAuroraExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Microscopic Aurora is a candidate")
+    }
+
+    /// FR-R02G1909-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheMicroscopicAuroraRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try microscopicAuroraRegistration()
+        XCTAssertEqual(MicroscopicAuroraExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(MicroscopicAuroraExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(MicroscopicAuroraExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G1909-006: without `-vcCandidates` Microscopic Aurora is a candidate only: in `candidates`, outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testMicroscopicAuroraIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(MicroscopicAuroraExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g19.microscopic-aurora")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G1909-003, SC-R02G1909-002: with `-vcCandidates` Microscopic Aurora is shown, opens through the registry
+    /// and engine with seed 0 (level 1), and level 1 is won by its certified plan
+    /// (`MicroscopicAuroraExperienceCore.certifiedActions(1)`: one well in slot 0 at row 11, column 18, strength 2,
+    /// clockwise) sent as `well.place [slot, row, column, strength, sense]` (sense 0 clockwise, 1 counterclockwise),
+    /// then `swim.play`, with three stars (the opening play is already in stage `playing`; the tutorial of levels
+    /// 1 … 3 is presentation and blocks no action, so no `tutorial.dismiss` is needed); the win is recorded verified
+    /// with its trace (the placement, then the play), opens level 2, and `level.next` plays it.
+    func testMicroscopicAuroraOpensAsACandidateAndLevelOneIsWonByItsCertifiedPlan() async throws {
+        let registration = try microscopicAuroraRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls: [String] = registration.controls.map(\.id)
+        for control in MicroscopicAuroraExperienceCore.actionIDs {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        for control in ["well.place", "well.remove", "swim.play", "play.undo", "play.redo", "level.next", "clock.show",
+                        "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss",
+                        "replay.start", "replay.step", "replay.stop", "settings.sound"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(MicroscopicAuroraExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<MicroscopicAuroraExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, MicroscopicAuroraStage.playing, "the opening play accepts actions")
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9, "level 1's budget")
+        let placements: [MicroscopicAuroraAction] = MicroscopicAuroraExperienceCore.certifiedActions(1)
+        let well = MicroscopicAuroraWell(cell: MicroscopicAuroraCell(row: 11, column: 18), strength: 2,
+                                         sense: .clockwise)
+        XCTAssertEqual(placements, [.place(slot: 0, well: well)], "level 1's certified plan")
+        for placement in placements {
+            switch placement {
+            case .place(let slot, let well):
+                let values: [Double] = [Double(slot), Double(well.cell.row), Double(well.cell.column),
+                                        Double(well.strength), well.sense == .clockwise ? 0 : 1]
+                XCTAssertEqual(engine.handle(control: "well.place", values: values), .accepted, "placement \(values)")
+            case .remove, .play:
+                XCTFail("a certified plan holds placements only")
+            }
+        }
+        XCTAssertNil(engine.outcome, "the placements alone do not end the level")
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9 - placements.count, "each placement spends one action")
+        XCTAssertEqual(engine.handle(control: "swim.play"), .accepted)
+        XCTAssertEqual(engine.outcome?.code, MicroscopicAuroraExperienceCore.wonCode)
+        XCTAssertEqual(MicroscopicAuroraExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, MicroscopicAuroraStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified plan earns three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        let trace: [MicroscopicAuroraAction] = placements + [.play]
+        XCTAssertEqual(engine.core?.progress.solved[1]?.trace, trace,
+                       "the trace is the certified plan, then the play")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `MA` (their own literals in
+    /// Tests/UI/MicroscopicAurora/MASupport.swift, which this target cannot import); the same literals equal the Core's
+    /// certified level 1: the plan is one well in slot 0 at row 11, column 18, strength 2, clockwise (sense 0), then
+    /// the play; the budget is 9; each pinned well lies in the declared slot, cell, strength and sense ranges and stands
+    /// on one of the level's sites (level 1 has three: row 9, column 7; row 11, column 18; row 17, column 8). Seed 0
+    /// opens level 1.
+    func testMicroscopicAuroraLevelOnePinsInMAEqualTheCore() throws {
+        // The same literals as `MA.levelOnePlan` and `MA.levelOneBudget` in MASupport.swift.
+        let levelOneWells: [(slot: Int, row: Int, column: Int, strength: Int, sense: Int)] = [(0, 11, 18, 2, 0)]
+        let levelOneBudget = 9
+
+        let certified = try MicroscopicAuroraExperienceCore.generated(number: 1)
+        let certifiedPlacements: [MicroscopicAuroraAction] = certified.plan.actions
+        XCTAssertEqual(MicroscopicAuroraExperienceCore.certifiedActions(1), certifiedPlacements,
+                       "the certified plan's placements")
+        var coreValues: [[Int]] = []
+        for placement in certifiedPlacements {
+            switch placement {
+            case .place(let slot, let well):
+                coreValues.append([slot, well.cell.row, well.cell.column, well.strength,
+                                   well.sense == .clockwise ? 0 : 1])
+            case .remove, .play:
+                XCTFail("level 1's certified plan holds placements only")
+            }
+        }
+        var pinnedValues: [[Int]] = []
+        for well in levelOneWells {
+            pinnedValues.append([well.slot, well.row, well.column, well.strength, well.sense])
+        }
+        XCTAssertEqual(coreValues, pinnedValues, "level 1 certified wells (slot, row, column, strength, sense)")
+
+        let level: MicroscopicAuroraLevel = certified.level
+        XCTAssertEqual(level.budget, levelOneBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, certifiedPlacements.count, "the witness fits the budget")
+        let sites: [MicroscopicAuroraCell] = try XCTUnwrap(level.sites, "level 1 has sites")
+        for well in levelOneWells {
+            XCTAssertTrue(MicroscopicAuroraExperienceCore.slotRange.contains(well.slot), "a declared slot \(well)")
+            XCTAssertTrue(MicroscopicAuroraExperienceCore.cellRange.contains(well.row), "a declared row \(well)")
+            XCTAssertTrue(MicroscopicAuroraExperienceCore.cellRange.contains(well.column), "a declared column \(well)")
+            XCTAssertTrue(MicroscopicAuroraWell.strengths.contains(well.strength), "a declared strength \(well)")
+            XCTAssertTrue(MicroscopicAuroraExperienceCore.senseRange.contains(well.sense), "a declared sense \(well)")
+            XCTAssertTrue(sites.contains(MicroscopicAuroraCell(row: well.row, column: well.column)),
+                          "one of the level's sites \(well)")
+        }
+
+        let opening = try MicroscopicAuroraExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, levelOneBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, MicroscopicAuroraStage.playing, "the opening accepts actions")
+        XCTAssertEqual(opening.certifiedPlacements, certifiedPlacements.count,
+                       "stars are counted against the witness")
+        XCTAssertEqual(MicroscopicAuroraExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
