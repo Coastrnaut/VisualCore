@@ -97,7 +97,7 @@ edited file is refused.
   `-3f`
 - [X] T-R02G2002-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-26: 2026-11-26 rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G20-02.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
-- [ ] T-R02G2002-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2002-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-26: 2026-11-26 reference-1 exit 0 (.autonomy/migration/checks/R02-G20-02.reference-1.json)
 - [ ] T-R02G2002-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2002-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2002-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
