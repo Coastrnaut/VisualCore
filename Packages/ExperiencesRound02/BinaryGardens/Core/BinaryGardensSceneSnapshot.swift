@@ -8,6 +8,15 @@
 // and the budget, the level number and the presentation time; plus the palette and the three quality tiers. The
 // renderer never holds the kernel, so no drawing result can change the game (renderer purity), and every drawn
 // position, flux, share, band, window and integral is the kernel's integer.
+//
+// Feature 504 (R02-G21-04) T-R02G2104-002 (FR-R02G2104-002 … 008, 016; SC-R02G2104-003, 006; clarifications Q3, Q4;
+// research R4, R10) adds, presentation only: the level's star speed ω and each star's ring, phase and luminosity
+// freedoms (copied from the level, so the gesture controller can read the orbit tangent, the phase targets and the
+// locks at touch-down); the preview of a drag (``BinaryGardensPreview``: the change as a kernel action and either the
+// changed arrangement with the kernel's own report of it — the kernel's internal change rule
+// `BinaryGardensSky.changed` and `BinaryGardensSky.report`, never a second law — or the kernel's refusal in the order
+// the play gives it); and the inspected world. Every initialiser leaves the preview and the inspection empty, so the
+// drawing of R02-G21-03 is unchanged; none of it enters the digest (the snapshot never does) and nothing is saved.
 import Foundation
 
 /// The palette of Binary Gardens, as linear colours 0 … 1 (warm vermilion, ice blue and mint world on deep space;
@@ -203,6 +212,95 @@ public struct BinaryGardensSceneWorld: Sendable, Equatable {
     }
 }
 
+/// Which of a star's ring, phase and luminosity the player may adjust (feature 504): a presentation copy of the level's
+/// `BinaryGardensStar` flags.
+public struct BinaryGardensStarFreedom: Sendable, Equatable {
+    /// Whether the star may move to another ring (`ringAdjustable`).
+    public let ring: Bool
+    /// Whether the star's phase may shift (`phaseAdjustable`).
+    public let phase: Bool
+    /// Whether the star's luminosity may change (`luminosityAdjustable`).
+    public let luminosity: Bool
+
+    /// A freedom of the given flags.
+    public init(ring: Bool, phase: Bool, luminosity: Bool) {
+        self.ring = ring
+        self.phase = phase
+        self.luminosity = luminosity
+    }
+
+    /// Every control adjustable (the unchecked snapshot's default).
+    public static let free: BinaryGardensStarFreedom = BinaryGardensStarFreedom(ring: true, phase: true,
+                                                                               luminosity: true)
+}
+
+/// The preview of one drag (feature 504, R02-G21-04): the change as a kernel action and what the kernel makes of it —
+/// the changed arrangement with the kernel's report of it, or the kernel's refusal. Presentation only; never in the
+/// digest.
+public struct BinaryGardensPreview: Sendable, Equatable {
+    /// What the kernel makes of the change.
+    public enum Outcome: Sendable, Equatable {
+        /// The kernel accepts the change: the changed arrangement and the kernel's report of it.
+        case accepted(arrangement: BinaryGardensArrangement, report: BinaryGardensReport)
+        /// The kernel refuses the change with this refusal (the change rule's, or `.budget` with no action left).
+        case refused(BinaryGardensError)
+    }
+
+    /// The change: a `.ring`, `.phase`, `.luminosity` or `.tilt` action.
+    public let change: BinaryGardensAction
+    /// What the kernel makes of it.
+    public let outcome: Outcome
+
+    /// A preview of the given values (unchecked; ``of(_:arrangement:actionsLeft:level:)`` computes one).
+    public init(change: BinaryGardensAction, outcome: Outcome) {
+        self.change = change
+        self.outcome = outcome
+    }
+
+    /// The previewed report; nil when refused.
+    public var report: BinaryGardensReport? {
+        if case .accepted(_, let report) = outcome { return report }
+        return nil
+    }
+
+    /// The previewed arrangement; nil when refused.
+    public var arrangement: BinaryGardensArrangement? {
+        if case .accepted(let arrangement, _) = outcome { return arrangement }
+        return nil
+    }
+
+    /// The kernel's refusal; nil when accepted.
+    public var refusal: BinaryGardensError? {
+        if case .refused(let error) = outcome { return error }
+        return nil
+    }
+
+    /// The previewed verdict: whether running the changed arrangement would win; nil when refused.
+    public var wins: Bool? { report?.wins }
+
+    /// The preview of `change` from `arrangement` with `actionsLeft` actions left in `level`, judged by the kernel in the
+    /// order the play judges an arrangement action: the kernel's change rule (`BinaryGardensSky.changed`: range, grid,
+    /// locked, unchanged, separation), then `.budget` when no action is left, then `BinaryGardensSky.report` of the
+    /// changed arrangement. Nil (no preview) for `.run`, for an unchanged value (the change rule's
+    /// `.action("unchanged")`) and for an arrangement without the level's shape.
+    public static func of(_ change: BinaryGardensAction, arrangement: BinaryGardensArrangement, actionsLeft: Int,
+                          level: BinaryGardensLevel) -> BinaryGardensPreview? {
+        if case .run = change { return nil }
+        guard BinaryGardensSky.isWellFormed(level, arrangement) else { return nil }
+        let next: BinaryGardensArrangement
+        do throws(BinaryGardensError) {
+            next = try BinaryGardensSky.changed(level, arrangement, by: change)
+        } catch {
+            if error == .action("unchanged") { return nil }
+            return BinaryGardensPreview(change: change, outcome: .refused(error))
+        }
+        guard actionsLeft > 0 else { return BinaryGardensPreview(change: change, outcome: .refused(.budget)) }
+        return BinaryGardensPreview(change: change,
+                                    outcome: .accepted(arrangement: next,
+                                                       report: BinaryGardensSky.report(level, arrangement: next)))
+    }
+}
+
 /// An immutable copy of what the renderer may read (see the file header).
 public struct BinaryGardensSceneSnapshot: Sendable, Equatable {
     /// The ticks of one cycle (and the entries of every per-tick list), 48.
@@ -240,6 +338,14 @@ public struct BinaryGardensSceneSnapshot: Sendable, Equatable {
     public let levelNumber: Int
     /// The presentation time in seconds (never negative or non-finite).
     public let time: Double
+    /// The level's star speed ω in phase steps per tick, 1 … 3 (feature 504; presentation copy; 1 when unchecked).
+    public let starSpeed: Int
+    /// Each star's freedoms, star 1 first (feature 504; presentation copy; every control adjustable when unchecked).
+    public let freedoms: [BinaryGardensStarFreedom]
+    /// The previewed drag; nil from every initialiser (feature 504; presentation only; never in the digest).
+    public private(set) var preview: BinaryGardensPreview? = nil
+    /// The inspected world; nil from every initialiser (feature 504; presentation only; never in the digest).
+    public private(set) var inspectedWorld: Int? = nil
 
     /// A snapshot of `play` with tick `shownTick` shown (clamped to 1 … 48), at presentation time `time` (a non-finite
     /// or negative time becomes 0). Copies the play's report; never holds the kernel.
@@ -265,16 +371,21 @@ public struct BinaryGardensSceneSnapshot: Sendable, Equatable {
                   phaseStep: level.phaseStep, lethalTolerance: level.lethalTolerance, worlds: worlds,
                   arrangement: play.arrangement, starPositions: report.starPositions, shownTick: shownTick,
                   failure: play.failure ?? report.failure, stage: play.stage, actionsLeft: play.actionsLeft,
-                  budget: level.budget, levelNumber: levelNumber, time: time)
+                  budget: level.budget, levelNumber: levelNumber, time: time, starSpeed: level.starSpeed,
+                  freedoms: level.stars.map { star in
+                      BinaryGardensStarFreedom(ring: star.ringAdjustable, phase: star.phaseAdjustable,
+                                               luminosity: star.luminosityAdjustable)
+                  })
     }
 
     /// A snapshot of the given values, unchecked (presentation variants and tests: arrangements, failures and stages a
     /// play may not reach); the fit scale is computed from the radii, `shownTick` is clamped to 1 … 48 and `time` made
-    /// finite and non-negative.
+    /// finite and non-negative; the star speed defaults to 1 and the freedoms to every control adjustable (feature 504).
     init(ringRadii: [Int], luminosityLevels: [Int], maxTilt: Int, phaseStep: Int, lethalTolerance: Int,
          worlds: [BinaryGardensSceneWorld], arrangement: BinaryGardensArrangement,
          starPositions: [[BinaryGardensPoint]], shownTick: Int, failure: BinaryGardensFailure?,
-         stage: BinaryGardensStage, actionsLeft: Int, budget: Int, levelNumber: Int, time: Double) {
+         stage: BinaryGardensStage, actionsLeft: Int, budget: Int, levelNumber: Int, time: Double,
+         starSpeed: Int = 1, freedoms: [BinaryGardensStarFreedom] = [.free, .free]) {
         self.ringRadii = ringRadii
         self.luminosityLevels = luminosityLevels
         self.maxTilt = maxTilt
@@ -291,6 +402,8 @@ public struct BinaryGardensSceneSnapshot: Sendable, Equatable {
         self.budget = budget
         self.levelNumber = levelNumber
         self.time = time.isFinite ? max(0, time) : 0
+        self.starSpeed = starSpeed
+        self.freedoms = freedoms
     }
 
     /// The fit scale k = 0.95 / R for R the largest of `ringRadii` and `worldRadii` (R at least 1).
@@ -337,5 +450,55 @@ public struct BinaryGardensSceneSnapshot: Sendable, Equatable {
         let positions: [BinaryGardensPoint] = worlds[world].positions
         let index: Int = Self.tickIndex(tick)
         return index < positions.count ? positions[index] : BinaryGardensPoint(x: 0, y: 0, z: 0)
+    }
+
+    // MARK: Feature 504 — star steps, preview and inspection
+
+    /// Star `star`'s freedoms (every control adjustable for a star the snapshot lacks).
+    public func freedom(_ star: Int) -> BinaryGardensStarFreedom {
+        freedoms.indices.contains(star) ? freedoms[star] : .free
+    }
+
+    /// The table step star `star` stands at at tick `tick`: (θ + ω · tick) mod 48 (`BinaryGardensSky.phase`), θ its
+    /// phase in the arrangement (0 for a star the snapshot lacks); tick 48 gives θ.
+    public func starStep(_ star: Int, tick: Int) -> Int {
+        let phases: [Int] = arrangement.phases
+        let theta: Int = phases.indices.contains(star) ? phases[star] : 0
+        return BinaryGardensSky.phase(theta, speed: starSpeed, tick: tick)
+    }
+
+    /// This snapshot with `change` previewed in `level` (the snapshot's level): ``preview`` is
+    /// ``BinaryGardensPreview/of(_:arrangement:actionsLeft:level:)`` of this snapshot's arrangement and actions left —
+    /// the kernel's own judgement. A level whose rings, luminosity levels, maximum tilt, phase step, star speed or world
+    /// count differ from the snapshot's, `.run` or an unchanged value gives this snapshot without a preview.
+    /// Presentation only: nothing else changes.
+    public func previewing(_ change: BinaryGardensAction, level: BinaryGardensLevel) -> BinaryGardensSceneSnapshot {
+        var copy: BinaryGardensSceneSnapshot = self
+        guard level.ringRadii == ringRadii, level.luminosityLevels == luminosityLevels, level.maxTilt == maxTilt,
+              level.phaseStep == phaseStep, level.starSpeed == starSpeed, level.worlds.count == worlds.count else {
+            copy.preview = nil
+            return copy
+        }
+        copy.preview = BinaryGardensPreview.of(change, arrangement: arrangement, actionsLeft: actionsLeft, level: level)
+        return copy
+    }
+
+    /// This snapshot without a preview (presentation only).
+    public func clearingPreview() -> BinaryGardensSceneSnapshot {
+        var copy: BinaryGardensSceneSnapshot = self
+        copy.preview = nil
+        return copy
+    }
+
+    /// This snapshot with world `world` inspected (nil, or a world the snapshot lacks, clears the inspection);
+    /// presentation only.
+    public func inspecting(_ world: Int?) -> BinaryGardensSceneSnapshot {
+        var copy: BinaryGardensSceneSnapshot = self
+        if let index = world, worlds.indices.contains(index) {
+            copy.inspectedWorld = index
+        } else {
+            copy.inspectedWorld = nil
+        }
+        return copy
     }
 }

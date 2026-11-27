@@ -15,7 +15,7 @@ modelled on feature 484).
 
 ## Phase 2: Foundational — view orbit, camera, preview, inspection and picking
 
-- [ ] T-R02G2104-002 [P] Add the stored `starSpeed` (ω; default 1 when unchecked), `freedoms`
+- [X] T-R02G2104-002 [P] Add the stored `starSpeed` (ω; default 1 when unchecked), `freedoms` — Verified 2026-11-27: host-2 exit 0 (swift test --filter BinaryGardens, all pass); snapshot additions, freedoms, preview
   (`BinaryGardensStarFreedom` ring, phase, luminosity copied from the level's `ringAdjustable`, `phaseAdjustable`,
   `luminosityAdjustable`; default all adjustable when unchecked), `preview` and `inspectedWorld` (both nil from every
   initialiser; "presentation only; never in the digest"), `starStep(_:tick:)` ((θ + ω·tick) mod 48),
