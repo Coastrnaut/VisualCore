@@ -93,7 +93,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G2101-005 [P] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensPuzzle.swift`
+- [X] T-R02G2101-005 [P] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensPuzzle.swift` — Verified 2026-11-27: host-4 exit=0, BinaryGardensPuzzleTests: 200 walks against the play, 120 moves on the largest level (.autonomy/migration/checks/R02-G21-01.host-4.json)
   (agent C: `PuzzleRules`: State = position (arrangement, actions spent), Move = an arrangement action; legal moves
   "every legal arrangement action while actions are left" in the order of research R14 (star 1 then star 2, rings
   ascending, phases 0 … 47, luminosities ascending, then tilts 0 … T_max; at most 120); goal "the predicted run wins";
