@@ -106,7 +106,7 @@ R02-G20-03 (`git show a3269b5cc:<path>`, the R02-G20-03 record commit).
   brackets (wrapping and empty) and bloom markers from the kernel's values only; trail ticks cyclic; a won level in
   place; the glow mesh empty at level-2 and its shell counts per tier; each failure kind marked; shader stream
   encoding); agent B; `--name host-3`
-- [ ] T-R02G2103-005 [P] [US2] Create
+- [X] T-R02G2103-005 [P] [US2] Create — Verified 2026-11-27: host-4 exit=0, BinaryGardensExperienceCoreTests (15) and RendererPurityTests (200 seeded snapshots) (.autonomy/migration/checks/R02-G21-03.host-4.json)
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensExperienceCore.swift` (controls "`star.ring [star,
   index]`, `star.phase [star, step]`, `star.luminosity [star, index]`, `orbit.tilt [step]`, `light.run`, `play.undo`,
   `play.redo`, `level.next`, `clock.show [tick]`; declared ranges star 0 … 1, ring index 0 … 7, phase 0 … 47,
