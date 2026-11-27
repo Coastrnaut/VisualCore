@@ -1,8 +1,8 @@
 // BGSupport — feature 509 (R02-G21-09) T-R02G2109-004, modelled on feature 499 (FR-R02G2109-002, 007; SC-R02G2109-001;
 // clarifications Q1, Q2): helpers of the interface tests of Binary Gardens (R02-G21) inside the one app, ported from
-// `MWSupport` (feature 499). The namespace is `BG` (no other UI test uses `BG`). Binary Gardens is a candidate
-// (`ExperienceRegistry.candidates`); every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries
-// become available and are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips
+// `MWSupport` (feature 499). The namespace is `BG` (no other UI test uses `BG`). Binary Gardens was a candidate
+// until X-R02-G21 (2026-11-27); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog
+// entries become available and are registered; harmless now that it is integrated). A fresh start erases the data (`-vcResetData`, so no level is solved), skips
 // the welcome and opens the experience directly with `-openExperience r02-g21.binary-gardens`; a relaunch (`BG.reopen`)
 // backgrounds the app first (its save point, the lesson of feature 309), terminates it and starts again without the
 // reset, so the stored progress (solved levels, stars, the frontier, the verified winning trace) survives.

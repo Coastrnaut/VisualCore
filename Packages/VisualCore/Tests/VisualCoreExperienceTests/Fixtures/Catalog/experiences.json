@@ -1699,7 +1699,7 @@
         "catalog_sha256": "adf594d6994ffa3f4af4d1035c4e99faecdedffecac96f4ddc21bdc983ce401f",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g22.mycelium-architect",

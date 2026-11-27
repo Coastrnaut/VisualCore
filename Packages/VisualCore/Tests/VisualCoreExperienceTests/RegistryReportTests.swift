@@ -77,7 +77,8 @@ import Testing
                          "r02-g17.celestial-eclipse-lab",
                          "r02-g18.apsides-workshop",
                          "r02-g19.microscopic-aurora",
-                         "r02-g20.mushroom-weather"].compactMap(ExperienceID.init(rawValue:))
+                         "r02-g20.mushroom-weather",
+                         "r02-g21.binary-gardens"].compactMap(ExperienceID.init(rawValue:))
         #expect(manifest.registryReport(registered: integrated).isMatch)
         #expect(manifest.registryReport(registered: []).missingRegistrations == integrated)
     }

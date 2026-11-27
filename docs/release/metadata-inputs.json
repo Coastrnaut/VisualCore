@@ -373,9 +373,17 @@
       "name": "Mushroom Weather",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G21",
+      "id": "r02-g21.binary-gardens",
+      "name": "Binary Gardens",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "cc570eb765da73028371057cdca6908a488efa116e2b693cdb55728054d235c2",
+  "ledger_sha256": "125fe24aa1290468d419c2625793aaad5981d5cb51f221ec0968b1ac2a91fb7b",
   "privacy_answers": "unproven",
   "schema": 1
 }
