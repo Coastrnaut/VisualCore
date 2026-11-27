@@ -104,7 +104,9 @@ presentation of later features.
   row shows ticks (`clock.show`, presentation only). Two fingers orbit the view within yaw ±60° and pitch −20° … +35°;
   a double tap on empty space or "Reset view" returns to the authored view. A finished play explains itself in words;
   the preview, the inspection and the orbit never enter the digest, and an opening, `level.next`, a reset or a restore
-  clears them.
+  clears them; the presenter recognises a new play by the level number and the play's records (the shell gives
+  no reset or restore hook, as for feature 494), so a reset or restore that leaves the shown play unchanged keeps the
+  inspection and the orbit.
 - **Panel parity.** The panel keeps every row and gains a Ring picker, a Luminosity picker, a phase target stepper by
   the phase step with "Set phase", a Tilt picker (when T_max > 0), "Inspect" with the inspected world's words and "Reset
   view"; each choice sends one action through the presenter, which shows refusals in words and keeps their bare codes in

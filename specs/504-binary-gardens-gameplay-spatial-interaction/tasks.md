@@ -184,6 +184,6 @@ MVP: Story 1. Requirement coverage: FR-001 → 002, 003, 005; FR-002 → 002, 00
   through the shell of a saved play different from the shown one clears the preview, the inspected world and the orbit,
   per spec Edge Cases (opening, next level, reset and restore) and FR-R02G2104-016 (partial: only `level.next` and a
   reset after play are tested); `--name sim-27-2`
-- [ ] T-R02G2104-014 State in `docs/architecture/binary-gardens.md` that the presenter recognises a new play by the
+- [X] T-R02G2104-014 State in `docs/architecture/binary-gardens.md` that the presenter recognises a new play by the — Verified 2026-11-27: docs/architecture/binary-gardens.md states the new-play rule; validate_docs PASS
   level number and the play's records (the shell gives no reset or restore hook, as for feature 494), so a reset or
   restore that leaves the shown play unchanged keeps the inspection and the orbit, per spec Edge Cases (partial)
