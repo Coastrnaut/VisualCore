@@ -44,7 +44,7 @@ is contacted. No {owner} tasks; one {device} task. Prerequisites: R02-G21-05 …
   `-3f`
 - [X] T-R02G2110-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0
   host-full` (nothing in the app changes)
-- [ ] T-R02G2110-007 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2110-007 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0
 - [ ] T-R02G2110-008 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2110-009 {device} After ImplementationLock-100: the device campaign (UA-F13) runs rows BG-D1 … BG-D8 on D1,
   D2, D3 (SC-R02G2110-004)
