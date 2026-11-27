@@ -37,7 +37,7 @@ on CI). No {owner} or {device} tasks (pure logic); no GLSL.
 **Independent test**: each catalog level's witness, replayed and run, wins within the budget; no arrangement reachable
 with fewer actions wins.
 
-- [ ] T-R02G2002-003 [US1] Implement `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSolver.swift`
+- [X] T-R02G2002-003 [US1] Implement `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSolver.swift` — Verified 2026-11-26: 2026-11-26 host-2 exit 0: 63 tests in 8 suites incl. 10 solver tests (hand minima, independent BFS counts, loss order, work bound) (.autonomy/migration/checks/R02-G20-02.host-2.json)
   (lead: arrangements by distance "pod count + vents toggled + one for a changed moonlight" from a start with no pod;
   within a depth "by pod count ascending, then vent count ascending, then pod site combinations and vent combinations
   in lexicographic order, then the new moonlight ascending, skipping the start's"; "each depth after 0 ordered by the
