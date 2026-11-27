@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G20-03: Mushroom Weather hero renderer; round-two CI halves).
+Last updated: 2026-11-27 (R02-G20-04: Mushroom Weather gameplay spatial interaction).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mushroom Weather gameplay spatial interaction** (R02-G20-04, 2026-11-27). Host: picker (500 seeded points over three
+  orbits against an independent pick, drop, moon and cycle rule), geometry with the orbit camera in view at the orbit
+  corners and seven aspects and the preview equal to the kernel's run, the gesture controller (500 seeded scripts at
+  three sizes and three orbits on playing, won and failed plays) and panel wins (all 100 certified levels, one panel
+  action per witness action, digests equal step by step). Simulator: 11 gesture wiring tests through the presenter's
+  pointer entry (37 tests in the suite). Lessons: the panel's moonlight − / + choose a level and Set moonlight spends one
+  action, so every certified witness maps to the panel one action at a time; the refusal text read prefixed engine codes
+  as unknown until the mirror stripped `action.rule.`.
 - **Mushroom Weather hero renderer** (R02-G20-03, 2026-11-27). Host: snapshot (5), shader sources (19), scene
   geometry (14), adapter and renderer purity (17), scenarios (7; regenerate the manifest with `UPDATE_SCENARIO_MANIFEST=1`).
   Simulator (`--only-testing MushroomWeatherExperienceTests`, 26 tests): frames of levels 1, 21, 41, 61, 81 at three

@@ -95,3 +95,26 @@ accounts for every unit; the catalog's 0.016667 s timestep is a presentation clo
   runs, undoes, redoes and moves to the next level. The candidate is registered in the one app (not available until
   X-R02-G20) with its scenario manifest (the standard scenarios, a three-level playthrough, the hero, fixtures and the
   80 acceptance rows R2-G20-QA-001 … 080).
+
+## Gameplay spatial interaction (feature 494, R02-G20-04)
+
+- **Picking.** `MushroomWeatherPicker` projects the parts through the drawn camera (the view orbit included) and tries
+  them in the order drawn last first: a vent within its projected frame grown by 12 points, a pod within its projected
+  radius grown by 12 points (later slots first), a site within its projected ring radius grown by 12 points, the moon
+  within its projected radius grown by 12 points, then the cycle scrubber (a track at y −0.9 between the floor and the
+  gauges) within a 14-point band, then the floor inside its projected rectangle; anything else is empty space.
+- **Gestures.** `MushroomWeatherGestureController` turns touches into actions. A tap on an empty site while playing
+  places a pod in the first free slot (`pod.place`), or says that every slot is used; a tap on a vent sends its other
+  state (`vent.set`). Dragging a pod (16 points or more, while playing) previews the weather with the pod on the site
+  nearest the finger within 24 points, or removed when the finger leaves the floor: the previewed mist, caps and gauges
+  come from the kernel's own run, and the dragged pod is drawn as a ghost (material 29). Lifting sends one `pod.place`
+  or one `pod.remove` when the target is a change, otherwise nothing. Dragging the moon up or down previews the
+  moonlight level start + round(−dy / 40), clamped 0 … 3, and lifting sends one `moon.set` when it differs. Dragging the
+  scrubber shows the cycle nearest the finger (`clock.show`, presentation only, in any stage). Two fingers orbit the
+  view within yaw ±60° and pitch −20° … +35° (the camera refits to keep the box with the moon in view); a double tap off
+  the floor or "Reset view" returns to the authored view. A finished play explains itself in words; second fingers and
+  cancels send no kernel action; the preview and the orbit never enter the digest.
+- **Panel parity.** The panel keeps every action (slot, site, Place, Remove, vent toggles, moonlight − / + with Set
+  moonlight, cycles, Run, Undo, Redo, Next level) and gains "Reset view"; its kernel buttons send through the presenter,
+  which shows and logs refusal codes with or without the engine's prefix. A host test wins all 100 certified levels
+  through the panel, one panel action per witness action.

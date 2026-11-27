@@ -99,7 +99,7 @@ tests stay short (< 10 s each). No {owner} tasks. Agents model their files on Mi
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G2004-006 Docs: `docs/architecture/mushroom-weather.md` (gestures, the scrubber and the preview),
+- [X] T-R02G2004-006 Docs: `docs/architecture/mushroom-weather.md` (gestures, the scrubber and the preview), — Verified 2026-11-27: 2026-11-27 docs (architecture gestures and preview, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G20-04.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G2004-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

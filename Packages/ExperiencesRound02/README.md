@@ -1025,5 +1025,8 @@ certificates (`MushroomWeatherWitness`, `docs/games/mushroom-weather/levels/`, p
 (R02-G20-03) adds the hero renderer and the experience: `MushroomWeatherSceneSnapshot`, `MushroomWeatherSceneGeometry`
 (the forest floor, mist, lathed caps and pods, vents, gauges, the CPU reference), `MushroomWeatherShaders`, the adapter
 `MushroomWeatherExperienceCore`, the scenario manifest and the iOS target `MushroomWeatherExperience` (presenter, scene,
-controls), registered as a candidate. See
+controls), registered as a candidate. Feature 494 (R02-G20-04) adds gameplay spatial interaction:
+`MushroomWeatherViewOrbit`, `MushroomWeatherPicker` (vents, pods, sites, the moon, the cycle scrubber and the floor
+picked through the drawn camera) and `MushroomWeatherGestureController` (tap a site to place a pod, drag a pod with a
+previewed run, tap a vent, drag the moon to set the moonlight, scrub cycles, orbit and reset the view). See
 [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).
