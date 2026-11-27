@@ -92,7 +92,7 @@ edited file is refused.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G2002-007 Docs: `docs/architecture/mushroom-weather.md` (content pipeline),
+- [X] T-R02G2002-007 Docs: `docs/architecture/mushroom-weather.md` (content pipeline), — Verified 2026-11-26: 2026-11-26 docs (architecture content pipeline, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G20-02.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G2002-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

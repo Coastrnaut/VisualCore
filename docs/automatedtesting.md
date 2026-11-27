@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G20-01: Mushroom Weather rule kernel).
+Last updated: 2026-11-26 (R02-G20-02: Mushroom Weather content pipeline).
 
 ## 1. What is tested, and where
 
@@ -1003,6 +1003,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mushroom Weather content pipeline** (R02-G20-02, 2026-11-26). `swift test --package-path Packages/ExperiencesRound02
+  --filter MushroomWeather` (91 tests in 11 suites, about 15 s): sites (refusals, the play's "not a site", stored form
+  unchanged without sites), the solver (hand levels with known minima, an independent breadth-first search over the
+  puzzle's moves reproducing the per-depth counts, the loss order changing only the work, the work bound), the
+  generator (determinism, drawing order, band values, the filters and the neighbour rule), the witness (byte round
+  trip, digests, an independent replay, damaged and edited files refused by reason) and the catalog (pinned digest,
+  all 100 witnesses won, an independent enumeration on the two levels with the fewest sites per band, 20 byte-for-byte
+  groups of 5). Witness files are written only with `MUSHROOM_WEATHER_WRITE_WITNESSES=1 swift test --no-parallel`;
+  tests reading the files fail on that first write and pass on the next run. Lesson: the catalog builds in about 24 s
+  in a debug build, so certification runs as 20 parallel groups of 5 levels.
 - **Microscopic Aurora device rows** (R02-G19-10, 2026-11-26). `python3 scripts/check_device_rows.py --experience
   r02-g19.microscopic-aurora` (release step `device-rows-r02-g19`, tests `MicroscopicAuroraDeviceRowsCheckTests`, 8)
   checks the definition (rows MA-D1 … MA-D8, 12 device scenarios) against the scenario manifest, the ledger's

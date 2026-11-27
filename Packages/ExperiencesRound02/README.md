@@ -1019,4 +1019,7 @@ with antisymmetric flows, evaporation by vents and moonlight and release by spor
 growth by time-integrated humidity and colony runs), the judge (`dried`, `mold`, `unstable`), `MushroomWeatherLevel`
 (immutable, fingerprinted, JSON schema 1, with names in words), the play state `MushroomWeatherPlay` with stages, pod,
 vent and moonlight actions and the run, records, undo and redo, and `MushroomWeatherPuzzle` (an R02-F23 `PuzzleRules`
-over arrangements). See [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).
+over arrangements). Feature 492 (R02-G20-02) adds pod sites, the 100-level manifest, the seeded generator
+(`MushroomWeatherGenerator`), the minimal solver (`MushroomWeatherSolver`, work bound 1,500) and the witness
+certificates (`MushroomWeatherWitness`, `docs/games/mushroom-weather/levels/`, pinned catalog digest). See
+[docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).
