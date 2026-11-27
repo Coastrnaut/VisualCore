@@ -313,8 +313,10 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
 
     /// Decodes a stored level, re-checking every rule and the fingerprint.
     ///
-    /// - Throws: `.newerSchema(s)` above ``schema``; `.malformed(description)` for unreadable JSON, missing keys, a
-    ///   schema below 1, any refusal of the initialiser (its reason code) or a fingerprint that does not match.
+    /// - Throws: `.newerSchema(s)` above ``schema``; `.level(reason)` for stored values the initialiser refuses
+    ///   (clarification Q5: an invalid level is refused `r02-g20.level`; feature 491 T-R02G2001-013);
+    ///   `.malformed(description)` for unreadable JSON, missing keys, a schema below 1 or a fingerprint that does not
+    ///   match.
     public static func decode(_ data: Data) throws(MushroomWeatherError) -> MushroomWeatherLevel {
         struct Probe: Decodable { let schema: Int }
         let probe: Probe
@@ -327,6 +329,7 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
         do {
             level = try stored.content.level()
         } catch {
+            if case .level = error { throw error }
             throw .malformed(error.reasonCode)
         }
         guard level.fingerprint == stored.fingerprint else { throw .malformed("fingerprint") }

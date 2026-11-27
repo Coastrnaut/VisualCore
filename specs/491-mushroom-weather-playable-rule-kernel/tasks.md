@@ -98,7 +98,7 @@ the lead. Agents may draft in isolated copies before 001 (new files only). MVP: 
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G2001-013 Make `MushroomWeatherLevel.decode` refuse a stored level whose values are invalid with
+- [X] T-R02G2001-013 Make `MushroomWeatherLevel.decode` refuse a stored level whose values are invalid with — Verified 2026-11-26: 2026-11-26 host-6 exit 0: decode refuses an invalid stored value r02-g20.level; the stored-form test expects it; 45 tests pass (.autonomy/migration/checks/R02-G20-01.host-6.json)
   `r02-g20.level` (pass the initializer's `.level` refusal through instead of wrapping it as `.malformed`), and update
   the stored-form tests in `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherLevelTests.swift` and
   `…InvariantTests.swift` per FR-R02G2001-009, Clarification Q5 (contradicts); `--name host-6`

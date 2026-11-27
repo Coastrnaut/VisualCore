@@ -393,7 +393,7 @@ import Testing
         #expect(edited != text)
         #expect(code(edited) == "r02-g20.malformed")
         #expect(code(text.replacingOccurrences(of: "\"diffusion\":\(level.diffusion)",
-                                               with: "\"diffusion\":0")) == "r02-g20.malformed")
+                                               with: "\"diffusion\":0")) == "r02-g20.level")
         #expect(code(text.replacingOccurrences(of: "\"fingerprint\":\"\(level.fingerprint)\"",
                                                with: "\"fingerprint\":\"\(String(repeating: "0", count: 64))\""))
             == "r02-g20.malformed")
