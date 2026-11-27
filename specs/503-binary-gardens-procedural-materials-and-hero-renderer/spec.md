@@ -87,7 +87,9 @@ curves, procedural planets and starfields". The shared packages have a UV sphere
   then index, so a star behind a world is covered by it): a world is a cube-sphere of radius 0.07 at its position at the
   shown tick (its faces emitted far-first from the fixed eye, so its near side covers its far side), mint world
   #7BE8BE, shaded in the fragment shader by the light of both stars — each star's colour by the
-  angle to that star, scaled by that star's kernel share of the world's flux at the shown tick over 64 000, with a
+  angle to that star, scaled by the logarithmic light response of that star's kernel share at the shown tick (the stream carries the
+  share over 64 000; the response is log2-shaped and reaches 1 at 1 024 milliflux, so catalog worlds of tens to hundreds
+  of milliflux read), with a
   brightened sunrise band along each star's terminator, so two suns paint two crossing coloured bands, over an ambient
   floor of 0.35 of the surface colour so a world's night side still reads — and by
   shader-only seasonal banding that follows the world's band at the shown tick, by the latitude φ = asin(n.z) of the
@@ -129,7 +131,8 @@ curves, procedural planets and starfields". The shared packages have a UV sphere
   1,152 × 768 at shown tick 24 and check, at points at least 6 pixels from every element drawn after them, that each
   world's centre is brighter than the backdrop at that point by at least 0.15 in luminance (at least one world is
   checked in every frame; the ambient floor of 0.35 keeps a world's surface above that margin on its night side); that each star's centre is brighter than the backdrop by at least 0.4 (at least one star is
-  checked in every frame); that the first actions bar (lit) has red above blue by at least 0.08 (vermilion); that the
+  checked in every frame; in the unlit fallback, which draws a star as its flat disc colour without the white-hot core,
+  the check is that colour within 0.1); that the first actions bar (lit) has red above blue by at least 0.08 (vermilion); that the
   first gauge plate's left margin differs from the backdrop by at least 0.05; and that the median of a 9 × 9 pixel patch
   of backdrop in a lower corner matches the gradient colour at its height within 0.06 (the sparse starfield cannot move
   a median). Palette: space #070815, space top #151B3D, starfield #C8D2F0, ring idle #2B3560, orbit #3A6B66, star one

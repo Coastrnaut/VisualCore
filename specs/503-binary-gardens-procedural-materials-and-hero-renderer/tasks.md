@@ -192,7 +192,7 @@ FR-009 → 002, 007 … 011; FR-010 → 003, 004, 006.
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G2103-014 State in `specs/503-binary-gardens-procedural-materials-and-hero-renderer/spec.md` (clarification Q1)
+- [X] T-R02G2103-014 State in `specs/503-binary-gardens-procedural-materials-and-hero-renderer/spec.md` (clarification Q1) — Verified 2026-11-27: spec Q1 and research state the logarithmic light response
   and `research.md` that each star's light reaches a world through the logarithmic response
   `BinaryGardensShaders.lightResponse(share:)` (log2, 1 at 1 024 milliflux) of the share the uv stream carries
   (share / 64 000), since a linear share leaves catalog worlds black, per Clarifications Q1 (contradicts)

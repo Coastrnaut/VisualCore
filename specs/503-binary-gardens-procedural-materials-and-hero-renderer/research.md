@@ -88,3 +88,17 @@
   iteration share = quads per face / 64 (1, 25/64, 9/64), effect passes = glow shells (2, 1, 0), resolution share 1;
   no budget rises from level-0 to level-2. Rationale: the shared contract requires a non-increasing profile; the Core's
   `qualityTiers` (3) equals the presenter's levels.
+
+## Implementation decisions (feature 503 convergence, T-R02G2103-014 … 016)
+
+- **Light response.** A linear share / 64 000 leaves catalog worlds (tens to hundreds of milliflux) black, so the
+  shaders light through `BinaryGardensShaders.lightResponse(share:)`, log2-shaped and 1 at 1 024 milliflux; the uv
+  stream still carries share / 64 000.
+- **Fallback star check.** The unlit fallback draws a star as its flat disc colour (vermilion about 0.48 in luminance)
+  without the white-hot core, so its frame check is that colour within 0.1; the shader path keeps the +0.4 margin.
+- **Failure marks** are drawn on a failed play only (stage failed, or result after a failed run), never for the
+  predicted failure while playing, as feature 493 does.
+- **Hero tick.** The earliest tick with the most comfortable worlds after the certified plan (tick 1 on level 1).
+- **Gauge plate.** Its quad spans u = ±1 exactly (coverage by v only), because the ±1.25 fringe of a plate over
+  x −0.95 … 1.22 would reach x 1.49, outside the fitted box; every other flat keeps ±1.25.
+
