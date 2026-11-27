@@ -144,6 +144,7 @@ final class BinaryGardensMirror {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 

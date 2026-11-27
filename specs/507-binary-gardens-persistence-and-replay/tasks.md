@@ -16,7 +16,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G2107-002 [P] [US2] Edit `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensProgress.swift`
+- [X] T-R02G2107-002 [P] [US2] Edit `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensProgress.swift` — Verified 2026-11-27: host-1 exit 0 (swift test --filter BinaryGardens: 299 tests in 27 suites; Reconciliation 19, Progress 24 pass); replay mode named in the feedback plan and presenter
   (Result gains "trace: [BinaryGardensAction]" (effective `.ring(star:index:)`, `.phase(star:step:)`,
   `.luminosity(star:index:)` and `.tilt(step:)` actions, then `.run`) and "verified: Bool";
   `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing only when it spends fewer

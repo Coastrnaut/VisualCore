@@ -13,6 +13,13 @@
 // shape and the validation helpers. Modelled on feature 495's MushroomWeatherProgressTests. Test data uses explicit
 // types and plain loops (CI type-check rule); each test well under 10 s. No clock: dates are inputs. Dismissal is the
 // adapter's and is tested there; only the step logic is tested here.
+// Feature 507 (R02-G21-07) T-R02G2107-002 (FR-R02G2107-003; clarifications Q1 … Q3): traced results — a traced record
+// is verified and stores its trace, replaces a stored result only with fewer actions spent (a tie keeps the earlier
+// trace), practice and replay record nothing, a daily traced win opens nothing; the untraced record stays unverified;
+// `drop(level:)` keeps the frontier; schema 2 encodings decode with an empty trace, unverified, and an untraced result
+// keeps the schema 2 encoding; traced encodings round-trip; the replay mode awards and opens nothing and encodes as
+// `{"level": n, "mode": "replay"}`; 300 seeded (SeededRandom seed 2_507) traced and untraced records keep the best
+// result and round-trip.
 import Foundation
 import Testing
 import VisualCoreSimulation
@@ -518,7 +525,8 @@ import VisualCoreSimulation
         #expect(empty == Progress())
         #expect(String(decoding: try Progress().encoded(), as: UTF8.self) == "{\"frontier\":1,\"solved\":[]}")
 
-        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 13), .daily(level: 100)]
+        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 13), .daily(level: 100),
+                             .replay(level: 1), .replay(level: 100)]
         for mode in modes {
             let modeData: Data = try encoder.encode(mode)
             #expect(try decoder.decode(Mode.self, from: modeData) == mode)
@@ -554,7 +562,10 @@ import VisualCoreSimulation
             #expect(throws: (any Error).self) { try decoder.decode(Progress.self, from: Data(text.utf8)) }
         }
         let badModes: [String] = [
-            "{\"mode\":\"replay\",\"level\":1}",
+            "{\"mode\":\"replay\"}",
+            "{\"mode\":\"replay\",\"level\":0}",
+            "{\"mode\":\"replay\",\"level\":101}",
+            "{\"mode\":\"rerun\",\"level\":1}",
             "{\"mode\":\"daily\"}",
             "{\"mode\":\"daily\",\"level\":0}",
             "{\"mode\":\"daily\",\"level\":101}"
@@ -563,6 +574,164 @@ import VisualCoreSimulation
             #expect(throws: (any Error).self) { try decoder.decode(Mode.self, from: Data(text.utf8)) }
         }
         #expect(throws: (any Error).self) { try decoder.decode(Step.self, from: Data("\"place\"".utf8)) }
+    }
+
+    // MARK: Traced results (feature 507)
+
+    /// A short trace for the progress tests (the kernel is not consulted here): `count` tilt steps, then the run.
+    static func trace(_ count: Int, first: Int = 0) -> [Action] {
+        var actions: [Action] = []
+        for index in 0..<count { actions.append(.tilt(step: (first + index) % 7)) }
+        actions.append(.run)
+        return actions
+    }
+
+    @Test func tracedRecordsAreVerifiedAndTiesKeepTheEarlierTrace() {
+        var progress: Progress = Progress()
+        let first: [Action] = Self.trace(3)
+        let r1: Bool = progress.record(level: 5, actionsSpent: 5, certified: 3, trace: first)
+        #expect(r1)
+        #expect(progress.solved[5] == Progress.Result(actionsSpent: 5, stars: 2, trace: first, verified: true))
+        #expect(progress.frontier == 6)
+        // A tie keeps the earlier trace; a worse result keeps it too.
+        let r2: Bool = progress.record(level: 5, actionsSpent: 5, certified: 3, trace: Self.trace(3, first: 2))
+        #expect(!r2)
+        let r3: Bool = progress.record(level: 5, actionsSpent: 6, certified: 3, trace: Self.trace(2))
+        #expect(!r3)
+        #expect(progress.solved[5]?.trace == first)
+        // Fewer actions replace it, trace and all.
+        let better: [Action] = Self.trace(2, first: 4)
+        let r4: Bool = progress.record(level: 5, actionsSpent: 3, certified: 3, trace: better)
+        #expect(r4)
+        #expect(progress.solved[5] == Progress.Result(actionsSpent: 3, stars: 3, trace: better, verified: true))
+        // An untraced record never replaces a traced one on a tie and is unverified when it is first.
+        let r5: Bool = progress.record(level: 5, actionsSpent: 3, certified: 3, mode: .campaign)
+        #expect(!r5)
+        #expect(progress.solved[5]?.verified == true)
+        let r6: Bool = progress.record(level: 9, actionsSpent: 4, certified: 3, mode: .campaign)
+        #expect(r6)
+        #expect(progress.solved[9] == Progress.Result(actionsSpent: 4, stars: 2))
+        #expect(progress.solved[9]?.verified == false && progress.solved[9]?.trace == [])
+        // Practice and replay record nothing; daily records without opening.
+        let r7: Bool = progress.record(level: 40, actionsSpent: 1, certified: 1,
+                                        mode: .practice, trace: Self.trace(1))
+        #expect(!r7)
+        let r8: Bool = progress.record(level: 40, actionsSpent: 1, certified: 1,
+                                        mode: .replay(level: 40), trace: Self.trace(1))
+        #expect(!r8)
+        let r9: Bool = progress.record(level: 40, actionsSpent: 1, certified: 1, mode: .replay(level: 40))
+        #expect(!r9)
+        #expect(progress.solved[40] == nil && progress.frontier == 10)
+        let r10: Bool = progress.record(level: 40, actionsSpent: 1, certified: 1,
+                                        mode: .daily(level: 40), trace: Self.trace(1))
+        #expect(r10)
+        #expect(progress.solved[40]?.verified == true && progress.frontier == 10)
+        // Levels outside 1 … 100 and actions spent below 1 are ignored.
+        let r11: Bool = progress.record(level: 0, actionsSpent: 1, certified: 1, trace: Self.trace(1))
+        #expect(!r11)
+        let r12: Bool = progress.record(level: 101, actionsSpent: 1, certified: 1, trace: Self.trace(1))
+        #expect(!r12)
+        let r13: Bool = progress.record(level: 3, actionsSpent: 0, certified: 1, trace: Self.trace(0))
+        #expect(!r13)
+        #expect(progress.solved[3] == nil)
+    }
+
+    @Test func dropKeepsTheFrontier() {
+        var progress: Progress = Progress()
+        for level in 1...10 { progress.record(level: level, actionsSpent: 2, certified: 2, trace: Self.trace(2)) }
+        #expect(progress.frontier == 11 && progress.solved.count == 10)
+        progress.drop(level: 4)
+        progress.drop(level: 10)
+        progress.drop(level: 77)
+        #expect(progress.solved.count == 8 && progress.solved[4] == nil && progress.solved[10] == nil)
+        #expect(progress.frontier == 11 && progress.isOpen(11) && progress.isValid)
+    }
+
+    @Test func schemaTwoEncodingsDecodeUnverifiedAndTracesRoundTrip() throws {
+        let decoder: JSONDecoder = JSONDecoder()
+        let schemaTwo: String = "{\"frontier\":4,\"solved\":[{\"actionsSpent\":1,\"level\":1,\"stars\":3},"
+            + "{\"actionsSpent\":4,\"level\":3,\"stars\":1}]}"
+        let old: Progress = try decoder.decode(Progress.self, from: Data(schemaTwo.utf8))
+        #expect(old.solved[1] == Progress.Result(actionsSpent: 1, stars: 3, trace: [], verified: false))
+        #expect(old.solved[3] == Progress.Result(actionsSpent: 4, stars: 1, trace: [], verified: false))
+        // An untraced, unverified result keeps the schema 2 encoding exactly.
+        #expect(String(decoding: try old.encoded(), as: UTF8.self) == schemaTwo)
+        var traced: Progress = old
+        let actions: [Action] = [.ring(star: 0, index: 2), .phase(star: 1, step: 12), .luminosity(star: 0, index: 1),
+                                 .tilt(step: 3), .run]
+        traced.record(level: 2, actionsSpent: 4, certified: 4, trace: actions)
+        let data: Data = try traced.encoded()
+        let decoded: Progress = try decoder.decode(Progress.self, from: data)
+        #expect(decoded == traced && decoded.solved[2]?.trace == actions && decoded.solved[2]?.verified == true)
+        #expect(try decoded.encoded() == data)
+        let text: String = String(decoding: data, as: UTF8.self)
+        #expect(text.contains("\"level\":2,\"stars\":3,\"trace\":[") && text.contains("\"verified\":true}"))
+        #expect(!text.contains("\"verified\":false"))
+        // Explicit empty trace and false flag decode as untraced and re-encode without them.
+        let explicit: String = "{\"frontier\":2,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3,"
+            + "\"trace\":[],\"verified\":false}]}"
+        let plain: Progress = try decoder.decode(Progress.self, from: Data(explicit.utf8))
+        #expect(plain.solved[1] == Progress.Result(actionsSpent: 2, stars: 3))
+        #expect(String(decoding: try plain.encoded(), as: UTF8.self)
+            == "{\"frontier\":2,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3}]}")
+        // A claimed-verified empty trace survives decoding (reconciliation drops it) and round-trips.
+        let claimed: String = "{\"frontier\":2,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3,"
+            + "\"verified\":true}]}"
+        let claim: Progress = try decoder.decode(Progress.self, from: Data(claimed.utf8))
+        #expect(claim.solved[1]?.verified == true && claim.solved[1]?.trace == [])
+        #expect(String(decoding: try claim.encoded(), as: UTF8.self) == claimed)
+        // The result type's own coding follows the same rules.
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let result: Progress.Result = Progress.Result(actionsSpent: 3, stars: 2, trace: actions, verified: true)
+        #expect(try decoder.decode(Progress.Result.self, from: try encoder.encode(result)) == result)
+        #expect(String(decoding: try encoder.encode(Progress.Result(actionsSpent: 3, stars: 2)), as: UTF8.self)
+            == "{\"actionsSpent\":3,\"stars\":2}")
+        #expect(try decoder.decode(Progress.Result.self, from: Data("{\"actionsSpent\":3,\"stars\":2}".utf8))
+            == Progress.Result(actionsSpent: 3, stars: 2, trace: [], verified: false))
+    }
+
+    @Test func replayModeAwardsAndOpensNothing() throws {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        #expect(!Mode.replay(level: 1).awardsStars && !Mode.replay(level: 1).opensLevels)
+        #expect(Mode.replay(level: 8).budget(base: 13) == 13)
+        #expect(Mode.replay(level: 1).isValid && Mode.replay(level: 100).isValid)
+        #expect(!Mode.replay(level: 0).isValid && !Mode.replay(level: 101).isValid)
+        #expect(String(decoding: try encoder.encode(Mode.replay(level: 42)), as: UTF8.self)
+            == "{\"level\":42,\"mode\":\"replay\"}")
+        #expect(Mode.replay(level: 42) != Mode.daily(level: 42))
+    }
+
+    @Test func seededTracedRecordsKeepTheBestAndRoundTrip() throws {
+        var random: SeededRandom = SeededRandom(seed: 2_507)
+        var progress: Progress = Progress()
+        var best: [Int: Int] = [:]
+        var bestTrace: [Int: [Action]] = [:]
+        for _ in 0..<300 {
+            let level: Int = random.int(1...100)
+            let spent: Int = random.int(1...12)
+            let traced: Bool = random.int(0...2) > 0
+            let actions: [Action] = Self.trace(random.int(0...5), first: random.int(0...6))
+            let changed: Bool
+            if traced {
+                changed = progress.record(level: level, actionsSpent: spent, certified: 3, trace: actions)
+            } else {
+                changed = progress.record(level: level, actionsSpent: spent, certified: 3, mode: .campaign)
+            }
+            let improves: Bool = best[level].map { spent < $0 } ?? true
+            #expect(changed == improves)
+            if improves {
+                best[level] = spent
+                bestTrace[level] = traced ? actions : []
+            }
+        }
+        for (level, spent) in best {
+            #expect(progress.best(level) == spent && progress.solved[level]?.trace == bestTrace[level])
+            #expect(progress.solved[level]?.verified == !(bestTrace[level] ?? []).isEmpty)
+        }
+        let decoded: Progress = try JSONDecoder().decode(Progress.self, from: try progress.encoded())
+        #expect(decoded == progress && decoded.isValid)
     }
 
     @Test func validationHelpers() {
