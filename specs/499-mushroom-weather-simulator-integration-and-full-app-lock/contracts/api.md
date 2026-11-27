@@ -8,8 +8,8 @@ extension MushroomWeatherExperienceCore {
     public static func schemaTwoExample(seed: UInt64 = 7) -> MigrationExample?
 }
 // Panel identifiers: experience.r02-g20.mushroom-weather.<name>, the names the panel of features 493 … 497 carries
-// (expected: slot, slot-minus, slot-plus, selection, pods-detail, site, site-minus, site-plus, place, remove, vent-1 …
-// vent-6, moonlight, moonlight-minus, moonlight-plus, reset-view, cycle, cycle-minus, cycle-plus, cycle-detail, run,
+// (expected: slot, slot-minus, slot-plus, selection, pods-detail, site, site-minus, site-plus, place, remove, vent-0 …
+// vent-5 (labelled Vent 1 … 6), moon, moon-minus, moon-plus, moon-set, reset-view, cycle, cycle-minus, cycle-plus, cycle-detail, run,
 // undo, redo, next-level, dismiss-tutorial, hint, campaign, daily, practice, level-picker, play-level, replay,
 // replay-step, replay-stop, sound, actions, status, failure, explanation, progress, summary, message, tutorial,
 // hint-text, band, stars, goal, replay-position), pinned as built.

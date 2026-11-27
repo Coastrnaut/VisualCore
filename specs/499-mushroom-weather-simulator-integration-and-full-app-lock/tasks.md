@@ -31,8 +31,8 @@ change (the shaders and reference of R02-G20-03 are unchanged and re-proven by t
 - [ ] T-R02G2009-003 [US1] Edit `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherControls.swift`:
   the failure explanation keeps its own identifier `explanation`, and `identifierNames` lists every identifier the
   panel carries (spec Clarifications Q1; contracts/api.md lists the expected names: slot, slot-minus, slot-plus,
-  selection, pods-detail, site, site-minus, site-plus, place, remove, vent-1 … vent-6, moonlight, moonlight-minus,
-  moonlight-plus, reset-view, cycle, cycle-minus, cycle-plus, cycle-detail, run, undo, redo, next-level,
+  selection, pods-detail, site, site-minus, site-plus, place, remove, vent-0 … vent-5 (labelled Vent 1 … 6), moon,
+  moon-minus, moon-plus, moon-set, reset-view, cycle, cycle-minus, cycle-plus, cycle-detail, run, undo, redo, next-level,
   dismiss-tutorial, hint, campaign, daily, practice, level-picker, play-level, replay, replay-step, replay-stop, sound,
   actions, status, failure, explanation, progress, summary, message, tutorial, hint-text, band, stars, goal,
   replay-position; pinned as built; unique), with
