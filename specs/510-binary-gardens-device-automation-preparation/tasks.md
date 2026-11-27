@@ -30,7 +30,7 @@ is contacted. No {owner} tasks; one {device} task. Prerequisites: R02-G21-05 …
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G2110-004 [P] [US2] Create `docs/apps/binary-gardens/device-campaign.md` (agent B, modelled on
+- [X] T-R02G2110-004 [P] [US2] Create `docs/apps/binary-gardens/device-campaign.md` (agent B, modelled on — Verified 2026-11-27: device-campaign.md installed; lead review: ids BG-D1 … BG-D8, titles, devices D1/D2/D3 and gating (BG-D6 non-gating) equal device-rows.json; D3 26.5 and BLOCKED_OWNER_ACTION stated; docs exit=0
   `docs/apps/mushroom-weather/device-campaign.md`, read against the gestures of feature 504: devices and order, D3 on
   iPadOS 26.5 never updated, owner actions as BLOCKED_OWNER_ACTION, every row BG-D1 … BG-D8 with devices, procedure,
   pass condition and "pending device campaign", no number claimed, the stress session only in the device campaign);
