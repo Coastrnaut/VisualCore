@@ -80,7 +80,7 @@ chunks (1, 2, 3c, 3e, 3f; Mushroom Weather in 3f).
   `--name host-full`, `--name app-unit`
 - [X] T-R02G2006-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G20-06.reference-1.json)
 - [X] T-R02G2006-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0 (.autonomy/migration/checks/R02-G20-06.reference-2.json)
-- [ ] T-R02G2006-010 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G2006-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit=0 (.autonomy/migration/checks/R02-G20-06.script-tests.json)
 - [ ] T-R02G2006-011 {device} After ImplementationLock-100: sound, haptics and VoiceOver on D1/D2/D3 (SC-R02G2006-006)
 - [ ] T-R02G2006-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
