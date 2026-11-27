@@ -123,7 +123,7 @@ edited file is refused.
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G2102-007 Docs: `docs/architecture/binary-gardens.md` (content pipeline: phase step, manifest, generator,
+- [X] T-R02G2102-007 Docs: `docs/architecture/binary-gardens.md` (content pipeline: phase step, manifest, generator, — Verified 2026-11-27: docs (architecture content pipeline, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit=0
   solver, witness, digest, R4 measurement), `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md` (chunk 2
   time with the catalog; if it nears 540 s, Binary Gardens moves to its own chunk and the doc says so);
   `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f`

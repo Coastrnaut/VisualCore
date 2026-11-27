@@ -36,3 +36,23 @@ presentation of later features.
   next fingerprints replay a play exactly; the level's stored form is JSON schema 1 with sorted keys and a SHA-256
   fingerprint, re-checked on decode in a fixed order (`r02-g21.malformed`, `.newer-schema`, `.level`). The rules are an
   R02-F23 `PuzzleRules` (`BinaryGardensPuzzle`) over arrangements, with at most 120 moves.
+
+## Content pipeline (feature 502, R02-G21-02)
+
+- **Phase step.** A level may restrict star phases to multiples of a step g (1, 2, 3, 4, 6, 8, 12, 16 or 24); g = 1 is
+  the default and is left out of the stored form, so every feature-501 level keeps its bytes and fingerprint.
+- **Manifest.** 100 planned levels (`BinaryGardensManifest`), 20 per band with budgets 8 … 19 and the five control
+  emphases; the catalog's "81" is the original milestone, 001 … 080 extend it and 081 … 100 are the parity expansion.
+- **Generator.** `BinaryGardensGenerator` draws a winning arrangement first from the band's profile and sets each
+  world's bounds from its winning run in exact integers, then a starting arrangement; candidates are seeded per index
+  (at most 64) and skipped when the separation cannot be kept, a bound would be 0, the kernel refuses the level, the
+  level is reducible, it repeats the previous level or the solver's minimal plan is not the band's length 1, 2, 3, 3, 4.
+- **Solver.** `BinaryGardensSolver` searches breadth-first over the puzzle's legal moves, skipping arrangements reached
+  at any depth and expanding each depth in loss order, within a work bound of 5 000 arrangements judged (counted, never
+  timed); its plan carries the arrangements counted at each smaller depth as the minimality proof and the nearest miss.
+  Measured on the real catalog: 23 464 arrangements judged in all, at most 1 589 for one level.
+- **Witnesses and digest.** `BinaryGardensWitness` writes `docs/games/binary-gardens/levels/NNN.witness.json` (schema
+  1, sorted keys, compared byte for byte; rewritten only with `BINARY_GARDENS_WRITE_WITNESSES=1`), and the catalog
+  digest `PuzzleCatalog<BinaryGardensPuzzle>.digest(id: "binary-gardens", …)` is pinned in a test. The pipeline's five
+  sources live in `Core/Content`, so the kernel's own scans stay unchanged.
+

@@ -1054,4 +1054,7 @@ tilt, separation, milliflux by the clamped inverse square, flux bands, the cycli
 the judge (`frozen`, `scorched`, `unstable`, `wilted`, `bleached`), `BinaryGardensLevel` (immutable, fingerprinted,
 JSON schema 1, with names in words), the play state `BinaryGardensPlay` with stages, ring, phase, luminosity and tilt
 actions and the run, records, undo and redo, and `BinaryGardensPuzzle` (an R02-F23 `PuzzleRules` over arrangements).
+Feature 502 (R02-G21-02) adds the phase step, the 100-level manifest, the seeded generator (`BinaryGardensGenerator`),
+the minimal breadth-first solver (`BinaryGardensSolver`, work bound 5 000) and the witness certificates
+(`BinaryGardensWitness`, `docs/games/binary-gardens/levels/`, pinned catalog digest), in `Core/Content`.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).
