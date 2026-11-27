@@ -15,7 +15,7 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G2105-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensHints.swift`
+- [X] T-R02G2105-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensHints.swift` — Verified 2026-11-27: host-2 exit 0 (swift test --filter BinaryGardens: 232 tests in 22 suites; BinaryGardensHintsTests 29 pass)
   (`BinaryGardensHintPlan`, `BinaryGardensHintKind` ring/phase/luminosity/tilt/run/stuck/retry, `BinaryGardensHint`
   with levels 1 … 3 and the texts of clarification Q1 — level 1 "Move a star to another ring", "Shift a star's phase",
   "Change a star's brightness" or "Tilt the orbit plane"; level 2 "Move star n outward" ("inward"; a higher ring index
