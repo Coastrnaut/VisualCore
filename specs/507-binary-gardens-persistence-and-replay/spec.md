@@ -130,7 +130,10 @@ Answered autonomously under the owner's standing delegation, safest well-support
   Impact: FR-R02G2107-005, 007.
 - Q: Which existing tests may change? → A: only the assertions this feature deliberately changes, updated in place and
   named in the tasks: the declared control list (four new controls: `replay.start`, `replay.step`, `replay.stop`,
-  `settings.sound`), the schema version 3, the digest domain v3, and R02-G21-06's presenter-held sound choice, which
+  `settings.sound`), the schema version 3 (the newer-schema refusal test's literal versions in
+  `BinaryGardensExperienceCoreTests` and the `schemaVersion` assertion in `BinaryGardensSceneSnapshotTests` included),
+  the digest domain v3 (over the level, the play fingerprint, the progress with its traces and the mode; never the
+  tutorial step, the shown tick, the sound choice or the dropped count), and R02-G21-06's presenter-held sound choice, which
   now comes from the state. Every other existing test passes unchanged. Impact: FR-R02G2107-006; SC-R02G2107-005.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -215,7 +218,8 @@ actions other than stepping, stopping, showing a tick and the sound setting are 
   presentation only; not saved, so a restored state shows tick 48, the panel's default selection, no preview, no
   inspection, hint level 1 and the authored view.
 - **Restore work:** at most 100 results, each a replay of at most 64 actions on a certified level that is generated once
-  per process; no restore runs a search.
+  per process (the first use of a level in a process runs its certifying solver, at most 5,000 arrangements judged;
+  later restores in the process reuse it); no other search runs during a restore.
 - **Deterministic seeds:** the opening level, the daily level and every certified level come from fixed seeds and dates,
   so the same save replays identically on every device.
 
@@ -236,7 +240,8 @@ actions other than stepping, stopping, showing a tick and the sound setting are 
 - **FR-R02G2107-005**: All randomness MUST derive from fixed seeds or the given calendar date; no clock or random source
   is read by the state.
 - **FR-R02G2107-006**: Invalid requests MUST be refused with stable reason codes (`r02-g21.no-replay`,
-  `r02-g21.replay-end`, `r02-g21.replay`, `r02-g21.not-whole` and the existing codes); existing tests pass apart from the
+  `r02-g21.replay-end`, `r02-g21.replay` and the existing codes, `r02-g21.not-whole` among them for the new controls'
+  values); existing tests pass apart from the
   named assertions this feature changes; new public names are documented with `///`; the reference regression passes.
 - **FR-R02G2107-007**: The player's settings MUST persist: the sound choice (the game's only setting of its own) is part
   of the snapshot (not the digest), changed by a settings control and applied when the experience opens; migrated saves
