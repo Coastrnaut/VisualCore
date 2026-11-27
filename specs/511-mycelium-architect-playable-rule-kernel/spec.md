@@ -190,16 +190,17 @@ refused.
 - **FR-R02G2201-002**: The arrangement MUST consist of the placed nutrients, the placed blockers and the seeded
   directions at the root; each placement MUST be on an empty cell and within the level's counts.
 - **FR-R02G2201-003**: The nutrient value of every cell MUST be a whole number computed from every unconsumed nutrient
-  by a fixed distance rule, so every device gets the same field.
+  by the rule f(c) = Σ s · max(0, R − Chebyshev distance), so every device gets the same field.
 - **FR-R02G2201-004**: Each growth pulse MUST move every growing tip, in a fixed order, one cell in the direction of
   greatest score: the gain in nutrient value minus the curvature penalty times the turn from its heading minus the
-  obstacle penalty times the obstacles around the target cell, with fixed tie-breaks; a tip with no admissible
-  neighbour or only negative scores MUST go dormant; a tip entering a nutrient MUST consume it and branch once.
+  obstacle penalty times the obstacles around the target cell, with fixed tie-breaks (smaller turn, then lower
+  direction number); a tip with no admissible neighbour or only negative scores MUST go dormant; a tip entering a
+  nutrient MUST consume it, and a new tip MUST start on that cell a quarter turn clockwise from the step's direction.
 - **FR-R02G2201-005**: Every grown segment MUST add its whole-number branch weight; the network MUST never exceed 2048
   nodes.
-- **FR-R02G2201-006**: Running growth MUST end the level: failed at the first move into a toxic cell (reason: toxic)
-  or the first move that would take the branch weight above the nutrient budget (reason: starved), naming the pulse,
-  tip and cell; otherwise, once growth ends, failed when a terminal is not in the network (reason: unreached, the
+- **FR-R02G2201-006**: Running growth MUST end the level: before each step failed when the step would take the branch
+  weight above the nutrient budget (reason: starved, nothing grown), after it failed when the step entered a toxic cell
+  (reason: toxic), naming the pulse, tip and cell; otherwise, once growth ends, failed when a terminal is not in the network (reason: unreached, the
   lowest-numbered such terminal) or the branch weight is above the limit (reason: overweight); otherwise won.
 - **FR-R02G2201-007**: An action MUST place a nutrient, place a blocker, clear a placed item, seed a direction or
   remove a seed, and spend one action; every action MUST be validated (cells, counts, change, stage, budget, previous
