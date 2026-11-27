@@ -92,7 +92,7 @@ campaign covers the game). Agents model their files on Microscopic Aurora's (fea
   `-3f`
 - [X] T-R02G2005-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full and app-unit exit=0 (.autonomy/migration/checks/R02-G20-05.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G2005-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2005-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G20-05.reference-1.json)
 - [ ] T-R02G2005-009 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2005-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2005-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
