@@ -55,7 +55,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G2109-006 [US3] Release build and symbols (`BinaryGardensGolden`, `acceptanceScenarios` forbidden): `--name
+- [X] T-R02G2109-006 [US3] Release build and symbols (`BinaryGardensGolden`, `acceptanceScenarios` forbidden): `--name — Verified 2026-11-27: release exit 0 (app-release-build and app-release-symbols pass; BinaryGardensGolden forbidden); regression exit 0 (binary_gardens_regression.py host and simulator PASS, 100 of 100 levels)
   release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`; `--name regression --
   python3 scripts/binary_gardens_regression.py` (100 of 100 levels, SC-R02G2109-004)
 
