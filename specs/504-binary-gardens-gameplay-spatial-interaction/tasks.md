@@ -160,7 +160,7 @@ modelled on feature 484).
   `--name host-full`, `--name app-unit` (the quickstart step 5 commands)
 - [X] T-R02G2104-008 Reference regression chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only — Verified 2026-11-27: reference-1 exit 0
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
-- [ ] T-R02G2104-009 Reference regression chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only
+- [X] T-R02G2104-009 Reference regression chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only — Verified 2026-11-27: reference-2 exit 0
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26`)
 - [ ] T-R02G2104-010 Script tests, run alone (`--name script-tests -- python3 scripts/test_scripts.py`)
