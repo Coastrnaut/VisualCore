@@ -8,7 +8,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G1910-001 Baselines after R02-G19-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G1910-001 Baselines after R02-G19-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-26: 2026-11-26 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 on the committed tree (.autonomy/migration/checks/R02-G19-10.baseline-*.json)
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two chunks, 3e with `MicroscopicAurora`; no Swift changes
   follow; the rendering baseline is R02-G19-09's runs)
 
