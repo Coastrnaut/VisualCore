@@ -8,7 +8,7 @@ tests stay short (< 10 s each). No {owner} tasks. Agents model their files on Mi
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2004-001 Baselines on the committed tree after R02-G20-03 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2004-001 Baselines on the committed tree after R02-G20-03 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: 2026-11-27 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 after R02-G20-03 (.autonomy/migration/checks/R02-G20-04.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G20-03's
   rendering runs (exit 0)
 
