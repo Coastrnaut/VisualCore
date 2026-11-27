@@ -81,7 +81,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
 - [X] T-R02G2108-007 Docs: `docs/architecture/binary-gardens.md` (regression net), — Verified 2026-11-27: round02-host-1, -2, -3c, -3e, -3f exit 0; docs: architecture regression section, package README, automatedtesting
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the chunks of T-001)
-- [ ] T-R02G2108-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name
+- [X] T-R02G2108-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   host-full`, `--name app-unit`
 - [ ] T-R02G2108-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2108-010 Reference regression chunk 2 (`--name reference-2`)
