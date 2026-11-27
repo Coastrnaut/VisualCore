@@ -131,3 +131,7 @@ pass.
 draft in isolated copies before 001 (new files only). MVP: Stories 1 and 2. Requirement coverage: FR-001, 002 → 003,
 004; FR-003 → 002, 005; FR-004 → 002, 003, 004, 006; FR-005 → 005; FR-006 → 004, 006; FR-007 → 006; FR-008 → 006;
 FR-009 → 007 … 011.
+
+## Phase 5: Convergence
+
+- [ ] T-R02G2003-014 Correct the draw-order comments of `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSceneGeometry.swift` (the file header and `MushroomWeatherElement.Kind.isSolid`) from "depth testing on / resolved by depth" to painter's order with depth testing off, as built, per research R3 (contradicts); `--name host-5 -- swift test --package-path Packages/ExperiencesRound02 --filter MushroomWeather`
