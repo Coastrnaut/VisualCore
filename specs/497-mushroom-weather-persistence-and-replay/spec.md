@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-07 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2007-###,
 SC-R02G2007-###, T-R02G2007-###
@@ -28,6 +28,60 @@ Canonical overrides:
 - **Model:** feature 487 (Microscopic Aurora's persistence and replay), adapted to pod, vent and moonlight actions and the
   run, including the lesson carried since feature 327: the saved frontier is restored as saved (raising it from the
   kept results would open levels for an honest daily win).
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+487's answers where the games agree. Facts checked in code (read-only, 2026-11-26): the shared `SavedStateStore` keeps
+one `state.json` per experience, writes it atomically, moves an unreadable file aside and refuses a newer schema; the
+engine applies the experience's `MigrationChain`; Mushroom Weather's adapter writes snapshot schema 2 (after R02-G20-05) `{level, mode,
+progress, records, tutorial}` with a 1 → 2 step; `MushroomWeatherProgress.Result` keeps `actionsSpent` (every
+accepted pod, vent and moonlight record, undone ones included) and `stars`; the play's records have kinds place, remove,
+vent, moonlight, run, undo and redo (plus begin, dismissTutorial, pause, resume and showResult); the controls are `pod.place`,
+`pod.remove`, `vent.set`, `moon.set`, `weather.run`, `play.undo`, `play.redo`, `level.next`, `clock.show`, `level.select`, `mode.daily`,
+`mode.practice`, `mode.campaign` and `tutorial.dismiss`; the shown cycle is presentation state of the adapter and the
+panel's selection, drag preview, hint level and camera are presenter state; the presenter holds the sound
+choice (off by default) since R02-G20-06; a play is won only by the run (`weather.run`), so a winning play's last
+effective action is its run.
+
+- Q: What is stored for each result, and when is it written? → A: each result keeps its least actions spent, its stars
+  and the winning trace — the ordered effective actions of the play that earned it (a placement or move with its
+  slot and cell, a removal with its slot, a vent change with its index and state, a moonlight change with its level),
+  each as the kernel applied it, followed by the run; an action that was undone and not redone is left out, so the trace never contains an undo or a redo — plus `verified`.
+  Actions spent still count every pod, vent and moonlight record, undone ones included, as since R02-G20-05, so they
+  are at least the actions the trace spends (the run spends none). A campaign or daily win replaces the stored result only when it is
+  better (ties keep the earlier trace); practice records nothing. The shared store writes at the app's save points; this
+  feature does not change when. Impact: FR-R02G2007-001, 003; SC-R02G2007-001.
+- Q: How are scores reconciled on restore? → A: for every result with a trace: the certified level is generated, a fresh
+  play (campaign budget) replays the trace (each action accepted, then the run), and the result is kept only
+  if the play ends won, the actions the trace spends are at most `actionsSpent`, and `stars` equals the stars rule for
+  `actionsSpent` and the level's certified action count; otherwise it is dropped. The adapter exposes the number dropped
+  (never in the digest) and the presenter announces it once as `state` ("n saved results could not be checked and were
+  removed.", "1 saved result could not be checked and was removed."). Results without a trace (schema 1 or 2) are kept,
+  marked unverified. The frontier is restored as saved. Impact: FR-R02G2007-003; SC-R02G2007-003.
+- Q: How do migrations work? → A: schema 3 adds the trace and `verified` to each result, the mode `replay(level)` and
+  the sound choice. 1 → 2 is the existing step; 2 → 3 copies results with an empty trace and `verified: false` and sets
+  the sound choice off. Schema 4 or newer is refused by the shared store; a damaged payload is refused with `damaged`
+  and the opening state is used. Impact: FR-R02G2007-002, 007; SC-R02G2007-002.
+- Q: How does replay work? → A: `replay.start [level]` opens mode `replay(level)` with a fresh play of that level when a
+  verified result with a trace exists (`r02-g20.no-replay` otherwise); `replay.step` applies the next action of the
+  trace — a pod, vent or moonlight action, or finally the run (`r02-g20.replay-end` after the last or once the run ended); `replay.stop`
+  returns to campaign at that level (the frontier when it is not open). During replay every other play control except
+  `tutorial.dismiss` and `clock.show` (presentation) and `settings.sound` is refused with `r02-g20.replay` (the panel's
+  selection, drag previews and the camera are presentation only and stay allowed, but an action they would send is
+  refused);
+  replay never changes progress; the tutorial is done during replay. The refusals are shown and announced in words:
+  "There is no saved solution to replay for this level.", "The replay is over." and "Stop the replay first."; a replayed
+  win claims no stars. A save taken during a replay restores the replay only when its records are exactly the first
+  actions of that level's verified trace; otherwise it is refused as `damaged`. Impact: FR-R02G2007-004;
+  SC-R02G2007-004.
+- Q: Which inputs make the state deterministic, and how is the sound choice changed? → A: the seed (opening level), the
+  certified catalog (fixed planned seeds), the calendar date given to `mode.daily` and the recorded actions; the state
+  reads no clock and no random source. The sound choice is changed by `settings.sound [0 … 1]` (whole numbers; 1 on),
+  stored in the snapshot, never in the digest, and applied by the presenter when the experience opens or the value
+  changes (replacing R02-G20-06's presenter-only choice). Impact: FR-R02G2007-005, 007.
 
 ## User Scenarios & Testing *(mandatory)*
 
