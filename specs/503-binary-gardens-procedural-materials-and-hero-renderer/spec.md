@@ -85,12 +85,15 @@ curves, procedural planets and starfields". The shared packages have a UV sphere
   design's "numerical gravitation in fixed steps" read as the 48 fixed steps of the cycle — decoration only); the bodies
   (the two stars and every world, sorted back to front by their distance from the eye, ties by kind — worlds first —
   then index, so a star behind a world is covered by it): a world is a cube-sphere of radius 0.07 at its position at the
-  shown tick, mint world #7BE8BE, shaded in the fragment shader by the light of both stars — each star's colour by the
+  shown tick (its faces emitted far-first from the fixed eye, so its near side covers its far side), mint world
+  #7BE8BE, shaded in the fragment shader by the light of both stars — each star's colour by the
   angle to that star, scaled by that star's kernel share of the world's flux at the shown tick over 64 000, with a
-  brightened sunrise band along each star's terminator, so two suns paint two crossing coloured bands — and by
-  shader-only seasonal banding that follows the world's band at the shown tick: lethal low ice caps reaching latitude
-  ±30° (frost #DDF2FF), dim caps at ±60°, comfortable open flowers (procedural petal dots, flower #FFE6F2) over a mint
-  surface, bright a scorched equatorial belt of half-width 15° (scorch #C2412A), lethal high a belt of half-width 40°;
+  brightened sunrise band along each star's terminator, so two suns paint two crossing coloured bands, over an ambient
+  floor of 0.35 of the surface colour so a world's night side still reads — and by
+  shader-only seasonal banding that follows the world's band at the shown tick, by the latitude φ = asin(n.z) of the
+  sphere normal n with feathered edges: lethal low ice caps covering every latitude |φ| ≥ 30° (frost #DDF2FF), dim
+  caps covering |φ| ≥ 60°, comfortable open flowers (procedural petal dots, flower #FFE6F2) over a mint
+  surface, bright a scorched equatorial belt |φ| ≤ 15° (scorch #C2412A), lethal high a belt |φ| ≤ 40°;
   beneath each world j + 1 pips (marking it as world j + 1); a star is a disc facing the eye of radius
   0.05 + 0.012 · (its luminosity index) at its position at the shown tick — star 1 vermilion #FF5A36, star 2 ice blue
   #A6DDFF, both with a white-hot core #FFF4E8 of half the radius — with corona rays at the richer tiers and, beneath it,
@@ -106,8 +109,9 @@ curves, procedural planets and starfields". The shared packages have a UV sphere
   actions bars, `budget` bars at y = −1.2 − 0.1 · (worlds) − 0.03 (each 1.8 / budget wide with a gap of a fifth, 0.035
   tall), lit for the actions left (actions lit #FF7A4D, actions unlit #1E2648). The glow is additive and drawn last. The
   light shown is the report of the current arrangement; the shown tick is presentation state of the adapter
-  (`clock.show [tick]`, 1 … 48, never in the digest), 48 at opening — the starting configuration, since tick 48 is
-  tick 0 again — and never advanced by time. The camera is a fixed authored perspective (eye (0, −2.0, 3.2) looking at
+  (`clock.show [tick]`, accepted 1 … 48, never in the digest), 48 at opening — the starting configuration, since tick
+  48 is tick 0 again — and never advanced by time; it persists across ring, phase, luminosity, tilt, run, undo and redo
+  (the report always covers ticks 1 … 48) and returns to 48 at an opening, `level.next`, reset and restore. The camera is a fixed authored perspective (eye (0, −2.0, 3.2) looking at
   (0, −0.35, 0)) fitted to the box x −1.3 … 1.3, y −1.85 … 1.15, z −0.85 … 0.85 (a star at the largest tilt rises at
   most 0.68 above the plane, plus its disc) with a 5 % margin for aspect 0.4 … 2.5. Nothing drawn is consulted by the
   rules. Impact: FR-R02G2103-001, 002, 003, 006.
@@ -124,7 +128,7 @@ curves, procedural planets and starfields". The shared packages have a UV sphere
   (x = −0.925 on the first row) and the first actions bar, and gives the palette. Simulator tests render offscreen at
   1,152 × 768 at shown tick 24 and check, at points at least 6 pixels from every element drawn after them, that each
   world's centre is brighter than the backdrop at that point by at least 0.15 in luminance (at least one world is
-  checked in every frame); that each star's centre is brighter than the backdrop by at least 0.4 (at least one star is
+  checked in every frame; the ambient floor of 0.35 keeps a world's surface above that margin on its night side); that each star's centre is brighter than the backdrop by at least 0.4 (at least one star is
   checked in every frame); that the first actions bar (lit) has red above blue by at least 0.08 (vermilion); that the
   first gauge plate's left margin differs from the backdrop by at least 0.05; and that the median of a 9 × 9 pixel patch
   of backdrop in a lower corner matches the gradient colour at its height within 0.06 (the sparse starfield cannot move
@@ -143,7 +147,8 @@ curves, procedural planets and starfields". The shared packages have a UV sphere
   `fallbackReason` and keeps running; tier changes go to its `tierLog`. Reduce Motion stops the coronas and motes
   (positions never move by time already); Reduce Flashing caps the glow gain. A failure marks the failing element in
   the broken colour (frozen or scorched: a broken ring around the named world and its gauge cell at the named tick's
-  column, ((tick − 1) mod 48) + 1; unstable: the world's window bracket; wilted or bleached: its bloom meter marker),
+  column, ((tick − 1) mod 48) + 1; unstable: the world's window bracket, or, when no tick is comfortable (window 0,
+  start 0), the required-length tick W drawn alone and marked; wilted or bleached: its bloom meter marker),
   and the failure text names it, as the kernel's `failureDescription` does. Impact: FR-R02G2103-003, 007;
   SC-R02G2103-002.
 - Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
@@ -158,8 +163,10 @@ curves, procedural planets and starfields". The shared packages have a UV sphere
   longer certifies) and accepts `star.ring [star, index]`, `star.phase [star, step]`, `star.luminosity [star, index]`,
   `orbit.tilt [step]`, `light.run`, `play.undo`, `play.redo`, `level.next` and `clock.show [tick]` (stars 0 and 1;
   whole numbers only); the kernel refuses everything out of range, locked, unchanged, off the phase grid, breaking the
-  separation or out of stage with its own codes, and `clock.show` refuses a tick outside 1 … 48 with
-  `r02-g21.tick`; its digest (domain `r02-g21.binary-gardens.v1`) is the level number and the play's fingerprint
+  separation or out of stage with its own codes; the declared ranges are star 0 … 1, ring index 0 … 7, phase 0 … 47,
+  luminosity index 0 … 3, tilt 0 … 6 and tick 0 … 60 (0 … 48 + the largest tolerance 12, the span of the kernel's walk
+  ticks), so the engine refuses only values outside them, and `clock.show` refuses 0 and 49 … 60 with
+  `r02-g21.tick` without touching the kernel; its digest (domain `r02-g21.binary-gardens.v1`) is the level number and the play's fingerprint
   (never the record history or the shown tick, so undo restores the earlier digest); snapshot schema 1
   `{level, records}` (schema 1, so no registered schema example is needed). Impact: FR-R02G2103-005, 008, 009;
   SC-R02G2103-004.
@@ -246,7 +253,8 @@ it as available, and the experience package, registry, catalog and content check
   and the drawn plane; actions by a row of bars; every star, world, tick and failure can be named in words by the
   kernel, so no information is carried by hue only.
 - **A failure (frozen, scorched, unstable, wilted, bleached):** the failing element is marked in the broken colour (the
-  named world's ring and gauge cell, its window bracket or its bloom marker); the failure shown names it, as the kernel's
+  named world's ring and gauge cell, its window bracket — or its required-length tick alone when the window is 0 — or
+  its bloom marker); the failure shown names it, as the kernel's
   reason does.
 - **A won level:** every world blooms (flowers and, at the richer tiers, a mint glow); the frame checks use the same
   positions.
@@ -279,7 +287,10 @@ it as available, and the experience package, registry, catalog and content check
   the edge cases state.
 - **FR-R02G2103-008**: The experience MUST be registered in the catalog as a candidate and linked into the one app; the
   experience package, registry, catalog, content and dependency checks MUST pass; it MUST NOT be shown as available.
-- **FR-R02G2103-009**: Existing tests MUST pass unchanged except where a test names the next unregistered candidate;
+- **FR-R02G2103-009**: Existing tests MUST pass unchanged except where a test names the next unregistered candidate
+  and except `BinaryGardensInvariantTests`, whose kernel scans (no clock, floating point or run-time trigonometry;
+  allowed imports) read a fixed list of the kernel's files (feature 501's five and feature 502's five), so the
+  presentation sources (snapshot, shaders with `sin(`/`cos(`, geometry, adapter, scenarios) stay outside them;
   every new public name is documented; the reference regression passes; the Cores keep running on the host.
 - **FR-R02G2103-010**: No information MUST be carried by hue alone (the non-colour twins of the edge cases), and the
   presenter MUST expose its tier log, fallback reason and frame probes for diagnostics, with no telemetry leaving the
