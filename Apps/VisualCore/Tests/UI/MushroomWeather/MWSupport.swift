@@ -1,8 +1,8 @@
 // MWSupport — feature 499 (R02-G20-09) T-R02G2009-004, modelled on feature 489 (FR-R02G2009-002, 007; SC-R02G2009-001;
 // clarifications Q1, Q2): helpers of the interface tests of Mushroom Weather (R02-G20) inside the one app, ported from
-// `MASupport` (feature 489). The namespace is `MW` (no other UI test uses `MW`). Mushroom Weather is a candidate until
-// X-R02-G20; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and
-// are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens
+// `MASupport` (feature 489). The namespace is `MW` (no other UI test uses `MW`). Mushroom Weather was a candidate until
+// X-R02-G20 (2026-11-27); every launch still carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries
+// become available and are registered; harmless now that it is integrated). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens
 // the experience directly with `-openExperience r02-g20.mushroom-weather`; a relaunch (`MW.reopen`) backgrounds the
 // app first (its save point, the lesson of feature 309), terminates it and starts again without the reset, so the
 // stored progress (solved levels, stars, the frontier, the verified winning trace) survives.

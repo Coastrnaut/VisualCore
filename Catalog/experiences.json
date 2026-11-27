@@ -1660,7 +1660,7 @@
         "catalog_sha256": "a71fe37a03ecb54e1a1b3e73c490119e3a18cf04ce5395307f504e54c6c584e5",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g21.binary-gardens",

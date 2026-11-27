@@ -365,9 +365,17 @@
       "name": "Microscopic Aurora",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G20",
+      "id": "r02-g20.mushroom-weather",
+      "name": "Mushroom Weather",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "3c78fe31841d70c99a32361634bddeba2fdd4fdb71fa7ee208eb6e635fb5e237",
+  "ledger_sha256": "cc570eb765da73028371057cdca6908a488efa116e2b693cdb55728054d235c2",
   "privacy_answers": "unproven",
   "schema": 1
 }
