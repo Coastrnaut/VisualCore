@@ -80,7 +80,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 - [X] T-R02G2001-007 Docs: `docs/architecture/mushroom-weather.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-26: 2026-11-26 round02-host-1, -2, -3c, -3e, -3f exit 0, chunk 3f with MushroomWeather (.autonomy/migration/checks/R02-G20-01.round02-host-*.json); architecture page, package README and testing doc written
   `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f` (chunk 3f gains MushroomWeather)
-- [ ] T-R02G2001-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2001-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-26: 2026-11-26 rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G20-01.*.json)
   `--name host-full`
 - [ ] T-R02G2001-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2001-010 Reference regression chunk 2 (`--name reference-2`)
