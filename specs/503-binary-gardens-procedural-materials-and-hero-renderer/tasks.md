@@ -179,7 +179,7 @@ pass.
 - [X] T-R02G2103-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0 (.autonomy/migration/checks/R02-G21-03.reference-2.json)
 - [X] T-R02G2103-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit=0 (.autonomy/migration/checks/R02-G21-03.script-tests.json)
 - [ ] T-R02G2103-012 {device} After ImplementationLock-100: frame time per tier on D1/D2/D3 (SC-R02G2103-006)
-- [ ] T-R02G2103-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then
+- [X] T-R02G2103-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then — Verified 2026-11-27: converge round 2 found nothing to append after T-014 … 016; build_catalog --check last; README updated (203 features); gate sealed and recorded
   `python3 scripts/build_catalog.py --check` last, seal and record; README row and gate list updated
 
 ## Dependencies and parallel work
