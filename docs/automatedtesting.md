@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G20-05: Mushroom Weather teaching and progression).
+Last updated: 2026-11-27 (R02-G20-06: Mushroom Weather polish and accessibility).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mushroom Weather polish and accessibility** (R02-G20-06, 2026-11-27). Host: `MushroomWeatherFeedbackPlanTests`
+  (9: texts, kinds and haptics exact for pod, vent and moonlight actions, undo, redo, every refusal code bare and
+  prefixed, wins in campaign and practice, failures of all three kinds, level and mode changes), `…LightsTests` (8: a
+  scripted win and adversarial flicker sampled at 1/60 s stay within 3 half-range crossings per second and fade over
+  at least 0.4 s under Reduce Flashing) and `…SoundRecipeTests` (9: pure recipes, whole-cycle loops, a fifth against a
+  3 Hz beat). Simulator: `…AccessibilityTests` (12: labels and values, adjustable selection, level 1 won through
+  accessibility operations with every step announced, still frames, the sound state table, the fallback's won fade;
+  59 in the suite). The teaching tests now expect the feedback plan's refusal sentences, and the won render test
+  settles the lights with one still a second later, as Microscopic Aurora's did.
 - **Mushroom Weather teaching and progression** (R02-G20-05, 2026-11-27). Host: hints (exact hints from every opening
   win all 100 levels; 200 seeded reachable states; an off-path brute force; 500 seeded failures plus constructed mold
   levels), progress (20), progression core (11: controls, refusals, practice, daily, schema 2, migration 1 → 2), the

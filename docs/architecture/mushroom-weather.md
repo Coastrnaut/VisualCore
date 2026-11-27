@@ -141,3 +141,28 @@ accounts for every unit; the catalog's 0.016667 s timestep is a presentation clo
   2026-01-01 × 17) mod 100 + 1 and is playable while still locked without opening it; practice raises the budget to 24
   without stars or unlocks. The panel shows the band, the goal, the best stars, the modes and a picker of open levels.
   The snapshot is schema 2 (digest domain `r02-g20.mushroom-weather.v2`) with a migration from schema 1.
+
+## Polish and accessibility (feature 496, R02-G20-06)
+
+- **Feedback.** `MushroomWeatherFeedbackPlan.after(old:new:)` turns each change of the adapter core into one
+  announcement and one haptic through the shared route: a pod placed ("Pod n placed at row r, column c."), moved or
+  removed, a vent opened or closed, the moonlight set, undo and redo, each followed by the colonies staying in band,
+  whether running now would win and the actions left (`state`, selection); a won run (`outcome`, success, "Every colony
+  stayed in its band." with the actions spent and stars outside practice), a failed run (the failure explanation,
+  `outcome`, warning), a level or mode change (`level`) and refusals in words (`rejection`, error). The run, which
+  always ends the level, plans only its outcome; showing a cycle or dismissing the tutorial plans nothing; a revealed
+  hint is announced as `state`. The presenter keeps a feedback log.
+- **Comfort.** `MushroomWeatherLights` eases the glow (0.7 playing, 1 won, 0.35 failed) and the won look by the frame
+  clock (0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade); the scene draws the eased levels (`u_won`, the
+  glow gain, and in the unlit fallback the not-won and won colours blended by the won level, rebuilt per tenth), so no
+  element crosses half its range more than three times a second. Motion is 0 under Reduce Motion or Reduce Flashing.
+- **Sound.** Off by default (a Sound toggle). Each change of the panel's selection (slot or site; never a drag preview)
+  plays the selected site's audition: the tone 220 Hz × 2^(n/12), n = 2 × site index, with a fifth when a pod can be
+  placed there or a partial 3 Hz above when it cannot, 0.6 s. The ambient loop's root (110 Hz × 1, 9/8, 5/4, 4/3) comes
+  from the actions left, up to four partials from the quarters of the colonies staying in band, a moonlight partial at
+  the root × 3, an octave when won and halved gains when failed; it is rebuilt only when that recipe changes and plays
+  only while wanted, on screen and active (`MushroomWeatherSound`).
+- **Panel.** A summary element ("a actions left. <progress>. Selected: pod n, site at row r, column c. Level:
+  <level>."), the slot, site and moonlight adjustable with VoiceOver, each vent toggle "open" or "closed", a value in
+  words on every control, refusals in the feedback plan's words, rows that become columns at accessibility text sizes
+  and a 520-point readable width on iPad.
