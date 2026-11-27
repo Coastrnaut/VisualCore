@@ -57,7 +57,7 @@ with fewer actions wins.
 
 **Independent test**: building the catalog twice gives identical levels and the pinned digest.
 
-- [ ] T-R02G2002-004 [US2] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherGenerator.swift`
+- [X] T-R02G2002-004 [US2] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherGenerator.swift` — Verified 2026-11-26: 2026-11-26 host-3 exit 0: 75 tests in 9 suites incl. 12 generator tests (determinism, drawing order, band values, vents and sites near colonies, filters, neighbour rule, candidate bound) (.autonomy/migration/checks/R02-G20-02.host-3.json)
   (lead, from the measured prototype: band profiles "band 1 (6 … 7, 6 … 7, 2 … 5, 1, 2, 2, 4, 2, 4 … 6), 2 (6 … 8,
   6 … 8, 3 … 6, 2, 2, 3, 4, 3, 3 … 5), 3 (7 … 8, 7 … 9, 3 … 7, 2, 3, 3, 5, 3, 2 … 4), 4 (7 … 9, 8 … 10, 4 … 8, 3, 3, 4,
   6, 4, 1 … 3), 5 (8 … 9, 8 … 10, 4 … 8, 3, 4, 5, 6, 5, 1 … 2)" (rows, columns, blocked, vents, slots, colonies, sites,
