@@ -69,11 +69,11 @@ this section, research.md, data-model.md and plan.md in the same commit.
   limit (the band's), the sites (the band's count of empty cells), the plan (the band's length p of actions, each a
   seed in a direction not yet seeded within the seed limit, a nutrient on a free site or a blocker on a free site; the
   emphasised kind first when the emphasis names one — `place nutrient` a nutrient, `block toxin` a blocker, `seed
-  filament` a seed — the rest drawn uniformly among the kinds still possible), the starting seeds (1 … seed limit − (plan
-  seeds) directions not in the plan, at least one when the plan has no seed). The winning arrangement is the starting
+  filament` a seed — the rest drawn uniformly among the kinds still possible), the starting seeds (0 … seed limit − plan
+  seeds directions not in the plan, at least 1 when the plan has no seed). The winning arrangement is the starting
   seeds plus the plan. It is grown on a probe level with a placeholder terminal and the widest budget; the candidate is
   skipped unless that growth is neither toxic nor starved and grows at least 4 cells beyond the root. The terminals (the
-  band's count) are the grown cells, other than placed and fixed cells, with the latest grown pulses (ties by cell
+  band's count) are the grown cells, other than sites and fixed nutrients, with the latest grown pulses (ties by cell
   order); nutrient budget = grown weight + the band's budget slack, weight limit = grown weight + the band's limit slack
   (at most the budget). Band profiles (width × height, rock ‰, toxin ‰, terminals, sites, fixed nutrients, seed limit,
   strength, reach, κ, ο, pulses, budget slack, limit slack, plan p): band 1 (8 × 8, 80, 30, 1, 4, 0, 1, 4 … 8, 4 … 8,
