@@ -139,7 +139,8 @@ Answered autonomously under the owner's standing delegation, safest well-support
   numbered from 1, ticks in the level's words, numbers grouped as the level groups them:
   frozen — "World n froze at tick t: its light stayed below its lethal floor for more than E ticks in a row." (with
   E = 0: "World n froze at tick t: its light fell below its lethal floor."; "1 tick" in the singular);
-  scorched — the same with "scorched" and "above its lethal ceiling";
+  scorched — the same with "scorched" and "above its lethal ceiling" (with E = 0: "World n scorched at tick t: its
+  light rose above its lethal ceiling.");
   unstable — "World n kept comfortable light for only w ticks in a row; W were needed." ("1 tick", "1 was needed" in
   the singular; with w = 0 "World n never had comfortable light; W were needed.");
   wilted — "World n wilted: its light over the cycle totalled I, below its bloom band B_lo … B_hi.";
