@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g19.microscopic-aurora",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g19.microscopic-aurora --runtime 26",
+  "elapsed_seconds": 405.789,
+  "exit_code": 0,
+  "finished": "2026-11-27T01:34:44+00:00",
+  "gate": "X-R02-G19",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G19.sim26.log",
+  "log_sha256": "ddd40a580b6deff9ea404840fb0768925b648fafc1f29de82b9717a5d5f59962",
+  "name": "sim26",
+  "started": "2026-11-27T01:27:58+00:00",
+  "timed_out": false
+}
