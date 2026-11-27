@@ -1,0 +1,231 @@
+{
+  "actions" : [
+    {
+      "seed" : {
+        "_0" : 0
+      }
+    },
+    {
+      "nutrient" : {
+        "_0" : {
+          "column" : 5,
+          "row" : 3
+        }
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "arrangement" : {
+      "blockers" : [
+
+      ],
+      "nutrients" : [
+
+      ],
+      "seeds" : [
+        0
+      ]
+    },
+    "arrangements" : 18,
+    "depth" : 1,
+    "failure" : {
+      "unreached" : {
+        "terminal" : 0
+      }
+    },
+    "failureWords" : "terminal 1 at (4, 4) was not reached",
+    "nearestMiss" : 16
+  },
+  "difficulty" : {
+    "boardCells" : 100,
+    "moveSpace" : 18,
+    "nearestMiss" : 16,
+    "searchedBelow" : 19,
+    "sites" : 5,
+    "terminals" : 2,
+    "toxins" : 7,
+    "witnessLength" : 2,
+    "work" : 23
+  },
+  "digests" : [
+    "0d138a85dd65d5e3",
+    "36954a67c3d42e69",
+    "36954a67c3d42e69"
+  ],
+  "fingerprints" : [
+    "0c133dee7f5c91a339969f871833bf570aedb5b4fb950a492dff99b0c0c25569",
+    "d3ce9b932af3afc18a464f7e6e76e104c1da8fef29da581e4238004e155391b6",
+    "dea7e7fc05d819118f2bacf67bb6bcda667885bdd249a2006a1e109c3d1aa20d",
+    "89ad0c7df06ae7e13f8b95301d41eb82cb1e397844937f2cc689a553bc234c00"
+  ],
+  "level" : {
+    "budget" : 10,
+    "curvature" : 1,
+    "difficulty" : 2,
+    "fingerprint" : "da5a06bfb6f783f3d7cbdeab50bfe8187229e0ad05184b67cb8343c97779aceb",
+    "fixedNutrients" : [
+      {
+        "column" : 2,
+        "row" : 1
+      },
+      {
+        "column" : 9,
+        "row" : 9
+      }
+    ],
+    "height" : 10,
+    "id" : "mycelium-architect-024",
+    "maxBlockers" : 1,
+    "maxNutrients" : 2,
+    "maxSeeds" : 2,
+    "nutrientBudget" : 18,
+    "obstacle" : 1,
+    "pulses" : 64,
+    "reach" : 7,
+    "rocks" : [
+      {
+        "column" : 3,
+        "row" : 0
+      },
+      {
+        "column" : 5,
+        "row" : 1
+      },
+      {
+        "column" : 9,
+        "row" : 1
+      },
+      {
+        "column" : 5,
+        "row" : 4
+      },
+      {
+        "column" : 7,
+        "row" : 4
+      },
+      {
+        "column" : 6,
+        "row" : 5
+      },
+      {
+        "column" : 0,
+        "row" : 6
+      },
+      {
+        "column" : 4,
+        "row" : 7
+      }
+    ],
+    "root" : {
+      "column" : 2,
+      "row" : 8
+    },
+    "schema" : 1,
+    "seed" : 9225522954131215511,
+    "sites" : [
+      {
+        "column" : 2,
+        "row" : 0
+      },
+      {
+        "column" : 3,
+        "row" : 1
+      },
+      {
+        "column" : 3,
+        "row" : 3
+      },
+      {
+        "column" : 5,
+        "row" : 3
+      },
+      {
+        "column" : 5,
+        "row" : 7
+      }
+    ],
+    "startSeeds" : [
+
+    ],
+    "strength" : 6,
+    "terminals" : [
+      {
+        "column" : 4,
+        "row" : 4
+      },
+      {
+        "column" : 5,
+        "row" : 5
+      }
+    ],
+    "toxins" : [
+      {
+        "column" : 5,
+        "row" : 0
+      },
+      {
+        "column" : 8,
+        "row" : 0
+      },
+      {
+        "column" : 0,
+        "row" : 3
+      },
+      {
+        "column" : 7,
+        "row" : 3
+      },
+      {
+        "column" : 1,
+        "row" : 4
+      },
+      {
+        "column" : 2,
+        "row" : 5
+      },
+      {
+        "column" : 8,
+        "row" : 9
+      }
+    ],
+    "tutorial" : false,
+    "weightLimit" : 13,
+    "width" : 10
+  },
+  "number" : 24,
+  "report" : {
+    "firstToxic" : null,
+    "nodeCount" : 5,
+    "nutrientBudget" : 18,
+    "outcome" : "won",
+    "terminals" : [
+      {
+        "cell" : {
+          "column" : 4,
+          "row" : 4
+        },
+        "index" : 0,
+        "pathWeight" : 12,
+        "pulse" : 4
+      },
+      {
+        "cell" : {
+          "column" : 5,
+          "row" : 5
+        },
+        "index" : 1,
+        "pathWeight" : 9,
+        "pulse" : 3
+      }
+    ],
+    "totalWeight" : 12,
+    "weightLimit" : 13
+  },
+  "schema" : 1,
+  "skipped" : 0
+}

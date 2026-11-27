@@ -1,0 +1,225 @@
+{
+  "actions" : [
+    {
+      "seed" : {
+        "_0" : 1
+      }
+    },
+    {
+      "nutrient" : {
+        "_0" : {
+          "column" : 8,
+          "row" : 1
+        }
+      }
+    },
+    {
+      "seed" : {
+        "_0" : 2
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "arrangement" : {
+      "blockers" : [
+
+      ],
+      "nutrients" : [
+        {
+          "column" : 8,
+          "row" : 1
+        }
+      ],
+      "seeds" : [
+        0
+      ]
+    },
+    "arrangements" : 169,
+    "depth" : 2,
+    "failure" : {
+      "unreached" : {
+        "terminal" : 0
+      }
+    },
+    "failureWords" : "terminal 1 at (9, 2) was not reached",
+    "nearestMiss" : 32
+  },
+  "difficulty" : {
+    "boardCells" : 121,
+    "moveSpace" : 20,
+    "nearestMiss" : 32,
+    "searchedBelow" : 190,
+    "sites" : 6,
+    "terminals" : 2,
+    "toxins" : 5,
+    "witnessLength" : 3,
+    "work" : 218
+  },
+  "digests" : [
+    "8c5c45d5bbf59b6e",
+    "033806faab9334e4",
+    "d57113027b84fe18",
+    "d57113027b84fe18"
+  ],
+  "fingerprints" : [
+    "02bce764385f74c1b16f9bca068f5955a9df0b870a2e97c20f893d5fbc5d1f76",
+    "233118807bbebe092ea51000222cd0b34775f8fa9ecf5e505413b954bc551676",
+    "06840469fb4b081841c1e8401de30a2d772a8f10553acd44093f78407d59b637",
+    "6cce1cee78ff2016b1bf2d44b1107d2ca8334056396b8c1d12648c6733aeb12e",
+    "2a4d1d8352d3c43ab89f79c0fd2a723590b8533467974101bf2b0d6ddb0afe6e"
+  ],
+  "level" : {
+    "budget" : 13,
+    "curvature" : 2,
+    "difficulty" : 3,
+    "fingerprint" : "80db3a5222ccde3c60d17746e03de58d5bda8a2720ea8bb9f6d18224bc4ba129",
+    "fixedNutrients" : [
+      {
+        "column" : 6,
+        "row" : 3
+      },
+      {
+        "column" : 4,
+        "row" : 4
+      }
+    ],
+    "height" : 11,
+    "id" : "mycelium-architect-049",
+    "maxBlockers" : 1,
+    "maxNutrients" : 2,
+    "maxSeeds" : 2,
+    "nutrientBudget" : 47,
+    "obstacle" : 1,
+    "pulses" : 80,
+    "reach" : 7,
+    "rocks" : [
+      {
+        "column" : 6,
+        "row" : 0
+      },
+      {
+        "column" : 5,
+        "row" : 2
+      },
+      {
+        "column" : 5,
+        "row" : 6
+      },
+      {
+        "column" : 7,
+        "row" : 6
+      },
+      {
+        "column" : 5,
+        "row" : 9
+      }
+    ],
+    "root" : {
+      "column" : 1,
+      "row" : 9
+    },
+    "schema" : 1,
+    "seed" : 8428180331598884957,
+    "sites" : [
+      {
+        "column" : 8,
+        "row" : 1
+      },
+      {
+        "column" : 7,
+        "row" : 5
+      },
+      {
+        "column" : 8,
+        "row" : 5
+      },
+      {
+        "column" : 0,
+        "row" : 9
+      },
+      {
+        "column" : 0,
+        "row" : 10
+      },
+      {
+        "column" : 5,
+        "row" : 10
+      }
+    ],
+    "startSeeds" : [
+
+    ],
+    "strength" : 3,
+    "terminals" : [
+      {
+        "column" : 9,
+        "row" : 2
+      },
+      {
+        "column" : 6,
+        "row" : 2
+      }
+    ],
+    "toxins" : [
+      {
+        "column" : 0,
+        "row" : 1
+      },
+      {
+        "column" : 3,
+        "row" : 1
+      },
+      {
+        "column" : 2,
+        "row" : 3
+      },
+      {
+        "column" : 3,
+        "row" : 4
+      },
+      {
+        "column" : 10,
+        "row" : 10
+      }
+    ],
+    "tutorial" : false,
+    "weightLimit" : 47,
+    "width" : 11
+  },
+  "number" : 49,
+  "report" : {
+    "firstToxic" : null,
+    "nodeCount" : 17,
+    "nutrientBudget" : 47,
+    "outcome" : "won",
+    "terminals" : [
+      {
+        "cell" : {
+          "column" : 9,
+          "row" : 2
+        },
+        "index" : 0,
+        "pathWeight" : 26,
+        "pulse" : 9
+      },
+      {
+        "cell" : {
+          "column" : 6,
+          "row" : 2
+        },
+        "index" : 1,
+        "pathWeight" : 19,
+        "pulse" : 7
+      }
+    ],
+    "totalWeight" : 45,
+    "weightLimit" : 47
+  },
+  "schema" : 1,
+  "skipped" : 41
+}

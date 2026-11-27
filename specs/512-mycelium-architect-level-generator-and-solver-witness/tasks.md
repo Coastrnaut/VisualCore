@@ -48,7 +48,7 @@ Packages/ExperiencesRound02 --filter MyceliumArchitect`. New sources go in `Myce
   `CoreTests/MyceliumArchitectWitnessTests.swift` (agent B: clarification Q5 layout; digests, fingerprints, terminal
   report, counterexample, difficulty, skipped; schema 1 sorted keys; damaged, edited and newer refused; verify replays);
   `--name host-5`
-- [ ] T-R02G2202-007 [US3] [US4] Create `CoreTests/MyceliumArchitectCatalogTests.swift` (20 groups of 5 levels: witness
+- [X] T-R02G2202-007 [US3] [US4] Create `CoreTests/MyceliumArchitectCatalogTests.swift` (20 groups of 5 levels: witness — Verified 2026-11-27: MyceliumArchitectCatalogTests (pinned digest 3a2b82b6…, progression, neighbour rule, content and novelty boundaries, 20 groups) and the 100 witness files (written once with MYCELIUM_ARCHITECT_WRITE_WITNESSES=1, then byte-identical); host-6 exit=0
   replay wins within budget, minimality counts, byte-identical witness files, pinned digest, progression rule, band
   means not falling, neighbour rule, `testMyceliumArchitectContentBoundary` and `testMyceliumArchitectNoveltyBoundary`
   with seeded neighbouring-input checks) and write `docs/games/mycelium-architect/levels/001.witness.json` … `100` once

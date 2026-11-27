@@ -1,0 +1,190 @@
+{
+  "actions" : [
+    {
+      "seed" : {
+        "_0" : 0
+      }
+    },
+    {
+      "blocker" : {
+        "_0" : {
+          "column" : 6,
+          "row" : 2
+        }
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "arrangement" : {
+      "blockers" : [
+
+      ],
+      "nutrients" : [
+
+      ],
+      "seeds" : [
+        0
+      ]
+    },
+    "arrangements" : 18,
+    "depth" : 1,
+    "failure" : {
+      "unreached" : {
+        "terminal" : 0
+      }
+    },
+    "failureWords" : "terminal 1 at (2, 0) was not reached",
+    "nearestMiss" : 32
+  },
+  "difficulty" : {
+    "boardCells" : 90,
+    "moveSpace" : 18,
+    "nearestMiss" : 32,
+    "searchedBelow" : 19,
+    "sites" : 5,
+    "terminals" : 1,
+    "toxins" : 1,
+    "witnessLength" : 2,
+    "work" : 26
+  },
+  "digests" : [
+    "0d138a85dd65d5e3",
+    "3bdf686071d91a6e",
+    "3bdf686071d91a6e"
+  ],
+  "fingerprints" : [
+    "61d641c76bf815e3da4df97db0d82d7d79d90a2d594ba678e06bbe0b27872d11",
+    "a31fab1b97b0bb0a9edf8ece2eec91a72e43e13bc1621128f4666719e7207979",
+    "24bf00fe3432f93debd31b474a18030cc75cdb8bcc09046a01b62ec66548d68f",
+    "07f92965aaf8d0162a13d544215886033db044bd9a88ce6937a93789a12518c0"
+  ],
+  "level" : {
+    "budget" : 10,
+    "curvature" : 1,
+    "difficulty" : 2,
+    "fingerprint" : "8c44f5488faa091d6a0aa411b0334d3d6189f8b4524911f190a1534a68e1ffb1",
+    "fixedNutrients" : [
+      {
+        "column" : 5,
+        "row" : 1
+      },
+      {
+        "column" : 5,
+        "row" : 3
+      }
+    ],
+    "height" : 9,
+    "id" : "mycelium-architect-032",
+    "maxBlockers" : 2,
+    "maxNutrients" : 1,
+    "maxSeeds" : 2,
+    "nutrientBudget" : 32,
+    "obstacle" : 0,
+    "pulses" : 64,
+    "reach" : 6,
+    "rocks" : [
+      {
+        "column" : 6,
+        "row" : 1
+      },
+      {
+        "column" : 2,
+        "row" : 3
+      },
+      {
+        "column" : 7,
+        "row" : 3
+      },
+      {
+        "column" : 9,
+        "row" : 3
+      },
+      {
+        "column" : 9,
+        "row" : 4
+      },
+      {
+        "column" : 9,
+        "row" : 5
+      },
+      {
+        "column" : 8,
+        "row" : 7
+      }
+    ],
+    "root" : {
+      "column" : 1,
+      "row" : 7
+    },
+    "schema" : 1,
+    "seed" : 2241647648679658023,
+    "sites" : [
+      {
+        "column" : 8,
+        "row" : 0
+      },
+      {
+        "column" : 6,
+        "row" : 2
+      },
+      {
+        "column" : 0,
+        "row" : 4
+      },
+      {
+        "column" : 1,
+        "row" : 5
+      },
+      {
+        "column" : 0,
+        "row" : 8
+      }
+    ],
+    "startSeeds" : [
+
+    ],
+    "strength" : 4,
+    "terminals" : [
+      {
+        "column" : 2,
+        "row" : 0
+      }
+    ],
+    "toxins" : [
+      {
+        "column" : 6,
+        "row" : 4
+      }
+    ],
+    "tutorial" : false,
+    "weightLimit" : 31,
+    "width" : 10
+  },
+  "number" : 32,
+  "report" : {
+    "firstToxic" : null,
+    "nodeCount" : 11,
+    "nutrientBudget" : 32,
+    "outcome" : "won",
+    "terminals" : [
+      {
+        "cell" : {
+          "column" : 2,
+          "row" : 0
+        },
+        "index" : 0,
+        "pathWeight" : 21,
+        "pulse" : 7
+      }
+    ],
+    "totalWeight" : 27,
+    "weightLimit" : 31
+  },
+  "schema" : 1,
+  "skipped" : 15
+}
