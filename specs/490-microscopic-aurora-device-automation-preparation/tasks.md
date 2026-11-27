@@ -28,7 +28,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
 - [ ] T-R02G1910-004 [P] [US2] Create `docs/apps/microscopic-aurora/device-campaign.md` (agent B, modelled on
-  `docs/apps/microscopic-aurora/device-campaign.md`, read against the gestures of feature 484: devices and order, D3 on
+  `docs/apps/apsides-workshop/device-campaign.md`, read against the gestures of feature 484: devices and order, D3 on
   iPadOS 26.5, owner actions as BLOCKED_OWNER_ACTION, every row MA-D1 … MA-D8 with devices, procedure, pass condition
   and "pending device campaign", no number claimed, the stress session only in the device campaign); `--name docs --
   python3 scripts/validate_docs.py`
