@@ -9,7 +9,7 @@ R02-G20-03 (`git show a3269b5cc:<path>`, the R02-G20-03 record commit).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2103-001 Baselines on the committed tree after R02-G21-02 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2103-001 Baselines on the committed tree after R02-G21-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit=0 (.autonomy/migration/checks/R02-G21-03.baseline-*.json); rendering baseline is R02-G21-02's runs
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (2 with BinaryGardens:
   `'MoonlitMechanism|AcousticConstellator|HarmonicBridges|BinaryGardens'`); the rendering baseline is R02-G21-02's
   rendering runs (exit 0)
