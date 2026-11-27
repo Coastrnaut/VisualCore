@@ -35,7 +35,8 @@ script tests alone. Seed 2_494. **Constraints**: presentation-only view orbit, s
 points, drag distance 16 points, pod, site, vent and moon allowance 12 points, scrubber band 14 points, target-site
 reach 24 points, moon step 40 points per level, tap duration 0.5 s, double tap 0.35 s and 22 points by event
 timestamps; yaw ±60°, pitch −20° … +35°; the scrubber at y −0.9 lies inside feature 493's camera box (y −1.5 … 1.2
-unchanged); the previewed run is the kernel's `MushroomWeatherForest.run` of the previewed arrangement (a catalog run
+unchanged); the orbit refit keeps the box extended to the moon's depth (z −0.5 … 0.3) inside the view, never moving the
+eye closer than the authored distance, so orbit 0 is the authored camera; the previewed run is the kernel's `MushroomWeatherForest.run` of the previewed arrangement (a catalog run
 of at most 40 cycles over at most 90 cells is well under a millisecond, so a preview per drag move is affordable);
 tests under 10 s.
 

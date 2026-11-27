@@ -21,3 +21,8 @@
 - **R8 Picking order as drawn.** Decision: vents over pods over sites (drawn later win); the moon is behind the forest;
   the scrubber has its own band; the floor is the rest of the floor rectangle. Rationale: what the finger seems to touch
   is what is picked.
+- **R9 The refit includes the moon.** Decision: at a non-authored orbit the camera fits feature 493's box extended to
+  z −0.5 … 0.3 (the moon stands at z −0.5), keeping the larger of the authored and the fitting eye distance.
+  Rationale: the moon must stay in view while orbiting (SC-R02G2004-004), and at orbit 0 the authored camera already
+  fits, so the refit is continuous and bit-identical there. Alternatives considered: refitting the authored camera
+  too (would change feature 493's frame).

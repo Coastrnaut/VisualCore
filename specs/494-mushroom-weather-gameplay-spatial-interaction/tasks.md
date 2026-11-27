@@ -20,8 +20,9 @@ tests stay short (< 10 s each). No {owner} tasks. Agents model their files on Mi
   `previewing(_:level:)` to `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSceneSnapshot.swift`; add
   `MushroomWeatherViewOrbit` ("yaw ±60°, pitch −20° … +35°; authored (0, 0); presentation only", `clamped()`),
   `camera(aspect:orbit:)` (yaw about the vertical axis through the authored box centre, pitch about the authored view;
-  refit so the box x −1.3 … 1.3, y −1.5 … 1.2, z 0 … 0.3 stays inside the view with at least a 5 % margin at aspects
-  0.4 … 2.5; the eye outside the box; `camera(aspect:)` equals the authored orbit, bit-identical), the scrubber ("a
+  refit so the box x −1.3 … 1.3, y −1.5 … 1.2, z −0.5 … 0.3 (feature 493's box extended to the moon's depth) stays
+  inside the view with at least a 5 % margin at aspects 0.4 … 2.5, the eye distance being the larger of the authored
+  distance and the fitting one; the eye outside the box; `camera(aspect:)` equals the authored orbit, bit-identical), the scrubber ("a
   track at y −0.9 from x −0.9 to 0.9 with a mark at the shown cycle", `scrubberY`, `scrubberPoint(_:)`), `podCentre`,
   `ventCentre`, the preview (the previewed run drawn in place of the committed one, the dragged pod as a ghost at its
   target, the moon at the previewed brightness) and camera-taking forest and glow meshes and parts (the existing
