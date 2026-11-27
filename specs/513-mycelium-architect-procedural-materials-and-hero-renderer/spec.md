@@ -242,8 +242,9 @@ it as available, and the experience package, registry, catalog and content check
 - **FR-R02G2203-008**: The experience MUST be registered in the catalog as a candidate and linked into the one app; the
   experience package, registry, catalog, content and dependency checks MUST pass; it MUST NOT be shown as available.
 - **FR-R02G2203-009**: Existing tests MUST pass unchanged except where a test names the next unregistered candidate or
-  lists the registered entries, and except the kernel's invariant scans, which read a fixed list of the kernel's files
-  so the presentation sources stay outside them; every new public name is documented; the reference regression passes;
+  lists the registered entries, and the kernel's source scans (feature 511's invariant tests read the files directly in `Core/`, feature
+  512's generator test the files in `Core/Content/`) stay unchanged because the presentation sources live in a separate
+  `Core/Presentation/` folder outside both; every new public name is documented; the reference regression passes;
   the Cores keep running on the host.
 - **FR-R02G2203-010**: No information MUST be carried by hue alone (the non-colour twins of the edge cases), and the
   presenter MUST expose its tier log, fallback reason and frame probes for diagnostics, with no telemetry leaving the
