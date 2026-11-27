@@ -27,7 +27,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
 
-- [ ] T-R02G2010-004 [P] [US2] Create `docs/apps/mushroom-weather/device-campaign.md` (agent B, modelled on
+- [X] T-R02G2010-004 [P] [US2] Create `docs/apps/mushroom-weather/device-campaign.md` (agent B, modelled on — Verified 2026-11-27: docs exit=0 (.autonomy/migration/checks/R02-G20-10.docs.json); campaign plan with D3 on iPadOS 26.5 not updated, owner actions as BLOCKED_OWNER_ACTION, rows MW-D1 … MW-D8 pending
   `docs/apps/microscopic-aurora/device-campaign.md`, read against the gestures of feature 494: devices and order, D3 on
   iPadOS 26.5, owner actions as BLOCKED_OWNER_ACTION, every row MW-D1 … MW-D8 with devices, procedure, pass condition
   and "pending device campaign", no number claimed, the stress session only in the device campaign); `--name docs --
