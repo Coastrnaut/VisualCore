@@ -97,7 +97,7 @@ reasons as they are added (feature 501's convergence lesson).
   "r02-g22-mycelium-architect") with
   `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPuzzleTests.swift` (agreement with the play
   on 200 walks); `--name host-4`
-- [ ] T-R02G2201-006 [P] Create
+- [X] T-R02G2201-006 [P] Create — Verified 2026-11-27: MyceliumArchitectInvariantTests (nine named invariants, seed 2_516) installed; host-5 exit=0 (33 XCTest + 17 Swift Testing)
   `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectInvariantTests.swift` (agent D:
   `testMyceliumArchitectTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
