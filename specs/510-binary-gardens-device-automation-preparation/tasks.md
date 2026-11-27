@@ -23,8 +23,9 @@ is contacted. No {owner} tasks; one {device} task. Prerequisites: R02-G21-05 …
   r02-g21.binary-gardens` (expected `device-rows r02-g21.binary-gardens: PASS (8 rows, 12 scenarios)`)
 - [ ] T-R02G2110-003 [P] [US1] Write `BinaryGardensDeviceRowsCheckTests` (agent A, as a separate file the lead inserts
   into `scripts/test_scripts.py` above the `if __name__ == "__main__":` block: the real Binary Gardens definition passes;
-  a copy with a scenario removed, a copy with BG-D1's `pass` field removed, a copy naming an unknown scenario and a copy
-  with T-R02G2109-011 dropped from every row's covers each fail by name; the release step `device-rows-r02-g21` runs the
+  a copy with a scenario removed, a copy with BG-D1's `pass` field removed, a copy naming an unknown scenario, a copy
+  with T-R02G2109-011 and a copy with T-R02G2104-011 dropped from every row's covers each fail by name with the five
+  reasons of contracts/api.md; the release step `device-rows-r02-g21` runs the
   check for `r02-g21.binary-gardens`); `--name script-tests` (alone)
 
 ## Phase 3: Story 2 — a person can follow the plan (P2)
