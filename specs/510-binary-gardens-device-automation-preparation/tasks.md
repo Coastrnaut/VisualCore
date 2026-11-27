@@ -48,7 +48,7 @@ is contacted. No {owner} tasks; one {device} task. Prerequisites: R02-G21-05 …
 - [X] T-R02G2110-008 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0
 - [ ] T-R02G2110-009 {device} After ImplementationLock-100: the device campaign (UA-F13) runs rows BG-D1 … BG-D8 on D1,
   D2, D3 (SC-R02G2110-004)
-- [ ] T-R02G2110-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2110-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converged in one round (no findings); README row and gate list updated
   README row and gate list updated; after the record push, check its CI run with `gh run list`
 
 ## Dependencies and parallel work
