@@ -272,13 +272,20 @@ import VisualCoreSimulation
             return (play, fingerprints)
         }
 
-        /// The kernel sources present in the Core directory next to this test directory.
+        /// The kernel's source files (the presentation files of feature 493 — the scene snapshot, geometry, shaders
+        /// and adapter — draw with floating point and are not part of the kernel).
+        static let kernelFiles: [String] = ["MushroomWeatherDifficulty.swift", "MushroomWeatherError.swift",
+                                            "MushroomWeatherForest.swift", "MushroomWeatherGenerator.swift",
+                                            "MushroomWeatherLevel.swift", "MushroomWeatherManifest.swift",
+                                            "MushroomWeatherPlay.swift", "MushroomWeatherPuzzle.swift",
+                                            "MushroomWeatherSolver.swift"]
+
+        /// The kernel sources in the Core directory next to this test directory.
         static func kernelSources() throws -> [(name: String, text: String)] {
             let tests: URL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             let core: URL = tests.deletingLastPathComponent().appendingPathComponent("Core")
             var sources: [(name: String, text: String)] = []
-            let names: [String] = (try? FileManager.default.contentsOfDirectory(atPath: core.path)) ?? []
-            for name in names.sorted() where name.hasSuffix(".swift") {
+            for name in kernelFiles {
                 let url: URL = core.appendingPathComponent(name)
                 sources.append((name, try String(contentsOf: url, encoding: .utf8)))
             }

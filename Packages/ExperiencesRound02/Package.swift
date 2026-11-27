@@ -825,12 +825,21 @@ let package = Package(
         // Feature 491 (R02-G20-01): Mushroom Weather's pure rule kernel.
         .target(name: "MushroomWeatherCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 493 (R02-G20-03): the adapter, snapshot, geometry and scenarios.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "MushroomWeather/Core"),
         .testTarget(name: "MushroomWeatherCoreTests",
                     dependencies: ["MushroomWeatherCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   // Feature 493 (R02-G20-03): meshes, quality profiles and the experience contract.
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "MushroomWeather/CoreTests"),
         // Feature 481 (R02-G19-01): Microscopic Aurora's pure rule kernel.
         .target(name: "MicroscopicAuroraCore",
