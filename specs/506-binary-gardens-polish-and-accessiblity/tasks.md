@@ -97,7 +97,7 @@ round02-host in five chunks (1, 2, 3c, 3e, 3f). Prerequisites: R02-G21-04 and R0
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G2106-006 Docs: `docs/architecture/binary-gardens.md` (polish and accessibility),
+- [X] T-R02G2106-006 Docs: `docs/architecture/binary-gardens.md` (polish and accessibility), — Verified 2026-11-27: round02-host-1, -2, -3c, -3e, -3f exit 0; docs: architecture polish section, package README, automatedtesting
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the five round-two filters)
 - [ ] T-R02G2106-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,

@@ -1067,5 +1067,7 @@ its rings or along its orbit with a previewed report, tap or drag pips and the t
 orbit and reset the view) and the panel's direct ring, luminosity, phase and tilt choices. Feature 505 (R02-G21-05) adds
 teaching and progression: `BinaryGardensHints` (three hint levels from the certified witness or a bounded search),
 `BinaryGardensFailureExplanation`, the tutorial, progress with stars, the daily level (× 13) and practice (budget 24),
-and snapshot schema 2 with a migration from schema 1.
+and snapshot schema 2 with a migration from schema 1. Feature 506 (R02-G21-06) adds polish and accessibility:
+`BinaryGardensFeedbackPlan` (announcements and haptics), `BinaryGardensLights` (eased glow, won look and blooms),
+`BinaryGardensSoundRecipe` and `BinaryGardensSound` (an audition and an optional ambient loop) and the accessible panel.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).

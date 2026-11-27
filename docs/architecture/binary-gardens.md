@@ -139,3 +139,29 @@ presentation of later features.
   while still locked without opening it; practice raises the budget to 24 without stars or unlocks. The panel shows the
   band, the goal ("Win in at most k actions for 3 stars", "1 action" in the singular), the best stars, the modes and a stepper over the open levels. The snapshot is schema 2 (digest domain
   `r02-g21.binary-gardens.v2`) with a migration from schema 1; locked means not yet won, never paid for.
+
+## Polish and accessibility (feature 506, R02-G21-06)
+
+- **Feedback.** `BinaryGardensFeedbackPlan.after(old:new:)` turns each change of the adapter core into one
+  announcement and one haptic through the shared route: a star moved to a ring ("Star n moved to ring r (ρ units)."),
+  shifted in phase, its luminosity set, the tilt set, undo and redo, each followed by the worlds keeping their light,
+  whether running now would win or fail and the actions left (`state`, selection); a won run (`outcome`, success, with
+  the actions spent and stars outside practice), a failed run (the failure explanation, `outcome`, warning), a level or
+  mode change (`level`) and refusals in sentences (`rejection`, error). The run plans only its outcome; showing a tick,
+  previews and dismissing the tutorial plan nothing; a revealed hint is announced as `state`. The presenter keeps a
+  feedback log beside the tier log and the refusal log.
+- **Comfort.** `BinaryGardensLights` eases the glow (0.7 playing, 1 won, 0.35 failed), the won look and each world's
+  bloom by the frame clock (0.15 s, 0.45 s under Reduce Flashing, no reversal mid-fade); the scene draws the eased
+  levels (`u_won`, the glow gain, each world's shell factor in the glow mesh rebuilt at each 1/32 step, and in the
+  unlit fallback the not-won and won colours blended by the won level, rebuilt per tenth), so no element crosses half
+  its range more than three times a second. The corona rays and motes hold still under Reduce Motion or Reduce
+  Flashing; a won run's motes appear with the outcome.
+- **Sound.** Off by default (a Sound toggle). Choosing a star plays its audition: the tone 220 Hz × 2^(n/12), n = 2 ×
+  (7 − ring index), with a fifth when the star can change or a partial 3 Hz above when it cannot, 0.6 s. The ambient
+  loop's root (110 Hz × 1, 9/8, 5/4, 4/3) comes from the actions left, up to four partials from the quarters of the
+  worlds keeping their light, a brightness partial from the stars' luminosities, an octave when won and halved gains
+  when failed; it plays only while wanted, on screen and active (`BinaryGardensSound`).
+- **Panel.** A summary element, the star, ring, phase, luminosity, tilt and tick adjustable with VoiceOver (", locked"
+  for a locked control), a value in words on every control, refusals in the feedback plan's sentences, rows that become
+  columns at accessibility text sizes and a 520-point readable width on iPad; the same behaviour at every tier and in
+  the fallback.
