@@ -105,7 +105,7 @@ reasons as they are added (feature 501's convergence lesson).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G2201-007 Docs: `docs/architecture/mycelium-architect.md` (new: rules),
+- [X] T-R02G2201-007 Docs: `docs/architecture/mycelium-architect.md` (new: rules), — Verified 2026-11-27: architecture doc (new), package README, automatedtesting; validate_docs PASS; round02-host-1 (VoxelOrigami|MyceliumArchitect)/2/3c/3e/3f exit=0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md` (MyceliumArchitect in local chunk round02-host-1
   and in CI half b); `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f` (chunk 1 gains MyceliumArchitect: `swift test
   --package-path Packages/ExperiencesRound02 --filter 'VoxelOrigami|MyceliumArchitect'`; the other four filters

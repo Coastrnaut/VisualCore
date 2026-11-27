@@ -1080,3 +1080,13 @@ Feature 509 (R02-G21-09) adds the in-app integration: pinned panel identifiers, 
 the registered schema-1 and schema-2 examples and the app unit tests. Feature 510 (R02-G21-10) adds its device-row definition and written campaign
 plan (`docs/apps/binary-gardens/`), checked by `scripts/check_device_rows.py`; no device is contacted.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).
+
+## Mycelium Architect (R02-G22, `r02-g22.mycelium-architect`, free)
+
+`MyceliumArchitectCore` (feature 511, R02-G22-01) is the playable rule kernel: the lattice growth in deterministic
+integer arithmetic (`MyceliumArchitectGrowth`: the nutrient field, tips choosing the greatest gradient minus curvature
+and obstacle penalties with fixed tie-breaks, branching at consumed nutrients, weights 2 and 3), the judge (`starved`,
+`toxic`, `unreached`, `overweight`), `MyceliumArchitectLevel` (immutable, fingerprinted, JSON schema 1, with names in
+words), the play state `MyceliumArchitectPlay` with nutrient, blocker, clear, seed and unseed actions and the run,
+records, undo and redo, and `MyceliumArchitectPuzzle` (an R02-F23 `PuzzleRules` over arrangements).
+See [docs/architecture/mycelium-architect.md](../../docs/architecture/mycelium-architect.md).

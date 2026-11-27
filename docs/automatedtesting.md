@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G21-10: Binary Gardens device rows).
+Last updated: 2026-11-27 (R02-G22-01: Mycelium Architect rule kernel).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mycelium Architect rule kernel** (R02-G22-01, 2026-11-27). `swift test --package-path Packages/ExperiencesRound02
+  --filter MyceliumArchitect` (50 tests: 33 XCTest in three classes and 17 Swift Testing in two suites, about 4 s):
+  level checks and the stored form, the growth against an independent reference over 500 seeded runs, 500 seeded traces
+  replaying exactly, the puzzle contract (200 walks) and nine boundary invariants. Mycelium Architect joins the local
+  round-two chunk 1 (`VoxelOrigami|MyceliumArchitect`) and CI's round02-host-tests half b.
 - **Binary Gardens device rows** (R02-G21-10, 2026-11-27). `python3 scripts/check_device_rows.py --experience
   r02-g21.binary-gardens` (release step `device-rows-r02-g21`, tests `BinaryGardensDeviceRowsCheckTests`, 8) checks
   the definition (rows BG-D1 … BG-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G21
