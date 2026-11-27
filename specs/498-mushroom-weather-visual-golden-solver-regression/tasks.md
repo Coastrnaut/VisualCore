@@ -48,7 +48,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G2008-005 [US2] [US3] Create
+- [X] T-R02G2008-005 [US2] [US3] Create — Verified 2026-11-27: sim-27 exit=0, 69 tests in 10 suites incl. RegressionGoldenFrameTests and RegressionMemoryTests (.autonomy/migration/checks/R02-G20-08.sim-27.json)
   `Packages/ExperiencesRound02/MushroomWeather/ExperienceTests/MushroomWeatherRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/MushroomWeather/ExperienceTests/MushroomWeatherRegressionMemoryTests.swift` (agent C:
   the 16 frames rendered and checked against their descriptions with the feature-493 tolerances (each cap's centre 0.2
