@@ -45,7 +45,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
   generate `Packages/ExperiencesRound02/BinaryGardens/golden-frames.json` (schema 1) with
   `BINARY_GARDENS_WRITE_GOLDEN=1` only after R02-G21-07 is recorded, and add `BinaryGardensGolden` to
   `RELEASE_FORBIDDEN` in `scripts/release_check.py`
-- [ ] T-R02G2108-004 [P] [US2] Create
+- [X] T-R02G2108-004 [P] [US2] Create — Verified 2026-11-27: host-2 exit 0 (swift test --filter BinaryGardensRegressionGoldenTests: 13 tests)
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensRegressionGoldenTests.swift` (agent C: every
   frame's recomputed description matches its pinned one; each pinned digest equals the digest of its pinned
   description; a moved position beyond a quantum, a changed colour, material entry or count, a missing frame, an unknown
