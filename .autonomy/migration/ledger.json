@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-27T20:21:31+00:00",
+ "updated": "2026-11-27T20:59:53+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -379,7 +379,7 @@
   {"id":"R02-G21-07","kind":"game-feature","title":"Binary Gardens: Persistence and replay","depends":["R02-G21-06"],"status":"pass","attempts":[{"at":"2026-11-27T18:11:32+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G21-07.json","evidence_sha256":"f9bc94e2a0c91997870f480fe810314cf6c6ffd87a709cf87be3de480dbf7de4","revision":"ac9cf1fe25438ab584b06db2862dd7d102609b3b"}],"experience":"R02-G21","spec_dir":"specs/507-binary-gardens-persistence-and-replay"},
   {"id":"R02-G21-08","kind":"game-feature","title":"Binary Gardens: Visual golden/solver regression","depends":["R02-G21-07"],"status":"pass","attempts":[{"at":"2026-11-27T18:52:16+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G21-08.json","evidence_sha256":"ce7d6a1651f0415a767a4e3c93afcc0bd3cbbdaeb6487c462d0710aae1818463","revision":"35c818540bf1ccc481cb79095c814452b2d948a1"}],"experience":"R02-G21","spec_dir":"specs/508-binary-gardens-visual-golden-solver-regression"},
   {"id":"R02-G21-09","kind":"game-feature","title":"Binary Gardens: Simulator integration and full app lock","depends":["R02-G21-08"],"status":"pass","attempts":[{"at":"2026-11-27T20:21:31+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G21-09.json","evidence_sha256":"77b97b48434c35c84c4c45997da65262c57909e06118203139ae0fa388ace820","revision":"4b2522a5410c20979708e92aa638b646da514884"}],"experience":"R02-G21","spec_dir":"specs/509-binary-gardens-simulator-integration-and-full-app-lock"},
-  {"id":"R02-G21-10","kind":"game-feature","title":"Binary Gardens: Device automation preparation","depends":["R02-G21-09"],"status":"pending","attempts":[],"experience":"R02-G21","spec_dir":"specs/510-binary-gardens-device-automation-preparation"},
+  {"id":"R02-G21-10","kind":"game-feature","title":"Binary Gardens: Device automation preparation","depends":["R02-G21-09"],"status":"pass","attempts":[{"at":"2026-11-27T20:59:53+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G21-10.json","evidence_sha256":"f1f58910d3b301e12fb8d8dba718c5d5b4df7537bb2e8020594fe50ad783ad78","revision":"9b1a22aca47b30c0074c6825d616c98103e4f36b"}],"experience":"R02-G21","spec_dir":"specs/510-binary-gardens-device-automation-preparation"},
   {"id":"X-R02-G21","kind":"experience","title":"Binary Gardens complete in the unified app (simulator-verified)","depends":["R02-G21-10","UA-F05","UA-F06","UA-F09"],"status":"pending","attempts":[],"experience":"r02-g21.binary-gardens","tier":"free"},
   {"id":"R02-G22-01","kind":"game-feature","title":"Mycelium Architect: Playable rule kernel","depends":["UA-F03","R02-F02","R02-F03","R02-F04","R02-F05","R02-F06","R02-F07","R02-F16","R02-F19","R02-F21","R02-F22","R02-F23","R02-F24","R02-F26"],"status":"pending","attempts":[],"experience":"R02-G22","spec_dir":"specs/511-mycelium-architect-playable-rule-kernel"},
   {"id":"R02-G22-02","kind":"game-feature","title":"Mycelium Architect: Level generator and solver witness","depends":["R02-G22-01"],"status":"pending","attempts":[],"experience":"R02-G22","spec_dir":"specs/512-mycelium-architect-level-generator-and-solver-witness"},
