@@ -16,6 +16,8 @@
 // position in the trace, the kind, the action and the fingerprints before and after; a trace replays to the same
 // records, fingerprints and outcome. Integers only; no clock, no random source. Modelled on `MicroscopicAuroraPlay`
 // (feature 481).
+// Feature 492 (R02-G20-02) T-R02G2002-002: on a level that lists pod sites, a placement on any other cell is refused
+// `.action("not a site")`, checked after the colony cell and before the occupied cell.
 import Foundation
 import VisualCoreMath
 
@@ -267,11 +269,12 @@ public struct MushroomWeatherPlay: Sendable, Equatable {
     /// slots and the current arrangement (the run returns the current arrangement).
     ///
     /// - Throws: for `place`, `.action("slot out of range")` (outside 0 … P − 1), `.action("off floor")` (outside the
-    ///   grid or on a blocked cell), `.action("colony cell")` (a colony stands on the cell), `.action("occupied
-    ///   cell")` (another slot's pod is on the cell) or `.action("unchanged")` (the slot's pod is already there); for
-    ///   `remove`, `.action("slot out of range")` or `.action("empty slot")`; for `vent`, `.action("vent out of
-    ///   range")` (outside 0 … vents − 1) or `.action("unchanged")`; for `moonlight`, `.action("moonlight out of
-    ///   range")` (outside 0 … 3) or `.action("unchanged")`; each checked in this order.
+    ///   grid or on a blocked cell), `.action("colony cell")` (a colony stands on the cell), `.action("not a site")`
+    ///   (the level lists sites and the cell is not one), `.action("occupied cell")` (another slot's pod is on the cell)
+    ///   or `.action("unchanged")` (the slot's pod is already there); for `remove`, `.action("slot out of range")` or
+    ///   `.action("empty slot")`; for `vent`, `.action("vent out of range")` (outside 0 … vents − 1) or
+    ///   `.action("unchanged")`; for `moonlight`, `.action("moonlight out of range")` (outside 0 … 3) or
+    ///   `.action("unchanged")`; each checked in this order.
     func changed(_ action: MushroomWeatherAction) throws(MushroomWeatherError) -> MushroomWeatherArrangement {
         var pods: [MushroomWeatherCell?] = arrangement.pods
         var vents: [Bool] = arrangement.ventsOpen
@@ -281,6 +284,8 @@ public struct MushroomWeatherPlay: Sendable, Equatable {
             guard pods.indices.contains(slot) else { throw .action("slot out of range") }
             guard level.isFloor(cell) else { throw .action("off floor") }
             guard !level.colonyCells.contains(cell) else { throw .action("colony cell") }
+            // Feature 492 (R02-G20-02): a level that lists sites allows pods on its sites only.
+            guard level.allowsPod(cell) else { throw .action("not a site") }
             for other in pods.indices where other != slot && pods[other] == cell { throw .action("occupied cell") }
             guard pods[slot] != cell else { throw .action("unchanged") }
             pods[slot] = cell

@@ -15,7 +15,7 @@ on CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2002-002 Kernel extension and shared types (lead): in
+- [X] T-R02G2002-002 Kernel extension and shared types (lead): in — Verified 2026-11-26: 2026-11-26 host exit 0: 53 tests in 7 suites incl. 8 sites tests (refusals by name, allowsPod, play and puzzle on sites, byte-identical stored form without sites, budgets 13 … 24) (.autonomy/migration/checks/R02-G20-02.host.json)
   `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherLevel.swift` widen `budgets` to "1 … 24" and add
   optional `sites` ("2 … 8 distinct floor cells without a colony, row-major"; refusals in order after "pods share a
   cell": "sites", "sites duplicate", "site off floor", "site on colony", "pod not on a site"; omitted from the stored

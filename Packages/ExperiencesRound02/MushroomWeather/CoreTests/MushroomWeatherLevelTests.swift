@@ -336,7 +336,7 @@ import Testing
             ("moonlight", { try Self.variant(start: Self.start(moonlight: 4)) }),
             ("moonlight", { try Self.variant(start: Self.start(moonlight: -1)) }),
             ("budget", { try Self.variant(budget: 0) }),
-            ("budget", { try Self.variant(budget: 13) }),
+            ("budget", { try Self.variant(budget: 25) }),
         ]
         if let blockedCell {
             cases.append(("blocked duplicate", { try Self.variant(blocked: l.blocked + [blockedCell]) }))

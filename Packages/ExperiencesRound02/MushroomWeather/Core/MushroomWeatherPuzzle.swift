@@ -16,6 +16,8 @@
 // spends nothing and only reveals the outcome that `isSolved` already predicts. The rules carry no stage, fingerprints,
 // report, failure, records, undo or redo: those belong to the play. Integers only; no clock, no random source.
 // Modelled on `MicroscopicAuroraPuzzle` (feature 481).
+// Feature 492 (R02-G20-02) T-R02G2002-002: on a level that lists pod sites, the placeable cells are its sites only, so
+// a placement on any other cell is neither listed nor applied.
 import VisualCoreSimulation
 
 /// The pure rules of one Mushroom Weather level as an R02-F23 puzzle contract.
@@ -52,7 +54,7 @@ public struct MushroomWeatherPuzzle: PuzzleRules {
         for row in 0..<level.rows {
             for column in 0..<level.columns {
                 let cell: MushroomWeatherCell = MushroomWeatherCell(row: row, column: column)
-                if level.isFloor(cell) && !colonies.contains(cell) { cells.append(cell) }
+                if level.isFloor(cell) && !colonies.contains(cell) && level.allowsPod(cell) { cells.append(cell) }
             }
         }
         self.placeableCells = cells
@@ -125,7 +127,7 @@ public struct MushroomWeatherPuzzle: PuzzleRules {
             return nil
         case .place(let slot, let cell):
             guard pods.indices.contains(slot), level.isFloor(cell), !level.colonyCells.contains(cell),
-                  !isOccupied(cell, otherThan: slot, in: pods), pods[slot] != cell else { return nil }
+                  level.allowsPod(cell), !isOccupied(cell, otherThan: slot, in: pods), pods[slot] != cell else { return nil }
             pods[slot] = cell
         case .remove(let slot):
             guard pods.indices.contains(slot), pods[slot] != nil else { return nil }

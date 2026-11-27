@@ -9,6 +9,11 @@
 // difficulty 1 … 5 and whether a tutorial precedes play. Its fingerprint is the SHA-256 hex of its canonical JSON
 // (schema 1, sorted keys, fingerprint excluded); the stored form is re-checked on decode. Pods, colonies, vents and
 // progress are named in words (FR-R02G2001-013). Modelled on `MicroscopicAuroraLevel` (feature 481).
+// Feature 492 (R02-G20-02) T-R02G2002-002 (FR-R02G2002-001; clarification Q1) extends it additively: the action budget
+// widens to 1 … 24, and a level may list 2 … 8 distinct floor cells without a colony as its pod sites (stored row-major;
+// every starting pod on a site; refused in order after "pods share a cell": "sites", "sites duplicate", "site off
+// floor", "site on colony", "pod not on a site"). A level without sites omits the field from its stored form, so it
+// encodes, fingerprints and plays exactly as in feature 491.
 import Foundation
 import VisualCoreMath
 
@@ -38,8 +43,10 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
     public static let lengths: ClosedRange<Int> = 20...200
     /// The smallest required cycles K (the largest is T).
     public static let minimumRequired: Int = 5
-    /// The action budgets.
-    public static let budgets: ClosedRange<Int> = 1...12
+    /// The action budgets (1 … 12 in feature 491, widened by feature 492).
+    public static let budgets: ClosedRange<Int> = 1...24
+    /// The number of pod sites a level may list (feature 492).
+    public static let siteCounts: ClosedRange<Int> = 2...8
 
     /// The level's id, a lowercase slug.
     public let id: String
@@ -73,7 +80,7 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
     public let required: Int
     /// The starting arrangement.
     public let start: MushroomWeatherArrangement
-    /// The action budget, 1 … 12.
+    /// The action budget, 1 … 24.
     public let budget: Int
     /// Whether a tutorial precedes play.
     public let tutorial: Bool
@@ -81,19 +88,22 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
     public let fingerprint: String
     /// Whether each cell is floor, row-major (derived from `blocked`).
     public let floorMask: [Bool]
+    /// The pod sites, row-major, or nil when pods may stand on any floor cell no colony stands on (feature 492).
+    public let sites: [MushroomWeatherCell]?
 
-    /// A level of the given values, checked; the blocked cells are stored row-major.
+    /// A level of the given values, checked; the blocked cells and the pod sites (nil: pods may stand on any floor cell
+    /// no colony stands on; feature 492) are stored row-major.
     ///
     /// - Throws: `.level(name)` naming the first value outside its range or rule.
     public init(id: String, seed: UInt64, difficulty: Int, rows: Int, columns: Int, blocked: [MushroomWeatherCell],
                 humidity: [Int], diffusion: Int, rates: [Int], vents: [MushroomWeatherVent],
                 podRules: MushroomWeatherPodRules, colonies: [MushroomWeatherColony], moldBound: Int, length: Int,
                 required: Int, start: MushroomWeatherArrangement, budget: Int,
-                tutorial: Bool = false) throws(MushroomWeatherError) {
+                tutorial: Bool = false, sites: [MushroomWeatherCell]? = nil) throws(MushroomWeatherError) {
         try self.init(id: id, seed: seed, difficulty: difficulty, rows: rows, columns: columns, blocked: blocked,
                       humidity: humidity, diffusion: diffusion, rates: rates, vents: vents, podRules: podRules,
                       colonies: colonies, moldBound: moldBound, length: length, required: required, start: start,
-                      budget: budget, tutorial: tutorial, refusingAWin: true)
+                      budget: budget, tutorial: tutorial, sites: sites, refusingAWin: true)
     }
 
     /// A level of the given values, checked; the "already won" rule only when `refusingAWin` (a probe that only reads
@@ -101,7 +111,7 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
     init(id: String, seed: UInt64, difficulty: Int, rows: Int, columns: Int, blocked: [MushroomWeatherCell],
          humidity: [Int], diffusion: Int, rates: [Int], vents: [MushroomWeatherVent], podRules: MushroomWeatherPodRules,
          colonies: [MushroomWeatherColony], moldBound: Int, length: Int, required: Int,
-         start: MushroomWeatherArrangement, budget: Int, tutorial: Bool,
+         start: MushroomWeatherArrangement, budget: Int, tutorial: Bool, sites: [MushroomWeatherCell]? = nil,
          refusingAWin: Bool) throws(MushroomWeatherError) {
         guard Self.isSlug(id) else { throw .level("id") }
         guard Self.difficulties.contains(difficulty) else { throw .level("difficulty") }
@@ -153,6 +163,17 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
             guard !colonyCells.contains(pod) else { throw .level("pod on colony") }
         }
         guard Set(placed).count == placed.count else { throw .level("pods share a cell") }
+        var sortedSites: [MushroomWeatherCell]?
+        if let sites {
+            guard Self.siteCounts.contains(sites.count) else { throw .level("sites") }
+            guard Set(sites).count == sites.count else { throw .level("sites duplicate") }
+            for site in sites {
+                guard isFloor(site) else { throw .level("site off floor") }
+                guard !colonyCells.contains(site) else { throw .level("site on colony") }
+            }
+            for pod in placed where !sites.contains(pod) { throw .level("pod not on a site") }
+            sortedSites = sites.sorted()
+        }
         guard start.ventsOpen.count == vents.count else { throw .level("vent states") }
         guard Self.moonlightLevels.contains(start.moonlight) else { throw .level("moonlight") }
         guard Self.budgets.contains(budget) else { throw .level("budget") }
@@ -165,7 +186,7 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
                               rates: rates, vents: vents, podRules: podRules, colonies: colonies,
                               moldBound: moldBound, length: length, required: required, pods: start.pods,
                               ventsOpen: start.ventsOpen, moonlight: start.moonlight, budget: budget,
-                              tutorial: tutorial)
+                              tutorial: tutorial, sites: sortedSites)
         guard let data = try? Self.encoder.encode(content) else { throw .malformed("encode") }
         self.id = id
         self.seed = seed
@@ -186,6 +207,7 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
         self.budget = budget
         self.tutorial = tutorial
         self.floorMask = mask
+        self.sites = sortedSites
         self.fingerprint = StableHash.sha256Hex(Array(data))
         if refusingAWin {
             guard !MushroomWeatherForest.report(self, arrangement: start).wins else { throw .level("already won") }
@@ -218,6 +240,13 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
     /// The cell at row-major index `index`.
     public func cell(at index: Int) -> MushroomWeatherCell {
         MushroomWeatherCell(row: index / columns, column: index % columns)
+    }
+
+    /// Whether a pod may stand on `cell` as far as the sites go: always for a level without sites, else exactly when
+    /// `cell` is one of its sites (feature 492). The floor and colony rules are checked separately.
+    public func allowsPod(_ cell: MushroomWeatherCell) -> Bool {
+        guard let sites else { return true }
+        return sites.contains(cell)
     }
 
     /// The colony cells.
@@ -380,12 +409,14 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
         let moonlight: Int
         let budget: Int
         let tutorial: Bool
+        /// Omitted from the JSON when nil (synthesized `encodeIfPresent`), so a level without sites keeps its form.
+        let sites: [MushroomWeatherCell]?
 
         init(schema: Int, id: String, seed: UInt64, difficulty: Int, rows: Int, columns: Int,
              blocked: [MushroomWeatherCell], humidity: [Int], diffusion: Int, rates: [Int],
              vents: [MushroomWeatherVent], podRules: MushroomWeatherPodRules, colonies: [MushroomWeatherColony],
              moldBound: Int, length: Int, required: Int, pods: [MushroomWeatherCell?], ventsOpen: [Bool],
-             moonlight: Int, budget: Int, tutorial: Bool) {
+             moonlight: Int, budget: Int, tutorial: Bool, sites: [MushroomWeatherCell]? = nil) {
             self.schema = schema
             self.id = id
             self.seed = seed
@@ -407,6 +438,7 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
             self.moonlight = moonlight
             self.budget = budget
             self.tutorial = tutorial
+            self.sites = sites
         }
 
         init(level: MushroomWeatherLevel) {
@@ -416,7 +448,7 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
                       podRules: level.podRules, colonies: level.colonies, moldBound: level.moldBound,
                       length: level.length, required: level.required, pods: level.start.pods,
                       ventsOpen: level.start.ventsOpen, moonlight: level.start.moonlight, budget: level.budget,
-                      tutorial: level.tutorial)
+                      tutorial: level.tutorial, sites: level.sites)
         }
 
         /// The level of this content, re-checked.
@@ -427,7 +459,7 @@ public struct MushroomWeatherLevel: Sendable, Equatable {
                                      length: length, required: required,
                                      start: MushroomWeatherArrangement(pods: pods, ventsOpen: ventsOpen,
                                                                        moonlight: moonlight),
-                                     budget: budget, tutorial: tutorial)
+                                     budget: budget, tutorial: tutorial, sites: sites)
         }
     }
 
