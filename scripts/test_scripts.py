@@ -8452,6 +8452,105 @@ class MushroomWeatherRegressionTests(unittest.TestCase):
         self.assertEqual(code, 1)
 
 
+class BinaryGardensRegressionTests(unittest.TestCase):
+    """The local Binary Gardens regression command (feature 508, R02-G21-08, T-R02G2108-006,
+    FR-R02G2108-006 and FR-R02G2108-007, SC-R02G2108-005): the commands in order (the simulator part with its memory
+    isolation variable), the usage lines naming this script, the first-failing-name parser and the summary with an
+    injected runner (no process is spawned)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tool = load("binary_gardens_regression")
+
+    def run_main(self, *argv, codes=(), outputs=()):
+        calls = []
+
+        def run(cmd, cwd):
+            calls.append((list(cmd), cwd))
+            i = len(calls) - 1
+            return (codes[i] if i < len(codes) else 0), (outputs[i] if i < len(outputs) else "")
+
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = self.tool.main(list(argv), root=Path("/repo"), run=run)
+        return code, out.getvalue(), calls
+
+    def test_dry_run_prints_both_commands_in_order(self):
+        code, out, calls = self.run_main("--dry-run")
+        self.assertEqual(code, 0)
+        self.assertEqual(calls, [])
+        lines = out.splitlines()
+        self.assertEqual(lines, [
+            "$ swift test --package-path Packages/ExperiencesRound02 --filter BinaryGardensRegression",
+            "$ env TEST_RUNNER_BINARY_GARDENS_MEMORY_ISOLATED=1 python3 scripts/xcodebuild_package.py --package "
+            "Packages/ExperiencesRound02 --scheme "
+            "ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing "
+            "BinaryGardensExperienceTests/BinaryGardensRegressionGoldenFrameTests "
+            "BinaryGardensExperienceTests/BinaryGardensRegressionMemoryTests",
+        ])
+
+    def test_usage_lines_name_this_script(self):
+        doc = self.tool.__doc__ or ""
+        usage = [line.strip() for line in doc.splitlines() if line.strip().startswith("python3 scripts/")]
+        self.assertEqual(len(usage), 3)
+        for line in usage:
+            self.assertTrue(line.startswith("python3 scripts/binary_gardens_regression.py"), line)
+        self.assertNotIn("microscopic_aurora_regression.py", doc)
+        self.assertNotIn("mushroom_weather_regression.py", doc)
+
+    def test_skip_simulator_omits_the_second_command(self):
+        code, out, calls = self.run_main("--dry-run", "--skip-simulator")
+        self.assertEqual(code, 0)
+        self.assertEqual(len(out.splitlines()), 1)
+        self.assertNotIn("xcodebuild_package.py", out)
+        code, out, calls = self.run_main("--skip-simulator")
+        self.assertEqual(code, 0)
+        self.assertEqual([c[0][:2] for c in calls], [["swift", "test"]])
+        self.assertNotIn("simulator", out)
+
+    def test_simulator_part_passes_the_isolation_variable(self):
+        code, out, calls = self.run_main()
+        self.assertEqual(code, 0)
+        host, simulator = calls[0][0], calls[1][0]
+        self.assertNotIn("env", host)
+        self.assertEqual(simulator[:2], ["env", "TEST_RUNNER_BINARY_GARDENS_MEMORY_ISOLATED=1"])
+        self.assertEqual(simulator[2:4], ["python3", "scripts/xcodebuild_package.py"])
+        self.assertIn("sim-27.2", simulator)
+
+    def test_first_failing_parser(self):
+        parse = self.tool.first_failing
+        self.assertEqual(parse("✔ Test group01(index:) passed\n"
+                               "✘ Test goldenFramesMatch() recorded an issue at "
+                               "BinaryGardensRegressionTests.swift:40\n"
+                               "✘ Test group09(index:) failed after 0.2 seconds with 1 issue."), "goldenFramesMatch")
+        memory = "BinaryGardensExperienceTests.BinaryGardensRegressionMemoryTests"
+        self.assertEqual(parse(f"Test Case '-[{memory} testMemoryStaysBounded]' started.\n"
+                               f"Test Case '-[{memory} testMemoryStaysBounded]' failed (1.234 seconds)."),
+                         "testMemoryStaysBounded")
+        self.assertIsNone(parse("Test Case '-[A.B testPasses]' passed (0.1 seconds).\n✔ Test fine() passed"))
+        self.assertIsNone(parse(""))
+
+    def test_exit_code_and_summary_with_a_fake_runner(self):
+        code, out, calls = self.run_main()
+        self.assertEqual(code, 0)
+        self.assertEqual([c[1] for c in calls], [Path("/repo")] * 2)
+        self.assertIn("binary-gardens-regression host: PASS", out)
+        self.assertIn("binary-gardens-regression simulator: PASS", out)
+        self.assertTrue(out.rstrip().endswith("binary-gardens-regression: PASS"))
+        code, out, calls = self.run_main(codes=(1, 0), outputs=("✘ Test group09(index:) failed\n", ""))
+        self.assertEqual(code, 1)
+        self.assertEqual(len(calls), 2, "the simulator part still runs after a host failure")
+        self.assertIn("binary-gardens-regression host: FAIL (exit 1; first failing: group09)", out)
+        self.assertIn("binary-gardens-regression simulator: PASS", out)
+        self.assertTrue(out.rstrip().endswith("binary-gardens-regression: FAIL"))
+        code, out, _ = self.run_main(codes=(0, 65), outputs=("", "Test Case '-[M.C testFrames]' failed (2 s)."))
+        self.assertEqual(code, 1)
+        self.assertIn("binary-gardens-regression simulator: FAIL (exit 65; first failing: testFrames)", out)
+        code, out, _ = self.run_main("--skip-simulator", codes=(1,), outputs=("error: build failed",))
+        self.assertEqual(code, 1)
+        self.assertIn("binary-gardens-regression host: FAIL (exit 1; first failing: unknown)", out)
+
+
 class MushroomWeatherDeviceRowsCheckTests(unittest.TestCase):
     """Feature 500 R02-G20-10 (T-R02G2010-003, FR-R02G2010-003, FR-R02G2010-004, SC-R02G2010-001, SC-R02G2010-002):
     the device-row check accepts Mushroom Weather's real definition (MW-D1 ... MW-D8) and names each defect of a

@@ -244,6 +244,12 @@ jobs:
         # name; the simulator part runs locally through scripts/mushroom_weather_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter MushroomWeatherRegression
 
+      - name: Binary Gardens regression (host)
+        if: matrix.group == 'b'
+        # Feature 508 (R02-G21-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/binary_gardens_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter BinaryGardensRegression
+
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase
     # and harness simulator tests need the locally built ANGLE frameworks and run in scripts/release_check.py.

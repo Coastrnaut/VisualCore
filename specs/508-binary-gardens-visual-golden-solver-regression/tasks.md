@@ -68,7 +68,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
 
 ## Phase 5: Story 4 — the checks run on every change (P2)
 
-- [ ] T-R02G2108-006 [P] [US4] Create `scripts/binary_gardens_regression.py` (agent B: host filter
+- [X] T-R02G2108-006 [P] [US4] Create `scripts/binary_gardens_regression.py` (agent B: host filter — Verified 2026-11-27: regression exit 0 (scripts/binary_gardens_regression.py: host PASS, simulator PASS with the memory isolation variable); BinaryGardensRegressionTests in scripts/test_scripts.py; CI step 'Binary Gardens regression (host)' in half b
   `BinaryGardensRegression`, then the simulator classes through `xcodebuild_package.py --only-testing` on `sim-27.2` with
   the isolation variable; one summary line per part with pass or fail and the first failing name; non-zero exit on any
   failure; `--dry-run` and `--skip-simulator`; usage lines naming this script) and its test class, handed over as a
