@@ -51,7 +51,7 @@ R02-G20-03 (`git show a3269b5cc:<path>`, the R02-G20-03 record commit).
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G2103-003 [P] [US1] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensShaders.swift`
+- [X] T-R02G2103-003 [P] [US1] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensShaders.swift` — Verified 2026-11-27: host-2 exit=0, BinaryGardensShaderSourceTests (18) (.autonomy/migration/checks/R02-G21-03.host-2.json)
   (system and glow sources, GLSL ES 3.00; `BinaryGardensMaterial` with contiguous codes from 0 per data-model.md —
   "valued materials (worlds: star 1 share / 64 000; trail: age; cells: height share) add 0.4 · value; +64 when broken";
   `encode` and `decode`; the still backdrop gradient with a fixed-hash starfield covering at most 2 % of the area; each
