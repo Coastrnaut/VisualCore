@@ -123,6 +123,6 @@ coverage: FR-001/005 → 005; FR-002/003 → 003, 005; FR-004 → 004, 005; FR-0
 - [X] T-R02G2106-013 State in `docs/architecture/binary-gardens.md` that the lights settle at once when a frame's time — Verified 2026-11-27: docs/architecture/binary-gardens.md states the still-frame settling rule; validate_docs PASS
   is earlier than the last frame's (an off-screen still drawn after live frames), so stills never show a half-finished
   fade, per spec Clarifications Q3 (unrequested: a rule beyond feature 496's, kept for the still-frame tests)
-- [ ] T-R02G2106-014 State in `docs/architecture/binary-gardens.md` that a refused preview keeps feature 504's short
+- [X] T-R02G2106-014 State in `docs/architecture/binary-gardens.md` that a refused preview keeps feature 504's short — Verified 2026-11-27: docs/architecture/binary-gardens.md states the preview refusal wording; validate_docs PASS
   wording inside "That change would be refused: …" while every sent refusal uses the feedback plan's sentence, per
   FR-R02G2106-002 and clarification Q1 (partial: previews are not announced and keep their own words)
