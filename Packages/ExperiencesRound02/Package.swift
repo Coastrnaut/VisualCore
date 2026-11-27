@@ -831,7 +831,9 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               // Feature 496 (R02-G20-06): the ambient sound recipe.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
                 path: "MushroomWeather/Core"),
         .testTarget(name: "MushroomWeatherCoreTests",
                     dependencies: ["MushroomWeatherCore",
@@ -840,7 +842,9 @@ let package = Package(
                                    // Feature 493 (R02-G20-03): meshes, quality profiles and the experience contract.
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore),
-                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
+                                   // Feature 496 (R02-G20-06): the ambient recipe in tests.
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "MushroomWeather/CoreTests"),
         // Feature 493 (R02-G20-03): Mushroom Weather's experience (presenter, scene, controls).
         .target(name: "MushroomWeatherExperience",
@@ -850,7 +854,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 496 (R02-G20-06): the ambient loop and the audition.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "MushroomWeather/Experience"),
         // Feature 493 (R02-G20-03): the simulator tests of Mushroom Weather's experience.
         .testTarget(name: "MushroomWeatherExperienceTests",
@@ -861,7 +868,10 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   // Feature 496 (R02-G20-06): the sound state in tests.
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore),
+                                   .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "MushroomWeather/ExperienceTests"),
         // Feature 481 (R02-G19-01): Microscopic Aurora's pure rule kernel.
         .target(name: "MicroscopicAuroraCore",
