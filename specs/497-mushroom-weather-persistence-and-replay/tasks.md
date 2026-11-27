@@ -89,7 +89,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
   `-3f` (the five round-two filters)
 - [X] T-R02G2007-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full and app-unit exit=0 (.autonomy/migration/checks/R02-G20-07.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   host-full`, `--name app-unit`
-- [ ] T-R02G2007-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2007-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G20-07.reference-1.json)
 - [ ] T-R02G2007-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2007-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2007-012 {device} After ImplementationLock-100: a save survives a real app termination on D1/D2/D3.
