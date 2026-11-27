@@ -48,13 +48,14 @@ multipliers are 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 
 
 - Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
   failed play's hint is "Undo the last action or retry the level." While playing: when the current arrangement already
-  wins, the hint is "Every colony stays in its band: run the weather"; otherwise a bounded search from the current
-  arrangement looks for a winning arrangement reachable within min(actions left, 2) actions, where an action places a
-  pod on a free site (into the first free slot), moves a slot's pod to a free site, takes a slot's pod away, toggles a
-  vent or sets another moonlight level; one action is tried before two; the certified witness's next action is tried
-  first whenever the current arrangement lies on the way to the witness's (its pods a subset of the witness's, its
-  toggled vents a subset of the witness's, its moonlight the start's or the witness's), so exact hints from a level's
-  start replay its witness, then removals by slot, moves and placements by slot and site, vents by index and moonlight
+  wins, the hint is "Every colony stays in its band: run the weather"; when the current arrangement lies on the way to
+  the certified witness's (its pods a subset of the witness's, its toggled vents a subset of the witness's, its
+  moonlight the start's or the witness's) and the actions left cover the witness's remaining actions, the hint is the
+  witness's next remaining action in the witness's order (so exact hints from a level's start replay its witness, of up
+  to 5 actions); otherwise a bounded search from the current arrangement looks for a winning arrangement reachable
+  within min(actions left, 2) actions, where an action places a pod on a free site (into the first free slot), moves a
+  slot's pod to a free site, takes a slot's pod away, toggles a vent or sets another moonlight level; one action is
+  tried before two, in the order removals by slot, moves and placements by slot and site, vents by index, moonlight
   levels ascending; at most 1,500 arrangements judged. The first action of the found sequence is the hint; when none is
   found: "No way to win was found in the actions left: undo the last action or retry the level." Level 1 names the kind
   of change ("Change a spore pod", "Change a vent" or "Change the moonlight"); level 2 adds where ("Use the site at row
