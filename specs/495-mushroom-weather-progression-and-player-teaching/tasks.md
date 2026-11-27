@@ -90,7 +90,7 @@ campaign covers the game). Agents model their files on Microscopic Aurora's (fea
 - [X] T-R02G2005-006 Docs: `docs/architecture/mushroom-weather.md` (teaching and progression), — Verified 2026-11-27: 2026-11-27 docs (architecture teaching and progression, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G20-05.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
-- [ ] T-R02G2005-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2005-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full and app-unit exit=0 (.autonomy/migration/checks/R02-G20-05.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G2005-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2005-009 Reference regression chunk 2 (`--name reference-2`)
