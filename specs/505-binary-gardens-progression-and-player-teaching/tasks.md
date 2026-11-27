@@ -129,7 +129,7 @@ Agents may draft in isolated copies before 001 (new files only). MVP: Stories 2 
 
 ## Phase 6: Convergence
 
-- [ ] T-R02G2105-012 State in `docs/architecture/binary-gardens.md` that the one-line status keeps its short failure
+- [X] T-R02G2105-012 State in `docs/architecture/binary-gardens.md` that the one-line status keeps its short failure — Verified 2026-11-27: docs/architecture/binary-gardens.md states the status keeps its short failure words; validate_docs PASS
   words ("Failed: …", asserted by the R02-G21-03 render tests, which clarification Q6 does not let this feature change)
   while the panel and the description show the full failure explanation, per FR-R02G2105-003 and T-R02G2105-005
   (partial: the status is not replaced)

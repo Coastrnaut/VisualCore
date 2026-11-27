@@ -128,7 +128,8 @@ presentation of later features.
 - **Failure text.** `BinaryGardensFailureExplanation` puts the run's failure in words: the world that froze or scorched
   and the tick (in the level's tick words), the world whose comfortable window was too short with the ticks needed, or
   the world that wilted or bleached with its total light and bloom band, worlds numbered from 1, each followed by
-  "Undo the last action or retry the level."
+  "Undo the last action or retry the level." The panel and the description show this explanation; the one-line status keeps
+  its short words ("Failed: …"), which the feature-503 render tests assert.
 - **Tutorial.** Levels 1 … 3 show three instructions (adjust a star; balance every world's light, then run; what fails
   a run), each advancing when done (an accepted arrangement action, then a second one or the level's end, then the
   level's end); dismissible; undo, redo and showing a tick never move it back.
@@ -136,5 +137,5 @@ presentation of later features.
   within two more, else 1), level 1 open and a campaign win opening the next (no wrap after 100; a fresh opening of
   level N opens 1 … N), five bands of 20; the daily level is (days since 2026-01-01 × 13) mod 100 + 1 and is playable
   while still locked without opening it; practice raises the budget to 24 without stars or unlocks. The panel shows the
-  band, the goal, the best stars, the modes and a stepper over the open levels. The snapshot is schema 2 (digest domain
+  band, the goal ("Win in at most k actions for 3 stars", "1 action" in the singular), the best stars, the modes and a stepper over the open levels. The snapshot is schema 2 (digest domain
   `r02-g21.binary-gardens.v2`) with a migration from schema 1; locked means not yet won, never paid for.
