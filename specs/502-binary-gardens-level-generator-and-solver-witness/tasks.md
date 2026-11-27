@@ -127,7 +127,7 @@ edited file is refused.
   solver, witness, digest, R4 measurement), `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md` (chunk 2
   time with the catalog; if it nears 540 s, Binary Gardens moves to its own chunk and the doc says so);
   `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f`
-- [ ] T-R02G2102-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2102-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0 (.autonomy/migration/checks/R02-G21-02.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
 - [ ] T-R02G2102-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2102-010 Reference regression chunk 2 (`--name reference-2`)
