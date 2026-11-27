@@ -42,6 +42,11 @@
 // revealed hint is `hint(text:)`: `state` with the hint's words and no haptic. A refusal is `refused(code:)` with the
 // adapter's codes (`MushroomWeatherExperienceRule.locked`, `.date`, `.notWhole`, `.cycle`) and the kernel's. Integers
 // only.
+// Feature 497 (R02-G20-07) T-R02G2007-003 (FR-R02G2007-004; clarification Q4): the replay refusals have their words
+// ("There is no saved solution to replay for this level." for `r02-g20.no-replay`, "The replay is over." for
+// `r02-g20.replay-end`, "Stop the replay first." for `r02-g20.replay`); a `replay.step` adds one record to the same
+// play, so it is announced like the action it applies (case 2), and `replay.start` and `replay.stop` open a fresh play
+// (case 1, mode "replay" or "campaign"); a replayed win claims no stars (replay never awards them).
 import Foundation
 import VisualCoreSimulation
 
@@ -108,7 +113,9 @@ public struct MushroomWeatherFeedbackPlan: Sendable, Equatable {
     /// has ended." (`r02-g20.stage`), "The play changed before the action arrived." (`r02-g20.stale`), "That level
     /// could not be made." (`r02-g20.level`), "That value must be a whole number." (`r02-g20.not-whole`), "That cycle
     /// is outside the run." (`r02-g20.cycle`); any other code (the kernel's `r02-g20.malformed`, the engine's own codes
-    /// such as `action.out-of-range`) "That action was refused."
+    /// such as `action.out-of-range`) "That action was refused."; since feature 497 "There is no saved solution to
+    /// replay for this level." (`r02-g20.no-replay`), "The replay is over." (`r02-g20.replay-end`) and "Stop the replay
+    /// first." (`r02-g20.replay`).
     public static func refusalText(code: String) -> String {
         let bare: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
         switch bare {
@@ -122,6 +129,10 @@ public struct MushroomWeatherFeedbackPlan: Sendable, Equatable {
         case MushroomWeatherError.level("").reasonCode: return "That level could not be made."
         case MushroomWeatherExperienceRule.notWhole: return "That value must be a whole number."
         case MushroomWeatherExperienceRule.cycle: return "That cycle is outside the run."
+        // Feature 497: the replay refusals.
+        case MushroomWeatherExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case MushroomWeatherExperienceRule.replayEnd: return "The replay is over."
+        case MushroomWeatherExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }
@@ -166,12 +177,13 @@ public struct MushroomWeatherFeedbackPlan: Sendable, Equatable {
             + "; a budget of " + actionsWords(level.budget)
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily".
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" or "replay" (feature 497).
     public static func modeName(_ mode: MushroomWeatherMode) -> String {
         switch mode {
         case .campaign: "campaign"
         case .practice: "practice"
         case .daily: "daily"
+        case .replay: "replay"
         }
     }
 
@@ -251,8 +263,8 @@ public struct MushroomWeatherFeedbackPlan: Sendable, Equatable {
     }
 
     /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars against the core's
-    /// `certifiedActionCount` in campaign and daily, never in practice), haptic `success`; or the failure explanation,
-    /// haptic `warning`.
+    /// `certifiedActionCount` in campaign and daily, never in practice or replay, feature 497), haptic `success`; or the
+    /// failure explanation, haptic `warning`.
     static func outcomePlan(_ core: MushroomWeatherExperienceCore) -> MushroomWeatherFeedbackPlan {
         let play: MushroomWeatherPlay = core.play
         if play.stage == .won {

@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MushroomWeatherExperienceCoreTests|MushroomWeatherReplayCoreTests|MushroomWeatherProgressionCoreTests|MushroomWeatherScenariosTests|MushroomWeatherFeedbackPlanTests"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'MushroomWeatherExperienceCoreTests|MushroomWeatherReplayCoreTests|MushroomWeatherProgressionCoreTests|MushroomWeatherScenariosTests|MushroomWeatherFeedbackPlanTests'",
+  "elapsed_seconds": 11.807,
+  "exit_code": 0,
+  "finished": "2026-11-27T07:05:07+00:00",
+  "gate": "R02-G20-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G20-07.host-2.log",
+  "log_sha256": "81bed2202aa381f8877b3826a172a9ab827f0c1f8df2e13be45828a8ac8bb61b",
+  "name": "host-2",
+  "started": "2026-11-27T07:04:55+00:00",
+  "timed_out": false
+}

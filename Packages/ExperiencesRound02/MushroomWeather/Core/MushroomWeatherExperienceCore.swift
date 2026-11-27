@@ -89,6 +89,28 @@
 // cycle). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys; schema-1 payloads
 // migrate (no won levels, level 1 open plus the levels up to the restored level, campaign mode, the tutorial at its
 // first step — `place` on the tutorial levels, else `done`); an envelope of a newer schema is refused.
+//
+// Feature 497 (R02-G20-07) T-R02G2007-003 (FR-R02G2007-001 … 007; clarifications Q1–Q5): a campaign or daily win
+// records its winning trace (`MushroomWeatherReconciliation.netTrace` of the play's records: the effective pod, vent and
+// moonlight actions, an undone action left out unless redone, then the run) as a verified result; restore reconciles
+// every result (`MushroomWeatherReconciliation.reconcile`, the frontier as saved) and exposes `reconciliationDropped`
+// (not digested, not in `==`); the replay mode `replay(level)` plays a verified trace action by action:
+//   replay.start [1…100]  a fresh play of that level in mode `replay(level)` (campaign budget) with the tutorial done
+//                         (`r02-g20.no-replay` without a verified result with a trace); during a replay it restarts it;
+//   replay.step           the next action of the trace, a pod, vent or moonlight action or finally the run
+//                         (`r02-g20.replay-end` after the last or once the run ended; `r02-g20.no-replay` outside
+//                         replay);
+//   replay.stop           campaign at that level, the frontier when it is not open (`r02-g20.no-replay` outside
+//                         replay);
+//   settings.sound [0…1]  the sound choice: 1 on, 0 off; whole; allowed in every mode.
+// In replay every other action except `tutorial.dismiss` and `clock.show` (presentation) and `settings.sound` is
+// refused with `r02-g20.replay`, and nothing is recorded. A restored replay whose place, remove, vent, moonlight and run
+// records are not exactly the first actions of its level's verified trace (in order, no undo or redo) is refused as
+// `damaged`; a restored replay whose result did not survive reconciliation, or was never verified, returns to campaign
+// at that level (the frontier when it is not open). Digest "r02-g20.mushroom-weather.v3" (the same parts as v2, the
+// progress now with traces; never the sound choice or the dropped count); snapshot schema 3 `{"level", "mode",
+// "progress", "records", "sound", "tutorial"}` (results carry `trace` and `verified`), migrating 1 → 2 → 3 (2 → 3: every
+// result an empty trace and `verified` false, sound off). Modelled on feature 487's MicroscopicAuroraExperienceCore.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -105,6 +127,12 @@ public enum MushroomWeatherExperienceRule {
     public static let locked = "r02-g20.locked"
     /// An impossible calendar date (`mode.daily`, feature 495).
     public static let date = "r02-g20.date"
+    /// No verified result with a trace to replay, or a replay control outside replay (feature 497).
+    public static let noReplay = "r02-g20.no-replay"
+    /// The replay has no further action: the trace is over or the run ended (feature 497).
+    public static let replayEnd = "r02-g20.replay-end"
+    /// An action that is not allowed during replay (feature 497).
+    public static let replay = "r02-g20.replay"
 }
 
 /// Why a saved Mushroom Weather state was refused on restore (feature 493). A refused restore changes nothing.
@@ -118,18 +146,21 @@ public enum MushroomWeatherRestoreRefusal: Error, Equatable, Sendable {
     case kernel(MushroomWeatherError)
 }
 
-/// The state of Mushroom Weather as an experience (see the file header). Snapshot schema 2.
+/// The state of Mushroom Weather as an experience (see the file header). Snapshot schema 3.
 public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g20.mushroom-weather"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 2
-    /// The digest's domain string (schema 2).
-    public static let digestDomain = "r02-g20.mushroom-weather.v2"
+    public static let schemaVersion = 3
+    /// The digest's domain string (schema 3).
+    public static let digestDomain = "r02-g20.mushroom-weather.v3"
     /// The action ids in declaration order.
     public static let actionIDs = ["pod.place", "pod.remove", "vent.set", "moon.set", "weather.run", "play.undo",
                                    "play.redo", "level.next", "clock.show", "level.select", "mode.daily",
-                                   "mode.practice", "mode.campaign", "tutorial.dismiss"]
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss", "replay.start",
+                                   "replay.step", "replay.stop", "settings.sound"]
+    /// The declared range of `settings.sound`: 0 off, 1 on (feature 497).
+    public static let soundRange: ClosedRange<Int> = 0...1
     /// The budget of a practice play: the kernel's maximum (`MushroomWeatherMode.practiceBudget`, 24).
     public static let practiceBudget: Int = MushroomWeatherMode.practiceBudget
     /// The level numbers of the catalog.
@@ -176,6 +207,12 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
+    /// How many saved results the last restore dropped because they did not verify (feature 497); not in the digest,
+    /// the snapshot or `==`.
+    public private(set) var reconciliationDropped = 0
+    /// The player's sound choice (feature 497), set by `settings.sound`: in the snapshot (key `"sound"`) and `==`,
+    /// never in the digest; off at an opening, after a reset and in a migrated save.
+    public private(set) var soundOn = false
 
     /// What a reset restores (feature 495).
     struct Opening: Sendable {
@@ -376,18 +413,45 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown cycle, the
-    /// quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode, the tutorial step and the sound choice (not
+    /// the shown cycle, the quality tier, the dropped count or the opening level).
     public static func == (lhs: MushroomWeatherExperienceCore, rhs: MushroomWeatherExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
-            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial && lhs.soundOn == rhs.soundOn
     }
 
     // MARK: Contract
 
-    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    /// Schema 3 with the steps 1 → 2 (``migratedToSchemaTwo(_:)``) and 2 → 3 (``migratedToSchemaThree(_:)``); a
+    /// payload that does not decode is refused.
     public static var migrations: MigrationChain {
-        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) },
+                                                             2: { payload in try migratedToSchemaThree(payload) }])
+    }
+
+    /// The schema-3 object of a schema-2 object (feature 497): every won result gains an empty `trace` and `verified`
+    /// false, and the sound choice is off.
+    ///
+    /// - Throws: ``MushroomWeatherRestoreRefusal/damaged`` when `object` has no progress with a solved list.
+    public static func migratedToSchemaThree(_ object: [String: Any]) throws -> [String: Any] {
+        guard var progress = object["progress"] as? [String: Any], let solved = progress["solved"] as? [Any] else {
+            throw MushroomWeatherRestoreRefusal.damaged
+        }
+        var entries: [Any] = []
+        for entry in solved {
+            guard var result = entry as? [String: Any] else {
+                entries.append(entry)
+                continue
+            }
+            result["trace"] = [Any]()
+            result["verified"] = false
+            entries.append(result)
+        }
+        progress["solved"] = entries
+        var migrated: [String: Any] = object
+        migrated["progress"] = progress
+        migrated["sound"] = false
+        return migrated
     }
 
     /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 495): no won levels with level 1 open
@@ -431,6 +495,10 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "mode.practice"),
         ExperienceControl(id: "mode.campaign"),
         ExperienceControl(id: "tutorial.dismiss"),
+        ExperienceControl(id: "replay.start", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "replay.step"),
+        ExperienceControl(id: "replay.stop"),
+        ExperienceControl(id: "settings.sound", ranges: [declared(soundRange)]),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -438,8 +506,9 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The fourteen controls with their declared ranges (see the file header); `weather.run`, `play.undo`,
-    /// `play.redo`, `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
+    /// The eighteen controls with their declared ranges (see the file header); `weather.run`, `play.undo`,
+    /// `play.redo`, `level.next`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`, `replay.step` and
+    /// `replay.stop` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with cycle 0 shown; no clock is read.
@@ -483,6 +552,9 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
                 return .rejected(.rule(code: MushroomWeatherExperienceRule.notWhole))
             }
             values.append(whole)
+        }
+        if case .replay = mode, !Self.replayControls.contains(action.control) {
+            return .rejected(.rule(code: MushroomWeatherExperienceRule.replay))
         }
         do throws(MushroomWeatherError) {
             if let kernel = Self.kernelAction(action.control, values) {
@@ -536,6 +608,33 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
                 case "mode.campaign":
                     try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
                     return .accepted
+                case "replay.start":
+                    guard let result = progress.solved[values[0]], result.verified, !result.trace.isEmpty else {
+                        return .rejected(.rule(code: MushroomWeatherExperienceRule.noReplay))
+                    }
+                    try open(number: values[0], mode: .replay(level: values[0]))
+                    tutorial = .done
+                    return .accepted
+                case "replay.step":
+                    guard case .replay(let level) = mode, let result = progress.solved[level], result.verified else {
+                        return .rejected(.rule(code: MushroomWeatherExperienceRule.noReplay))
+                    }
+                    // Replay never undoes, so each trace action made exactly one place, remove, vent, moonlight or run
+                    // record (a fresh play also holds its begin and tutorial records, which are not counted).
+                    let index: Int = Self.actionRecordCount(play.records)
+                    guard play.stage == .playing, index < result.trace.count else {
+                        return .rejected(.rule(code: MushroomWeatherExperienceRule.replayEnd))
+                    }
+                    try play.apply(result.trace[index], expecting: play.fingerprint)
+                case "replay.stop":
+                    guard case .replay(let level) = mode else {
+                        return .rejected(.rule(code: MushroomWeatherExperienceRule.noReplay))
+                    }
+                    try open(number: progress.isOpen(level) ? level : progress.frontier, mode: .campaign)
+                    return .accepted
+                case "settings.sound":
+                    soundOn = values[0] == 1
+                    return .accepted
                 default:   // tutorial.dismiss
                     tutorial = tutorial.dismissed()
                     return .accepted
@@ -586,12 +685,34 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
     /// nothing). A won play is final, so a win is recorded once.
     private mutating func recordIfWon() {
         guard play.stage == .won else { return }
+        if case .replay = mode { return }
         progress.record(level: levelNumber, actionsSpent: MushroomWeatherProgress.actionsSpent(play),
-                        certified: certifiedActionCount, mode: mode)
+                        certified: certifiedActionCount, mode: mode, trace: winningTrace)
     }
 
-    /// Back to the opening state the seed chose (progress included, campaign mode, cycle 0 shown); the quality tier,
-    /// which is not state, is kept.
+    /// The controls accepted during replay (feature 497).
+    static let replayControls: Set<String> = ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss",
+                                              "clock.show", "settings.sound"]
+
+    /// The winning trace of the current play (feature 497): its effective pod, vent and moonlight actions in order, then
+    /// the run (``MushroomWeatherReconciliation/netTrace(_:)``), never an undo or a redo.
+    var winningTrace: [MushroomWeatherAction] { MushroomWeatherReconciliation.netTrace(play.records) }
+
+    /// The number of place, remove, vent, moonlight and run records among `records` (feature 497): the trace actions a
+    /// replay applied.
+    static func actionRecordCount(_ records: [MushroomWeatherRecord]) -> Int {
+        var count: Int = 0
+        for record in records {
+            switch record.kind {
+            case .place, .remove, .vent, .moonlight, .run: count += 1
+            case .undo, .redo, .begin, .dismissTutorial, .pause, .resume: break
+            }
+        }
+        return count
+    }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode, cycle 0 shown, sound off); the
+    /// quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
         play = opening.play
@@ -600,6 +721,7 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         tutorial = opening.tutorial
         certifiedPlan = opening.certifiedPlan
         shownCycle = 0
+        soundOn = false
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.
@@ -611,9 +733,9 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g20.mushroom-weather.v2", then the level number, the play's fingerprint (actions spent, failure, level,
-    /// moonlight, pods, stage, vents), the progress and the mode (their sorted JSON); never the tutorial step or the
-    /// shown cycle.
+    /// "r02-g20.mushroom-weather.v3", then the level number, the play's fingerprint (actions spent, failure, level,
+    /// moonlight, pods, stage, vents), the progress (with its traces) and the mode (their sorted JSON); never the
+    /// tutorial step, the shown cycle, the sound choice or the dropped count.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
@@ -627,7 +749,7 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
+    /// The payload's JSON form (schema 3); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
@@ -639,21 +761,26 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         var records: [MushroomWeatherRecord]
         /// The tutorial step; nil in a migrated schema-1 payload.
         var tutorial: MushroomWeatherTutorialStep?
+        /// The sound choice; nil (off) in a payload written before schema 3.
+        var sound: Bool?
     }
 
-    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "sound", "tutorial"}` with sorted keys and unescaped
+    /// slashes.
     public func snapshotPayload() throws -> Data {
         try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
-                                                 records: play.records, tutorial: tutorial))
+                                                 records: play.records, tutorial: tutorial, sound: soundOn))
     }
 
-    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
-    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), with cycle 0
-    /// shown; a reset returns to the opening state `seed` chooses.
+    /// The core of `payload` (schema 3): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress (reconciled: results that do not replay are dropped and counted in
+    /// ``reconciliationDropped``; the frontier as saved), mode, tutorial step (the first step when absent) and sound
+    /// choice (off when absent), with cycle 0 shown; a reset returns to the opening state `seed` chooses.
     ///
     /// - Throws: ``MushroomWeatherRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or
-    ///   tutorial step, or a daily mode naming another level among them), a level number outside 1 … 100 or a level or
-    ///   trace the kernel refuses.
+    ///   tutorial step, a daily or replay mode naming another level, or a saved replay whose action records are not
+    ///   exactly the first actions of its level's verified trace among them), a level number outside 1 … 100 or a
+    ///   level or trace the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> MushroomWeatherExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw MushroomWeatherRestoreRefusal.damaged
@@ -664,6 +791,28 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         if case .daily(let daily) = decoded.mode, daily != decoded.level {
             throw MushroomWeatherRestoreRefusal.damaged
         }
+        if case .replay(let replayed) = decoded.mode, replayed != decoded.level {
+            throw MushroomWeatherRestoreRefusal.damaged
+        }
+        // Feature 497: a saved replay's place, remove, vent, moonlight and run records are exactly the first actions of
+        // its level's saved trace — in order, no undo or redo — or the payload is damaged.
+        if case .replay(let replayed) = decoded.mode, let saved = decoded.progress.solved[replayed], saved.verified {
+            var applied: [MushroomWeatherAction] = []
+            for record in decoded.records {
+                switch record.kind {
+                case .place, .remove, .vent, .moonlight, .run:
+                    guard let action = record.action else { throw MushroomWeatherRestoreRefusal.damaged }
+                    applied.append(action)
+                case .undo, .redo:
+                    throw MushroomWeatherRestoreRefusal.damaged
+                case .begin, .dismissTutorial, .pause, .resume:
+                    continue
+                }
+            }
+            guard applied.count <= saved.trace.count, Array(saved.trace.prefix(applied.count)) == applied else {
+                throw MushroomWeatherRestoreRefusal.damaged
+            }
+        }
         do throws(MushroomWeatherError) {
             let certified: MushroomWeatherGenerated = try generated(number: decoded.level)
             let play: MushroomWeatherPlay = try MushroomWeatherPlay.replay(
@@ -671,11 +820,19 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
             let tutorial: MushroomWeatherTutorialStep = decoded.tutorial
                 ?? MushroomWeatherTutorialStep.initial(level: decoded.level)
             let openingCore: MushroomWeatherExperienceCore = try opening(number: levelNumber(forSeed: seed))
-            return MushroomWeatherExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
-                                                 mode: decoded.mode, tutorial: tutorial,
-                                                 certifiedPlan: certified.plan,
-                                                 openingNumber: openingCore.openingNumber,
-                                                 opening: openingCore.opening)
+            // Feature 497: every saved result is checked by replaying its trace; the frontier stays as saved.
+            let reconciled = MushroomWeatherReconciliation.reconcile(decoded.progress)
+            var core: MushroomWeatherExperienceCore = MushroomWeatherExperienceCore(
+                levelNumber: decoded.level, play: play, progress: reconciled.progress, mode: decoded.mode,
+                tutorial: tutorial, certifiedPlan: certified.plan, openingNumber: openingCore.openingNumber,
+                opening: openingCore.opening)
+            core.reconciliationDropped = reconciled.dropped
+            core.soundOn = decoded.sound ?? false
+            // A replay whose result did not survive the check returns to campaign at that level (or the frontier).
+            if case .replay(let level) = decoded.mode, reconciled.progress.solved[level]?.verified != true {
+                try core.open(number: core.progress.isOpen(level) ? level : core.progress.frontier, mode: .campaign)
+            }
+            return core
         } catch {
             throw MushroomWeatherRestoreRefusal.kernel(error)
         }
