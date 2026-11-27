@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-10: Microscopic Aurora device rows).
+Last updated: 2026-11-26 (R02-G20-01: Mushroom Weather rule kernel).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Mushroom Weather rule kernel** (R02-G20-01, 2026-11-26). `swift test --package-path Packages/ExperiencesRound02
+  --filter MushroomWeather` (45 tests in six suites): level checks and the stored form, the weather against an
+  independent reimplementation of the cycle law on 500 seeded fixtures with three arrangements each (every humidity
+  value at every cycle, the ledger balancing every cycle, growth cycles, colony runs and the judge), band edges, the
+  mold bound, survival floors, the growth threshold and the final run one step either side, the play (500 seeded traces
+  replayed, undo and redo by fingerprint, every refusal in order), the puzzle contract against the kernel and the play
+  on 200 walks each and the nine source invariants. Building 500 fixtures takes about 5 s in a debug build, so the
+  tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
+  cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
+  `MushroomWeather`.
 - **Microscopic Aurora device rows** (R02-G19-10, 2026-11-26). `python3 scripts/check_device_rows.py --experience
   r02-g19.microscopic-aurora` (release step `device-rows-r02-g19`, tests `MicroscopicAuroraDeviceRowsCheckTests`, 8)
   checks the definition (rows MA-D1 … MA-D8, 12 device scenarios) against the scenario manifest, the ledger's

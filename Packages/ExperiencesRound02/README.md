@@ -1010,3 +1010,13 @@ stored schema examples, the app's interface tests (`MA`, chunk `b4`) and app uni
 adds its device-row definition and written campaign plan (`docs/apps/microscopic-aurora/`), checked by
 `scripts/check_device_rows.py`; no device is contacted. See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).
+
+## Mushroom Weather (R02-G20, `r02-g20.mushroom-weather`, free)
+
+`MushroomWeatherCore` (feature 491, R02-G20-01) is the playable rule kernel: the exact weather in deterministic integer
+arithmetic (`MushroomWeatherForest`: a forest floor of up to 12 × 14 cells, one synchronous cycle of pairwise diffusion
+with antisymmetric flows, evaporation by vents and moonlight and release by spore pods, an exact water ledger, pod
+growth by time-integrated humidity and colony runs), the judge (`dried`, `mold`, `unstable`), `MushroomWeatherLevel`
+(immutable, fingerprinted, JSON schema 1, with names in words), the play state `MushroomWeatherPlay` with stages, pod,
+vent and moonlight actions and the run, records, undo and redo, and `MushroomWeatherPuzzle` (an R02-F23 `PuzzleRules`
+over arrangements). See [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).
