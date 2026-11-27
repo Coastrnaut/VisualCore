@@ -251,8 +251,9 @@ file is refused.
   progression rule.
 - **SC-R02G2002-005**: For every level, no arrangement reachable with fewer actions than its witness wins; edited, newer
   and damaged witness files are refused.
-- **SC-R02G2002-006**: Existing tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes in
-  under 10 seconds on a debug host build, the catalog certification split as needed.
+- **SC-R02G2002-006**: Existing tests pass unchanged, except feature 491's two out-of-range budget cases (the level
+  test and the input-budget invariant), which move from 13 to 25 with the widened range; the reference regression passes
+  7 of 7; each unit test finishes in under 10 seconds on a debug host build, the catalog certification split as needed.
 
 ## Assumptions
 
