@@ -32,7 +32,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G2108-003 [US2] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensGolden.swift` (DEBUG or
+- [X] T-R02G2108-003 [US2] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensGolden.swift` (DEBUG or — Verified 2026-11-27: golden-frames.json (17 frames, schema 1, 64,835 bytes) written with BINARY_GARDENS_WRITE_GOLDEN=1 after R02-G21-07 was recorded; BinaryGardensGolden in RELEASE_FORBIDDEN
   VISUALCORE_AUTOMATION; "17 frames: levels 1, 21, 41, 61, 81 at tiers 0 … 2 and level 25 at tier 0, each after all of
   the witness's actions but not the run, tick 24 shown, presentation time 0, the authored camera, no preview and no
   inspected world, plus the hero frame of `scenario-manifest.json` at tier 0 (`BinaryGardensExperienceCore.heroTick(_:)`);

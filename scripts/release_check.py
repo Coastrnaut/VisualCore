@@ -382,7 +382,9 @@ RELEASE_FORBIDDEN = ["DebugLaunch", "DebugExperience", "DebugInventory", "Scenar
                      # Feature 488 (R02-G19-08): Microscopic Aurora's golden frames, test builds only.
                      "MicroscopicAuroraGolden",
                      # Feature 498 (R02-G20-08): Mushroom Weather's golden frames, test builds only.
-                     "MushroomWeatherGolden"]
+                     "MushroomWeatherGolden",
+                     # Feature 508 (R02-G21-08): Binary Gardens' golden frames, test builds only.
+                     "BinaryGardensGolden"]
 
 
 def registered_ids(root: Path = ROOT) -> list[str]:
