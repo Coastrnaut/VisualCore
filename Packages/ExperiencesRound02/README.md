@@ -1005,5 +1005,6 @@ off by default) and an accessible panel (a summary element, adjustable selection
 (`replay.start`, `replay.step`, `replay.stop`) and the saved sound choice (`settings.sound`). Feature 488
 (R02-G19-08) adds the regression net: a solver regression over all 100 levels, golden frame descriptions
 (`MicroscopicAuroraGolden`, `golden-frames.json`), simulator golden-frame and memory tests, a CI step and
-`scripts/microscopic_aurora_regression.py`. See
+`scripts/microscopic_aurora_regression.py`. Feature 489 (R02-G19-09) pins the panel's identifiers and adds the
+stored schema examples, the app's interface tests (`MA`, chunk `b4`) and app unit tests. See
 [docs/architecture/microscopic-aurora.md](../../docs/architecture/microscopic-aurora.md).

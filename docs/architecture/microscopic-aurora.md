@@ -196,3 +196,18 @@ decided exactly on integer positions; the catalog's 0.008333 s timestep is a pre
   class runs alone) and release every GPU object of the scene.
 - **Running it.** CI's round-two job has a "Microscopic Aurora regression (host)" step;
   `python3 scripts/microscopic_aurora_regression.py` runs the host and simulator parts with one summary.
+
+## In-app integration (feature 489, R02-G19-09)
+
+- **Identifiers.** Every panel element has an identifier `experience.r02-g19.microscopic-aurora.<name>`; the 48 names
+  are pinned in `MicroscopicAuroraControls.identifierNames` and each is used once (the failure explanation has its own
+  `explanation`).
+- **Interface tests.** `MAPlayUITests` opens the candidate in the one app, wins level 1 through the panel alone (choose
+  the well's site, strength and sense, Place, then Play) with "Best: 3 of 3 stars", sees level 2 open and keeps the
+  progress over a relaunch; `MAReplayUITests` replays the solved level to its end and stops back to the campaign. They
+  run in the serial release-check chunk `b4`.
+- **Stored examples.** `schemaOneExample()` and `schemaTwoExample()` are registered with the app, which restores both
+  into schema 3; app unit tests also open the candidate through the registry and engine, win level 1 and confirm it is
+  not available without the testing argument.
+- **Builds.** The app compiles in debug and release for the simulator with the game linked; the release symbol check
+  confirms the test-only golden source and scenarios are absent.
