@@ -20,7 +20,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   for MW-D6), covers, owner_steps, status "pending device campaign"; no result field); edit `scripts/release_check.py`
   (step `device-rows-r02-g20`); `--name device-rows -- python3 scripts/check_device_rows.py --experience
   r02-g20.mushroom-weather`
-- [ ] T-R02G2010-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Mushroom Weather definition passes; a
+- [X] T-R02G2010-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Mushroom Weather definition passes; a — Verified 2026-11-27: script-tests exit=0, 808 tests incl. MushroomWeatherDeviceRowsCheckTests (8) (.autonomy/migration/checks/R02-G20-10.script-tests.json)
   copy with a scenario removed, a copy with MW-D1's `pass` field removed and a copy with T-R02G2009-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g20` runs the check for
   `r02-g20.mushroom-weather`); `--name script-tests` (alone)
