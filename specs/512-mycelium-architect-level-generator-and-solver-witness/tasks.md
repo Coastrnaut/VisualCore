@@ -44,7 +44,7 @@ Packages/ExperiencesRound02 --filter MyceliumArchitect`. New sources go in `Myce
 
 ## Phase 4: Stories 3 and 4 — difficulty and witnesses (P2)
 
-- [ ] T-R02G2202-006 [P] [US4] Create `Core/Content/MyceliumArchitectWitness.swift` and
+- [X] T-R02G2202-006 [P] [US4] Create `Core/Content/MyceliumArchitectWitness.swift` and — Verified 2026-11-27: MyceliumArchitectWitness and its tests (10) installed; host-5 exit=0
   `CoreTests/MyceliumArchitectWitnessTests.swift` (agent B: clarification Q5 layout; digests, fingerprints, terminal
   report, counterexample, difficulty, skipped; schema 1 sorted keys; damaged, edited and newer refused; verify replays);
   `--name host-5`
