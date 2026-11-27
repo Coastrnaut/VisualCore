@@ -13,9 +13,9 @@
   any moonlight, while a move or removal never reaches an arrangement sooner; so the first win at the smallest distance
   is minimal, and exhausting every smaller distance proves it. An independent breadth-first search over the puzzle's
   moves reproduced the prototype's counts per depth on ten levels.
-- **R3 Fixed order, loss at the last depth.** Decision: arrangements are enumerated by pod count, then vent count, then
-  pod and vent combinations in lexicographic order, then the moonlight; the last depth is ordered by the band loss of
-  each arrangement's parent. Rationale: deterministic; the loss (how far the colonies end from their bands and from a
+- **R3 Fixed order, loss order within each depth.** Decision: arrangements are enumerated by pod count, then vent count, then
+  pod and vent combinations in lexicographic order, then the moonlight; each depth after 0 is ordered by the band loss
+  of each arrangement's parent (every depth below the plan's is judged in full). Rationale: deterministic; the loss (how far the colonies end from their bands and from a
   full final run, with a large penalty for a dried or moldy run) only changes how soon the first win is met, never which
   depth is minimal.
 - **R4 Constructive generator; ranges measured first.** Decision: draw a floor, colonies, vents and sites next to the

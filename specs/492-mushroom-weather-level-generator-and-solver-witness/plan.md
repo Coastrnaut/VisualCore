@@ -13,8 +13,8 @@ seed, band, budget, control emphasis); band profiles (rows, columns, blocked cel
 plan length, margin); a constructive generator per manifest entry (a floor, colonies, vents and sites next to the
 colonies, a winning choice of pods, vent toggles and a moonlight change, each colony's band from the winning run
 widened by a margin, sensitive floors below the run's minimum, no starting pod); a depth search solver over
-arrangements by their distance from the start (pod count + vents toggled + a moonlight change), the last depth ordered
-by the band loss of each arrangement's parent, counting arrangements judged against a bound of 1,500 and storing the
+arrangements by their distance from the start (pod count + vents toggled + a moonlight change), each depth after 0
+ordered by the band loss of each arrangement's parent, counting arrangements judged against a bound of 1,500 and storing the
 counts at every smaller depth as the minimality proof; difficulty metrics with the nearest miss; witness files with
 per-action state digests, the terminal report (ledger totals, colony runs) and the counterexample; the catalog digest,
 the neighbour rule and the progression rule. Research: [research.md](research.md). Data: [data-model.md](data-model.md).

@@ -66,8 +66,8 @@ Earlier profiles were rejected: plans 2, 3, 3, 4, 5 with vents and sites anywher
   the vents, each on a "near" cell (a floor cell without a colony within one step, diagonals included, of a colony),
   open rate 120 … 200, closed rate 0 … 30, a starting state; the starting moonlight (0 … 3); M (1000 … 2000); T
   (30 … 40); K (6 … 10); the sites (the near cells that are not vents, up to the band's count); the winning choice (pod
-  count k from max(1, plan − V − 1) … min(plan, P, S), the rest a moonlight change when it exceeds the vents and the
-  remaining vent toggles, picked by partial shuffles); a margin per colony; each colony's sensitivity. The level starts
+  count k from max(1, plan − V − 1) … min(plan, P, S), the rest a moonlight change when it exceeds the vents (otherwise,
+  when the rest is above 0, a moonlight change on a draw of 0 … 1) and the remaining vent toggles, picked by partial shuffles); a margin per colony; each colony's sensitivity. The level starts
   with no pod. Each colony's band is its minimum and maximum over the last K cycles of the winning run, widened by its
   margin and clamped to 0 … M; a sensitive colony's floor is min(low·3/4, its lowest value over the winning run).
   Band profiles (rows, columns, blocked, vents, slots, colonies, sites, plan, margin): band 1 (6 … 7, 6 … 7, 2 … 5, 1,
@@ -84,9 +84,8 @@ Earlier profiles were rejected: plans 2, 3, 3, 4, 5 with vents and sites anywher
   removal and a placement, so this is exact); for a level without sites or with a starting pod the solver returns no
   plan. The solver judges depth 0 (the start), then every arrangement at distance 1, 2, …; within a depth by pod count
   ascending, then vent count ascending, then pod site combinations and vent combinations in lexicographic order, then
-  the new moonlight ascending, skipping the start's. Depths below the last are judged in that fixed order; the last
-  depth is ordered by the band loss of each arrangement's parent (the arrangement without its last action: the
-  moonlight change, else the last vent toggle, else the last pod), ties keeping the fixed order: loss = Σ over colonies
+  the new moonlight ascending, skipping the start's. Each depth after 0 is ordered by the band loss of each
+  arrangement's parent (the arrangement without its last action: the moonlight change, else the last vent toggle, else the last pod), ties keeping the fixed order: loss = Σ over colonies
   of max(0, low − h, h − high) for its humidity after the last cycle run plus K − min(K, final run), plus M per colony
   when the run fails `dried` or `mold`. The first winning arrangement ends the search; the plan is its placements in slot
   order, then its vent toggles, then its moonlight change, then `run`, replayed through the kernel's play, whose report
