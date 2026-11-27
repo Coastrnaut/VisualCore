@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-08 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2008-###,
 SC-R02G2008-###, T-R02G2008-###
@@ -23,6 +23,69 @@ Canonical overrides:
   memory on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 488 (the Microscopic Aurora visual golden and solver regression), adapted to pods on sites,
   vents and moonlight, the run of the weather, the midnight forest floor and the glowing caps.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+488's answers where the games agree. Facts checked in code and specs (read-only, 2026-11-26): `MushroomWeatherSolver.plan`
+certifies a level with sites and no starting pod by judging every arrangement at distance 0, 1, 2 …, depth by depth,
+returning `actions`, `arrangement`, `arrangementsByDepth` (arrangements judged per depth), `nearestMiss` and `work`,
+within 1,500 arrangements judged (`workBound`); the 100 witness files in `docs/games/mushroom-weather/levels/` hold the
+number, the level (floor, humidity, diffusion, rates, vents, pod rules, colonies, mold bound, length, required cycles,
+start, budget, tutorial, sites, fingerprint), the actions (the plan's actions, then the run that wins), the per-action
+digests, the fingerprints after `begin`, after `dismissTutorial` on a tutorial level and after each action, the report,
+the counterexample (`depth` = size − 1, `arrangements` judged at that depth and `nearestMiss`), the difficulty and the
+skipped candidate count, byte-checked by the catalog tests with the catalog digest pinned; the simulator frame checks of
+feature 493 compare rendered frames with the CPU reference at 1,152 × 768 (each cap's centre brighter than moss by 0.2
+in luminance, the moon 0.1 from the backdrop, the first actions bar with red above blue by 0.08, the first gauge track
+0.1 from the backdrop, each point at least 6 px from what is drawn after it, the lower-corner patch within 0.06 of the
+gradient); the palette has 21 named colours (`MushroomWeatherPalette.all`; `hex` holds the five registered values); the
+forest scene's `release()` frees every renderer, the next draw rebuilds them and `liveObjectCount` counts them;
+`ProcessMemory.footprint()` reads the footprint; the CI job `round02-host-tests` has a named regression step per earlier
+round-two game (Microscopic Aurora's the latest).
+
+- Q: What exactly does the solver regression check, and how is "within its work bound" measured? → A: for every one of
+  the 100 levels: the generated level equals its witness's level (fingerprint); the witness's actions replay on a fresh
+  play to a win on exactly the final run and not before, within the budget, with exactly its per-action fingerprints
+  and digests; and `plan` returns exactly the witness's actions with `arrangementsByDepth[size − 1]` equal to the
+  counterexample's `arrangements` and `nearestMiss` equal to its `nearestMiss`; `work` is at most `workBound` (counted,
+  never timed). The run is split into tests of 10 levels (10 tests), each well under 10 s. Impact: FR-R02G2008-001;
+  SC-R02G2008-001.
+- Q: Which alterations must the regression detect and how is each named? → A: twelve kinds, each applied to a copy and
+  each producing a failure message naming the level and the part: a colony's band, a colony's survival floor, a cell's
+  starting humidity, the diffusion, a vent's rate, the pod release, the growth threshold, the mold bound, the budget; a
+  plan action; a witness action, a per-action fingerprint or digest; the counterexample's arrangements count. Impact:
+  FR-R02G2008-002; SC-R02G2008-002.
+- Q: What is a golden frame description, where is its digest pinned, and how is it regenerated? → A: for each golden
+  frame (levels 1, 21, 41, 61, 81 at tiers 0, 1, 2, each after all of the witness's actions but before the run, so
+  actions are spent from the actions bars and the level is not yet won, shown at the cycle half the cycles run (as the
+  feature-493 frame checks), at presentation time 0, the authored camera and no preview, plus the hero frame of the
+  scenario manifest's hero scenario at tier 0: 16 frames) the Core computes, at 1,152 × 768, the projected pixel
+  positions of the floor centre, every cap centre, the moon centre, the first gauge track and the first actions bar,
+  rounded to 1/8 pixel, the counts of floor and blocked cells, mist squares, sites, pods, grown pods, vents, open vents,
+  colonies, colonies in band at the shown cycle and lit and total actions bars, the moonlight, and the 21 palette colours
+  as 8-bit sRGB; serialized as JSON with sorted keys and hashed with SHA-256. The 16 descriptions and their digests live
+  in `Packages/ExperiencesRound02/MushroomWeather/golden-frames.json`; the host test recomputes each: an equal digest
+  passes; otherwise every position must lie within one 1/8-pixel quantum of the pinned one and every count and colour
+  must be equal, or the test fails naming the frame and the first differing value; each pinned digest must also equal
+  the digest of its pinned description. The file is rewritten only when `MUSHROOM_WEATHER_WRITE_GOLDEN=1` is set. The
+  simulator test renders the 16 frames and checks them against the same descriptions with the feature-493 tolerances.
+  Impact: FR-R02G2008-003, 004; SC-R02G2008-003.
+- Q: How is memory measured and what releases are checked? → A: on the simulator, 12 cycles of open (prepare a level),
+  draw 3 frames at tier 0, send a memory warning, draw 1 frame, close (teardown); the footprint is read with
+  `ProcessMemory.footprint()` after each cycle; every reading of cycles 2 … 12 stays within 16 MB of cycle 1's reading,
+  applied only when the memory test class runs alone (`TEST_RUNNER_MUSHROOM_WEATHER_MEMORY_ISOLATED=1`; in the full
+  parallel suite the readings are only printed). After each close and each memory warning the scene holds no GPU objects
+  of its own (`liveObjectCount` is 0) and the next frame rebuilds them. An unavailable footprint fails with a named
+  reason. Impact: FR-R02G2008-005; SC-R02G2008-004.
+- Q: How do CI and the local command report, and what do they run? → A: CI's `round02-host-tests` job keeps running all
+  round-two host tests and adds a named step "Mushroom Weather regression (host)" that runs the Mushroom Weather
+  regression filter alone. The local command `python3 scripts/mushroom_weather_regression.py` runs the host regression
+  filter and then the simulator regression test classes through `xcodebuild_package.py --only-testing`, and prints one
+  summary line per part with pass or fail and the first failing name; its exit code is non-zero on any failure. Nothing
+  is timed against the wall clock. Impact: FR-R02G2008-006, 007; SC-R02G2008-005.
 
 ## User Scenarios & Testing *(mandatory)*
 
