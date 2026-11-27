@@ -221,3 +221,16 @@ accounts for every unit; the catalog's 0.016667 s timestep is a presentation clo
   not available without the testing argument.
 - **Builds.** The app compiles in debug and release for the simulator with the game linked; the release symbol check
   confirms the test-only golden source and scenarios are absent.
+
+## Device preparation (feature 500, R02-G20-10)
+
+Nothing here touches a device. `docs/apps/mushroom-weather/device-rows.json` defines the device scenario set (the 11
+standard and game scenarios and `fixture-level-1-solved`) and rows MW-D1 … MW-D8 for D1, D2 and D3 (the ledger's
+DEV1/2/3-R02-G20 rows): launch and first frame, frame pacing and frame time per tier, memory and thermal state with the
+round-two stress session, touch feel and latency (a tap on a site that places a pod, a pod drag with the previewed run,
+a tap on a vent, a moon drag that sets the moonlight, a cycle scrub, orbit and the double tap that resets the view),
+sound and haptics, a non-gating VoiceOver walk-through, progress across a real termination and the panel journeys.
+Every row is "pending device campaign" and covers the open {device} tasks of features 493, 494 and 496 … 499 and
+UA-F13's measurements; `scripts/check_device_rows.py --experience r02-g20.mushroom-weather` (release step
+`device-rows-r02-g20`) keeps it true. The written plan is `docs/apps/mushroom-weather/device-campaign.md`; D3 stays on
+iPadOS 26.5.

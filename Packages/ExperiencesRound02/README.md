@@ -1042,5 +1042,6 @@ replayed on restore, edited ones dropped and counted), replay of the best soluti
 solver regression over all 100 levels, golden frame descriptions (`MushroomWeatherGolden`, `golden-frames.json`),
 simulator golden-frame and memory tests, a CI step and `scripts/mushroom_weather_regression.py`. Feature 499
 (R02-G20-09) pins the panel's identifiers and adds the stored schema examples, the app's interface tests (`MW`, chunk
-`c4`) and app unit tests. See
+`c4`) and app unit tests. Feature 500 (R02-G20-10) adds its device-row definition and written campaign plan
+(`docs/apps/mushroom-weather/`), checked by `scripts/check_device_rows.py`; no device is contacted. See
 [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).
