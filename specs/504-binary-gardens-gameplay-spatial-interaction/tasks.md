@@ -158,7 +158,7 @@ modelled on feature 484).
   round02-host-1`, `-2`, `-3c`, `-3e`, `-3f` (the baseline commands of quickstart step 1)
 - [X] T-R02G2104-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit` (the quickstart step 5 commands)
-- [ ] T-R02G2104-008 Reference regression chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only
+- [X] T-R02G2104-008 Reference regression chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only — Verified 2026-11-27: reference-1 exit 0
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
 - [ ] T-R02G2104-009 Reference regression chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
