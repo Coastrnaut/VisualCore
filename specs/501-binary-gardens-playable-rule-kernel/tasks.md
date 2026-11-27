@@ -135,7 +135,7 @@ SC-001 … 005 → 002 … 006; SC-006 → 007 … 011.
   (as `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSky.swift` does), and pin it in
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensSkyTests.swift`; `--name host-6` per FR-R02G2101-014
   (partial)
-- [ ] T-R02G2101-014 Record in `specs/501-binary-gardens-playable-rule-kernel/contracts/api.md` the public names the
+- [X] T-R02G2101-014 Record in `specs/501-binary-gardens-playable-rule-kernel/contracts/api.md` the public names the — Verified 2026-11-27: contracts/api.md lists the public names beyond the contract with their reasons
   kernel exposes beyond the contract (memberwise initializers of Star, World, Arrangement, Point, WorldLight and Report;
   `BinaryGardensBand.isLethal` and `.words`; `BinaryGardensFailure.world`; `BinaryGardensLevel.startReport`,
   `grouped(_:)` and its range constants; `BinaryGardensSky.tableScale`, `positionScale`, `squaredScale`,

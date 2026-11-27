@@ -119,3 +119,18 @@ The sky's geometry, light and judge live in `BinaryGardensSky` and the puzzle co
 the game's name does not clash with a module type. `BinaryGardensPlay` and `BinaryGardensPuzzle` agree: a move is
 legal in the puzzle exactly when `apply(_:expecting:)` accepts it in `playing` with actions left, and both produce the
 same arrangement. No existing module's API changes; no VisualCore API baseline update is needed.
+
+## Public names beyond this contract (feature 501 convergence, T-R02G2101-014)
+
+The implementation exposes these additional public names; each is documented in the source:
+
+- Memberwise initializers of `BinaryGardensStar`, `BinaryGardensWorld`, `BinaryGardensArrangement`,
+  `BinaryGardensPoint`, `BinaryGardensWorldLight` and `BinaryGardensReport`: tests, the generator (feature 502) and the
+  scene snapshot (feature 503) build these values directly.
+- `BinaryGardensBand.isLethal` and `.words`: the judge's lethal walk and the light report's words.
+- `BinaryGardensFailure.world`: the failing world's number for the failure explanation (feature 505).
+- `BinaryGardensLevel.startReport`, `grouped(_:)` and its public range constants: the opening report, numbers in
+  words with grouped digits, and the ranges the generator draws from.
+- `BinaryGardensSky.tableScale`, `positionScale`, `squaredScale` and `millifluxPerUnit`: the fixed-point scales
+  (1024, 2^20, 2^40, 1000) named once for the renderer and the tests.
+
