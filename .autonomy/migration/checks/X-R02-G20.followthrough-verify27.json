@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g20.mushroom-weather",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g20.mushroom-weather --runtime 27",
+  "elapsed_seconds": 468.395,
+  "exit_code": 0,
+  "finished": "2026-11-27T10:31:31+00:00",
+  "gate": "X-R02-G20",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G20.followthrough-verify27.log",
+  "log_sha256": "981bf305b8fd9cc01af7a9d2fff61958fa79fa7dca99c9d1ee70f582c00f3ff5",
+  "name": "followthrough-verify27",
+  "started": "2026-11-27T10:23:42+00:00",
+  "timed_out": false
+}
