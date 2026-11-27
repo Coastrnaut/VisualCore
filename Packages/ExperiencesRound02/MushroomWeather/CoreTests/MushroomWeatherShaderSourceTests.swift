@@ -4,7 +4,7 @@
 // only in the forest vertex stage and multiplied by the motion (Reduce Motion), at most 16 vec4 uniform slots per
 // program, no texture sampler, no `discard`, no loop (so no unbounded one), no reserved word used as a name, vertex
 // outputs matching fragment inputs, balanced braces, ASCII-only sources, the attribute names and locations (the
-// `ShaderMeshRenderer` streams), the material code table (distinct, ordered 0 … 28, each selected by the vertex shader
+// `ShaderMeshRenderer` streams), the material code table (distinct, ordered 0 … 30, each selected by the vertex shader
 // with its palette colour and handled exactly once by the fragment shader), the value and broken mark carried in uv,
 // the GLSL palette constants generated from `MushroomWeatherPalette` and parsing back within 1e-6, the layered solids
 // (flat on level-2), the translucent caps with moisture beads whose density follows h/M, the signed-distance quad
@@ -12,6 +12,10 @@
 // Reduce Motion, the won level lighting every cap, the glow per kind, the glow gain per tier (0 at level-2) and the
 // Reduce Flashing cap, and, when `glslangValidator` is installed, a real front-end compile of each source (skipped
 // otherwise). Test data uses explicit types and plain loops (CI type-check rule).
+//
+// Feature 494 (R02-G20-04) T-R02G2004-002 (FR-R02G2004-002, 005, 006): the table now runs 0 … 30 — the ghost pod (29, a
+// disc at the ghost opacity in the pod colour) and the scrubber (30, a strip in the moon colour) appended after the
+// mold patch, every earlier code, the value scale and the broken offset unchanged.
 import Foundation
 import Testing
 @testable import MushroomWeatherCore
@@ -419,7 +423,7 @@ import Testing
         #expect(fragment.contains("const vec3 MW_MIDNIGHT_TOP = vec3(0.054902, 0.101961, 0.200000);"))
         let glowF: String = Shaders.glowFragment
         let floats: [(name: String, value: Double, source: String)] = [
-            (name: "MW_MAX_MATERIAL", value: 28, source: vertex),
+            (name: "MW_MAX_MATERIAL", value: 30, source: vertex),
             (name: "MW_BROKEN_OFFSET", value: Shaders.brokenOffset, source: vertex),
             (name: "MW_VALUE_SCALE", value: Shaders.valueScale, source: vertex),
             (name: "MW_DROPLET_RATE", value: Shaders.dropletRate, source: vertex),
@@ -450,6 +454,7 @@ import Testing
             (name: "MW_BEAD_LIFT", value: Shaders.beadLift, source: fragment),
             (name: "MW_MIST_ALPHA", value: Shaders.mistAlpha, source: fragment),
             (name: "MW_DROPLET_FADE_IN", value: Shaders.dropletFadeIn, source: fragment),
+            (name: "MW_GHOST_ALPHA", value: Shaders.ghostAlpha, source: fragment),
             (name: "MW_GLOW_WEIGHT", value: Shaders.glowWeight, source: glowF),
             (name: "MW_GLOW_CORE", value: Shaders.glowCore, source: glowF),
             (name: "MW_MAX_GAIN", value: Shaders.maxGlowGain, source: glowF),
@@ -470,7 +475,7 @@ import Testing
             "backdrop", "moon", "phaseTickLit", "phaseTickUnlit", "floor", "log", "stone", "frond", "mist",
             "siteRing", "stalk", "cap", "capOut", "bandRingSolid", "bandRingDashed", "pod", "podRing", "droplet",
             "mote", "ventFrame", "ventSlat", "gaugeTrack", "bandBracket", "marker", "runLit", "runUnlit", "barLit",
-            "barUnlit", "moldPatch",
+            "barUnlit", "moldPatch", "ghostPod", "scrubber",
         ]
         #expect(Material.allCases.count == names.count)
         #expect(Shaders.materials.count == names.count)
@@ -512,7 +517,7 @@ import Testing
             let token: String = "isCode(m, \(material.rawValue).0)"
             #expect(Self.occurrences(token, in: fragment) == 1, "\(material) handled \(token)")
         }
-        #expect(Self.occurrences("isCode(m, 29.0)", in: fragment) == 0)
+        #expect(Self.occurrences("isCode(m, 31.0)", in: fragment) == 0)
         // The design's colours per element (clarification Q1).
         let expected: [(material: Material, colour: SIMD3<Double>)] = [
             (material: .moon, colour: Palette.moon), (material: .floor, colour: Palette.moss),
@@ -526,6 +531,7 @@ import Testing
             (material: .ventFrame, colour: Palette.vent), (material: .bandBracket, colour: Palette.band),
             (material: .marker, colour: Palette.marker), (material: .barLit, colour: Palette.actionsLit),
             (material: .barUnlit, colour: Palette.actionsUnlit), (material: .moldPatch, colour: Palette.broken),
+            (material: .ghostPod, colour: Palette.pod), (material: .scrubber, colour: Palette.moon),
         ]
         for entry in expected { #expect(entry.material.baseColour == entry.colour, "\(entry.material)") }
         // Frame checks (clarification Q3): the lit bar reads amber (red above blue by 0.08); the gauge track differs
@@ -569,9 +575,12 @@ import Testing
         #expect(Shaders.encode(.stalk, broken: true) == 42)
         #expect(Shaders.decode(Double.nan).material == .backdrop)
         #expect(Shaders.decode(-4).material == .backdrop)
-        #expect(Shaders.decode(30).material == .moldPatch)
+        #expect(Shaders.decode(28).material == .moldPatch)
+        #expect(Shaders.decode(30).material == .scrubber)
         #expect(Shaders.decode(30).broken == false)
-        #expect(Shaders.decode(999).material == .moldPatch)
+        #expect(Shaders.decode(31).material == .scrubber)
+        #expect(Shaders.decode(31).broken == false)
+        #expect(Shaders.decode(999).material == .scrubber)
         #expect(Shaders.decode(999).broken == true)
         // Moon brightness (4 + L) / 7, moisture h/M.
         #expect(Shaders.moonBrightness(moonlight: 0) == 4.0 / 7.0)
@@ -754,8 +763,9 @@ import Testing
         let quads: [Material] = [
             .moon, .phaseTickLit, .phaseTickUnlit, .floor, .mist, .siteRing, .bandRingSolid, .bandRingDashed, .podRing,
             .droplet, .mote, .ventSlat, .bandBracket, .marker, .runLit, .runUnlit, .barLit, .barUnlit, .moldPatch,
+            .ghostPod,
         ]
-        #expect(quads.count == 19)
+        #expect(quads.count == 20)
         for material in Material.allCases where !quads.contains(material) {
             #expect(Shaders.quadCoverage(material, u: 0, v: 0) == 0, "\(material)")
             #expect(Shaders.quadCoverage(material, u: mid, v: 0) == 0, "\(material)")
@@ -952,5 +962,32 @@ import Testing
             #expect(process.terminationStatus == 0, "\(file.name): \(output)")
         }
         #endif
+    }
+
+    /// Feature 494 (R02-G20-04) T-R02G2004-002: the ghost pod and the scrubber materials appended after code 28.
+    @Test func ghostPodAndScrubberMaterialsFollowTheEncodingContract() {
+        #expect(Material.ghostPod.rawValue == 29)
+        #expect(Material.scrubber.rawValue == 30)
+        #expect(Shaders.maxMaterial == 30)
+        #expect(Shaders.brokenOffset == 32)
+        #expect(Double(Shaders.maxMaterial) + Shaders.valueScale < Shaders.brokenOffset - 0.5)
+        #expect(!Material.ghostPod.isValued && !Material.scrubber.isValued)
+        #expect(Shaders.encode(.ghostPod) == 29 && Shaders.encode(.scrubber, broken: true) == 62)
+        // The ghost pod: a disc at the ghost opacity, empty outside the unit circle and inside the quad.
+        #expect(abs(Shaders.quadCoverage(.ghostPod, u: 0, v: 0) - Shaders.ghostAlpha) < 1e-12)
+        #expect(Shaders.quadCoverage(.ghostPod, u: 0.8, v: 0.8) == 0)
+        #expect(Shaders.ghostAlpha > 0 && Shaders.ghostAlpha < 1)
+        #expect(Shaders.quadCoverage(.scrubber, u: 0, v: 0) == 0)
+        let fragment: String = Shaders.forestFragment
+        #expect(fragment.contains("float isGhost = isCode(m, 29.0);"))
+        #expect(fragment.contains("coverage = coverage + discCover * MW_GHOST_ALPHA * isGhost;"))
+        let strip: String = "float strip = isCode(m, 7.0) + isCode(m, 19.0) + isCode(m, 21.0) + isCode(m, 30.0);"
+        #expect(fragment.contains(strip))
+        let vertex: String = Shaders.forestVertex
+        #expect(vertex.contains("base = mix(base, MW_POD, isCode(m, 29.0));"))
+        #expect(vertex.contains("base = mix(base, MW_MOON, isCode(m, 30.0));"))
+        // The fallback colours the geometry writes for the two materials.
+        #expect(MushroomWeatherSceneGeometry.colour(of: Shaders.encode(.ghostPod)) == Palette.pod)
+        #expect(MushroomWeatherSceneGeometry.colour(of: Shaders.encode(.scrubber)) == Palette.moon)
     }
 }

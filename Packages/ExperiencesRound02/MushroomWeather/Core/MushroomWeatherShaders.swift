@@ -16,7 +16,7 @@
 // patch, and the broken colour of anything a failure names (any material, keeping its shape).
 //
 // Vertex streams (the geometry states the same contract; the shared renderer binds only position, normal and uv):
-// - `a_uv.x` = material code (``MushroomWeatherMaterial``, 0 … 28) + ``MushroomWeatherShaders/valueScale`` · value
+// - `a_uv.x` = material code (``MushroomWeatherMaterial``, 0 … 30) + ``MushroomWeatherShaders/valueScale`` · value
 //   (0 … 1; only for the valued materials below, otherwise 0) + ``MushroomWeatherShaders/brokenOffset`` (32) when the
 //   element is drawn in the broken colour. Write it with ``MushroomWeatherShaders/encode(_:value:broken:)``.
 //   Valued materials: cap and capOut — the moisture h/M of the colony's cell at the shown cycle (bead density); mist —
@@ -62,11 +62,18 @@
 // samplers, no image assets, no `discard` and no loops at all (so every loop is bounded; the bead field reads one
 // lattice cell). Output is premultiplied alpha. Palette constants are generated from `MushroomWeatherPalette` with six
 // fixed decimals, so the shader colours equal the CPU's within 1e-6.
+//
+// Feature 494 (R02-G20-04) T-R02G2004-002 (FR-R02G2004-002, 005, 006; clarification Q3) appends two materials after
+// code 28, keeping every earlier code, the value scale and the broken offset (32, still above every code): 29
+// ``MushroomWeatherMaterial/ghostPod`` — the dragged pod's ghost at its target site (quad, disc at
+// ``ghostAlpha`` opacity, pod colour) — and 30 ``MushroomWeatherMaterial/scrubber`` — the cycle scrubber's track and
+// mark (strip, moon colour).
 
 import Foundation
 
 /// The material code a forest-program vertex carries in `a_uv.x` (FR-R02G2003-001, 002): one per kind of element the
-/// geometry draws, 0 … 28. The geometry writes ``MushroomWeatherShaders/encode(_:value:broken:)``; the forest vertex
+/// geometry draws, 0 … 30 (29 and 30 added by feature 494). The geometry writes
+/// ``MushroomWeatherShaders/encode(_:value:broken:)``; the forest vertex
 /// shader selects ``paletteConstant``. The comment of each case names its coverage rule and what `a_uv.y` and
 /// `a_normal` carry (see the file header).
 public enum MushroomWeatherMaterial: Int, Sendable, CaseIterable, Hashable {
@@ -130,6 +137,11 @@ public enum MushroomWeatherMaterial: Int, Sendable, CaseIterable, Hashable {
     case barUnlit = 27
     /// The mold patch on the moldy cell (quad, lobed disc), broken colour.
     case moldPatch = 28
+    /// The dragged pod's ghost at its target site (quad, disc at ``MushroomWeatherShaders/ghostAlpha`` opacity), pod
+    /// colour (feature 494, a preview only).
+    case ghostPod = 29
+    /// The cycle scrubber's track and mark (strip), moon colour (feature 494).
+    case scrubber = 30
 
     /// The plain code (no value, not broken), as `Float` for the uv stream.
     public var code: Float { Float(rawValue) }
@@ -148,13 +160,14 @@ public enum MushroomWeatherMaterial: Int, Sendable, CaseIterable, Hashable {
         case .cap: return "MW_CAP"
         case .capOut: return "MW_CAP_OUT"
         case .bandRingSolid, .bandRingDashed, .bandBracket, .runLit: return "MW_BAND"
-        case .pod, .podRing: return "MW_POD"
+        case .pod, .podRing, .ghostPod: return "MW_POD"
         case .droplet, .mote: return "MW_DROPLET"
         case .ventFrame, .ventSlat, .gaugeTrack: return "MW_VENT"
         case .marker: return "MW_MARKER"
         case .runUnlit, .barUnlit: return "MW_ACTIONS_UNLIT"
         case .barLit: return "MW_ACTIONS_LIT"
         case .moldPatch: return "MW_BROKEN"
+        case .scrubber: return "MW_MOON"
         }
     }
 
@@ -212,7 +225,7 @@ public enum MushroomWeatherShaders {
         (name: "a_uv", location: 2),
     ]
 
-    /// Every material as (Swift name, code, GLSL palette constant the forest vertex shader selects), codes 0 … 28.
+    /// Every material as (Swift name, code, GLSL palette constant the forest vertex shader selects), codes 0 … 30.
     public static var materials: [(name: String, code: Float, constant: String)] {
         var result: [(name: String, code: Float, constant: String)] = []
         for material in MushroomWeatherMaterial.allCases {
@@ -274,8 +287,8 @@ public enum MushroomWeatherShaders {
         return result
     }
 
-    /// The highest material code (the mold patch).
-    public static let maxMaterial: Int = MushroomWeatherMaterial.moldPatch.rawValue
+    /// The highest material code (the scrubber, feature 494).
+    public static let maxMaterial: Int = MushroomWeatherMaterial.scrubber.rawValue
     /// What `a_uv.x` adds for an element drawn in the broken colour (above every code, so the shape is kept).
     public static let brokenOffset: Double = 32
     /// How much of `a_uv.x` above its code is the value: x = code + valueScale · value. Below 0.5, so the code still
@@ -345,6 +358,8 @@ public enum MushroomWeatherShaders {
 
     /// The mist squares' opacity.
     public static let mistAlpha: Double = 0.62
+    /// The ghost pod's opacity (feature 494).
+    public static let ghostAlpha: Double = 0.45
     /// The droplets' cycles per second along their rise.
     public static let dropletRate: Double = 0.5
     /// The share of a droplet's life over which it fades in.
@@ -469,6 +484,8 @@ public enum MushroomWeatherShaders {
         base = mix(base, MW_ACTIONS_LIT, isCode(m, 26.0));
         base = mix(base, MW_ACTIONS_UNLIT, isCode(m, 27.0));
         base = mix(base, MW_BROKEN, isCode(m, 28.0));
+        base = mix(base, MW_POD, isCode(m, 29.0));
+        base = mix(base, MW_MOON, isCode(m, 30.0));
         base = mix(base, MW_MIST_HIGH, isCode(m, 8.0) * value);
         base = mix(base, MW_CAP, isCode(m, 12.0) * won);
         base = base * mix(1.0, value, isCode(m, 1.0));
@@ -525,6 +542,7 @@ public enum MushroomWeatherShaders {
     const float MW_BEAD_LIFT = \(decimals(beadLift));
     const float MW_MIST_ALPHA = \(decimals(mistAlpha));
     const float MW_DROPLET_FADE_IN = \(decimals(dropletFadeIn));
+    const float MW_GHOST_ALPHA = \(decimals(ghostAlpha));
     float isCode(float m, float code) {
         return 1.0 - step(0.5, abs(m - code));
     }
@@ -545,13 +563,14 @@ public enum MushroomWeatherShaders {
         float square = isCode(m, 4.0) + isCode(m, 20.0) + isCode(m, 24.0) + isCode(m, 25.0);
         square = square + isCode(m, 26.0) + isCode(m, 27.0);
         float solid = isCode(m, 5.0) + isCode(m, 6.0) + isCode(m, 10.0) + isCode(m, 15.0);
-        float strip = isCode(m, 7.0) + isCode(m, 19.0) + isCode(m, 21.0);
+        float strip = isCode(m, 7.0) + isCode(m, 19.0) + isCode(m, 21.0) + isCode(m, 30.0);
         float isMist = isCode(m, 8.0);
         float isCap = isCode(m, 11.0) + isCode(m, 12.0);
         float dashed = isCode(m, 14.0);
         float isDroplet = isCode(m, 17.0);
         float isBracket = isCode(m, 22.0);
         float isMold = isCode(m, 28.0);
+        float isGhost = isCode(m, 29.0);
         float h = clamp(v_local, 0.0, 1.0);
         vec3 backdrop = mix(MW_MIDNIGHT, MW_MIDNIGHT_TOP, h);
         float nl = length(v_aux);
@@ -592,6 +611,7 @@ public enum MushroomWeatherShaders {
         coverage = coverage + discCover * disc + discCover * fade * isDroplet;
         coverage = coverage + ringCover * ring + ringCover * dash * dashed;
         coverage = coverage + bracketCover * isBracket + moldCover * isMold;
+        coverage = coverage + discCover * MW_GHOST_ALPHA * isGhost;
         float alpha = clamp(coverage, 0.0, 1.0);
         rgb = clamp(rgb, 0.0, 1.0);
         color = vec4(rgb * alpha, alpha);
@@ -788,6 +808,7 @@ public enum MushroomWeatherShaders {
         case .bandBracket:
             return squareCover * max(cover(v - bracketBar), cover(abs(u) - bracketEnd))
         case .moldPatch: return cover(1 - r - moldWobble * sin(moldLobes * angle(u: u, v: v)))
+        case .ghostPod: return cover(1 - r) * ghostAlpha
         default: return 0
         }
     }

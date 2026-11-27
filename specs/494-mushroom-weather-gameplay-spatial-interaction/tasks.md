@@ -14,7 +14,7 @@ tests stay short (< 10 s each). No {owner} tasks. Agents model their files on Mi
 
 ## Phase 2: Foundational — view orbit, camera, preview, scrubber and picking
 
-- [ ] T-R02G2004-002 [P] Add the preview ("nil when no preview": the kind — pod slot with target site or removal, or a
+- [X] T-R02G2004-002 [P] Add the preview ("nil when no preview": the kind — pod slot with target site or removal, or a — Verified 2026-11-27: 2026-11-27 host-2 exit 0: 165 tests in 18 suites incl. picker (500 seeded points over 3 orbits against an independent pick, drop, moon and cycle rule), orbit camera in view at the corners and 7 aspects, preview equal to the kernel run, ghost pod and scrubber materials (.autonomy/migration/checks/R02-G20-04.host-2.json)
   moonlight level — the previewed arrangement and the previewed run — fields, colony runs, growth and failure — computed
   with the kernel's `MushroomWeatherForest.run`; "presentation only; never in the digest") and
   `previewing(_:level:)` to `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSceneSnapshot.swift`; add

@@ -9,6 +9,14 @@
 // `MushroomWeatherShaders` (encoded codes, quad-local normals at ±1.25, strips, lathed and flat solids); the fronds'
 // reach, the droplets and motes per tier and independent of time; the backdrop filling the view and its gradient
 // coordinate; the fallback colours. Explicit types, plain loops.
+//
+// Feature 494 (R02-G20-04) T-R02G2004-002 (FR-R02G2004-002, 004 … 008; SC-R02G2004-003, 004; research R9) adds: the
+// orbit camera equal to the authored camera at orbit 0 (bit for bit) and continuous next to it; every element, the
+// scrubber and a preview inside the view with a 5 % margin at the authored orbit, the four orbit corners and two inner
+// orbits × 7 aspects, the eye outside the box and the facing backdrop filling the view; the previewed run equal to the
+// kernel's run of the previewed arrangement, drawn in place of the committed one with the ghost pod at its target and
+// the moon at the previewed brightness; refused previews give none; without a preview every mesh is R02-G20-03's
+// geometry followed by the scrubber, and the camera-taking meshes equal the authored ones at the authored camera.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -164,10 +172,11 @@ import VisualCoreScenes
     static let quadMaterials: Set<MushroomWeatherMaterial> = [.moon, .phaseTickLit, .phaseTickUnlit, .floor, .mist,
                                                               .siteRing, .bandRingSolid, .bandRingDashed, .podRing,
                                                               .droplet, .mote, .ventSlat, .bandBracket, .marker,
-                                                              .runLit, .runUnlit, .barLit, .barUnlit, .moldPatch]
+                                                              .runLit, .runUnlit, .barLit, .barUnlit, .moldPatch,
+                                                              .ghostPod]
 
     /// The materials drawn as strips (a_normal zero, a_uv.y across).
-    static let stripMaterials: Set<MushroomWeatherMaterial> = [.frond, .ventFrame, .gaugeTrack]
+    static let stripMaterials: Set<MushroomWeatherMaterial> = [.frond, .ventFrame, .gaugeTrack, .scrubber]
 
     /// The solid materials (a_normal the world normal when lathed, zero when flat).
     static let solidMaterials: Set<MushroomWeatherMaterial> = [.log, .stone, .stalk, .cap, .capOut, .pod]
@@ -655,5 +664,322 @@ import VisualCoreScenes
         #expect(G.colour(of: MushroomWeatherShaders.encode(.floor, broken: true)) == MushroomWeatherPalette.broken)
         #expect(G.colour(of: MushroomWeatherShaders.encode(.capOut), won: 1) == MushroomWeatherPalette.cap)
         #expect(G.moonBrightness(0) == 4.0 / 7 && G.moonBrightness(3) == 1 && G.filledTicks(2) == 3)
+    }
+
+    // MARK: Feature 494 — orbit, scrubber and preview
+
+    /// The orbits checked (feature 494): the authored one, the four corners of the bounds and two inner orbits.
+    static let orbitsChecked: [MushroomWeatherViewOrbit] = {
+        var result: [MushroomWeatherViewOrbit] = [MushroomWeatherViewOrbit.authored]
+        for corner in MushroomWeatherViewOrbit.corners { result.append(corner) }
+        result.append(MushroomWeatherViewOrbit(yaw: 0.5, pitch: 0.3))
+        result.append(MushroomWeatherViewOrbit(yaw: -0.3, pitch: -0.2))
+        return result
+    }()
+
+    /// A snapshot of `level` in stage `playing` with a pod in slot 0 on site 0 (and, with `second`, a pod in slot 1 on
+    /// site 2), at the middle of its predicted run.
+    static func podSnapshot(_ level: MushroomWeatherLevel, second: Bool = false) throws -> Snapshot {
+        var play: MushroomWeatherPlay = MushroomWeatherPlay(level: level)
+        try play.handle(.begin)
+        if play.stage == .tutorial { try play.handle(.dismissTutorial) }
+        let sites: [Cell] = level.sites ?? []
+        try #require(sites.count >= 3)
+        try play.apply(.place(slot: 0, cell: sites[0]), expecting: play.fingerprint)
+        if second { try play.apply(.place(slot: 1, cell: sites[2]), expecting: play.fingerprint) }
+        let probe: Snapshot = Snapshot(play: play, shownCycle: 0, levelNumber: 1, time: 0)
+        return Snapshot(play: play, shownCycle: probe.cyclesRun / 2, levelNumber: 1, time: 0)
+    }
+
+    /// The distance between world points `a` and `b`.
+    static func gap(_ a: SIMD3<Double>, _ b: SIMD3<Double>) -> Double {
+        let d: SIMD3<Double> = a - b
+        return (d.x * d.x + d.y * d.y + d.z * d.z).squareRoot()
+    }
+
+    /// Whether `point` lies strictly outside the orbit box.
+    static func outsideOrbitBox(_ point: SIMD3<Double>) -> Bool {
+        point.x < G.orbitBoxLow.x || point.x > G.orbitBoxHigh.x || point.y < G.orbitBoxLow.y
+            || point.y > G.orbitBoxHigh.y || point.z < G.orbitBoxLow.z || point.z > G.orbitBoxHigh.z
+    }
+
+    /// The number of vertices of `mesh` (every one but the backdrop's; a droplet also at the top of its rise) outside
+    /// the view of `camera` with a 5 % margin.
+    static func outsideView(_ mesh: Mesh, _ camera: MushroomWeatherCamera) -> Int {
+        var outside: Int = 0
+        for k in mesh.positions.indices {
+            let d = decoded(mesh, k)
+            if d.material == .backdrop { continue }
+            let p: Vec3 = mesh.positions[k]
+            let point: SIMD3<Double> = SIMD3(p.x, p.y, p.z)
+            if !inView(point, camera) { outside += 1 }
+            if d.material == .droplet && !inView(point + SIMD3(0, 0, mesh.normals[k].z), camera) { outside += 1 }
+        }
+        return outside
+    }
+
+    @Test func orbitCameraIsTheAuthoredCameraAtOrbitZero() {
+        var aspects: [Double] = Self.aspects
+        aspects.append(Double.nan)
+        aspects.append(-2)
+        aspects.append(50)
+        aspects.append(0.1)
+        for aspect in aspects {
+            let authored: MushroomWeatherCamera = G.camera(aspect: aspect)
+            #expect(G.camera(aspect: aspect, orbit: .authored) == authored)
+            #expect(G.authoredCamera(aspect: aspect) == authored)
+            #expect(authored.eye == G.eye && authored.target == G.lookAt)
+            // Next to the authored orbit the camera moves continuously (the refit keeps the authored distance).
+            let nudged: MushroomWeatherCamera = G.camera(aspect: aspect,
+                                                         orbit: MushroomWeatherViewOrbit(yaw: 1e-9, pitch: -1e-9))
+            #expect(Self.gap(nudged.eye, authored.eye) < 1e-6 && Self.gap(nudged.target, authored.target) < 1e-6)
+            #expect(nudged.fovY == authored.fovY && nudged.aspect == authored.aspect)
+            // Orbits beyond the bounds are clamped.
+            let wild: MushroomWeatherViewOrbit = MushroomWeatherViewOrbit(yaw: 5, pitch: -3)
+            let limit: MushroomWeatherViewOrbit = MushroomWeatherViewOrbit(
+                yaw: MushroomWeatherViewOrbit.yawLimit, pitch: MushroomWeatherViewOrbit.pitchRange.lowerBound)
+            #expect(G.camera(aspect: aspect, orbit: wild) == G.camera(aspect: aspect, orbit: limit))
+        }
+        // The basis read from the view matrix is the authored basis.
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = G.viewBasis(G.camera(aspect: 1))
+        let authoredBasis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = G.viewBasis()
+        #expect(Self.gap(basis.forward, authoredBasis.forward) < 1e-12)
+        #expect(Self.gap(basis.right, authoredBasis.right) < 1e-12)
+        #expect(Self.gap(basis.up, authoredBasis.up) < 1e-12)
+        // A positive yaw carries the eye towards +x; a positive pitch raises it; the bounds hold.
+        let yawed: MushroomWeatherCamera = G.camera(aspect: 1, orbit: MushroomWeatherViewOrbit(yaw: 0.5, pitch: 0))
+        #expect(yawed.eye.x > 0.5)
+        let raised: MushroomWeatherCamera = G.camera(aspect: 1, orbit: MushroomWeatherViewOrbit(yaw: 0, pitch: 0.3))
+        let lowered: MushroomWeatherCamera = G.camera(aspect: 1, orbit: MushroomWeatherViewOrbit(yaw: 0, pitch: -0.3))
+        #expect(raised.eye.z - raised.target.z > G.eye.z - G.lookAt.z)
+        #expect(lowered.eye.z - lowered.target.z < G.eye.z - G.lookAt.z)
+        for orbit in Self.orbitsChecked { #expect(orbit.isWithinBounds && orbit.clamped() == orbit) }
+        #expect(!MushroomWeatherViewOrbit(yaw: 1.1, pitch: 0).isWithinBounds)
+        #expect(MushroomWeatherViewOrbit(yaw: .nan, pitch: .infinity).clamped() == .authored)
+    }
+
+    @Test func sceneInsideTheViewAtOrbitCornersAndSevenAspects() throws {
+        var snaps: [Snapshot] = []
+        let picks: [Int] = [0, 9]
+        for n in picks {
+            let level: MushroomWeatherLevel = Self.levels[n]
+            let base: Snapshot = try Self.podSnapshot(level)
+            let sites: [Cell] = level.sites ?? []
+            let previewed: Snapshot = base.previewing(.pod(slot: 0, target: sites[1]), level: level)
+            #expect(previewed.preview != nil)
+            snaps.append(previewed)
+        }
+        let tier: MushroomWeatherTier = MushroomWeatherTier.of(1)
+        for orbit in Self.orbitsChecked {
+            for aspect in Self.aspects {
+                let camera: MushroomWeatherCamera = G.camera(aspect: aspect, orbit: orbit)
+                #expect(camera.aspect == aspect)
+                for index in 0..<8 {
+                    #expect(Self.inView(G.orbitCorner(index), camera), "orbit corner \(index) \(orbit) \(aspect)")
+                    #expect(Self.inView(G.corner(index), camera), "corner \(index) \(orbit) \(aspect)")
+                }
+                #expect(Self.outsideOrbitBox(camera.eye), "\(orbit) \(aspect)")
+                #expect(Self.gap(camera.eye, camera.target) >= G.authoredDistance - 1e-9)
+                for snap in snaps {
+                    let forest: Mesh = try G.forestMesh(snap, tier: tier, camera: camera)
+                    #expect(Self.outsideView(forest, camera) == 0, "forest \(orbit) \(aspect)")
+                    let glow: Mesh = try G.glowMesh(snap, tier: tier, camera: camera)
+                    #expect(Self.outsideView(glow, camera) == 0, "glow \(orbit) \(aspect)")
+                    #expect(Self.positions(forest, [.ghostPod]).count == 4)
+                    #expect(Self.positions(forest, [.scrubber]).count == 8)
+                }
+            }
+        }
+        // The facing backdrop fills the view from every orbit corner at aspects 0.25 … 4.
+        for orbit in MushroomWeatherViewOrbit.corners {
+            for aspect in [0.25, 0.4, 1.0, 2.5, 4.0] {
+                let camera: MushroomWeatherCamera = G.camera(aspect: aspect, orbit: orbit)
+                let mesh: Mesh = try G.forestMesh(snaps[0], tier: MushroomWeatherTier.of(2), camera: camera)
+                let corners: [SIMD3<Double>] = Self.positions(mesh, [.backdrop])
+                #expect(corners.count == 4)
+                var xs: [Double] = []
+                var ys: [Double] = []
+                for corner in corners {
+                    guard let p = G.project(corner, camera: camera) else {
+                        Issue.record("backdrop corner behind the eye")
+                        continue
+                    }
+                    xs.append(p.x)
+                    ys.append(p.y)
+                }
+                #expect((xs.min() ?? 0) < 0 && (xs.max() ?? 0) > 1 && (ys.min() ?? 0) < 0 && (ys.max() ?? 0) > 1)
+                let middle: SIMD3<Double> = (corners[0] + corners[1] + corners[2] + corners[3]) / 4
+                let centre: SIMD2<Double> = try #require(G.project(middle, camera: camera))
+                #expect(abs(centre.x - 0.5) < 1e-9 && abs(centre.y - 0.5) < 1e-9)
+            }
+        }
+    }
+
+    @Test func previewIsTheKernelRunDrawnWithAGhostAndTheMoon() throws {
+        let picks: [Int] = [0, 4, 9]
+        for n in picks {
+            let level: MushroomWeatherLevel = Self.levels[n]
+            let base: Snapshot = try Self.podSnapshot(level)
+            #expect(base.preview == nil)
+            let sites: [Cell] = level.sites ?? []
+            let free: Cell = sites[1]
+            // A pod moved to a free site: the kernel's run of the moved arrangement, nothing else changed.
+            let moved: Snapshot = base.previewing(.pod(slot: 0, target: free), level: level)
+            let preview: MushroomWeatherPreview = try #require(moved.preview)
+            var pods: [Cell?] = base.pods
+            pods[0] = free
+            let expected: MushroomWeatherArrangement = MushroomWeatherArrangement(pods: pods, ventsOpen: base.ventsOpen,
+                                                                                  moonlight: base.moonlight)
+            #expect(preview.arrangement == expected && preview.kind == .pod(slot: 0, target: free))
+            let run = MushroomWeatherForest.run(level, arrangement: expected, keepFields: true)
+            #expect(preview.report == run.report && preview.fields == run.fields)
+            #expect(preview.cyclesRun == run.report.cycles && preview.failure == run.report.failure)
+            #expect(moved.clearingPreview() == base)
+            #expect(moved.fields == base.fields && moved.pods == base.pods && moved.stage == base.stage)
+            let drawn: Snapshot = G.drawnSnapshot(moved)
+            #expect(drawn.preview == nil && drawn.fields == run.fields && drawn.cyclesRun == run.report.cycles)
+            #expect(drawn.pods == base.pods && drawn.shownCycle == min(base.shownCycle, run.report.cycles))
+            for (k, colony) in drawn.colonies.enumerated() {
+                let h: Int = run.fields[drawn.shownCycle][colony.cell.row * drawn.columns + colony.cell.column]
+                #expect(colony.inBand == (colony.low <= h && h <= colony.high))
+                #expect(colony.finalRun == run.report.colonies[k].finalRun)
+            }
+            let tier: MushroomWeatherTier = MushroomWeatherTier.of(1)
+            let mesh: Mesh = try G.forestMesh(moved, tier: tier)
+            Self.checkForest(mesh, tier: tier)
+            let ghost: [SIMD3<Double>] = Self.positions(mesh, [.ghostPod])
+            #expect(ghost.count == 4)
+            if ghost.count == 4 {
+                let centre: SIMD3<Double> = (ghost[0] + ghost[1] + ghost[2] + ghost[3]) / 4
+                #expect(Self.gap(centre, G.cellCentre(free, base, height: G.podHeight)) < 1e-12)
+            }
+            let reference: Mesh = try G.elementsPart(drawn, tier: tier).mesh
+            #expect(Self.key(Self.positions(mesh, [.mist])) == Self.key(Self.positions(reference, [.mist])))
+            #expect(Self.key(Self.positions(mesh, [.pod])) == Self.key(Self.positions(reference, [.pod])))
+            // A removal: the kernel's run without the pod, no ghost.
+            let removed: Snapshot = base.previewing(.pod(slot: 0, target: nil), level: level)
+            let removal: MushroomWeatherPreview = try #require(removed.preview)
+            #expect(removal.arrangement.pods[0] == nil)
+            #expect(removal.report == MushroomWeatherForest.report(level, arrangement: removal.arrangement))
+            #expect(Self.positions(try G.forestMesh(removed, tier: tier), [.ghostPod]).isEmpty)
+            // A moonlight level: the kernel's run at that level, the moon at its brightness, its ticks lit.
+            let target: Int = (base.moonlight + 1) % 4
+            let lit: Snapshot = base.previewing(.moonlight(level: target), level: level)
+            let light: MushroomWeatherPreview = try #require(lit.preview)
+            #expect(light.arrangement.moonlight == target && light.arrangement.pods == base.pods)
+            #expect(light.report == MushroomWeatherForest.report(level, arrangement: light.arrangement))
+            let litMesh: Mesh = try G.forestMesh(lit, tier: tier)
+            #expect(Self.positions(litMesh, [.ghostPod]).isEmpty)
+            var moonValues: [Double] = []
+            for k in litMesh.positions.indices where Self.decoded(litMesh, k).material == .moon {
+                moonValues.append(Self.decoded(litMesh, k).value)
+            }
+            #expect(moonValues.count == 4)
+            for value in moonValues { #expect(abs(value - G.moonBrightness(target)) < 1e-9) }
+            #expect(Self.positions(litMesh, [.phaseTickLit]).count == 4 * G.filledTicks(target))
+            // Refused changes give no preview: the pod's own site, an empty slot, a slot out of range, a cell that is
+            // not a site, the current moonlight, a level out of range, another floor.
+            #expect(base.previewing(.pod(slot: 0, target: sites[0]), level: level).preview == nil)
+            #expect(base.previewing(.pod(slot: 1, target: free), level: level).preview == nil)
+            #expect(base.previewing(.pod(slot: 9, target: free), level: level).preview == nil)
+            #expect(base.previewing(.pod(slot: -1, target: nil), level: level).preview == nil)
+            var notSite: Cell? = nil
+            for cell in G.floorCells(base) where !sites.contains(cell) && !level.colonyCells.contains(cell) {
+                notSite = cell
+                break
+            }
+            if let cell = notSite {
+                #expect(base.previewing(.pod(slot: 0, target: cell), level: level).preview == nil)
+            }
+            #expect(base.previewing(.moonlight(level: base.moonlight), level: level).preview == nil)
+            #expect(base.previewing(.moonlight(level: 4), level: level).preview == nil)
+            #expect(base.previewing(.moonlight(level: -1), level: level).preview == nil)
+            var other: MushroomWeatherLevel? = nil
+            for candidate in Self.levels where candidate.rows != level.rows || candidate.columns != level.columns {
+                other = candidate
+                break
+            }
+            if let wrong = other {
+                #expect(base.previewing(.moonlight(level: target), level: wrong).preview == nil)
+            }
+            // A site another pod holds.
+            let two: Snapshot = try Self.podSnapshot(level, second: true)
+            #expect(two.previewing(.pod(slot: 0, target: sites[2]), level: level).preview == nil)
+            #expect(two.previewing(.pod(slot: 1, target: sites[0]), level: level).preview == nil)
+            #expect(two.previewing(.pod(slot: 1, target: free), level: level).preview != nil)
+        }
+    }
+
+    @Test func withoutAPreviewTheMeshesAreR02G2003sFollowedByTheScrubber() throws {
+        let picks: [Int] = [0, 3, 6, 9]
+        for n in picks {
+            let level: MushroomWeatherLevel = Self.levels[n]
+            let snaps: [Snapshot] = [try Self.snapshot(level), try Self.podSnapshot(level, second: true)]
+            for snap in snaps {
+                for tier in MushroomWeatherTier.all {
+                    let old: Mesh = try G.elementsPart(snap, tier: tier).mesh
+                    let new: Mesh = try G.forestMesh(snap, tier: tier)
+                    let count: Int = old.positions.count
+                    try #require(new.positions.count == count + 8)
+                    try #require(new.indices.count == old.indices.count + 12)
+                    #expect(Array(new.positions[0..<count]) == old.positions)
+                    #expect(Array(new.normals[0..<count]) == old.normals)
+                    #expect(Array(new.uvs[0..<count]) == old.uvs)
+                    #expect(Array(new.indices[0..<old.indices.count]) == old.indices)
+                    for k in count..<new.positions.count { #expect(Self.decoded(new, k).material == .scrubber) }
+                    // The scrubber: the track from x −0.9 to 0.9 at y −0.9 and the mark at the shown cycle.
+                    let scrubber: [SIMD3<Double>] = Self.positions(new, [.scrubber])
+                    var lowX: Double = Double.infinity
+                    var highX: Double = -Double.infinity
+                    for p in scrubber {
+                        lowX = min(lowX, p.x)
+                        highX = max(highX, p.x)
+                        #expect(abs(p.y - G.scrubberY) <= G.scrubberMarkReach + 1e-12 && p.z == 0)
+                    }
+                    #expect(abs(lowX + 0.9) < 1e-9 && abs(highX - 0.9) < 1e-9)
+                    let fraction: Double = Double(snap.shownCycle) / Double(max(snap.cyclesRun, 1))
+                    #expect(abs(G.scrubberMark(snap).x - (-0.9 + 1.8 * fraction)) < 1e-12)
+                    // The authored camera at any aspect gives the same meshes and colours.
+                    let part: MushroomWeatherColouredMesh = try G.forestPart(snap, tier: tier)
+                    let glow: MushroomWeatherColouredMesh = try G.glowPart(snap, tier: tier)
+                    for aspect in [0.4, 1.0, 2.5] {
+                        let camera: MushroomWeatherCamera = G.camera(aspect: aspect)
+                        #expect(try G.forestPart(snap, tier: tier, camera: camera) == part)
+                        #expect(try G.forestMesh(snap, tier: tier, camera: camera) == new)
+                        #expect(try G.glowPart(snap, tier: tier, camera: camera) == glow)
+                        #expect(try G.glowMesh(snap, tier: tier, camera: camera) == glow.mesh)
+                    }
+                    #expect(G.drawnSnapshot(snap) == snap)
+                }
+            }
+        }
+    }
+
+    @Test func orbitMeshesFaceTheDrawnEye() throws {
+        let snap: Snapshot = try Self.podSnapshot(Self.levels[2])
+        let tier: MushroomWeatherTier = MushroomWeatherTier.of(2)
+        let authored: Mesh = try G.forestMesh(snap, tier: tier)
+        for orbit in MushroomWeatherViewOrbit.corners {
+            let camera: MushroomWeatherCamera = G.camera(aspect: 1, orbit: orbit)
+            let mesh: Mesh = try G.forestMesh(snap, tier: tier, camera: camera)
+            Self.checkForest(mesh, tier: tier)
+            #expect(mesh != authored)
+            let moon: [SIMD3<Double>] = Self.positions(mesh, [.moon])
+            try #require(moon.count == 4)
+            let centre: SIMD3<Double> = (moon[0] + moon[1] + moon[2] + moon[3]) / 4
+            #expect(Self.gap(centre, G.moonPosition) < 1e-12)
+            let a: SIMD3<Double> = moon[1] - moon[0]
+            let b: SIMD3<Double> = moon[3] - moon[0]
+            let n: SIMD3<Double> = SIMD3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
+            let towards: SIMD3<Double> = camera.eye - centre
+            let lengths: Double = (n * n).sum().squareRoot() * (towards * towards).sum().squareRoot()
+            let cosine: Double = (n * towards).sum() / lengths
+            #expect(abs(abs(cosine) - 1) < 1e-9, "\(orbit)")
+            // Flat caps and pods face the drawn eye too: the same positions as the authored mesh except those parts.
+            let glow: Mesh = try G.glowMesh(snap, tier: MushroomWeatherTier.of(0), camera: camera)
+            Self.checkGlow(glow)
+            let floors: [SIMD3<Double>] = Self.positions(mesh, [.floor, .mist, .siteRing, .gaugeTrack])
+            #expect(Self.key(floors) == Self.key(Self.positions(authored, [.floor, .mist, .siteRing, .gaugeTrack])))
+        }
     }
 }

@@ -6,6 +6,16 @@
 // moonlight, the failure, the stage, the actions left and the budget, the level number and the presentation time; plus
 // the palette and the three quality tiers. The renderer never holds the kernel, so no drawing result can change the
 // game (renderer purity), and every drawn humidity is a kernel humidity.
+//
+// Feature 494 (R02-G20-04) T-R02G2004-002 (FR-R02G2004-002, 004, 006; SC-R02G2004-003; clarification Q3) adds the
+// preview of a pod drag or a moon drag. ``MushroomWeatherSceneSnapshot/previewing(_:level:)`` returns a copy whose
+// `preview` holds the kind (a pod's slot with its target site or removal, or a moonlight level), the previewed
+// arrangement and the previewed run — every cycle's humidity, the colony runs, the pods' growth and the failure —
+// computed with the kernel's own `MushroomWeatherForest.run` of the previewed arrangement (no other law). Only a change
+// the kernel would accept is previewed (the slot holds a pod; a floor cell the level allows, no colony on it, not the
+// pod's own and not another slot's; or removal; a moonlight level 0 … 3 other than the current one); anything else
+// gives the copy without a preview. Presentation only: the preview never enters the digest, the game state or the
+// kernel, and every snapshot made by the initialisers has no preview, so the existing drawing is unchanged.
 import Foundation
 
 /// The palette of Mushroom Weather, as linear colours 0 … 1 (fern jade, amber spores and deep blue on a midnight
@@ -150,6 +160,77 @@ public struct MushroomWeatherSceneColony: Sendable, Equatable {
     }
 }
 
+/// What a drag would change (feature 494, R02-G20-04): a pod moved to a site or removed, or the moonlight level.
+public enum MushroomWeatherPreviewKind: Sendable, Equatable {
+    /// Slot `slot`'s pod moved to `target`, or removed from its slot when `target` is nil.
+    case pod(slot: Int, target: MushroomWeatherCell?)
+    /// The moonlight set to `level`, 0 … 3.
+    case moonlight(level: Int)
+}
+
+/// The preview of one drag (feature 494, R02-G20-04): the previewed arrangement and the kernel's run of it.
+/// Presentation only; never in the digest.
+public struct MushroomWeatherPreview: Sendable, Equatable {
+    /// What the drag would change.
+    public let kind: MushroomWeatherPreviewKind
+    /// The arrangement as it would be after the change.
+    public let arrangement: MushroomWeatherArrangement
+    /// The kernel's report of the previewed arrangement (cycles run, colony runs, pod growth, failure).
+    public let report: MushroomWeatherReport
+    /// The humidity of every cell at cycles 0 … report.cycles of the previewed run (the kernel's), indexed
+    /// [cycle][cell], each row-major.
+    public let fields: [[Int]]
+
+    /// A preview of the given values (unchecked).
+    public init(kind: MushroomWeatherPreviewKind, arrangement: MushroomWeatherArrangement,
+                report: MushroomWeatherReport, fields: [[Int]]) {
+        self.kind = kind
+        self.arrangement = arrangement
+        self.report = report
+        self.fields = fields
+    }
+
+    /// The cycles the previewed run ran.
+    public var cyclesRun: Int { report.cycles }
+    /// The previewed failure, nil when the previewed run wins.
+    public var failure: MushroomWeatherFailure? { report.failure }
+
+    /// The arrangement `arrangement` changed by `kind` in `level`, or nil when the play would refuse the change
+    /// (for a pod: slot out of range or empty, a target off the floor, on a colony, not a site of a level with sites,
+    /// held by another slot or the pod's own cell; for the moonlight: a level outside 0 … 3 or the current one).
+    public static func changed(_ arrangement: MushroomWeatherArrangement, by kind: MushroomWeatherPreviewKind,
+                               level: MushroomWeatherLevel) -> MushroomWeatherArrangement? {
+        var pods: [MushroomWeatherCell?] = arrangement.pods
+        var moonlight: Int = arrangement.moonlight
+        switch kind {
+        case .pod(let slot, let target):
+            guard pods.indices.contains(slot), let own = pods[slot] else { return nil }
+            if let cell = target {
+                guard level.isFloor(cell), !level.colonyCells.contains(cell), level.allowsPod(cell),
+                      cell != own else { return nil }
+                for other in pods.indices where other != slot && pods[other] == cell { return nil }
+                pods[slot] = cell
+            } else {
+                pods[slot] = nil
+            }
+        case .moonlight(let value):
+            guard MushroomWeatherLevel.moonlightLevels.contains(value), value != moonlight else { return nil }
+            moonlight = value
+        }
+        return MushroomWeatherArrangement(pods: pods, ventsOpen: arrangement.ventsOpen, moonlight: moonlight)
+    }
+
+    /// The preview of changing `arrangement` by `kind` in `level`, run by the kernel
+    /// (`MushroomWeatherForest.run` of the previewed arrangement, keeping every cycle's field); nil when the play would
+    /// refuse the change (``changed(_:by:level:)``).
+    public static func of(_ kind: MushroomWeatherPreviewKind, arrangement: MushroomWeatherArrangement,
+                          level: MushroomWeatherLevel) -> MushroomWeatherPreview? {
+        guard let next = changed(arrangement, by: kind, level: level) else { return nil }
+        let run = MushroomWeatherForest.run(level, arrangement: next, keepFields: true)
+        return MushroomWeatherPreview(kind: kind, arrangement: next, report: run.report, fields: run.fields)
+    }
+}
+
 /// An immutable copy of what the renderer may read (see the file header).
 public struct MushroomWeatherSceneSnapshot: Sendable, Equatable {
     /// The floor's rows R.
@@ -195,6 +276,8 @@ public struct MushroomWeatherSceneSnapshot: Sendable, Equatable {
     public let levelNumber: Int
     /// The presentation time in seconds (never negative or non-finite).
     public let time: Double
+    /// The previewed drag; nil when no preview (feature 494; presentation only; never in the digest).
+    public private(set) var preview: MushroomWeatherPreview? = nil
 
     /// A snapshot of `play` with cycle `shownCycle` shown (clamped to 0 … cycles run).
     public init(play: MushroomWeatherPlay, shownCycle: Int, levelNumber: Int, time: Double) {
@@ -279,5 +362,33 @@ public struct MushroomWeatherSceneSnapshot: Sendable, Equatable {
     public func isGrown(_ slot: Int) -> Bool {
         guard slot < grownAt.count, let cycle = grownAt[slot] else { return false }
         return shownCycle >= cycle
+    }
+
+    /// The arrangement the snapshot shows: its pods, vent states and moonlight (feature 494).
+    public var arrangement: MushroomWeatherArrangement {
+        MushroomWeatherArrangement(pods: pods, ventsOpen: ventsOpen, moonlight: moonlight)
+    }
+
+    /// This snapshot with `kind` previewed (feature 494, T-R02G2004-002): ``preview`` is
+    /// ``MushroomWeatherPreview/of(_:arrangement:level:)`` of this snapshot's arrangement in `level` (the snapshot's
+    /// level), the kernel's run; a change the play would refuse, or a level whose floor, vents or slots differ from the
+    /// snapshot's, gives this snapshot without a preview. Presentation only: nothing else changes.
+    public func previewing(_ kind: MushroomWeatherPreviewKind,
+                           level: MushroomWeatherLevel) -> MushroomWeatherSceneSnapshot {
+        var copy: MushroomWeatherSceneSnapshot = self
+        guard level.rows == rows, level.columns == columns, level.vents.count == vents.count,
+              level.start.pods.count == pods.count else {
+            copy.preview = nil
+            return copy
+        }
+        copy.preview = MushroomWeatherPreview.of(kind, arrangement: arrangement, level: level)
+        return copy
+    }
+
+    /// This snapshot without a preview (feature 494; presentation only).
+    public func clearingPreview() -> MushroomWeatherSceneSnapshot {
+        var copy: MushroomWeatherSceneSnapshot = self
+        copy.preview = nil
+        return copy
     }
 }

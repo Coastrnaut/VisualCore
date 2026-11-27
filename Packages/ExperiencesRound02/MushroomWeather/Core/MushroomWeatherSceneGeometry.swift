@@ -81,6 +81,35 @@
 // solids). Tiers change only the lathes (flat at level-2), the droplets, the fronds, the motes and the glow: every
 // other vertex is the same at every tier. Nothing here depends on the presentation time. Doubles are used for drawing
 // only. Modelled on `MicroscopicAuroraSceneGeometry` (483).
+//
+// Feature 494 (R02-G20-04) T-R02G2004-002 (FR-R02G2004-002, 004 … 008; SC-R02G2004-001, 003, 004; clarifications Q1,
+// Q3, Q4; research R9) adds, modelled on feature 484:
+//   * the player's view orbit (``MushroomWeatherViewOrbit``) and `camera(aspect:orbit:)`: the authored camera frame
+//     (eye, look-at point and up direction) is turned rigidly by the pitch about the authored right axis (+x) through
+//     the look-at point (positive raises the eye), then by the yaw about the vertical axis (+z) through the centre of
+//     the orbit box (``orbitBoxLow`` … ``orbitBoxHigh``: the authored box extended to the moon's depth, x −1.3 … 1.3,
+//     y −1.5 … 1.2, z −0.5 … 0.3); the field of view stays the authored one for the aspect and the eye is moved along
+//     the view axis to the larger of the authored distance and the distance at which every corner of the orbit box lies
+//     inside the view with ``refitMargin`` per side, so everything inside the box (the floor, the forest, the moon, the
+//     gauges, the bars, the scrubber, a preview) keeps a margin of at least 5 % at every orbit and aspect 0.4 … 2.5.
+//     The eye (at least the authored 3.31 from the look-at point, at least 45° above it) stays outside the box. At the
+//     authored orbit `camera(aspect:)` (which calls it) is the fixed camera of R02-G20-03, bit for bit;
+//   * the cycle scrubber, drawn after every element (it is not an element, so the paint order and the CPU reference are
+//     unchanged): a track ``scrubberTrackWidth`` wide at y = ``scrubberY`` (−0.9, between the floor and the gauges)
+//     from x = −0.9 to 0.9 and a mark (a strip ``scrubberMarkWidth`` wide, ±``scrubberMarkReach``) at the shown cycle's
+//     fraction of the cycles run, both material 30 ``MushroomWeatherMaterial/scrubber`` (strips at z 0);
+//   * the preview (`snapshot.preview`): the previewed run (mist, caps in or out of band, band rings, gauges, run bars,
+//     pod growth and the moon at the previewed brightness and phase ticks) is drawn in place of the committed one
+//     (``drawnSnapshot(_:)``), the committed pods stay where they are and a dragged pod's target gets a ghost pod (a
+//     disc quad facing the eye of the pod's radius at its height, material 29 ``MushroomWeatherMaterial/ghostPod``)
+//     right after the pods (none for a removal or a moonlight preview). Without a preview nothing changes;
+//   * camera-taking `forestMesh(_:tier:camera:)`, `glowMesh(_:tier:camera:)`, `forestPart(_:tier:wonLevel:camera:)`
+//     and `glowPart(_:tier:wonLevel:camera:)`: every part facing the eye (moon, phase ticks, droplets, motes, flat caps
+//     and pods, glow shells, the ghost pod) faces the camera's eye and the backdrop becomes a quad perpendicular to its
+//     view axis behind the orbit box; for a camera at the authored eye and look-at point they equal the overloads
+//     without a camera, which use the authored camera. So without a preview and at the authored camera every mesh is
+//     R02-G20-03's followed by the scrubber.
+// The orbit and the preview are presentation only: never saved, never read by the rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -396,6 +425,26 @@ public enum MushroomWeatherSceneGeometry {
     public static let backdropAspects: ClosedRange<Double> = 0.25...4
     /// The backdrop's distance from the eye along the view axis (beyond the moon).
     public static let backdropDistance: Double = 6
+    /// The box an orbiting camera holds (feature 494, research R9): lower corner, the authored box extended to the
+    /// moon's depth.
+    public static let orbitBoxLow: SIMD3<Double> = SIMD3(-1.3, -1.5, -0.5)
+    /// The box an orbiting camera holds: upper corner.
+    public static let orbitBoxHigh: SIMD3<Double> = SIMD3(1.3, 1.2, 0.3)
+    /// The margin per side in view coordinates an orbiting camera refits the orbit box to (above the required 5 %; the
+    /// authored camera already holds the orbit box with it, so the refit is continuous at the authored orbit).
+    public static let refitMargin: Double = 0.052
+    /// The cycle scrubber's centre line (feature 494), between the floor and the gauges.
+    public static let scrubberY: Double = -0.9
+    /// The scrubber track's left end (cycle 0).
+    public static let scrubberStart: Double = -0.9
+    /// The scrubber track's right end (the last cycle run).
+    public static let scrubberEnd: Double = 0.9
+    /// The scrubber track's width.
+    public static let scrubberTrackWidth: Double = 0.008
+    /// The scrubber mark's reach above and below the track's centre line.
+    public static let scrubberMarkReach: Double = 0.03
+    /// The scrubber mark's width.
+    public static let scrubberMarkWidth: Double = 0.008
 
     // MARK: Material codes
 
@@ -593,6 +642,107 @@ public enum MushroomWeatherSceneGeometry {
     /// The backdrop's centre: on the view axis at ``backdropDistance`` from the eye.
     public static func backdropCentre() -> SIMD3<Double> { eye + viewBasis().forward * backdropDistance }
 
+    /// Site `index`'s ring centre (feature 494; clamped; the floor centre without sites): its cell at z 0.01.
+    public static func siteCentre(_ index: Int, _ snapshot: MushroomWeatherSceneSnapshot) -> SIMD3<Double> {
+        guard !snapshot.sites.isEmpty else { return floorCentre() }
+        var centre: SIMD3<Double> = cellCentre(snapshot.sites[clamped(index, snapshot.sites.count)], snapshot,
+                                               height: 0)
+        centre.z = siteZ
+        return centre
+    }
+
+    /// The corners of vent `index`'s frame (feature 494): the square of side 0.9 s at height 0.9 s around its centre,
+    /// counter-clockwise from (−, −).
+    public static func ventCorners(_ index: Int, _ snapshot: MushroomWeatherSceneSnapshot) -> [SIMD3<Double>] {
+        let c: SIMD3<Double> = ventCentre(index, snapshot)
+        let h: Double = ventSide * scale(snapshot) / 2
+        return [c + SIMD3(-h, -h, 0), c + SIMD3(h, -h, 0), c + SIMD3(h, h, 0), c + SIMD3(-h, h, 0)]
+    }
+
+    /// The floor rectangle's half extents (feature 494): (C · s / 2, R · s / 2) around the floor centre in the plane
+    /// z = 0, the whole grid.
+    public static func floorHalf(_ snapshot: MushroomWeatherSceneSnapshot) -> SIMD2<Double> {
+        let s: Double = scale(snapshot)
+        return SIMD2(Double(max(snapshot.columns, 0)) * s / 2, Double(max(snapshot.rows, 0)) * s / 2)
+    }
+
+    /// The scrubber track's point at `fraction` (clamped to 0 … 1; non-finite counts as 0): (−0.9 + 1.8 · fraction,
+    /// −0.9, 0) (feature 494).
+    public static func scrubberPoint(_ fraction: Double) -> SIMD3<Double> {
+        let f: Double = fraction.isFinite ? min(max(fraction, 0), 1) : 0
+        return SIMD3(scrubberStart + (scrubberEnd - scrubberStart) * f, scrubberY, 0)
+    }
+
+    /// The fraction of the scrubber track at the shown cycle: shown / cycles run (0 when nothing was run).
+    public static func scrubberFraction(_ snapshot: MushroomWeatherSceneSnapshot) -> Double {
+        guard snapshot.cyclesRun > 0 else { return 0 }
+        return min(max(Double(snapshot.shownCycle) / Double(snapshot.cyclesRun), 0), 1)
+    }
+
+    /// The scrubber mark's centre: ``scrubberPoint(_:)`` of ``scrubberFraction(_:)`` (the committed run's cycle).
+    public static func scrubberMark(_ snapshot: MushroomWeatherSceneSnapshot) -> SIMD3<Double> {
+        scrubberPoint(scrubberFraction(snapshot))
+    }
+
+    /// The snapshot the forest is drawn from (feature 494): `snapshot` itself without a preview; with a preview, a copy
+    /// with the previewed run — every cycle's field, the cycles run, the shown cycle clamped to them, each colony's
+    /// runs and whether it is in band at the shown cycle, the pods' growth (the dragged pod, still drawn at its own site,
+    /// keeps its committed growth), the vent states and the moonlight of the previewed arrangement and, while not
+    /// failed, the previewed failure; the pods, sites, stage, actions and the rest unchanged. The copy carries no
+    /// preview.
+    public static func drawnSnapshot(_ snapshot: MushroomWeatherSceneSnapshot) -> MushroomWeatherSceneSnapshot {
+        guard let preview = snapshot.preview, !preview.fields.isEmpty else { return snapshot }
+        let s: MushroomWeatherSceneSnapshot = snapshot
+        let cycles: Int = min(max(preview.report.cycles, 0), preview.fields.count - 1)
+        let shown: Int = min(max(s.shownCycle, 0), cycles)
+        let field: [Int] = preview.fields[shown]
+        var colonies: [MushroomWeatherSceneColony] = []
+        for (k, colony) in s.colonies.enumerated() {
+            let index: Int = colony.cell.row * s.columns + colony.cell.column
+            let h: Int = index >= 0 && index < field.count ? field[index] : 0
+            var finalRun: Int = colony.finalRun
+            var longestRun: Int = colony.longestRun
+            if k < preview.report.colonies.count {
+                finalRun = preview.report.colonies[k].finalRun
+                longestRun = preview.report.colonies[k].longestRun
+            }
+            colonies.append(MushroomWeatherSceneColony(cell: colony.cell, low: colony.low, high: colony.high,
+                                                       survivalFloor: colony.survivalFloor, finalRun: finalRun,
+                                                       longestRun: longestRun,
+                                                       inBand: colony.low <= h && h <= colony.high))
+        }
+        var grownAt: [Int?] = preview.report.grownAt
+        if case .pod(let slot, _) = preview.kind, slot >= 0, slot < grownAt.count, slot < s.grownAt.count {
+            grownAt[slot] = s.grownAt[slot]
+        }
+        let failure: MushroomWeatherFailure? = s.stage == .failed ? s.failure : preview.report.failure
+        return MushroomWeatherSceneSnapshot(rows: s.rows, columns: s.columns, blocked: s.blocked,
+                                            fields: preview.fields, cyclesRun: cycles, shownCycle: shown,
+                                            moldBound: s.moldBound, colonies: colonies,
+                                            requiredCycles: s.requiredCycles, pods: s.pods, grownAt: grownAt,
+                                            sites: s.sites, vents: s.vents,
+                                            ventsOpen: preview.arrangement.ventsOpen,
+                                            moonlight: preview.arrangement.moonlight, failure: failure,
+                                            stage: s.stage, actionsLeft: s.actionsLeft, budget: s.budget,
+                                            levelNumber: s.levelNumber, time: s.time)
+    }
+
+    /// The ghost pod drawn for a pod preview with a target site (feature 494): its centre (the target cell at height
+    /// 0.1 s) and radius (0.26 s when the previewed run grows the pod by the shown cycle clamped to its cycles, else
+    /// 0.18 s); nil without a preview, for a removal or for a moonlight preview.
+    public static func ghostPod(_ snapshot: MushroomWeatherSceneSnapshot)
+        -> (slot: Int, centre: SIMD3<Double>, radius: Double)? {
+        guard let preview = snapshot.preview, case .pod(let slot, let target) = preview.kind,
+              let cell = target else { return nil }
+        let shown: Int = min(max(snapshot.shownCycle, 0), max(preview.report.cycles, 0))
+        var grown: Bool = false
+        if slot >= 0, slot < preview.report.grownAt.count, let cycle = preview.report.grownAt[slot] {
+            grown = shown >= cycle
+        }
+        return (slot: slot, centre: cellCentre(cell, snapshot, height: podHeight),
+                radius: (grown ? grownRadius : podRadius) * scale(snapshot))
+    }
+
     // MARK: Elements
 
     /// Every element with its centre, in drawing order (by kind, then index; clarification Q1). The same for every
@@ -675,31 +825,93 @@ public enum MushroomWeatherSceneGeometry {
 
     // MARK: Meshes
 
-    /// The forest mesh for the forest program, in drawing order (see the header).
+    /// The forest mesh for the forest program, in drawing order (see the header), seen from the authored camera.
     public static func forestMesh(_ snapshot: MushroomWeatherSceneSnapshot,
                                   tier: MushroomWeatherTier) throws(MeshError) -> Mesh {
         try forestPart(snapshot, tier: tier).mesh
     }
 
-    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2.
+    /// The forest mesh seen from `camera` (feature 494): every eye-facing part facing its eye and the backdrop behind
+    /// the orbit box (``forestPart(_:tier:wonLevel:camera:)`` without colours); equal to ``forestMesh(_:tier:)`` for a
+    /// camera at the authored eye and look-at point.
+    public static func forestMesh(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier,
+                                  camera: MushroomWeatherCamera) throws(MeshError) -> Mesh {
+        try forestPart(snapshot, tier: tier, camera: camera).mesh
+    }
+
+    /// The glow mesh for the glow program (`glowPart` without colours); empty at level-2. Seen from the authored
+    /// camera.
     public static func glowMesh(_ snapshot: MushroomWeatherSceneSnapshot,
                                 tier: MushroomWeatherTier) throws(MeshError) -> Mesh {
         try glowPart(snapshot, tier: tier).mesh
+    }
+
+    /// The glow mesh seen from `camera` (feature 494): every shell facing its eye
+    /// (``glowPart(_:tier:wonLevel:camera:)`` without colours); empty at level-2; equal to ``glowMesh(_:tier:)`` for a camera at the authored eye and look-at
+    /// point.
+    public static func glowMesh(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier,
+                                camera: MushroomWeatherCamera) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, camera: camera).mesh
     }
 
     /// The whole forest with fallback colours for the shared unlit renderer: each vertex in the base colour the forest
     /// vertex shader selects (``colour(of:won:)``: mist shaded by its value, the moon by its brightness, broken parts
     /// in the broken colour, out-of-band caps in the cap colour on a won level), the backdrop from midnight at its
     /// bottom to midnight top at its top. The mesh is ``forestMesh(_:tier:)``; `wonLevel` (default `snapshot.isWon`)
-    /// changes only the colours.
+    /// changes only the colours. Seen from the authored camera; the preview and the scrubber as in the header (feature
+    /// 494).
     public static func forestPart(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier,
                                   wonLevel: Bool? = nil) throws(MeshError) -> MushroomWeatherColouredMesh {
+        try forest(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts())
+    }
+
+    /// The whole forest with fallback colours seen from `camera` (feature 494): every eye-facing part facing its eye
+    /// and the backdrop a quad perpendicular to its view axis behind the orbit box; otherwise as
+    /// ``forestPart(_:tier:wonLevel:)``, which it equals for a camera at the authored eye and look-at point.
+    public static func forestPart(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier,
+                                  wonLevel: Bool? = nil,
+                                  camera: MushroomWeatherCamera) throws(MeshError) -> MushroomWeatherColouredMesh {
+        try forest(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(camera: camera))
+    }
+
+    /// The forest of R02-G20-03 alone (feature 494): every element of `snapshot` in drawing order, without the preview
+    /// and the scrubber, seen from the authored camera (the reference the tests compare the new meshes with).
+    static func elementsPart(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier,
+                             wonLevel: Bool? = nil) throws(MeshError) -> MushroomWeatherColouredMesh {
         var parts: Parts = Parts()
         parts.won = (wonLevel ?? snapshot.isWon) ? 1 : 0
         for element in paintOrder(snapshot) {
             try draw(element, into: &parts, snapshot, tier: tier)
         }
         return parts.built()
+    }
+
+    /// Builds the forest into `parts` (empty, with the eye to face): every element of the drawn snapshot
+    /// (``drawnSnapshot(_:)``) in drawing order, the ghost pod right after the pods, then the scrubber of `snapshot`.
+    static func forest(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier, wonLevel: Bool?,
+                       parts start: Parts) throws(MeshError) -> MushroomWeatherColouredMesh {
+        var parts: Parts = start
+        parts.won = (wonLevel ?? snapshot.isWon) ? 1 : 0
+        let drawn: MushroomWeatherSceneSnapshot = drawnSnapshot(snapshot)
+        var ghost: (slot: Int, centre: SIMD3<Double>, radius: Double)? = ghostPod(snapshot)
+        for element in paintOrder(drawn) {
+            if let g = ghost, element.kind.rawValue > MushroomWeatherElement.Kind.pod.rawValue {
+                try parts.billboardQuad(centre: g.centre, half: g.radius, code: code(.ghostPod), w: 0)
+                ghost = nil
+            }
+            try draw(element, into: &parts, drawn, tier: tier)
+        }
+        if let g = ghost { try parts.billboardQuad(centre: g.centre, half: g.radius, code: code(.ghostPod), w: 0) }
+        try scrubber(&parts, snapshot)
+        return parts.built()
+    }
+
+    /// Draws the scrubber (feature 494): the track and the mark at the shown cycle (strips at z 0, material 30).
+    static func scrubber(_ parts: inout Parts, _ snapshot: MushroomWeatherSceneSnapshot) throws(MeshError) {
+        try parts.strip(scrubberPoint(0), scrubberPoint(1), width: scrubberTrackWidth, code: code(.scrubber))
+        let mark: SIMD3<Double> = scrubberMark(snapshot)
+        try parts.strip(mark - SIMD3(0, scrubberMarkReach, 0), mark + SIMD3(0, scrubberMarkReach, 0),
+                        width: scrubberMarkWidth, code: code(.scrubber))
     }
 
     /// Draws one element into `parts` (see the header).
@@ -712,7 +924,11 @@ public enum MushroomWeatherSceneGeometry {
         let y: SIMD3<Double> = SIMD3(0, 1, 0)
         switch element.kind {
         case .backdrop:
-            try backdrop(&parts)
+            if let camera = parts.camera {
+                try facingBackdrop(&parts, camera)
+            } else {
+                try backdrop(&parts)
+            }
         case .moon:
             try moon(&parts, moonlight: snapshot.moonlight)
         case .floor:
@@ -807,14 +1023,44 @@ public enum MushroomWeatherSceneGeometry {
                        colours: [low, low, high, high], facing: -basis.forward)
     }
 
+    /// Draws the backdrop facing `camera`'s eye (feature 494): one quad perpendicular to its view axis at the larger of
+    /// ``backdropDistance`` and the farthest orbit-box corner's depth plus 1, with ``backdropHalf()`` scaled by that
+    /// distance over ``backdropDistance`` (the orbit cameras keep the authored field of view, so it fills the view at
+    /// aspects 0.25 … 4); a_uv.y the height 0 … 1 as the authored backdrop.
+    static func facingBackdrop(_ parts: inout Parts, _ camera: MushroomWeatherCamera) throws(MeshError) {
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis(camera)
+        let distance: Double = facingBackdropDistance(camera)
+        let half: SIMD2<Double> = backdropHalf() * (distance / backdropDistance)
+        let c: SIMD3<Double> = camera.eye + basis.forward * distance
+        let w: SIMD3<Double> = basis.right * half.x
+        let h: SIMD3<Double> = basis.up * half.y
+        let low: SIMD3<Double> = MushroomWeatherShaders.backdropColour(height: 0)
+        let high: SIMD3<Double> = MushroomWeatherShaders.backdropColour(height: 1)
+        try parts.quad([c - w - h, c + w - h, c + w + h, c - w + h], code: code(.backdrop), local: [0, 0, 1, 1],
+                       colours: [low, low, high, high], facing: -basis.forward)
+    }
+
+    /// The distance from `camera`'s eye along its view axis at which ``facingBackdrop(_:_:)`` stands: the larger of
+    /// ``backdropDistance`` and the farthest orbit-box corner's depth plus 1.
+    static func facingBackdropDistance(_ camera: MushroomWeatherCamera) -> Double {
+        let forward: SIMD3<Double> = viewBasis(camera).forward
+        var farthest: Double = 0
+        for index in 0..<8 { farthest = max(farthest, dot(orbitCorner(index) - camera.eye, forward)) }
+        return max(backdropDistance, farthest + 1)
+    }
+
     /// The moon's brightness (4 + L)/7 for moonlight L (clamped to 0 … 3), the moon's value.
     public static func moonBrightness(_ moonlight: Int) -> Double {
         MushroomWeatherShaders.moonBrightness(moonlight: moonlight)
     }
 
     /// The centre of phase tick `k` (0 top, 1 right, 2 bottom, 3 left), in the moon's eye-facing plane.
-    public static func tickCentre(_ k: Int) -> SIMD3<Double> {
-        let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) = billboardBasis(moonPosition)
+    public static func tickCentre(_ k: Int) -> SIMD3<Double> { tickCentre(k, eye: eye) }
+
+    /// The centre of phase tick `k` in the moon's plane facing `eye` (feature 494).
+    static func tickCentre(_ k: Int, eye viewer: SIMD3<Double>) -> SIMD3<Double> {
+        let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) = billboardBasis(moonPosition,
+                                                                                                 eye: viewer)
         let angle: Double = Double.pi / 2 - Double(k) * Double.pi / 2
         return moonPosition + (b.right * cos(angle) + b.up * sin(angle)) * tickOrbit
     }
@@ -828,7 +1074,7 @@ public enum MushroomWeatherSceneGeometry {
                                 code: code(.moon, value: moonBrightness(moonlight)), w: 0)
         let filled: Int = filledTicks(moonlight)
         for k in 0..<tickCount {
-            try parts.billboardQuad(centre: tickCentre(k), half: tickRadius,
+            try parts.billboardQuad(centre: tickCentre(k, eye: parts.eye), half: tickRadius,
                                     code: code(k < filled ? .phaseTickLit : .phaseTickUnlit), w: 0)
         }
     }
@@ -1118,12 +1364,29 @@ public enum MushroomWeatherSceneGeometry {
     /// (default `snapshot.isWon`) changes only the colours.
     public static func glowPart(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier,
                                 wonLevel: Bool? = nil) throws(MeshError) -> MushroomWeatherColouredMesh {
+        try glow(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts())
+    }
+
+    /// The glow with fallback colours seen from `camera` (feature 494): every shell facing its eye; otherwise as
+    /// ``glowPart(_:tier:wonLevel:)``, which it equals for a camera at the authored eye and look-at point. Drawn from
+    /// ``drawnSnapshot(_:)`` (the previewed run while a preview is drawn).
+    public static func glowPart(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier,
+                                wonLevel: Bool? = nil,
+                                camera: MushroomWeatherCamera) throws(MeshError) -> MushroomWeatherColouredMesh {
+        try glow(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(camera: camera))
+    }
+
+    /// Builds the glow into `parts` (empty, with the eye to face; see ``glowPart(_:tier:wonLevel:)``) from the drawn
+    /// snapshot (``drawnSnapshot(_:)``).
+    static func glow(_ source: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier, wonLevel: Bool?,
+                     parts start: Parts) throws(MeshError) -> MushroomWeatherColouredMesh {
         typealias K = MushroomWeatherShaders.GlowKind
-        var parts: Parts = Parts()
+        var parts: Parts = start
+        let snapshot: MushroomWeatherSceneSnapshot = drawnSnapshot(source)
         let shells: Int = max(tier.glowShells, 0)
         guard shells > 0 else { return parts.built() }
         let s: Double = scale(snapshot)
-        let won: Bool = wonLevel ?? snapshot.isWon
+        let won: Bool = wonLevel ?? source.isWon
         for k in stride(from: shells, through: 1, by: -1) {
             for colony in snapshot.colonies.indices {
                 let factor: Double = MushroomWeatherShaders.glowFactor(inBand: capLit(colony, snapshot, won: false))
@@ -1150,11 +1413,28 @@ public enum MushroomWeatherSceneGeometry {
         return (forward: f, right: r, up: cross(r, f))
     }
 
+    /// `camera`'s unit forward, right and up vectors, read from its view matrix (feature 494): for the authored camera
+    /// those of ``viewBasis()`` within rounding.
+    public static func viewBasis(_ camera: MushroomWeatherCamera)
+        -> (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) {
+        let v: Mat4 = camera.view
+        let right: SIMD3<Double> = SIMD3(v.c0.x, v.c1.x, v.c2.x)
+        let up: SIMD3<Double> = SIMD3(v.c0.y, v.c1.y, v.c2.y)
+        let forward: SIMD3<Double> = SIMD3(-v.c0.z, -v.c1.z, -v.c2.z)
+        return (forward: forward, right: right, up: up)
+    }
+
     /// The basis of a part facing the eye at `centre`: right (+z × towards-eye, +x when degenerate), up and the unit
     /// direction towards the eye (right × up).
     static func billboardBasis(_ centre: SIMD3<Double>)
         -> (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) {
-        let w: SIMD3<Double> = unit(eye - centre)
+        billboardBasis(centre, eye: eye)
+    }
+
+    /// The basis of a part at `centre` facing `viewer` (feature 494; ``billboardBasis(_:)`` for the authored eye).
+    static func billboardBasis(_ centre: SIMD3<Double>, eye viewer: SIMD3<Double>)
+        -> (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) {
+        let w: SIMD3<Double> = unit(viewer - centre)
         let raw: SIMD3<Double> = cross(SIMD3(0, 0, 1), w)
         let length: Double = (raw.x * raw.x + raw.y * raw.y + raw.z * raw.z).squareRoot()
         let right: SIMD3<Double> = length > 1e-9 ? raw / length : SIMD3(1, 0, 0)
@@ -1173,11 +1453,106 @@ public enum MushroomWeatherSceneGeometry {
               index & 4 == 0 ? boxLow.z : boxHigh.z)
     }
 
+    /// Corner `index` (0 … 7; bit 0 x, bit 1 y, bit 2 z, clear: low) of the orbit box (feature 494).
+    static func orbitCorner(_ index: Int) -> SIMD3<Double> {
+        SIMD3(index & 1 == 0 ? orbitBoxLow.x : orbitBoxHigh.x, index & 2 == 0 ? orbitBoxLow.y : orbitBoxHigh.y,
+              index & 4 == 0 ? orbitBoxLow.z : orbitBoxHigh.z)
+    }
+
     /// The fixed camera for `aspect`: from (0, −1.6, 3.0) looking at (0, −0.2, 0) with +y up; the vertical field of
     /// view is the smallest that holds every corner of the box x −1.3 … 1.3, y −1.5 … 1.2, z 0 … 0.3 inside the view
     /// with ``fitMargin`` per side (the box is convex and in front of the eye, so every point inside it keeps a margin
-    /// of at least 5 % for aspect 0.4 … 2.5). Independent of the snapshot, the tier and the time.
+    /// of at least 5 % for aspect 0.4 … 2.5). Independent of the snapshot, the tier and the time. Equals
+    /// ``camera(aspect:orbit:)`` at ``MushroomWeatherViewOrbit/authored`` bit for bit (feature 494).
     public static func camera(aspect: Double) -> MushroomWeatherCamera {
+        camera(aspect: aspect, orbit: .authored)
+    }
+
+    /// The camera for `orbit` (clamped, see ``MushroomWeatherViewOrbit/clamped()``) and `aspect` (feature 494,
+    /// T-R02G2004-002; research R9): the authored frame turned by the orbit (``orbitFrame(_:)``), the authored field of
+    /// view for the aspect, and the eye on the turned view axis at the larger of the authored distance (3.31) and the
+    /// distance at which every corner of the orbit box (x −1.3 … 1.3, y −1.5 … 1.2, z −0.5 … 0.3) lies inside the view
+    /// with ``refitMargin`` per side, so everything inside the box keeps a margin of at least 5 % at every orbit and
+    /// aspect 0.4 … 2.5; the eye stays outside the box. Near half the nearest corner's depth (at least 0.001), far
+    /// past the facing backdrop. At the authored orbit it is the fixed camera of R02-G20-03, bit for bit.
+    /// Presentation only; independent of the snapshot, the tier and the time.
+    public static func camera(aspect: Double, orbit: MushroomWeatherViewOrbit) -> MushroomWeatherCamera {
+        let o: MushroomWeatherViewOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return authoredCamera(aspect: aspect) }
+        let a: Double = usableAspect(aspect)
+        let fovY: Double = authoredCamera(aspect: a).fovY
+        let frame: (target: SIMD3<Double>, back: SIMD3<Double>, up: SIMD3<Double>) = orbitFrame(o)
+        let forward: SIMD3<Double> = -frame.back
+        let right: SIMD3<Double> = unit(cross(forward, frame.up))
+        let up: SIMD3<Double> = cross(right, forward)
+        let tanHalf: Double = tan(fovY / 2)
+        let limit: Double = 1 - 2 * refitMargin
+        var distance: Double = authoredDistance
+        for index in 0..<8 {
+            let r: SIMD3<Double> = orbitCorner(index) - frame.target
+            let along: Double = dot(r, forward)
+            let vertical: Double = abs(dot(r, up)) / (limit * tanHalf) - along
+            let horizontal: Double = abs(dot(r, right)) / (limit * tanHalf * a) - along
+            distance = max(distance, vertical, horizontal)
+        }
+        let eyePoint: SIMD3<Double> = frame.target + frame.back * distance
+        var nearest: Double = Double.infinity
+        var farthest: Double = 0
+        for index in 0..<8 {
+            let depth: Double = dot(orbitCorner(index) - eyePoint, forward)
+            nearest = min(nearest, depth)
+            farthest = max(farthest, depth)
+        }
+        let near: Double = max(nearest * 0.5, 1e-3)
+        let far: Double = max(farthest + 1, backdropDistance) + 2
+        let view: Mat4 = Mat4.lookAt(eye: vec(eyePoint), target: vec(frame.target), up: vec(up))
+        let projection: Mat4 = Mat4.perspective(fovY: fovY, aspect: a, near: near, far: far)
+        return MushroomWeatherCamera(eye: eyePoint, target: frame.target, fovY: fovY, aspect: a, near: near, far: far,
+                                     view: view, projection: projection, viewProjection: projection * view)
+    }
+
+    /// The authored distance from the eye to the look-at point, |(0, −1.4, 3.0)| ≈ 3.31.
+    static var authoredDistance: Double {
+        let d: SIMD3<Double> = eye - lookAt
+        return dot(d, d).squareRoot()
+    }
+
+    /// The vertical axis the orbit yaws about passes through the orbit box centre (0, −0.15, −0.1).
+    static var orbitPivot: SIMD3<Double> { (orbitBoxLow + orbitBoxHigh) / 2 }
+
+    /// `v` turned by `angle` radians about +x (the authored right axis), counter-clockwise seen from +x.
+    static func pitched(_ v: SIMD3<Double>, _ angle: Double) -> SIMD3<Double> {
+        let c: Double = cos(angle)
+        let s: Double = sin(angle)
+        return SIMD3(v.x, v.y * c - v.z * s, v.y * s + v.z * c)
+    }
+
+    /// `v` turned by `angle` radians about +z, counter-clockwise seen from above.
+    static func yawed(_ v: SIMD3<Double>, _ angle: Double) -> SIMD3<Double> {
+        let c: Double = cos(angle)
+        let s: Double = sin(angle)
+        return SIMD3(v.x * c - v.y * s, v.x * s + v.y * c, v.z)
+    }
+
+    /// The frame of `orbit` (clamped): the look-at point, the unit direction from it back towards the eye and the unit
+    /// up direction. The authored frame (look-at (0, −0.2, 0), back along (0, −1.4, 3.0), up ``viewBasis()``'s) is
+    /// turned rigidly by −pitch about +x through the look-at point (so a positive pitch raises the eye; the frame never
+    /// rolls, even with the eye straight above the look-at point at pitch ≈ 25°), then by the yaw about the vertical
+    /// axis through ``orbitPivot``.
+    static func orbitFrame(_ orbit: MushroomWeatherViewOrbit)
+        -> (target: SIMD3<Double>, back: SIMD3<Double>, up: SIMD3<Double>) {
+        let o: MushroomWeatherViewOrbit = orbit.clamped()
+        let back0: SIMD3<Double> = unit(eye - lookAt)
+        let up0: SIMD3<Double> = viewBasis().up
+        let back1: SIMD3<Double> = pitched(back0, -o.pitch)
+        let up1: SIMD3<Double> = pitched(up0, -o.pitch)
+        let pivot: SIMD3<Double> = SIMD3(orbitPivot.x, orbitPivot.y, 0)
+        let target: SIMD3<Double> = pivot + yawed(lookAt - pivot, o.yaw)
+        return (target: target, back: unit(yawed(back1, o.yaw)), up: unit(yawed(up1, o.yaw)))
+    }
+
+    /// The fixed camera of R02-G20-03 for `aspect` (see ``camera(aspect:)``), unchanged.
+    static func authoredCamera(aspect: Double) -> MushroomWeatherCamera {
         let a: Double = usableAspect(aspect)
         let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis()
         let limit: Double = 1 - 2 * fitMargin
@@ -1257,6 +1632,23 @@ public enum MushroomWeatherSceneGeometry {
         var colours: [Vec4] = []
         /// The won light the fallback colours use (0 or 1).
         var won: Double = 0
+        /// The eye the eye-facing parts face (feature 494): the authored eye unless a camera is given.
+        var eye: SIMD3<Double> = MushroomWeatherSceneGeometry.eye
+        /// The camera whose view the backdrop faces, nil for the authored camera (feature 494).
+        var camera: MushroomWeatherCamera? = nil
+
+        /// Parts seen from the authored camera.
+        init() {}
+
+        /// Parts seen from `camera` (feature 494): its eye faced; a camera at the authored eye and look-at point
+        /// counts as the authored camera, so its meshes equal the authored ones.
+        init(camera: MushroomWeatherCamera) {
+            typealias G = MushroomWeatherSceneGeometry
+            if camera.eye != G.eye || camera.target != G.lookAt {
+                eye = camera.eye
+                self.camera = camera
+            }
+        }
         /// The side floor-parallel flats face: up, towards the eye.
         static let up: SIMD3<Double> = SIMD3(0, 0, 1)
         /// The zero vector (a_normal of strips, flat solids and the backdrop).
@@ -1352,7 +1744,7 @@ public enum MushroomWeatherSceneGeometry {
         /// eye-facing basis).
         mutating func billboardQuad(centre: SIMD3<Double>, half: Double, code: Double, w: Double) throws(MeshError) {
             let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) =
-                MushroomWeatherSceneGeometry.billboardBasis(centre)
+                MushroomWeatherSceneGeometry.billboardBasis(centre, eye: eye)
             try shapeQuad(centre: centre, u: b.right, v: b.up, half: SIMD2(half, half), code: code, w: w)
         }
 
@@ -1361,7 +1753,7 @@ public enum MushroomWeatherSceneGeometry {
         mutating func billboardDisc(centre: SIMD3<Double>, radius: Double, sides: Int,
                                     code: Double) throws(MeshError) {
             let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) =
-                MushroomWeatherSceneGeometry.billboardBasis(centre)
+                MushroomWeatherSceneGeometry.billboardBasis(centre, eye: eye)
             let n: Int = max(sides, 3)
             var outline: [SIMD3<Double>] = []
             for k in 0..<n {
@@ -1413,7 +1805,7 @@ public enum MushroomWeatherSceneGeometry {
         mutating func glowBand(centre: SIMD3<Double>, inner: Double, outer: Double, code: Double,
                                colour: SIMD3<Double>) throws(MeshError) {
             let b: (right: SIMD3<Double>, up: SIMD3<Double>, facing: SIMD3<Double>) =
-                MushroomWeatherSceneGeometry.billboardBasis(centre)
+                MushroomWeatherSceneGeometry.billboardBasis(centre, eye: eye)
             let n: Int = MushroomWeatherSceneGeometry.glowSides
             for k in 0..<n {
                 let a0: Double = 2 * Double.pi * Double(k) / Double(n)
