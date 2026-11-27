@@ -1,0 +1,250 @@
+{
+  "actions" : [
+    {
+      "place" : {
+        "cell" : {
+          "column" : 3,
+          "row" : 2
+        },
+        "slot" : 0
+      }
+    },
+    {
+      "moonlight" : {
+        "level" : 1
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "arrangements" : 8,
+    "depth" : 1,
+    "nearestMiss" : 11
+  },
+  "difficulty" : {
+    "actions" : 2,
+    "arrangementsSearched" : 9,
+    "colonies" : 2,
+    "narrowestBand" : 11,
+    "nearestMiss" : 11,
+    "sites" : 4,
+    "vents" : 1,
+    "work" : 11
+  },
+  "digests" : [
+    "e3c2f2ba9a13ed6a",
+    "41ded8371413f06d",
+    "41ded8371413f06d"
+  ],
+  "fingerprints" : [
+    "bfd8c67ab58e233411fd4d5bb91f00825fb0f577f32d43fcba415071870ff233",
+    "c46a07bfacf9075600ea10bde594df434cd46d27ed36ac123abfb84463ad20f8",
+    "2fe10f697482e644d46cf5e7d4dad87fff5f24351b5b490f9ee9e745fb6ef0be",
+    "6fc7b5e9c7f7e6a7a406a83a308d3d9a16ada2157531d7a4cfac10b379427ef7"
+  ],
+  "level" : {
+    "blocked" : [
+      {
+        "column" : 5,
+        "row" : 0
+      },
+      {
+        "column" : 4,
+        "row" : 2
+      },
+      {
+        "column" : 0,
+        "row" : 6
+      }
+    ],
+    "budget" : 8,
+    "colonies" : [
+      {
+        "cell" : {
+          "column" : 5,
+          "row" : 1
+        },
+        "high" : 34,
+        "low" : 20,
+        "survivalFloor" : 15
+      },
+      {
+        "cell" : {
+          "column" : 2,
+          "row" : 2
+        },
+        "high" : 61,
+        "low" : 50,
+        "survivalFloor" : 37
+      }
+    ],
+    "columns" : 6,
+    "difficulty" : 1,
+    "diffusion" : 12,
+    "fingerprint" : "636f882e3973d6cad80804ddde3f3c65a06ba8aaf04563bf6d159d766cb5b0d2",
+    "humidity" : [
+      28,
+      89,
+      76,
+      78,
+      109,
+      0,
+      113,
+      119,
+      80,
+      120,
+      167,
+      104,
+      41,
+      39,
+      132,
+      98,
+      0,
+      7,
+      197,
+      93,
+      96,
+      82,
+      87,
+      153,
+      172,
+      126,
+      177,
+      103,
+      185,
+      86,
+      188,
+      115,
+      31,
+      103,
+      154,
+      146,
+      0,
+      160,
+      136,
+      182,
+      52,
+      9
+    ],
+    "id" : "mushroom-weather-004",
+    "length" : 40,
+    "moldBound" : 1276,
+    "moonlight" : 2,
+    "podRules" : {
+      "grownRelease" : 37,
+      "growthThreshold" : 3616,
+      "release" : 24,
+      "slots" : 2
+    },
+    "pods" : [
+      null,
+      null
+    ],
+    "rates" : [
+      25,
+      34,
+      43,
+      39,
+      55,
+      0,
+      26,
+      24,
+      35,
+      37,
+      47,
+      34,
+      29,
+      34,
+      38,
+      42,
+      0,
+      27,
+      22,
+      56,
+      60,
+      44,
+      43,
+      42,
+      55,
+      25,
+      22,
+      54,
+      57,
+      31,
+      33,
+      40,
+      60,
+      48,
+      48,
+      25,
+      0,
+      42,
+      43,
+      22,
+      52,
+      43
+    ],
+    "required" : 7,
+    "rows" : 7,
+    "schema" : 1,
+    "seed" : 6966803643927394771,
+    "sites" : [
+      {
+        "column" : 2,
+        "row" : 1
+      },
+      {
+        "column" : 1,
+        "row" : 2
+      },
+      {
+        "column" : 3,
+        "row" : 2
+      },
+      {
+        "column" : 2,
+        "row" : 3
+      }
+    ],
+    "tutorial" : false,
+    "vents" : [
+      {
+        "cell" : {
+          "column" : 1,
+          "row" : 1
+        },
+        "closedRate" : 22,
+        "openRate" : 185
+      }
+    ],
+    "ventsOpen" : [
+      true
+    ]
+  },
+  "number" : 4,
+  "report" : {
+    "colonies" : [
+      {
+        "finalRun" : 7,
+        "firstOutOfBand" : 1,
+        "longestRun" : 7
+      },
+      {
+        "finalRun" : 18,
+        "firstOutOfBand" : 1,
+        "longestRun" : 18
+      }
+    ],
+    "cycles" : 40,
+    "end" : 1322,
+    "evaporated" : 3962,
+    "released" : 1051,
+    "start" : 4233
+  },
+  "schema" : 1,
+  "skipped" : 1
+}

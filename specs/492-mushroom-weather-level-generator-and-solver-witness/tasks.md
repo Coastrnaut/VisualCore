@@ -82,7 +82,7 @@ edited file is refused.
   cycles run); counterexample (the depth one below, the count of arrangements at it, the nearest miss); difficulty;
   skipped; decode refuses newer, damaged and non-replaying files) with
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G2002-006 [US2] [US3] [US4] Create
+- [X] T-R02G2002-006 [US2] [US3] [US4] Create — Verified 2026-11-26: 2026-11-26 host-5 exit 0: 91 tests in 11 suites incl. catalog suite (pinned digest a71fe37a…, 100 witnesses win, independent enumeration on 10 levels, 20 byte-for-byte groups); 100 witness files (.autonomy/migration/checks/R02-G20-02.host-5.json)
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the budget, and no arrangement at a smaller distance wins; the
   independent breadth-first search on the two levels with the fewest sites, then fewest colonies, in each band (ties by

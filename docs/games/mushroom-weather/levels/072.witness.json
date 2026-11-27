@@ -1,0 +1,389 @@
+{
+  "actions" : [
+    {
+      "place" : {
+        "cell" : {
+          "column" : 9,
+          "row" : 2
+        },
+        "slot" : 0
+      }
+    },
+    {
+      "place" : {
+        "cell" : {
+          "column" : 8,
+          "row" : 4
+        },
+        "slot" : 1
+      }
+    },
+    {
+      "place" : {
+        "cell" : {
+          "column" : 7,
+          "row" : 6
+        },
+        "slot" : 2
+      }
+    },
+    {
+      "vent" : {
+        "index" : 0,
+        "open" : false
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "arrangements" : 192,
+    "depth" : 3,
+    "nearestMiss" : 11
+  },
+  "difficulty" : {
+    "actions" : 4,
+    "arrangementsSearched" : 268,
+    "colonies" : 4,
+    "narrowestBand" : 4,
+    "nearestMiss" : 11,
+    "sites" : 6,
+    "vents" : 3,
+    "work" : 277
+  },
+  "digests" : [
+    "1d26abbb1c942a87",
+    "d2dec8f75b30f5e3",
+    "975b1ccf046c98fb",
+    "d81d15c36755b9b0",
+    "d81d15c36755b9b0"
+  ],
+  "fingerprints" : [
+    "d141e0584549a9883969d6271a1b5863538b2796c6782d5040db9aed5f5ecd70",
+    "8c8b58a9d48e2f33b2abe0775c7d909770c8871baea7eefcd1a2d7da9d5f6c20",
+    "14f92a5344bbc48b1400fcf90cbbdcf250b7d90206ae5ba921ec975dc91fb9fc",
+    "623f871d165609088d946513c4cf6965fd72dd5bad54816f222d4b781770f05f",
+    "531669f9e9ae37c4bb59a50982401cf37095f0b262ed4d5e11fae25680672fd7",
+    "8017d7ff9dcf0f7cd88d7bc015b054cfee2125ddcda20c89d7fb0ecf483eb172"
+  ],
+  "level" : {
+    "blocked" : [
+      {
+        "column" : 0,
+        "row" : 0
+      },
+      {
+        "column" : 1,
+        "row" : 0
+      },
+      {
+        "column" : 2,
+        "row" : 0
+      },
+      {
+        "column" : 5,
+        "row" : 1
+      },
+      {
+        "column" : 0,
+        "row" : 4
+      }
+    ],
+    "budget" : 14,
+    "colonies" : [
+      {
+        "cell" : {
+          "column" : 9,
+          "row" : 3
+        },
+        "high" : 63,
+        "low" : 59,
+        "survivalFloor" : 24
+      },
+      {
+        "cell" : {
+          "column" : 3,
+          "row" : 1
+        },
+        "high" : 41,
+        "low" : 28
+      },
+      {
+        "cell" : {
+          "column" : 7,
+          "row" : 5
+        },
+        "high" : 46,
+        "low" : 37
+      },
+      {
+        "cell" : {
+          "column" : 6,
+          "row" : 5
+        },
+        "high" : 29,
+        "low" : 23
+      }
+    ],
+    "columns" : 10,
+    "difficulty" : 4,
+    "diffusion" : 4,
+    "fingerprint" : "46637b9b33cef521aab2a64e63320858e87250624df85599e6dbed203b7425ba",
+    "humidity" : [
+      0,
+      0,
+      0,
+      151,
+      154,
+      108,
+      32,
+      79,
+      170,
+      54,
+      195,
+      181,
+      2,
+      178,
+      12,
+      0,
+      177,
+      101,
+      169,
+      35,
+      135,
+      128,
+      173,
+      111,
+      184,
+      141,
+      159,
+      60,
+      52,
+      68,
+      179,
+      10,
+      82,
+      4,
+      162,
+      191,
+      143,
+      151,
+      125,
+      24,
+      0,
+      76,
+      173,
+      30,
+      185,
+      82,
+      188,
+      197,
+      170,
+      138,
+      195,
+      162,
+      197,
+      42,
+      71,
+      63,
+      56,
+      93,
+      175,
+      126,
+      195,
+      115,
+      127,
+      43,
+      71,
+      54,
+      13,
+      98,
+      89,
+      44
+    ],
+    "id" : "mushroom-weather-072",
+    "length" : 31,
+    "moldBound" : 1770,
+    "moonlight" : 2,
+    "podRules" : {
+      "grownRelease" : 40,
+      "growthThreshold" : 3803,
+      "release" : 16,
+      "slots" : 3
+    },
+    "pods" : [
+      null,
+      null,
+      null
+    ],
+    "rates" : [
+      0,
+      0,
+      0,
+      39,
+      39,
+      22,
+      52,
+      52,
+      43,
+      47,
+      54,
+      41,
+      48,
+      48,
+      53,
+      0,
+      46,
+      28,
+      37,
+      22,
+      32,
+      44,
+      30,
+      26,
+      31,
+      43,
+      22,
+      43,
+      48,
+      34,
+      33,
+      52,
+      35,
+      44,
+      60,
+      49,
+      27,
+      31,
+      60,
+      32,
+      0,
+      31,
+      31,
+      42,
+      21,
+      53,
+      39,
+      42,
+      39,
+      59,
+      34,
+      43,
+      27,
+      30,
+      34,
+      25,
+      55,
+      39,
+      33,
+      31,
+      53,
+      24,
+      24,
+      40,
+      34,
+      28,
+      60,
+      36,
+      47,
+      39
+    ],
+    "required" : 8,
+    "rows" : 7,
+    "schema" : 1,
+    "seed" : 10045156470967034425,
+    "sites" : [
+      {
+        "column" : 3,
+        "row" : 0
+      },
+      {
+        "column" : 3,
+        "row" : 2
+      },
+      {
+        "column" : 9,
+        "row" : 2
+      },
+      {
+        "column" : 8,
+        "row" : 4
+      },
+      {
+        "column" : 5,
+        "row" : 5
+      },
+      {
+        "column" : 7,
+        "row" : 6
+      }
+    ],
+    "tutorial" : false,
+    "vents" : [
+      {
+        "cell" : {
+          "column" : 4,
+          "row" : 1
+        },
+        "closedRate" : 4,
+        "openRate" : 190
+      },
+      {
+        "cell" : {
+          "column" : 8,
+          "row" : 5
+        },
+        "closedRate" : 26,
+        "openRate" : 155
+      },
+      {
+        "cell" : {
+          "column" : 7,
+          "row" : 4
+        },
+        "closedRate" : 30,
+        "openRate" : 146
+      }
+    ],
+    "ventsOpen" : [
+      true,
+      true,
+      true
+    ]
+  },
+  "number" : 72,
+  "report" : {
+    "colonies" : [
+      {
+        "finalRun" : 11,
+        "firstOutOfBand" : 1,
+        "longestRun" : 11
+      },
+      {
+        "finalRun" : 11,
+        "firstOutOfBand" : 1,
+        "longestRun" : 11
+      },
+      {
+        "finalRun" : 10,
+        "firstOutOfBand" : 1,
+        "longestRun" : 10
+      },
+      {
+        "finalRun" : 9,
+        "firstOutOfBand" : 1,
+        "longestRun" : 9
+      }
+    ],
+    "cycles" : 31,
+    "end" : 2318,
+    "evaporated" : 6518,
+    "released" : 1488,
+    "start" : 7348
+  },
+  "schema" : 1,
+  "skipped" : 2
+}

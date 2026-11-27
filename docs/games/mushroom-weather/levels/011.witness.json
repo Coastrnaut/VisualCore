@@ -1,0 +1,256 @@
+{
+  "actions" : [
+    {
+      "place" : {
+        "cell" : {
+          "column" : 3,
+          "row" : 3
+        },
+        "slot" : 0
+      }
+    },
+    {
+      "moonlight" : {
+        "level" : 3
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "arrangements" : 8,
+    "depth" : 1,
+    "nearestMiss" : 23
+  },
+  "difficulty" : {
+    "actions" : 2,
+    "arrangementsSearched" : 9,
+    "colonies" : 2,
+    "narrowestBand" : 9,
+    "nearestMiss" : 23,
+    "sites" : 4,
+    "vents" : 1,
+    "work" : 25
+  },
+  "digests" : [
+    "69626b3fa9d78768",
+    "c437d38afdb235a7",
+    "c437d38afdb235a7"
+  ],
+  "fingerprints" : [
+    "5a1dd80ae334f3f5051a6a38050df33c800aa61786da143b21dc356d059dd0ff",
+    "111a8d91933c77dfe5e5998ec5d0e315dc3a1ec82905e858648c5c26b6f6d1d3",
+    "89a20e6421225147e7e46574421b8a39509fbdbac337ccc93661ae0c84aaf1a4",
+    "24403ae4de29757207459350d747b5eed2988e97292e805fd66ee28f3cf3b037"
+  ],
+  "level" : {
+    "blocked" : [
+      {
+        "column" : 4,
+        "row" : 0
+      },
+      {
+        "column" : 4,
+        "row" : 1
+      },
+      {
+        "column" : 0,
+        "row" : 2
+      },
+      {
+        "column" : 2,
+        "row" : 4
+      },
+      {
+        "column" : 4,
+        "row" : 5
+      }
+    ],
+    "budget" : 11,
+    "colonies" : [
+      {
+        "cell" : {
+          "column" : 0,
+          "row" : 4
+        },
+        "high" : 27,
+        "low" : 14
+      },
+      {
+        "cell" : {
+          "column" : 3,
+          "row" : 4
+        },
+        "high" : 48,
+        "low" : 39
+      }
+    ],
+    "columns" : 7,
+    "difficulty" : 1,
+    "diffusion" : 10,
+    "fingerprint" : "1df73157e760905a6a00568f479297ebdaabb5072ce6c456bd7c3f16cac79ec2",
+    "humidity" : [
+      0,
+      105,
+      64,
+      85,
+      0,
+      91,
+      16,
+      39,
+      52,
+      150,
+      49,
+      0,
+      199,
+      41,
+      0,
+      128,
+      166,
+      45,
+      92,
+      7,
+      74,
+      107,
+      131,
+      7,
+      63,
+      114,
+      168,
+      61,
+      80,
+      41,
+      0,
+      179,
+      24,
+      85,
+      193,
+      26,
+      158,
+      144,
+      107,
+      0,
+      146,
+      118
+    ],
+    "id" : "mushroom-weather-011",
+    "length" : 35,
+    "moldBound" : 1146,
+    "moonlight" : 0,
+    "podRules" : {
+      "grownRelease" : 26,
+      "growthThreshold" : 2043,
+      "release" : 18,
+      "slots" : 2
+    },
+    "pods" : [
+      null,
+      null
+    ],
+    "rates" : [
+      41,
+      21,
+      41,
+      32,
+      0,
+      21,
+      24,
+      20,
+      41,
+      27,
+      29,
+      0,
+      31,
+      48,
+      0,
+      58,
+      48,
+      60,
+      45,
+      37,
+      33,
+      20,
+      23,
+      44,
+      26,
+      26,
+      45,
+      57,
+      48,
+      27,
+      0,
+      36,
+      52,
+      48,
+      54,
+      39,
+      53,
+      44,
+      52,
+      0,
+      22,
+      49
+    ],
+    "required" : 6,
+    "rows" : 6,
+    "schema" : 1,
+    "seed" : 3003335985672344418,
+    "sites" : [
+      {
+        "column" : 1,
+        "row" : 3
+      },
+      {
+        "column" : 2,
+        "row" : 3
+      },
+      {
+        "column" : 3,
+        "row" : 3
+      },
+      {
+        "column" : 4,
+        "row" : 3
+      }
+    ],
+    "tutorial" : false,
+    "vents" : [
+      {
+        "cell" : {
+          "column" : 1,
+          "row" : 5
+        },
+        "closedRate" : 14,
+        "openRate" : 200
+      }
+    ],
+    "ventsOpen" : [
+      false
+    ]
+  },
+  "number" : 11,
+  "report" : {
+    "colonies" : [
+      {
+        "finalRun" : 11,
+        "firstOutOfBand" : 1,
+        "longestRun" : 11
+      },
+      {
+        "finalRun" : 15,
+        "firstOutOfBand" : 1,
+        "longestRun" : 15
+      }
+    ],
+    "cycles" : 35,
+    "end" : 950,
+    "evaporated" : 3131,
+    "released" : 726,
+    "start" : 3355
+  },
+  "schema" : 1,
+  "skipped" : 0
+}
