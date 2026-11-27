@@ -37,7 +37,7 @@ levels, measured locally, never asserted on CI). No {owner} or {device} tasks (p
 **Independent test**: each catalog level's witness actions, replayed from the start, win on the run within the budget;
 no arrangement reachable with fewer actions wins.
 
-- [ ] T-R02G2102-003 [US1] Manifest, difficulty, solver and generator, measured first (lead): create
+- [X] T-R02G2102-003 [US1] Manifest, difficulty, solver and generator, measured first (lead): create — Verified 2026-11-27: host-2 exit=0, BinaryGardensSolverTests; manifest, difficulty, solver and generator in Core/Content (feature 501's file-count scan unchanged); R4 measurement recorded: no profile change, catalog work 23 464, largest level 1 589 of 5 000 (.autonomy/migration/checks/R02-G21-02.host-2.json)
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensManifest.swift` (the 100 entries "number 1 … 100,
   planned seed, band 1 … 5, budget 8 … 19, emphasis" copied from `python3 scripts/planning_index.py levels --experience
   R02-G21`, "20 per band; budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19 by band; emphases `adjust orbit`, `phase

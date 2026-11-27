@@ -53,7 +53,23 @@ contract both call it), `BinaryGardensSky.isWellFormed`, `keepsSeparation`, `rep
   dominate (a far world at luminosity 4 receives only a few milliflux, at most 1000 · 32 / 3² ≈ 3,555 for the nearest
   and brightest), raise the trim k; (4) when a band is slow, lower its world count. Never the
   plan lengths p, the phase steps or the budgets. Each changed value is written back into spec
-  clarification Q1, data-model.md, plan.md's Technical Context and this entry in the same commit. Measured values: recorded here by T-R02G2102-003.
+  clarification Q1, data-model.md, plan.md's Technical Context and this entry in the same commit. **Measured values
+  (T-R02G2102-003, 2026-11-27, debug host build, the real generator and solver on the kernel with the phase step,
+  the 100 manifest entries chained as `catalog()` chains them):** every entry generates — no `generation(n)`, so the
+  adjustment ladder was not used and **no profile value changed** (clarification Q1, data-model.md and plan.md stay as
+  written). Per band 1 … 5: largest accepted candidate index 3, 8, 24, 11, 14 (entries needing more than candidate 0:
+  12, 13, 19, 16, 15; 75 in all); witness lengths all exactly p = 1, 2, 3, 3, 4 (no plan shorter or longer reached the
+  catalog); work per level (arrangements judged, the accepted candidate's solver run) at most 8, 23, 295, 290, 1,589,
+  summing to 75, 290, 2,415, 3,915, 16,769 per band and 23,464 for the catalog — the work bound 5,000 is never
+  approached (largest 1,589, about 32 %); move space 2 … 7, 4 … 11, 10 … 20, 15 … 24, 15 … 25; worlds 1, 1 … 2, 2,
+  2 … 3, 3; σ 0, 0, 2 … 4, 2 … 5, 3 … 6. Skips seen: drafting skips (separation redraws, c_lo = 0, a level refusal or a
+  reducible winner, not split further: 18, 57, 134, 52, 44 by band), plans shorter than p (a different arrangement
+  wins with fewer actions: 0, 6, 22, 15, 26 by band), never "no plan within depth or work", never a neighbour skip,
+  never a replay failure. Slowest level: 100 (0.95 s, 14 skipped candidates); slowest group of five: 96 … 100 (2.0 s of
+  generation); whole catalog 8.9 s, well inside the 6 s-per-group trigger of the ladder. In the catalog test the slowest
+  certification group (generation plus witness making and its rebuild) is 86 … 90 at 3.7 s (band-5 groups 3.0 … 3.7 s,
+  every other group under 0.7 s), the slowest content-boundary group 86 … 90 at 2.4 s, all under 10 s; the full `--filter BinaryGardens` run (93 tests)
+  takes 17 s in parallel and 36 s with `--no-parallel` (local, not asserted).
 - **R5 Reducible pre-filter.** Decision: skip a candidate when the winning arrangement with any one changed control put
   back to its starting value still wins. Rationale: such a candidate would fail the plan-length check after a full
   search; at most p ≤ 4 reports decide it. It is also the novelty invariant's core (every changed control matters).

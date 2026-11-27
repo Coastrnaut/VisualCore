@@ -56,7 +56,7 @@ integral`, `time window coverage`, `minimum separation` — 20 each). The first 
 generator and solver on the committed kernel over the real 100 entries and records in research.md R4 the largest
 candidate index per band, the work per level and for the catalog, the witness lengths by band and the slowest level
 and group of five; a profile value changed there is written back into this section, research.md R4, data-model.md and plan.md's Technical Context in
-the same commit, never left divergent.
+the same commit, never left divergent. Measured 2026-11-27 (research R4, debug host build): all 100 entries generate with the profiles below unchanged — largest accepted candidate index 3, 8, 24, 11, 14 by band (75 entries need more than candidate 0), witness lengths exactly 1, 2, 3, 3, 4, largest work per level 8, 23, 295, 290, 1,589 (catalog 23,464 arrangements judged for the accepted levels), slowest level 100 (0.95 s with its 14 skipped candidates), slowest group of five 96 … 100 (2.0 s), whole catalog 8.9 s; no value changed.
 
 - Q: How does the kernel change, and how is a level built from its manifest entry? → A: the kernel gains an optional
   phase step g ∈ {1, 2, 3, 4, 6, 8, 12, 16, 24} (the divisors of 48 up to 24); with g > 1 every starting star phase must

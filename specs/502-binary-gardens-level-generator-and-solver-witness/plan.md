@@ -57,7 +57,11 @@ neighbour rule needs level n − 1). **Target platform**: macOS host for tests; 
 type**: SwiftPM library target inside the experience collection package of the single app (ADR-0009 D-06).
 **Performance**: one report is about 1,000 integer steps (feature 501 plan); a band-5 candidate judges at most 4,048
 arrangements, each also needing the puzzle contract's move list (at most 2 · (5 + 8 + 4) + 4 = 38 candidates, each a
-48-tick separation check); the solver memoises nothing across candidates and reads no clock. **Constraints**:
+48-tick separation check); the solver memoises nothing across candidates and reads no clock. **Measured** (research R4,
+2026-11-27, debug host build): the band profiles of clarification Q1 hold unchanged — largest accepted candidate index
+3, 8, 24, 11, 14 by band, witness lengths exactly 1, 2, 3, 3, 4, work per level at most 8, 23, 295, 290, 1,589 (23,464
+for the catalog), slowest level 100 (0.95 s), slowest group 96 … 100 (2.0 s of generation, 3.0 … 3.7 s per band-5
+certification group with the witnesses), whole catalog 8.9 s. **Constraints**:
 additive (feature 501's tests stay unchanged; no budget widening: every manifest budget 8 … 19 lies inside 1 … 24);
 reason codes `r02-g21.*` (new: `r02-g21.generation`, `r02-g21.witness`); denylisted names (ProjectM, PresetLibrary,
 MilkDrop …) avoided; the filter word `BinaryGardens` matches no other game. **Scale/Scope**: 4 edited and 5 new source
@@ -117,11 +121,11 @@ Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensError.swift        e
 Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensLevel.swift        edit  optional phase step, refusals, stored form (lead)
 Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSky.swift          edit  "off the phase grid" in changed, grid in isWellFormed (lead)
 Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensPuzzle.swift       edit  phase candidates on the grid (lead)
-Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensManifest.swift     new   100 entries, provenance (lead)
-Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensDifficulty.swift   new   control, plan, difficulty (lead)
-Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSolver.swift       new   breadth-first sweep, loss order, work (lead)
-Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensGenerator.swift    new   band profiles, candidates, bounds, catalog, digest (lead)
-Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensWitness.swift      new   digests, terminal report, counterexample (agent B)
+Packages/ExperiencesRound02/BinaryGardens/Core/Content/BinaryGardensManifest.swift     new   100 entries, provenance (lead)
+Packages/ExperiencesRound02/BinaryGardens/Core/Content/BinaryGardensDifficulty.swift   new   control, plan, difficulty (lead)
+Packages/ExperiencesRound02/BinaryGardens/Core/Content/BinaryGardensSolver.swift       new   breadth-first sweep, loss order, work (lead)
+Packages/ExperiencesRound02/BinaryGardens/Core/Content/BinaryGardensGenerator.swift    new   band profiles, candidates, bounds, catalog, digest (lead)
+Packages/ExperiencesRound02/BinaryGardens/Core/Content/BinaryGardensWitness.swift      new   digests, terminal report, counterexample (agent B)
 Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensPhaseStepTests.swift  new  kernel extension (lead)
 Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensSolverTests.swift     new  incl. independent sequence enumeration (agent A)
 Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensGeneratorTests.swift  new (agent C)
@@ -136,8 +140,11 @@ docs/architecture/binary-gardens.md, Packages/ExperiencesRound02/README.md, docs
 CoreTests only. `BinaryGardensPlan` and `BinaryGardensControl` live in `BinaryGardensDifficulty.swift` (as
 `MushroomWeatherPlan` lives in `MushroomWeatherDifficulty.swift`) so the solver, generator and witness share them
 without a cycle. The content and novelty boundary tests sit in `BinaryGardensCatalogTests` (as AuroraLoom's content
-boundary does), next to the catalog cache they need; feature 501's `BinaryGardensInvariantTests` stays unchanged. No
-XcodeGen, app target, scheme, catalog registration or CI change.
+boundary does), next to the catalog cache they need; feature 501's `BinaryGardensInvariantTests` stays unchanged. The
+five new sources sit in `Core/Content/` (same target, same module): feature 501's INV-01 test lists the `.swift`
+files directly in `Core/` and expects exactly 5, so new files beside them would fail that unchanged test; the
+subdirectory keeps it green, and `BinaryGardensGeneratorTests` scans `Core/Content/` for the same clock,
+floating-point and trigonometry tokens. No XcodeGen, app target, scheme, catalog registration or CI change.
 
 **Migration**: none. The level's stored form gains an optional `phaseStep`, omitted when 1, so every existing stored
 level and fingerprint is unchanged; witness schema 1 is new. **Rollback**: revert the feature's commits; every change
