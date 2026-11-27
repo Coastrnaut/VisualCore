@@ -95,3 +95,10 @@ against the play contract in contracts/api.md; shared files (package, error, for
 the lead. Agents may draft in isolated copies before 001 (new files only). MVP: Story 1. Requirement coverage: FR-001,
 002, 009, 013 → 002; FR-003, 004, 014 → 002, 003; FR-005 … 008, 011 → 004; FR-010 → 005; FR-012 → 006; SC-001 … 005 →
 002 … 006; SC-006 → 007 … 011.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G2001-013 Make `MushroomWeatherLevel.decode` refuse a stored level whose values are invalid with
+  `r02-g20.level` (pass the initializer's `.level` refusal through instead of wrapping it as `.malformed`), and update
+  the stored-form tests in `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherLevelTests.swift` and
+  `…InvariantTests.swift` per FR-R02G2001-009, Clarification Q5 (contradicts); `--name host-6`
