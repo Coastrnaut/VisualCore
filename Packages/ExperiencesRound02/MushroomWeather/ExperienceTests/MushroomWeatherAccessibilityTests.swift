@@ -185,13 +185,14 @@ enum MushroomWeatherA11y {
 
     /// The controls of the panel by identifier name: each needs a label and a value (clarification Q5). The plain
     /// texts (actions, status, failure, progress, message, pods and cycle detail lines, the bare cycle, the selection
-    /// line, tutorial, hint text, band, stars, goal) are read as text, not controls. `vent-\(index)` is the vent
-    /// toggles' identifier as the panel's source writes it.
+    /// line, tutorial, hint text, band, stars, goal, the replay position) are read as text, not controls.
+    /// `vent-\(index)` is the vent toggles' identifier as the panel's source writes it; since feature 497 (R02-G20-07)
+    /// the replay controls (Replay, Step, Stop) are listed too.
     nonisolated static let controlNames: [String] = [
         "sound", "summary", "dismiss-tutorial", "hint", "slot-minus", "slot", "slot-plus", "site-minus", "site",
         "site-plus", "place", "remove", "vent-\\(index)", "moon-minus", "moon", "moon-plus", "moon-set", "cycle-minus",
         "cycle-plus", "run", "undo", "redo", "next-level", "campaign", "daily", "practice", "level-picker",
-        "play-level", "reset-view",
+        "play-level", "reset-view", "replay", "replay-step", "replay-stop",
     ]
     /// The adjustable elements (increment and decrement).
     nonisolated static let adjustableNames: [String] = ["slot", "site", "moon"]
@@ -553,7 +554,8 @@ enum MushroomWeatherA11y {
         }
         let sound: Substring? = Access.modifierRun("sound", in: source)
         #expect(sound?.contains("mirror.soundOn ? \"on\" : \"off\"") == true, "Sound reads on or off")
-        #expect(sound?.contains("presenter?.setSound(on: $0)") == true, "the toggle sets the presenter's sound")
+        // Since feature 497 (R02-G20-07) the toggle saves the choice through `settings.sound`.
+        #expect(sound?.contains("saveSound(on: $0)") == true, "the toggle saves the sound choice")
         let summary: Substring? = Access.modifierRun("summary", in: source)
         #expect(summary?.contains(".accessibilityValue(mirror.summary)") == true, "the summary reads the plan's words")
         let reset: Substring? = Access.modifierRun("reset-view", in: source)

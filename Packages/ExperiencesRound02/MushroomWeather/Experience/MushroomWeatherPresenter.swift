@@ -52,6 +52,19 @@
 // and active; drag previews and the chosen moonlight play none. The mirror carries the summary element's text
 // (`MushroomWeatherFeedbackPlan.summaryText(core:slot:site:)`) and the sound choice (off by default; saving it is
 // R02-G20-07). Presentation only. Modelled on `MicroscopicAuroraPresenter` (feature 486).
+//
+// Feature 497 (R02-G20-07) T-R02G2007-006 (FR-R02G2007-003, 004, 007; clarifications Q2, Q4, Q5): the mirror carries
+// whether a verified replay exists for the level (`replayAvailable`: a verified result with a trace, outside replay),
+// whether a replay runs and its position (`replaying`, `replayPosition` = the trace actions played, the pod, vent,
+// moonlight and run records of the play, `replayLength` = the trace's actions, the run included); the mode's name is
+// `MushroomWeatherFeedbackPlan.modeName(_:)` (campaign, practice, daily or replay); `startReplay`, `stepReplay` and
+// `stopReplay` send `replay.start [level]`, `replay.step` and `replay.stop` (a refusal, `r02-g20.no-replay`,
+// `r02-g20.replay-end` or `r02-g20.replay`, is shown and announced in the plan's words); the Sound toggle saves the
+// choice through `settings.sound [0/1]` (`saveSound(on:port:)`), and the restored choice (`core.soundOn`) is applied
+// when the experience opens (the first core taken in) and whenever it changes; the results a restore dropped
+// (`core.reconciliationDropped`) are announced once per presenter as `state` ("n saved results could not be checked
+// and were removed.", "1 saved result could not be checked and was removed."). Modelled on
+// `MicroscopicAuroraPresenter` (feature 487).
 #if os(iOS)
 import Foundation
 import MushroomWeatherCore
@@ -130,16 +143,13 @@ final class MushroomWeatherMirror {
         bestStars > 0 ? "Best: \(bestStars) of 3 stars" : "Best: not won yet"
     }
 
-    /// "Mode: campaign", "Mode: practice" or "Mode: daily" (feature 495).
+    /// "Mode: campaign", "Mode: practice", "Mode: daily" or "Mode: replay" (feature 495; replay since feature 497).
     var modeLabel: String { "Mode: " + Self.modeName(mode) }
 
-    /// The mode's name: campaign, practice or daily (feature 495).
+    /// The mode's name: campaign, practice, daily or replay (feature 495; since feature 497 the feedback plan's
+    /// `MushroomWeatherFeedbackPlan.modeName(_:)`, so the panel and the announcements use the same word).
     static func modeName(_ mode: MushroomWeatherMode) -> String {
-        switch mode {
-        case .campaign: "campaign"
-        case .practice: "practice"
-        case .daily: "daily"
-        }
+        MushroomWeatherFeedbackPlan.modeName(mode)
     }
 
     /// The picker's line for level `level`: "Level n, band b", with ", s of 3 stars" once it has been won
@@ -280,8 +290,16 @@ final class MushroomWeatherMirror {
 
     /// The latest core taken in, for the summary element (feature 496); nil before the first.
     var summaryCore: MushroomWeatherExperienceCore?
-    /// Whether the sound is on (feature 496; off by default; presentation only, saving it is R02-G20-07).
+    /// Whether the sound is on (feature 496; off by default; since feature 497 the core's saved choice, `soundOn`).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay (feature 497).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 497).
+    var replaying = false
+    /// The trace actions of the running replay played so far (0 when no replay runs; feature 497).
+    var replayPosition = 0
+    /// The actions of the running replay's trace, the run included (0 when no replay runs; feature 497).
+    var replayLength = 0
 
     /// The index of the selected site among the level's own sites, for the summary element (feature 496): the clamped
     /// site index on a level with sites; nil on a level without sites (any free floor cell), whose cells the summary
@@ -660,6 +678,8 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
     /// of the play hides the hint (the next press shows level 1).
     private func absorbProgress(_ core: MushroomWeatherExperienceCore) {
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        absorbSaved(core)    // feature 497: before `latestCore` moves on, so the first core and a change are seen
+        absorbReplay(core)
         latestCore = core
         if let shown = hintPlay, shown != core.play { clearHint() }
         mirror.tutorialText = core.tutorial == .done ? nil : core.tutorial.text
@@ -849,7 +869,8 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
         sound.audition(selectedAudition)
     }
 
-    /// Turns the sound on or off (presentation only); turning it on plays the recipe of the current play.
+    /// Turns the sound on or off (presentation only; the Sound toggle saves the choice through
+    /// ``saveSound(on:port:)`` since feature 497); turning it on plays the recipe of the current play.
     func setSound(on: Bool) {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
@@ -864,5 +885,97 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
 
     /// The scene became active or inactive.
     func sceneActive(_ active: Bool) { sound.setActive(active) }
+
+    /// Saves the sound choice through `settings.sound [0/1]` (feature 497); the change taken in turns the loop on or
+    /// off (`absorbSaved(_:)` applies `core.soundOn`).
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    // MARK: Persistence and replay (feature 497, R02-G20-07)
+
+    /// Starts the replay of the current level's verified stored solution (`replay.start [level]`).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.start", [Double(mirror.levelNumber)], port: port)
+    }
+
+    /// Applies the next action of the running replay (`replay.step`).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 497).
+    private var droppedAnnounced = false
+
+    /// The announcement of `count` saved results dropped by a restore (feature 497): "n saved results could not be
+    /// checked and were removed.", in the singular "1 saved result could not be checked and was removed.".
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// Whether `mode` is a replay (feature 497).
+    static func isReplay(_ mode: MushroomWeatherMode) -> Bool {
+        if case .replay = mode { return true }
+        return false
+    }
+
+    /// The trace actions a play applied (feature 497): its pod (place and remove), vent, moonlight and run records,
+    /// as the core counts a replay's position (a fresh play also holds its begin and tutorial records; a replay never
+    /// undoes or redoes).
+    static func appliedActions(_ play: MushroomWeatherPlay) -> Int {
+        var count: Int = 0
+        for record in play.records {
+            switch record.kind {
+            case .place, .remove, .vent, .moonlight, .run: count += 1
+            case .undo, .redo, .begin, .dismissTutorial, .pause, .resume: break
+            }
+        }
+        return count
+    }
+
+    /// Takes the saved parts of `core` in (feature 497): the restored sound choice when it first appears (the
+    /// experience opens) or changes, and the dropped results announced once.
+    private func absorbSaved(_ core: MushroomWeatherExperienceCore) {
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(MushroomWeatherFeedbackPlan(text: Self.droppedText(core.reconciliationDropped), kind: .state,
+                                              haptic: nil))
+        }
+    }
+
+    /// Takes the replay state of `core` into the mirror (feature 497): Replay is offered for a level with a verified
+    /// result that has a trace (outside replay); during replay the position is the trace actions played of the
+    /// trace's actions.
+    private func absorbReplay(_ core: MushroomWeatherExperienceCore) {
+        if let result = core.progress.solved[core.levelNumber] {
+            mirror.replayAvailable = result.verified && !result.trace.isEmpty && !Self.isReplay(core.mode)
+        } else {
+            mirror.replayAvailable = false
+        }
+        if case .replay(let level) = core.mode {
+            mirror.replaying = true
+            mirror.replayPosition = Self.appliedActions(core.play)
+            mirror.replayLength = core.progress.solved[level]?.trace.count ?? 0
+        } else {
+            mirror.replaying = false
+            mirror.replayPosition = 0
+            mirror.replayLength = 0
+        }
+    }
 }
 #endif

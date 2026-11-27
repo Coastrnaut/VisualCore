@@ -69,7 +69,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G2007-006 [US3] Edit
+- [X] T-R02G2007-006 [US3] Edit — Verified 2026-11-27: sim-27 exit=0, 63 tests in 8 suites incl. MushroomWeatherReplayTests (4) (.autonomy/migration/checks/R02-G20-07.sim-27.json)
   `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherPresenter.swift` and
   `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherControls.swift` (Replay for a verified
   solved level, Step and Stop with labels and values, the replay position; the Sound toggle sends `settings.sound` and

@@ -1,9 +1,10 @@
 // MushroomWeatherExperienceIdentityTests — feature 493 (R02-G20-03) T-R02G2003-006 (FR-R02G2003-005, 007, 008). The
 // experience's id is the catalog id; the registry's factory (`make(id:storage:reduceMotion:reduceFlashing:)`, which
 // does not depend on the registration) builds a shell around the presenter with the accessibility settings passed
-// through, as does the tests' factory; the controls are the fourteen declared actions in order (nine until feature 495
-// T-R02G2005-005 added level.select, mode.daily, mode.practice, mode.campaign and tutorial.dismiss); the registration
-// facts hold (100 certified levels, schema 2 since feature 495, the tiers level-0 … level-2, the palette #050A1A,
+// through, as does the tests' factory; the controls are the declared actions in order (nine until feature 495
+// T-R02G2005-005 added level.select, mode.daily, mode.practice, mode.campaign and tutorial.dismiss; eighteen since
+// feature 497 (R02-G20-07) added replay.start, replay.step, replay.stop and settings.sound); the registration facts
+// hold (100 certified levels, schema 3 since feature 497, the tiers level-0 … level-2, the palette #050A1A,
 // #5FD3A0, #F2A93B, #3A6FD8, #12261C); the presenter's quality levels equal the names of the Core's `qualityProfile`;
 // the presenter holds no GPU object and no snapshot before setup; Reduce Motion stops the droplets and motes (`motion`
 // 0) and Reduce Flashing caps the glow; and the presenter declares its two frame probes (the backdrop corners) once a
@@ -24,12 +25,13 @@ import VisualCoreExperienceHost
         #expect(MushroomWeatherExperienceCore.experienceID == "r02-g20.mushroom-weather")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 2 (feature 495), three tiers, the five-colour
+    /// The registration's content facts: 100 certified levels, schema 3 (feature 497), three tiers, the five-colour
     /// palette.
     @Test func theRegistrationFactsHold() {
         #expect(MushroomWeatherExperienceCore.levelNumbers == 1...100)
         #expect(MushroomWeatherExperienceCore.certifiedCandidates.count == 100)
-        #expect(MushroomWeatherExperienceCore.schemaVersion == 2)
+        // Schema 3 since feature 497 (R02-G20-07) T-R02G2007-003: results with traces and the sound choice.
+        #expect(MushroomWeatherExperienceCore.schemaVersion == 3)
         var names: [String] = []
         for level in MushroomWeatherExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -44,7 +46,8 @@ import VisualCoreExperienceHost
         #expect(ids == MushroomWeatherExperienceCore.actionIDs)
         #expect(ids == ["pod.place", "pod.remove", "vent.set", "moon.set", "weather.run", "play.undo", "play.redo",
                         "level.next", "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
-                        "tutorial.dismiss"])
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"])
+        #expect(ids.count == 18)
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers` and equal the names of its
