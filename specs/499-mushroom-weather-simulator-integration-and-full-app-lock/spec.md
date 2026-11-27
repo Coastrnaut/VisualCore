@@ -5,7 +5,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-09 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2009-###,
 SC-R02G2009-###, T-R02G2009-###
@@ -26,6 +26,57 @@ Canonical overrides:
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
 - **Model:** feature 489 (Microscopic Aurora's simulator integration and full app lock), adapted to placing spore
   pods, changing vents and moonlight and letting the weather run.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+489's answers where the games agree. Facts checked in code and specs (read-only, 2026-11-26): feature 489 (Microscopic
+Aurora) is the model (`Apps/VisualCore/Tests/UI/MicroscopicAurora` with `MASupport.swift`, `MAPlayUITests.swift`,
+`MAReplayUITests.swift`, serial chunk `b4`; `MicroscopicAuroraControls.identifierNames`;
+`MicroscopicAuroraSchemaExamples.swift`); Mushroom Weather's panel (features 493 … 497) gives every control a label, a
+value and an identifier through `port.identifier(name)` as Microscopic Aurora's does; its snapshot is schema 3 after
+feature 497 (schema 1 `{level, records}`, 2 adds the mode, progress and the tutorial, 3 adds the sound choice and traces);
+the canvas description of a won level says "Every colony stayed in its band." (feature 496) and the panel's `stars` text
+reads "Best: 3 of 3 stars" once a level is won with its certified count; level 1's certified plan is a pod at row 2,
+column 5 in slot 0 and vent 0 closed (`docs/games/mushroom-weather/levels/001.witness.json`), then the run; the
+tutorial shows on levels 1 … 3; the UI chunk keys in `release_check.py` in use are a3, a4, b3, b4, c3, d3 … z3 and
+g2 … z2, j4 (`c4` is free); no UI test class uses the prefix `MW`.
+
+- Q: How do the interface tests find controls and what do they read? → A: through the identifiers the panel carries
+  (`experience.r02-g20.mushroom-weather.<name>`); the failure explanation has its own identifier `explanation`, and this
+  feature pins the full list as `MushroomWeatherControls.identifierNames` with a test that every name is unique and
+  used once in the panel. The tests read the canvas description for the level and the win, the `stars` text for the
+  stars, the `actions` text to confirm each action took effect, the slot and site controls' values before Place is
+  pressed, each vent toggle's value, and the replay step's value for the replay position. Impact: FR-R02G2009-001, 002.
+- Q: Which interface tests exist and how are they grouped? → A: namespace `MW` in
+  `Apps/VisualCore/Tests/UI/MushroomWeather/MWSupport.swift`; `MWPlayUITests` (fresh launch with `-vcResetData
+  -vcSkipWelcome -vcCandidates -openExperience r02-g20.mushroom-weather`: dismiss the tutorial, play level 1's certified
+  plan — choose slot 1, move the site with Site − / Site + to the target (reading the control's value after a press so a
+  lost tap is retried), press Place (counting it only when the actions-left count moves), toggle vent 1 closed — then
+  Run; read "Every colony stayed in its band." and "Best: 3 of 3 stars", the level picker shows level 2 open; relaunch
+  without reset after sending the app to the background: the stars and level 2 are kept) and `MWReplayUITests` (after
+  the win, Replay best solution, Step until the replay ends won, Stop back to the campaign). They run as a new serial
+  chunk `c4` of `release_check.py` (its key checked unique); each test stays under 90 s apart from the simulator's
+  automation-session setup of each app launch (about 30 s per launch, and a relaunch test launches twice). Level 1's
+  certified plan is pinned in `MW` and checked against the Core by an app unit test. Impact: FR-R02G2009-002, 007;
+  SC-R02G2009-001.
+- Q: Which earlier-schema examples are stored and where do they come from? → A:
+  `MushroomWeatherExperienceCore.schemaOneExample()` (the schema-1 saved state `{level: 1, records}` of a play of level 1
+  with one pod placed that does not win, so it is still playing) and `schemaTwoExample()` (schema 2 with progress, the
+  campaign mode, the tutorial done and level 1 solved with its stars at one action above the certified count, no trace),
+  both `MigrationExample`s built in the Core (`MushroomWeatherSchemaExamples.swift`, modelled on
+  `MicroscopicAuroraSchemaExamples`), registered with `examples:`; the app's migration check restores both into schema
+  3 with progress kept (a schema-2 result without a trace keeps its stars unverified, as feature 497 reconciles). The
+  registration's comment is corrected. Impact: FR-R02G2009-003; SC-R02G2009-002.
+- Q: What proves the release configuration excludes test-only code? → A: the existing `app-release-build` and
+  `app-release-symbols` steps; `MushroomWeatherGolden` is forbidden by feature 498, and the scenarios exist only under
+  `DEBUG || VISUALCORE_AUTOMATION` (covered by the existing `acceptanceScenarios` entry). Impact: FR-R02G2009-004;
+  SC-R02G2009-003.
+- Q: How is "not available" checked? → A: an app unit test: without `-vcCandidates` the catalog lists
+  `r02-g20.mushroom-weather` as not available and the launcher cannot open it; the registry's candidates list contains
+  it and `all` does not. Impact: FR-R02G2009-006; SC-R02G2009-002.
 
 ## User Scenarios & Testing *(mandatory)*
 
