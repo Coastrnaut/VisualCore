@@ -163,7 +163,7 @@ modelled on feature 484).
 - [X] T-R02G2104-009 Reference regression chunk 2 (`--name reference-2 -- python3 scripts/release_check.py --only — Verified 2026-11-27: reference-2 exit 0
   reference-test-anglerendering-ios27 reference-test-anglerendering-ios26 projectm-reference-ios27
   projectm-reference-ios26`)
-- [ ] T-R02G2104-010 Script tests, run alone (`--name script-tests -- python3 scripts/test_scripts.py`)
+- [X] T-R02G2104-010 Script tests, run alone (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-27: script-tests exit 0 (run alone)
 - [ ] T-R02G2104-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G2104-008)
 - [ ] T-R02G2104-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
