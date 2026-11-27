@@ -1056,5 +1056,9 @@ JSON schema 1, with names in words), the play state `BinaryGardensPlay` with sta
 actions and the run, records, undo and redo, and `BinaryGardensPuzzle` (an R02-F23 `PuzzleRules` over arrangements).
 Feature 502 (R02-G21-02) adds the phase step, the 100-level manifest, the seeded generator (`BinaryGardensGenerator`),
 the minimal breadth-first solver (`BinaryGardensSolver`, work bound 5 000) and the witness certificates
-(`BinaryGardensWitness`, `docs/games/binary-gardens/levels/`, pinned catalog digest), in `Core/Content`.
+(`BinaryGardensWitness`, `docs/games/binary-gardens/levels/`, pinned catalog digest), in `Core/Content`. Feature 503
+(R02-G21-03) adds the hero renderer and the experience: `BinaryGardensSceneSnapshot`, `BinaryGardensSceneGeometry`
+(orbits through the kernel's table, cube-sphere worlds, star discs, gauges, the CPU reference), `BinaryGardensShaders`,
+the adapter `BinaryGardensExperienceCore`, the scenario manifest and the iOS target `BinaryGardensExperience`
+(presenter, scene, controls), registered as a candidate.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).

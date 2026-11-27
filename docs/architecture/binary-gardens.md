@@ -56,3 +56,33 @@ presentation of later features.
   digest `PuzzleCatalog<BinaryGardensPuzzle>.digest(id: "binary-gardens", …)` is pinned in a test. The pipeline's five
   sources live in `Core/Content`, so the kernel's own scans stay unchanged.
 
+## Hero renderer and experience (feature 503, R02-G21-03)
+
+- **Snapshot.** `BinaryGardensSceneSnapshot` is all the renderer reads: the arrangement (rings, phases, luminosities,
+  tilt), the ring radii, luminosity levels, maximum tilt and phase step, each world's light at every tick (flux, each
+  star's share, band), window, lethal run and bloom result, the shown tick, and the stage, failure, actions and level.
+- **The system.** One scale per level, k = 0.95 / R with R the largest ring or world radius; every orbit is a 48-gon
+  through the kernel's own cosine-table points, so each body sits on a vertex of its drawn orbit. Drawn in painter's
+  order with depth testing off (the window surface has no depth buffer): the backdrop with a hashed starfield, orbit
+  rings, the tilt dial, trails of fixed tick positions, bodies back to front (cube-sphere worlds with their faces
+  emitted far-first, star discs in vermilion and ice blue with luminosity pips), one gauge row per world (48 tick cells,
+  comfort guide lines, the window bracket, the shown-tick marker, the bloom meter) and the actions bars; the glow is
+  additive and last. A failure marks the failing element broken on a failed play; a won level blooms every world.
+- **Lighting.** Each world is shaded by both stars' shares at the shown tick through a logarithmic response, with a
+  sunrise band along each terminator over an ambient floor of 0.35, and seasonal banding by latitude: ice caps when
+  lethal low, dim caps, open flowers when comfortable, a scorched belt when bright or lethal high.
+- **Tiers.** `level-0`: 8 × 8 quads per cube face, 12 corona rays, 8-tick trails, 8 motes, 2 glow shells; `level-1`:
+  5 × 5, 6 rays, 4-tick trails, 4 motes, 1 shell; `level-2`: 3 × 3 with the banding kept and no rays, trails, motes or
+  glow.
+- **Shaders.** GLSL ES 3.00 system and glow programs with 38 material codes in the uv stream (code + 0.4 · value, + 64
+  when drawn broken); motes and coronas move by the time uniform times the motion uniform (0 under Reduce Motion);
+  Reduce Flashing caps the glow.
+- **Adapter.** `BinaryGardensExperienceCore` opens certified level (seed mod 100) + 1 from a table of each witness's
+  skipped candidates, accepts `star.ring`, `star.phase`, `star.luminosity`, `orbit.tilt`, `light.run`, `play.undo`,
+  `play.redo`, `level.next` and `clock.show` (declared 0 … 60; 0 and 49 … 60 refused with `r02-g21.tick`); the shown
+  tick opens at 48 and is never digested; its digest is the level number and the play's fingerprint; snapshot schema 1.
+- **Experience.** The presenter draws with the fixed camera, logs tier changes, falls back to the unlit level-2
+  geometry when a program fails, and declares two backdrop probes; the panel chooses a star and steps its ring, phase
+  (by the phase step), luminosity and the tilt, steps the shown tick and runs, undoes, redoes and moves on. The
+  candidate is registered in the one app (not available until X-R02-G21) with its scenario manifest.
+

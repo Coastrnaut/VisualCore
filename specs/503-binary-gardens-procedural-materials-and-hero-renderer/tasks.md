@@ -169,7 +169,7 @@ pass.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G2103-007 Docs: `docs/architecture/binary-gardens.md` (renderer and experience),
+- [X] T-R02G2103-007 Docs: `docs/architecture/binary-gardens.md` (renderer and experience), — Verified 2026-11-27: docs (architecture renderer and experience, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit=0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2` (filter
   `'MoonlitMechanism|AcousticConstellator|HarmonicBridges|BinaryGardens'`), `-3c`, `-3e`, `-3f`
 - [ ] T-R02G2103-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
