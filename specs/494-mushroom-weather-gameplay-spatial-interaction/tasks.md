@@ -73,7 +73,7 @@ tests stay short (< 10 s each). No {owner} tasks. Agents model their files on Mi
 
 ## Phase 4: Story 6 — every move without gestures (P1)
 
-- [ ] T-R02G2004-004 [P] [US6] Create `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherPanelWinTests.swift`:
+- [X] T-R02G2004-004 [P] [US6] Create `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherPanelWinTests.swift`: — Verified 2026-11-27: 2026-11-27 host-4 exit 0: 174 tests in 20 suites incl. panel-win (all 100 certified levels won through one panel action per witness action, in 20 groups of 5, digests and fingerprints equal step by step; panel undo and redo restore digests) (.autonomy/migration/checks/R02-G20-04.host-4.json)
   all 100 certified levels won through panel actions only (FR-R02G2004-010; SC-R02G2004-005; each witness action as
   the panel's one-action placement, vent toggle or moonlight − and +, then Run; never more actions than the budget),
   split so each test is under 10 s, plus panel Undo then Redo restoring the digests; agent D; `--name host-4`
