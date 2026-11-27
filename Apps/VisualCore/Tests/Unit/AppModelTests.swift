@@ -17,6 +17,7 @@ import HarmonicBridgesCore
 import HueCompassCore
 import LissajousLabyrinthCore
 import MicroscopicAuroraCore
+import MushroomWeatherCore
 import MoonlitMechanismCore
 import NocturneGardenCore
 import StarlitCartoucheCore
@@ -3878,6 +3879,188 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(opening.certifiedPlacements, certifiedPlacements.count,
                        "stars are counted against the witness")
         XCTAssertEqual(MicroscopicAuroraExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+    // MARK: Mushroom Weather in the app (feature 499, R02-G20-09; T-R02G2009-005, FR-R02G2009-003, 006;
+    // SC-R02G2009-002)
+
+    /// Mushroom Weather's registration: a candidate until X-R02-G20.
+    private func mushroomWeatherRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(MushroomWeatherExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Mushroom Weather is a candidate")
+    }
+
+    /// FR-R02G2009-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheMushroomWeatherRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try mushroomWeatherRegistration()
+        XCTAssertEqual(MushroomWeatherExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(MushroomWeatherExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(MushroomWeatherExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G2009-006: without `-vcCandidates` Mushroom Weather is a candidate only: in `candidates`, outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testMushroomWeatherIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(MushroomWeatherExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g20.mushroom-weather")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G2009-003, SC-R02G2009-002: with `-vcCandidates` Mushroom Weather is shown, opens through the registry and
+    /// engine with seed 0 (level 1), and level 1 is won by its certified plan (`generated(number: 1).plan.actions`: a
+    /// pod in slot 0 at row 2, column 5, then vent 0 closed) sent as `pod.place [slot, row, column]` and
+    /// `vent.set [index, state]` (state 1 open, 0 closed), then `weather.run`, with three stars (the opening play is
+    /// already in stage `playing`; the tutorial of levels 1 … 3 is presentation and blocks no action, so no
+    /// `tutorial.dismiss` is needed); the win is recorded verified with its trace (the plan, then the run), opens level
+    /// 2, and `level.next` plays it.
+    func testMushroomWeatherOpensAsACandidateAndLevelOneIsWonByItsCertifiedPlan() async throws {
+        let registration = try mushroomWeatherRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls: [String] = registration.controls.map(\.id)
+        for control in MushroomWeatherExperienceCore.actionIDs {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        for control in ["pod.place", "pod.remove", "vent.set", "moon.set", "weather.run", "play.undo", "play.redo",
+                        "level.next", "clock.show", "level.select", "mode.daily", "mode.practice", "mode.campaign",
+                        "tutorial.dismiss", "replay.start", "replay.step", "replay.stop", "settings.sound"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(MushroomWeatherExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<MushroomWeatherExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, MushroomWeatherStage.playing, "the opening play accepts actions")
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9, "level 1's budget")
+        let plan: [MushroomWeatherAction] = try MushroomWeatherExperienceCore.generated(number: 1).plan.actions
+        let expectedPlan: [MushroomWeatherAction] = [.place(slot: 0, cell: MushroomWeatherCell(row: 2, column: 5)),
+                                                     .vent(index: 0, open: false)]
+        XCTAssertEqual(plan, expectedPlan, "level 1's certified plan")
+        for action in plan {
+            switch action {
+            case .place(let slot, let cell):
+                let values: [Double] = [Double(slot), Double(cell.row), Double(cell.column)]
+                XCTAssertEqual(engine.handle(control: "pod.place", values: values), .accepted, "pod \(values)")
+            case .vent(let index, let open):
+                let values: [Double] = [Double(index), open ? 1 : 0]
+                XCTAssertEqual(engine.handle(control: "vent.set", values: values), .accepted, "vent \(values)")
+            case .remove, .moonlight, .run:
+                XCTFail("level 1's certified plan holds a pod and a vent only")
+            }
+        }
+        XCTAssertNil(engine.outcome, "the arrangement actions alone do not end the level")
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9 - plan.count, "each arrangement action spends one action")
+        XCTAssertEqual(engine.handle(control: "weather.run"), .accepted)
+        XCTAssertEqual(engine.outcome?.code, MushroomWeatherExperienceCore.wonCode)
+        XCTAssertEqual(MushroomWeatherExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, MushroomWeatherStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified plan earns three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        let trace: [MushroomWeatherAction] = plan + [.run]
+        XCTAssertEqual(engine.core?.progress.solved[1]?.trace, trace, "the trace is the certified plan, then the run")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `MW` (their own literals in
+    /// Tests/UI/MushroomWeather/MWSupport.swift, which this target cannot import); the same literals equal the Core's
+    /// certified level 1: the plan is a pod in slot 0 at row 2, column 5, then vent 0 (labelled Vent 1) closed, then
+    /// the run; the budget is 9; the pinned pod lies in the declared slot, row and column ranges and stands on one of
+    /// the level's sites (level 1 has four: row 0, column 4; row 2, column 4; row 2, column 5; row 5, column 2); the
+    /// pinned vent lies in the declared vent range and starts open. Seed 0 opens level 1.
+    func testMushroomWeatherLevelOnePinsInMWEqualTheCore() throws {
+        // The same literals as `MW.levelOnePods`, `MW.levelOneVents` and `MW.levelOneBudget` in MWSupport.swift.
+        let levelOnePods: [(slot: Int, row: Int, column: Int)] = [(0, 2, 5)]
+        let levelOneVents: [(index: Int, open: Bool)] = [(0, false)]
+        let levelOneBudget = 9
+
+        let certified = try MushroomWeatherExperienceCore.generated(number: 1)
+        let plan: [MushroomWeatherAction] = certified.plan.actions
+        var corePods: [[Int]] = []
+        var coreVents: [[Int]] = []
+        for action in plan {
+            switch action {
+            case .place(let slot, let cell):
+                XCTAssertTrue(coreVents.isEmpty, "the plan's pods come before its vents")
+                corePods.append([slot, cell.row, cell.column])
+            case .vent(let index, let open):
+                coreVents.append([index, open ? 1 : 0])
+            case .remove, .moonlight, .run:
+                XCTFail("level 1's certified plan holds pods and vents only")
+            }
+        }
+        var pinnedPods: [[Int]] = []
+        for pod in levelOnePods {
+            pinnedPods.append([pod.slot, pod.row, pod.column])
+        }
+        var pinnedVents: [[Int]] = []
+        for vent in levelOneVents {
+            pinnedVents.append([vent.index, vent.open ? 1 : 0])
+        }
+        XCTAssertEqual(corePods, pinnedPods, "level 1 certified pods (slot, row, column)")
+        XCTAssertEqual(coreVents, pinnedVents, "level 1 certified vents (index, state)")
+        XCTAssertEqual(plan.count, levelOnePods.count + levelOneVents.count, "the certified action count")
+
+        let level: MushroomWeatherLevel = certified.level
+        XCTAssertEqual(level.budget, levelOneBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, plan.count, "the witness fits the budget")
+        let sites: [MushroomWeatherCell] = try XCTUnwrap(level.sites, "level 1 has sites")
+        for pod in levelOnePods {
+            XCTAssertTrue(MushroomWeatherExperienceCore.slotRange.contains(pod.slot), "a declared slot \(pod)")
+            XCTAssertTrue(MushroomWeatherExperienceCore.rowRange.contains(pod.row), "a declared row \(pod)")
+            XCTAssertTrue(MushroomWeatherExperienceCore.columnRange.contains(pod.column), "a declared column \(pod)")
+            XCTAssertTrue(sites.contains(MushroomWeatherCell(row: pod.row, column: pod.column)),
+                          "one of the level's sites \(pod)")
+        }
+        for vent in levelOneVents {
+            XCTAssertTrue(MushroomWeatherExperienceCore.ventRange.contains(vent.index), "a declared vent \(vent)")
+            XCTAssertTrue(level.start.ventsOpen.indices.contains(vent.index), "one of the level's vents \(vent)")
+            XCTAssertEqual(level.start.ventsOpen[vent.index], !vent.open, "the pinned vent changes its state \(vent)")
+        }
+
+        let opening = try MushroomWeatherExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, levelOneBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, MushroomWeatherStage.playing, "the opening accepts actions")
+        XCTAssertEqual(opening.certifiedActionCount, plan.count, "stars are counted against the witness")
+        XCTAssertEqual(MushroomWeatherExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }

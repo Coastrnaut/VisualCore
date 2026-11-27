@@ -53,7 +53,7 @@ change (the shaders and reference of R02-G20-03 are unchanged and re-proven by t
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G2009-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G2009-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-27: app-unit exit=0, 159 tests incl. the 4 Mushroom Weather AppModelTests (.autonomy/migration/checks/R02-G20-09.app-unit.json)
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `MW`'s pinned level 1 certified plan and budget equal the
   Core's); `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`
