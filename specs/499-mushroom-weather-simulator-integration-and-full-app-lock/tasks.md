@@ -60,7 +60,7 @@ change (the shaders and reference of R02-G20-03 are unchanged and re-proven by t
 
 ## Phase 5: Story 3 — builds and solvability (P2)
 
-- [ ] T-R02G2009-006 [US3] Release build and symbols (`MushroomWeatherGolden`, `acceptanceScenarios` already forbidden):
+- [X] T-R02G2009-006 [US3] Release build and symbols (`MushroomWeatherGolden`, `acceptanceScenarios` already forbidden): — Verified 2026-11-27: release exit=0 (app-release-build, app-release-symbols) (.autonomy/migration/checks/R02-G20-09.release.json); regression exit=0, 100 of 100 levels (.autonomy/migration/checks/R02-G20-09.regression.json)
   `--name release -- python3 scripts/release_check.py --only app-release-build app-release-symbols`; `--name regression
   -- python3 scripts/mushroom_weather_regression.py` (100 of 100 levels, SC-R02G2009-004)
 
