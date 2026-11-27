@@ -164,8 +164,10 @@ refused.
   moonlight levels and their evaporation factor, the colonies (cell, preferred band, sensitivity and survival floor),
   the pod release and growth rules (release per cycle, growth threshold and grown release), the mold saturation bound,
   the run length in cycles, the required consecutive cycles in band, the starting pods, vents and moonlight, the
-  action budget and whether it shows a tutorial. A level is refused when a value is out of range, a colony or pod lies
-  off the floor, there is no target colony, or the starting arrangement already wins.
+  action budget and whether it shows a tutorial. A level is refused when a value is out of range (including required
+  cycles above the run length), a colony, vent or starting pod lies off the floor, two colonies or two pods share a cell
+  or a pod stands on a colony, there is no target colony, a sensitive colony starts below its survival floor, a cell
+  starts above the mold bound, or the starting arrangement already wins.
 - **FR-R02G2001-002**: A spore pod MUST stand on one free floor cell (not blocked, not a colony, not another pod); the
   number of pods is bounded by the level; a vent belongs to a fixed vent cell and is open or closed; the moonlight is
   one of the level's fixed levels.
