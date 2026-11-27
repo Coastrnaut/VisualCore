@@ -67,7 +67,7 @@ change (the shaders and reference of R02-G19-03 are unchanged and re-proven by t
 - [X] T-R02G1909-007 Docs: `docs/architecture/microscopic-aurora.md` (in-app integration), — Verified 2026-11-26: 2026-11-26 round02-host-1, -2, -3c, -3e, -3f exit 0 and script-tests exit 0 run alone (.autonomy/migration/checks/R02-G19-09.round02-host-*.json, .script-tests.json); architecture, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`; `--name script-tests` (alone)
-- [ ] T-R02G1909-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name
+- [X] T-R02G1909-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-26: 2026-11-26 rendering-27, rendering-26, experiences, host-full exit 0 (.autonomy/migration/checks/R02-G19-09.*.json; app-unit and app-ui are this gate's own runs)
   host-full` (app-unit and app-ui are this gate's own runs)
 - [ ] T-R02G1909-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G1909-010 Reference regression chunk 2 (`--name reference-2`)
