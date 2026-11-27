@@ -52,7 +52,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 4: Stories 2 and 3 — failures, undo, redo, replay (P1)
 
-- [ ] T-R02G2001-004 [P] [US1] [US2] [US3] Create
+- [X] T-R02G2001-004 [P] [US1] [US2] [US3] Create — Verified 2026-11-26: 2026-11-26 host-3 exit 0: 8 play tests (known actions win on 500 fixtures, each failure named, budget, every refusal in order, fingerprints, undo and redo, 500 seeded traces replayed) (.autonomy/migration/checks/R02-G20-01.host-3.json)
   `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherPlay.swift` (agent B: stages "loading, tutorial,
   playing, paused, won, failed, result"; the arrangement from the level; `place(slot, cell)`, `remove(slot)`,
   `vent(index, open)` and `moonlight(level)` validated in the order stage, previous fingerprint, action ("out of range,
