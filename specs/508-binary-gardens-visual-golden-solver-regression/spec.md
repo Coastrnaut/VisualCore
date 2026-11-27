@@ -30,7 +30,8 @@ Canonical overrides:
   R02-G21-05 (feature 505: progress, modes, the state-derived tutorial, snapshot schema 2 and digest domain v2),
   R02-G21-06 (feature 506: announcements, haptics, eased lights, the Reduce Flashing glow cap) and R02-G21-07 (feature
   507: saves, replay and migration). None of 505, 506 or 507 is in code. This feature pins its baselines on the code
-  those features leave, so it is implemented only after all four gates are recorded; where a requirement below names
+  those features leave, so its golden baseline is written and its gate recorded only after all four gates are recorded (the solver
+  regression, which reads only the unchanged levels, witnesses and solver, may be written earlier, Q6); where a requirement below names
   their parts, it names them as prerequisites.
 - **Model:** feature 498 (the Mushroom Weather visual golden and solver regression, itself modelled on feature 488),
   adapted to two stars on quantized rings, phases, luminosities and tilt, the run of the light over 48 ticks, the
@@ -61,13 +62,13 @@ action, the report, the counterexample (`depth` = size − 1, `arrangements`, `n
 from what is drawn after it, each world's centre 0.15 brighter in luminance than the backdrop there and each star's
 0.4, the first lit actions bar red above blue by 0.08, the first gauge plate's left margin 0.05 from the backdrop and
 each 9 × 9 lower-corner patch median within 0.06 of the gradient; none of those five levels has a tilt dial (maximum
-tilt 0); the first level with the full tilt range 0 … 3 is level 25; the palette `BinaryGardensPalette.all` has 27
+tilt 0); the first level with the full tilt range 0 … 3 is level 25; the palette `BinaryGardensPalette.all` (module-internal; the golden code reads it inside the Core) has 27
 named colours (`hex` holds the five registered values); `BinaryGardensMaterial` has 42 cases, codes 0 … 41
 (`BinaryGardensShaders.maxMaterial` is `inspectBracket` = 41 since feature 504); the tiers differ only in cube-sphere
 tessellation, corona rays, trails, motes and glow shells; the system scene's `release()` frees the system, glow and
 fallback renderers, `liveObjectCount` counts them, and the presenter's `teardown` and `shedCaches` both call
 `release()`; `ProcessMemory.footprint()` reads the footprint; the hero scenario plays level 1's certified plan without
-the run and shows `BinaryGardensScenarios.heroTick`; the CI job `round02-host-tests` runs in halves a and b, half b's
+the run and shows `BinaryGardensExperienceCore.heroTick(_:)` (in `BinaryGardensScenarios.swift`); the CI job `round02-host-tests` runs in halves a and b, half b's
 filter already includes `BinaryGardens`, and half b carries one named regression step per game of its half (Mushroom
 Weather's the latest).
 
