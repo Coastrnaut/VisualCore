@@ -93,7 +93,7 @@ no arrangement reachable with fewer actions wins.
 **Independent test**: band means of the witness length do not fall; the 100 witness files match byte for byte and an
 edited file is refused.
 
-- [ ] T-R02G2102-005 [P] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensWitness.swift`
+- [X] T-R02G2102-005 [P] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensWitness.swift` — Verified 2026-11-27: host-4 exit=0, BinaryGardensWitnessTests (8); 100 witness files written with BINARY_GARDENS_WRITE_WITNESSES=1 (.autonomy/migration/checks/R02-G21-02.host-4.json)
   (agent B: schema 1 sorted-key, pretty-printed JSON with one trailing newline; state digests "16 hex characters of the
   SHA-256 of the arrangement and the actions spent" over `canonicalText` "rings=a,b;phases=a,b;luminosities=a,b;tilt=t;spent=s"
   after each action; play fingerprints "after `begin`, `dismissTutorial` when the level has one, and each action";

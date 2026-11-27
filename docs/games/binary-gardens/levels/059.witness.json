@@ -1,0 +1,181 @@
+{
+  "actions" : [
+    {
+      "ring" : {
+        "index" : 2,
+        "star" : 1
+      }
+    },
+    {
+      "phase" : {
+        "star" : 1,
+        "step" : 18
+      }
+    },
+    {
+      "luminosity" : {
+        "index" : 0,
+        "star" : 0
+      }
+    },
+    {
+      "run" : {
+
+      }
+    }
+  ],
+  "counterexample" : {
+    "arrangement" : {
+      "luminosities" : [
+        2,
+        2
+      ],
+      "phases" : [
+        6,
+        18
+      ],
+      "rings" : [
+        2,
+        2
+      ],
+      "tilt" : 0
+    },
+    "arrangements" : 64,
+    "depth" : 2,
+    "failure" : {
+      "unstable" : {
+        "required" : 44,
+        "window" : 13,
+        "world" : 0
+      }
+    },
+    "nearestMiss" : 31019
+  },
+  "difficulty" : {
+    "actions" : 3,
+    "adjustable" : 4,
+    "arrangementsSearched" : 79,
+    "moveSpace" : 14,
+    "narrowestBand" : 21,
+    "nearestMiss" : 31019,
+    "tightestWindow" : 44,
+    "work" : 80,
+    "worlds" : 2
+  },
+  "digests" : [
+    "ee93a20e32a9a84e",
+    "4f7dbd6d4ace4b83",
+    "267ba6d1cc89284b",
+    "267ba6d1cc89284b"
+  ],
+  "fingerprints" : [
+    "bdaf825ee6433a6ebb7782ad7684bc3ef72b70093ab45688e31f4b1922bcffd3",
+    "2bb1b890e0c5d170f19ec8304809a4923f2e6dcc3770d2926db8b102d7d59c90",
+    "8228413f0c9de2560ce6978d7651dbf70a2da2a274ce4775614764ccf88494c7",
+    "bb71baa3d30ed125d6c23393b14d6ab8ef0a964c242a041e0068e918908424d3",
+    "8b77b76fce9080fa0b8bfd7a0aeba2acce9ea76d51db9b6988b776b75ad007b4"
+  ],
+  "level" : {
+    "budget" : 15,
+    "clampRadius" : 3,
+    "difficulty" : 3,
+    "fingerprint" : "ba43849a63a8cf3c8b2f70ef54b37b4c846b8c8833dabb0a042b41a7a0161508",
+    "id" : "binary-gardens-059",
+    "lethalTolerance" : 3,
+    "luminosityLevels" : [
+      16,
+      17,
+      19
+    ],
+    "maxTilt" : 0,
+    "minimumSeparation" : 4,
+    "phaseStep" : 6,
+    "ringRadii" : [
+      2,
+      3,
+      10,
+      15
+    ],
+    "schema" : 1,
+    "seed" : 7771493888909447862,
+    "starSpeed" : 1,
+    "stars" : [
+      {
+        "luminosity" : 2,
+        "luminosityAdjustable" : true,
+        "phase" : 6,
+        "phaseAdjustable" : false,
+        "ring" : 2,
+        "ringAdjustable" : false
+      },
+      {
+        "luminosity" : 2,
+        "luminosityAdjustable" : true,
+        "phase" : 36,
+        "phaseAdjustable" : true,
+        "ring" : 3,
+        "ringAdjustable" : true
+      }
+    ],
+    "startTilt" : 0,
+    "tutorial" : false,
+    "worlds" : [
+      {
+        "bloomHigh" : 2051,
+        "bloomLow" : 1747,
+        "comfortHigh" : 60,
+        "comfortLow" : 22,
+        "lethalHigh" : 70,
+        "lethalLow" : 17,
+        "phase" : 39,
+        "radius" : 31,
+        "speed" : -2,
+        "window" : 44
+      },
+      {
+        "bloomHigh" : 11522,
+        "bloomLow" : 9814,
+        "comfortHigh" : 233,
+        "comfortLow" : 212,
+        "lethalHigh" : 268,
+        "lethalLow" : 177,
+        "phase" : 15,
+        "radius" : 19,
+        "speed" : 1,
+        "window" : 44
+      }
+    ]
+  },
+  "number" : 59,
+  "report" : {
+    "minimumSeparationSquared" : 219671009689600,
+    "minimumSeparationTick" : 1,
+    "outcome" : "won",
+    "worlds" : [
+      {
+        "bloom" : "inside",
+        "integral" : 1899,
+        "longestLethalRun" : 0,
+        "meanRemainder" : 27,
+        "meanWhole" : 39,
+        "requiredWindow" : 44,
+        "tolerance" : 3,
+        "window" : 48,
+        "windowStart" : 1
+      },
+      {
+        "bloom" : "inside",
+        "integral" : 10668,
+        "longestLethalRun" : 0,
+        "meanRemainder" : 12,
+        "meanWhole" : 222,
+        "requiredWindow" : 44,
+        "tolerance" : 3,
+        "window" : 48,
+        "windowStart" : 1
+      }
+    ]
+  },
+  "schema" : 1,
+  "skipped" : 6
+}
