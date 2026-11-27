@@ -54,9 +54,10 @@ g2 … z2, j4 (`c4` is free); no UI test class uses the prefix `MW`.
   `Apps/VisualCore/Tests/UI/MushroomWeather/MWSupport.swift`; `MWPlayUITests` (fresh launch with `-vcResetData
   -vcSkipWelcome -vcCandidates -openExperience r02-g20.mushroom-weather`: dismiss the tutorial, play level 1's certified
   plan — choose slot 1, move the site with Site − / Site + to the target (reading the control's value after a press so a
-  lost tap is retried), press Place (counting it only when the actions-left count moves), toggle vent 1 (identifier `vent-0`) closed —
-  then Run; read "Every colony stayed in its band." and "Best: 3 of 3 stars", the level picker shows level 2 open; relaunch
-  without reset after sending the app to the background: the stars and level 2 are kept) and `MWReplayUITests` (after
+  lost tap is retried), press Place (counting it only when the actions-left count moves), toggle vent 1 (identifier
+  `vent-0`) closed — then Run; read "Every colony stayed in its band." and "Best: 3 of 3 stars", the level picker shows
+  level 2 open; relaunch without reset after sending the app to the background: the stars and level 2 are kept) and
+  `MWReplayUITests` (after
   the win, Replay best solution, Step until the replay ends won, Stop back to the campaign). They run as a new serial
   chunk `c4` of `release_check.py` (its key checked unique); each test stays under 90 s apart from the simulator's
   automation-session setup of each app launch (about 30 s per launch, and a relaunch test launches twice). Level 1's
