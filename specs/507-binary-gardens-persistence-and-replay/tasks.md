@@ -105,7 +105,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
 - [X] T-R02G2107-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   host-full`, `--name app-unit`
 - [X] T-R02G2107-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit 0
-- [ ] T-R02G2107-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G2107-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit 0
 - [ ] T-R02G2107-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2107-012 {device} After ImplementationLock-100: a save survives a real app termination on D1/D2/D3
   (SC-R02G2107-007)
