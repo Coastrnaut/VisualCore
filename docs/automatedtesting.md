@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G21-08: Binary Gardens regression net).
+Last updated: 2026-11-27 (R02-G21-09: Binary Gardens in-app integration).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Binary Gardens in-app integration** (R02-G21-09, 2026-11-27). Host: schema examples (8). Simulator: identifier
+  tests (87 tests in the suite). App: `BGPlayUITests` (2) and `BGReplayUITests` (1) in the serial chunk `d4`
+  (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-d4`), four app unit tests. Lessons:
+  a SwiftUI segmented picker's segments ignored XCUITest taps, so panels the interface tests drive use buttons; read the
+  build-for-testing step's status before the UI errors, since a failed build leaves the old test binary in place.
 - **Binary Gardens regression net** (R02-G21-08, 2026-11-27). Host: solver regression (15: ten groups of ten levels
   and thirteen alterations on levels 1, 41, 81), golden descriptions (13, 17 pinned frames). Simulator: golden frames
   (4, level 25's tilt pip included) and memory (12 cycles; the 16 MB bound only with

@@ -61,7 +61,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G2109-007 Docs: `docs/architecture/binary-gardens.md` (in-app integration),
+- [X] T-R02G2109-007 Docs: `docs/architecture/binary-gardens.md` (in-app integration), — Verified 2026-11-27: docs (architecture in-app integration, package README, automatedtesting); validate_docs PASS; round02-host-1/2/3c/3e/3f exit=0; script-tests exit=0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`; `--name script-tests` (alone)
 - [ ] T-R02G2109-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name

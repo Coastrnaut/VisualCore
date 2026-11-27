@@ -213,3 +213,20 @@ presentation of later features.
   class runs alone) and release every GPU object of the scene.
 - **Running it.** CI's round-two job (half b) has a "Binary Gardens regression (host)" step;
   `python3 scripts/binary_gardens_regression.py` runs the host and simulator parts with one summary.
+
+## In-app integration (feature 509, R02-G21-09)
+
+- **Identifiers.** Every panel element has an identifier `experience.r02-g21.binary-gardens.<name>`; the 56 names are
+  pinned in `BinaryGardensControls.identifierNames` and each is used once (the failure explanation has its own
+  `explanation`; the level line carries none). The star row is two buttons, "Star 1" and "Star 2", in one adjustable
+  element: a segmented picker's segment taps never reached its selection under interface automation.
+- **Interface tests.** `BGPlayUITests` opens the candidate in the one app, wins level 1 through the panel alone (choose
+  star 2, lower its luminosity one level, then Run) with "Every world kept its window and bloomed." and "Best: 3 of 3
+  stars", sees level 2 open and keeps the progress over a relaunch; `BGReplayUITests` replays the solved level to its
+  end and stops back to the campaign. They run in the serial release-check chunk `d4`.
+- **Stored examples.** `schemaOneExample()` (level 1 after star 2's ring change) and `schemaTwoExample()` (level 1
+  solved with 2 actions and 2 stars) are registered with the app, which restores both into schema 3; app unit tests
+  also open the candidate through the registry and engine, win level 1 and confirm it is not available without the
+  testing argument.
+- **Builds.** The app compiles in debug and release for the simulator with the game linked; the release symbol check
+  confirms the test-only golden source and scenarios are absent.
