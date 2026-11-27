@@ -35,7 +35,7 @@ Packages/ExperiencesRound02 --filter MyceliumArchitect`. New sources go in `Myce
   (accepted candidate index per band, work, witness lengths, slowest level and group of five) and record it in
   research R4 (profile changes written back to spec Q2, research, data model and plan in the same commit); `--name
   host-2`
-- [ ] T-R02G2202-004 [P] [US1] Create `CoreTests/MyceliumArchitectSolverTests.swift` (agent A: minimal plans; the
+- [X] T-R02G2202-004 [P] [US1] Create `CoreTests/MyceliumArchitectSolverTests.swift` (agent A: minimal plans; the — Verified 2026-11-27: MyceliumArchitectSolverTests (7, independent enumeration on the two smallest levels per band) installed; host-3 exit=0
   independent enumeration of every shorter action sequence through the puzzle moves, no visited set, on the two levels
   with the smallest move space per band; per-depth counts equal; work counted; plans replay); `--name host-3`
 - [ ] T-R02G2202-005 [P] [US2] Create `CoreTests/MyceliumArchitectGeneratorTests.swift` (agent C: determinism,
