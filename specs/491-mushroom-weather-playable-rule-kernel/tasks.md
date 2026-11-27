@@ -70,7 +70,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
   "every legal arrangement action while actions are left"; goal "the predicted run wins"; rulesID
   "r02-g20-mushroom-weather") with `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherPuzzleTests.swift`
   (agreement with the play on 200 walks); `--name host-4`
-- [ ] T-R02G2001-006 [P] Create
+- [X] T-R02G2001-006 [P] Create — Verified 2026-11-26: 2026-11-26 host-5 exit 0: the nine named source invariant tests with seeded neighbouring checks; 45 Mushroom Weather tests in six suites pass (.autonomy/migration/checks/R02-G20-01.host-5.json)
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherInvariantTests.swift` (agent D:
   `testMushroomWeatherTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
