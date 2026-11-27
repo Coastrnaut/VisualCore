@@ -15,7 +15,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2109-002 Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSchemaExamples.swift`
+- [X] T-R02G2109-002 Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSchemaExamples.swift` — Verified 2026-11-27: host exit 0 (swift test --filter BinaryGardensSchemaExampleTests: 8 tests, schema 1 and 2 examples restore to schema 3, digests pinned); registry examples registered
   (contracts/api.md; schema 1 "`{level: 1, records}` of a play of level 1 with star 2's ring change `star.ring [1, 1]`
   accepted (playing, not won)"; schema 2 "campaign mode, the tutorial done, progress (frontier 2, level 1 solved with 2
   actions spent and 2 stars, one above the certified count of 1), the records of a fresh play", "the result is kept,
