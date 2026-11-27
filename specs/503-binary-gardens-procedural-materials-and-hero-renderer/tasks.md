@@ -72,7 +72,7 @@ R02-G20-03 (`git show a3269b5cc:<path>`, the R02-G20-03 record commit).
   (version line, declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, contiguous material
   table and encode/decode round trip, palette constants match, starfield ≤ 2 %, banding latitudes, ambient floor, glow
   caps); agent A; `--name host-2`
-- [ ] T-R02G2103-004 [P] [US1] Create
+- [X] T-R02G2103-004 [P] [US1] Create — Verified 2026-11-27: host-3 exit=0, BinaryGardensSceneGeometryTests (17) (.autonomy/migration/checks/R02-G21-03.host-3.json)
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSceneGeometry.swift` (clarification Q1: a kernel point p
   at k · p / 2²⁰ with k = 0.95 / R, R the largest of the level's ring radii and world radii, barycentre at the origin;
   the backdrop quad; the tilt dial of T_max + 1 pips from (−1.15, 1.08, 0) in steps of 0.05 (none when T_max = 0), pip
