@@ -16,7 +16,7 @@ levels, measured locally, never asserted on CI). No {owner} or {device} tasks (p
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2102-002 Kernel extension (lead): before editing, record one literal fingerprint of a hand level from the
+- [X] T-R02G2102-002 Kernel extension (lead): before editing, record one literal fingerprint of a hand level from the — Verified 2026-11-27: host exit=0, 93 tests; BinaryGardensPhaseStepTests pin the feature-501 fingerprint before the additive phase step (.autonomy/migration/checks/R02-G21-02.host.json)
   unchanged kernel (pinned in the new test); then in `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensLevel.swift`
   add `phaseSteps` and an optional `phaseStep` ("g ∈ {1, 2, 3, 4, 6, 8, 12, 16, 24} (default 1)"; refusals "after
   "nothing adjustable", before "separation" and "already won": "phase step" (not a listed divisor), "phase off grid" (a

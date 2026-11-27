@@ -14,6 +14,11 @@
 // of the exceeding tick); otherwise, worlds ascending, `unstable` (window shorter than W) before `wilted` (I < B_lo) or
 // `bleached` (I > B_hi); otherwise the level is won. The stars keep the minimum separation σ when their squared
 // separation at every tick 0 … 47 is at least σ²·2^40. Integers only; no clock is read and no trigonometry runs.
+//
+// Feature 502 (R02-G21-02) T-R02G2102-002 (FR-R02G2102-009; research R2), additive: a phase action to a step that is
+// not a multiple of the level's phase step is refused `.action("off the phase grid")` right after "phase out of range"
+// and before "locked" (the play and the puzzle contract both call `changed`), and a well-formed arrangement has its
+// phases on the grid. With the default phase step 1 nothing changes.
 
 /// A star of a level: its starting ring, phase and luminosity and which of them the player may adjust.
 public struct BinaryGardensStar: Sendable, Hashable, Codable {
@@ -342,14 +347,14 @@ public enum BinaryGardensSky {
         return .lethalHigh
     }
 
-    /// Whether `arrangement` has the level's shape: two entries per star array, every index in range and a tilt of
-    /// 0 … T_max.
+    /// Whether `arrangement` has the level's shape: two entries per star array, every index in range, every phase on the
+    /// level's phase grid and a tilt of 0 … T_max.
     static func isWellFormed(_ level: BinaryGardensLevel, _ arrangement: BinaryGardensArrangement) -> Bool {
         guard arrangement.rings.count == 2, arrangement.phases.count == 2,
               arrangement.luminosities.count == 2 else { return false }
         for star in 0..<2 {
             guard level.ringRadii.indices.contains(arrangement.rings[star]),
-                  (0..<cycle).contains(arrangement.phases[star]),
+                  level.allowsPhase(arrangement.phases[star]),
                   level.luminosityLevels.indices.contains(arrangement.luminosities[star]) else { return false }
         }
         return (0...level.maxTilt).contains(arrangement.tilt)
@@ -539,7 +544,8 @@ public enum BinaryGardensSky {
     /// flags, the current value and the minimum separation (the run returns `arrangement`).
     ///
     /// - Throws: `.action("star out of range")` (outside 0 … 1), `.action("ring out of range")`,
-    ///   `.action("phase out of range")` (outside 0 … 47), `.action("luminosity out of range")`,
+    ///   `.action("phase out of range")` (outside 0 … 47), `.action("off the phase grid")` (a step that is not a
+    ///   multiple of the level's phase step; feature 502), `.action("luminosity out of range")`,
     ///   `.action("tilt out of range")` (outside 0 … T_max), `.action("locked")` (the control is not adjustable; the tilt
     ///   when T_max = 0), `.action("unchanged")` or `.action("separation")` (the new arrangement breaks the minimum
     ///   separation at a tick of 0 … 47), checked in this order.
@@ -559,6 +565,7 @@ public enum BinaryGardensSky {
         case .phase(let star, let step):
             guard (0..<2).contains(star) else { throw .action("star out of range") }
             guard (0..<cycle).contains(step) else { throw .action("phase out of range") }
+            guard step % level.phaseStep == 0 else { throw .action("off the phase grid") }
             guard level.stars[star].phaseAdjustable else { throw .action("locked") }
             guard phases[star] != step else { throw .action("unchanged") }
             phases[star] = step

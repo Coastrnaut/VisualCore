@@ -13,6 +13,10 @@
 // and both produce the same arrangement; a move the play would refuse, or the run, is refused (nil). The rules carry no
 // stage, fingerprints, report, failure, records, undo or redo: those belong to the play. Integers only; no clock, no
 // random source. Modelled on `MushroomWeatherPuzzle` (feature 491).
+//
+// Feature 502 (R02-G21-02) T-R02G2102-002 (FR-R02G2102-009; research R2), additive: the phase moves are the steps on
+// the level's phase grid only (0, g, 2g, … < 48 for phase step g; every step 0 … 47 for the default g = 1), so the
+// move list of a level without a phase step is unchanged and a move is still legal exactly when the play accepts it.
 import VisualCoreSimulation
 
 /// The pure rules of one Binary Gardens level as an R02-F23 puzzle contract.
@@ -59,12 +63,15 @@ public struct BinaryGardensPuzzle: PuzzleRules {
     }
 
     /// Every arrangement action of the level in the order of research R14, legal or not: for each star, the rings
-    /// ascending, the phases 0 … 47 and the luminosities ascending; then the tilts 0 … T_max.
+    /// ascending, the phases on the level's grid ascending (0 … 47 for phase step 1) and the luminosities ascending;
+    /// then the tilts 0 … T_max.
     func candidates() -> [BinaryGardensAction] {
         var result: [BinaryGardensAction] = []
         for star in 0..<2 {
             for index in level.ringRadii.indices { result.append(.ring(star: star, index: index)) }
-            for step in 0..<BinaryGardensSky.cycle { result.append(.phase(star: star, step: step)) }
+            for step in stride(from: 0, to: BinaryGardensSky.cycle, by: level.phaseStep) {
+                result.append(.phase(star: star, step: step))
+            }
             for index in level.luminosityLevels.indices { result.append(.luminosity(star: star, index: index)) }
         }
         for step in 0...level.maxTilt { result.append(.tilt(step: step)) }
@@ -72,8 +79,8 @@ public struct BinaryGardensPuzzle: PuzzleRules {
     }
 
     /// The legal moves: none with the budget spent; otherwise every arrangement action the play would accept, in the
-    /// order of research R14 (star 1 then star 2: rings ascending, phases 0 … 47, luminosities ascending; then tilts
-    /// 0 … T_max), at most 120.
+    /// order of research R14 (star 1 then star 2: rings ascending, phases on the grid ascending, luminosities ascending;
+    /// then tilts 0 … T_max), at most 120.
     public func moves(in state: Position) -> [BinaryGardensAction] {
         guard isOpen(state) else { return [] }
         var result: [BinaryGardensAction] = []

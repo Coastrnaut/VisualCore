@@ -11,6 +11,13 @@
 // wins. Its fingerprint is the SHA-256 hex of its canonical JSON (schema 1, sorted keys, fingerprint excluded); the
 // stored form is re-checked on decode. Stars, rings, worlds, bands, measures and progress are named in words
 // (FR-R02G2101-013). Modelled on `MushroomWeatherLevel` (feature 491).
+//
+// Feature 502 (R02-G21-02) T-R02G2102-002 (FR-R02G2102-006, 009; SC-R02G2102-007; clarification Q1; research R1, R2),
+// additive: a level may declare a phase step g ∈ {1, 2, 3, 4, 6, 8, 12, 16, 24} (the divisors of 48 up to 24), the
+// grid on which its star phases lie. After "nothing adjustable" and before the encoding, "separation" and "already won",
+// the level refuses "phase step" (g not a listed divisor) and then "phase off grid" (a starting phase not a multiple of
+// g). g = 1 is the default and is omitted from the stored form, so a level without a phase step encodes, fingerprints
+// and plays byte for byte as in feature 501.
 import Foundation
 import VisualCoreMath
 
@@ -54,6 +61,8 @@ public struct BinaryGardensLevel: Sendable, Equatable {
     public static let tolerances: ClosedRange<Int> = 0...12
     /// The action budgets.
     public static let budgets: ClosedRange<Int> = 1...24
+    /// The phase steps a level may declare: the divisors of 48 up to 24 (1 is feature 501's behaviour, every phase).
+    public static let phaseSteps: [Int] = [1, 2, 3, 4, 6, 8, 12, 16, 24]
 
     /// The level's id, a lowercase slug.
     public let id: String
@@ -85,28 +94,35 @@ public struct BinaryGardensLevel: Sendable, Equatable {
     public let budget: Int
     /// Whether a tutorial precedes play.
     public let tutorial: Bool
+    /// The phase step g, one of ``phaseSteps``: every star phase lies on the grid 0, g, 2g, … (1, the default: every
+    /// phase 0 … 47, feature 501's behaviour; omitted from the stored form).
+    public let phaseStep: Int
     /// The SHA-256 hex of the canonical JSON content.
     public let fingerprint: String
 
     /// A level of the given values, checked.
     ///
-    /// - Throws: `.level(name)` naming the first value outside its range or rule.
+    /// - Parameter phaseStep: the phase step g, one of ``phaseSteps`` (default 1: every phase, as in feature 501).
+    /// - Throws: `.level(name)` naming the first value outside its range or rule; "phase step" (g not one of
+    ///   ``phaseSteps``) and "phase off grid" (a starting phase not a multiple of g) after "nothing adjustable" and
+    ///   before "separation" and "already won".
     public init(id: String, seed: UInt64, difficulty: Int, ringRadii: [Int], starSpeed: Int, luminosityLevels: [Int],
                 stars: [BinaryGardensStar], maxTilt: Int, startTilt: Int, minimumSeparation: Int, clampRadius: Int,
                 worlds: [BinaryGardensWorld], lethalTolerance: Int, budget: Int,
-                tutorial: Bool) throws(BinaryGardensError) {
+                tutorial: Bool, phaseStep: Int = 1) throws(BinaryGardensError) {
         try self.init(id: id, seed: seed, difficulty: difficulty, ringRadii: ringRadii, starSpeed: starSpeed,
                       luminosityLevels: luminosityLevels, stars: stars, maxTilt: maxTilt, startTilt: startTilt,
                       minimumSeparation: minimumSeparation, clampRadius: clampRadius, worlds: worlds,
-                      lethalTolerance: lethalTolerance, budget: budget, tutorial: tutorial, refusingAWin: true)
+                      lethalTolerance: lethalTolerance, budget: budget, tutorial: tutorial, refusingAWin: true,
+                      phaseStep: phaseStep)
     }
 
     /// A level of the given values, checked; the "already won" rule only when `refusingAWin` (a probe that only reads
-    /// reports passes false).
+    /// reports passes false); `phaseStep` as in the public initialiser.
     init(id: String, seed: UInt64, difficulty: Int, ringRadii: [Int], starSpeed: Int, luminosityLevels: [Int],
          stars: [BinaryGardensStar], maxTilt: Int, startTilt: Int, minimumSeparation: Int, clampRadius: Int,
          worlds: [BinaryGardensWorld], lethalTolerance: Int, budget: Int, tutorial: Bool,
-         refusingAWin: Bool) throws(BinaryGardensError) {
+         refusingAWin: Bool, phaseStep: Int = 1) throws(BinaryGardensError) {
         guard Self.isSlug(id) else { throw .level("id") }
         guard Self.difficulties.contains(difficulty) else { throw .level("difficulty") }
         guard Self.ringCounts.contains(ringRadii.count) else { throw .level("ring count") }
@@ -152,10 +168,13 @@ public struct BinaryGardensLevel: Sendable, Equatable {
             adjustable = true
         }
         guard adjustable else { throw .level("nothing adjustable") }
+        guard Self.phaseSteps.contains(phaseStep) else { throw .level("phase step") }
+        for star in stars where star.phase % phaseStep != 0 { throw .level("phase off grid") }
         let content = Content(schema: Self.schema, id: id, seed: seed, difficulty: difficulty, ringRadii: ringRadii,
                               starSpeed: starSpeed, luminosityLevels: luminosityLevels, stars: stars, maxTilt: maxTilt,
                               startTilt: startTilt, minimumSeparation: minimumSeparation, clampRadius: clampRadius,
-                              worlds: worlds, lethalTolerance: lethalTolerance, budget: budget, tutorial: tutorial)
+                              worlds: worlds, lethalTolerance: lethalTolerance, budget: budget, tutorial: tutorial,
+                              phaseStep: phaseStep == 1 ? nil : phaseStep)
         guard let data = try? Self.encoder.encode(content) else { throw .malformed("encode") }
         self.id = id
         self.seed = seed
@@ -172,6 +191,7 @@ public struct BinaryGardensLevel: Sendable, Equatable {
         self.lethalTolerance = lethalTolerance
         self.budget = budget
         self.tutorial = tutorial
+        self.phaseStep = phaseStep
         self.fingerprint = StableHash.sha256Hex(Array(data))
         guard BinaryGardensSky.keepsSeparation(self, arrangement: start) else { throw .level("separation") }
         if refusingAWin {
@@ -180,16 +200,21 @@ public struct BinaryGardensLevel: Sendable, Equatable {
     }
 
     /// A probe level that skips the "already won" rule, for reading the reports of other arrangements (the content
-    /// pipeline, the fixtures and hand-made test levels); every other rule is checked.
+    /// pipeline, the fixtures and hand-made test levels); every other rule is checked, the phase step included.
     static func probe(ringRadii: [Int], starSpeed: Int, luminosityLevels: [Int], stars: [BinaryGardensStar],
                       maxTilt: Int, startTilt: Int, minimumSeparation: Int, clampRadius: Int,
                       worlds: [BinaryGardensWorld], lethalTolerance: Int,
-                      budget: Int = 1) throws(BinaryGardensError) -> BinaryGardensLevel {
+                      budget: Int = 1, phaseStep: Int = 1) throws(BinaryGardensError) -> BinaryGardensLevel {
         try BinaryGardensLevel(id: "probe", seed: 0, difficulty: 1, ringRadii: ringRadii, starSpeed: starSpeed,
                                luminosityLevels: luminosityLevels, stars: stars, maxTilt: maxTilt,
                                startTilt: startTilt, minimumSeparation: minimumSeparation, clampRadius: clampRadius,
                                worlds: worlds, lethalTolerance: lethalTolerance, budget: budget, tutorial: false,
-                               refusingAWin: false)
+                               refusingAWin: false, phaseStep: phaseStep)
+    }
+
+    /// Whether `step` is a phase a star of this level may take: 0 … 47 and a multiple of ``phaseStep``.
+    public func allowsPhase(_ step: Int) -> Bool {
+        Self.phases.contains(step) && step % phaseStep == 0
     }
 
     /// The starting arrangement: both stars' starting rings, phases and luminosities and the starting tilt.
@@ -374,11 +399,13 @@ public struct BinaryGardensLevel: Sendable, Equatable {
         let lethalTolerance: Int
         let budget: Int
         let tutorial: Bool
+        /// The phase step when above 1; nil (omitted from the JSON and the fingerprint text) for 1.
+        let phaseStep: Int?
 
         init(schema: Int, id: String, seed: UInt64, difficulty: Int, ringRadii: [Int], starSpeed: Int,
              luminosityLevels: [Int], stars: [BinaryGardensStar], maxTilt: Int, startTilt: Int,
              minimumSeparation: Int, clampRadius: Int, worlds: [BinaryGardensWorld], lethalTolerance: Int,
-             budget: Int, tutorial: Bool) {
+             budget: Int, tutorial: Bool, phaseStep: Int? = nil) {
             self.schema = schema
             self.id = id
             self.seed = seed
@@ -395,6 +422,7 @@ public struct BinaryGardensLevel: Sendable, Equatable {
             self.lethalTolerance = lethalTolerance
             self.budget = budget
             self.tutorial = tutorial
+            self.phaseStep = phaseStep
         }
 
         init(level: BinaryGardensLevel) {
@@ -403,7 +431,8 @@ public struct BinaryGardensLevel: Sendable, Equatable {
                       luminosityLevels: level.luminosityLevels, stars: level.stars, maxTilt: level.maxTilt,
                       startTilt: level.startTilt, minimumSeparation: level.minimumSeparation,
                       clampRadius: level.clampRadius, worlds: level.worlds, lethalTolerance: level.lethalTolerance,
-                      budget: level.budget, tutorial: level.tutorial)
+                      budget: level.budget, tutorial: level.tutorial,
+                      phaseStep: level.phaseStep == 1 ? nil : level.phaseStep)
         }
 
         /// The level of this content, re-checked.
@@ -412,7 +441,7 @@ public struct BinaryGardensLevel: Sendable, Equatable {
                                    starSpeed: starSpeed, luminosityLevels: luminosityLevels, stars: stars,
                                    maxTilt: maxTilt, startTilt: startTilt, minimumSeparation: minimumSeparation,
                                    clampRadius: clampRadius, worlds: worlds, lethalTolerance: lethalTolerance,
-                                   budget: budget, tutorial: tutorial)
+                                   budget: budget, tutorial: tutorial, phaseStep: phaseStep ?? 1)
         }
     }
 

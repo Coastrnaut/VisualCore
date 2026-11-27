@@ -1,6 +1,7 @@
 // BinaryGardensError — feature 501 (R02-G21-01) T-R02G2101-002 (FR-R02G2101-006, 009, 011; clarification Q5). The
 // refusals of Binary Gardens' rule kernel, each with a stable reason code `r02-g21.*` that the experience logs with the
 // level id and the action. Modelled on `MushroomWeatherError` (feature 491) and `MicroscopicAuroraError` (feature 481).
+// Feature 502 (R02-G21-02) T-R02G2102-002 (FR-R02G2102-006) adds `generation(Int)` and `witness(String)`.
 
 /// A refusal of a Binary Gardens level, action or event.
 public enum BinaryGardensError: Error, Equatable, Sendable {
@@ -19,6 +20,11 @@ public enum BinaryGardensError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of the manifest entry with this number qualified within the generator's candidate bound
+    /// (feature 502).
+    case generation(Int)
+    /// A solver witness is damaged, edited or no longer replays; the payload names the part (feature 502).
+    case witness(String)
 
     /// The stable reason code, `r02-g21.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +36,8 @@ public enum BinaryGardensError: Error, Equatable, Sendable {
         case .stale: "r02-g21.stale"
         case .newerSchema: "r02-g21.newer-schema"
         case .malformed: "r02-g21.malformed"
+        case .generation: "r02-g21.generation"
+        case .witness: "r02-g21.witness"
         }
     }
 }
