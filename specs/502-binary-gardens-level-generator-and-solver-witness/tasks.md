@@ -104,7 +104,7 @@ edited file is refused.
   skipped; decode refuses newer (`r02-g21.newer-schema`), damaged and non-replaying or edited (`r02-g21.witness`) files
   with the reasons of contracts/api.md) with
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G2102-006 [US1] [US2] [US3] [US4] Create
+- [X] T-R02G2102-006 [US1] [US2] [US3] [US4] Create — Verified 2026-11-27: host-5 exit=0, BinaryGardensCatalogTests with pinned digest adf594d6…, content and novelty boundaries (.autonomy/migration/checks/R02-G21-02.host-5.json)
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the budget, and no arrangement at a smaller depth wins; the
   independent enumeration on the two levels with the smallest move space in each band (ties by level number);

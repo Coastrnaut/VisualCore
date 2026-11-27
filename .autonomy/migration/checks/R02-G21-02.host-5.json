@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "BinaryGardens"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter BinaryGardens",
+  "elapsed_seconds": 25.21,
+  "exit_code": 0,
+  "finished": "2026-11-27T12:12:57+00:00",
+  "gate": "R02-G21-02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G21-02.host-5.log",
+  "log_sha256": "e49e438e4083fae60129e95ac1efd845749a93eea41af976941f0fb8dae96037",
+  "name": "host-5",
+  "started": "2026-11-27T12:12:32+00:00",
+  "timed_out": false
+}
