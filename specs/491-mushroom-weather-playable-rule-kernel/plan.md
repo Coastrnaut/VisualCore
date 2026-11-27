@@ -58,7 +58,7 @@ Post-design re-check: PASS.
 ```text
 Packages/ExperiencesRound02/Package.swift                                              edit  + Core target (lead)
 Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherError.swift            new   (lead)
-Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherWeather.swift          new   cycle, ledger, judge (lead)
+Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherForest.swift           new   cycle, ledger, judge (lead)
 Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherLevel.swift            new   level, words, stored form (lead)
 Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherPlay.swift             new   play, records, replay (B)
 Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherPuzzle.swift           new   PuzzleRules (C)
