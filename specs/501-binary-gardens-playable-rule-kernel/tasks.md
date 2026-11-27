@@ -11,7 +11,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2101-001 Baselines after X-R02-G20 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G2101-001 Baselines after X-R02-G20 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit=0 (.autonomy/migration/checks/R02-G21-01.baseline-*.json)
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the round-two chunks of feature 457 with the five filters as at
   R02-G20-10, without `BinaryGardens`, on the committed tree before the targets exist); the rendering baseline is
   X-R02-G20's visualcore-rendering run
