@@ -55,7 +55,7 @@ round02-host in five chunks (1, 2, 3c, 3e, 3f). Prerequisites: R02-G21-04 and R0
   amplitudes and gain when failed; ≤ 6 partials, gain ≤ 0.3, 4 … 16 s, a whole number of cycles per partial"); edit
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSceneGeometry.swift` (`glowPart` and `glowMesh` take
   optional bloom levels as each world's shell factor; nil gives today's mesh bit for bit; the presenter rebuilds when a
-  bloom level moves by 1/32 or more) with `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensLightsTests.swift`
+  bloom level crosses a 1/32 step) with `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensLightsTests.swift`
   (a scripted win and adversarial flicker — a ring change undone and redone every frame, a failed run undone and redone
   every frame, the shown tick stepped back and forth every frame, level changes — sampled every 1/60 s: at most 3
   half-range crossings per second and every complete one-way fade over half the range ≥ 0.4 s under Reduce Flashing),

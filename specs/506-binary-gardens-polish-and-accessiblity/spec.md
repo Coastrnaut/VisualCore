@@ -112,7 +112,7 @@ Answered autonomously under the owner's standing delegation, safest well-support
   each easing toward its target by the frame clock's elapsed time between drawn frames (0.15 s normally, 0.45 s under
   Reduce Flashing, linear; under Reduce Flashing a fade that has started finishes before it may turn back); the scene
   draws the eased levels (the glow gain times the glow level, each world's shell factor its bloom level — the factor is vertex data of the glow mesh, so the mesh is rebuilt
-  when a bloom level moves by 1/32 or more —, the won
+  when a bloom level crosses a 1/32 step —, the won
   uniform the won level, and in the fallback the not-won and won colours blended by the won level, rebuilt when the
   level moves by a tenth or more); the state and digest never see them. The stars, rings, phases, luminosity pips, tilt
   dial, gauges, trails and the worlds' band tints change only with the player's actions and the shown tick and are not
