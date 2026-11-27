@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-01 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2001-###,
 SC-R02G2001-###, T-R02G2001-###
@@ -33,6 +33,67 @@ Canonical overrides:
 - **Shared features used:** R02-F03 (numbers) and R02-F23 (puzzle contract: the kernel's rules are a puzzle contract,
   so R02-G20-02 can certify levels).
 - **Model:** feature 481 (Microscopic Aurora's rule kernel) for structure, stored form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+481's answers where the games agree (stages, stored form, records, refusal codes, puzzle contract). Facts checked in
+code (read-only, 2026-11-26): Microscopic Aurora's kernel (`MicroscopicAuroraLevel`, `MicroscopicAuroraPlay`,
+`MicroscopicAuroraError` with codes `r02-g19.level`, `.action`, `.budget`, `.stage`, `.stale`, `.newer-schema`,
+`.malformed`) keeps every limit as an integer range, fingerprints levels with SHA-256 of a canonical text and
+implements R02-F23's `PuzzleRules` (`MicroscopicAuroraPuzzle`, `VisualCoreSimulation`); no `MushroomWeather` module
+exists yet in `Packages/ExperiencesRound02`.
+
+- Q: What is the forest floor, in which units? → A: a grid of 6 … 12 rows by 6 … 14 columns (rows and columns from 0);
+  each cell is floor or blocked (a log or stone that holds no water and exchanges none). Humidity is a whole number of
+  units per floor cell, 0 … 10000; the boundary is closed (no water crosses the edge of the grid). The mold bound M is
+  1000 … 10000 and every starting humidity is 0 … M. Impact: FR-R02G2001-001, 003; SC-R02G2001-004.
+- Q: What exactly happens in one cycle, so every device agrees and the ledger balances? → A: three steps, each computed
+  from the state at the start of that step (synchronous, so cell order cannot change the result). (1) Diffusion: for
+  every pair of orthogonally adjacent floor cells a and b, the flow from a to b is (hₐ − h_b)·D/64 with D 1 … 12,
+  truncated toward zero; each cell adds the flows into it and subtracts the flows out of it. Flows are antisymmetric,
+  so the total is unchanged exactly, and since a cell has at most four neighbours and 4·12/64 < 1, no cell goes
+  negative. (2) Evaporation: each floor cell has an evaporation rate 0 … 200 (vent cells have an open and a closed rate);
+  with moonlight level L 0 … 3, a cell loses ⌊h·rate·(4 + L)/4096⌋, never more than it holds. (3) Release: each pod
+  adds its release r (1 … 40) to its cell, or its grown release g (r … 80) once grown. The ledger of the cycle is the
+  total before, the released, the evaporated and the total after, and total after = total before + released −
+  evaporated holds exactly. All values fit in 64-bit integers. Impact: FR-R02G2001-003, 014; SC-R02G2001-003.
+- Q: How do pods grow and what are the colonies? → A: after each cycle's three steps, each pod adds its cell's humidity
+  to its integral; when the integral reaches the growth threshold G (100 … 200000) the pod is grown from the next cycle
+  on. A colony stands on a floor cell (never a pod's), with a band low … high (0 ≤ low ≤ high ≤ M) and, if sensitive,
+  a survival floor f (0 ≤ f ≤ low); a level has 1 … 6 colonies, every one a target. A colony is in band in a cycle when
+  low ≤ h ≤ high after that cycle. Impact: FR-R02G2001-001, 004, 005.
+- Q: In which order is the run judged, and what does "sustain for T cycles" mean exactly? → A: the run walks cycles
+  1 … T (T 20 … 200). After each cycle: the lowest-numbered sensitive colony with h < f fails `dried` (colony, cycle);
+  otherwise the first floor cell in row-major order with h > M fails `mold` (cell, cycle). After the last cycle, the
+  level is won exactly when every colony has been in band for each of the last K cycles (K 5 … T), so the network ends
+  stable; otherwise it fails `unstable`, naming the colony with the shortest final in-band run (lowest number on a
+  tie) and that run's length. The report also gives each colony's longest in-band run and its first cycle out of band.
+  A level is refused when a sensitive colony starts below its floor, a cell starts above M, or the starting arrangement
+  wins. Impact: FR-R02G2001-005, 014; SC-R02G2001-004.
+- Q: Which actions exist, how does a level live and how is it stored? → A: pod slots 0 … P − 1 (P 1 … 6).
+  `place(slot, row, column)` puts a pod into a slot or moves it (the cell must differ from the slot's current one, be
+  floor, and hold no colony and no other pod); `remove(slot)` empties an occupied slot; `vent(index, open)` sets one of
+  the level's 0 … 6 vent cells (it must change the vent's state); `moonlight(level)` sets L (it must change it). Each
+  spends one action and is refused `r02-g20.action` when out of range, unchanged or on a forbidden cell, or removing an
+  empty slot, `r02-g20.budget` when no action is left. A pod moved or placed starts ungrown with a zero integral; growth
+  happens only during the run. `run` spends nothing and ends the level (won or failed); undo and redo restore
+  arrangements and, from failed, undo returns to playing with the arrangement before the run. The budget is 1 … 12. As
+  feature 481: stages loading → tutorial → playing ⇄ paused → won or failed → result; begin, dismissTutorial, pause and
+  resume are their own record kinds; each record carries the schema, the level seed, an index, the kind, the action
+  and the fingerprints before and after; replay refuses a record of another level or a broken chain
+  (`r02-g20.malformed`); `.stage` and `.stale` as there. The stored form is JSON schema 1 with sorted keys (id, seed,
+  difficulty 1 … 5, rows, columns, blocked cells, starting humidity, diffusion, evaporation rates, vents, moonlight,
+  pod rules, colonies, mold bound, run length, required cycles, starting pods, budget, tutorial, fingerprint = SHA-256
+  of a canonical text); a damaged or edited form is refused `r02-g20.malformed`, a newer one `r02-g20.newer-schema`,
+  an invalid level `r02-g20.level`. The report after every action holds the humidity by cycle, the ledger by cycle, the
+  growth cycles, each colony's runs, the first failure and the predicted outcome, with words for each ("pod 2 at row 3,
+  column 7, grown at cycle 18", "colony 1 at row 5, column 2: 412 units, band 380 … 520, in band for the last 12 of 12
+  cycles"). The puzzle contract (R02-F23): the position is the arrangement (pods, vents, moonlight), the moves are the
+  actions legal from it, the goal test is that the predicted run wins; certifying levels (R02-G20-02) searches
+  arrangements. Impact: FR-R02G2001-006, 007, 008, 009, 010, 011, 013, 014.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -116,9 +177,9 @@ refused.
   the growth threshold, and from then on release the grown amount.
 - **FR-R02G2001-005**: Running the weather MUST end the level: failed at the first cycle a sensitive colony falls
   below its survival floor (reason: dried out) or any cell exceeds the mold bound (reason: mold), with the colony or
-  cell and the cycle; otherwise won exactly when every target colony has been inside its band for the required
-  consecutive cycles by the end of the run, and failed (reason: unstable) naming the colony with the shortest interval
-  when not.
+  cell and the cycle; otherwise won exactly when every target colony has been inside its band for each of the last
+  required cycles of the run, and failed (reason: unstable) naming the colony with the shortest final interval when
+  not.
 - **FR-R02G2001-006**: An action MUST place, move or remove a pod, open or close a vent, or set the moonlight, and
   spend one action; every action MUST be validated (ranges, cells, stage, budget, previous fingerprint) and refused
   without change when invalid.
