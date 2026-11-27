@@ -109,7 +109,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
 - [X] T-R02G2107-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit 0 (run alone)
 - [ ] T-R02G2107-012 {device} After ImplementationLock-100: a save survives a real app termination on D1/D2/D3
   (SC-R02G2107-007)
-- [ ] T-R02G2107-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2107-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converge clean at the first round; README row and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
