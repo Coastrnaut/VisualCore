@@ -53,7 +53,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherExperienceCoreTests.swift` updates (schema
   3, migrations 1 → 3 and 2 → 3, reconciliation on restore, replay rules and codes, a replay saved mid-way restores
   while a changed, reordered or undo-carrying replay is refused `damaged`, sound setting); `--name host-2`
-- [ ] T-R02G2007-004 [P] [US1] [US2] Create
+- [X] T-R02G2007-004 [P] [US1] [US2] Create — Verified 2026-11-27: host-3 exit=0, MushroomWeatherPersistenceTests 9 functions (.autonomy/migration/checks/R02-G20-07.host-3.json)
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherPersistenceTests.swift` (agent B: 500 seeded
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
