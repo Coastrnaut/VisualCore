@@ -111,11 +111,12 @@ Answered autonomously under the owner's standing delegation, safest well-support
   won, else 0) and each world's bloom (1 when the world is comfortable at the shown tick or the level is won, else 0),
   each easing toward its target by the frame clock's elapsed time between drawn frames (0.15 s normally, 0.45 s under
   Reduce Flashing, linear; under Reduce Flashing a fade that has started finishes before it may turn back); the scene
-  draws the eased levels (the glow gain times the glow level, each world's shell factor its bloom level, the won
+  draws the eased levels (the glow gain times the glow level, each world's shell factor its bloom level — the factor is vertex data of the glow mesh, so the mesh is rebuilt
+  when a bloom level moves by 1/32 or more —, the won
   uniform the won level, and in the fallback the not-won and won colours blended by the won level, rebuilt when the
   level moves by a tenth or more); the state and digest never see them. The stars, rings, phases, luminosity pips, tilt
   dial, gauges, trails and the worlds' band tints change only with the player's actions and the shown tick and are not
-  faded. The corona rays and pollen motes move at under 1 cycle per second normally; under Reduce Motion or Reduce
+  faded; the pollen motes a won run adds around the worlds appear with the outcome, like the band tints. The corona rays and pollen motes move at under 1 cycle per second normally; under Reduce Motion or Reduce
   Flashing their time is held at 0, so the system is still between actions. The measure: sampling the drawn levels
   every 1/60 s through a scripted win and adversarial flicker (a ring change undone and redone every frame, a failed
   run undone and redone every frame, the shown tick stepped back and forth every frame, level changes), no eased
@@ -293,7 +294,9 @@ logs, equal sound decisions and, under Reduce Flashing, the same fade bounds.
   with its trigger), alongside the tier log and feature 504's refusal log, for tests and diagnostics; nothing leaves
   the device.
 - **FR-R02G2106-009**: Existing tests pass except the assertions this feature deliberately changes (the refusal words
-  of `refusalText(code:)` and the Reduce Flashing motion), updated in place and named in the tasks; no state, digest or
+  of `refusalText(code:)` and any R02-G21-04 or R02-G21-05 test asserting the former refusal line, and
+  `BinaryGardensRenderTests.aWonLevelBloomsEveryWorld`, which draws one settling frame before its checked frame because
+  the won look now fades in; no committed test asserts the motion under Reduce Flashing alone), updated in place and named in the tasks; no state, digest or
   snapshot schema change; new public names documented with `///`; the reference regression passes.
 
 ### Key Entities
