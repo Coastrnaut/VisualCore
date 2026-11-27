@@ -212,8 +212,8 @@ file is refused.
   and budget; only levels the kernel accepts and the solver certifies within the budget MAY be emitted.
 - **FR-R02G2002-002**: A solver MUST find a minimal sequence of actions after which running the weather wins, by a
   search over arrangements (pod sites, vent states, moonlight) by the number of actions from the start, each judged by
-  the exact grid diffusion of feature 491 with its bounded evapotranspiration, with reachability checks pruning
-  arrangements that cannot change the outcome and a band loss guiding the order, with its work bounded and counted, and
+  the exact grid diffusion of feature 491 with its bounded evapotranspiration, with reachability checks skipping
+  arrangements already reached at a smaller depth (never pruning by outcome) and a band loss guiding the order, with its work bounded and counted, and
   MUST prove that no shorter sequence wins; every plan it reports MUST be replayed through the kernel's play.
 - **FR-R02G2002-003**: Each level MUST carry difficulty metrics (witness length, colonies, narrowest band, pod sites,
   vents, arrangements searched, solver work) derived from the level and the solver.
