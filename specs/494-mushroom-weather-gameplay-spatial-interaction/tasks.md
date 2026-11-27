@@ -104,7 +104,7 @@ tests stay short (< 10 s each). No {owner} tasks. Agents model their files on Mi
   `-3f`
 - [X] T-R02G2004-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: 2026-11-27 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G20-04.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   `--name host-full`, `--name app-unit`
-- [ ] T-R02G2004-008 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2004-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: 2026-11-27 reference-1 exit 0 (.autonomy/migration/checks/R02-G20-04.reference-1.json)
 - [ ] T-R02G2004-009 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2004-010 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2004-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G2004-007)
