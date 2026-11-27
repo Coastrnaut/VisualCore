@@ -196,7 +196,7 @@ FR-009 → 002, 007 … 011; FR-010 → 003, 004, 006.
   and `research.md` that each star's light reaches a world through the logarithmic response
   `BinaryGardensShaders.lightResponse(share:)` (log2, 1 at 1 024 milliflux) of the share the uv stream carries
   (share / 64 000), since a linear share leaves catalog worlds black, per Clarifications Q1 (contradicts)
-- [ ] T-R02G2103-015 State in `spec.md` (clarification Q3) that in the unlit fallback a star's frame check is its flat
+- [X] T-R02G2103-015 State in `spec.md` (clarification Q3) that in the unlit fallback a star's frame check is its flat — Verified 2026-11-27: spec Q3 states the fallback star check (committed with T-014)
   colour within 0.1 (the +0.4 margin applies to the shader path), per SC-R02G2103-001 (partial)
 - [ ] T-R02G2103-016 Record in `research.md` that failure marks are drawn on a failed play only (as feature 493), that the
   hero tick is the earliest tick with the most comfortable worlds after the certified plan, and that the gauge plate's
