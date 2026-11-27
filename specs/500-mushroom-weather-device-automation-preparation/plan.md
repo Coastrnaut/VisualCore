@@ -9,8 +9,8 @@ Write Mushroom Weather's device contract without touching a device:
 `docs/apps/mushroom-weather/device-rows.json` (schema 1 of feature 310: the device scenario set of 12 scenarios,
 the devices D1, D2, D3 tied to the ledger's DEV1/2/3-R02-G20 rows, and rows MW-D1 … MW-D8 with procedure,
 measurements, pass condition, gating, covered tasks, owner steps and status "pending device campaign") and the written
-plan `docs/apps/mushroom-weather/device-campaign.md` modelled on Apsides Workshop's
-(`docs/apps/apsides-workshop/device-campaign.md`). The existing generic `scripts/check_device_rows.py` validates it
+plan `docs/apps/mushroom-weather/device-campaign.md` modelled on Microscopic Aurora's
+(`docs/apps/microscopic-aurora/device-campaign.md`). The existing generic `scripts/check_device_rows.py` validates it
 against the scenario manifest, the ledger and the open {device} tasks of features 491–499; `scripts/test_scripts.py`
 gains tests on the real Mushroom Weather definition and `release_check.py` a step `device-rows-r02-g20`. Research:
 [research.md](research.md). Data: [data-model.md](data-model.md). Contract:
