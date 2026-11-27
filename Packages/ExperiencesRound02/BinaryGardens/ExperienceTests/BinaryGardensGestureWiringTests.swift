@@ -1096,6 +1096,39 @@ enum BinaryGardensGestureScript {
         #expect(shell.presenter.refusalLog.isEmpty)
     }
 
+    /// k2. A restore through the shell of a saved play other than the shown one clears the preview, the inspection and
+    /// the orbit (spec Edge Cases; FR-R02G2104-016; convergence task T-R02G2104-013).
+    @Test func aRestoreClearsThePresentation() async throws {
+        let target = try #require(try Script.worldTarget(), "a world that picks")
+        let session = ExperienceSession()
+        defer { session.close() }
+        let shell = try await Script.open(session, number: target.number, setUp: target.setUp)
+        let saved: ExperienceSnapshot = try shell.snapshot()
+        let result: ActionResult = shell.presenter.send("level.next", [], port: shell.port)
+        #expect(result == .accepted, "\(result.code)")
+        try T.draw(session)
+        let snapshot: Snapshot = try Script.drawn(shell)
+        let first: Vec2 = try #require(Script.gridPoint(snapshot, orbit: .authored, wanted: .empty),
+                                       "empty space picks")
+        let second: Vec2 = try #require(Script.gridPoint(snapshot, orbit: .authored, wanted: .empty, away: first,
+                                                         minimum: 200), "a second empty point picks")
+        var time: Double = Script.start
+        shell.presenter.inspect(0)
+        Script.orbit(shell, ids: 2, 3, from: first, second, by: Vec2(100, 0), time: &time)
+        try T.draw(session)
+        #expect(shell.presenter.mirror.inspectedWorld == 0)
+        #expect(shell.presenter.orbit != .authored)
+
+        try shell.restore(saved)
+        try T.draw(session)
+        #expect(try T.core(shell).levelNumber == target.number, "the restore returns to the saved level")
+        #expect(shell.presenter.mirror.inspectedWorld == nil, "a restore clears the inspection")
+        #expect(shell.presenter.mirror.preview == nil, "a restore clears the preview")
+        #expect(shell.presenter.orbit == .authored, "a restore returns the camera to the authored view")
+        #expect(try Script.drawn(shell).inspectedWorld == nil)
+        #expect(shell.presenter.scene.orbit == .authored)
+    }
+
     /// l. The canvas gestures send the five declared gesture controls; the native controls every declared control.
     @Test func theGestureAndNativeActionSets() {
         let presenter = BinaryGardensPresenter(reduceMotion: false, reduceFlashing: false)

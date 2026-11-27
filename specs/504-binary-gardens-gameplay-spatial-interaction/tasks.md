@@ -179,7 +179,7 @@ MVP: Story 1. Requirement coverage: FR-001 → 002, 003, 005; FR-002 → 002, 00
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G2104-013 Add a gesture wiring test in
+- [X] T-R02G2104-013 Add a gesture wiring test in — Verified 2026-11-27: sim-27-2 exit 0 (45 tests in 5 suites; aRestoreClearsThePresentation passes)
   `Packages/ExperiencesRound02/BinaryGardens/ExperienceTests/BinaryGardensGestureWiringTests.swift` that a restore
   through the shell of a saved play different from the shown one clears the preview, the inspected world and the orbit,
   per spec Edge Cases (opening, next level, reset and restore) and FR-R02G2104-016 (partial: only `level.next` and a
