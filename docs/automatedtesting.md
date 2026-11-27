@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G21-06: Binary Gardens polish and accessibility).
+Last updated: 2026-11-27 (R02-G21-07: Binary Gardens persistence and replay).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Binary Gardens persistence and replay** (R02-G21-07, 2026-11-27). Host: reconciliation (19), progress traces (24),
+  replay core (8), persistence (500 round trips, 100 + 100 migrations, 200 seeded saves, determinism), the replay
+  catalog (100 levels in 10 groups, each step against the witness fingerprints); the `BinaryGardens` filter now runs 318
+  tests in 30 suites. Simulator: 6 replay tests (75 in the suite). Lesson: results keep their schema-2 encoding when
+  untraced, so the progress tests that pin exact JSON pass unchanged while schema 3 adds traces.
 - **Binary Gardens polish and accessibility** (R02-G21-06, 2026-11-27). Host: feedback plan (13), lights (9: a
   scripted win and adversarial flicker sampled every 1/60 s), sound recipe (6), geometry bloom levels (2); the
   `BinaryGardens` filter now runs 275 tests in 26 suites. Simulator: 13 accessibility tests (69 in the suite), the

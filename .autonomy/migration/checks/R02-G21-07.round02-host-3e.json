@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "FacetedForge|NocturneGarden|BackwardsAurora|MicroscopicAurora"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'FacetedForge|NocturneGarden|BackwardsAurora|MicroscopicAurora'",
+  "elapsed_seconds": 191.992,
+  "exit_code": 0,
+  "finished": "2026-11-27T17:53:29+00:00",
+  "gate": "R02-G21-07",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G21-07.round02-host-3e.log",
+  "log_sha256": "4ddee1da81c2ef5c7996af8a027e71c429d4da507532f78c8f0481f114b54c28",
+  "name": "round02-host-3e",
+  "started": "2026-11-27T17:50:17+00:00",
+  "timed_out": false
+}

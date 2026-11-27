@@ -1070,4 +1070,7 @@ teaching and progression: `BinaryGardensHints` (three hint levels from the certi
 and snapshot schema 2 with a migration from schema 1. Feature 506 (R02-G21-06) adds polish and accessibility:
 `BinaryGardensFeedbackPlan` (announcements and haptics), `BinaryGardensLights` (eased glow, won look and blooms),
 `BinaryGardensSoundRecipe` and `BinaryGardensSound` (an audition and an optional ambient loop) and the accessible panel.
+Feature 507 (R02-G21-07) adds persistence and replay: snapshot schema 3 with migrations from 1 and 2, winning traces with
+every result, `BinaryGardensReconciliation` (restore replays and checks every stored result), the replay mode and the
+saved sound choice.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).

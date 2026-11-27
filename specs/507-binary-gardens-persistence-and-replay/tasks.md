@@ -99,7 +99,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G2107-007 Docs: `docs/architecture/binary-gardens.md` (persistence and replay),
+- [X] T-R02G2107-007 Docs: `docs/architecture/binary-gardens.md` (persistence and replay), — Verified 2026-11-27: round02-host-1, -2, -3c, -3e, -3f exit 0; docs: architecture persistence section, package README, automatedtesting
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the five round-two filters)
 - [ ] T-R02G2107-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name

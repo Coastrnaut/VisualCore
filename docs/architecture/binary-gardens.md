@@ -167,3 +167,26 @@ presentation of later features.
   columns at accessibility text sizes and a 520-point readable width on iPad; the same behaviour at every tier and in
   the fallback; a sent refusal reads in the feedback plan's sentence, while a refused preview (never sent
   and never announced) keeps feature 504's short words inside "That change would be refused: …".
+
+## Persistence and replay (feature 507, R02-G21-07)
+
+- **Saves.** The one app's shared saved-state store writes the snapshot atomically; schema 3 is `{"level", "mode",
+  "progress", "records", "sound", "tutorial"}` (digest domain `r02-g21.binary-gardens.v3` over the level, the play
+  fingerprint, the progress with its traces and the mode) and migrates from schema 1 and 2 (2 → 3: every result an
+  empty trace, unverified, sound off). A result writes its trace and `verified` only when they are not empty or false,
+  so untraced results keep their schema-2 form. The shown tick, the selected star, previews, the inspected world, the
+  hint level and the view are presentation and are not saved.
+- **Reconcilable scores.** A campaign or daily win stores the winning trace: the effective ring, phase, luminosity and
+  tilt actions in order (an undone action left out unless redone), then the run. On restore
+  `BinaryGardensReconciliation` replays every trace (at most 64 actions) on a fresh play of its certified level and
+  keeps the result only when it wins, spends at most the recorded actions and its stars match the stars rule; the
+  frontier is restored as saved. Dropped results are counted (`reconciliationDropped`, never digested) and announced
+  once ("n saved results could not be checked and were removed.").
+- **Replay.** `replay.start [level]` opens mode `replay(level)` for a level with a verified trace (else
+  `r02-g21.no-replay`) with tick 48 shown, `replay.step` applies the next action and keeps the shown tick (finally the
+  run; `r02-g21.replay-end` after it), `replay.stop` returns to the campaign; showing a tick, dismissing the tutorial
+  and the sound setting stay allowed, other play actions are refused (`r02-g21.replay`), nothing is recorded and no
+  stars are claimed. A save taken mid-replay restores only when its records are the start of that trace. The panel
+  offers Replay, Step and Stop with the replay position.
+- **Settings.** The sound choice is saved through `settings.sound [0 … 1]`, snapshotted but never digested, and applied
+  when the experience opens.
