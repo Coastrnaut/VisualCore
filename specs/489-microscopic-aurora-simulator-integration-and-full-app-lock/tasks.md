@@ -38,7 +38,7 @@ change (the shaders and reference of R02-G19-03 are unchanged and re-proven by t
   name of Q1 is listed once, has the prefix `experience.r02-g19.microscopic-aurora.`, and the panel source uses each
   exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing MicroscopicAuroraExperienceTests`
-- [ ] T-R02G1909-004 [US1] Create `Apps/VisualCore/Tests/UI/MicroscopicAurora/MASupport.swift`, `MAPlayUITests.swift`,
+- [X] T-R02G1909-004 [US1] Create `Apps/VisualCore/Tests/UI/MicroscopicAurora/MASupport.swift`, `MAPlayUITests.swift`, — Verified 2026-11-26: 2026-11-26 app-ui exit 0 (.autonomy/migration/checks/R02-G19-09.app-ui.json): MAPlayUITests and MAReplayUITests in serial chunk b4 passed in 304.4 s (level 1 won with 3 stars, progress kept over a relaunch, replay ends won); xcodegen regenerated; b4 key checked unique
   `MAReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified plan (its wells from
   `MicroscopicAuroraExperienceCore.certifiedActions(1)`: slot, site, strength, sense) and the budget pinned in `MA`; for
   each well the slot, site and strength moved with Well, Site and Strength − or + by their controls' values and the sense

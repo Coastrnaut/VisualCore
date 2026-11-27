@@ -1328,6 +1328,24 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(argv[start:start + 2],
                          ["VisualCoreUITests/AWPlayUITests", "VisualCoreUITests/AWReplayUITests"])
 
+    def test_microscopic_aurora_ui_chunk(self):
+        """Feature 489 R02-G19-09 (T-R02G1909-004): the serial chunk `b4` runs the Microscopic Aurora interface
+        journeys; its key appears once in the `UI_CHUNKS` literal and its classes in no other chunk."""
+        self.assertEqual(relcheck.UI_CHUNKS["b4"], ["MAPlayUITests", "MAReplayUITests"])
+        self.assertIn("b4", relcheck.SERIAL_CHUNKS)
+        source = Path(relcheck.__file__).read_text(encoding="utf-8")
+        self.assertEqual(source.count('"b4": ['), 1)
+        for name, chunk in relcheck.UI_CHUNKS.items():
+            if name != "b4":
+                self.assertNotIn("MAPlayUITests", chunk, name)
+                self.assertNotIn("MAReplayUITests", chunk, name)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-b4"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2],
+                         ["VisualCoreUITests/MAPlayUITests", "VisualCoreUITests/MAReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""
