@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "BinaryGardensExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing BinaryGardensExperienceTests",
+  "elapsed_seconds": 20.944,
+  "exit_code": 0,
+  "finished": "2026-11-27T15:10:24+00:00",
+  "gate": "R02-G21-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G21-04.sim-27.log",
+  "log_sha256": "51a96e57e71ecf6dca1a1ed91b59c23690651747a40790d9bd168acd84b46b0e",
+  "name": "sim-27",
+  "started": "2026-11-27T15:10:03+00:00",
+  "timed_out": false
+}

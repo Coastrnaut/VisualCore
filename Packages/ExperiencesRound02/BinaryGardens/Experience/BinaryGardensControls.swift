@@ -11,8 +11,17 @@
 // the kernel refuses it and the panel says why. The header shows the actions left of the budget, the status (stage, or
 // the failure in words), the progress description, the level in words, the tutorial on levels that have one, the
 // failure in words and a refused action in words; the worlds at the shown tick are named in words, so no information
-// is carried by colour alone. Dragging the stars, scrubbing the cycle and full accessibility come in later features
-// of R02-G21. Modelled on `MushroomWeatherControls` (feature 493).
+// is carried by colour alone. Full accessibility comes in a later feature of R02-G21. Modelled on
+// `MushroomWeatherControls` (feature 493).
+// Feature 504 (R02-G21-04) T-R02G2104-005 (FR-R02G2104-001, 013, 015): every kernel control sends through the
+// presenter (so refusals are shown and logged with their code), every row is kept, and the panel gains direct choices
+// that each send one action for the selected star: a Ring picker (ring 1 … n, `star.ring [star, index]`), a Luminosity
+// picker (level 1 … L, `star.luminosity [star, index]`) and a Phase target stepper by the phase step g (presentation
+// only) with "Set phase" (`star.phase [star, target]`); a Tilt picker (0 … T_max, `orbit.tilt [step]`, shown when
+// T_max > 0); an "Inspect" picker (none, world 1 … W; presentation only) with the inspected world's words below it;
+// and "Reset view" (the authored camera, presentation only). A choice of the current value sends nothing. A refused
+// drag preview is named in words in the header. A star tapped on the canvas is selected here. Modelled on
+// `MushroomWeatherControls` (feature 494).
 #if os(iOS)
 import BinaryGardensCore
 import SwiftUI
@@ -24,6 +33,15 @@ struct BinaryGardensControls: View {
     let port: ExperienceActionPort
     /// What the panel shows (and the panel's selection).
     @Bindable var mirror: BinaryGardensMirror
+    /// Sends a control with its values through the presenter (feature 504).
+    let sendAction: (String, [Double]) -> Void
+    /// Inspects a world, or clears the inspection with nil, through the presenter (feature 504).
+    let inspect: (Int?) -> Void
+    /// Returns the camera to the authored view (feature 504).
+    let resetView: () -> Void
+
+    /// The "Inspect" picker's tag for no world (feature 504).
+    private static let noWorld = -1
 
     /// The panel.
     var body: some View {
@@ -37,9 +55,13 @@ struct BinaryGardensControls: View {
                 tiltRow
                 tickRow
                 playRow
+                choiceRows
+                inspectRow
+                viewRow
             }
             .padding()
         }
+        .onChange(of: mirror.star) { _, _ in mirror.phaseTarget = mirror.phase }
     }
 
     /// The level, actions, status, tutorial, failure and refusal lines.
@@ -63,6 +85,10 @@ struct BinaryGardensControls: View {
         if let message = mirror.message {
             Text(message).font(.footnote)
                 .accessibilityIdentifier(port.identifier("message"))
+        }
+        if let refused = mirror.previewRefusalLabel {
+            Text(refused).font(.footnote)
+                .accessibilityIdentifier(port.identifier("preview-refusal"))
         }
     }
 
@@ -191,16 +217,126 @@ struct BinaryGardensControls: View {
         }
     }
 
+    /// The direct choices of the selected star and the tilt (feature 504): each choice of another value sends one
+    /// action.
+    @ViewBuilder private var choiceRows: some View {
+        Picker("Ring", selection: ringChoice) {
+            ForEach(0..<mirror.ringCount, id: \.self) { index in
+                Text("Ring \(index + 1)").tag(index)
+            }
+        }
+        .pickerStyle(.menu)
+        .accessibilityLabel("Ring of the star")
+        .accessibilityValue("ring \(mirror.ring + 1) of \(mirror.ringCount)")
+        .accessibilityIdentifier(port.identifier("ring-choice"))
+        Picker("Luminosity", selection: luminosityChoice) {
+            ForEach(0..<mirror.luminosityCount, id: \.self) { index in
+                Text("Level \(index + 1)").tag(index)
+            }
+        }
+        .pickerStyle(.menu)
+        .accessibilityLabel("Luminosity of the star")
+        .accessibilityValue("level \(mirror.luminosity + 1) of \(mirror.luminosityCount)")
+        .accessibilityIdentifier(port.identifier("luminosity-choice"))
+        HStack(spacing: 16) {
+            Stepper("Phase target \(mirror.gridPhaseTarget)",
+                    onIncrement: { mirror.phaseTarget = mirror.phaseTarget(moved: 1) },
+                    onDecrement: { mirror.phaseTarget = mirror.phaseTarget(moved: -1) })
+                .accessibilityLabel("Phase target, in steps of \(mirror.phaseStep)")
+                .accessibilityValue("phase \(mirror.gridPhaseTarget) of 47")
+                .accessibilityIdentifier(port.identifier("phase-target"))
+            Button("Set phase") { setPhase() }
+                .accessibilityLabel("Shift the star to the phase target")
+                .accessibilityValue(mirror.starLabel)
+                .accessibilityIdentifier(port.identifier("set-phase"))
+        }
+        if mirror.maxTilt > 0 {
+            Picker("Tilt", selection: tiltChoice) {
+                ForEach(0...mirror.maxTilt, id: \.self) { step in
+                    Text("Tilt \(step)").tag(step)
+                }
+            }
+            .pickerStyle(.menu)
+            .accessibilityLabel("Tilt of the star orbits")
+            .accessibilityValue(mirror.tiltLabel)
+            .accessibilityIdentifier(port.identifier("tilt-choice"))
+        }
+    }
+
+    /// Inspect a world (feature 504; presentation only), with its words below.
+    @ViewBuilder private var inspectRow: some View {
+        Picker("Inspect", selection: inspectChoice) {
+            Text("None").tag(Self.noWorld)
+            ForEach(0..<mirror.worldCount, id: \.self) { world in
+                Text("World \(world + 1)").tag(world)
+            }
+        }
+        .pickerStyle(.menu)
+        .accessibilityLabel("Inspect a world")
+        .accessibilityValue(mirror.inspectedWorld.map { "world \($0 + 1)" } ?? "none")
+        .accessibilityIdentifier(port.identifier("inspect"))
+        if let words = mirror.inspectedLabel {
+            Text(words).font(.footnote)
+                .accessibilityIdentifier(port.identifier("inspect-detail"))
+        }
+    }
+
+    /// Reset the view (feature 504; presentation only).
+    @ViewBuilder private var viewRow: some View {
+        HStack(spacing: 16) {
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityIdentifier(port.identifier("reset-view"))
+        }
+    }
+
+    /// The Ring picker's selection: the selected star's ring; choosing another sends `star.ring [star, index]`.
+    private var ringChoice: Binding<Int> {
+        Binding(get: { mirror.ring }, set: { index in choose("star.ring", index, current: mirror.ring) })
+    }
+
+    /// The Luminosity picker's selection: the selected star's level; choosing another sends `star.luminosity [star,
+    /// index]`.
+    private var luminosityChoice: Binding<Int> {
+        Binding(get: { mirror.luminosity },
+                set: { index in choose("star.luminosity", index, current: mirror.luminosity) })
+    }
+
+    /// The Tilt picker's selection: the tilt; choosing another sends `orbit.tilt [step]`.
+    private var tiltChoice: Binding<Int> {
+        Binding(get: { mirror.tilt }, set: { step in chooseTilt(step) })
+    }
+
+    /// The Inspect picker's selection: the inspected world, or ``noWorld``.
+    private var inspectChoice: Binding<Int> {
+        Binding(get: { mirror.inspectedWorld ?? Self.noWorld }, set: { world in inspect(world < 0 ? nil : world) })
+    }
+
+    /// Sends `control [selected star, value]` when `value` differs from `current`.
+    private func choose(_ control: String, _ value: Int, current: Int) {
+        guard value != current else { return }
+        send(control, [Double(mirror.selectedStar), Double(value)])
+    }
+
+    /// Sends `orbit.tilt [step]` when `step` differs from the tilt.
+    private func chooseTilt(_ step: Int) {
+        guard step != mirror.tilt else { return }
+        send("orbit.tilt", [Double(step)])
+    }
+
+    /// Sends `star.phase [selected star, phase target]` (one action; the kernel refuses the unchanged phase).
+    private func setPhase() {
+        send("star.phase", [Double(mirror.selectedStar), Double(mirror.gridPhaseTarget)])
+    }
+
     /// Shows tick `tick` read cyclically over 1 … 48.
     private func show(tick: Int) {
         send("clock.show", [Double(BinaryGardensMirror.wrappedTick(tick))])
     }
 
-    /// Sends `control` and shows a refusal in words.
+    /// Sends `control` through the presenter, which shows a refusal in words and logs its code.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(BinaryGardensMirror.refusalText(code: result.code))."
+        sendAction(control, values)
     }
 }
 #endif

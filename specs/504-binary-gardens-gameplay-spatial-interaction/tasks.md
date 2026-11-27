@@ -122,7 +122,7 @@ modelled on feature 484).
 
 ## Phase 5: Story 6 and wiring — orbit, reset, presenter, scene, panel
 
-- [ ] T-R02G2104-005 [US6] Wire `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensPresenter.swift`
+- [X] T-R02G2104-005 [US6] Wire `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensPresenter.swift` — Verified 2026-11-27: sim-27 exit 0 (sim-27.2, BinaryGardensExperienceTests: 44 tests in 5 suites pass, the 14 gesture wiring tests included)
   (FR-R02G2104-001 … 016; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot
   (the core's snapshot with the `BinaryGardensMirror`'s preview and inspection applied); ring, phase, luminosity and
   tilt changes sent through `star.ring [star, index]`, `star.phase [star, step]`, `star.luminosity [star, index]` and

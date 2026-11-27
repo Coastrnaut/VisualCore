@@ -9,6 +9,21 @@
 // rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the kernel (renderer purity). Its
 // probes (two backdrop corners) let the verification runner check a frame (the round-two X gates require them).
 // Modelled on `MushroomWeatherPresenter` (feature 493).
+// Feature 504 (R02-G21-04) T-R02G2104-005 (FR-R02G2104-001 … 016): a canvas touch goes through the presenter's
+// `BinaryGardensGestureController` with the drawn snapshot (`pointer`; the core's snapshot with the mirror's preview
+// and inspection applied): a star drag across the rings or along its orbit previews the change (the kernel's own
+// preview, `BinaryGardensSceneSnapshot.previewing`, presentation only, kept in the mirror) and its release sends one
+// `star.ring [star, index]` or `star.phase [star, step]`; a pip tap or drag sends one `star.luminosity [star, index]`,
+// a dial tap or drag one `orbit.tilt [step]` (each dropping the preview); a world tap inspects the world (marked in the
+// scene, its kernel words at the shown tick in the description) and a second tap clears it; a gauge press shows ticks
+// (`clock.show [tick]`, in any stage); a tapped star is selected in the panel; two fingers orbit the camera and a
+// double tap on empty space or "Reset view" (`resetView()`) returns it (presentation only; the meshes are rebuilt).
+// Kernel actions are sent only while playing (the controller's rule); a gesture that does nothing for a stated reason
+// says it in the mirror's message (the controller's texts verbatim). A refused preview is named in words; a refused
+// action is shown in the panel and its code, read with or without the engine's `action.rule.` prefix, is kept in the
+// refusal log (at most 64). An opening, `level.next`, reset or restore (a new level number, or records that no longer
+// extend the followed ones) clears the preview, the inspection and the orbit. Modelled on `MushroomWeatherPresenter`
+// (feature 494).
 #if os(iOS)
 import BinaryGardensCore
 import Foundation
@@ -17,6 +32,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show: the latest state the presenter described, the shown tick and the panel's selection.
 @MainActor
@@ -42,10 +58,18 @@ final class BinaryGardensMirror {
     var shownTick = BinaryGardensExperienceCore.openingTick
     /// The play followed (a copy; never sent anywhere).
     var play: BinaryGardensPlay?
-    /// The text of the last refused change, if any.
+    /// The text of the last refused change, or why a gesture did nothing, if any.
     var message: String?
     /// The star the panel edits (0 or 1).
     var star = 0
+    /// A drag's preview (feature 504; presentation only): the change the drag would make, nil while no drag previews.
+    var preview: BinaryGardensAction?
+    /// The kernel's refusal of the drawn preview (feature 504), nil while no refused preview is drawn.
+    var previewRefusal: BinaryGardensError?
+    /// The inspected world (feature 504; presentation only), nil while no world is inspected.
+    var inspectedWorld: Int?
+    /// The panel's phase target for the selected star (feature 504; presentation only; on the phase grid 0 … 48 − g).
+    var phaseTarget = 0
 
     /// The ticks of one cycle, 48.
     static var cycle: Int { BinaryGardensSky.cycle }
@@ -79,6 +103,55 @@ final class BinaryGardensMirror {
 
     /// The tilt (0 while no play is followed).
     var tilt: Int { arrangement?.tilt ?? 0 }
+
+    /// The worlds of the followed level (0 while no play is followed; feature 504).
+    var worldCount: Int { play?.level.worlds.count ?? 0 }
+
+    /// The panel's phase target on the level's phase grid, within 0 … 48 − g (feature 504).
+    var gridPhaseTarget: Int { Self.gridPhase(phaseTarget, step: phaseStep) }
+
+    /// `phase` snapped down to the phase grid of step `step` and read within 0 … 48 − step (feature 504).
+    static func gridPhase(_ phase: Int, step: Int) -> Int {
+        let g: Int = max(step, 1)
+        let cycle: Int = Self.cycle
+        let wrapped: Int = (phase % cycle + cycle) % cycle
+        return wrapped - wrapped % g
+    }
+
+    /// The phase target `step` grid steps from the current one, read cyclically over 0 … 47 (feature 504).
+    func phaseTarget(moved step: Int) -> Int {
+        let cycle: Int = Self.cycle
+        return Self.gridPhase(((gridPhaseTarget + step * phaseStep) % cycle + cycle) % cycle, step: phaseStep)
+    }
+
+    /// Selects star `star` (clamped to 0 … 1) and takes its phase as the phase target (feature 504).
+    func select(star: Int) {
+        self.star = min(max(star, 0), 1)
+        phaseTarget = phase
+    }
+
+    /// The inspected world's kernel words at the shown tick (its light, each star's share and band at the tick, then
+    /// its window and bloom over the cycle), or nil while no world of the followed play is inspected (feature 504).
+    var inspectedLabel: String? {
+        guard let world = inspectedWorld, let play, play.level.worlds.indices.contains(world),
+              world < play.report.worlds.count else { return nil }
+        let tick: Int = Self.wrappedTick(shownTick)
+        return play.level.worldTickDescription(world, tick: tick, report: play.report) + "; "
+            + play.level.worldDescription(world, report: play.report)
+    }
+
+    /// The drawn refused preview in words, or nil (feature 504).
+    var previewRefusalLabel: String? {
+        guard let refusal = previewRefusal else { return nil }
+        return Self.previewRefusalMessage(refusal)
+    }
+
+    /// Drops the preview, its refusal and the inspection (feature 504: an opening, `level.next`, reset or restore).
+    func clearPresentation() {
+        preview = nil
+        previewRefusal = nil
+        inspectedWorld = nil
+    }
 
     /// The selected star's entry of `values`, or 0.
     private func value(_ values: [Int]?) -> Int {
@@ -147,10 +220,42 @@ final class BinaryGardensMirror {
     /// The prefix the engine puts before a rule's code in an action result's code.
     static let rulePrefix = "action.rule."
 
+    /// `code` without the engine's ``rulePrefix`` (feature 504: codes are read with or without it).
+    static func bareCode(_ code: String) -> String {
+        code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+    }
+
+    /// The panel line of a refusal: "That change was refused: " and the reason in words, with a full stop.
+    static func refusalMessage(code: String) -> String {
+        "That change was refused: \(refusalText(code: code))."
+    }
+
+    /// Records the result of sending a control (feature 504): a refusal is shown in words; an accepted action clears
+    /// the message.
+    func record(accepted: Bool, code: String) {
+        message = accepted ? nil : Self.refusalMessage(code: code)
+    }
+
+    /// A refused preview's kernel refusal in words (feature 504): a separation break, a locked control and a value off
+    /// the phase grid or out of range are named; any other refusal reads as its reason code does.
+    static func previewRefusalText(_ refusal: BinaryGardensError) -> String {
+        switch refusal {
+        case .action("separation"): return "the two stars would come too close to each other"
+        case .action("locked"): return "that control is locked on this level"
+        case .action("off the phase grid"): return "that phase is off the level's phase grid"
+        default: return refusalText(code: refusal.reasonCode)
+        }
+    }
+
+    /// The panel line of a refused preview: "That change would be refused: " and the reason in words, with a full stop.
+    static func previewRefusalMessage(_ refusal: BinaryGardensError) -> String {
+        "That change would be refused: \(previewRefusalText(refusal))."
+    }
+
     /// A refused action's reason code in words: the rule's code (`r02-g21.…`), with or without the engine's
     /// `action.rule.` prefix (an action result's code carries it).
     static func refusalText(code: String) -> String {
-        let rule: String = code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+        let rule: String = bareCode(code)
         switch rule {
         case "r02-g21.stage": return "the play is over: undo a failed run or go to the next level"
         case "r02-g21.action": return "that ring, phase, luminosity or tilt cannot be set that way (locked, unchanged, off "
@@ -201,8 +306,19 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     let scene = BinaryGardensSystemScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G2103-004).
     private(set) var tierLog: [BinaryGardensTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot drawn (tests, the description and the gestures), with the mirror's preview and inspection
+    /// applied (feature 504).
     private(set) var lastSnapshot: BinaryGardensSceneSnapshot?
+    /// The core's snapshot last drawn, without the preview and the inspection, and its level (feature 504).
+    private var lastBase: (snapshot: BinaryGardensSceneSnapshot, level: BinaryGardensLevel)?
+    /// The level number of the play last followed (feature 504: a new one is a new play).
+    private var followedLevel: Int?
+    /// The gesture controller (feature 504): star, pip, dial, world and gauge gestures, double taps and orbits.
+    private(set) var gestures = BinaryGardensGestureController()
+    /// The bare codes of refused actions, oldest first, at most ``refusalLogLimit`` (feature 504).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -238,11 +354,41 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         scene.resize(context)
     }
 
-    /// Follows `core`'s play and presentation in the mirror when they changed.
+    /// Follows `core`'s play and presentation in the mirror when they changed. A new play (an opening, `level.next`,
+    /// reset or restore: another level number, or records that do not extend the followed ones) clears the preview,
+    /// the inspection and the orbit (feature 504); a changed play takes the selected star's phase as the phase target.
     private func follow(_ core: BinaryGardensExperienceCore) {
-        if mirror.play != core.play || mirror.shownTick != core.shownTick {
-            mirror.follow(core.play, shownTick: core.shownTick)
-        }
+        let previous: BinaryGardensPlay? = mirror.play
+        let playChanged: Bool = previous != core.play
+        guard playChanged || mirror.shownTick != core.shownTick else { return }
+        let fresh: Bool = Self.isNewPlay(previous, core.play, followedLevel: followedLevel,
+                                         levelNumber: core.levelNumber)
+        followedLevel = core.levelNumber
+        mirror.follow(core.play, shownTick: core.shownTick)
+        if fresh { clearPresentation() }
+        if playChanged { mirror.phaseTarget = mirror.phase }
+    }
+
+    /// Whether `next` (of level `levelNumber`) is a new play after `previous` (of level `followedLevel`): no play was
+    /// followed, the level number changed, or `next`'s records do not extend `previous`'s (a reset or a restore; the
+    /// records are append-only, undo and redo included).
+    static func isNewPlay(_ previous: BinaryGardensPlay?, _ next: BinaryGardensPlay, followedLevel: Int?,
+                          levelNumber: Int) -> Bool {
+        guard let previous, followedLevel == levelNumber else { return true }
+        let old: [BinaryGardensRecord] = previous.records
+        let new: [BinaryGardensRecord] = next.records
+        guard new.count >= old.count else { return true }
+        return !new.starts(with: old)
+    }
+
+    /// Drops the preview and the inspection, cancels a gesture in progress and returns the camera to the authored view
+    /// (feature 504: a new play).
+    private func clearPresentation() {
+        mirror.clearPresentation()
+        if gestures.state != .idle { gestures.cancel() }
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+        refreshPreview()
     }
 
     /// Draws `core` at host tier `tier`, logging tier changes.
@@ -254,8 +400,12 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         }
         follow(core)
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
-        let snapshot = core.snapshot(time: time)
+        let base: BinaryGardensSceneSnapshot = core.snapshot(time: time)
+        lastBase = (snapshot: base, level: core.play.level)
+        let snapshot: BinaryGardensSceneSnapshot = presented(base, level: core.play.level)
         lastSnapshot = snapshot
+        mirror.previewRefusal = snapshot.preview?.refusal
+        scene.orbit = gestures.orbit
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
 
@@ -314,12 +464,144 @@ final class BinaryGardensPresenter: ExperiencePresenter {
             mirror.status = played ? "Playing" : "Ready"
             mirror.failureText = nil
         }
+        if let inspected = mirror.inspectedLabel {
+            if !text.hasSuffix(" ") { text += " " }
+            text += "Inspected " + inspected + "."
+        }
         return text
     }
 
-    /// The control panel.
+    /// `snapshot` with the mirror's drag preview (judged by the kernel in `level`) and inspection applied (feature 504;
+    /// presentation only).
+    private func presented(_ snapshot: BinaryGardensSceneSnapshot,
+                           level: BinaryGardensLevel) -> BinaryGardensSceneSnapshot {
+        var shown: BinaryGardensSceneSnapshot = snapshot
+        if let change = mirror.preview { shown = shown.previewing(change, level: level) }
+        return shown.inspecting(mirror.inspectedWorld)
+    }
+
+    /// Re-applies the mirror's preview and inspection to the last core snapshot, so tests and the next gesture read
+    /// them (feature 504).
+    private func refreshPreview() {
+        guard let base = lastBase else { return }
+        let snapshot: BinaryGardensSceneSnapshot = presented(base.snapshot, level: base.level)
+        lastSnapshot = snapshot
+        mirror.previewRefusal = snapshot.preview?.refusal
+    }
+
+    /// The control panel: the direct choices, "Inspect" and "Reset view" (feature 504); every kernel control sends
+    /// through ``send(_:_:port:)``, so refusals are shown and logged.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(BinaryGardensControls(port: port, mirror: mirror))
+        AnyView(BinaryGardensControls(port: port, mirror: mirror,
+                                      sendAction: { [weak self] control, values in
+                                          self?.send(control, values, port: port)
+                                      },
+                                      inspect: { [weak self] world in self?.inspect(world) },
+                                      resetView: { [weak self] in self?.resetView() }))
+    }
+
+    // MARK: Gestures (feature 504)
+
+    /// The camera's orbit (presentation only; the gesture controller's).
+    var orbit: BinaryGardensViewOrbit { gestures.orbit }
+
+    /// The gesture controller's state (diagnostics).
+    var gestureState: BinaryGardensGestureController.State { gestures.state }
+
+    /// The canvas gestures move stars between rings, shift their phases, set their luminosity, tilt the orbit plane
+    /// and show ticks; the preview, the inspection and the orbit are presentation state.
+    var gestureActions: Set<String> { ["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "clock.show"] }
+
+    /// The native controls send every declared control, every action a gesture can and more.
+    var nativeActions: Set<String> { Set(Core.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
+    /// order: a ring, phase, luminosity or tilt change through `star.ring [star, index]`, `star.phase [star, step]`,
+    /// `star.luminosity [star, index]` or `orbit.tilt [step]` (one action each; the preview is dropped), a tick through
+    /// `clock.show [tick]` (presentation only), an inspection kept in the mirror, a star selected in the panel, a
+    /// preview kept in the mirror and drawn, a reset view (the controller is already at the authored orbit) and an
+    /// explanation to the mirror's message.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let drawn = lastSnapshot else { return }
+        let actions: [BinaryGardensGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: drawn)
+        for action in actions { apply(action, port: port) }
+        if event.phase == .ended || event.phase == .cancelled || gestures.state == .orbiting
+            || gestures.state == .cancelled {
+            mirror.preview = nil
+        }
+        scene.orbit = gestures.orbit
+        refreshPreview()
+    }
+
+    /// Applies one gesture action (see ``pointer(_:viewSize:port:)``).
+    private func apply(_ action: BinaryGardensGestureAction, port: ExperienceActionPort) {
+        switch action {
+        case let .setRing(star, index):
+            mirror.preview = nil
+            send("star.ring", [Double(star), Double(index)], port: port)
+        case let .setPhase(star, step):
+            mirror.preview = nil
+            send("star.phase", [Double(star), Double(step)], port: port)
+        case let .setLuminosity(star, index):
+            mirror.preview = nil
+            send("star.luminosity", [Double(star), Double(index)], port: port)
+        case let .setTilt(step):
+            mirror.preview = nil
+            send("orbit.tilt", [Double(step)], port: port)
+        case let .showTick(tick):
+            send("clock.show", [Double(tick)], port: port)
+        case let .inspectWorld(world):
+            mirror.inspectedWorld = world
+        case let .selectStar(star):
+            mirror.select(star: star)
+        case let .preview(change):
+            mirror.preview = change
+        case .clearPreview:
+            mirror.preview = nil
+        case .resetView:
+            break   // the controller has already returned to the authored orbit; the next frame draws it
+        case let .explain(reason):
+            mirror.message = reason
+        }
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the preview disappears.
+    func cancelPointers() {
+        gestures.cancel()
+        mirror.preview = nil
+        refreshPreview()
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Inspects world `world`, or clears the inspection with nil or a world the level lacks (the panel's "Inspect";
+    /// presentation only).
+    func inspect(_ world: Int?) {
+        if let world, (0..<mirror.worldCount).contains(world) {
+            mirror.inspectedWorld = world
+        } else {
+            mirror.inspectedWorld = nil
+        }
+        refreshPreview()
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its bare code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result: ActionResult = port.send(control, values)
+        mirror.record(accepted: result.isAccepted, code: result.code)
+        if !result.isAccepted {
+            refusalLog.append(BinaryGardensMirror.bareCode(result.code))
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        refreshPreview()
+        return result
     }
 }
 #endif

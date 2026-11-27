@@ -17,6 +17,12 @@
 // level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, the geometry's fallback colours, the broken
 // marks and the won look included) and keeps the reason; nothing here can reach the kernel. A zero-sized drawable is
 // cleared and nothing else is drawn. Modelled on `MushroomWeatherForestScene` (feature 493).
+// Feature 504 (R02-G21-04) T-R02G2104-005 (FR-R02G2104-008, 010, 015): the meshes face the camera of the presenter's
+// orbit (`BinaryGardensSceneGeometry.camera(aspect:orbit:)` and the camera-taking mesh builders) and draw the
+// snapshot's preview (the ghost star, the previewed light with the committed cells as ghost bands) and inspection (the
+// ring round the inspected world, the bracket by its gauge row); the geometry key also holds the orbit, the aspect, the
+// preview and the inspected world, so the meshes are rebuilt when any of them changes. The two-sun light directions are
+// the drawn snapshot's stars (`BinaryGardensSceneGeometry.drawnSnapshot`: a previewed luminosity or tilt moves them).
 #if os(iOS)
 import BinaryGardensCore
 import Foundation
@@ -44,6 +50,9 @@ final class BinaryGardensSystemScene {
     private(set) var lastShaderTime: Double = 0
     /// The `u_star1` and `u_star2` values of the last frame drawn by the shader path (tests).
     private(set) var lastStarUniforms: (SIMD3<Double>, SIMD3<Double>)?
+    /// The camera's orbit (feature 504; presentation only, the presenter's gesture controller's). A changed orbit
+    /// rebuilds the meshes on the next draw.
+    var orbit: BinaryGardensViewOrbit = .authored
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the fallback.
     private struct GeometryKey: Equatable {
@@ -55,6 +64,14 @@ final class BinaryGardensSystemScene {
         let actionsLeft: Int
         let tier: Int
         let fallback: Bool
+        /// The camera's orbit (feature 504; the meshes face the drawn camera).
+        let orbit: BinaryGardensViewOrbit
+        /// The aspect the meshes were built for (feature 504).
+        let aspect: Double
+        /// The drawn preview (feature 504; presentation only).
+        let preview: BinaryGardensPreview?
+        /// The inspected world (feature 504; presentation only).
+        let inspectedWorld: Int?
     }
 
     private var registry: ResourceRegistry?
@@ -70,8 +87,8 @@ final class BinaryGardensSystemScene {
         resize(context)
     }
 
-    /// Records the new aspect; the camera follows on the next draw. The meshes face the authored eye, so they are
-    /// rebuilt only when the aspect really changed.
+    /// Records the new aspect; the camera follows on the next draw. The meshes face the drawn camera, so they are
+    /// rebuilt only when the aspect (or, at the next draw, the orbit) really changed.
     func resize(_ context: RenderContext) {
         let next: Double = Double(max(1, context.pixelWidth)) / Double(max(1, context.pixelHeight))
         if next != aspect { geometryKey = nil }
@@ -113,9 +130,9 @@ final class BinaryGardensSystemScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = BinaryGardensSceneGeometry.camera(aspect: aspect)
+        let camera = BinaryGardensSceneGeometry.camera(aspect: aspect, orbit: orbit)
         let next: GeometryKey = key(snapshot, tier: tier)
-        if next != geometryKey { try rebuild(snapshot, tier: tier) }
+        if next != geometryKey { try rebuild(snapshot, tier: tier, camera: camera) }
         geometryKey = key(snapshot, tier: tier)
         if fallbackReason != nil {
             try drawFallback(camera)
@@ -124,7 +141,8 @@ final class BinaryGardensSystemScene {
         let won: Float = snapshot.isWon ? 1 : 0
         let time: Double = BinaryGardensShaders.shaderTime(snapshot.time)
         lastShaderTime = time
-        let stars: (SIMD3<Double>, SIMD3<Double>) = BinaryGardensSceneGeometry.starUniforms(snapshot)
+        let stars: (SIMD3<Double>, SIMD3<Double>) =
+            BinaryGardensSceneGeometry.starUniforms(BinaryGardensSceneGeometry.drawnSnapshot(snapshot))
         lastStarUniforms = stars
         try drawSystem(camera, time: time, won: won, stars: stars)
         // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
@@ -136,23 +154,25 @@ final class BinaryGardensSystemScene {
     /// The geometry key of `snapshot` at `tier`.
     private func key(_ s: BinaryGardensSceneSnapshot, tier: BinaryGardensTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, arrangement: s.arrangement, shownTick: s.shownTick, stage: s.stage,
-                    failure: s.failure, actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil)
+                    failure: s.failure, actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil,
+                    orbit: orbit, aspect: aspect, preview: s.preview, inspectedWorld: s.inspectedWorld)
     }
 
-    /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
-    private func rebuild(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier) throws {
+    /// Rebuilds the GPU objects for `snapshot` at `tier` facing `camera`: the two programs, or the unlit fallback.
+    private func rebuild(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                         camera: BinaryGardensCamera) throws {
         guard let registry else { return }
         let keepFallback = fallbackReason
         release()
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let system = try BinaryGardensSceneGeometry.systemMesh(snapshot, tier: tier)
+                let system = try BinaryGardensSceneGeometry.systemMesh(snapshot, tier: tier, camera: camera)
                 systemRenderer = try Self.renderer(system, vertex: BinaryGardensShaders.systemVertex,
                                                    fragment: systemFragment, name: "binary-gardens-system",
                                                    registry: registry)
                 systemBuilds += 1
-                let glow = try BinaryGardensSceneGeometry.glowMesh(snapshot, tier: tier)
+                let glow = try BinaryGardensSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera)
                 glowBuilds += 1
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: BinaryGardensShaders.glowVertex,
@@ -170,8 +190,8 @@ final class BinaryGardensSystemScene {
         let minimal = BinaryGardensTier.of(BinaryGardensTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [BinaryGardensColouredMesh] = [
-            try BinaryGardensSceneGeometry.systemPart(snapshot, tier: minimal),
-            try BinaryGardensSceneGeometry.glowPart(snapshot, tier: minimal),
+            try BinaryGardensSceneGeometry.systemPart(snapshot, tier: minimal, camera: camera),
+            try BinaryGardensSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh
