@@ -15,7 +15,7 @@ campaign covers the game). Agents model their files on Microscopic Aurora's (fea
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G2005-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherHints.swift`
+- [X] T-R02G2005-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherHints.swift` — Verified 2026-11-27: 2026-11-27 host-2 exit 0: 182 tests in 21 suites incl. hints (exact hints from the opening then the run win all 100 levels; 200 seeded reachable states give accepted hints; off-path search agrees with brute force; 500 seeded failures and constructed mold failures explained truly; singular and plural unstable wording) (.autonomy/migration/checks/R02-G20-05.host-2.json)
   (`MushroomWeatherHintPlan`, `MushroomWeatherHintKind` pod/vent/moonlight/run/stuck, `MushroomWeatherHint` with levels
   1 … 3 and the texts of clarification Q1 — level 1 "Change a spore pod", "Change a vent" or "Change the moonlight";
   level 2 "Use the site at row r, column c", "Take pod n away", "Use vent n" or "Make the moonlight brighter" ("dimmer");

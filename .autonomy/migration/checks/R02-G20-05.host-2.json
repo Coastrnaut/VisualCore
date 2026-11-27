@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MushroomWeather"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter MushroomWeather",
+  "elapsed_seconds": 32.137,
+  "exit_code": 0,
+  "finished": "2026-11-27T05:42:09+00:00",
+  "gate": "R02-G20-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G20-05.host-2.log",
+  "log_sha256": "b1e89dc1f1c7698c773670669c689faad67754f30fffa8d5a17e9996c410412b",
+  "name": "host-2",
+  "started": "2026-11-27T05:41:37+00:00",
+  "timed_out": false
+}
