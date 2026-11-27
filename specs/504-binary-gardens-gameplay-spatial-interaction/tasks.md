@@ -165,7 +165,7 @@ modelled on feature 484).
   projectm-reference-ios26`)
 - [X] T-R02G2104-010 Script tests, run alone (`--name script-tests -- python3 scripts/test_scripts.py`) — Verified 2026-11-27: script-tests exit 0 (run alone)
 - [ ] T-R02G2104-011 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G2104-008)
-- [ ] T-R02G2104-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2104-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converge round 1 appended T-013, T-014 (implemented, sim-27-2 exit 0); converge round 2 clean; README row and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
