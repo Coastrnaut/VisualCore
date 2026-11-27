@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-02 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2002-###,
 SC-R02G2002-###, T-R02G2002-###
@@ -31,6 +31,94 @@ Canonical overrides:
 - **Model:** feature 482 (Microscopic Aurora's content pipeline) for manifest, generator, solver, witness files, digest
   and progression, adapted to the weather rules of feature 491: a move places, moves or removes a pod, sets a vent or
   the moonlight, and the run ends the level.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+482's answers where the games agree. Facts checked (read-only, 2026-11-26): R02-G20-01's `MushroomWeatherLevel` (6 … 12
+by 6 … 14 cells, humidity 0 … M, M 1000 … 10000, run 20 … 200 cycles, K 5 … T, 1 … 6 pod slots, 0 … 6 vents, 1 … 6
+colonies, budget 1 … 12, a starting arrangement that must not win), `MushroomWeatherForest` (a report depends only on the
+set of pod cells, the vent states and the moonlight), `MushroomWeatherPlay` and `MushroomWeatherPuzzle` (its move list
+reaches 1,017 actions, within R02-F23's branching budget of 1,024); R02-F24's `PuzzleCatalog.digest(id:identities:)` and
+the standard `ProgressionRule` (drop at most 1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`;
+the canonical manifest's 100 entries (bands 1 … 5 × 20, budgets 8 … 19, five control emphases, 20 each). The ranges
+below were measured before they were written down: a prototype of this generator and solver on the real kernel, run
+over the real 100 manifest entries, certified every entry within candidate index 2, with at most 1,128 arrangements
+judged for one level (1,115 for an accepted level) and 24,947 for the whole catalog (21.2 s in a debug build, at most
+1.14 s for one level and 3.53 s for a group of five); witness lengths by band were 2, 3, 3, 4 and 5, with no
+progression drop or jump; two full runs were identical; an independent breadth-first search over the puzzle's moves on
+levels 1, 2, 21, 22, 41, 42, 61, 62, 81 and 82 reproduced the solver's counts per depth and found no shorter win.
+Earlier profiles were rejected: plans 2, 3, 3, 4, 5 with vents and sites anywhere needed up to candidate index 42 and
+5.4 s for one level, because most candidates were reducible; requiring vents and sites next to a colony fixed it.
+
+- Q: How does the kernel change, and how is a level built from its manifest entry? → A: the kernel widens the budget
+  range to 1 … 24 and gains optional pod sites: a level may list 2 … 8 distinct floor cells without a colony as its
+  sites; with sites, a pod placed on any other cell is refused `r02-g20.action` ("not a site") by the play and is not
+  a move of the puzzle contract, and every starting pod must stand on a site; a level without sites encodes,
+  fingerprints and plays exactly as in feature 491 (the field is omitted). The level refuses, in order after "pods
+  share a cell", "sites" (count), "sites duplicate", "site off floor", "site on colony" and "pod not on a site". The 100
+  entries are a table in `MushroomWeatherManifest` with their provenance. Candidate c of entry n draws from
+  `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index: c))`, in this order: rows, columns; the blocked count and
+  cells; the starting humidity of each floor cell in row-major order (0 … 200); D (4 … 12); each floor cell's rate
+  (20 … 60); the pod rules (release 10 … 30, grown release min(80, r + 0 … 30), threshold 800 … 4000); the colony cells;
+  the vents, each on a "near" cell (a floor cell without a colony within one step, diagonals included, of a colony),
+  open rate 120 … 200, closed rate 0 … 30, a starting state; the starting moonlight (0 … 3); M (1000 … 2000); T
+  (30 … 40); K (6 … 10); the sites (the near cells that are not vents, up to the band's count); the winning choice (pod
+  count k from max(1, plan − V − 1) … min(plan, P, S), the rest a moonlight change when it exceeds the vents and the
+  remaining vent toggles, picked by partial shuffles); a margin per colony; each colony's sensitivity. The level starts
+  with no pod. Each colony's band is its minimum and maximum over the last K cycles of the winning run, widened by its
+  margin and clamped to 0 … M; a sensitive colony's floor is min(low·3/4, its lowest value over the winning run).
+  Band profiles (rows, columns, blocked, vents, slots, colonies, sites, plan, margin): band 1 (6 … 7, 6 … 7, 2 … 5, 1,
+  2, 2, 4, 2, 4 … 6), band 2 (6 … 8, 6 … 8, 3 … 6, 2, 2, 3, 4, 3, 3 … 5), band 3 (7 … 8, 7 … 9, 3 … 7, 2, 3, 3, 5, 3,
+  2 … 4), band 4 (7 … 9, 8 … 10, 4 … 8, 3, 3, 4, 6, 4, 1 … 3), band 5 (8 … 9, 8 … 10, 4 … 8, 3, 4, 5, 6, 5, 1 … 2). Budget
+  = the manifest's; ids `mushroom-weather-NNN`; tutorial on levels 1 … 3; difficulty = band. A candidate is skipped when
+  there are too few near cells, the winning run fails, the level rules refuse it (including a start that already wins),
+  the winning choice still wins with any one action removed ("reducible"), its floor and colonies equal the previous
+  level's (FR-R02G2002-007), the solver's minimal plan is not the band's plan length, or the plan does not win through
+  the play; at most 64 candidates, then `generation(n)`. Impact: FR-R02G2002-001, 007; SC-R02G2002-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing shorter wins? → A: a report depends only on the
+  set of pod cells, the vent states and the moonlight, and from a start with no pod the fewest actions reaching an
+  arrangement are its pod count plus the vents it toggles plus one when the moonlight differs (a move replaces a
+  removal and a placement, so this is exact); for a level without sites or with a starting pod the solver returns no
+  plan. The solver judges depth 0 (the start), then every arrangement at distance 1, 2, …; within a depth by pod count
+  ascending, then vent count ascending, then pod site combinations and vent combinations in lexicographic order, then
+  the new moonlight ascending, skipping the start's. Depths below the last are judged in that fixed order; the last
+  depth is ordered by the band loss of each arrangement's parent (the arrangement without its last action: the
+  moonlight change, else the last vent toggle, else the last pod), ties keeping the fixed order: loss = Σ over colonies
+  of max(0, low − h, h − high) for its humidity after the last cycle run plus K − min(K, final run), plus M per colony
+  when the run fails `dried` or `mold`. The first winning arrangement ends the search; the plan is its placements in slot
+  order, then its vent toggles, then its moonlight change, then `run`, replayed through the kernel's play, whose report
+  must agree. Work = arrangements judged, counted and bounded at 1,500, above the largest search space up to a plan
+  depth (band 5: 1 + 12 + 63 + 192 + 378 = 1,144), as a guard. The minimality proof is the count of arrangements at each
+  smaller depth, every one judged and none winning. Impact: FR-R02G2002-002; SC-R02G2002-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `MushroomWeatherDifficulty` holds the
+  witness length (actions), the colonies, the narrowest band (high − low), the pod sites, the vents, the arrangements
+  judged at smaller depths, the solver work and the nearest miss (the smallest band loss among the arrangements judged
+  at smaller depths). The catalog in manifest order keeps R02-F24's standard `ProgressionRule` (drop at most 1, jump at
+  most 3) on the witness length; band means must not fall (measured above: 2, 3, 3, 4, 5). Impact: FR-R02G2002-003, 005;
+  SC-R02G2002-004.
+- Q: What is in a witness file and how is it checked? → A: `docs/games/mushroom-weather/levels/NNN.witness.json`, JSON
+  schema 1 with sorted keys: number, the level's stored form (with its sites), the actions (the plan, then `run`), the
+  state digest after every action (16 hex characters of the SHA-256 of the arrangement and the actions spent), the play
+  fingerprints after `begin` (and `dismissTutorial` when the level has one) and after each action, the terminal report
+  (the ledger totals of the run — total at the start, released, evaporated, total at the end — and each colony's final
+  run, longest run and first cycle out of band, and the cycles run), the counterexample (the depth one below the plan,
+  the number of arrangements at that depth, none winning, and the nearest miss), the difficulty and the candidates
+  skipped. A test rebuilds every witness and compares bytes; it writes the files only with
+  `MUSHROOM_WEATHER_WRITE_WITNESSES=1`. Decoding refuses newer schemas, damaged files and witnesses that no longer
+  replay. Impact: FR-R02G2002-004; SC-R02G2002-003, 005.
+- Q: How is the catalog identified, how long may certification take and how are refusals named? → A: the digest is
+  `PuzzleCatalog<MushroomWeatherPuzzle>.digest(id: "mushroom-weather", identities:)` over the 100 level fingerprints in
+  manifest order, pinned in a test. Certification tests are split into 20 groups of 5 levels so each runs under 10
+  seconds on a debug host build (measured locally, not asserted on CI); generated levels are cached per process, since
+  level n's neighbour rule needs level n − 1. New refusals: `generation(Int)` (`r02-g20.generation`) and
+  `witness(String)` (`r02-g20.witness`). The independent check of SC-R02G2002-002 runs a breadth-first search over the
+  puzzle contract's moves (place, move, remove, vent, moonlight) with no loss ordering on the two levels with the
+  fewest sites, then fewest colonies, in each band (ties by level number), reproducing the per-depth counts with no
+  win below the plan length. The two existing kernel tests that use 13 as an out-of-range budget move to 25. Impact:
+  FR-R02G2002-006; SC-R02G2002-002, 006.
 
 ## User Scenarios & Testing *(mandatory)*
 
