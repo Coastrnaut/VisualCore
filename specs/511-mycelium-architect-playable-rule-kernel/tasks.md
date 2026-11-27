@@ -59,7 +59,7 @@ reasons as they are added (feature 501's convergence lesson).
 
 ## Phase 3: Story 1 — feed the network so its veins reach every terminal (P1) 🎯
 
-- [ ] T-R02G2201-003 [P] [US1] Create
+- [X] T-R02G2201-003 [P] [US1] Create — Verified 2026-11-27: MyceliumArchitectGrowthTests (independent reference, 500 seeded runs, hand cases) installed; host-2 exit=0 (24 tests)
   `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectGrowthTests.swift` (agent A: an
   independent reimplementation of the field, admissibility, scoring, tie-breaks, tip order, branching, weights and the
   judge, written from the spec's clarifications only, compared with the kernel on 500 seeded runs: every field value,
