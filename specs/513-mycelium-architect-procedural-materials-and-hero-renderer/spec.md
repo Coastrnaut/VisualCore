@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-27
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G22-03 (migration ledger, game feature of experience R02-G22) · ID namespace FR-R02G2203-###,
 SC-R02G2203-###, T-R02G2203-###
@@ -31,6 +31,113 @@ Canonical overrides:
   packages; the kernel of R02-G22-01 and the certified levels of R02-G22-02 (this gate starts after R02-G22-02 is
   recorded).
 - **Model:** feature 503 (Binary Gardens' hero renderer and experience), itself modelled on feature 493.
+
+## Clarifications
+
+### Session 2026-11-27
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+503's answers where the games agree. Facts checked in code (read-only, 2026-11-27): Binary Gardens' experience as
+recorded at R02-G21-03 is the pattern in this package — a Core adapter (`…ExperienceCore`) with a table of certified
+candidate indices (each witness's `skipped`), an immutable scene snapshot, a CPU projection reference, GLSL sources in
+the Core with material codes in the uv stream (the shared `ShaderMeshRenderer` binds only position, normal and uv), an
+iOS-only experience target (`…Experience.swift`, presenter, scene, controls), a presenter that declares frame
+`probes(_:)` and quality levels equal to the Core's `qualityTiers`, a fallback through the shared unlit mesh renderer
+with `fallbackReason` and `tierLog`, a scenario manifest with 80 acceptance scenarios and a registration with content
+facts in `Catalog/registrations.json`; the window surface has no depth buffer, so everything is drawn in painter's
+order with depth testing off and no face culling. The Mycelium Architect kernel (`Packages/ExperiencesRound02/
+MyceliumArchitect/Core`) provides the level (a 4 … 32 board, root, 1 … 6 terminals, rocks, toxins, fixed nutrients,
+optional sites, field and penalties, limits, pulses, budget and limit), the arrangement, the exact growth report (the
+field, steps, the grown network in growth order with pulses and parent indices, total weight, terminal pulses and path
+weights, pulses run, first failure), the play and words for every cell, step, terminal and failure; R02-G22-02 adds the
+100-level catalog (boards 8 … 16, every level with sites) with witnesses and the pinned digest
+3a2b82b6363ef37ad1678847640b07e33f58e2ac2127ef39e9a34ff32797b040. No `MyceliumArchitectExperience` exists yet.
+`AppModelTests` uses `r02-g22.mycelium-architect` as its synthetic unregistered candidate; the next round-two game is
+`r02-g23.erosion-painter`; the archived matrix has 80 acceptance rows R2-G22-QA-001 … 080; the catalog's design gives the
+palette "emerald, copper and violet roots", the hero "organic veins pulsing like a starlit subterranean city", the
+geometry "instanced tapered cylinder branch segments and procedural cap mushrooms" and the signature shader "recursive
+hyphae bloom under translucent luminous caps".
+
+- Q: What exactly does the scene show, and how does it map the board to space? → A: the board lies in the plane z = 0
+  (x right, y up the board, z up out of it). One fit rule per level: with s = 1.9 / max(W, H), cell (c, r) has its
+  centre at ((c + 0.5 − W/2)·s, 0.05 + (H/2 − r − 0.5)·s, 0), so every board fills the same square of side 1.9 centred
+  at (0, 0.05) and nothing a player does changes the scale. Drawn in painter's order with depth testing off and no face
+  culling: the backdrop (a still vertical gradient from cave #06070A at the bottom to cave top #12161C at the top with
+  hashed spore points, spore #9FE8C8, covering at most 2 % of its area — the "starlit" city seen from below — the same
+  at every tier); the floor plate under the board (floor #14171C) with grid lines (grid #1E232B); site marks (a dashed
+  square inset by 0.1·s, site #4A5568); toxins (a pool of radius 0.42·s with concentric ripples, toxin #7B3FB8); rocks
+  (a raised rounded block of 0.9·s with copper veins drawn in the shader, rock #3B2F2A, vein copper #C8743A); blockers
+  (a stone disc of radius 0.38·s with a ring, blocker #2A2D33, ring #8A8F98); nutrients (an orb of radius 0.3·s, fixed
+  and placed both nutrient #E08A3C, a placed one with an outer ring; consumed nutrients drop to a dim ring); the veins
+  (one tapered tube per grown segment up to the shown pulse, from the parent cell's centre to the child's, radius from
+  0.16·s at the root end down to 0.06·s by the child's path weight over the network's largest path weight, emerald
+  #2FE08A, whose brightness pulses outward along the path weight with presentation time; a small bloom at every cell
+  where a nutrient was consumed); seeds (a short sprout from the root in each seeded direction, sprout #5BE38F); the
+  root cap (radius 0.36·s, cap #9FF2D0); the terminal caps (radius 0.42·s; closed and hollow when not reached by the
+  shown pulse, cap closed #4B6B60, open and lit when reached, cap open #C9FFE9, with a ring of terminal + 1 pips); the
+  gauges below the board: a weight bar plate from x = −0.95 to 0.95 at y = −1.12 (gauge plate #1A2347) whose fill
+  (weight #2FE08A) maps 0 … the nutrient budget, with a tick at the limit (limit #E0E6EE) and the bar's end at the
+  budget; a row of terminal pips at y = −1.24 (filled when reached, hollow otherwise); the actions bars at y = −1.34
+  (each 1.9 / budget wide with a gap of a fifth, 0.035 tall), lit for the actions left (actions lit #E08A3C, actions
+  unlit #1E2648). The glow is additive and drawn last. The network shown is the report of the current arrangement; the
+  shown pulse is presentation state of the adapter (`growth.show [pulse]`, 0 … pulses run, never in the digest), equal
+  to the pulses run at opening and after every action, undo, redo, `level.next`, reset and restore, and never advanced
+  by time. The camera is a fixed authored perspective (eye (0, −1.9, 2.8) looking at (0, −0.3, 0)) fitted to the box
+  x −1.05 … 1.05, y −1.45 … 1.05, z 0 … 0.25 with a 5 % margin for aspect 0.4 … 2.5. Nothing drawn is consulted by the
+  rules. Impact: FR-R02G2203-001, 002, 003, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): vein tubes of 8 sides, caps of 16 segments,
+  hyphae fuzz of 6 strands at every branch point and under every open cap, 24 drifting spores and 2 glow shells around
+  the root, the open caps and the blooms; `level-1`: 6 sides, 12 segments, 3 strands, 12 spores, 1 glow shell; `level-2`
+  (the design's "Tier 0, D3-safe"): 4 sides (still tapered), 8 segments, no fuzz, no spores, no glow. The backdrop, the
+  floor and grid, the cells, the network's segments and radii, the caps' positions and sizes, the pips, gauges, actions
+  bars and colours are the same at every tier. Levels are ordered richest first; the Core's `qualityTiers` equals the
+  presenter's levels; the presenter logs each tier change with its reason. Impact: FR-R02G2203-004; SC-R02G2203-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects through the same
+  camera the board centre, the root's centre, every terminal's centre, the weight plate's left margin (x = −0.925) and
+  the first actions bar, and gives the palette. Simulator tests render offscreen at 1,152 × 768 at the full shown pulse
+  and check, at points at least 6 pixels from every element drawn after them, that the root cap's centre is brighter
+  than the backdrop at that point by at least 0.15 in luminance; that every reached terminal's centre is brighter by at
+  least 0.3 and every unreached one differs by at least 0.05 (in the unlit fallback: the flat colour within 0.1); that
+  the first actions bar (lit) has red above blue by at least 0.08 (copper); that the weight plate's left margin differs
+  from the backdrop by at least 0.05; and that the median of a 9 × 9 pixel backdrop patch in a lower corner matches the
+  gradient colour at its height within 0.06. Palette: cave #06070A, cave top #12161C, spore #9FE8C8, floor #14171C,
+  grid #1E232B, site #4A5568, toxin #7B3FB8, rock #3B2F2A, vein copper #C8743A, blocker #2A2D33, ring #8A8F98, nutrient
+  #E08A3C, emerald #2FE08A, sprout #5BE38F, cap #9FF2D0, cap closed #4B6B60, cap open #C9FFE9, gauge plate #1A2347,
+  weight #2FE08A, limit #E0E6EE, actions lit #E08A3C, actions unlit #1E2648, broken #FF6B5E, glow #F2FFF8. Impact:
+  FR-R02G2203-006; SC-R02G2203-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `MyceliumArchitectSceneSnapshot` (the level's board, root, terminals, rocks, toxins, fixed nutrients and sites; the
+  arrangement; from the kernel's report the grown cells in growth order with their pulses and parent indices, each
+  cell's path weight, the consumed nutrients, the total weight, the terminal pulses, the pulses run; the shown pulse,
+  the fit scale s, stage, failure, actions left, budget, nutrient budget, weight limit, level number and presentation
+  time) made by the adapter; it never holds the kernel. If a program fails to compile or link, the scene draws the
+  level-2 geometry unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go
+  to its `tierLog`. Reduce Motion stops the vein pulses, ripples and spores; Reduce Flashing caps the glow gain. A
+  failure marks the failing element in the broken colour (toxic: a broken ring on the entered toxin cell; starved: a
+  dashed broken outline on the cell the step could not grow into and the weight bar's end; unreached: a broken ring on
+  the named terminal; overweight: the weight fill past the limit tick), and the failure text names it, as the kernel's
+  `failureDescription` does. Impact: FR-R02G2203-003, 007; SC-R02G2203-002.
+- Q: How is the experience registered, what does the adapter accept and how do the streams carry materials? → A:
+  `Catalog/registrations.json` gains `r02-g22.mycelium-architect` (capabilities of at most 40 characters, tiers
+  `level-0` … `level-2`, the palette #06070A, #2FE08A, #E08A3C, #7B3FB8, #12161C, the scenario manifest
+  `Packages/ExperiencesRound02/MyceliumArchitect/scenario-manifest.json`, no permissions, a summary of at most 300
+  characters, content facts: 100 levels and the pinned catalog digest of R02-G22-02); `project.yml` and the app's
+  experience registry link `MyceliumArchitectExperience` as a candidate (`available: false` until X-R02-G22), opening
+  at seed 0 (level 1); `AppModelTests` switches its synthetic unregistered candidate to `r02-g23.erosion-painter`. The
+  adapter (`MyceliumArchitectExperienceCore`) prepares certified level (seed mod 100) + 1 from its table of certified
+  candidate indices and accepts `cell.nutrient [column, row]`, `cell.blocker [column, row]`, `cell.clear [column, row]`,
+  `root.seed [direction]`, `root.unseed [direction]`, `growth.run`, `play.undo`, `play.redo`, `level.next` and
+  `growth.show [pulse]` (whole numbers only); the kernel refuses everything off the board, not empty, not a site, over a
+  limit, locked or out of stage with its own codes; the declared ranges are column and row 0 … 31, direction 0 … 7 and
+  pulse 0 … 128, so the engine refuses only values outside them, and `growth.show` refuses a pulse above the pulses run
+  with `r02-g22.pulse` without touching the kernel; its digest (domain `r02-g22.mycelium-architect.v1`) is the level
+  number and the play's fingerprint (never the record history or the shown pulse); snapshot schema 1 `{level,
+  records}`. Vertex streams as feature 503: `a_uv.x` = material code + value scale · value (a fraction 0 … 1, for
+  valued materials only: a vein's path weight over the largest, a bar's fill) + a broken offset when a failure names
+  the element; the flats are cut out by signed distance in the fragment shader; a tube vertex carries its ring normal
+  in `a_normal`. Programs are GLSL ES 3.00 with at most 16 vec4 uniforms, no texture samplers and only bounded loops; the
+  palette constants in the sources equal the CPU's; spores, veins and fuzz come from a fixed hash, never a random
+  source. Impact: FR-R02G2203-001, 002, 003, 005, 008, 009; SC-R02G2203-003, 004.
 
 ## User Scenarios & Testing *(mandatory)*
 
