@@ -114,7 +114,7 @@ reasons as they are added (feature 501's convergence lesson).
   `--name host-full`
 - [X] T-R02G2201-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0
 - [X] T-R02G2201-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0
-- [ ] T-R02G2201-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G2201-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit=0 (run alone)
 - [ ] T-R02G2201-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
 
