@@ -277,10 +277,12 @@ public struct MyceliumArchitectPlay: Sendable, Equatable {
         switch action {
         case .nutrient(let cell):
             guard level.isEmpty(cell, in: arrangement) else { throw .action("cell") }
+            guard level.isSite(cell) else { throw .action("not a site") }
             guard nutrients.count < level.maxNutrients else { throw .action("nutrient limit") }
             nutrients.append(cell)
         case .blocker(let cell):
             guard level.isEmpty(cell, in: arrangement) else { throw .action("cell") }
+            guard level.isSite(cell) else { throw .action("not a site") }
             guard blockers.count < level.maxBlockers else { throw .action("blocker limit") }
             blockers.append(cell)
         case .clear(let cell):

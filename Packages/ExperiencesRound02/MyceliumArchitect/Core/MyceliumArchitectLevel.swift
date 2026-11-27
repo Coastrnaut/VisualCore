@@ -37,6 +37,8 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
     public static let nutrientBudgets = 2...4094
     /// The action budget range.
     public static let budgets = 1...24
+    /// The placement site count range (feature 512).
+    public static let siteCounts = 2...12
 
     /// The level's slug.
     public let id: String
@@ -84,6 +86,9 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
     public let budget: Int
     /// Whether a tutorial precedes play.
     public let tutorial: Bool
+    /// The placement sites, 2 … 12 empty cells in ascending (row, column), or nil: placements anywhere (feature 511's
+    /// behaviour; omitted from the stored form and the fingerprint). Feature 512 (R02-G22-02).
+    public let sites: [MyceliumArchitectCell]?
     /// The SHA-256 hex of the canonical JSON content.
     public let fingerprint: String
 
@@ -95,13 +100,14 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
                 fixedNutrients: [MyceliumArchitectCell], strength: Int, reach: Int, curvature: Int, obstacle: Int,
                 maxNutrients: Int, maxBlockers: Int, maxSeeds: Int, startSeeds: [MyceliumArchitectDirection],
                 pulses: Int, nutrientBudget: Int, weightLimit: Int, budget: Int,
-                tutorial: Bool) throws(MyceliumArchitectError) {
+                tutorial: Bool, sites: [MyceliumArchitectCell]? = nil) throws(MyceliumArchitectError) {
         try self.init(id: id, seed: seed, difficulty: difficulty, width: width, height: height, root: root,
                       terminals: terminals, rocks: rocks, toxins: toxins, fixedNutrients: fixedNutrients,
                       strength: strength, reach: reach, curvature: curvature, obstacle: obstacle,
                       maxNutrients: maxNutrients, maxBlockers: maxBlockers, maxSeeds: maxSeeds,
                       startSeeds: startSeeds, pulses: pulses, nutrientBudget: nutrientBudget,
-                      weightLimit: weightLimit, budget: budget, tutorial: tutorial, refusingAWin: true)
+                      weightLimit: weightLimit, budget: budget, tutorial: tutorial, refusingAWin: true,
+                      sites: sites)
     }
 
     /// A level of the given values, checked; the "already won" rule only when `refusingAWin` (a probe that only reads
@@ -111,7 +117,7 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
          fixedNutrients: [MyceliumArchitectCell], strength: Int, reach: Int, curvature: Int, obstacle: Int,
          maxNutrients: Int, maxBlockers: Int, maxSeeds: Int, startSeeds: [MyceliumArchitectDirection],
          pulses: Int, nutrientBudget: Int, weightLimit: Int, budget: Int, tutorial: Bool,
-         refusingAWin: Bool) throws(MyceliumArchitectError) {
+         refusingAWin: Bool, sites: [MyceliumArchitectCell]? = nil) throws(MyceliumArchitectError) {
         guard Self.isSlug(id) else { throw .level("id") }
         guard Self.difficulties.contains(difficulty) else { throw .level("difficulty") }
         guard Self.sides.contains(width) else { throw .level("width") }
@@ -142,6 +148,13 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
         guard Self.nutrientBudgets.contains(nutrientBudget) else { throw .level("nutrient budget") }
         guard (2...nutrientBudget).contains(weightLimit) else { throw .level("weight limit") }
         guard Self.budgets.contains(budget) else { throw .level("budget") }
+        if let sites {
+            guard Self.siteCounts.contains(sites.count), Set(sites).count == sites.count else {
+                throw .level("site count")
+            }
+            guard sites.allSatisfy(onBoard) else { throw .level("site") }
+            guard sites.allSatisfy({ !features.contains($0) }) else { throw .level("site not empty") }
+        }
         guard maxNutrients > 0 || maxBlockers > 0 || startSeeds.count < maxSeeds else {
             throw .level("nothing placeable")
         }
@@ -151,7 +164,7 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
                               reach: reach, curvature: curvature, obstacle: obstacle, maxNutrients: maxNutrients,
                               maxBlockers: maxBlockers, maxSeeds: maxSeeds, startSeeds: startSeeds.sorted(),
                               pulses: pulses, nutrientBudget: nutrientBudget, weightLimit: weightLimit,
-                              budget: budget, tutorial: tutorial)
+                              budget: budget, tutorial: tutorial, sites: sites?.sorted())
         guard let data = try? Self.encoder.encode(content) else { throw .malformed("encode") }
         self.id = id
         self.seed = seed
@@ -176,6 +189,7 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
         self.weightLimit = weightLimit
         self.budget = budget
         self.tutorial = tutorial
+        self.sites = sites?.sorted()
         self.fingerprint = StableHash.sha256Hex(Array(data))
         if refusingAWin {
             guard !MyceliumArchitectGrowth.report(self, arrangement: start).wins else { throw .level("already won") }
@@ -193,6 +207,12 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
     /// Whether `cell` is on the board.
     public func contains(_ cell: MyceliumArchitectCell) -> Bool {
         (0..<width).contains(cell.column) && (0..<height).contains(cell.row)
+    }
+
+    /// Whether `cell` may take a placement: every cell without sites, else only a site (feature 512).
+    public func isSite(_ cell: MyceliumArchitectCell) -> Bool {
+        guard let sites else { return true }
+        return sites.contains(cell)
     }
 
     /// Whether `cell` is empty in `arrangement`: on the board and not the root, a terminal, a rock, a toxin, a fixed
@@ -377,13 +397,15 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
         let weightLimit: Int
         let budget: Int
         let tutorial: Bool
+        /// The sites when declared; nil (omitted from the JSON and the fingerprint text) otherwise.
+        let sites: [MyceliumArchitectCell]?
 
         init(schema: Int, id: String, seed: UInt64, difficulty: Int, width: Int, height: Int,
              root: MyceliumArchitectCell, terminals: [MyceliumArchitectCell], rocks: [MyceliumArchitectCell],
              toxins: [MyceliumArchitectCell], fixedNutrients: [MyceliumArchitectCell], strength: Int, reach: Int,
              curvature: Int, obstacle: Int, maxNutrients: Int, maxBlockers: Int, maxSeeds: Int,
              startSeeds: [MyceliumArchitectDirection], pulses: Int, nutrientBudget: Int, weightLimit: Int,
-             budget: Int, tutorial: Bool) {
+             budget: Int, tutorial: Bool, sites: [MyceliumArchitectCell]? = nil) {
             self.schema = schema
             self.id = id
             self.seed = seed
@@ -408,6 +430,7 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
             self.weightLimit = weightLimit
             self.budget = budget
             self.tutorial = tutorial
+            self.sites = sites
         }
 
         init(level: MyceliumArchitectLevel) {
@@ -418,7 +441,7 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
                       curvature: level.curvature, obstacle: level.obstacle, maxNutrients: level.maxNutrients,
                       maxBlockers: level.maxBlockers, maxSeeds: level.maxSeeds, startSeeds: level.startSeeds,
                       pulses: level.pulses, nutrientBudget: level.nutrientBudget, weightLimit: level.weightLimit,
-                      budget: level.budget, tutorial: level.tutorial)
+                      budget: level.budget, tutorial: level.tutorial, sites: level.sites)
         }
 
         /// The level of this content, re-checked.
@@ -429,7 +452,7 @@ public struct MyceliumArchitectLevel: Sendable, Equatable {
                                        curvature: curvature, obstacle: obstacle, maxNutrients: maxNutrients,
                                        maxBlockers: maxBlockers, maxSeeds: maxSeeds, startSeeds: startSeeds,
                                        pulses: pulses, nutrientBudget: nutrientBudget, weightLimit: weightLimit,
-                                       budget: budget, tutorial: tutorial)
+                                       budget: budget, tutorial: tutorial, sites: sites)
         }
     }
 

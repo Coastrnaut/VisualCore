@@ -59,20 +59,20 @@ public struct MyceliumArchitectPuzzle: PuzzleRules {
     }
 
     /// Every arrangement action of `arrangement` in the order of research R14, legal or not: nutrients on every board
-    /// cell in ascending (row, column), blockers likewise, clears of the placed items merged in ascending (row, column),
+    /// cell (or every site, feature 512) in ascending (row, column), blockers likewise, clears of the placed items merged in ascending (row, column),
     /// seeds in ascending direction, unseeds in ascending direction.
     func candidates(_ arrangement: MyceliumArchitectArrangement) -> [MyceliumArchitectAction] {
         var result: [MyceliumArchitectAction] = []
-        for row in 0..<level.height {
-            for column in 0..<level.width {
-                result.append(.nutrient(MyceliumArchitectCell(column: column, row: row)))
+        var cells: [MyceliumArchitectCell] = []
+        if let sites = level.sites {
+            cells = sites
+        } else {
+            for row in 0..<level.height {
+                for column in 0..<level.width { cells.append(MyceliumArchitectCell(column: column, row: row)) }
             }
         }
-        for row in 0..<level.height {
-            for column in 0..<level.width {
-                result.append(.blocker(MyceliumArchitectCell(column: column, row: row)))
-            }
-        }
+        for cell in cells { result.append(.nutrient(cell)) }
+        for cell in cells { result.append(.blocker(cell)) }
         let placed: [MyceliumArchitectCell] = (arrangement.nutrients + arrangement.blockers).sorted()
         for cell in placed { result.append(.clear(cell)) }
         for direction in MyceliumArchitectDirection.allCases.sorted() { result.append(.seed(direction)) }

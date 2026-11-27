@@ -14,7 +14,7 @@ Packages/ExperiencesRound02 --filter MyceliumArchitect`. New sources go in `Myce
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2202-002 Kernel extension: before editing record one literal fingerprint of a hand level from the
+- [X] T-R02G2202-002 Kernel extension: before editing record one literal fingerprint of a hand level from the — Verified 2026-11-27: sites extension (level, play, puzzle, error), MyceliumArchitectSitesTests (5, pinned fingerprint without sites unchanged); host exit=0 (33 XCTest + 22 Swift Testing)
   unchanged kernel; edit `Packages/ExperiencesRound02/MyceliumArchitect/Core/MyceliumArchitectLevel.swift` (optional
   `sites`: "nil or 2 … 12 distinct cells, on the board, empty (not root, terminal, rock, toxin, fixed nutrient),
   ascending; refusals "site count", "site", "site not empty" after the shared-cell check and before "nothing

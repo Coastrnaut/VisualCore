@@ -1,6 +1,7 @@
 // MyceliumArchitectError — feature 511 (R02-G22-01) T-R02G2201-002 (FR-R02G2201-007, 010, 012; clarifications Q4,
 // Q5). The refusals of Mycelium Architect's rule kernel, each with a stable reason code `r02-g22.*` that the
 // experience logs with the level id and the action. Modelled on `BinaryGardensError` (feature 501).
+// Feature 512 (R02-G22-02) T-R02G2202-002 (FR-R02G2202-006) adds `generation(Int)` and `witness(String)`.
 
 /// A refusal of a Mycelium Architect level, action or event.
 public enum MyceliumArchitectError: Error, Equatable, Sendable {
@@ -19,6 +20,11 @@ public enum MyceliumArchitectError: Error, Equatable, Sendable {
     case newerSchema(Int)
     /// A stored level or trace is damaged or breaks a rule; the payload describes the damage.
     case malformed(String)
+    /// No candidate of the manifest entry with this number qualified within the generator's candidate bound
+    /// (feature 512).
+    case generation(Int)
+    /// A solver witness is damaged, edited or no longer replays; the payload names the part (feature 512).
+    case witness(String)
 
     /// The stable reason code, `r02-g22.<kebab-case>`.
     public var reasonCode: String {
@@ -30,6 +36,8 @@ public enum MyceliumArchitectError: Error, Equatable, Sendable {
         case .stale: "r02-g22.stale"
         case .newerSchema: "r02-g22.newer-schema"
         case .malformed: "r02-g22.malformed"
+        case .generation: "r02-g22.generation"
+        case .witness: "r02-g22.witness"
         }
     }
 }
