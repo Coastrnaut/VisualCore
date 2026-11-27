@@ -43,7 +43,7 @@ R02-G19-03 (`git show <R02-G19-03 record commit>:<path>`).
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherShaderSourceTests.swift` (version line,
   declared uniforms, at most 16 vec4 uniforms, no texture samplers, bounded loops, palette constants match, glow caps);
   agent A; `--name host-2`
-- [ ] T-R02G2003-004 [P] [US1] Create
+- [X] T-R02G2003-004 [P] [US1] Create — Verified 2026-11-26: 2026-11-26 host-3 exit 0: 129 tests in 14 suites incl. 14 geometry tests (extreme settings finite and bounded, every element in view at 7 aspects over 10 catalog levels, positions equal across tiers, mist from kernel values, gauges, won in place, glow shells per tier, failure marks on a failed stage only, shader stream encoding) (.autonomy/migration/checks/R02-G20-03.host-3.json)
   `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSceneGeometry.swift` (clarification Q1: cell (r, c)
   at ((c − (C − 1)/2) · s, ((R − 1)/2 − r) · s, 0) with s = min(1.8 / C, 1.6 / R); the backdrop quad; the moon disc of
   radius 0.12 at (1.15, 1.05, −0.5) with four phase ticks, L + 1 filled; floor squares of side 0.96 s; logs (rounded
