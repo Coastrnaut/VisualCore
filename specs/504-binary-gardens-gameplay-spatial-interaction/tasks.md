@@ -9,7 +9,7 @@ modelled on feature 484).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2104-001 Baselines on the committed tree after R02-G21-03 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2104-001 Baselines on the committed tree after R02-G21-03 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit=0 (.autonomy/migration/checks/R02-G21-04.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the quickstart step 1 commands); the
   rendering baseline is R02-G21-03's rendering runs (exit 0)
 
