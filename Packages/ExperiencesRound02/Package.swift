@@ -835,7 +835,9 @@ let package = Package(
                                .product(name: "VisualCoreScenes", package: visualCore),
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreDiagnostics", package: visualCore),
-                               .product(name: "VisualCorePersistence", package: visualCore)],
+                               .product(name: "VisualCorePersistence", package: visualCore),
+                               // Feature 506 (R02-G21-06): the ambient sound recipe.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore)],
                 path: "BinaryGardens/Core"),
         .testTarget(name: "BinaryGardensCoreTests",
                     dependencies: ["BinaryGardensCore",
@@ -844,7 +846,9 @@ let package = Package(
                                    // Feature 503 (R02-G21-03): meshes, quality profiles and the experience contract.
                                    .product(name: "VisualCoreScenes", package: visualCore),
                                    .product(name: "VisualCoreExperience", package: visualCore),
-                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore),
+                                   // Feature 506 (R02-G21-06): the ambient recipe in tests.
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore)],
                     path: "BinaryGardens/CoreTests"),
         // Feature 503 (R02-G21-03): Binary Gardens' experience (presenter, scene, controls).
         .target(name: "BinaryGardensExperience",
@@ -854,7 +858,10 @@ let package = Package(
                                .product(name: "VisualCoreExperience", package: visualCore),
                                .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                               // Feature 506 (R02-G21-06): the ambient loop and the audition.
+                               .product(name: "VisualCoreAudioDSP", package: visualCore),
+                               .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                 path: "BinaryGardens/Experience"),
         // Feature 503 (R02-G21-03): the simulator tests of Binary Gardens' experience.
         .testTarget(name: "BinaryGardensExperienceTests",
@@ -865,7 +872,10 @@ let package = Package(
                                    .product(name: "VisualCoreSimulation", package: visualCore),
                                    .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
                                    .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
-                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS])),
+                                   // Feature 506 (R02-G21-06): the sound state in tests.
+                                   .product(name: "VisualCoreAudioDSP", package: visualCore),
+                                   .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "BinaryGardens/ExperienceTests"),
         // Feature 491 (R02-G20-01): Mushroom Weather's pure rule kernel.
         .target(name: "MushroomWeatherCore",

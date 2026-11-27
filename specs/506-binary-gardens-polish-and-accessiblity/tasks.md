@@ -15,7 +15,7 @@ round02-host in five chunks (1, 2, 3c, 3e, 3f). Prerequisites: R02-G21-04 and R0
 - [X] T-R02G2106-001 Baselines on the committed tree after R02-G21-05 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 (after R02-G21-05 was recorded)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters); the rendering
   baseline is R02-G21-05's rendering runs (exit 0)
-- [ ] T-R02G2106-002 Edit `Packages/ExperiencesRound02/Package.swift` (`BinaryGardensCore` and its tests gain
+- [X] T-R02G2106-002 Edit `Packages/ExperiencesRound02/Package.swift` (`BinaryGardensCore` and its tests gain — Verified 2026-11-27: host exit 0 (swift test --filter BinaryGardensCoreTests) with VisualCoreAudioDSP on Core and tests, VisualCoreAudioDSP and VisualCoreAudio (iOS) on Experience and tests
   VisualCoreAudioDSP (the tests also VisualCoreExperience); `BinaryGardensExperience` and its tests gain
   VisualCoreAudioDSP and VisualCoreAudio, iOS-conditioned, as Mushroom Weather's targets have); `--name host -- swift
   test --package-path Packages/ExperiencesRound02 --filter BinaryGardensCoreTests`
