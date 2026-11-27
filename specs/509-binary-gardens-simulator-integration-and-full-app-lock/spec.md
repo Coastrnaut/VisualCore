@@ -24,7 +24,7 @@ Canonical overrides:
   X-R02-G21.
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock and the per-round device campaign.
   **Device-only items:** the same journeys on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
-- **Prerequisites recorded first:** R02-G21-04 (feature 504, in code, gate pending), R02-G21-05 … R02-G21-08 (features
+- **Prerequisites recorded first:** R02-G21-04 (feature 504, recorded pass on 2026-11-27), R02-G21-05 … R02-G21-08 (features
   505 … 508, specified and planned, not yet in code). This feature's interface tests, schema examples and regression
   evidence depend on what those features build, so its implementation starts only after their gates are recorded.
 - **Model:** feature 499 (Mushroom Weather's simulator integration and full app lock), adapted to choosing a star,
@@ -80,7 +80,8 @@ Answered autonomously under the owner's standing delegation, safest well-support
   hint, stars, goal, band, explanation, modes, level picker, play-level, replay section and sound, named as Mushroom
   Weather names them where a control has the same role) — with a test that every name is unique and used once in the
   panel; where a prerequisite builds a different name, the list follows what is built and this specification is
-  aligned at analyze. The tests read the canvas description for the level and the win, the `stars` text for the stars,
+  aligned at analyze. The panel's level line (a heading text, not a control) carries no identifier and no test reads
+  it. The tests read the canvas description for the level and the win, the `stars` text for the stars,
   the `actions` text to confirm each action took effect, the `star` control's value before an adjustment, the
   `luminosity` control's value before and after the change, and the replay step's value for the replay position.
   Impact: FR-R02G2109-001, 002.
@@ -98,9 +99,12 @@ Answered autonomously under the owner's standing delegation, safest well-support
   Impact: FR-R02G2109-002, 007; SC-R02G2109-001.
 - Q: Which earlier-schema examples are stored and where do they come from? → A:
   `BinaryGardensExperienceCore.schemaOneExample()` (the schema-1 saved state `{level: 1, records}` of a play of level 1
-  with one accepted arrangement action other than the certified one, which leaves the play unwon and still playing)
+  with one accepted arrangement action other than the certified one, which leaves the play unwon and still playing:
+  on level 1, where only star 2 is adjustable and the certified plan is one luminosity change, star 2's ring change
+  `star.ring [1, 1]`, accepted by the kernel as the host test proves)
   and `schemaTwoExample()` (schema 2 with progress, the campaign mode, the tutorial done and level 1 solved with 2
-  actions spent and 2 stars, one action above the certified count, no trace), both `MigrationExample`s built in the
+  actions spent and 2 stars, one action above the certified count of 1 (the certified count is the plan's arrangement actions, the run not
+  counted, as the budget counts it), no trace), both `MigrationExample`s built in the
   Core (`BinaryGardensSchemaExamples.swift`, modelled on `MushroomWeatherSchemaExamples`), registered with `examples:`;
   the app's migration check restores both into schema 3 with progress kept (a schema-2 result without a trace keeps
   its stars unverified, as feature 507 reconciles). The registration's comment is corrected. Impact: FR-R02G2109-003;
