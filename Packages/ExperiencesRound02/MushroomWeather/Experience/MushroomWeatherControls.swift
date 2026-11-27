@@ -44,6 +44,12 @@
 // `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
 // `settings.sound`. The existing identifiers and actions are unchanged. Modelled on `MicroscopicAuroraControls`
 // (feature 487).
+//
+// Feature 499 (R02-G20-09) T-R02G2009-003 (FR-R02G2009-001; clarification Q1): the failure explanation has its own
+// identifier `explanation` (it gave `failure`, the short failure line's name, before), and every name the panel gives
+// through `port.identifier` (`experience.r02-g20.mushroom-weather.<name>`) is listed in ``identifierNames``, each
+// once; the vent toggles' `vent-<index>` (vent 1 … 6 as `vent-0` … `vent-5`, the most vents a level holds) are listed
+// by index. Modelled on `MicroscopicAuroraControls` (feature 489).
 #if os(iOS)
 import MushroomWeatherCore
 import SwiftUI
@@ -65,6 +71,18 @@ struct MushroomWeatherControls: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 496).
     @Environment(\.scenePhase) private var scenePhase
+
+    /// Every identifier name the panel gives through `port.identifier`, each exactly once (feature 499, clarification
+    /// Q1), pinned as built: the interface tests find the controls by these names. The vent toggles give
+    /// `vent-<index>` for vent index 0 … 5 (labelled Vent 1 … 6; `MushroomWeatherLevel.ventCounts` allows at most six).
+    static let identifierNames: [String] = [
+        "slot", "slot-minus", "slot-plus", "selection", "pods-detail", "site", "site-minus", "site-plus", "place",
+        "remove", "vent-0", "vent-1", "vent-2", "vent-3", "vent-4", "vent-5", "moon", "moon-minus", "moon-plus",
+        "moon-set", "reset-view", "cycle", "cycle-minus", "cycle-plus", "cycle-detail", "run", "undo", "redo",
+        "next-level", "dismiss-tutorial", "hint", "campaign", "daily", "practice", "level-picker", "play-level", "replay",
+        "replay-step", "replay-stop", "sound", "actions", "status", "failure", "explanation", "progress", "summary",
+        "message", "tutorial", "hint-text", "band", "stars", "goal", "replay-position",
+    ]
 
     /// The widest the panel's content grows, padding included (clarification Q5 of feature 496).
     static let readableWidth: CGFloat = 520
@@ -360,8 +378,8 @@ struct MushroomWeatherControls: View {
         }
     }
 
-    /// The tutorial instruction with Dismiss tutorial, Hint with the hint text, the failure explanation, and the band,
-    /// goal and best stars (feature 495).
+    /// The tutorial instruction with Dismiss tutorial, Hint with the hint text, the failure explanation (identifier
+    /// `explanation` since feature 499), and the band, goal and best stars (feature 495).
     @ViewBuilder private var teaching: some View {
         if let tutorial = mirror.tutorialText {
             Text(tutorial).font(.callout).fixedSize(horizontal: false, vertical: true)
@@ -382,7 +400,7 @@ struct MushroomWeatherControls: View {
         }
         if let explanation = mirror.explanation {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier(port.identifier("failure"))
+                .accessibilityIdentifier(port.identifier("explanation"))
         }
         row {
             Text(mirror.bandLabel).font(.footnote)

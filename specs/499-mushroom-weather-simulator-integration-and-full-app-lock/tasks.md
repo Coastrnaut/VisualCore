@@ -28,7 +28,7 @@ change (the shaders and reference of R02-G20-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G2009-003 [US1] Edit `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherControls.swift`:
+- [X] T-R02G2009-003 [US1] Edit `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherControls.swift`: — Verified 2026-11-27: sim-27 exit=0, 75 tests in 11 suites incl. MushroomWeatherIdentifierTests (6; 53 names) (.autonomy/migration/checks/R02-G20-09.sim-27.json)
   the failure explanation keeps its own identifier `explanation`, and `identifierNames` lists every identifier the
   panel carries (spec Clarifications Q1; contracts/api.md lists the expected names: slot, slot-minus, slot-plus,
   selection, pods-detail, site, site-minus, site-plus, place, remove, vent-0 … vent-5 (labelled Vent 1 … 6), moon,
