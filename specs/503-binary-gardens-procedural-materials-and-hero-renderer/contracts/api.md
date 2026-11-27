@@ -105,7 +105,7 @@ public enum BinaryGardensShaders {
     public static let maxUniformVec4s: Int               // 16
     public static let paletteConstants: [(name: String, colour: SIMD3<Double>)]
     public static let valueScale: Double                 // 0.4
-    public static let brokenOffset: Double               // 32
+    public static let brokenOffset: Double               // 64 (above every code 0 … 37)
     public static let ambientFloor: Double               // 0.35
     public static func encode(_ material: BinaryGardensMaterial, value: Double, broken: Bool) -> Double
     public static func decode(_ x: Double) -> (material: BinaryGardensMaterial, value: Double, broken: Bool)

@@ -43,7 +43,7 @@
   readable by shape (caps, belt, flowers) as well as tint. ("Caps reaching latitude ±30°" is read as caps covering every
   latitude beyond ±30°.)
 - **R7 Flats by signed distance, materials in uv.** Decision: as in feature 493, `a_uv.x` = material code + 0.4 · value
-  (valued materials only) + 32 when a failure names the element; flats (ring dashes, pips, cells, brackets, markers,
+  (valued materials only) + 64 when a failure names the element (above every code 0 … 37); flats (ring dashes, pips, cells, brackets, markers,
   bars, discs, rays, motes) carry their quad-local coordinate (u, v) and a shape parameter w in `a_normal`, as 493's
   quads do (a world's `a_normal` is its sphere normal, so its second share rides in `a_uv.y`), and are cut by signed
   distance; the backdrop carries its height 0 … 1 in `a_uv.y`; star discs are quads facing the eye with a white-hot core of half the radius. Rationale: the shared

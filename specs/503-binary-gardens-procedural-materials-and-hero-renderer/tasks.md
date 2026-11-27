@@ -22,13 +22,14 @@ R02-G20-03 (`git show a3269b5cc:<path>`, the R02-G20-03 record commit).
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensInvariantTests.swift` (no clock, floating point or
   run-time trigonometry; allowed imports) read a fixed list of the kernel's files — feature 501's five
   (`BinaryGardensError.swift`, `BinaryGardensLevel.swift`, `BinaryGardensPlay.swift`, `BinaryGardensPuzzle.swift`,
-  `BinaryGardensSky.swift`) and feature 502's five (`BinaryGardensManifest.swift`, `BinaryGardensDifficulty.swift`,
-  `BinaryGardensSolver.swift`, `BinaryGardensGenerator.swift`, `BinaryGardensWitness.swift`) — so the presentation
+  `BinaryGardensSky.swift`) and feature 502's five in `Core/Content/` (`Content/BinaryGardensManifest.swift`, `Content/BinaryGardensDifficulty.swift`,
+  `Content/BinaryGardensSolver.swift`, `Content/BinaryGardensGenerator.swift`, `Content/BinaryGardensWitness.swift`,
+  read relative to `Core/`), and `#expect(sources.count == 5)` becomes `#expect(sources.count == 10)` — so the presentation
   sources (snapshot, shaders with `sin(`/`cos(`, geometry, adapter with `clock.show`, scenarios) stay outside them;
   create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSceneSnapshot.swift` (snapshot per data-model.md:
   ringRadii, luminosityLevels, maxTilt, phaseStep, lethalTolerance, worlds (`BinaryGardensSceneWorld`: radius, phase,
   speed, lethalLow, comfortLow, comfortHigh, lethalHigh, window, bloomLow, bloomHigh; positions, flux, shares
-  `[tick − 1][star]` and bands at ticks 1 … 48, longestLethalRun, longestWindow, windowStart, integral, bloom — "the
+  `[tick − 1][star]` and bands at ticks 1 … 48, longestLethalRun, longestWindow (the report's `window`), windowStart, integral, bloom — "the
   kernel's integers, copied; positions at scale 2²⁰, flux and shares in milliflux"), arrangement, starPositions
   `[tick − 1][star]`, shownTick (1 … 48), fitScale k = 0.95 / R, failure, stage, actionsLeft, budget, levelNumber, time;
   "immutable; built by the adapter from the play (`init(play:shownTick:levelNumber:time:)`); never holds the kernel; a
@@ -52,7 +53,7 @@ R02-G20-03 (`git show a3269b5cc:<path>`, the R02-G20-03 record commit).
 
 - [ ] T-R02G2103-003 [P] [US1] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensShaders.swift`
   (system and glow sources, GLSL ES 3.00; `BinaryGardensMaterial` with contiguous codes from 0 per data-model.md —
-  "valued materials (worlds: star 1 share / 64 000; trail: age; cells: height share) add 0.4 · value; +32 when broken";
+  "valued materials (worlds: star 1 share / 64 000; trail: age; cells: height share) add 0.4 · value; +64 when broken";
   `encode` and `decode`; the still backdrop gradient with a fixed-hash starfield covering at most 2 % of the area; each
   world lit by both stars in their own colours by max(0, n · l_i) times its share (star 1's share / 64 000 in `a_uv.x`
   as the value, star 2's in `a_uv.y`, star positions at the shown tick in `u_star1`, `u_star2`) with a brightened
@@ -143,8 +144,7 @@ pass.
   and `Packages/ExperiencesRound02/BinaryGardens/scenario-manifest.json` (generated; the committed manifest equals the
   Swift one; `--name scenarios -- swift test --package-path Packages/ExperiencesRound02 --filter BinaryGardens`);
   register the candidate (`Catalog/registrations.json` with `r02-g21.binary-gardens`, tiers `level-0` … `level-2`, the
-  palette, capabilities ≤ 40 characters, summary ≤ 300 characters, content facts: 100 levels and the catalog digest
-  pinned at R02-G21-02, the scenario manifest, no permissions, `available: false`; `python3 scripts/build_catalog.py`
+  palette, capabilities ≤ 40 characters, summary ≤ 300 characters, `content`: `levels` 100 and `catalog_sha256` = `BinaryGardensCatalogTests.pinnedDigest`, the scenario manifest, no permissions, `available: false`; `python3 scripts/build_catalog.py`
   regenerates `Catalog/experiences.json` and
   `Packages/VisualCore/Tests/VisualCoreExperienceTests/Fixtures/Catalog/{registrations,experiences}.json`;
   `Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift` lists the new registration;
@@ -159,7 +159,7 @@ pass.
   brighter than the backdrop by 0.15 in luminance, at least one world checked; each star's centre brighter than the
   backdrop by 0.4, at least one star checked; the first actions bar (lit) with red above blue by 0.08; the first gauge
   plate's left margin 0.05 from the backdrop; the median of a 9 × 9 lower-corner patch within 0.06 of the gradient; tier
-  coordinates; fallback; resize and zero size; memory warning releases and the next frame rebuilds; Reduce Motion keeps
+  coordinates; fallback (a forced shader failure leaves the digest and verdict unchanged); resize and zero size; memory warning releases and the next frame rebuilds; Reduce Motion keeps
   the frame still; a failure marks the failing element broken; a won level blooms every world; identity); `--name
   sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing BinaryGardensExperienceTests`; `--name

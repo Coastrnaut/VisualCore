@@ -287,9 +287,9 @@ it as available, and the experience package, registry, catalog and content check
   the edge cases state.
 - **FR-R02G2103-008**: The experience MUST be registered in the catalog as a candidate and linked into the one app; the
   experience package, registry, catalog, content and dependency checks MUST pass; it MUST NOT be shown as available.
-- **FR-R02G2103-009**: Existing tests MUST pass unchanged except where a test names the next unregistered candidate
+- **FR-R02G2103-009**: Existing tests MUST pass unchanged except where a test names the next unregistered candidate or lists the registered entries (`RealCatalogTests`),
   and except `BinaryGardensInvariantTests`, whose kernel scans (no clock, floating point or run-time trigonometry;
-  allowed imports) read a fixed list of the kernel's files (feature 501's five and feature 502's five), so the
+  allowed imports) read a fixed list of the kernel's files (feature 501's five and feature 502's five in `Core/Content`), so the
   presentation sources (snapshot, shaders with `sin(`/`cos(`, geometry, adapter, scenarios) stay outside them;
   every new public name is documented; the reference regression passes; the Cores keep running on the host.
 - **FR-R02G2103-010**: No information MUST be carried by hue alone (the non-colour twins of the edge cases), and the

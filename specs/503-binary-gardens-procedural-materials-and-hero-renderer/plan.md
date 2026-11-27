@@ -41,7 +41,7 @@ VisualCoreScenes, VisualCoreExperience and VisualCoreDiagnostics; the package ga
 `BinaryGardensExperience` library product; rendering dependencies carry `condition: .when(platforms: [.iOS])` and
 experience sources sit in `#if os(iOS)`, so the Cores still run on the host. The kernel scans of
 `BinaryGardensInvariantTests` (no clock, floating point or run-time trigonometry; allowed imports) read a fixed list of
-the kernel's files (feature 501's five and feature 502's five), as 493 did for Mushroom Weather, so the presentation
+the kernel's files (feature 501's five and feature 502's five in `Core/Content`), as 493 did for Mushroom Weather, so the presentation
 sources (snapshot, shaders with `sin(`/`cos(`, geometry, adapter with `clock.show`, scenarios) stay outside them.
 **App**: `project.yml` adds the `BinaryGardensCore` and `BinaryGardensExperience` products; the registry registers the
 candidate (`ExperienceRegistry.candidates`, opening seed 0); `Catalog/registrations.json` gains the entry (content facts:
