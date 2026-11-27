@@ -551,7 +551,7 @@ enum BinaryGardensA11y {
             "if tick { show(tick: mirror.shownTick + step) }",
             "Button(\"Ring −\") { send(\"star.ring\", [Double(mirror.selectedStar), Double(mirror.ring(moved: -1))]) }",
             "Button(\"Ring +\") { send(\"star.ring\", [Double(mirror.selectedStar), Double(mirror.ring(moved: 1))]) }",
-            "Picker(\"Star\", selection: starChoice)",
+            "Button { selectStar(index) }",   // feature 509: two star buttons replace the segmented picker
             "if typeSize.isAccessibilitySize {",
             ".frame(maxWidth: Self.readableWidth, alignment: .leading)",
             ".onAppear { presenter?.controlsAppeared() }",

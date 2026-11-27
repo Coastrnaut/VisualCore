@@ -204,11 +204,6 @@ struct BinaryGardensControls: View {
         if let presenter { presenter.changeStar(star) } else { mirror.select(star: star) }
     }
 
-    /// The star picker's selection (feature 506): choosing a star goes through ``selectStar(_:)``.
-    private var starChoice: Binding<Int> {
-        Binding(get: { mirror.star }, set: { star in selectStar(star) })
-    }
-
     /// An adjustable element's action (feature 506): increment and decrement move the selected star or the shown tick
     /// (presentation only), or send one ring, phase, luminosity or tilt action like the + and − buttons.
     private func adjust(_ direction: AccessibilityAdjustmentDirection, star: Bool = false, ring: Bool = false,
@@ -255,17 +250,29 @@ struct BinaryGardensControls: View {
 
     /// Choose the star the panel edits.
     @ViewBuilder private var starRow: some View {
-        Picker("Star", selection: starChoice) {
-            Text("Star 1").tag(0)
-            Text("Star 2").tag(1)
+        // Two buttons rather than a segmented picker (feature 509): a segment tap of the overridden segmented picker
+        // never reached its selection under interface automation; each button selects its star.
+        HStack(spacing: 8) {
+            starButton(0)
+            starButton(1)
         }
-        .pickerStyle(.segmented)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel("Star to adjust")
         .accessibilityValue(mirror.starValue)
         .accessibilityAdjustableAction { direction in adjust(direction, star: true) }
         .accessibilityIdentifier(port.identifier("star"))
         Text(mirror.starLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("star-detail"))
+    }
+
+    /// One star's selection button (feature 509): selected shows as the prominent style and the selected trait.
+    @ViewBuilder private func starButton(_ index: Int) -> some View {
+        Button { selectStar(index) } label: {
+            Text("Star \(index + 1)").frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .tint(mirror.selectedStar == index ? Color.accentColor : Color.secondary)
+        .accessibilityAddTraits(mirror.selectedStar == index ? .isSelected : [])
     }
 
     /// Move the selected star to the inner or outer neighbouring ring.

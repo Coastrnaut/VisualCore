@@ -35,7 +35,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
   once, with the prefix `experience.r02-g21.binary-gardens.`, and the panel source uses each exactly once); lead;
   `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing BinaryGardensExperienceTests`
-- [ ] T-R02G2109-004 [US1] Create `Apps/VisualCore/Tests/UI/BinaryGardens/BGSupport.swift`, `BGPlayUITests.swift`,
+- [X] T-R02G2109-004 [US1] Create `Apps/VisualCore/Tests/UI/BinaryGardens/BGSupport.swift`, `BGPlayUITests.swift`, — Verified 2026-11-27: app-ui-8 exit 0 (app-ui-ios27-d4: BGPlayUITests 2 and BGReplayUITests 1 pass, 88 s, 146 s with a relaunch, 80 s); attempts app-ui … app-ui-7 failed because a segment tap never reached the overridden segmented star picker (and one build broke on XCUIElement.increment), so the star row became two buttons; sim-27-3 exit 0 after that panel change (87 tests); xcodegen generated
   `BGReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified plan (star 2's luminosity down one
   level, then the run) and the budget pinned in `BG`; star 2 chosen, its luminosity value read, Luminosity − tapped and
   counted only when the actions-left count of the `actions` text moves; then Run; read the canvas win text and "Best: 3
