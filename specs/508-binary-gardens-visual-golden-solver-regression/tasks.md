@@ -10,7 +10,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2108-001 Baselines on the committed tree after R02-G21-07 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2108-001 Baselines on the committed tree after R02-G21-07 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 (after R02-G21-07 was recorded)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters, chunk 2 with
   `BinaryGardens`)
 
