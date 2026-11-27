@@ -13,21 +13,24 @@ SC-R02G2002-###, T-R02G2002-###
 "Generate solvable seeded levels with certificates and difficulty metrics" for Mushroom Weather, with the canonical
 overrides of ADR-0009 and Auto-Creator.md sections 19 and 21.
 
-Canonical overrides: - **Feature directory and ids:** `specs/492-mushroom-weather-level-generator-and-solver-witness`;
-FR-R02G2002-###, SC-R02G2002-###, T-R02G2002-###. - **Packaging (ADR-0009):** experience R02-G20
-(`r02-g20.mushroom-weather`, free) in the one app; this feature extends the pure `MushroomWeatherCore` of feature 491.
-No app target, bundle identifier, scheme or store listing. - **Superseded parts of the source prompt:** price and "no
-IAP"; the Round 2 lock and per-round device campaign. **Device-only items:** none (pure logic). **Owner-only items:**
-none. - **Content count:** the canonical catalog is the 100-level manifest of the archived design (`python3
-scripts/planning_index.py levels --experience R02-G20`: 20 levels in each of bands 1 … 5, each with its planned seed and
-moves budget 8 … 19, control emphases `route humidity`, `commit season`, `place fungus`, `adjust mist vent` and `open
-canopy`, 20 each). The prompt's "content count 76" is a milestone figure, as for the earlier round-two games. - **Kernel
-extension (additive):** the manifest's budgets reach 19, above feature 491's budget range 1 … 12, so the range widens to
-1 … 24; and a level may declare its pod sites, the cells where spore pods may be placed (placements elsewhere are
-refused), so the solver searches, and proves minimality over, the whole move space of a level. A level without sites
-keeps feature 491's behaviour, stored form and fingerprint. - **Model:** feature 482 (Microscopic Aurora's content
-pipeline) for manifest, generator, solver, witness files, digest and progression, adapted to the weather rules of
-feature 491: a move places, moves or removes a pod, sets a vent or the moonlight, and the run ends the level.
+Canonical overrides:
+- **Feature directory and ids:** `specs/492-mushroom-weather-level-generator-and-solver-witness`; FR-R02G2002-###,
+  SC-R02G2002-###, T-R02G2002-###.
+- **Packaging (ADR-0009):** experience R02-G20 (`r02-g20.mushroom-weather`, free) in the one app; this feature extends
+  the pure `MushroomWeatherCore` of feature 491. No app target, bundle identifier, scheme or store listing.
+- **Superseded parts of the source prompt:** price and "no IAP"; the Round 2 lock and per-round device campaign.
+  **Device-only items:** none (pure logic). **Owner-only items:** none.
+- **Content count:** the canonical catalog is the 100-level manifest of the archived design (`python3
+  scripts/planning_index.py levels --experience R02-G20`: 20 levels in each of bands 1 … 5, each with its planned seed
+  and moves budget 8 … 19, control emphases `route humidity`, `commit season`, `place fungus`, `adjust mist vent` and
+  `open canopy`, 20 each). The prompt's "content count 76" is a milestone figure, as for the earlier round-two games.
+- **Kernel extension (additive):** the manifest's budgets reach 19, above feature 491's budget range 1 … 12, so the
+  range widens to 1 … 24; and a level may declare its pod sites, the cells where spore pods may be placed (placements
+  elsewhere are refused), so the solver searches, and proves minimality over, the whole move space of a level. A level
+  without sites keeps feature 491's behaviour, stored form and fingerprint.
+- **Model:** feature 482 (Microscopic Aurora's content pipeline) for manifest, generator, solver, witness files, digest
+  and progression, adapted to the weather rules of feature 491: a move places, moves or removes a pod, sets a vent or
+  the moonlight, and the run ends the level.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -108,8 +111,7 @@ file is refused.
 - **A plan needing more actions than the budget:** not emitted.
 - **A search over its work bound:** the candidate is skipped (counted work, never timed).
 - **A colony exactly on a band edge, a cell exactly at the mold bound, a growth integral at its threshold:** decided
-  exactly by the
-  kernel's integer rules; the generator and solver add no tolerance.
+  exactly by the kernel's integer rules; the generator and solver add no tolerance.
 - **A two-pod plan whose second pod would land on the first's site:** impossible by construction; the witness places
   pods on distinct sites in slot order.
 - **Damaged, newer or edited witness files:** refused with a named reason.
@@ -119,22 +121,23 @@ file is refused.
 ### Functional Requirements
 
 - **FR-R02G2002-001**: A generator MUST build each catalog level deterministically from its manifest number, seed, band
-  and budget; only levels the kernel accepts and the solver certifies within the budget MAY be emitted. -
-  **FR-R02G2002-002**: A solver MUST find a minimal sequence of actions after which running the weather wins, by a
+  and budget; only levels the kernel accepts and the solver certifies within the budget MAY be emitted.
+- **FR-R02G2002-002**: A solver MUST find a minimal sequence of actions after which running the weather wins, by a
   search over arrangements (pod sites, vent states, moonlight) by the number of actions from the start, each judged by
   the exact grid diffusion of feature 491 with its bounded evapotranspiration, with reachability checks pruning
   arrangements that cannot change the outcome and a band loss guiding the order, with its work bounded and counted, and
-  MUST prove that no shorter sequence wins; every plan it reports MUST be replayed through the kernel's play. -
-  **FR-R02G2002-003**: Each level MUST carry difficulty metrics (witness length, colonies, narrowest band, pod sites,
-  vents, arrangements searched, solver work) derived from the level and the solver. - **FR-R02G2002-004**: Each level
-  MUST have a versioned witness record (level, actions, per-action state digests, terminal weather report with its
-  ledger and colony survival intervals, counterexample proof); damaged, newer and edited files MUST be refused. -
-  **FR-R02G2002-005**: The catalog of 100 levels MUST have a digest pinned in tests and MUST satisfy the shared
-  progression rule; band means of the witness length never fall. - **FR-R02G2002-006**: Invalid requests MUST be refused
-  with stable reason codes `r02-g20.*`; existing code MUST change only additively; every new public name is documented;
-  the reference regression passes. - **FR-R02G2002-007**: Each emitted level MUST differ from its neighbours in the
-  manifest (its fingerprint and its floor and colonies are not those of the previous level), so adjacent seeds give
-  genuinely different puzzles.
+  MUST prove that no shorter sequence wins; every plan it reports MUST be replayed through the kernel's play.
+- **FR-R02G2002-003**: Each level MUST carry difficulty metrics (witness length, colonies, narrowest band, pod sites,
+  vents, arrangements searched, solver work) derived from the level and the solver.
+- **FR-R02G2002-004**: Each level MUST have a versioned witness record (level, actions, per-action state digests,
+  terminal weather report with its ledger and colony survival intervals, counterexample proof); damaged, newer and
+  edited files MUST be refused.
+- **FR-R02G2002-005**: The catalog of 100 levels MUST have a digest pinned in tests and MUST satisfy the shared
+  progression rule; band means of the witness length never fall.
+- **FR-R02G2002-006**: Invalid requests MUST be refused with stable reason codes `r02-g20.*`; existing code MUST change
+  only additively; every new public name is documented; the reference regression passes.
+- **FR-R02G2002-007**: Each emitted level MUST differ from its neighbours in the manifest (its fingerprint and its floor
+  and colonies are not those of the previous level), so adjacent seeds give genuinely different puzzles.
 
 ### Key Entities
 
@@ -151,32 +154,38 @@ file is refused.
 ### Measurable Outcomes
 
 - **SC-R02G2002-001**: All 100 catalog levels are won by replaying their witness and running the weather, within the
-  budget. - **SC-R02G2002-002**: The minimality proof equals an independent brute-force check on sampled catalog levels
-  (at least two per band). - **SC-R02G2002-003**: Building the catalog twice gives identical levels and the pinned
-  digest; each witness file matches the regenerated witness byte for byte. - **SC-R02G2002-004**: The mean witness
-  length does not fall from one band to the next; the catalog keeps its progression rule. - **SC-R02G2002-005**: For
-  every level, no arrangement reachable with fewer actions than its witness wins; edited, newer and damaged witness
-  files are refused. - **SC-R02G2002-006**: Existing tests pass unchanged; the reference regression passes 7 of 7; each
-  unit test finishes in under 10 seconds on a debug host build, the catalog certification split as needed.
+  budget.
+- **SC-R02G2002-002**: The minimality proof equals an independent brute-force check on sampled catalog levels (at least
+  two per band).
+- **SC-R02G2002-003**: Building the catalog twice gives identical levels and the pinned digest; each witness file
+  matches the regenerated witness byte for byte.
+- **SC-R02G2002-004**: The mean witness length does not fall from one band to the next; the catalog keeps its
+  progression rule.
+- **SC-R02G2002-005**: For every level, no arrangement reachable with fewer actions than its witness wins; edited, newer
+  and damaged witness files are refused.
+- **SC-R02G2002-006**: Existing tests pass unchanged; the reference regression passes 7 of 7; each unit test finishes in
+  under 10 seconds on a debug host build, the catalog certification split as needed.
 
 ## Assumptions
 
 - The 100 witness files live in `docs/games/mushroom-weather/levels/NNN.witness.json` (the manifest's "Required
   artifact"); they are regenerated only by a test run with an explicit opt-in and checked byte for byte on every other
-  run. - "Grid diffusion with bounded evapotranspiration and reachability checks" is read as: the solver enumerates the
+  run.
+- "Grid diffusion with bounded evapotranspiration and reachability checks" is read as: the solver enumerates the
   arrangements reachable by actions (pod sites, vent states, moonlight levels) by the number of actions from the start,
   judging each with the kernel's exact run (whose evaporation is bounded below 35 % a cycle), skips arrangements that
   are reachable at a shallower depth (reachability), and orders those at each depth by a band loss (how far the colonies
-  end from their bands), so the first win found is minimal and the loss only speeds the search. - The source constraints
-  "keep unstable diffusion timestep, negative humidity, growth update tied to FPS, spore density excessive and small
-  mushrooms invisible outside the admissible zone" are read as: the kernel's fixed-step integer law is stable by
-  construction (D ≤ 12 over 64) and never negative; growth counts cycles, never frames; a level has at most six pods;
-  colony and pod cells are named in words, so none depends on being seen. - Levels are presented, hinted and played
-  through later features (R02-G20-03 … 07); this feature draws nothing. - Accessibility and observability: every
-  generated level is named in words by feature 491's kernel (pods, vents, colonies, cells, humidity against each band),
-  so no level depends on colour; the witness files and the difficulty metrics are the content pipeline's observable
-  record, and skipped candidates are counted, not hidden. - The manifest's numbers, seeds, bands and budgets are copied
-  from the project's own archived design; no third-party content is used.
+  end from their bands), so the first win found is minimal and the loss only speeds the search.
+- The source constraints "keep unstable diffusion timestep, negative humidity, growth update tied to FPS, spore density
+  excessive and small mushrooms invisible outside the admissible zone" are read as: the kernel's fixed-step integer law
+  is stable by construction (D ≤ 12 over 64) and never negative; growth counts cycles, never frames; a level has at most
+  six pods; colony and pod cells are named in words, so none depends on being seen.
+- Levels are presented, hinted and played through later features (R02-G20-03 … 07); this feature draws nothing.
+- Accessibility and observability: every generated level is named in words by feature 491's kernel (pods, vents,
+  colonies, cells, humidity against each band), so no level depends on colour; the witness files and the difficulty
+  metrics are the content pipeline's observable record, and skipped candidates are counted, not hidden.
+- The manifest's numbers, seeds, bands and budgets are copied from the project's own archived design; no third-party
+  content is used.
 
 ## Traceability
 
