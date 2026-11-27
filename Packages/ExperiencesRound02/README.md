@@ -1088,5 +1088,7 @@ integer arithmetic (`MyceliumArchitectGrowth`: the nutrient field, tips choosing
 and obstacle penalties with fixed tie-breaks, branching at consumed nutrients, weights 2 and 3), the judge (`starved`,
 `toxic`, `unreached`, `overweight`), `MyceliumArchitectLevel` (immutable, fingerprinted, JSON schema 1, with names in
 words), the play state `MyceliumArchitectPlay` with nutrient, blocker, clear, seed and unseed actions and the run,
-records, undo and redo, and `MyceliumArchitectPuzzle` (an R02-F23 `PuzzleRules` over arrangements).
+records, undo and redo, and `MyceliumArchitectPuzzle` (an R02-F23 `PuzzleRules` over arrangements). Feature 512 (R02-G22-02) adds placement
+sites, the 100-entry manifest, the seeded generator, the breadth-first solver with its minimality proof, difficulty
+metrics and the witness files in `docs/games/mycelium-architect/levels/`.
 See [docs/architecture/mycelium-architect.md](../../docs/architecture/mycelium-architect.md).

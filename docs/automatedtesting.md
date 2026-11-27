@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G22-01: Mycelium Architect rule kernel).
+Last updated: 2026-11-27 (R02-G22-02: Mycelium Architect content pipeline).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mycelium Architect content pipeline** (R02-G22-02, 2026-11-27). `swift test --package-path
+  Packages/ExperiencesRound02 --filter MyceliumArchitect` (95 tests: 33 XCTest, 62 Swift Testing, about 6 s): the sites
+  extension with a pinned fingerprint, the solver against an independent enumeration on the two smallest levels per
+  band, the generator, the witnesses (damaged, edited and newer refused) and the catalog in 20 groups of 5 (byte-identical
+  witness files, pinned digest, progression, content and novelty boundaries). Witnesses are rewritten only with
+  `MYCELIUM_ARCHITECT_WRITE_WITNESSES=1 swift test --no-parallel --filter MyceliumArchitectCatalogTests` (the stored-file
+  tests of that run fail because they read before the writes; the next run is the check).
 - **Mycelium Architect rule kernel** (R02-G22-01, 2026-11-27). `swift test --package-path Packages/ExperiencesRound02
   --filter MyceliumArchitect` (50 tests: 33 XCTest in three classes and 17 Swift Testing in two suites, about 4 s):
   level checks and the stored form, the growth against an independent reference over 500 seeded runs, 500 seeded traces
