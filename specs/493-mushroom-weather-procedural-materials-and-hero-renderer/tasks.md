@@ -9,7 +9,7 @@ R02-G19-03 (`git show <R02-G19-03 record commit>:<path>`).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2003-001 Baselines on the committed tree after R02-G20-02 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2003-001 Baselines on the committed tree after R02-G20-02 is recorded: `--name baseline-host`, `--name — Verified 2026-11-26: 2026-11-26 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 after R02-G20-02 (.autonomy/migration/checks/R02-G20-03.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (3f with MushroomWeather); the rendering
   baseline is R02-G20-02's rendering runs (exit 0)
 - [ ] T-R02G2003-002 Edit `Packages/ExperiencesRound02/Package.swift` (`MushroomWeatherCore` gains VisualCoreScenes,
