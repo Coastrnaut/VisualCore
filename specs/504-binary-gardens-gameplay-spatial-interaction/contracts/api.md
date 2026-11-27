@@ -25,7 +25,7 @@ public struct BinaryGardensPreview: Sendable, Equatable {
     public static func of(_ change: BinaryGardensAction, arrangement: BinaryGardensArrangement, actionsLeft: Int,
                           level: BinaryGardensLevel) -> BinaryGardensPreview? }
     // kernel `BinaryGardensSky.changed`, then `.budget` when actionsLeft ≤ 0, then `BinaryGardensSky.report`;
-    // nil for .run or an unchanged value
+    // nil for .run, an unchanged value or a level whose shape differs from the arrangement's
 
 public struct BinaryGardensSceneSnapshot {           // additions only (stored properties in the struct)
     public let starSpeed: Int                         // ω (stored; set by init(play:…), default 1 when unchecked)
@@ -50,6 +50,8 @@ extension BinaryGardensSceneGeometry {
                                       eye: SIMD3<Double>) -> [(centre: SIMD3<Double>, lit: Bool)]
     public static func worldPips(_ world: Int, _ snapshot: BinaryGardensSceneSnapshot,
                                  eye: SIMD3<Double>) -> [SIMD3<Double>]
+    public static func coronaRays(_ star: Int, _ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                                  eye: SIMD3<Double>) -> [SIMD3<Double>]   // and the backdrop centre on the drawn view axis
     public static func starRadius(_ star: Int, _ snapshot: BinaryGardensSceneSnapshot) -> Double   // made public
     public static func drawnSnapshot(_ snapshot: BinaryGardensSceneSnapshot) -> BinaryGardensSceneSnapshot
         // the preview applied (research R5); itself without a preview
@@ -64,9 +66,12 @@ extension BinaryGardensSceneGeometry {
     public static func glowPart(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier, wonLevel: Bool?,
                                 camera: BinaryGardensCamera) throws(MeshError) -> BinaryGardensColouredMesh }
 
-// BinaryGardensMaterial gains: ghostStar = 38 (quad, dashed ring of the star's colour; broken when refused),
-// ghostCell = 39 (outline strips, the committed band's cell colour; value = band index / 4), inspectRing = 40 (quad,
-// ring, marker colour), inspectBracket = 41 (strip, marker colour); BinaryGardensShaders.maxMaterial = 41.
+// BinaryGardensMaterial gains: ghostStar = 38 (quad, dashed ring: a new angular dash coverage rule; the star's colour
+// chosen by a_normal.z = star as for ringShared and corona; broken when refused), ghostCell = 39 (outline strips, square
+// coverage; a valued material added to isValued, whose value band index / 4 selects BG_LETHAL_LOW … BG_LETHAL_HIGH in
+// the system vertex shader, baseColour and colour(of:won:)), inspectRing = 40 (quad, joins the ring coverage, marker
+// colour), inspectBracket = 41 (strip, square coverage, marker colour); BinaryGardensShaders.maxMaterial =
+// BinaryGardensMaterial.inspectBracket.rawValue = 41 (41 + 0.4 < 64 − 0.5).
 
 public enum BinaryGardensPick: Sendable, Equatable {
     case gauge(Int), pips(Int), star(Int), world(Int), ring(Int), dial, disc, empty }
@@ -142,8 +147,10 @@ Experience (`BinaryGardensExperience`, internal):
   `gestureState`, `gestureActions` = `["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "clock.show"]`,
   `nativeActions` = every declared control. An opening, `level.next`, reset or restore clears the preview, the
   inspection and the orbit.
-- `BinaryGardensSystemScene.orbit` and the inspection and preview in its geometry key; meshes from the camera-taking
+- `BinaryGardensSystemScene.orbit` and the orbit, aspect, inspection and preview in its geometry key; meshes from the camera-taking
   builders at `camera(aspect:orbit:)`.
-- `BinaryGardensControls` keeps every row and gains: Ring (picker, ring 1 … n), Luminosity (picker, level 1 … L), Phase
+- `BinaryGardensControls` (built by `makeControls` with a send closure through the presenter's `send`, so panel
+refusals are shown and logged in `refusalLog`, and a `resetView` closure calling the presenter's `resetView()`, as in
+feature 494) keeps every row and gains: Ring (picker, ring 1 … n), Luminosity (picker, level 1 … L), Phase
   target (stepper by g) with "Set phase", Tilt (picker 0 … T_max, when T_max > 0), "Inspect" (none, world 1 … W) and
-  "Reset view"; each choice sends one action; the inspected world's words below the Inspect row.
+  "Reset view"; each ring, luminosity, tilt and Set phase choice sends one action; Inspect and Reset view are presentation only; the inspected world's words below the Inspect row.

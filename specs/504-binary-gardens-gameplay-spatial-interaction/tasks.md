@@ -32,7 +32,8 @@ modelled on feature 484).
   `camera(aspect:orbit:)` (refit so the authored box x −1.3 … 1.3, y −1.85 … 1.15, z −0.85 … 0.85 stays inside the
   view with 0.06 per side at aspects 0.4 … 2.5, never closer than the authored distance ≈ 3.60; `camera(aspect:)`
   equals `camera(aspect:orbit: .authored)` bit for bit), the geometry overloads for the drawn eye
-  (`paintOrder(_:eye:)`, `luminosityPips(_:_:eye:)`, `worldPips(_:_:eye:)`: billboards facing it, bodies sorted back to
+  (`paintOrder(_:eye:)`, `luminosityPips(_:_:eye:)`, `worldPips(_:_:eye:)`, `coronaRays(_:_:tier:eye:)`, the
+  backdrop centre: billboards facing it, bodies sorted back to
   front from it, cube-sphere quads far-first from it, the backdrop perpendicular to its view axis; the existing
   signatures use the authored eye), `starRadius(_:_:)` made public, `drawnSnapshot(_:)` (the preview applied; itself
   without a preview), `ghostStars(_:)` (the ghost star at the target, refused flag), the ghost bands (the committed
@@ -83,16 +84,18 @@ modelled on feature 484).
   `yawPerViewWidth` π / 2, `pitchPerViewHeight` π / 3; the reasons `finishedReason` "The play is over: undo or go to
   the next level", `notRunningReason`, `starReason`, `ringReason`, `fixedReason`, `luminosityLockedReason`,
   `singleLevelReason` with the contract's exact texts; a tap (< 10 points, lifted before 0.5 s) on a star:
-  `selectStar` and `explain` that stars are dragged; on a world or a gauge row: `inspectWorld` (a second tap on the
-  inspected world clears it) in any stage; on the luminosity pips while playing: `setLuminosity` of the nearest pip
+  `selectStar` and `explain` that stars are dragged; on a world: `inspectWorld` (a second tap on the inspected world clears it) in any stage; on a gauge row:
+  `inspectWorld` of its world (no toggle) and, when the cast x ≤ 0.95 and the press did not scrub, `showTick` of the
+  column under the finger, in any stage; on the luminosity pips while playing: `setLuminosity` of the nearest pip
   when it differs, `explain` when locked or a single level; on the tilt dial while playing: `setTilt` of the nearest
-  pip when it differs; on a ring: `explain` the ring reason; on the disc or empty space: nothing, two such taps within
-  0.35 s and 22 points: `resetView`; a press lifted at 0.5 s or later without moving: nothing; a star drag (≥ 16
+  pip when it differs; on a ring: `explain` the ring reason; on the disc: nothing (and it breaks a double tap); on empty space: nothing, two such taps within 0.35 s and 22
+  points: `resetView`; a press lifted at 0.5 s or later without moving: nothing; a star drag (≥ 16
   points) while playing: its mode decided once by `dragMode`, then `preview` of `star.ring` or `star.phase` when the
   target changes, `clearPreview` when it returns to the committed value, and on release one `setRing` or `setPhase`
   when the target differs, else `clearPreview`; both locked: `explain` the fixed reason; a pip or dial drag sideways
   while playing: `preview` of `stepValue` when it changes and on release one `setLuminosity` or `setTilt` when it
-  differs, else `clearPreview`; a gauge press: `showTick` on every tick change from touch-down, any stage; outside
+  differs, else `clearPreview`; a gauge press: the tick read at touch-down (nothing sent), then `showTick` on every later change of the tick (cast x
+  clamped to the cells), any stage; outside
   playing: `explain` once and no kernel action; 10 … 16 points: nothing; a second finger cancels (clearing a preview)
   and orbits (yaw 90° per width, pitch 60° per height, clamped; a third re-bases); cancelled phases send nothing; only
   event timestamps read; `camera(viewSize:)`, `cancel()`, `resetView()`) with
@@ -126,8 +129,7 @@ modelled on feature 484).
   `gestureActions` = `["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "clock.show"]`, `nativeActions` =
   every declared control; the inspected world's kernel words at the shown tick in `describe(_:)`; an opening,
   `level.next`, reset or restore clears the preview, the inspection and the orbit),
-  `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensSystemScene.swift` (`orbit`, and the orbit,
-  preview and inspection in its `GeometryKey`; meshes from the camera-taking builders at `camera(aspect:orbit:)`,
+  `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensSystemScene.swift` (`orbit`, and the orbit, aspect, preview and inspection in its `GeometryKey`; meshes from the camera-taking builders at `camera(aspect:orbit:)`,
   rebuilt when any of them changes) and `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensControls.swift`
   (every row kept; Ring picker 1 … n, Luminosity picker 1 … L, Phase target stepper by g with "Set phase", Tilt picker
   0 … T_max when T_max > 0, "Inspect" none or world 1 … W with the inspected world's words below it, "Reset view"; each

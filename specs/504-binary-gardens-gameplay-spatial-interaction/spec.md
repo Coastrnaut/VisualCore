@@ -285,9 +285,8 @@ every certified level within its budget.
 - **FR-R02G2104-010**: Two-finger orbit MUST stay within fixed yaw and pitch bounds, keep the scene inside the view with
   a margin of 0.06 per side (at least 5 %) at every aspect 0.4 … 2.5 and never enter the digest, the snapshot's game state or the kernel; a double
   tap on empty space or "Reset view" returns to the authored view.
-- **FR-R02G2104-011**: Gestures outside playing, cancelled touches and second fingers MUST send no kernel action, and a
-  gesture that does nothing for a stated reason (finished, not running, locked, single level, unchanged) MUST give that
-  reason in words.
+- **FR-R02G2104-011**: Gestures outside playing, cancelled touches and second fingers MUST send no kernel action, and a gesture that does nothing for a stated reason (finished, not running, locked, single level) MUST give that reason
+  in words; a tap or release on the current value sends nothing and says nothing.
 - **FR-R02G2104-012**: The gesture constants (tap 10 points and 0.5 s, drag 16 points, double tap 0.35 s and 22 points,
   orbit 90° per view width and 60° per view height, yaw ±60°, pitch −20° … +35°, allowance 12 points, step travel 32
   points, tangent floor 0.5 points) MUST be fixed public constants equal to feature 494's where shared, and only event

@@ -36,8 +36,8 @@ R02-G21-03 experience, 2026-11-27. Model: feature 494 (`MushroomWeatherViewOrbit
 - **R5 What a preview draws.** Decision: the drawn snapshot (`drawnSnapshot(_:)`) takes the previewed report's worlds
   (flux, shares, bands, windows, integrals, bloom) for an accepted preview; for a luminosity or tilt preview also the
   previewed arrangement and star positions (the star disc and pips at the previewed level; the orbit plane, rings and
-  stars at the previewed tilt); for a ring or phase preview the committed stars and rings stay and a ghost star (dashed
-  outline, `ghostStar`, the star's current disc radius) is drawn at the target's position at the shown tick. Behind
+  stars at the previewed tilt); for a ring or phase preview the committed stars and rings stay and a ghost star (dashed outline, `ghostStar`, the star's current disc radius) is drawn at the target's position at the
+shown tick, right after its star's disc and pips, inside that star's body element. Behind
   every previewed gauge cell the committed cell is drawn as a ghost outline (`ghostCell`, the committed band's colour).
   A refused preview keeps the committed drawing and adds the ghost in the broken colour: at the target for a ring or
   phase change, at the star with its previewed radius for a luminosity change, at both stars' positions at the
@@ -102,4 +102,4 @@ R02-G21-03 experience, 2026-11-27. Model: feature 494 (`MushroomWeatherViewOrbit
 | `clock.show` "ticks 1 … 48" | declared range 0 … 60, 0 and 49 … 60 refused `r02-g21.tick` | gestures send only 1 … 48 |
 | the panel's phase −/+ "by g" | `phase(moved:)` wraps cyclically over 0 … 47 | unchanged; direct "Set phase" added |
 | the kernel's "pure change rule" | `BinaryGardensSky.changed` is internal | callable from the Core's preview; no kernel API change |
-| the 503 experience | not committed (T-R02G2103-006 open); no `pointer` override | this feature starts after R02-G21-03 is recorded |
+| the 503 experience | committed and recorded (R02-G21-03 pass); no `pointer` override | this feature starts after R02-G21-03 is recorded |

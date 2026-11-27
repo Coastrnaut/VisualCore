@@ -89,7 +89,7 @@ No NEEDS CLARIFICATION remains.
 | I Proven renderer only | PASS — the ghost star, ghost bands and inspection marks are new materials of the existing system program on the OpenGL ES → ANGLE → Metal path. |
 | II App-neutral API | PASS — game code stays in ExperiencesRound02; VisualCore API unchanged. |
 | II-a Preserve the reference | PASS — the reference regression runs in two chunks (7 of 7). |
-| III GPU lifecycle | PASS — meshes rebuilt on the render thread when the orbit, preview or inspection changes; release unchanged. |
+| III GPU lifecycle | PASS — meshes rebuilt on the render thread when the orbit, aspect, preview or inspection changes; release unchanged. |
 | IV Host-testable | PASS — orbit, preview, picking and gestures in the Core with host tests; wiring tested on the simulator. |
 | V Implementation before devices | PASS — touch feel and latency are `{device}` tasks. |
 | VI Evidence over assertion | PASS — every task's check recorded with `run-check`; agent reports retested by the lead. |
