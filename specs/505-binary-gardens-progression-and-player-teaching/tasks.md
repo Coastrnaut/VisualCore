@@ -112,7 +112,7 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
 - [X] T-R02G2105-006 Docs: `docs/architecture/binary-gardens.md` (teaching and progression), — Verified 2026-11-27: round02-host-1, -2, -3c, -3e, -3f exit 0; docs: architecture teaching section, package README, automatedtesting
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
-- [ ] T-R02G2105-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2105-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G2105-008 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2105-009 Reference regression chunk 2 (`--name reference-2`)
