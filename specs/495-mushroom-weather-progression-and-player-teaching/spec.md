@@ -61,7 +61,7 @@ multipliers are 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 
   of change ("Change a spore pod", "Change a vent" or "Change the moonlight"); level 2 adds where ("Use the site at row
   r, column c", "Take pod n away", "Use vent n" or "Make the moonlight brighter (or dimmer)"); level 3 the exact action
   ("Put pod n on the site at row r, column c", "Move pod n to the site at row r, column c", "Take pod n away", "Open (or
-  close) vent n", "Set the moonlight to level l"). Hints never change the state, are unlimited, do not affect stars and
+  close) vent n", "Set the moonlight to level l"), pods and vents numbered from 1 (slot + 1, index + 1). Hints never change the state, are unlimited, do not affect stars and
   reset to level 1 after any change of the play. Impact: FR-R02G2005-002; SC-R02G2005-002.
 - Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
   instructions in order: (1) "Tap a marked site (or choose a site and press Place) to put a spore pod there; the mist

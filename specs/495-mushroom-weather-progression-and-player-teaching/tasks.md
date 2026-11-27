@@ -20,7 +20,7 @@ campaign covers the game). Agents model their files on Microscopic Aurora's (fea
   1 … 3 and the texts of clarification Q1 — level 1 "Change a spore pod", "Change a vent" or "Change the moonlight";
   level 2 "Use the site at row r, column c", "Take pod n away", "Use vent n" or "Make the moonlight brighter" ("dimmer");
   level 3 "Put pod n on the site at row r, column c", "Move pod n to the site at row r, column c", "Take pod n away",
-  "Open vent n" ("Close"), "Set the moonlight to level l"; already winning "Every colony stays in its band: run the
+  "Open vent n" ("Close"), "Set the moonlight to level l" (pods and vents numbered from 1: slot + 1, index + 1); already winning "Every colony stays in its band: run the
   weather"; stuck "No way to win was found in the actions left: undo the last action or retry the level."; failed play
   "Undo the last action or retry the level."; won play nil — while the current arrangement lies on the way to the
   certified witness's (its pods a subset of the witness's, its toggled vents a subset of the witness's, its moonlight the
