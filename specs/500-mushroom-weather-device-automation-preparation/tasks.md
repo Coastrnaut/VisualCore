@@ -8,7 +8,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2010-001 Baselines after R02-G20-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G2010-001 Baselines after R02-G20-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit=0 (.autonomy/migration/checks/R02-G20-10.baseline-*.json)
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two chunks, 3f with `MushroomWeather`; no Swift changes
   follow; the rendering baseline is R02-G20-09's runs)
 
