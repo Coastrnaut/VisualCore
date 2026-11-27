@@ -14,6 +14,11 @@
 // type-check rule); each test well under 10 s. No clock: dates are inputs. Dismissal is the adapter's and is tested
 // there; only the step logic is tested here. The witness directory may be overridden with the environment variable
 // MUSHROOM_WEATHER_LEVELS_DIR (default: the repository's directory, found from this file).
+// Feature 497 (R02-G20-07) T-R02G2007-002 (FR-R02G2007-001, 002, 003; clarifications Q1, Q2, Q3): each result carries
+// its trace and verified flag in the stable JSON shape; a traced record stores a verified result and replaces only a
+// worse one (a tie keeps the earlier trace); `drop(level:)` removes a result and keeps the frontier; payloads without
+// trace or verified (snapshot schema 1 and 2) decode as unverified results with an empty trace; the replay mode encodes
+// as `{"level":n,"mode":"replay"}`, keeps the campaign budget, awards no stars and opens nothing.
 import Foundation
 import Testing
 import VisualCoreSimulation
@@ -562,13 +567,15 @@ private let progressWitnessDirectory: URL = {
         #expect(decoded == progress)
         #expect(try decoded.encoded() == data)
         let text: String = String(decoding: data, as: UTF8.self)
-        #expect(text == "{\"frontier\":4,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3},"
-            + "{\"actionsSpent\":4,\"level\":3,\"stars\":2}]}")
+        // Since feature 497 each result also carries its trace and whether it is verified (empty and false here).
+        #expect(text == "{\"frontier\":4,\"solved\":[{\"actionsSpent\":2,\"level\":1,\"stars\":3,\"trace\":[],"
+            + "\"verified\":false},{\"actionsSpent\":4,\"level\":3,\"stars\":2,\"trace\":[],\"verified\":false}]}")
         let empty: Progress = try decoder.decode(Progress.self, from: try Progress().encoded())
         #expect(empty == Progress())
         #expect(String(decoding: try Progress().encoded(), as: UTF8.self) == "{\"frontier\":1,\"solved\":[]}")
 
-        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 17), .daily(level: 100)]
+        let modes: [Mode] = [.campaign, .practice, .daily(level: 1), .daily(level: 17), .daily(level: 100),
+                             .replay(level: 1), .replay(level: 100)]
         for mode in modes {
             let modeData: Data = try encoder.encode(mode)
             #expect(try decoder.decode(Mode.self, from: modeData) == mode)
@@ -600,7 +607,11 @@ private let progressWitnessDirectory: URL = {
             #expect(throws: (any Error).self) { try decoder.decode(Progress.self, from: Data(text.utf8)) }
         }
         let badModes: [String] = [
-            "{\"mode\":\"replay\",\"level\":1}",
+            // Since feature 497 `replay` is a mode; it needs a level in 1 … 100.
+            "{\"mode\":\"replay\"}",
+            "{\"mode\":\"replay\",\"level\":0}",
+            "{\"mode\":\"replay\",\"level\":101}",
+            "{\"mode\":\"rewind\",\"level\":1}",
             "{\"mode\":\"daily\"}",
             "{\"mode\":\"daily\",\"level\":0}",
             "{\"mode\":\"daily\",\"level\":101}"
@@ -608,5 +619,106 @@ private let progressWitnessDirectory: URL = {
         for text in badModes {
             #expect(throws: (any Error).self) { try decoder.decode(Mode.self, from: Data(text.utf8)) }
         }
+    }
+
+    // MARK: Traces (feature 497)
+
+    /// A trace of `moves` placements (slot 0 alternating between the cells at row `row`, columns 0 and 1), a vent, a
+    /// moonlight change and the run.
+    static func trace(moves: Int, row: Int) -> [Action] {
+        var actions: [Action] = []
+        for index in 0..<moves {
+            actions.append(.place(slot: 0, cell: Cell(row: row, column: index % 2)))
+        }
+        actions.append(.vent(index: 0, open: false))
+        actions.append(.moonlight(level: 1))
+        actions.append(.run)
+        return actions
+    }
+
+    @Test func tracedRecordKeepsTheBetterResultAndTiesKeepTheEarlierTrace() {
+        var progress: Progress = Progress()
+        let first: [Action] = Self.trace(moves: 1, row: 2)
+        let changed: Bool = progress.record(level: 4, actionsSpent: 3, certified: 2, trace: first)
+        #expect(changed)
+        #expect(progress.solved[4]?.trace == first && progress.solved[4]?.verified == true)
+        #expect(progress.stars(of: 4) == 2 && progress.frontier == 5)
+        // A tie (equal actions spent, equal stars) keeps the earlier trace; a worse result keeps it too.
+        let tie: [Action] = Self.trace(moves: 1, row: 3)
+        let tied: Bool = progress.record(level: 4, actionsSpent: 3, certified: 2, trace: tie)
+        #expect(!tied && progress.solved[4]?.trace == first)
+        let worse: Bool = progress.record(level: 4, actionsSpent: 5, certified: 2, trace: tie)
+        #expect(!worse && progress.solved[4]?.trace == first)
+        // A better result replaces the trace.
+        let better: [Action] = [.vent(index: 1, open: true), .run]
+        let improved: Bool = progress.record(level: 4, actionsSpent: 2, certified: 2, trace: better)
+        #expect(improved && progress.solved[4]?.trace == better && progress.stars(of: 4) == 3)
+        // An untraced better result replaces a traced one and is unverified.
+        let untraced: Bool = progress.record(level: 4, actionsSpent: 1, certified: 2, opensNext: true)
+        #expect(untraced && progress.solved[4]?.trace == [] && progress.solved[4]?.verified == false)
+        // Practice and replay record nothing; daily records and opens nothing.
+        let practised: Bool = progress.record(level: 9, actionsSpent: 1, certified: 1, mode: .practice, trace: better)
+        let replayed: Bool = progress.record(level: 9, actionsSpent: 1, certified: 1, mode: .replay(level: 9),
+                                             trace: better)
+        #expect(!practised && !replayed && progress.solved[9] == nil)
+        let daily: Bool = progress.record(level: 9, actionsSpent: 2, certified: 2, mode: .daily(level: 9),
+                                          trace: better)
+        #expect(daily && progress.solved[9]?.verified == true && progress.frontier == 5)
+        let outside: Bool = progress.record(level: 101, actionsSpent: 1, certified: 1, trace: better)
+        #expect(!outside)
+    }
+
+    @Test func dropRemovesAResultAndKeepsTheFrontier() {
+        var progress: Progress = Progress()
+        for level in 1...10 {
+            progress.record(level: level, actionsSpent: 3, certified: 3, trace: Self.trace(moves: 1, row: level))
+        }
+        #expect(progress.frontier == 11 && progress.solved.count == 10)
+        progress.drop(level: 5)
+        progress.drop(level: 50)
+        #expect(progress.solved[5] == nil && progress.solved.count == 9 && progress.frontier == 11)
+        #expect(progress.isOpen(5) && progress.isOpen(11))
+    }
+
+    @Test func tracedProgressRoundTripsAndOldPayloadsDecodeUnverified() throws {
+        let decoder: JSONDecoder = JSONDecoder()
+        var progress: Progress = Progress()
+        let trace: [Action] = [.place(slot: 1, cell: Cell(row: 2, column: 3)), .remove(slot: 1),
+                               .place(slot: 0, cell: Cell(row: 4, column: 5)), .vent(index: 2, open: true),
+                               .moonlight(level: 3), .run]
+        progress.record(level: 2, actionsSpent: 5, certified: 3, trace: trace)
+        progress.record(level: 7, actionsSpent: 4, certified: 3, opensNext: false)
+        let data: Data = try progress.encoded()
+        let decoded: Progress = try decoder.decode(Progress.self, from: data)
+        #expect(decoded == progress && decoded.solved[2]?.trace == trace && decoded.solved[2]?.verified == true)
+        #expect(try decoded.encoded() == data)
+        // Snapshot schema 1 and 2 entries carry neither trace nor verified.
+        let old: String = "{\"frontier\":3,\"solved\":[{\"actionsSpent\":1,\"level\":1,\"stars\":3},"
+            + "{\"actionsSpent\":5,\"level\":2,\"stars\":1}]}"
+        let legacy: Progress = try decoder.decode(Progress.self, from: Data(old.utf8))
+        #expect(legacy.frontier == 3 && legacy.solved.count == 2)
+        for level in 1...2 {
+            #expect(legacy.solved[level]?.trace == [] && legacy.solved[level]?.verified == false)
+        }
+        #expect(legacy.best(2) == 5 && legacy.stars(of: 2) == 1)
+        let result: Progress.Result = try decoder.decode(Progress.Result.self,
+                                                         from: Data("{\"actionsSpent\":2,\"stars\":2}".utf8))
+        #expect(result == Progress.Result(actionsSpent: 2, stars: 2, trace: [], verified: false))
+    }
+
+    @Test func replayModeEncodesKeepsTheBudgetAndAwardsNothing() throws {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let decoder: JSONDecoder = JSONDecoder()
+        for level in 1...100 {
+            let mode: Mode = .replay(level: level)
+            let data: Data = try encoder.encode(mode)
+            #expect(String(decoding: data, as: UTF8.self) == "{\"level\":\(level),\"mode\":\"replay\"}")
+            #expect(try decoder.decode(Mode.self, from: data) == mode)
+            #expect(!mode.awardsStars && !mode.opensLevels && mode.budget(base: 7) == 7)
+        }
+        var progress: Progress = Progress()
+        let changed: Bool = Self.record(&progress, level: 1, actionsSpent: 1, certified: 1, mode: .replay(level: 1))
+        #expect(!changed && progress == Progress())
     }
 }

@@ -15,7 +15,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
 
-- [ ] T-R02G2007-002 [P] [US2] Edit `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherProgress.swift`
+- [X] T-R02G2007-002 [P] [US2] Edit `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherProgress.swift` — Verified 2026-11-27: host-1-2 exit=0, 281 tests incl. MushroomWeatherReconciliationTests and ProgressTests (first attempt host-1 failed to compile without T-003's feedback plan; installed together) (.autonomy/migration/checks/R02-G20-07.host-1-2.json)
   (Result gains "trace: [MushroomWeatherAction]" (effective `.place(slot:cell:)`, `.remove(slot:)`, `.vent(index:open:)` and
   `.moonlight(level:)` actions, then `.run`) and "verified: Bool"; `record(level:actionsSpent:certified:mode:trace:)` stores a verified result, replacing
   only when better (ties keep the earlier trace); `drop(level:)`; encoding keeps old payloads decodable (missing trace =
