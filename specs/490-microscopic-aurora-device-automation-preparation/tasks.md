@@ -35,7 +35,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G1910-005 Docs: `docs/architecture/microscopic-aurora.md` (device preparation),
+- [X] T-R02G1910-005 Docs: `docs/architecture/microscopic-aurora.md` (device preparation), — Verified 2026-11-26: 2026-11-26 round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G19-10.round02-host-*.json); architecture device preparation, package README and testing doc updated
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G1910-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name

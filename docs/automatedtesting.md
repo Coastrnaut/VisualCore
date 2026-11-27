@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-26 (R02-G19-09: Microscopic Aurora simulator integration and full app lock).
+Last updated: 2026-11-26 (R02-G19-10: Microscopic Aurora device rows).
 
 ## 1. What is tested, and where
 
@@ -993,6 +993,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   `python3 scripts/celestial_eclipse_lab_regression.py`; CI step "Celestial Eclipse Lab regression (host)". Lesson: the
   palette has 21 colour constants (its 22nd static is a hex list), which the golden source found and the spec was
   corrected to.
+- **Microscopic Aurora device rows** (R02-G19-10, 2026-11-26). `python3 scripts/check_device_rows.py --experience
+  r02-g19.microscopic-aurora` (release step `device-rows-r02-g19`, tests `MicroscopicAuroraDeviceRowsCheckTests`, 8)
+  checks the definition (rows MA-D1 … MA-D8, 12 device scenarios) against the scenario manifest, the ledger's
+  DEV1/2/3-R02-G19 rows and the open {device} tasks of features 481 … 489; nothing contacts a device. The rows were
+  adapted from Apsides Workshop's definition, with the touch, stress, VoiceOver and journey rows rewritten for the
+  gestures of feature 484 and the well panel.
 - **Microscopic Aurora in the app** (R02-G19-09, 2026-11-26). Host: `MicroscopicAuroraSchemaExampleTests` (7 tests).
   Simulator: `MicroscopicAuroraIdentifierTests` (5 tests; 48 pinned names, each once; the suite now runs 73). App: four
   AppModelTests (stored examples, candidate availability, level 1 through the registry and engine, the `MA` pins against
