@@ -100,7 +100,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
   rulesID "r02-g21-binary-gardens") with
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensPuzzleTests.swift` (agreement with the play on 200
   walks); `--name host-4`
-- [ ] T-R02G2101-006 [P] Create
+- [X] T-R02G2101-006 [P] Create — Verified 2026-11-27: host-5 exit=0, nine BinaryGardens boundary invariant tests, seed 2_506 (.autonomy/migration/checks/R02-G21-01.host-5.json)
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensInvariantTests.swift` (agent D:
   `testBinaryGardensTimeBoundary`, `…InputbudgetBoundary`, `…GoalBoundary`, `…RepeatabilityBoundary`,
   `…UndoBoundary`, `…FailurehonestyBoundary`, `…StabilityBoundary`, `…SaveBoundary`, `…RendererpurityBoundary`, each
