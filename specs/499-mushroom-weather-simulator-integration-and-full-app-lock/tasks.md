@@ -66,7 +66,7 @@ change (the shaders and reference of R02-G20-03 are unchanged and re-proven by t
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G2009-007 Docs: `docs/architecture/mushroom-weather.md` (in-app integration),
+- [X] T-R02G2009-007 Docs: `docs/architecture/mushroom-weather.md` (in-app integration), — Verified 2026-11-27: docs (architecture in-app integration, package README, automatedtesting); round02-host-1, -2, -3c, -3e, -3f and script-tests exit=0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`; `--name script-tests` (alone)
 - [ ] T-R02G2009-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name

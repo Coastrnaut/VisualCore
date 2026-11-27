@@ -1040,5 +1040,7 @@ persistence and replay: snapshot schema 3 with winning traces, `MushroomWeatherR
 replayed on restore, edited ones dropped and counted), replay of the best solution (`replay.start`, `replay.step`,
 `replay.stop`) and the saved sound choice (`settings.sound`). Feature 498 (R02-G20-08) adds the regression net: a
 solver regression over all 100 levels, golden frame descriptions (`MushroomWeatherGolden`, `golden-frames.json`),
-simulator golden-frame and memory tests, a CI step and `scripts/mushroom_weather_regression.py`. See
+simulator golden-frame and memory tests, a CI step and `scripts/mushroom_weather_regression.py`. Feature 499
+(R02-G20-09) pins the panel's identifiers and adds the stored schema examples, the app's interface tests (`MW`, chunk
+`c4`) and app unit tests. See
 [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).

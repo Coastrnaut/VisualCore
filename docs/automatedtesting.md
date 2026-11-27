@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G20-08: Mushroom Weather visual golden and solver regression).
+Last updated: 2026-11-27 (R02-G20-09: Mushroom Weather in the app).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,13 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mushroom Weather in the app** (R02-G20-09, 2026-11-27). Host: `MushroomWeatherSchemaExampleTests` (8 tests).
+  Simulator: `MushroomWeatherIdentifierTests` (6 tests; 53 pinned names, each once; the suite now runs 75). App: four
+  AppModelTests (stored examples, candidate availability, level 1 through the registry and engine, the `MW` pins against
+  the Core; 155 → 159 app unit tests) and the interface chunk `c4` (`MWPlayUITests`, `MWReplayUITests`: 3 tests in 304 s
+  including four app launches). Lesson: the canvas says "Every colony ended the run in its band." while "Every colony
+  stayed in its band." is only the VoiceOver announcement, which interface tests cannot read; the spec was corrected to
+  the text as built before the tests were pinned.
 - **Mushroom Weather visual golden and solver regression** (R02-G20-08, 2026-11-27). Host:
   `MushroomWeatherRegressionSolverTests` (15 tests, 115 cases, about 4 s: all 100 levels in ten groups — level, witness
   replay winning on exactly the final run with per-action fingerprints and digests, the minimal plan with the

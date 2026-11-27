@@ -206,3 +206,18 @@ accounts for every unit; the catalog's 0.016667 s timestep is a presentation clo
   class runs alone) and release every GPU object of the scene.
 - **Running it.** CI's round-two job (half b) has a "Mushroom Weather regression (host)" step;
   `python3 scripts/mushroom_weather_regression.py` runs the host and simulator parts with one summary.
+
+## In-app integration (feature 499, R02-G20-09)
+
+- **Identifiers.** Every panel element has an identifier `experience.r02-g20.mushroom-weather.<name>`; the 53 names
+  (the vent toggles `vent-0` … `vent-5` among them) are pinned in `MushroomWeatherControls.identifierNames` and each is
+  used once (the failure explanation has its own `explanation`).
+- **Interface tests.** `MWPlayUITests` opens the candidate in the one app, wins level 1 through the panel alone (choose
+  pod slot 1 and the site at row 2, column 5, Place, close vent 1, then Run) with "Every colony ended the run in its
+  band." and "Best: 3 of 3 stars", sees level 2 open and keeps the progress over a relaunch; `MWReplayUITests` replays
+  the solved level to its end and stops back to the campaign. They run in the serial release-check chunk `c4`.
+- **Stored examples.** `schemaOneExample()` and `schemaTwoExample()` are registered with the app, which restores both
+  into schema 3; app unit tests also open the candidate through the registry and engine, win level 1 and confirm it is
+  not available without the testing argument.
+- **Builds.** The app compiles in debug and release for the simulator with the game linked; the release symbol check
+  confirms the test-only golden source and scenarios are absent.
