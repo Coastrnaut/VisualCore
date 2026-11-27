@@ -71,7 +71,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
   dropped and counted; FR-R02G2107-005: the same save restores to an equal digest twice and the daily level depends
   only on the date given); `--name host-3 -- swift test --package-path Packages/ExperiencesRound02 --filter
   BinaryGardens`
-- [ ] T-R02G2107-005 [P] [US3] Create
+- [X] T-R02G2107-005 [P] [US3] Create — Verified 2026-11-27: host-3 exit 0 covers it (same command on the tree with T-005 installed; BinaryGardensReplayCatalogTests: 100 levels in 10 groups pass)
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensReplayCatalogTests.swift`: for each of the 100
   certified levels (10 groups of 10, each under 10 s) win the level in campaign through the adapter with its certified
   actions and the run, then `replay.start [level]` and `replay.step` to the end, checking each step's play fingerprint
