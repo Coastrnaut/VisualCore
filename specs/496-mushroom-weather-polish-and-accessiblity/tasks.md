@@ -50,7 +50,7 @@ chunks (1, 2, 3c, 3e, 3f; Mushroom Weather in 3f).
 
 ## Phase 3: Wiring — presenter, scene, sound and panel
 
-- [ ] T-R02G2006-005 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherSound.swift`
+- [X] T-R02G2006-005 [US1] [US2] [US3] Create `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherSound.swift` — Verified 2026-11-27: sim-27 exit=0, 59 tests in 7 suites incl. MushroomWeatherAccessibilityTests (12) (.autonomy/migration/checks/R02-G20-06.sim-27.json)
   (the ambient loop over `AmbientLoopPlayer` and the audition, playing exactly while wanted, on screen and active); edit
   `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherPresenter.swift` (feedback through
   `ExperienceFeedback` with a feedback log; lights stepped per frame by the frame clock; changing the panel's selection

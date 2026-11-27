@@ -192,6 +192,9 @@ import VisualCoreMath
         _ = shell.presenter.describe(core)
         #expect(shell.presenter.mirror.status == "Won")
         #expect(shell.presenter.mirror.failureText == nil)
+        // Feature 496: the won look fades in by the frame clock (0.15 s), so one frame a second later settles it; the
+        // checked frames are then drawn at time 0 again (no elapsed time, the lights stay settled).
+        _ = try MushroomWeatherTest.still(session, time: 1)
         let reference: MushroomWeatherSceneSnapshot = try MushroomWeatherTest.coreAfter(1, plan + [.run])
             .snapshot(time: 0)
         var pixels: [[SIMD2<Double>?]] = []

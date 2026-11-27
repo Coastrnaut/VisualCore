@@ -24,6 +24,19 @@
 // stars) with "Play level" (`level.select [n]`). All wrapping text in the panel, never over the floor; refusals read in
 // words. The existing rows, identifiers and the feature 494 gesture wiring are unchanged. Modelled on
 // `MicroscopicAuroraControls` (feature 485).
+//
+// Feature 496 (R02-G20-06) T-R02G2006-005 (FR-R02G2006-001, 005, 006; clarification Q5): the summary element ("Forest",
+// identifier `summary`, the words of `MushroomWeatherFeedbackPlan.summaryText(core:slot:site:)`), the adjustable slot,
+// site and moonlight (`accessibilityAdjustableAction`: increment and decrement move the slot and the site like the −
+// and + buttons, through the presenter, which plays the selected site's audition when the sound is on, and choose the
+// moonlight to set like Moonlight − and +; their values are "pod n", "site at row r, column c" and "moonlight l of 3"),
+// each vent toggle with its value ("open" or "closed"), a value in words on every control (Place the selected site,
+// Remove the slot's pod, Cycle − and + the shown cycle, Run the progress, Undo and Redo the actions made, Next level
+// the next open level, Reset view "authored" or "orbited", Dismiss the instruction, Play level the picked level,
+// Campaign / Daily / Practice "selected" or "not selected", Hint the level shown, Sound "on" or "off"), refusals in the
+// feedback plan's words, the Sound toggle (off by default, identifier `sound`; presentation only, saving it is
+// R02-G20-07), rows that become columns at accessibility text sizes, wrapping text and a 520-point readable width
+// (iPad). The existing identifiers and actions are unchanged. Modelled on `MicroscopicAuroraControls` (feature 486).
 #if os(iOS)
 import MushroomWeatherCore
 import SwiftUI
@@ -41,6 +54,13 @@ struct MushroomWeatherControls: View {
     let sendAction: (String, [Double]) -> Void
     /// Returns the camera to the authored view (feature 494).
     let resetView: () -> Void
+    /// The text size: rows become columns at accessibility sizes (feature 496).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the sound plays only while it is (feature 496).
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 496).
+    static let readableWidth: CGFloat = 520
 
     /// The panel.
     var body: some View {
@@ -57,9 +77,60 @@ struct MushroomWeatherControls: View {
                 playRow
                 viewRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
+        .onAppear { presenter?.controlsAppeared() }
+        .onDisappear { presenter?.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter?.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 496).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 496; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter?.setSound(on: $0) }))
+            .disabled(presenter == nil)
+            .accessibilityLabel("Sound of the forest")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
+    }
+
+    /// The actions made of the budget, in words (feature 496): the value of Undo and Redo.
+    private var actionsMade: String {
+        let made: Int = max(mirror.budget - mirror.actionsLeft, 0)
+        return made == 1 ? "1 action made" : "\(made) actions made"
+    }
+
+    /// Changes the panel's selection through the presenter (which plays the audition when the sound is on), or
+    /// directly without one (feature 496).
+    private func select(_ change: @escaping (MushroomWeatherMirror) -> Void) {
+        if let presenter { presenter.changeSelection(change) } else { change(mirror) }
+    }
+
+    /// An adjustable value's action (feature 496): increment and decrement move the slot or the site like the + and −
+    /// buttons, or choose the moonlight to set like Moonlight + and − (presentation only; Place and Set moonlight spend
+    /// the action).
+    private func adjust(_ adjustment: AccessibilityAdjustmentDirection, slot: Bool = false, site: Bool = false,
+                        moon: Bool = false) {
+        let step: Int
+        switch adjustment {
+        case .increment: step = 1
+        case .decrement: step = -1
+        @unknown default: return
+        }
+        if slot { moveSlot(step) }
+        if site { moveSite(step) }
+        if moon { mirror.chosenMoonlight = mirror.clampedMoonlight(mirror.chosenMoonlight + step) }
     }
 
     /// The level, actions, status, failure (while no explanation replaces it) and refusal lines.
@@ -74,42 +145,54 @@ struct MushroomWeatherControls: View {
                 .accessibilityIdentifier(port.identifier("failure"))
         }
         Text(mirror.measureLabel).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("progress"))
-        Text(mirror.targetLabel).font(.footnote)
+        Text(mirror.summary).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Forest")
+            .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("message"))
         }
     }
 
     /// Choose the pod slot the panel edits.
     @ViewBuilder private var slotRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Slot −") { moveSlot(-1) }
                 .accessibilityLabel("Edit the previous pod")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("slot-minus"))
             Text("pod \(mirror.selectedSlot + 1) of \(mirror.slotCount)")
                 .accessibilityLabel("Pod slot")
-                .accessibilityValue("pod \(mirror.selectedSlot + 1) of \(mirror.slotCount)")
+                .accessibilityValue("pod \(mirror.selectedSlot + 1)")
+                .accessibilityAdjustableAction { direction in adjust(direction, slot: true) }
                 .accessibilityIdentifier(port.identifier("slot"))
             Button("Slot +") { moveSlot(1) }
                 .accessibilityLabel("Edit the next pod")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("slot-plus"))
         }
-        Text(mirror.podsLabel).font(.footnote)
+        Text(mirror.podsLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("pods-detail"))
     }
 
     /// Choose the site the pod would stand on.
     @ViewBuilder private var siteRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Site −") { moveSite(-1) }
                 .accessibilityLabel("Choose the previous site")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("site-minus"))
             Text(mirror.selectedSite.map { MushroomWeatherLevel.cellWords($0) } ?? "no site")
+                .accessibilityLabel("Site")
+                .accessibilityValue(mirror.selectedSite.map { "site at " + MushroomWeatherLevel.cellWords($0) }
+                                    ?? "no site")
+                .accessibilityAdjustableAction { direction in adjust(direction, site: true) }
                 .accessibilityIdentifier(port.identifier("site"))
             Button("Site +") { moveSite(1) }
                 .accessibilityLabel("Choose the next site")
@@ -120,28 +203,29 @@ struct MushroomWeatherControls: View {
 
     /// Place the selected pod, or remove the slot's pod.
     @ViewBuilder private var placeRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Place") { place() }
                 .accessibilityLabel("Place the pod")
                 .accessibilityValue(mirror.selectionLabel)
                 .accessibilityIdentifier(port.identifier("place"))
             Button("Remove") { send("pod.remove", [Double(mirror.selectedSlot)]) }
                 .accessibilityLabel("Remove the pod from this slot")
-                .accessibilityValue(mirror.podsLabel)
+                .accessibilityValue(mirror.selectedPodLabel)
                 .accessibilityIdentifier(port.identifier("remove"))
         }
-        Text(mirror.selectionLabel).font(.footnote)
+        Text(mirror.selectionLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("selection"))
     }
 
     /// One toggle per canopy vent.
     @ViewBuilder private var ventRow: some View {
         ForEach(Array(mirror.ventsOpen.enumerated()), id: \.offset) { index, open in
-            Button(open ? "Vent \(index + 1): open" : "Vent \(index + 1): shut") {
+            Button(open ? "Vent \(index + 1): open" : "Vent \(index + 1): closed") {
                 send("vent.set", [Double(index), open ? 0 : 1])
             }
-            .accessibilityLabel(open ? "Shut vent \(index + 1)" : "Open vent \(index + 1)")
-            .accessibilityValue(mirror.ventLabel(index))
+            .accessibilityLabel(ventName(index))
+            .accessibilityValue(open ? "open" : "closed")
+            .accessibilityHint(open ? "Closes the vent" : "Opens the vent")
             .accessibilityIdentifier(port.identifier("vent-\(index)"))
         }
     }
@@ -149,12 +233,15 @@ struct MushroomWeatherControls: View {
     /// Choose a moonlight level (presentation only) and set it with one action, as Microscopic Aurora's panel chooses a
     /// well's strength before Place: every certified moonlight change is one panel action.
     @ViewBuilder private var moonRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Moonlight −") { mirror.chosenMoonlight = mirror.clampedMoonlight(mirror.chosenMoonlight - 1) }
                 .accessibilityLabel("Choose a dimmer moonlight")
                 .accessibilityValue(mirror.chosenMoonLabel)
                 .accessibilityIdentifier(port.identifier("moon-minus"))
             Text(mirror.moonLabel)
+                .accessibilityLabel("Moonlight to set, now " + mirror.moonLabel)
+                .accessibilityValue(mirror.chosenMoonValue)
+                .accessibilityAdjustableAction { direction in adjust(direction, moon: true) }
                 .accessibilityIdentifier(port.identifier("moon"))
             Button("Moonlight +") { mirror.chosenMoonlight = mirror.clampedMoonlight(mirror.chosenMoonlight + 1) }
                 .accessibilityLabel("Choose a brighter moonlight")
@@ -169,7 +256,7 @@ struct MushroomWeatherControls: View {
 
     /// Show an earlier or later cycle of the run, and run the weather.
     @ViewBuilder private var cycleRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Cycle −") { show(cycle: mirror.shownCycle - 1) }
                 .accessibilityLabel("Show the run one cycle earlier")
                 .accessibilityValue(mirror.cycleLabel)
@@ -191,15 +278,19 @@ struct MushroomWeatherControls: View {
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last pod, vent, moonlight or run")
+                .accessibilityValue(actionsMade)
                 .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the pod, vent, moonlight or run")
+                .accessibilityValue(actionsMade)
                 .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue(mirror.levelNumber < mirror.frontier ? "level \(mirror.levelNumber + 1)"
+                                    : "no further level open")
                 .accessibilityIdentifier(port.identifier("next-level"))
         }
     }
@@ -212,6 +303,7 @@ struct MushroomWeatherControls: View {
                 .accessibilityIdentifier(port.identifier("tutorial"))
             Button("Dismiss tutorial") { dismissTutorial() }
                 .accessibilityLabel("Dismiss the tutorial")
+                .accessibilityValue(tutorial)
                 .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
         }
         Button("Hint") { presenter?.showHint() }
@@ -227,7 +319,7 @@ struct MushroomWeatherControls: View {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("failure"))
         }
-        HStack(spacing: 12) {
+        row {
             Text(mirror.bandLabel).font(.footnote)
                 .accessibilityIdentifier(port.identifier("band"))
             Text(mirror.starsLabel).font(.footnote)
@@ -239,7 +331,7 @@ struct MushroomWeatherControls: View {
 
     /// The mode buttons and the picker of open levels with their bands and stars (feature 495).
     @ViewBuilder private var progressRows: some View {
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { campaign() }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(modeValue("campaign"))
@@ -253,7 +345,7 @@ struct MushroomWeatherControls: View {
                 .accessibilityValue(modeValue("practice"))
                 .accessibilityIdentifier(port.identifier("practice"))
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(mirror.levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -303,29 +395,41 @@ struct MushroomWeatherControls: View {
 
     /// Reset the view (feature 494; presentation only).
     @ViewBuilder private var viewRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Reset view") { resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue((presenter?.gestures.orbit ?? .authored) == .authored ? "authored" : "orbited")
                 .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }
 
-    /// Moves the slot selection by `step`, wrapping over the level's slots.
-    private func moveSlot(_ step: Int) {
-        let count: Int = mirror.slotCount
-        mirror.slot = ((mirror.selectedSlot + step) % count + count) % count
+    /// Vent `index` named by its number and cell (feature 496; the vent toggle's label): "Vent n at row r, column c",
+    /// or "Vent n" while no play is followed.
+    private func ventName(_ index: Int) -> String {
+        guard let level = mirror.play?.level, index < level.vents.count else { return "Vent \(index + 1)" }
+        return "Vent \(index + 1) at " + MushroomWeatherLevel.cellWords(level.vents[index].cell)
     }
 
-    /// Moves the site selection by `step`, wrapping over the level's sites.
+    /// Moves the slot selection by `step`, wrapping over the level's slots (through the presenter since feature 496).
+    private func moveSlot(_ step: Int) {
+        select { mirror in
+            let count: Int = mirror.slotCount
+            mirror.slot = ((mirror.selectedSlot + step) % count + count) % count
+        }
+    }
+
+    /// Moves the site selection by `step`, wrapping over the level's sites (through the presenter since feature 496).
     private func moveSite(_ step: Int) {
-        let count: Int = max(1, mirror.sites.count)
-        mirror.siteIndex = ((mirror.siteIndex + step) % count + count) % count
+        select { mirror in
+            let count: Int = max(1, mirror.sites.count)
+            mirror.siteIndex = ((mirror.siteIndex + step) % count + count) % count
+        }
     }
 
     /// Sends the selected pod's placement.
     private func place() {
         guard let site = mirror.selectedSite else {
-            mirror.message = "That change was refused: this level has no sites."
+            mirror.message = MushroomWeatherFeedbackPlan.refusalText(code: "r02-g20.action")
             return
         }
         send("pod.place", [Double(mirror.selectedSlot), Double(site.row), Double(site.column)])

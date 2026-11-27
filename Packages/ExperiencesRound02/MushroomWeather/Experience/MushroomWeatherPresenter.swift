@@ -35,10 +35,28 @@
 // (`playDaily(port:date:)`); the core never reads a clock. A refused `level.select` or `level.next`
 // (`r02-g20.locked`: "that level is not open yet") and an impossible date (`r02-g20.date`: "that date cannot be used")
 // read in words. Modelled on `MicroscopicAuroraPresenter` (feature 485).
+//
+// Feature 496 (R02-G20-06) T-R02G2006-005 (FR-R02G2006-001 … 006; clarifications Q1 … Q5): the presenter routes
+// `MushroomWeatherFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) once for every new core it takes in, from the frame or the
+// description, and keeps a feedback log (`feedbackLog`); refusals are shown and announced in words (`refused(code:)`;
+// the panel shows exactly the plan's text, `refusalText(code:)`), and a revealed hint is announced as `state`
+// (`hint(text:)`). Changing the panel's selection, drag previews, the shown cycle, the view, dismissing the tutorial
+// and the Sound toggle are not announced (the controls speak their own values). The scene's lights
+// (`MushroomWeatherLights`: the glow and the won look) step toward the drawn snapshot every frame by the frame clock's
+// elapsed time (0.15 s fades, 0.45 s under Reduce Flashing; the first frame settles them). The ambient loop
+// (`MushroomWeatherSound`) is offered the recipe of the actions left, the quarters of the colonies staying in band, the
+// moonlight and the stage when the first core is taken in, when a level or mode opens and when that recipe changes; a
+// change of the panel's selection (`changeSelection(_:)`: slot or site, from the buttons and the adjustable values)
+// plays the selected site's audition (`MushroomWeatherAudition.of(site:placeable:)`) when the sound is on, on screen
+// and active; drag previews and the chosen moonlight play none. The mirror carries the summary element's text
+// (`MushroomWeatherFeedbackPlan.summaryText(core:slot:site:)`) and the sound choice (off by default; saving it is
+// R02-G20-07). Presentation only. Modelled on `MicroscopicAuroraPresenter` (feature 486).
 #if os(iOS)
 import Foundation
 import MushroomWeatherCore
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -241,9 +259,10 @@ final class MushroomWeatherMirror {
         code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
     }
 
-    /// The panel line of a refusal: "That change was refused: " and the reason in words.
+    /// The panel line of a refusal: since feature 496 exactly the feedback plan's sentence
+    /// (`MushroomWeatherFeedbackPlan.refusalText(code:)`, clarification Q1), the words that are announced.
     static func refusalMessage(code: String) -> String {
-        "That change was refused: \(refusalText(code: code))."
+        MushroomWeatherFeedbackPlan.refusalText(code: code)
     }
 
     /// Records the result of sending a control (feature 494): a refusal is shown in words; an accepted action clears
@@ -252,23 +271,61 @@ final class MushroomWeatherMirror {
         message = accepted ? nil : Self.refusalMessage(code: code)
     }
 
-    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix`` (feature 494).
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``. Since feature 496
+    /// it forwards to `MushroomWeatherFeedbackPlan.refusalText(code:)` (clarification Q1's sentences, e.g. "That level
+    /// is not open yet.").
     static func refusalText(code: String) -> String {
-        switch bareCode(code) {
-        case "r02-g20.stage": "the play is over: undo a failed run or go to the next level"
-        case "r02-g20.action": "that pod, vent or moonlight cannot be set that way, or there is nothing to undo, redo "
-            + "or remove"
-        case "r02-g20.budget": "no actions are left: run the weather or undo a change"
-        case "r02-g20.stale": "the play changed before the action arrived"
-        case "r02-g20.level": "the next level could not be made"
-        case "r02-g20.generation": "the next level could not be made"
-        case MushroomWeatherExperienceRule.locked: "that level is not open yet"
-        case MushroomWeatherExperienceRule.date: "that date cannot be used"
-        case MushroomWeatherExperienceRule.notWhole: "the slot, cell, vent, state, moonlight and cycle must be whole "
-            + "numbers"
-        case MushroomWeatherExperienceRule.cycle: "that cycle is past the end of the run"
-        default: "that action is not available now"
-        }
+        MushroomWeatherFeedbackPlan.refusalText(code: code)
+    }
+
+    /// The latest core taken in, for the summary element (feature 496); nil before the first.
+    var summaryCore: MushroomWeatherExperienceCore?
+    /// Whether the sound is on (feature 496; off by default; presentation only, saving it is R02-G20-07).
+    var soundOn = false
+
+    /// The index of the selected site among the level's own sites, for the summary element (feature 496): the clamped
+    /// site index on a level with sites; nil on a level without sites (any free floor cell), whose cells the summary
+    /// does not name.
+    var summarySiteIndex: Int? {
+        guard let sites = play?.level.sites, !sites.isEmpty else { return nil }
+        return min(max(siteIndex, 0), sites.count - 1)
+    }
+
+    /// The index of the selected site among ``sites`` (clamped), for the audition (feature 496); 0 without sites.
+    var selectedSiteIndex: Int {
+        let count: Int = sites.count
+        guard count > 0 else { return 0 }
+        return min(max(siteIndex, 0), count - 1)
+    }
+
+    /// Whether the selected site can take a pod (feature 496, clarification Q4): a site no pod holds while a slot is
+    /// free; false without a site or a play.
+    var selectedPlaceable: Bool {
+        guard let site = selectedSite, let play else { return false }
+        let pods: [MushroomWeatherCell?] = play.arrangement.pods
+        return !pods.contains(site) && pods.contains(nil)
+    }
+
+    /// The selected slot's pod in words (feature 496; Remove's value): "pod n at row r, column c, grown at cycle t",
+    /// "pod n empty", or "no pods" while no play is followed.
+    var selectedPodLabel: String {
+        guard let play else { return "no pods" }
+        let slot: Int = selectedSlot
+        guard slot < play.arrangement.pods.count else { return "pod \(slot + 1) empty" }
+        let grownAt: Int? = slot < play.report.grownAt.count ? play.report.grownAt[slot] : nil
+        return play.level.podDescription(slot, cell: play.arrangement.pods[slot], grownAt: grownAt)
+    }
+
+    /// The chosen moonlight in words (feature 496; the adjustable moonlight's value): "moonlight l of 3".
+    var chosenMoonValue: String {
+        "moonlight \(clampedMoonlight(chosenMoonlight)) of \(MushroomWeatherLevel.moonlightLevels.upperBound)"
+    }
+
+    /// The summary element's text (feature 496): `MushroomWeatherFeedbackPlan.summaryText(core:slot:site:)` of the
+    /// latest core and the panel's selection; empty before the first core.
+    var summary: String {
+        guard let core = summaryCore else { return "" }
+        return MushroomWeatherFeedbackPlan.summaryText(core: core, slot: selectedSlot, site: summarySiteIndex)
     }
 }
 
@@ -311,6 +368,16 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The feedback route of announcements and haptics (feature 496; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first (feature 496; tests and diagnostics).
+    private(set) var feedbackLog: [MushroomWeatherFeedbackPlan] = []
+    /// The eased light levels drawn by the scene (feature 496).
+    private(set) var lights: MushroomWeatherLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the selected site's audition (feature 496).
+    let sound: MushroomWeatherSound
     /// The latest core seen (feature 495): hints, the daily date and the progress lines read it.
     private(set) var latestCore: MushroomWeatherExperienceCore?
     /// The play the shown hint belongs to; nil while no hint is shown (feature 495).
@@ -334,6 +401,9 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
         self.reduceFlashing = reduceFlashing
         scene.reducedMotion = reduceMotion
         scene.reducedFlash = reduceFlashing
+        lights = MushroomWeatherLights(reducedFlash: reduceFlashing)
+        sound = MushroomWeatherSound(recipe: MushroomWeatherSoundRecipe.recipe(rootStep: 0, quarters: 0, moonlight: 0,
+                                                                              stage: .loading))
     }
 
     /// The tests' seam: before `setup`, replaces the forest program's fragment source with one that does not compile.
@@ -377,13 +447,25 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
             tierLog.append(MushroomWeatherTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
-        if latestCore != core { absorbProgress(core) }
+        if latestCore != core {
+            absorbFeedback(core)
+            absorbProgress(core)
+        }
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         let base: MushroomWeatherSceneSnapshot = core.snapshot(time: time)
         lastBase = (snapshot: base, level: core.play.level)
         let snapshot: MushroomWeatherSceneSnapshot = presented(base, level: core.play.level)
         lastSnapshot = snapshot
         scene.orbit = gestures.orbit
+        // The lights settle on the very first frame only; every later change, a level change included, fades, stepped
+        // by the frame clock (feature 496).
+        if let last = lastFrameTime {
+            lights.step(toward: snapshot, elapsed: frame.time > last ? frame.time - last : 0)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        lastFrameTime = frame.time
+        scene.lights = lights
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
 
@@ -412,7 +494,9 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbFeedback(core)
         absorbProgress(core)
+        mirror.summaryCore = core
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -559,6 +643,7 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
         let result = port.send(control, values)
         mirror.record(accepted: result.isAccepted, code: result.code)
         if !result.isAccepted {
+            route(MushroomWeatherFeedbackPlan.refused(code: result.code))   // feature 496: announced and felt
             refusalLog.append(MushroomWeatherMirror.bareCode(result.code))
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
@@ -662,13 +747,18 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
     /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
     private func reveal(_ texts: [String]?, level: Int, play: MushroomWeatherPlay) {
         hintPlay = play
-        guard let texts, texts.indices.contains(level - 1) else {
+        let before: (Int, String?) = (mirror.hintLevel, mirror.hintText)
+        if let texts, texts.indices.contains(level - 1) {
+            mirror.hintLevel = level
+            mirror.hintText = texts[level - 1]
+        } else {
             mirror.hintLevel = 0
             mirror.hintText = Self.noHintText
-            return
         }
-        mirror.hintLevel = level
-        mirror.hintText = texts[level - 1]
+        // Feature 496: a newly shown hint (or the no-hint line) is announced as `state`.
+        if let text = mirror.hintText, before.0 != mirror.hintLevel || before.1 != text {
+            route(MushroomWeatherFeedbackPlan.hint(text: text))
+        }
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -712,5 +802,67 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
     static func dateValues(_ date: DateComponents) -> [Double] {
         [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
+
+    // MARK: Feedback and sound (feature 496, R02-G20-06)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it; `.none` does nothing.
+    func route(_ plan: MushroomWeatherFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+    }
+
+    /// Takes a new core into the feedback and the sound, once per core (from the frame or the description): routes the
+    /// plan of the change from the latest core and offers the ambient recipe when a level or mode opened or the recipe
+    /// changed. The first core only offers its recipe, so the sound never holds a placeholder.
+    private func absorbFeedback(_ core: MushroomWeatherExperienceCore) {
+        guard let previous = latestCore else {
+            sound.offer(Self.recipe(core))
+            return
+        }
+        route(MushroomWeatherFeedbackPlan.after(old: previous, new: core))
+        let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+        if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+    }
+
+    /// The ambient recipe of `core`: its actions left, the quarters of the colonies staying in band, its moonlight and
+    /// its stage.
+    static func recipe(_ core: MushroomWeatherExperienceCore) -> AmbientLoopRecipe {
+        MushroomWeatherSoundRecipe.recipe(play: core.play)
+    }
+
+    /// The audition of the panel's selected site: `MushroomWeatherAudition.of(site:placeable:)` of the selected site's
+    /// index and whether a pod can go there.
+    var selectedAudition: MushroomWeatherAudition {
+        MushroomWeatherAudition.of(site: mirror.selectedSiteIndex, placeable: mirror.selectedPlaceable)
+    }
+
+    /// Changes the panel's selection (slot or site; presentation only; the buttons and the adjustable values); when
+    /// the selection changed (clarification Q4: once per change of slot or site) and the sound is on, plays the
+    /// selected site's audition (feature 496). Drag previews never come here.
+    func changeSelection(_ change: (MushroomWeatherMirror) -> Void) {
+        let before: [Int] = [mirror.slot, mirror.siteIndex]
+        change(mirror)
+        let after: [Int] = [mirror.slot, mirror.siteIndex]
+        guard mirror.soundOn, after != before else { return }
+        sound.audition(selectedAudition)
+    }
+
+    /// Turns the sound on or off (presentation only); turning it on plays the recipe of the current play.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
 }
 #endif

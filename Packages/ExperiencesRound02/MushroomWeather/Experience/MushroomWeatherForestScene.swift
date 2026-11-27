@@ -19,6 +19,14 @@
 // fails, the scene falls back to the level-2 geometry drawn unlit with the shared `MeshRenderer` (ambient 1, the
 // geometry's fallback colours, the broken marks and the won look included) and keeps the reason; nothing here can reach
 // the kernel. A zero-sized drawable is cleared and nothing else is drawn. Modelled on `MicroscopicAuroraDishScene`.
+//
+// Feature 496 (R02-G20-06) T-R02G2006-005 (FR-R02G2006-004; clarification Q3): the presenter's eased lights
+// (`MushroomWeatherLights`) are drawn: the glow gain is multiplied by the glow level and `u_won` is the won level.
+// `u_motion` is 0 under Reduce Motion or Reduce Flashing, so the droplets and motes stand still and the forest is still
+// between actions. The unlit fallback's geometry takes a won flag, not a level, so the fallback forest blends the
+// colours of the not-won and the won forest part by the won level (`blendedColours(off:on:level:)`; the two parts share
+// their positions, the won look changes colours only) and is rebuilt when that level moves by a tenth or more. Without
+// lights the snapshot's levels are drawn at once. Modelled on `MicroscopicAuroraDishScene` (feature 486).
 #if os(iOS)
 import Foundation
 import MushroomWeatherCore
@@ -47,6 +55,11 @@ final class MushroomWeatherForestScene {
     /// The camera's orbit (feature 494; presentation only, the presenter's gesture controller's). A changed orbit
     /// rebuilds the meshes on the next draw.
     var orbit: MushroomWeatherViewOrbit = .authored
+    /// The eased light levels the presenter steps every frame (feature 496): the glow gain is multiplied by
+    /// `lights.glow`, `u_won` is `lights.won`, and the fallback forest's won colours are blended by `lights.won`
+    /// (rebuilt when it moves by a tenth or more). Nil draws the snapshot's levels at once (the renderer tests'
+    /// default).
+    var lights: MushroomWeatherLights?
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the fallback.
     private struct GeometryKey: Equatable {
@@ -66,6 +79,8 @@ final class MushroomWeatherForestScene {
         let aspect: Double
         /// The drawn preview (feature 494; presentation only).
         let preview: MushroomWeatherPreview?
+        /// The won level in tenths, in the fallback only (feature 496): the fallback's colours depend on it.
+        let wonTenths: Int
     }
 
     private var registry: ResourceRegistry?
@@ -111,8 +126,8 @@ final class MushroomWeatherForestScene {
     /// The glow limit passed as `u_glowLimit`.
     var glowLimit: Double { MushroomWeatherShaders.glowLimit(reduceFlashing: reducedFlash) }
 
-    /// The motion passed as `u_motion`: 0 under Reduce Motion, else 1.
-    var motion: Double { MushroomWeatherShaders.motion(reduceMotion: reducedMotion) }
+    /// The motion passed as `u_motion`: 0 under Reduce Motion or (feature 496) Reduce Flashing, else 1.
+    var motion: Double { MushroomWeatherShaders.motion(reduceMotion: reducedMotion || reducedFlash) }
 
     /// Draws `snapshot` at `tier` into `context`'s framebuffer.
     func render(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier, context: RenderContext,
@@ -132,12 +147,13 @@ final class MushroomWeatherForestScene {
             try drawFallback(camera)
             return
         }
-        let won: Float = snapshot.isWon ? 1 : 0
+        let won = Float(wonLevel(snapshot))
         let time: Double = MushroomWeatherShaders.shaderTime(snapshot.time)
         lastShaderTime = time
         try drawForest(camera, time: time, won: won)
         // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
-        let gain = MushroomWeatherShaders.glowGain(for: tier)
+        // Feature 496 eases the glow gain by the glow level.
+        let gain = MushroomWeatherShaders.glowGain(for: tier) * (lights?.glow ?? 1)
         guard gain > 0 else { return }
         try drawGlow(camera, gain: gain, won: won)
     }
@@ -147,7 +163,24 @@ final class MushroomWeatherForestScene {
         GeometryKey(levelNumber: s.levelNumber, pods: s.pods, ventsOpen: s.ventsOpen, moonlight: s.moonlight,
                     shownCycle: s.shownCycle, stage: s.stage, failure: s.failure, actionsLeft: s.actionsLeft,
                     tier: tier.index, fallback: fallbackReason != nil, orbit: orbit, aspect: aspect,
-                    preview: s.preview)
+                    preview: s.preview,
+                    wonTenths: fallbackReason != nil ? Int((wonLevel(s) * 10).rounded(.down)) : 0)
+    }
+
+    /// The won level drawn (feature 496): the eased `lights.won`, or 1 on a won snapshot and 0 otherwise without
+    /// lights.
+    private func wonLevel(_ snapshot: MushroomWeatherSceneSnapshot) -> Double {
+        lights?.won ?? (snapshot.isWon ? 1 : 0)
+    }
+
+    /// The colours of the fallback forest at won level `level` (feature 496): each colour of `off` (the not-won part)
+    /// moved toward the same vertex's colour of `on` (the won part) by `level`, clamped to 0 … 1 (a non-finite level
+    /// reads 0). Parts of different sizes cannot be blended vertex by vertex: then `on`'s colours from a level of 0.5
+    /// up, `off`'s below. Pure.
+    static func blendedColours(off: [Vec4], on: [Vec4], level: Double) -> [Vec4] {
+        let t: Double = level.isFinite ? min(max(level, 0), 1) : 0
+        guard off.count == on.count else { return t >= 0.5 ? on : off }
+        return zip(off, on).map { a, b in a + (b - a) * t }
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier` facing `camera`: the two programs, or the unlit fallback.
@@ -181,9 +214,16 @@ final class MushroomWeatherForestScene {
         // included; level-2 has no glow, no droplets and no motes).
         let minimal = MushroomWeatherTier.of(MushroomWeatherTier.all.count - 1)
         let up = Vec3(0, 0, 1)
-        let parts: [MushroomWeatherColouredMesh] = [
-            try MushroomWeatherSceneGeometry.forestPart(snapshot, tier: minimal, camera: camera),
-            try MushroomWeatherSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
+        // Feature 496: the forest's won colours blended by the won level (the won look changes colours, not positions).
+        let off = try MushroomWeatherSceneGeometry.forestPart(snapshot, tier: minimal, wonLevel: false, camera: camera)
+        let on = try MushroomWeatherSceneGeometry.forestPart(snapshot, tier: minimal, wonLevel: true, camera: camera)
+        let level: Double = wonLevel(snapshot)
+        // Parts of different sizes switch whole at a level of 0.5 (see `blendedColours(off:on:level:)`).
+        let forestMesh: Mesh = off.colours.count == on.colours.count || level < 0.5 ? off.mesh : on.mesh
+        let glow = try MushroomWeatherSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera)
+        let parts: [(mesh: Mesh, colours: [Vec4])] = [
+            (forestMesh, Self.blendedColours(off: off.colours, on: on.colours, level: level)),
+            (glow.mesh, glow.colours),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

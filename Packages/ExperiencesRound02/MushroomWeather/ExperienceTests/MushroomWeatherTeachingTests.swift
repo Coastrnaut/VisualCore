@@ -20,7 +20,8 @@
 // level 13 in daily mode although it is locked in the campaign, Campaign returns to the frontier); a locked level,
 // `level.next` on the last open level and an impossible date (2026-02-30) are refused in words ("that level is not open
 // yet", "that date cannot be used") and change nothing. Explicit dates (no clock), no wall-clock assertion; each test
-// short. Explicit types and plain loops (CI type-check rule). Synthetic data only.
+// short. Explicit types and plain loops (CI type-check rule). Synthetic data only. Since feature 496 (R02-G20-06) the
+// refusal lines are the feedback plan's sentences ("That level is not open yet.", "That date cannot be used.").
 #if os(iOS)
 import CoreGraphics
 import Foundation
@@ -54,9 +55,9 @@ enum MushroomWeatherTeaching {
     /// The most hint-guided steps tried when following the hints (at most 5 certified actions, then the run).
     nonisolated static let followLimit: Int = 8
 
-    /// The panel message of a refusal with reason `code`.
+    /// The panel message of a refusal with reason `code` (since feature 496 the feedback plan's sentence).
     static func refusalMessage(_ code: String) -> String {
-        "That change was refused: " + MushroomWeatherMirror.refusalText(code: code) + "."
+        MushroomWeatherMirror.refusalMessage(code: code)
     }
 
     /// Opens level `number` (seed `number − 1`) at a small view (one frame drawn, cycle 0 shown) and describes the
@@ -485,7 +486,7 @@ enum MushroomWeatherTeaching {
         let code: String = MushroomWeatherExperienceRule.locked
         #expect(Teaching.isRefusal(locked, code), "\(locked.code)")
         let message: String = Teaching.refusalMessage(code)
-        #expect(message == "That change was refused: that level is not open yet.")
+        #expect(message == "That level is not open yet.")
         #expect(presenter.mirror.message == message, "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused pick changes nothing")
@@ -529,7 +530,7 @@ enum MushroomWeatherTeaching {
         let code: String = MushroomWeatherExperienceRule.date
         #expect(Teaching.isRefusal(refused, code), "\(refused.code)")
         let message: String = Teaching.refusalMessage(code)
-        #expect(message == "That change was refused: that date cannot be used.")
+        #expect(message == "That date cannot be used.")
         #expect(presenter.mirror.message == message, "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused date changes nothing")
