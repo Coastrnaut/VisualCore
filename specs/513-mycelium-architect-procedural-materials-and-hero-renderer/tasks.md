@@ -14,7 +14,7 @@ only after every agent has reported; read `exit=` before ticking). Commit after 
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2203-002 Edit `Packages/ExperiencesRound02/Package.swift` (MyceliumArchitectCore gains VisualCoreScenes,
+- [X] T-R02G2203-002 Edit `Packages/ExperiencesRound02/Package.swift` (MyceliumArchitectCore gains VisualCoreScenes, — Verified 2026-11-27: package dependencies, snapshot (palette, tiers), adapter (ten controls, r02-g22.pulse, digest, schema 1), scenarios and manifest (94 scenarios), adapter tests (12); host exit=0 (33 XCTest + 74 Swift Testing)
   VisualCoreExperience, VisualCoreDiagnostics, VisualCorePersistence; its tests gain VisualCoreScenes,
   VisualCoreExperience, VisualCoreDiagnostics; new `MyceliumArchitectExperience` (path `MyceliumArchitect/Experience`,
   iOS rendering dependencies with `.when(platforms: [.iOS])`), `MyceliumArchitectExperienceTests` and the product);

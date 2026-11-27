@@ -1080,12 +1080,21 @@ let package = Package(
         // Feature 511 (R02-G22-01): Mycelium Architect's pure rule kernel.
         .target(name: "MyceliumArchitectCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 513 (R02-G22-03): the adapter, snapshot, geometry and scenarios.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "MyceliumArchitect/Core"),
         .testTarget(name: "MyceliumArchitectCoreTests",
                     dependencies: ["MyceliumArchitectCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   // Feature 513 (R02-G22-03): meshes, quality profiles and the experience contract.
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "MyceliumArchitect/CoreTests"),
     ]
 )
