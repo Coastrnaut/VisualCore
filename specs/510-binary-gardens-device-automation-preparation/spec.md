@@ -66,7 +66,8 @@ action, star 2 set to luminosity level 1 of 2 (index 0), then the run.
   preview and set the value, a double tap on empty space that resets the view and two-finger orbit (T-R02G2104-011);
   BG-D5 sound and haptics heard and felt (T-R02G2106-011); BG-D6 VoiceOver walk-through at the largest text size,
   non-gating (T-R02G2106-011, P-08); BG-D7 progress across a real termination (T-R02G2107-012); BG-D8 panel journeys:
-  win level 1 with star 2's luminosity lowered and the run, replay, relaunch (T-R02G2109-011). All rows run on D1, D2,
+  win level 1 with star 2's luminosity lowered and the run, reading the panel's win text, replay, relaunch
+  (T-R02G2109-011); BG-D5 and BG-D6 quote feature 506's spoken announcements, re-read when R02-G21-06 is recorded. All rows run on D1, D2,
   D3 in that order. Impact: FR-R02G2110-001, 003; SC-R02G2110-001.
 - Q: What is the device scenario set? → A: the 11 standard and game scenarios (`launch-first-frame`, `input-response`,
   `completion`, `rejection`, `save-restore`, `reset`, `suspend-resume`, `teardown-reentry`, `cancel-prepare`,
@@ -124,7 +125,8 @@ number.
 1. **Given** the written plan, **When** a person reads any row, **Then** it states the devices in order, the owner
    steps, the procedure, what is measured and the pass condition, and no measured value.
 2. **Given** the written plan and the definition, **When** their rows are compared, **Then** they have the same ids,
-   titles, devices and gating.
+   titles, devices and gating (a lead review step recorded in the task, as for feature 500; the check reads only the
+   definition).
 
 ### Edge Cases
 
