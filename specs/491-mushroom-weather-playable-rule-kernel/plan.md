@@ -7,7 +7,7 @@
 
 Add Mushroom Weather's pure rule kernel, `MushroomWeatherCore`, to `Packages/ExperiencesRound02` on the pattern of
 Microscopic Aurora's (feature 481): a forest floor of 6 … 12 rows by 6 … 14 columns with floor and blocked cells and a
-closed boundary; integer humidity 0 … 10000 per floor cell; a run of T cycles (20 … 200), each three synchronous steps
+closed boundary; integer humidity per floor cell (starting 0 … M, M ≤ 10000); a run of T cycles (20 … 200), each three synchronous steps
 — diffusion between orthogonally adjacent floor cells with antisymmetric flows (hₐ − h_b)·D/64 truncated toward zero
 (D 1 … 12), evaporation ⌊h·rate·(4 + L)/4096⌋ by each cell's rate (vent cells open or closed) and the moonlight level
 L 0 … 3, and release by up to six pods (r, or g once grown) — with an exact ledger (total after = total before +
@@ -26,9 +26,10 @@ VisualCoreMath (`StableHash`), as the existing round-two Cores use them (`Micros
 `Packages/ExperiencesRound02/Package.swift`). No GPU, UIKit, Objective-C++ or GLSL code in this feature; no new
 package; one new target pair. **Package**: `Packages/ExperiencesRound02/Package.swift` gains `MushroomWeatherCore`
 (path `MushroomWeather/Core`), its tests (`MushroomWeather/CoreTests`) and the product. **Numbers**: `Int64`
-throughout; a cell holds at most 10000 + 200 · 80 units in a run (release only adds 80 a cycle to one cell, and mold
-ends the run at the first cell above M ≤ 10000), so one cycle's products are below 26000 · 200 · 7 < 2^26; integrals
-below 200 · 26000 < 2^23; totals below 168 · 26000 < 2^23. Nothing approaches 2^62; no platform floating point decides
+throughout; a cell holds at most M + 80 ≤ 10080 units in a run (diffusion never lifts a cell above its fullest
+neighbour, release adds at most 80, and mold ends the run at the first cycle with a cell above M ≤ 10000), so one
+cycle's products are below 10080 · 200 · 7 < 2^24; integrals below 200 · 10080 < 2^21; totals below 168 · 10080 <
+2^21. Nothing approaches 2^62; no platform floating point decides
 anything; `Double` appears only in the words. **Seeds**: fixtures use `SeededRandom(seed: 2_491)`; neighbouring-input
 checks seed 2_496. **Testing**: `swift test --package-path Packages/ExperiencesRound02 --filter MushroomWeather`.
 **Performance**: one run is at most 200 cycles × 168 cells × 4 neighbours, about 135,000 integer steps; a 500-run test

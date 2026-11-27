@@ -47,9 +47,10 @@ implements R02-F23's `PuzzleRules` (`MicroscopicAuroraPuzzle`, `VisualCoreSimula
 exists yet in `Packages/ExperiencesRound02`.
 
 - Q: What is the forest floor, in which units? → A: a grid of 6 … 12 rows by 6 … 14 columns (rows and columns from 0);
-  each cell is floor or blocked (a log or stone that holds no water and exchanges none). Humidity is a whole number of
-  units per floor cell, 0 … 10000; the boundary is closed (no water crosses the edge of the grid). The mold bound M is
-  1000 … 10000 and every starting humidity is 0 … M. Impact: FR-R02G2001-001, 003; SC-R02G2001-004.
+  each cell is floor or blocked (a log or stone that holds no water and exchanges none). Humidity is a whole number of units per floor cell, never negative; the boundary is closed (no water
+  crosses the edge of the grid). The mold bound M is 1000 … 10000 and every starting humidity is 0 … M; during a run a
+  cell can exceed M only at the cycle that ends the run as `mold` (by at most the grown release, 80, since diffusion
+  never lifts a cell above its fullest neighbour). Impact: FR-R02G2001-001, 003; SC-R02G2001-004.
 - Q: What exactly happens in one cycle, so every device agrees and the ledger balances? → A: three steps, each computed
   from the state at the start of that step (synchronous, so cell order cannot change the result). (1) Diffusion: for
   every pair of orthogonally adjacent floor cells a and b, the flow from a to b is (hₐ − h_b)·D/64 with D 1 … 12,

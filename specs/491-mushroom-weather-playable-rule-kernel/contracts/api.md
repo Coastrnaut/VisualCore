@@ -27,7 +27,7 @@ public struct MushroomWeatherReport: Sendable, Equatable { public let cycles: In
     public let colonies: [MushroomWeatherColonyRuns]
     public let failure: MushroomWeatherFailure?; public var wins: Bool { get } }
 public enum MushroomWeatherForest {
-    public static let maximumHumidity: Int                              // 10000
+    public static let maximumMoldBound: Int                             // 10000
     public static func cycle(_ humidity: [Int], level: MushroomWeatherLevel, arrangement: MushroomWeatherArrangement,
         grown: [Bool]) -> (humidity: [Int], ledger: MushroomWeatherLedger)   // ledger.cycle 0; run sets it
     public static func run(_ level: MushroomWeatherLevel, arrangement: MushroomWeatherArrangement,
