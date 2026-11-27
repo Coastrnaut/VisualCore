@@ -1166,6 +1166,34 @@
       "manifest": "Packages/ExperiencesRound02/MushroomWeather/scenario-manifest.json",
       "permissions": [],
       "summary": "Place glowing spore pods on a midnight forest floor, open or close canopy vents and shift the moonlight, then let the weather run: every mushroom colony must hold its humidity band to the end, without a sensitive colony drying out or a cell turning to mold."
+    },
+    "r02-g21.binary-gardens": {
+      "capabilities": [
+        "Keep every world in its light zone",
+        "Light in exact whole units",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#070815",
+        "#FF5A36",
+        "#A6DDFF",
+        "#7BE8BE",
+        "#151B3D"
+      ],
+      "content": {
+        "catalog_sha256": "adf594d6994ffa3f4af4d1035c4e99faecdedffecac96f4ddc21bdc983ce401f",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/BinaryGardens/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Move twin stars between their rings, shift their phases, set their brightness and tilt the orbit plane so every flower world circling them keeps a long enough comfortable window and blooms over the cycle, without a world freezing or scorching for too long."
     }
   }
 }

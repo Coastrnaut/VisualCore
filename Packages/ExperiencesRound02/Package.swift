@@ -69,6 +69,8 @@ let package = Package(
         .library(name: "MushroomWeatherExperience", targets: ["MushroomWeatherExperience"]),
         // Feature 501 (R02-G21-01): Binary Gardens' rule kernel, a candidate until X-R02-G21.
         .library(name: "BinaryGardensCore", targets: ["BinaryGardensCore"]),
+        // Feature 503 (R02-G21-03): Binary Gardens' experience (iOS only; a registered candidate until X-R02-G21).
+        .library(name: "BinaryGardensExperience", targets: ["BinaryGardensExperience"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -844,6 +846,27 @@ let package = Package(
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "BinaryGardens/CoreTests"),
+        // Feature 503 (R02-G21-03): Binary Gardens' experience (presenter, scene, controls).
+        .target(name: "BinaryGardensExperience",
+                dependencies: ["BinaryGardensCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "BinaryGardens/Experience"),
+        // Feature 503 (R02-G21-03): the simulator tests of Binary Gardens' experience.
+        .testTarget(name: "BinaryGardensExperienceTests",
+                    dependencies: ["BinaryGardensExperience", "BinaryGardensCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "BinaryGardens/ExperienceTests"),
         // Feature 491 (R02-G20-01): Mushroom Weather's pure rule kernel.
         .target(name: "MushroomWeatherCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),

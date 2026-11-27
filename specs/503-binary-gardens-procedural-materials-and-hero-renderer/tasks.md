@@ -131,7 +131,7 @@ R02-G20-03 (`git show a3269b5cc:<path>`, the R02-G20-03 record commit).
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G2103-006 [US3] [US4] Create
+- [X] T-R02G2103-006 [US3] [US4] Create — Verified 2026-11-27: scenarios, packages, catalog-search exit=0; sim-27-2 exit=0, 30 tests in 4 suites (first attempt sim-27 failed to compile a multi-line switch expression, fixed with explicit returns) (.autonomy/migration/checks/R02-G21-03.{scenarios,packages,catalog-search,sim-27-2}.json); registered as a candidate, synthetic candidate now r02-g22.mycelium-architect
   `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensExperience.swift`, `…Presenter.swift`,
   `…SystemScene.swift` (GL scene with `ShaderMeshRenderer`; fallback through `MeshRenderer` with `fallbackReason`; tier
   log with reason ("first frame", "quality controller changed the tier"); Reduce Motion and Reduce Flashing; the

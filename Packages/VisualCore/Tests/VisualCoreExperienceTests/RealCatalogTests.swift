@@ -190,7 +190,9 @@ enum CatalogFixture {
                                // Feature 483 (R02-G19-03); integrated at X-R02-G19.
                                "r02-g19.microscopic-aurora",
                                // Feature 493 (R02-G20-03); integrated at X-R02-G20.
-                               "r02-g20.mushroom-weather"],
+                               "r02-g20.mushroom-weather",
+                               // Feature 503 (R02-G21-03); a registered candidate until X-R02-G21.
+                               "r02-g21.binary-gardens"],
                 "the registrations of Catalog/registrations.json")
     }
 

@@ -1666,7 +1666,7 @@
       "id": "r02-g21.binary-gardens",
       "code": "R02-G21",
       "title": "Binary Gardens",
-      "summary": "Balance twin stars to keep orbiting flower worlds within a light zone",
+      "summary": "Move twin stars between their rings, shift their phases, set their brightness and tilt the orbit plane so every flower world circling them keeps a long enough comfortable window and blooms over the cycle, without a world freezing or scorching for too long.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1675,11 +1675,30 @@
         "orbital-dynamics"
       ],
       "order": 46,
-      "palette": [],
+      "palette": [
+        "#070815",
+        "#FF5A36",
+        "#A6DDFF",
+        "#7BE8BE",
+        "#151B3D"
+      ],
       "tile_seed": 2293014854,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Keep every world in its light zone",
+        "Light in exact whole units",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "adf594d6994ffa3f4af4d1035c4e99faecdedffecac96f4ddc21bdc983ce401f",
+        "levels": 100
+      },
       "available": false
     },
     {
