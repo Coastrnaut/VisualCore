@@ -89,7 +89,7 @@ reasons as they are added (feature 501's convergence lesson).
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G2201-005 [P] [US4] Create
+- [X] T-R02G2201-005 [P] [US4] Create — Verified 2026-11-27: MyceliumArchitectPuzzle and its tests installed; host-4 exit=0 (24 XCTest + 17 Swift Testing)
   `Packages/ExperiencesRound02/MyceliumArchitect/Core/MyceliumArchitectPuzzle.swift` (agent C: `PuzzleRules`: State =
   position (arrangement, actions spent), Move = an arrangement action; legal moves "every legal arrangement action while
   actions are left" in the order of research R14 (nutrients on empty cells in ascending (row, column), blockers
