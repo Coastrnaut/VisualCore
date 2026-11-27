@@ -24,7 +24,7 @@
   vent slats open or flat, log and stone shapes, gauge brackets with markers, run bars, rows of bars, moon phase ticks.
   Rationale: R02-F10.
 - **R7 Camera.** Decision: a fixed authored perspective tilted toward the floor (eye (0, −1.6, 3.0) looking at
-  (0, −0.2, 0)) fitted to x −1.3 … 1.3, y −1.5 … 1.2 for aspects 0.4 … 2.5 with a 5 % margin. Rationale: the stalks
+  (0, −0.2, 0)) fitted to x −1.3 … 1.3, y −1.5 … 1.2, z 0 … 0.3 for aspects 0.4 … 2.5 with a 5 % margin. Rationale: the stalks
   read as standing mushrooms while every cell stays visible.
 - **R8 Reuse of R02-G19-03 patterns.** Decision: the adapter, snapshot, presenter, fallback, tier log, scenario manifest
   and registration follow Microscopic Aurora's shapes so the shared checks apply unchanged; the digest is the level

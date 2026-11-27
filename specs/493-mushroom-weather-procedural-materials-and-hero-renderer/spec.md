@@ -75,7 +75,8 @@ droplets into a midnight miniature forest" and the geometry "procedural lathed s
   0.04 tall), lit for the actions left. The glow is additive and drawn last. The field shown is the predicted run of the
   current arrangement; the shown cycle is presentation state of the adapter (`clock.show [cycle]`, 0 … cycles run, never
   in the digest), 0 at opening and never advanced by time. The camera is a fixed authored perspective (eye (0, −1.6,
-  3.0) looking at (0, −0.2, 0)) fitted to the box x −1.3 … 1.3, y −1.5 … 1.2 with a 5 % margin for aspect 0.4 … 2.5.
+  3.0) looking at (0, −0.2, 0)) fitted to the box x −1.3 … 1.3, y −1.5 … 1.2, z 0 … 0.3 (the tallest element is a vent at 0.9 s ≤ 0.24; a cap
+  tops out below 0.2) with a 5 % margin for aspect 0.4 … 2.5.
   Nothing drawn is consulted by the rules. Impact: FR-R02G2003-001, 002, 003, 006.
 - Q: What do the three quality tiers change? → A: `level-0` (richest): lathed stalks, caps and pods of 16 segments with
   layered shading (translucent cap with rim light and the sparkle), 12 droplets per pod, fronds, 8 spore motes on a fixed
