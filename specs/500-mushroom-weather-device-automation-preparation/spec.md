@@ -42,7 +42,7 @@ covered by a row.
 **Acceptance Scenarios**:
 
 1. **Given** the device row definition, **When** it is checked, **Then** every scenario it names exists in Mushroom
-   Weather\'s scenario manifest and every row has devices D1, D2, D3 (or a stated subset), a procedure, a pass
+   Weather's scenario manifest and every row has devices D1, D2, D3 (or a stated subset), a procedure, a pass
    condition and the status "pending device campaign".
 2. **Given** the {device} tasks of features 491–499, **When** they are compared with the rows, **Then** each one is
    covered by at least one row.
