@@ -84,7 +84,7 @@ R02-G19-03 (`git show <R02-G19-03 record commit>:<path>`).
 **Independent test**: the simulator suite renders 5 levels at 3 tiers against the CPU reference; the catalog checks
 pass.
 
-- [ ] T-R02G2003-006 [US3] [US4] Create
+- [X] T-R02G2003-006 [US3] [US4] Create — Verified 2026-11-26: 2026-11-27 sim-27-2 exit 0 on sim-27.2: 26 tests in 4 suites (frames of levels 1, 21, 41, 61, 81 at three tiers vs the CPU reference, fallback, resize, memory warning, Reduce Motion stills, failure marks, won caps, identity); scenarios exit 0 (153 host tests incl. 7 scenario tests, 94-scenario manifest); packages and catalog-search exit 0; candidate registered; first sim attempt failed on a main-actor static in the test support, fixed (.autonomy/migration/checks/R02-G20-03.{sim-27-2,scenarios,packages,catalog-search}.json)
   `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherExperience.swift`, `…Presenter.swift`,
   `…ForestScene.swift` (GL scene with `ShaderMeshRenderer`; fallback; tier log; Reduce Motion and Reduce Flashing; the
   presenter declares `probes(_:)` — two backdrop corners, as the round-two X gates require — and its quality levels

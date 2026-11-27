@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/VisualCore",
+    "--filter",
+    "CatalogSearchTests|RealCatalogTests|RegistryReportTests"
+  ],
+  "command": "swift test --package-path Packages/VisualCore --filter 'CatalogSearchTests|RealCatalogTests|RegistryReportTests'",
+  "elapsed_seconds": 3.989,
+  "exit_code": 0,
+  "finished": "2026-11-27T04:14:08+00:00",
+  "gate": "R02-G20-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G20-03.catalog-search.log",
+  "log_sha256": "940c9902be8304da80a5143a2c7c2e8a0758951245345e8b98c5aa77b462a6b3",
+  "name": "catalog-search",
+  "started": "2026-11-27T04:14:04+00:00",
+  "timed_out": false
+}

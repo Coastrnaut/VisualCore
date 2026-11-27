@@ -1,0 +1,7752 @@
+{
+  "controls" : [
+    "pod.place",
+    "pod.remove",
+    "vent.set",
+    "moon.set",
+    "weather.run",
+    "play.undo",
+    "play.redo",
+    "level.next",
+    "clock.show"
+  ],
+  "experience" : "r02-g20.mushroom-weather",
+  "kind" : "game",
+  "round" : 2,
+  "scenarios" : [
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf"
+      },
+      "name" : "launch-first-frame",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "14a905d2b3bf55965421d388fe5732eaa28d2685041582eb0e3d77827f8ebfc8",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf"
+      },
+      "name" : "input-response",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "outcome" : "won"
+      },
+      "name" : "completion",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              6,
+              0,
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              -1,
+              0,
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              12,
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              -1,
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              14
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              6,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              -1,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              201
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              -1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0.5,
+              0,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4.5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              0,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              1,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              32
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "action.wrong-value-count",
+          "steps" : 0
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf"
+      },
+      "name" : "rejection",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "14a905d2b3bf55965421d388fe5732eaa28d2685041582eb0e3d77827f8ebfc8",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf"
+      },
+      "name" : "save-restore",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 10
+        }
+      ],
+      "expect" : {
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf",
+        "resetDigest" : true
+      },
+      "name" : "reset",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "suspend-resume",
+      "seed" : "0"
+    },
+    {
+      "cycles" : 5,
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "teardown-reentry",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+
+      ],
+      "expect" : {
+
+      },
+      "name" : "cancel-prepare",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              4,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "774dc07c343d53128971a21ce51f254b5d45962786940b639159567d803a2bbc",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf",
+        "outcome" : "won"
+      },
+      "name" : "full-playthrough",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              31
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9c6c07dc9d7bf9f8851b1108f197b6ccec41ff5aa9b808a86088458af8593daf",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf"
+      },
+      "name" : "hero",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e857d779dc2b76a8fcdfdd51e288552c5aa542fa83405278ffca889a41102b4e",
+        "initialDigest" : "50fc5626e0f5b44104c46d02cf985ac40782cf8df5fb6ba5d0b7e0a7db6720e5"
+      },
+      "name" : "acceptance-001",
+      "seed" : "67"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6358ccf90f7fa9ae7cc7d07190f1bd4761f62d9329e7b5f232a964947afa3fc9",
+        "initialDigest" : "d2d067eb0aa5bf1ef38be5e8c8d62f88b8ff7d78ddb36fb1aeee3c542fa269cb"
+      },
+      "name" : "acceptance-002",
+      "seed" : "74"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              5,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7d78df3a1f39f6ff28b6a8bd7c177cb361c8742b7192837bd459ae79b46bed57",
+        "initialDigest" : "0d6dd8244309fce99f066bde6fc7c2193dff8d2597b742c190a0b8d6459f61b4"
+      },
+      "name" : "acceptance-003",
+      "seed" : "81"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5abc99afae1517400633215482e38e6855e16f09bcd89e0964665616bb32ed02",
+        "initialDigest" : "aafe35f098d0a9dba010e3c62705d9e65f4c4810aa9bc421a0ff04a3811cbde7"
+      },
+      "name" : "acceptance-004",
+      "seed" : "88"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              6,
+              1,
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8c152dcf2e94d523d842099c84cac950133e41ba37b2d8a339b38fe5b108af9a",
+        "initialDigest" : "1fe8e333f7993a2eb94e2af474a2ab42204e055231ba49a380ddbb6aa420296c"
+      },
+      "name" : "acceptance-005",
+      "seed" : "95"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "607846930a63b04134af6c98d311cf948f47fac0ddaa90fea85b1e883ab69b89",
+        "initialDigest" : "ee78f22b33a1bc01fe15aa12df3d60f97ae0e7c364fe24d4999343a0b4cd2d10"
+      },
+      "name" : "acceptance-006",
+      "seed" : "2"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "95047b8d03d42ba25f7478f1cd3d474c52c43f3a63e645ae0cb349e02e226a4f",
+        "initialDigest" : "0d74f2e3c5c549e7cc9587fe9d3a9a45afbb12014e42098ead9ac0fbddc76321"
+      },
+      "name" : "acceptance-007",
+      "seed" : "9"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0.5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c174016016056ed88c18a3821eff126790ea0d19308bb444d21a6d589db29114",
+        "initialDigest" : "95d0e19b043427ad81fd9c0a9c7352b5c7237aa436497446d29e03f3e1b3bcb3"
+      },
+      "name" : "acceptance-008",
+      "seed" : "16"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ddb5737c955dd78b39e9a9a604eccd178c70c312b0358de9cdc02983e76a7837",
+        "initialDigest" : "3627922490b627c6f9a1fffd6e09c2fa7244c9b87764bd57cf486abe54bdbe7b"
+      },
+      "name" : "acceptance-009",
+      "seed" : "23"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              6,
+              1,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "033c32d0063f3cb7e204a4887f5c6090b7fd17649e399774d68fa8a33401a4b6",
+        "initialDigest" : "a41d6eb870e68054b31e866dc917a87ae493ebb45c057c6cdd6259365d47c161"
+      },
+      "name" : "acceptance-010",
+      "seed" : "30"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              5,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b5c9283ef891ebc67810bbb0189adba9dd52bf39e153e545ecde993cbec92772",
+        "initialDigest" : "96d34e7868544562a6c719369ea1e1578f6ca35ca40a442d85dcf3cd60151e86",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-011",
+      "seed" : "37"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8c66be4b3ee148c4055583f3a2d2c6e0cb9f39777adc4d6e87686d819ccbf1b8",
+        "initialDigest" : "d2cec79f36a8545648b7b2042a1e9b28d745bcf90e398ab6653075febaa47a5d",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-012",
+      "seed" : "44"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              3,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              5,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "30c38714249cf2227f0697488a6779f51dd6b079482077fea5c198b038c1388d",
+        "initialDigest" : "763f5d7cdb54f41dfc75097c3172cc35ed4e01f35187cd4b66f159b20f8b8d44",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-013",
+      "seed" : "51"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "548125e6b4c5fa0707160d37f6d6bb4bf32e86b583e455716585bb097559d824",
+        "initialDigest" : "3687c3373d934e922b4564fada1e12599d7fe0391f269459ad14b3bb27c2eeb9",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-014",
+      "seed" : "58"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              6,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "34293cd344982004b3cc8a6552217568bed2a77a8a1e068c2f50cd756eea2c59",
+        "initialDigest" : "9737669cbe5c99fb7083bd06603eb325ef48decae3474b7cc51bdd07b279aedb",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-015",
+      "seed" : "65"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4853d0a90ad1185876defa5fd9cc67293943cece1a97a84ae8e82be385290e5d",
+        "initialDigest" : "0bdfbc18dfc4655a787023d112b28770adf390c338c01e722c2df9186d5844ed",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-016",
+      "seed" : "72"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f9faa36f7a5f9bb61df060f97ba1ea26bc8eed55406499b953434acc0fa5041c",
+        "initialDigest" : "000d3d0a0d0e8c2487c99d66ea8ef28611a5c30819f821f03f026cddd11da61a",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-017",
+      "seed" : "79"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7095eee8ee86946f0b133e8056a10e0f1fe2219f2e431f99e3a40e69cf4dc297",
+        "initialDigest" : "aeee613d6e2133be84378d7b5047a1e27e0d40a5f6803699b8c2a7142f348705",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-018",
+      "seed" : "86"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              5,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a93adf0eaebc0339150e98c5c269e0c14a87579e4a43c7d00413a76b996e18ea",
+        "initialDigest" : "6b4cae4817ae393cda9b49747303579a2ce0889a99250b4e3d527bf304250671",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-019",
+      "seed" : "93"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.budget",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a2c693480a13c264c7e9c4ff80860be40d665b788c67b92adee7945223da79e2",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf",
+        "outcome" : "failed"
+      },
+      "name" : "acceptance-020",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              6,
+              0,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              16
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              5,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4706482b60fef5a62486231eb7371af24e4975dba0ed91aa7a9e14884ff644bb",
+        "initialDigest" : "4706482b60fef5a62486231eb7371af24e4975dba0ed91aa7a9e14884ff644bb"
+      },
+      "name" : "acceptance-021",
+      "seed" : "7"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              37
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              12,
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              4
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              38
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "993e972bbb6136b9c892ad387a14eba2b8043e99936ec776fbe1974660e0184b",
+        "initialDigest" : "993e972bbb6136b9c892ad387a14eba2b8043e99936ec776fbe1974660e0184b"
+      },
+      "name" : "acceptance-022",
+      "seed" : "14"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              22
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              6,
+              3,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              23
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              6,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e3cb02653c3cd4c8f6f3237b9d7713c56f7a83b75861520633b79a04f72ba2b1",
+        "initialDigest" : "e3cb02653c3cd4c8f6f3237b9d7713c56f7a83b75861520633b79a04f72ba2b1"
+      },
+      "name" : "acceptance-023",
+      "seed" : "21"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              29
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              12,
+              1
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              1
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "de4f2a51cc70a71aad71702667b44bdc08047603b10b33e86291ae5b1522a4a6",
+        "initialDigest" : "de4f2a51cc70a71aad71702667b44bdc08047603b10b33e86291ae5b1522a4a6"
+      },
+      "name" : "acceptance-024",
+      "seed" : "28"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              31
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              6,
+              3,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              2
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              32
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              6,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8163010bac0a2f7cc230d13490084a340716bcdeff9be3d93083df773f2a4aad",
+        "initialDigest" : "8163010bac0a2f7cc230d13490084a340716bcdeff9be3d93083df773f2a4aad"
+      },
+      "name" : "acceptance-025",
+      "seed" : "35"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              18
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              12,
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              19
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              6,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4a33598668e7a6c874c4bd64a8405063fc6a2aacf2041a012628c5dc6b180fde",
+        "initialDigest" : "4a33598668e7a6c874c4bd64a8405063fc6a2aacf2041a012628c5dc6b180fde"
+      },
+      "name" : "acceptance-026",
+      "seed" : "42"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              6,
+              1,
+              7
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              7
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              12
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d7f5959858137add71cc0513b87d401dff16e8f3785df1a900cf1a7f8e765cc0",
+        "initialDigest" : "d7f5959858137add71cc0513b87d401dff16e8f3785df1a900cf1a7f8e765cc0"
+      },
+      "name" : "acceptance-027",
+      "seed" : "49"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              33
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              12,
+              0
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              34
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              7,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6b4e100029cedffd7b1f040dc9ad78e23dec5be135fa7a02af93a35e71d0f0ae",
+        "initialDigest" : "6b4e100029cedffd7b1f040dc9ad78e23dec5be135fa7a02af93a35e71d0f0ae"
+      },
+      "name" : "acceptance-028",
+      "seed" : "56"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              36
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              6,
+              0,
+              5
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              4
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              5
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              37
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              6,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4cdf00057e0b726de521058c7da425fd332b0bdcd9295468b844323be1201eeb",
+        "initialDigest" : "4cdf00057e0b726de521058c7da425fd332b0bdcd9295468b844323be1201eeb"
+      },
+      "name" : "acceptance-029",
+      "seed" : "63"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              30
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              12,
+              6
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              2
+            ]
+          },
+          "result" : "action.out-of-range",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.remove",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0.5,
+              6
+            ]
+          },
+          "result" : "action.rule.r02-g20.not-whole",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              31
+            ]
+          },
+          "result" : "action.rule.r02-g20.cycle",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              6,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "952b71ee157ce1951e5bbae23aaa7ac23470158da28222baf4d2e57d6819b754",
+        "initialDigest" : "952b71ee157ce1951e5bbae23aaa7ac23470158da28222baf4d2e57d6819b754"
+      },
+      "name" : "acceptance-030",
+      "seed" : "70"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              11
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d7dff7df5843925aff8062993aefce31c05f12dc9cd65f80d130e968de3f4c84",
+        "initialDigest" : "fa6059ee442acb54c155b104523ca4c8a5b0583d341a25a9111879c47e77a38d"
+      },
+      "name" : "acceptance-031",
+      "seed" : "77"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              5,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "93bae268e3ed5f968d2468122c74dca6b0ea6c48ae7f692866e29be32d33b543",
+        "initialDigest" : "20e40703180d8dc21761cd2418d553303877702223e2cd9771b34ef5497ae89b"
+      },
+      "name" : "acceptance-032",
+      "seed" : "84"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bfe33064bd290e8840d5b44e4a1005fe8128f976cb7c843e45be0e209d537da3",
+        "initialDigest" : "6d5bb8aaff063cd075377943fb4c542f00715a00d6a999403c4adc4ca15f7b6e"
+      },
+      "name" : "acceptance-033",
+      "seed" : "91"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              5,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d862960258cd956991cd28c97c53992a2d2853b8fb793e8fc38d724fa57a169a",
+        "initialDigest" : "5322700d676d95ea17b91a3402116e44565dc360dee5767e42e3ca6f73e33199"
+      },
+      "name" : "acceptance-034",
+      "seed" : "98"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              17
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "692f08f0996738036ba5e7716a5205f55c6ae3f73ac5eb72ee5f8d8796e7afca",
+        "initialDigest" : "cfb187f0009ec17a50e2bf5cdc7bd05a84f98e6053b2000c20e3413c335c7c91"
+      },
+      "name" : "acceptance-035",
+      "seed" : "5"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              17
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "488a9af202d64188bc80de3c3862002adf62811eb2b0c1a8054f48cad439c167",
+        "initialDigest" : "98c17fe0202a61c3d1a135389c9508a574c40096498968f438020eaf1fb3d895"
+      },
+      "name" : "acceptance-036",
+      "seed" : "12"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              19
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "7853ce972a665ba9424d617634aa2d530eafeb3d9aeffb6402e603a4debe152c",
+        "initialDigest" : "313225d6522923908a0bd5a39008064d68eec2a1a6196c68c4eef7e9d7015140"
+      },
+      "name" : "acceptance-037",
+      "seed" : "19"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2d557ce920798332c0d03fafe11d58b77c3d88c6d2f7f8249315e5400f877a68",
+        "initialDigest" : "5cfc10fa1f8a815505de49e280d44a78170cbead9486fdd51c9a3a4c3eb2e39e"
+      },
+      "name" : "acceptance-038",
+      "seed" : "26"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              15
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0e40b86a9881f1bda3cf9ed388e092beb8df67a48ea85e924ff4a620caebcb3a",
+        "initialDigest" : "fb0f21bfa276ca115ec4fdb00a57940e81ada0d0d90cd1c68a57b5a14e3c02d0"
+      },
+      "name" : "acceptance-039",
+      "seed" : "33"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "clock.show",
+            "values" : [
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "68542d55b0e03f28d6e6650441b22f7bb667398b33241734d811c29ccdc22ead",
+        "initialDigest" : "fef569db3817514355efdfd9b7688af3a0e4cc3110255a2e03ed769361320e36"
+      },
+      "name" : "acceptance-040",
+      "seed" : "40"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "bf75a3dbf053f1a43651554e3b78c2d2f27b0209b991bcda4f97a30d7c562498",
+        "initialDigest" : "c1c44f0484504d7fe7d17b992a48897dbcffc07ebfe203d8a1ddc54a6d94b275",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-041",
+      "seed" : "47"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              8
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "a0b4c78bf00909f965f04f9a8ab88ff81dfb87811e0f275c2ef58611988d32fc",
+        "initialDigest" : "35503ee167d6730f6a0c6eeab30dd574a30226d802f3aaebcbcb4739a93ec432",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-042",
+      "seed" : "54"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              4,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              8,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "eef4ecf3bfa38d864fb0beb55a3c62cd4180aed65d6f6bd58655af316dd68849",
+        "initialDigest" : "56e126a7597432cc2e93f111ae914df541eb59d0ce703c6bc4046534b616c655",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-043",
+      "seed" : "61"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              1,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "00886bd8d53c5bc00ae76fc330f2c63f2930c3755e9dbe41f9161bed7d6fcf38",
+        "initialDigest" : "f2af85cd0bfc11ccf8b9d99dfda756ba5c813aac0d589c3cf71110a96278ab23",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-044",
+      "seed" : "68"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              4,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "129dbd7dca56013943c66e346699a090b94d1f8a65ed23ba926c54fc4d0db859",
+        "initialDigest" : "9fdb8ca832d2dec7283a04c7fc8df530f04f98bca3ea0e1bfba6331cf1b3f132",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-045",
+      "seed" : "75"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              4,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              5,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              3,
+              5,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "2e7822e296e8b399861bef7c0c8c8bbcb5510b08f1e9a72434117235c310878e",
+        "initialDigest" : "c4ed814a1fb29e89390d8d91b2b0a0e804230e437e54e5d3a89a27047325194b",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-046",
+      "seed" : "82"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              5,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              5,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              6,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              3,
+              6,
+              9
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "82b559484a1a34645b8e0f1e49d8a576c2724914dba782abdfdcc4d9535708f3",
+        "initialDigest" : "dc6ec42c1656f78ddd5d1c19817bba8cb91e28c4e5cf99a11a4cf4104b0fd1ae",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-047",
+      "seed" : "89"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              6,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "8fed94a329088784cf37edf6f5d4cb1ade10d3061ab633ddd25403e97de79e4b",
+        "initialDigest" : "3c5966f9f5ab9d7f5ad9a528197e7454576a06d32497156e3533dea432d12a68",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-048",
+      "seed" : "96"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1467cfa16c5c5e155f24e59237fdb35ec75a6fa21519c46bf5aaa9aa19f6a54a",
+        "initialDigest" : "9266531e5ec0ffdf38593bfbc18c9f10e8bb7a8a89bafbdd7bebcdc5ae1d25c7",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-049",
+      "seed" : "3"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.stage",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3d2a2f2749e30d922e7163c1b2c2f708c6662952be7c7bd4acbb18255f7eed4f",
+        "initialDigest" : "f7c843f966c1336fe523a81066671036725e8633dffb32fd89b593fe63978663",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-050",
+      "seed" : "10"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "c54d51c6a3767dce378e42c9909d1aa4d8fe863df357e7a43fddf8c883abd5f7",
+        "initialDigest" : "06771f35380f8f9cb1119e4305949382d72231fc47e3d87996d891927d79365d"
+      },
+      "name" : "acceptance-051",
+      "seed" : "17"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "273facfefc48be3f971d4cf2880c838c0485467479fdc5575bddffcf31a6f888",
+        "initialDigest" : "5d6b6b222941967534fa18a036fbea2cd696368d9cd6a133286e6e2c818ec187"
+      },
+      "name" : "acceptance-052",
+      "seed" : "24"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6ef471c98ca4eef012b33e78a1c965d6e27f41415cbf384a1856875eee7e4207",
+        "initialDigest" : "6ef471c98ca4eef012b33e78a1c965d6e27f41415cbf384a1856875eee7e4207"
+      },
+      "name" : "acceptance-053",
+      "seed" : "31"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f42a2404a7eeb48e5b86338a1f60b5e1288e847f040232d09ab52e687c429cba",
+        "initialDigest" : "2db29c0221cc3077ce67414403795b245f73a52948ed78ae7a672f36494fc37e"
+      },
+      "name" : "acceptance-054",
+      "seed" : "38"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9263876545e2a4c7d07327948fff25be5395ad89e86336adb19f807f101c866e",
+        "initialDigest" : "9263876545e2a4c7d07327948fff25be5395ad89e86336adb19f807f101c866e"
+      },
+      "name" : "acceptance-055",
+      "seed" : "45"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "1d759480c91ea821c3554b5e8c0e00130a6ba40345e009fc3d38356fde6b3a9f",
+        "initialDigest" : "1d759480c91ea821c3554b5e8c0e00130a6ba40345e009fc3d38356fde6b3a9f"
+      },
+      "name" : "acceptance-056",
+      "seed" : "52"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "170f2b567cdf282bddb45de4fd3c5eab76768b0febdd1fe1ab73f64ca9f4c3f6",
+        "initialDigest" : "170f2b567cdf282bddb45de4fd3c5eab76768b0febdd1fe1ab73f64ca9f4c3f6"
+      },
+      "name" : "acceptance-057",
+      "seed" : "59"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "d4e2b20a2323bd6d2902df9ff5b65950938bb478f72185a9a84900782b7bbb33",
+        "initialDigest" : "3f6e36b86b0554c08c6b686cb7f100a5ab84e27fa735e0a0c0fdf91028641ab4"
+      },
+      "name" : "acceptance-058",
+      "seed" : "66"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "ab7ef8cee91fae3da3e631932724e0268582a72d2f6a922270c97b5aadb6b911",
+        "initialDigest" : "ab7ef8cee91fae3da3e631932724e0268582a72d2f6a922270c97b5aadb6b911"
+      },
+      "name" : "acceptance-059",
+      "seed" : "73"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              6,
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "96cb8a08120fe836648cf529a10489c59de15a304d600d0dd540779893035552",
+        "initialDigest" : "702fce5ce638f2307202d45a9b507b2b21bb71b7dc11b1db876db16af237890a"
+      },
+      "name" : "acceptance-060",
+      "seed" : "80"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              7,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              2,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f976ec475f5e8e3b76ac70dd0dd791f079784b179b1abadeb2307b07ba7fbe06",
+        "initialDigest" : "79e71a0bbdf6506ed09fffd69d8a17a7107d2313c96f788659f373b8be02a239",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-061",
+      "seed" : "87"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              6,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              6,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              7,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              2,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              2
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "51b272707c4d5f1e90d86e3618945f84a9bd7d61c050de1df0482c1a91810c93",
+        "initialDigest" : "15c6cbf843300a7434759a3df064eaa0ac6079c983000fc5935468738017fe25",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-062",
+      "seed" : "94"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5086b4e1ddc9086af2235f856cb208ea9f7821c17e7e7488c8bbb12a9569f3d0",
+        "initialDigest" : "1f774c98c6b38489a9e3b04cda29753e8fd10c78bd69e285222ef04c05123c7b",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-063",
+      "seed" : "1"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "558b01c277116d6f47d2b3000da68032dfcc1118fedc648714f31ec62ab805b9",
+        "initialDigest" : "3d7d5b0740491fab2cdaba25afbcad1f859bcbdac5bcb095befe5686987bb33b",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-064",
+      "seed" : "8"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f3d63438b3e5a23d85770c31b28514d24841ead60a72f3d59736c13c28cd6aee",
+        "initialDigest" : "4a4641c0268a5fa3507a9bda247ff3299a7bcb892c59012789efdd64fa8200b2",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-065",
+      "seed" : "15"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              4,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "dc809d646a24d55dab200820384287420f1fcb6e34e353d8fdf1edf3edf23d8a",
+        "initialDigest" : "1fb510348ed58fec48c7118472526d8ad5624f74b7d241f19678f489ddf1c6d8",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-066",
+      "seed" : "22"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "5706b20986b8d1f29b8ad470f810a6373a81553cdfd123d8829670108ea9ebe5",
+        "initialDigest" : "9b10aa484f00a72905191c98cca15fda40ac1c955af694087bb5ad40cd984f71",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-067",
+      "seed" : "29"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "f3b3cf71171140f16b4e75254775501bcb5320ea5961c01465b88011b33f3660",
+        "initialDigest" : "ce508803160e432aa495b5830fd6ec9ff07e2503147206c871aa2da42f53a078",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-068",
+      "seed" : "36"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              1,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              1,
+              3,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              2,
+              4,
+              7
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "b48a5cff463e509e6b9beefa2b8c6429e500456a7dbbb56df54ee0d12abf2843",
+        "initialDigest" : "c3cf6a22a64c998e2b93130c0aee49699f167d0f45bc01cd69a4cd8703c1102b",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-069",
+      "seed" : "43"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              6,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              6,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "moon.set",
+            "values" : [
+              3
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "73854b82854aa1b4e00b8f37c4920b7bc060b3cb2a30d4068604c18d2e386336",
+        "initialDigest" : "b9fa5584af3a5d3d8251638235dbb9554a5a4c1b7d6fc1b65518e0912867858f",
+        "outcome" : "won"
+      },
+      "name" : "acceptance-070",
+      "seed" : "50"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "3687c3373d934e922b4564fada1e12599d7fe0391f269459ad14b3bb27c2eeb9",
+        "initialDigest" : "ec04997e439f3d1b72de2c33abd4043d39295f6af0609c3be0b539d2a8bc2edb"
+      },
+      "name" : "acceptance-071",
+      "seed" : "57"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "9737669cbe5c99fb7083bd06603eb325ef48decae3474b7cc51bdd07b279aedb",
+        "initialDigest" : "84f4386939530830994d66807185f13f1d81f87adee4b67b8a084d853961a64e"
+      },
+      "name" : "acceptance-072",
+      "seed" : "64"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              6
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "0bdfbc18dfc4655a787023d112b28770adf390c338c01e722c2df9186d5844ed",
+        "initialDigest" : "95f804742f8c06355eb3fefe696ea4d2a0c78f589db6259284bc41582a7cbe0c"
+      },
+      "name" : "acceptance-073",
+      "seed" : "71"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              3,
+              4
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "000d3d0a0d0e8c2487c99d66ea8ef28611a5c30819f821f03f026cddd11da61a",
+        "initialDigest" : "49be6c0a7cf4be71f5fbf72d65f9a992f5361f4f35ed4a537fb692869989ec34"
+      },
+      "name" : "acceptance-074",
+      "seed" : "78"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "aeee613d6e2133be84378d7b5047a1e27e0d40a5f6803699b8c2a7142f348705",
+        "initialDigest" : "58ed1e90f5bedcde4158b294504e3f8783fb2b3b5b8968ccb685e40a4aea6ad1"
+      },
+      "name" : "acceptance-075",
+      "seed" : "85"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "6b4cae4817ae393cda9b49747303579a2ce0889a99250b4e3d527bf304250671",
+        "initialDigest" : "9002ed9890e96c9c31a07610603119f9c3e42e043cc9d6f013ef09e3a89f5df0"
+      },
+      "name" : "acceptance-076",
+      "seed" : "92"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf",
+        "initialDigest" : "c874a01aaf41f691d0893486a5eefe76722ffd542eee3a8c47504ea87d44aab3"
+      },
+      "name" : "acceptance-077",
+      "seed" : "99"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              0,
+              1
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "4706482b60fef5a62486231eb7371af24e4975dba0ed91aa7a9e14884ff644bb",
+        "initialDigest" : "80fa5c7d835787fc1cb0ec7362018e686713f504d060bb054fcba273e65c51e6"
+      },
+      "name" : "acceptance-078",
+      "seed" : "6"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "993e972bbb6136b9c892ad387a14eba2b8043e99936ec776fbe1974660e0184b",
+        "initialDigest" : "19df63888e1f3fb4be5f200b52d118a46aafc0f3d2a25da06c52fa7cb29256d6"
+      },
+      "name" : "acceptance-079",
+      "seed" : "13"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "level.next",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              4,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "action.rule.r02-g20.action",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e3cb02653c3cd4c8f6f3237b9d7713c56f7a83b75861520633b79a04f72ba2b1",
+        "initialDigest" : "1bb1ca3bee24e06e79188be3f88b22ab8c948e0ae5c36ad72030b3f07e44d3bf"
+      },
+      "name" : "acceptance-080",
+      "seed" : "20"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "vent.set",
+            "values" : [
+              0,
+              0
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "77502389d44a4a0890f0fd105103f176b7213fbe92c10868698f31c84bfac671",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf",
+        "outcome" : "won"
+      },
+      "name" : "fixture-level-1-solved",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "weather.run",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "e231cccc7782b7e1ad891ce355fb1f62e8debe7e07a1e51437b3f80bef054876",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf",
+        "outcome" : "failed"
+      },
+      "name" : "fixture-run-fails",
+      "seed" : "0"
+    },
+    {
+      "entries" : [
+        {
+          "action" : {
+            "control" : "pod.place",
+            "values" : [
+              0,
+              2,
+              5
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.undo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        },
+        {
+          "action" : {
+            "control" : "play.redo",
+            "values" : [
+
+            ]
+          },
+          "result" : "accepted",
+          "steps" : 1
+        }
+      ],
+      "expect" : {
+        "finalDigest" : "14a905d2b3bf55965421d388fe5732eaa28d2685041582eb0e3d77827f8ebfc8",
+        "initialDigest" : "35114af0f3d162d3e63364b588ec635805f3f624c09d86de7a77ba057ff6c2bf"
+      },
+      "name" : "fixture-undo-redo",
+      "seed" : "0"
+    }
+  ],
+  "schema" : 1
+}

@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "MushroomWeatherExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing MushroomWeatherExperienceTests",
+  "elapsed_seconds": 9.145,
+  "exit_code": 65,
+  "finished": "2026-11-27T04:21:56+00:00",
+  "gate": "R02-G20-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G20-03.sim-27.log",
+  "log_sha256": "594bd78231d5715eeecbe76c02950e675fba05afd52d3ec53b53841ebf32f2ae",
+  "name": "sim-27",
+  "started": "2026-11-27T04:21:46+00:00",
+  "timed_out": false
+}

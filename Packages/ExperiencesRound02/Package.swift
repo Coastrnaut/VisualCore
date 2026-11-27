@@ -66,6 +66,7 @@ let package = Package(
         .library(name: "MicroscopicAuroraExperience", targets: ["MicroscopicAuroraExperience"]),
         // Feature 491 (R02-G20-01): Mushroom Weather's rule kernel, a candidate until X-R02-G20.
         .library(name: "MushroomWeatherCore", targets: ["MushroomWeatherCore"]),
+        .library(name: "MushroomWeatherExperience", targets: ["MushroomWeatherExperience"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -841,6 +842,27 @@ let package = Package(
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "MushroomWeather/CoreTests"),
+        // Feature 493 (R02-G20-03): Mushroom Weather's experience (presenter, scene, controls).
+        .target(name: "MushroomWeatherExperience",
+                dependencies: ["MushroomWeatherCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "MushroomWeather/Experience"),
+        // Feature 493 (R02-G20-03): the simulator tests of Mushroom Weather's experience.
+        .testTarget(name: "MushroomWeatherExperienceTests",
+                    dependencies: ["MushroomWeatherExperience", "MushroomWeatherCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "MushroomWeather/ExperienceTests"),
         // Feature 481 (R02-G19-01): Microscopic Aurora's pure rule kernel.
         .target(name: "MicroscopicAuroraCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),

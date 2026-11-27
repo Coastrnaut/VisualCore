@@ -1627,7 +1627,7 @@
       "id": "r02-g20.mushroom-weather",
       "code": "R02-G20",
       "title": "Mushroom Weather",
-      "summary": "Arrange fungi to create a stable forest humidity network",
+      "summary": "Place glowing spore pods on a midnight forest floor, open or close canopy vents and shift the moonlight, then let the weather run: every mushroom colony must hold its humidity band to the end, without a sensitive colony drying out or a cell turning to mold.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1636,11 +1636,30 @@
         "micro-ecosystems"
       ],
       "order": 45,
-      "palette": [],
+      "palette": [
+        "#050A1A",
+        "#5FD3A0",
+        "#F2A93B",
+        "#3A6FD8",
+        "#12261C"
+      ],
       "tile_seed": 1604298359,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Keep every colony in its humidity band",
+        "Weather in exact whole units",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "a71fe37a03ecb54e1a1b3e73c490119e3a18cf04ce5395307f504e54c6c584e5",
+        "levels": 100
+      },
       "available": false
     },
     {
