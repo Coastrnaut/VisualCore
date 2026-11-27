@@ -64,7 +64,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
   `damaged`, the sound setting), `BinaryGardensProgressionCoreTests.swift`, `BinaryGardensSceneSnapshotTests.swift`
   (`schemaVersion`) and `BinaryGardensFeedbackPlanTests.swift`; `--name host-2 -- swift test --package-path
   Packages/ExperiencesRound02 --filter BinaryGardens`
-- [ ] T-R02G2107-004 [P] [US1] [US2] Create
+- [X] T-R02G2107-004 [P] [US1] [US2] Create — Verified 2026-11-27: host-3 exit 0 (swift test --filter BinaryGardens: 318 tests in 30 suites; BinaryGardensPersistenceTests pass)
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensPersistenceTests.swift` (agent C: 500 seeded
   states round-trip with equal digests, the sound choice included and never digested; schema 1 and 2 payloads of 100
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
