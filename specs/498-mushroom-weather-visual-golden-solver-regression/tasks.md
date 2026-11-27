@@ -80,7 +80,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
   host-full`, `--name app-unit`
 - [X] T-R02G2008-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G20-08.reference-1.json)
 - [X] T-R02G2008-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0 (.autonomy/migration/checks/R02-G20-08.reference-2.json)
-- [ ] T-R02G2008-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G2008-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit=0 (.autonomy/migration/checks/R02-G20-08.script-tests.json)
 - [ ] T-R02G2008-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden
   levels. Not run before the lock.
 - [ ] T-R02G2008-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
