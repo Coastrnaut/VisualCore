@@ -21,7 +21,7 @@ Canonical overrides:
 - **Superseded parts of the source prompt:** price, "no IAP", the Round 2 lock, the per-round device campaign and the
   "content count 76" milestone figure (the catalog has 100 certified levels). **Device-only items:** frame time and
   memory on D1/D2/D3 after ImplementationLock-100. **Owner-only items:** none.
-- **Model:** feature 488 (the Mushroom Weather visual golden and solver regression), adapted to pods on sites,
+- **Model:** feature 488 (the Microscopic Aurora visual golden and solver regression), adapted to pods on sites,
   vents and moonlight, the run of the weather, the midnight forest floor and the glowing caps.
 
 ## User Scenarios & Testing *(mandatory)*
