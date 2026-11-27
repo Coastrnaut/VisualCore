@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-03 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2003-###,
 SC-R02G2003-###, T-R02G2003-###
@@ -30,6 +30,97 @@ Canonical overrides:
   non-colour clues) and the shared custom-shader mesh renderer added at R02-G01-03, through the existing VisualCore
   packages; the kernel and certified levels of R02-G20-01 and -02.
 - **Model:** feature 483 (Microscopic Aurora's hero renderer and experience).
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+483's answers where the games agree. Facts checked in code (read-only, 2026-11-26): Microscopic Aurora's experience as
+recorded at R02-G19-03 is the pattern in this package — a Core adapter with a table of certified candidate indices, an
+immutable scene snapshot, a CPU projection reference, GLSL sources in the Core, an iOS-only experience target
+(`…Experience.swift`, presenter, scene, controls), a scenario manifest with 80 acceptance scenarios, a registration with
+content facts in `Catalog/registrations.json` and the public `ShaderMeshRenderer`; the Mushroom Weather kernel provides
+the level (rows, columns, blocked cells, humidity, vents, pod rules, colonies with bands and floors, M, T, K, sites,
+budget), the run's integer humidity per cycle (`MushroomWeatherForest.run(…, keepFields: true)`), the report (ledger,
+growth cycles, colony runs, failure: dried, mold, unstable), the play (place, remove, vent, moonlight, run, undo, redo,
+stages) and the certified catalog of R02-G20-02 (6 … 9 by 6 … 10 cells, 2 … 5 colonies, 1 … 3 vents, 4 … 6 sites, runs
+of 30 … 40 cycles); `AppModelTests` uses `r02-g20.mushroom-weather` as its synthetic unregistered candidate and the next
+round-two game is `r02-g21.binary-gardens`; the archived matrix has 80 acceptance rows R2-G20-QA-001 … 080; the
+catalog's design gives the palette "fern jade, amber spores and deep blue", the hero "glowing umbrella caps breathing
+droplets into a midnight miniature forest" and the geometry "procedural lathed stalks and SDF mushroom caps".
+
+- Q: What exactly does the scene show, and how does it map the rules to space? → A: the floor plane is z = 0; cell (r, c)
+  of a level with R rows and C columns has its centre at world ((c − (C − 1)/2) · s, ((R − 1)/2 − r) · s, 0) with
+  s = min(1.8 / C, 1.6 / R), so every level fills the same box (one rule for every level); y is up the floor. Drawn in
+  this order with depth testing on for the solid parts: the backdrop (a large quad behind the floor; a vertical gradient
+  from midnight #050A1A at the bottom to midnight top #0E1A33 at the top, still); the moon (a disc of radius 0.12 at
+  (1.15, 1.05, −0.5), moon #E8EEF7, its brightness (4 + L)/7 and four phase ticks around it with L + 1 filled); the
+  floor cells (a square of side 0.96 s per floor cell, moss #12261C); the blocked cells (a log — a rounded box 0.8 s long
+  — when r + c is even, otherwise a stone — a low dome 0.36 s in radius; log #2A2118); the fronds (at the two richer
+  tiers only: small L-system fronds of three generations on blocked cells and along the floor's edge, reaching at most
+  0.3 s from their root, frond #1F4A33, decoration only); the mist (per floor cell a translucent square at height 0.02,
+  side s · (0.2 + 0.7 · min(1, h/M)) for the humidity h at the shown cycle, shaded from mist low #0B1E4A to mist high
+  #3A6FD8 by h/M — size and shade both carry the value); the sites (a ring of radius 0.32 s on the floor, site
+  #C9A15A); the colonies (a lathed stalk 0.35 s tall and a lathed umbrella cap of radius 0.42 s on top, cap #5FD3A0 when
+  the colony is in band at the shown cycle, cap out #3F6E5A otherwise, with a band ring — solid in band, dashed out — on
+  the floor around the stalk, stalk #D8E6D0; the cap's fragment shader adds an SDF sparkle of moisture beads whose
+  density follows h/M); the pods (a lathed amber orb of radius 0.18 s, 0.26 s once grown with a second ring, pod
+  #F2A93B, at height 0.1 s); the droplets (amber motes rising from each pod on fixed paths by presentation time, droplet
+  #FFC861, decoration only); the vents (a slatted frame of side 0.9 s at height 0.9 s over the vent cell; slats tilted
+  open or flat shut; vent #6E8B7A); the gauges below the floor, one row per colony from y = −1.0 down in steps of 0.07: a
+  track from x = −0.9 to 0.9 mapping 0 … M with a band bracket over low … high (band #9FF5C8) and a marker at the
+  humidity at the shown cycle (marker #F2A93B), and to its right a run bar of K segments lit for the colony's final run;
+  the actions bars, `budget` bars at y = −1.0 − 0.07 · (colonies) − 0.05 (each 1.8 / budget wide with a gap of a fifth,
+  0.04 tall), lit for the actions left. The glow is additive and drawn last. The field shown is the predicted run of the
+  current arrangement; the shown cycle is presentation state of the adapter (`clock.show [cycle]`, 0 … cycles run, never
+  in the digest), 0 at opening and never advanced by time. The camera is a fixed authored perspective (eye (0, −1.6,
+  3.0) looking at (0, −0.2, 0)) fitted to the box x −1.3 … 1.3, y −1.5 … 1.2 with a 5 % margin for aspect 0.4 … 2.5.
+  Nothing drawn is consulted by the rules. Impact: FR-R02G2003-001, 002, 003, 006.
+- Q: What do the three quality tiers change? → A: `level-0` (richest): lathed stalks, caps and pods of 16 segments with
+  layered shading (translucent cap with rim light and the sparkle), 12 droplets per pod, fronds, 8 spore motes on a fixed
+  loop and 2 glow shells around the caps and pods; `level-1`: 10 segments, 6 droplets, fronds, 4 motes, 1 glow shell;
+  `level-2` (the design's "Tier 0, D3-safe"): flat caps and pods (screen-facing discs), no droplets, no fronds, no motes,
+  no glow. The backdrop, moon, floor, blocked cells, mist, sites, vents, gauges, colours and positions are the same at
+  every tier. Levels are ordered richest first; the presenter logs each tier change with its reason. Impact:
+  FR-R02G2003-004; SC-R02G2003-001.
+- Q: How are rendered frames checked, and within which bounds? → A: the Core's CPU reference projects through the same
+  camera the floor centre, every colony's cap centre, the moon centre, the first gauge track's centre and the first
+  actions bar, and gives the palette. Simulator tests render offscreen at 1,152 × 768 at the shown cycle half the cycles
+  run and check, at points at least 6 pixels from every element drawn after them, that each cap's centre is brighter
+  than the floor (moss) by at least 0.2 in luminance (at least one cap is checked in every frame); that the moon's centre
+  differs from the backdrop by at least 0.1; that the first actions bar (lit) has red above blue by at least 0.08
+  (amber); that the first gauge track differs from the backdrop by at least 0.1; and that the median of a 9 × 9 pixel
+  patch of backdrop in a lower corner matches the gradient colour at its height within 0.06. Palette: midnight #050A1A,
+  midnight top #0E1A33, moon #E8EEF7, moss #12261C, log #2A2118, frond #1F4A33, mist low #0B1E4A, mist high #3A6FD8,
+  site #C9A15A, stalk #D8E6D0, cap #5FD3A0, cap out #3F6E5A, pod #F2A93B, droplet #FFC861, vent #6E8B7A, band #9FF5C8,
+  marker #F2A93B, actions lit #F2A93B, actions unlit #1A2A3A, broken #FF6B5E, glow #F7FFF9. Impact: FR-R02G2003-006;
+  SC-R02G2003-001.
+- Q: What happens on a shader failure, and what does the renderer read? → A: the presenter draws from an immutable
+  `MushroomWeatherSceneSnapshot` (the humidity field by cycle of the predicted run, the cycles run, the shown cycle, the
+  floor and blocked cells, the colonies with bands, floors and runs, the pods with their growth cycles, the sites, the
+  vents and their states, the moonlight, stage, failure, actions left, budget, level number and presentation time) made
+  by the adapter; it never holds the kernel. If a program fails to compile or link, the scene draws the level-2
+  geometry unlit with the shared unlit mesh renderer, keeps `fallbackReason` and keeps running; tier changes go to its
+  `tierLog`. Reduce Motion stops the droplets and motes (the field never moves by time already); Reduce Flashing caps
+  the glow gain. A failure marks the failing element in the broken colour (dried: the colony's cap wilts flat and its
+  band ring turns broken; mold: the moldy cell gets a broken patch; unstable: the named colony's gauge marker and run bar
+  turn broken) and the failure text names it, as the kernel's reason does. Impact: FR-R02G2003-003, 007; SC-R02G2003-002.
+- Q: How is the experience registered and what does the adapter accept? → A: `Catalog/registrations.json` gains
+  `r02-g20.mushroom-weather` (capabilities of at most 40 characters, tiers `level-0` … `level-2`, the palette #050A1A,
+  #5FD3A0, #F2A93B, #3A6FD8, #12261C, the scenario manifest `Packages/ExperiencesRound02/MushroomWeather/
+  scenario-manifest.json`, no permissions, a summary of at most 300 characters, content facts: 100 levels and the pinned
+  catalog digest of R02-G20-02); `project.yml` and the app's experience registry link `MushroomWeatherExperience` as a
+  candidate (`available: false` until X-R02-G20), opening at seed 0 (level 1); `AppModelTests` switches its synthetic
+  unregistered candidate to the next round-two game (`r02-g21.binary-gardens`). The adapter
+  (`MushroomWeatherExperienceCore`) prepares certified level (seed mod 100) + 1 from its table of certified candidate
+  indices (the whole catalog only if that candidate no longer certifies) and accepts `pod.place [slot, row, column]`,
+  `pod.remove [slot]`, `vent.set [index, open]` (open 1, shut 0), `moon.set [level]`, `weather.run`, `play.undo`,
+  `play.redo`, `level.next` and `clock.show [cycle]` (whole numbers only); the kernel refuses everything out of range or
+  out of stage and `clock.show` refuses a cycle outside 0 … cycles run; its digest (domain
+  `r02-g20.mushroom-weather.v1`) is the level number and the play's fingerprint (never the record history or the shown
+  cycle, so undo restores the earlier digest); snapshot schema 1 `{level, records}`. Impact: FR-R02G2003-005, 008, 009;
+  SC-R02G2003-004.
 
 ## User Scenarios & Testing *(mandatory)*
 
