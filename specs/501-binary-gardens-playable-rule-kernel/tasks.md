@@ -75,7 +75,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
 
 ## Phase 4: Stories 2 and 3 — failures, undo, redo, replay (P1)
 
-- [ ] T-R02G2101-004 [P] [US1] [US2] [US3] Create
+- [X] T-R02G2101-004 [P] [US1] [US2] [US3] Create — Verified 2026-11-27: host-3 exit=0, BinaryGardensPlayTests: 500 seeded traces replay, undo exact, every refusal reachable (.autonomy/migration/checks/R02-G21-01.host-3.json)
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensPlay.swift` (agent B: stages "loading, tutorial,
   playing, paused, won, failed, result"; the arrangement from the level; `ring(star, index)`, `phase(star, step)`,
   `luminosity(star, index)` and `tilt(step)` validated in the order stage, previous fingerprint, action ("star not 1 …
