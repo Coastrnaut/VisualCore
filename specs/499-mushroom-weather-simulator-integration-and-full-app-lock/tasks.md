@@ -44,7 +44,7 @@ change (the shaders and reference of R02-G20-03 are unchanged and re-proven by t
   `MWReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified plan (a pod at row 2, column 5 in slot 0, then vent 0 closed)
   and the budget pinned in `MW`; the slot and site moved with Pod and Site − or + by their controls' values, Place
   tapped, counted only when the actions-left count of the `actions` text moves; vent 1's toggle tapped until its value
-  reads closed, counted the same way; then Run; read "Every colony stayed in its band." and "Best: 3 of 3 stars";
+  reads closed, counted the same way; then Run; read "Every colony ended the run in its band." and "Best: 3 of 3 stars";
   background before terminate on relaunch); edit
   `scripts/release_check.py` (`UI_CHUNKS["c4"]`, `"c4"` in `SERIAL_CHUNKS`) and `scripts/test_scripts.py` (agent D; the
   key `c4` checked unique among the keys; any new test class above the `if __name__ == "__main__":` block); `xcodegen

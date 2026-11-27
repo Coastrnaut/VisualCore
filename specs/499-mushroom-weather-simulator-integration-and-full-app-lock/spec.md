@@ -38,7 +38,8 @@ Aurora) is the model (`Apps/VisualCore/Tests/UI/MicroscopicAurora` with `MASuppo
 `MicroscopicAuroraSchemaExamples.swift`); Mushroom Weather's panel (features 493 … 497) gives every control a label, a
 value and an identifier through `port.identifier(name)` as Microscopic Aurora's does; its snapshot is schema 3 after
 feature 497 (schema 1 `{level, records}`, 2 adds the mode, progress and the tutorial, 3 adds the sound choice and traces);
-the canvas description of a won level says "Every colony stayed in its band." (feature 496) and the panel's `stars` text
+the canvas description of a won level says "Every colony ended the run in its band." (feature 493; "Every colony stayed in
+its band." is the VoiceOver announcement of feature 496, which interface tests cannot read) and the panel's `stars` text
 reads "Best: 3 of 3 stars" once a level is won with its certified count; level 1's certified plan is a pod at row 2,
 column 5 in slot 0 and vent 0 closed (`docs/games/mushroom-weather/levels/001.witness.json`), then the run; the
 tutorial shows on levels 1 … 3; the UI chunk keys in `release_check.py` in use are a3, a4, b3, b4, c3, d3 … z3 and
@@ -55,7 +56,7 @@ g2 … z2, j4 (`c4` is free); no UI test class uses the prefix `MW`.
   -vcSkipWelcome -vcCandidates -openExperience r02-g20.mushroom-weather`: dismiss the tutorial, play level 1's certified
   plan — choose slot 1, move the site with Site − / Site + to the target (reading the control's value after a press so a
   lost tap is retried), press Place (counting it only when the actions-left count moves), toggle vent 1 (identifier
-  `vent-0`) closed — then Run; read "Every colony stayed in its band." and "Best: 3 of 3 stars", the level picker shows
+  `vent-0`) closed — then Run; read "Every colony ended the run in its band." and "Best: 3 of 3 stars", the level picker shows
   level 2 open; relaunch without reset after sending the app to the background: the stars and level 2 are kept) and
   `MWReplayUITests` (after
   the win, Replay best solution, Step until the replay ends won, Stop back to the campaign). They run as a new serial
@@ -96,7 +97,7 @@ visible, labelled controls and read the experience's spoken texts.
 
 1. **Given** a fresh app on the simulator, **When** the tester opens Mushroom Weather and plays level 1's certified
    solution (its pod placement and vent change, then the run of the weather) with the panel's buttons, **Then** the
-   experience says "Every colony stayed in its band.", the stars read "Best: 3 of 3 stars", and level 2 is open in the level picker.
+   experience says "Every colony ended the run in its band.", the stars read "Best: 3 of 3 stars", and level 2 is open in the level picker.
 2. **Given** a won level, **When** the app is relaunched, **Then** the same progress, stars and open levels are shown.
 3. **Given** a solved level, **When** the tester starts the replay and steps through it, **Then** the replay ends won
    and stopping it returns to the campaign.
@@ -143,8 +144,8 @@ solver regression proves all 100 levels solvable as certified.
   replay a solved level to its end.
 - **FR-R02G2009-003**: The app registration MUST store a migration example of every earlier snapshot schema (1 and 2),
   and the app's unit tests MUST restore each and open the candidate through the registry and engine.
-- **FR-R02G2009-004**: The app MUST compile in the debug and release configurations for the simulator with Microscopic
-  Aurora linked; test-only code MUST be excluded from release.
+- **FR-R02G2009-004**: The app MUST compile in the debug and release configurations for the simulator with Mushroom
+  Weather linked; test-only code MUST be excluded from release.
 - **FR-R02G2009-005**: The all-level solvability regression (feature 498) MUST pass in this gate's evidence.
 - **FR-R02G2009-006**: Mushroom Weather MUST stay a candidate: not listed as available, not openable from the
   catalog without the testing argument.
