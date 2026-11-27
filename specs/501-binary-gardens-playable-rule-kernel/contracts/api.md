@@ -37,7 +37,7 @@ public struct BinaryGardensReport: Sendable, Equatable {
     public let starPositions: [[BinaryGardensPoint]]                      // [tick 1 … 48][star]
     public let worldPositions: [[BinaryGardensPoint]]                     // [tick 1 … 48][world]
     public let worlds: [BinaryGardensWorldLight]
-    public let minimumSeparationSquared: Int; public let minimumSeparationTick: Int   // scale 2^40, tick 0 … 47
+    public let minimumSeparationSquared: Int; public let minimumSeparationTick: Int   // scale 2^40, tick 0 … 47 (tick 0 is the configuration of tick 48)
     public let failure: BinaryGardensFailure?; public var wins: Bool { get } }
 public enum BinaryGardensSky {
     public static let cycle: Int                                          // 48

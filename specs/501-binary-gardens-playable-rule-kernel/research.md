@@ -64,7 +64,7 @@
   nears the limit, when a third group is added. Local: chunk 2 (`MoonlitMechanism|AcousticConstellator|HarmonicBridges`,
   48 s at R02-G20-10) gains `BinaryGardens`, the lightest of the five chunks (1: 57 s, 3c: 138 s, 3e: 211 s, 3f: 147 s);
   feature 491 placed Mushroom Weather in 3f, which already has five games. Rationale: the new tests run in exactly one
-  CI half and one local chunk; the chunks stay balanced and far below 540 s. Alternatives: 3f (heaviest by game count);
+  CI half and one local chunk; the chunks stay balanced and far below 540 s. Alternatives: 3f (already five games, 147 s);
   a sixth chunk (more runs per gate for seconds of tests).
 - **R13 Fingerprints as the signed snapshot.** Decision: the level fingerprint is SHA-256 (`StableHash.sha256Hex`) of a
   canonical text of every level field in a fixed order; the play fingerprint is SHA-256 of schema, level fingerprint,
@@ -76,7 +76,7 @@
   luminosity, and the tilt) plus actions spent; moves in a fixed order: for star 1 then star 2, rings ascending, then
   phases 0 … 47, then luminosities ascending (each skipping the current value, locked controls and separation
   breakers), then tilts 0 … T_max (skipping the current); at most 120 moves, within `FairnessBudget.maxBranching`
-  (1 024). Rationale: "bounded coupled-orbit parameter sweep with sampling of received flux" sweeps exactly these
+  (1 024; the initializer's default is 64, so R02-G21-02's fairness budget passes maxBranching ≥ 120). Rationale: "bounded coupled-orbit parameter sweep with sampling of received flux" sweeps exactly these
   arrangements; the goal test is the kernel's predicted win.
 - **R15 Budget from the start at 1 … 24.** Decision: the action budget range is 1 … 24. Rationale: Mushroom Weather's
   feature 492 had to widen 1 … 12 to 1 … 24 for the manifest; the R02-G21 manifest needs 8 … 19.

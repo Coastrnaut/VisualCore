@@ -43,13 +43,14 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
   increasing, each 1 … 40), starSpeed ω 1 … 3, luminosityLevels (1 … 4, strictly increasing, each 1 … 64)", "maxTilt
   T_max 0 … 6, startTilt 0 … T_max, minimumSeparation σ 0 … 16, clampRadius r_min 1 … 8", "lethalTolerance E 0 … 12,
   budget 1 … 24", tutorial, seed, id; refused per FR-R02G2101-001 ("refused `r02-g21.level` when any value is out of
-  range or out of order, nothing is adjustable (all six star flags false and T_max = 0), the starting stars break the
+  range or out of order, nothing is adjustable (all six star flags false and T_max = 0), a star's luminosity is marked adjustable
+  while there is only one luminosity level, the starting stars break the
   separation at a tick of 0 … 47, or the starting arrangement already wins"); the arrangement "indices in range; 0 ≤ τ ≤
   T_max; keeps the separation at every tick 0 … 47"; stars, rings, worlds, bands, measures and progress named in words
   (FR-R02G2101-013); JSON schema 1 with sorted keys and fingerprint ("SHA-256 of the canonical text of every other field
-  (schema included, fingerprint excluded)"); decode re-checks ("broken JSON, a missing field, a schema below 1 or a
-  fingerprint that does not match the canonical text → `r02-g21.malformed`; `schema` > 1 → `r02-g21.newer-schema`; any
-  value that the initializer refuses → `r02-g21.level`")) and
+  (schema included, fingerprint excluded)"); decode re-checks in order ("broken JSON → `r02-g21.malformed`; `schema` > 1 →
+  `r02-g21.newer-schema`; a schema below 1 or a missing field → `r02-g21.malformed`; any value that the initializer
+  refuses → `r02-g21.level`; a fingerprint that does not match the canonical text → `r02-g21.malformed`")) and
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensFixtures.swift` (seeded levels with known winning
   arrangements, `SeededRandom(seed: 2_501)`, built by choosing rings, luminosities, a tilt range, worlds and an
   arrangement that keeps the separation, running it, taking each world's four flux bounds around its tick fluxes so its
@@ -68,7 +69,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
   kernel on 500 seeded runs: every position, star share, flux, band, lethal run, window, integral, minimum separation
   and outcome equal; hand cases: a flux one milliflux either side of each of the four bounds, a distance one unit either
   side of the clamp radius, a lethal run one tick either side of the tolerance (also across the cycle boundary, and
-  tolerance 0), a window one tick short of the requirement and the whole cycle comfortable, an integral one milliflux
+  tolerance 0), a mixed lethal-low-then-high run, a window one tick short of the requirement and the whole cycle comfortable, an integral one milliflux
   either side of each bloom bound, a separation one unit either side of the minimum, the judge order frozen/scorched →
   unstable → wilted/bleached); `--name host-2`
 
@@ -87,7 +88,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
   after an undo from failed re-runs the run and ends failed again with the same failure"); replay ("a replayed chain
   must start at the initial fingerprint and link every next to the following previous")) with
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensPlayTests.swift` (known arrangements win on the
-  run; each failure named; the budget refusal on the exact action with the run still allowed; 500 seeded traces replay;
+  run on 500 seeded fixtures (SC-R02G2101-001); each failure named; the budget refusal on the exact action with the run still allowed; 500 seeded traces replay;
   undo restores exact fingerprints; every refusal reason reachable); `--name host-3`
 
 ## Phase 5: Story 4 — contract and invariants (P2)

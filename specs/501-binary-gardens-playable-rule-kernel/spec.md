@@ -183,6 +183,8 @@ refused.
 - **Flux exactly at a lethal bound:** not lethal; lethal needs a strictly lower or higher flux.
 - **Flux exactly at a comfortable bound:** comfortable.
 - **A lethal run exactly as long as the tolerance:** the world survives; failure needs one tick more.
+- **A mixed lethal run** (lethal low then lethal high with no other tick between): one run; it fails with the band
+  of the tick at which it exceeds the tolerance (`frozen` if lethal low, `scorched` if lethal high).
 - **A lethal run straddling the end of the cycle:** counted whole, through the start of the next cycle; the failure
   names the walk tick (tick 50 is tick 2 of the next cycle).
 - **A comfortable window exactly as long as required, or the whole cycle comfortable:** the window holds (48 ticks at
@@ -204,7 +206,7 @@ refused.
   four flux bounds, the required window and the bloom band), the lethal tolerance, the action budget and whether it
   shows a tutorial. A level is refused when a value is out of range or out of order (ring radii or luminosity levels not
   strictly increasing, flux bounds or bloom bounds out of order), there is no world or more than the bound, nothing is
-  adjustable, the starting stars break the minimum separation at any tick of the cycle, or the starting arrangement
+  adjustable, a star's luminosity is marked adjustable while there is only one luminosity level, the starting stars break the minimum separation at any tick of the cycle, or the starting arrangement
   already wins.
 - **FR-R02G2101-002**: Each star MUST stand on one of the level's rings at a phase of the 48-step cycle with one of the
   level's luminosities; the orbit plane MUST have one tilt within the level's range; the two stars MUST keep the minimum

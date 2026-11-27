@@ -9,7 +9,7 @@ every body is back at its starting position after 48 ticks; known arrangements w
 `unstable`, `wilted` and `bleached` failures named with the world and the tick or the measure, in the judge order
 frozen/scorched → unstable → wilted/bleached; a flux one milliflux either side of each of the four bounds, a distance
 one unit either side of the clamp radius, a lethal run one tick either side of the tolerance (also across the cycle
-boundary, and tolerance 0), a window one tick short of the requirement and the whole cycle comfortable, an integral one
+boundary, and tolerance 0), a mixed lethal-low-then-high run, a window one tick short of the requirement and the whole cycle comfortable, an integral one
 milliflux either side of each bloom bound and a separation one unit either side of the minimum; refusals with reason
 codes `r02-g21.*` (out of range, unchanged, locked, breaking the separation, budget, stage, stale); undo (including from
 failed), redo and replay fingerprints on 500 seeded traces; stored-form round trips and refusals (damaged, edited,
