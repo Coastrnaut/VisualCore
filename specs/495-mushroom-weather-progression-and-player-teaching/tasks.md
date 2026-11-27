@@ -71,7 +71,7 @@ campaign covers the game). Agents model their files on Microscopic Aurora's (fea
   `Packages/ExperiencesRound02/MushroomWeather/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); update
   `MushroomWeatherPanelWinTests`, the gesture wiring tests and other suites whose `level.next` expectation changes; lead;
   `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter MushroomWeather`
-- [ ] T-R02G2005-005 Edit `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherPresenter.swift` (the
+- [X] T-R02G2005-005 Edit `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherPresenter.swift` (the — Verified 2026-11-27: 2026-11-27 sim-27-2 exit 0 on sim-27.2: 47 tests in 6 suites incl. 10 teaching tests (tutorial steps and dismissal, three hint levels equal to the Core's, a stale search never owns the hint, hints win level 1 with 3 stars, failure explanation, band, goal and stars, practice, daily and campaign, locked and impossible-date refusals in words); the first attempt failed on the test's own daily-level constant (30 for 13), fixed (.autonomy/migration/checks/R02-G20-05.{sim-27,sim-27-2}.json)
   tutorial instruction, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it,
   the search off the main actor and a stale search never owning the hint state — and the failure explanation as panel
   text, replacing the mirror's own failure words, with the level's difficulty band (of the five bands of 20), its goal
