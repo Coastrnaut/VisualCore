@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-05 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2005-###,
 SC-R02G2005-###, T-R02G2005-###
@@ -27,6 +27,71 @@ Canonical overrides:
   (accessible text), the kernel, content, adapter, renderer and gestures of R02-G20-01 … 04.
 - **Model:** feature 485 (Microscopic Aurora's progression and teaching): hints from the current state, tutorial,
   failure text, progress and stars, daily and practice modes and the snapshot migration.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+485's answers where the games agree. Facts checked in code (read-only, 2026-11-26): a report depends only on the
+arrangement (`MushroomWeatherForest.report(level, arrangement:)`: the pods' cells, the vents' states and the moonlight);
+`MushroomWeatherSolver.plan` certifies a level with sites and no starting pod by judging every arrangement at distance
+0, 1, 2 … (pods + vents toggled + one for a changed moonlight), at most 1,500 judged; the certified witnesses are 2, 3,
+3, 4 or 5 actions by band followed by the run; `place`, `remove`, `vent` and `moonlight` each spend 1 action, the run
+none, and placements off the level's sites are refused ("not a site"); the run ends the level won, or failed with
+`dried(colony, cycle)`, `mold(cell, cycle)` or `unstable(colony, run)`, all deterministic; undo works in playing,
+paused and failed plays, a won play is final; levels 1 … 3 carry the tutorial flag; catalog budgets are 8 … 19 (1 … 24
+allowed); levels have 4 … 6 sites, 1 … 3 vents and 2 … 5 colonies; cells are named "row r, column c" in the level's
+words; the adapter prepares level (seed mod 100) + 1, keeps the shown cycle, the preview and the orbit outside the play
+and snapshots `{level, records}` as schema 1; the core may not read a clock; the other round-two games' daily
+multipliers are 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89 and 97.
+
+- Q: How is a hint computed and what does each level reveal? → A: from the current state. A won play has no hint; a
+  failed play's hint is "Undo the last action or retry the level." While playing: when the current arrangement already
+  wins, the hint is "Every colony stays in its band: run the weather"; otherwise a bounded search from the current
+  arrangement looks for a winning arrangement reachable within min(actions left, 2) actions, where an action places a
+  pod on a free site (into the first free slot), moves a slot's pod to a free site, takes a slot's pod away, toggles a
+  vent or sets another moonlight level; one action is tried before two; the certified witness's next action is tried
+  first whenever the current arrangement lies on the way to the witness's (its pods a subset of the witness's, its
+  toggled vents a subset of the witness's, its moonlight the start's or the witness's), so exact hints from a level's
+  start replay its witness, then removals by slot, moves and placements by slot and site, vents by index and moonlight
+  levels ascending; at most 1,500 arrangements judged. The first action of the found sequence is the hint; when none is
+  found: "No way to win was found in the actions left: undo the last action or retry the level." Level 1 names the kind
+  of change ("Change a spore pod", "Change a vent" or "Change the moonlight"); level 2 adds where ("Use the site at row
+  r, column c", "Take pod n away", "Use vent n" or "Make the moonlight brighter (or dimmer)"); level 3 the exact action
+  ("Put pod n on the site at row r, column c", "Move pod n to the site at row r, column c", "Take pod n away", "Open (or
+  close) vent n", "Set the moonlight to level l"). Hints never change the state, are unlimited, do not affect stars and
+  reset to level 1 after any change of the play. Impact: FR-R02G2005-002; SC-R02G2005-002.
+- Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
+  instructions in order: (1) "Tap a marked site (or choose a site and press Place) to put a spore pod there; the mist
+  and gauges show the new weather" — it advances once a placement has been accepted; (2) "Keep every colony's gauge in
+  its band through the last cycles: open or close a vent or change the moonlight, then press Run — a hint shows what to
+  change" — it advances once a second action has been accepted or the level ends; (3) "A sensitive colony drying out, a
+  cell growing mold or a colony leaving its band too early fails the run: undo and try another change" — until the level
+  ends. `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G2005-001; SC-R02G2005-001.
+- Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted pod, vent and
+  moonlight record, undone ones included: 3 when at most the certified witness's action count, 2 when at most that + 2,
+  else 1; per level the best (least) actions spent of a won campaign play and its stars, a better result replacing a
+  worse one; level 1 open; a campaign win opens the next; `level.select [n]` opens any open level and refuses others
+  (`r02-g20.locked`); `level.next` moves to the next open level (refused when none, `r02-g20.locked`); the five bands of
+  20 are the certified difficulty bands. Impact: FR-R02G2005-004; SC-R02G2005-004.
+- Q: How do the daily level and practice mode work? → A: the daily level is (days from 2026-01-01 to the given calendar
+  date × 17) mod 100 + 1, negative day counts wrapped into 0 … 99 (17 is coprime with 100 and differs from the other
+  round-two games' multipliers); the date reaches the core as `mode.daily [year, month, day]` (an impossible date is
+  refused with `r02-g20.date`). Daily play follows campaign rules (a daily win records that level's best result and
+  stars) but does not open levels. `mode.practice` replays the current level with the budget raised to the kernel's
+  maximum (24); practice results never award stars or open levels; `mode.campaign` returns. Impact: FR-R02G2005-005;
+  SC-R02G2005-004.
+- Q: Where does progress live, how is it versioned and how is a failure explained? → A: as feature 485: progress and the
+  mode are part of the experience state and its digest; the tutorial step is snapshotted but not digested; the hint
+  level is presentation (held by the presenter, its search off the main actor); the shown cycle, a drag's preview and
+  the orbit stay presentation; the snapshot payload becomes schema 2 (`{level, mode, progress, records, tutorial}`) with
+  a migration from schema 1 (level 1 open plus the restored level, campaign mode, tutorial at its first step on
+  tutorial levels). A failure is explained from the play's failure, colonies numbered from 1 and cells in the level's
+  words ("the cell at row r, column c"): dried — "Colony n dried out at cycle t: it fell below its survival floor.";
+  mold — "The cell at row r, column c grew mold at cycle t: it rose above the mold bound."; unstable — "Colony n stayed
+  in its band for only the last r cycles; k were needed." — each followed by "Undo the last action or retry the level."
+  Impact: FR-R02G2005-003, 007; SC-R02G2005-003.
 
 ## User Scenarios & Testing *(mandatory)*
 
