@@ -1073,4 +1073,7 @@ and snapshot schema 2 with a migration from schema 1. Feature 506 (R02-G21-06) a
 Feature 507 (R02-G21-07) adds persistence and replay: snapshot schema 3 with migrations from 1 and 2, winning traces with
 every result, `BinaryGardensReconciliation` (restore replays and checks every stored result), the replay mode and the
 saved sound choice.
+Feature 508 (R02-G21-08) adds the regression net: the solver regression over all 100 levels with thirteen named
+alterations, `BinaryGardensGolden` (17 pinned frame descriptions, test builds only) with simulator frame checks, the
+memory cycles and `scripts/binary_gardens_regression.py`.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).

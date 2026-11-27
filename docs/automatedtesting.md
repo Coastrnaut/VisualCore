@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G21-07: Binary Gardens persistence and replay).
+Last updated: 2026-11-27 (R02-G21-08: Binary Gardens regression net).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Binary Gardens regression net** (R02-G21-08, 2026-11-27). Host: solver regression (15: ten groups of ten levels
+  and thirteen alterations on levels 1, 41, 81), golden descriptions (13, 17 pinned frames). Simulator: golden frames
+  (4, level 25's tilt pip included) and memory (12 cycles; the 16 MB bound only with
+  `TEST_RUNNER_BINARY_GARDENS_MEMORY_ISOLATED=1`), 82 tests in the suite. `python3 scripts/binary_gardens_regression.py`
+  runs both parts (`--dry-run`, `--skip-simulator`); CI half b has the step "Binary Gardens regression (host)".
 - **Binary Gardens persistence and replay** (R02-G21-07, 2026-11-27). Host: reconciliation (19), progress traces (24),
   replay core (8), persistence (500 round trips, 100 + 100 migrations, 200 seeded saves, determinism), the replay
   catalog (100 levels in 10 groups, each step against the witness fingerprints); the `BinaryGardens` filter now runs 318
