@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g20.mushroom-weather",
+    "--runtime",
+    "26"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g20.mushroom-weather --runtime 26",
+  "elapsed_seconds": 440.121,
+  "exit_code": 0,
+  "finished": "2026-11-27T10:07:27+00:00",
+  "gate": "X-R02-G20",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G20.sim26.log",
+  "log_sha256": "2feb23549165e7ef13418772d29b272381fb434017f2cbda66cd9f6853e3e99f",
+  "name": "sim26",
+  "started": "2026-11-27T10:00:07+00:00",
+  "timed_out": false
+}
