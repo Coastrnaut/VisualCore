@@ -55,7 +55,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
 
 ## Phase 4: Stories 2 and 3 — simulator frames and memory (P1, P2)
 
-- [ ] T-R02G2108-005 [US2] [US3] Create
+- [X] T-R02G2108-005 [US2] [US3] Create — Verified 2026-11-27: sim-27 exit 0 (sim-27.2, BinaryGardensExperienceTests: 82 tests in 10 suites; 17 golden frames incl. level 25's tilt pip, 12 memory cycles)
   `Packages/ExperiencesRound02/BinaryGardens/ExperienceTests/BinaryGardensRegressionGoldenFrameTests.swift` and
   `Packages/ExperiencesRound02/BinaryGardens/ExperienceTests/BinaryGardensRegressionMemoryTests.swift` (agent C: the 17
   frames rendered and checked against their descriptions with the feature-503 tolerances, level 25's tilt dial pip
