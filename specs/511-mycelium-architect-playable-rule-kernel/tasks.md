@@ -20,7 +20,7 @@ reasons as they are added (feature 501's convergence lesson).
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2201-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `MyceliumArchitectCore` depending on
+- [X] T-R02G2201-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `MyceliumArchitectCore` depending on — Verified 2026-11-27: package targets, CI half b filter, error, growth, level, fixtures and level tests installed; host exit=0 (12 tests)
   VisualCoreSimulation and VisualCoreMath, path `MyceliumArchitect/Core`; `MyceliumArchitectCoreTests`, path
   `MyceliumArchitect/CoreTests`, depending on MyceliumArchitectCore, VisualCoreSimulation and VisualCoreMath; product)
   and `.github/workflows/ci.yml` (job `round02-host-tests`, matrix `group: b`: `|MyceliumArchitect` appended after

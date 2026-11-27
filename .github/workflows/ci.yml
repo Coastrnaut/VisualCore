@@ -113,7 +113,7 @@ jobs:
           - group: a
             filter: 'AuroraLoom|LissajousLabyrinth|WaveKnotKeeper|HueCompass|ColorfallCanyons|ChronoConstellator|AmethystEscape|FacetedForge|NocturneGarden|BackwardsAurora'
           - group: b
-            filter: 'EchoCartographer|HarmonicBridges|AcousticConstellator|MoonlitMechanism|VoxelOrigami|StarlitCartouche|CelestialEclipseLab|ApsidesWorkshop|MicroscopicAurora|MushroomWeather|BinaryGardens'
+            filter: 'EchoCartographer|HarmonicBridges|AcousticConstellator|MoonlitMechanism|VoxelOrigami|StarlitCartouche|CelestialEclipseLab|ApsidesWorkshop|MicroscopicAurora|MushroomWeather|BinaryGardens|MyceliumArchitect'
     steps:
       - uses: actions/checkout@v5
       - name: Toolchain

@@ -71,6 +71,8 @@ let package = Package(
         .library(name: "BinaryGardensCore", targets: ["BinaryGardensCore"]),
         // Feature 503 (R02-G21-03): Binary Gardens' experience (iOS only; a registered candidate until X-R02-G21).
         .library(name: "BinaryGardensExperience", targets: ["BinaryGardensExperience"]),
+        // Feature 511 (R02-G22-01): Mycelium Architect's rule kernel, a candidate until X-R02-G22.
+        .library(name: "MyceliumArchitectCore", targets: ["MyceliumArchitectCore"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -1075,5 +1077,15 @@ let package = Package(
                                    .product(name: "VisualCoreAudioDSP", package: visualCore),
                                    .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "VoxelOrigami/ExperienceTests"),
+        // Feature 511 (R02-G22-01): Mycelium Architect's pure rule kernel.
+        .target(name: "MyceliumArchitectCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "MyceliumArchitect/Core"),
+        .testTarget(name: "MyceliumArchitectCoreTests",
+                    dependencies: ["MyceliumArchitectCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "MyceliumArchitect/CoreTests"),
     ]
 )
