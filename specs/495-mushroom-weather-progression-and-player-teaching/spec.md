@@ -66,8 +66,8 @@ multipliers are 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 
 - Q: What does the tutorial show, and when does it advance? → A: on the levels with a tutorial flag (1 … 3), three
   instructions in order: (1) "Tap a marked site (or choose a site and press Place) to put a spore pod there; the mist
   and gauges show the new weather" — it advances once a placement has been accepted; (2) "Keep every colony's gauge in
-  its band through the last cycles: open or close a vent or change the moonlight, then press Run — a hint shows what to
-  change" — it advances once a second action has been accepted or the level ends; (3) "A sensitive colony drying out, a
+  its band through the last cycles: add another pod, open or close a vent or change the moonlight, then press Run — a
+  hint shows what to change" — it advances once a second action has been accepted or the level ends; (3) "A sensitive colony drying out, a
   cell growing mold or a colony leaving its band too early fails the run: undo and try another change" — until the level
   ends. `tutorial.dismiss` ends it for that level; undo never moves it back. Impact: FR-R02G2005-001; SC-R02G2005-001.
 - Q: What are the progress and star rules? → A: stars measure the actions spent by every accepted pod, vent and
