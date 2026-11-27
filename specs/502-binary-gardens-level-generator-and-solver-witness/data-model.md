@@ -1,0 +1,26 @@
+# Data model: R02-G21-02
+
+| Entity | Fields | Rules |
+|---|---|---|
+| `BinaryGardensLevel` (edit) | + phaseStep g ∈ {1, 2, 3, 4, 6, 8, 12, 16, 24} (default 1) | refusals after "nothing adjustable", before "separation" and "already won": "phase step" (not a listed divisor), "phase off grid" (a starting phase not a multiple of g); g = 1 omitted from the stored form, so every feature-501 level keeps its bytes and fingerprint |
+| `BinaryGardensSky.changed` (edit) | — | `.action("off the phase grid")` for a phase step not a multiple of g, after "phase out of range" and before "locked"; `isWellFormed` requires phases on the grid |
+| `BinaryGardensPuzzle` (edit) | — | phase candidates 0, g, 2g, … < 48 |
+| `BinaryGardensError` (edit) | + `generation(Int)`, `witness(String)` | reason codes `r02-g21.generation`, `r02-g21.witness` |
+| `BinaryGardensManifestEntry` | number 1 … 100, planned seed, band 1 … 5, budget 8 … 19, emphasis | 100 entries in manifest order, 20 per band; budgets 8 … 11, 10 … 13, 12 … 15, 14 … 17, 16 … 19 by band; emphases `adjust orbit`, `phase twin stars`, `set luminosity`, `watch world`, `commit light window`, 20 each; provenance round2.md section 6.21.18 |
+| `BinaryGardensControl` | seven cases in fixed order: star 1 ring, phase, luminosity; star 2 ring, phase, luminosity; tilt | legal values: ring indices, phases on the grid, luminosity indices, tilts 0 … T_max; adjustable from the level's flags (tilt when T_max > 0) |
+| `BinaryGardensBandProfile` | adjustable, rings, ring radius range, luminosity levels, phase step, T_max, worlds, σ, ω maximum, trim k, comfort margin m ‰, lethal margin ℓ ‰, bloom margin b ‰, window slack s, tolerance E, plan p | band 1 (2, 3, 2 … 12, 2, 8, 2, 1, 0, 1, 1, 60 … 90, 300, 150, 4 … 8, 6 … 8, 1); band 2 (3, 3 … 4, 2 … 12, 2 … 3, 8, 2 … 3, 1 … 2, 0, 2, 4, 40 … 70, 250, 100, 3 … 6, 4 … 6, 2); band 3 (4, 4, 2 … 16, 3, 6, 3, 2, 2 … 4, 2, 6, 30 … 50, 200, 80, 2 … 4, 3 … 5, 3); band 4 (5, 4 … 5, 2 … 16, 3, 6, 3, 2 … 3, 2 … 5, 3, 8, 20 … 40, 150, 60, 1 … 3, 2 … 4, 3); band 5 (5, 5, 2 … 16, 3 … 4, 6, 3, 3, 3 … 6, 3, 10, 10 … 30, 100, 40, 0 … 2, 1 … 3, 4); luminosity levels drawn distinct in 4 … 32, clamp radius 2 … 4, world radius largest ring + 3 … min(60, largest + 20), world phase 0 … 47, world speed ±1 … ±3 — arithmetic values of spec Q1, confirmed or changed (and written back) by the measurement of research R4 |
+| `BinaryGardensPlan` | actions (the parent chain from the start; `run` not included), arrangement (the winning one), arrangementsByDepth (judged at depths 0 … size − 1; depth 0 = 1), nearestMiss (loss), nearestMissArrangement, work | the first winning arrangement of the breadth-first sweep; size = actions.count ≥ 1 |
+| loss | Σ over worlds of (Σ over ticks 1 … 48 of max(0, c_lo − F, F − c_hi)) + max(0, B_lo − I, I − B_hi) + 1000 · max(0, W − window) | milliflux; 0 does not imply a win (the lethal walk and σ are separate) |
+| `BinaryGardensDifficulty` | actions (witness length), worlds, narrowestBand (min over worlds of c_hi − c_lo), tightestWindow (max over worlds of W), adjustable, moveSpace (Σ over adjustable controls of their other legal values), arrangementsSearched (Σ arrangementsByDepth), work, nearestMiss | from the level and the plan; `puzzleDifficulty` = `PuzzleDifficulty(shortest: actions, explored: work)` |
+| `BinaryGardensGenerated` | entry, level, plan, difficulty, skipped | skipped = the accepted candidate's index (0 … 63) |
+| `BinaryGardensCounterexample` | depth (= size − 1), arrangements (judged at that depth, none winning), nearestMiss (loss), arrangement, failure (`BinaryGardensFailure`) | from the plan; re-derived on decode |
+| `BinaryGardensWitnessReport` | worlds: per world integral, meanWhole (= integral / 48), meanRemainder (= integral mod 48), longestLethalRun, tolerance, window, windowStart, requiredWindow, bloom (`inside`); minimumSeparationSquared, minimumSeparationTick, outcome (`won`) | the report of the play after `run` |
+| `BinaryGardensWitness` | schema 1, number, level (stored form, with `phaseStep` when above 1), actions (plan + `run`), digests (one after every action), fingerprints (after `begin`, `dismissTutorial` when the level has one, and each action), report, counterexample, difficulty, skipped | sorted-key, pretty-printed JSON with one trailing newline; decode refuses newer (`r02-g21.newer-schema`), damaged and non-replaying or edited (`r02-g21.witness`) files |
+| catalog | 100 `BinaryGardensGenerated` in manifest order; digest `PuzzleCatalog<BinaryGardensPuzzle>.digest(id: "binary-gardens", identities: fingerprints)` | ids `binary-gardens-NNN`; tutorial on 1 … 3; difficulty = band; neighbours differ in ring radii or worlds; `ProgressionRule.standard` holds on the witness lengths; band means non-decreasing (by construction 1, 2, 3, 3, 4) |
+
+## State transitions
+
+Generation of entry n: for c in 0 … 63 — draw candidate c → skip (separation not kept within 16 redraws, c_lo = 0, λ_hi
+> 200 000, refused by the level rules, reducible) → skip (ring radii and worlds equal level n − 1's) → solve → skip (no
+plan within the work bound, plan size ≠ p, replay through the play does not win) → emit with skipped = c. No candidate:
+`generation(n)`.
