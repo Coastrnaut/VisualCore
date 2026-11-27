@@ -117,7 +117,7 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
 - [X] T-R02G2105-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit 0
 - [X] T-R02G2105-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit 0
 - [X] T-R02G2105-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit 0 (run alone)
-- [ ] T-R02G2105-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2105-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converge round 1 appended T-012, T-013 (implemented, docs); converge round 2 clean; README row and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
