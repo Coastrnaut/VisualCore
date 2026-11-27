@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-06 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2006-###,
 SC-R02G2006-###, T-R02G2006-###
@@ -26,6 +26,84 @@ Canonical overrides:
   player, and the kernel, content, adapter, renderer, gestures and teaching of R02-G20-01 … 05.
 - **Model:** feature 486 (Microscopic Aurora's polish and accessibility), adapted to pods placed on sites, vents and the
   moonlight, the run of the weather, the colonies' bands and the dried, mold and unstable failures.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+486's answers where the games agree. Facts checked in code and specs (read-only, 2026-11-26): the shared
+`ExperienceFeedback` route, `AnnouncementKind` (`rejection`, `outcome`, `level`, `state`), `HapticKind` (`selection`,
+`success`, `warning`, `error`) and `AmbientLoopPlayer` with a fixed `AmbientLoopRecipe` are those feature 486 used; the
+kernel names cells "row r, column c", a pod "pod n at row r, column c" (with its growth), a vent "vent n at row r,
+column c, open" (or "closed"), the moonlight "moonlight l of 3", a colony with its humidity, band and final run, a
+failure ("colony n dries out at cycle t", "row r, column c turns to mold at cycle t", "colony n is in band for only the
+last r cycles, needs k") and the progress as "<the pods>; <the vents>; <the moonlight>; <the colonies>; needs every
+colony in band for the last K of T cycles; running now would win (or fail: <reason>); a actions left"; a pod, vent or
+moonlight action (`pod.place`, `pod.remove`, `vent.set`, `moon.set`) spends one action and never ends the level, the
+run (`weather.run`) always ends it, won or failed; feature 493 draws droplets and motes moved by a time uniform and
+stops them under Reduce Motion, the shown cycle never advances by time, the won look lights every cap at once today and
+the glow gain is capped (lower under Reduce Flashing); a pod can go on a level site no other pod holds while a slot is
+free; the refusal codes are `r02-g20.level`, `action`, `budget`, `stage`, `stale`, `not-whole`, `cycle`, `locked` and
+`date` (reported by the engine as `action.rule.<code>`).
+
+- Q: What exactly is announced, and with which kind? → A: after an accepted action (`state`), the change then the
+  progress: "Pod n placed at row r, column c." / "Pod n moved to row r, column c." / "Pod n removed." / "Vent n opened."
+  ("closed") / "Moonlight set to level l."; undo and redo "Undone." / "Redone."; each followed by " c of n colonies stay
+  in band, running now would win (or fail), a actions left." ("1 action left" singular; a colony stays in band when its
+  final in-band run of the predicted run reaches the required cycles); a win (`outcome`): "Every colony stayed in its
+  band. Level won spending a actions, k of 3 stars." (without the stars in practice); a failure (`outcome`): the
+  failure explanation of feature 495; a level or mode change (`level`): "Level n, band b, <mode>." with the tutorial
+  instruction when shown; a refusal (`rejection`) in words: `r02-g20.locked` "That level is not open yet.",
+  `r02-g20.date` "That date cannot be used.", `r02-g20.action` "That pod, vent or moonlight change cannot be made, or
+  there is nothing to remove, undo or redo.", `r02-g20.budget` "No actions are left: undo or retry.", `r02-g20.stage`
+  "The level has ended.", `r02-g20.stale` "The play changed before the action arrived.", `r02-g20.level` "That level
+  could not be made.", `r02-g20.not-whole` "That value must be a whole number.", `r02-g20.cycle` "That cycle is outside
+  the run.", any other code "That action was refused." (the engine's `action.rule.` prefix read as the bare code). A
+  revealed hint is announced (`state`) with its text. Changing the panel's selection, drag previews, the shown cycle,
+  the view, dismissing the tutorial and the Sound toggle are not announced (the controls speak their own values). Texts
+  are a pure function of the old and new core (and the refusal code), so tests compare them exactly; the panel shows the
+  same refusal text. Impact: FR-R02G2006-002; SC-R02G2006-002.
+- Q: Which haptics play, and how are bursts handled? → A: `selection` for an accepted pod, vent or moonlight action,
+  undo or redo; `success` for a won run; `warning` for a failed run; `error` for a refusal; changing the selection,
+  previews, the shown cycle, the view and level changes play none. The run plays only its outcome. The shared planners'
+  intervals apply. Impact: FR-R02G2006-003; SC-R02G2006-002.
+- Q: How are fades done and measured under Reduce Flashing, and what stays still? → A: as feature 486: the presenter
+  keeps light levels for the glow (0.7 while playing, 1 once won, 0.35 once failed) and the won look (1 once won, else
+  0), each easing toward its target by the frame clock's elapsed time between drawn frames (0.15 s normally, 0.45 s
+  under Reduce Flashing, linear; under Reduce Flashing a fade that has started finishes before it may turn back); the
+  scene draws the eased levels (the glow gain times the glow level, the won uniform the won level, and in the fallback
+  the won colours by the won level, rebuilt when the level moves by a tenth or more); the state and digest never see
+  them. The pods, vents, moonlight, mist and gauges change only with the player's actions and are not faded. Droplets
+  and motes drift on their fixed paths at under 1 cycle per second normally; under Reduce Motion or Reduce Flashing
+  their time is held at 0, so the forest is still between actions. The measure: sampling the drawn levels every 1/60 s
+  through a scripted win and adversarial flicker (a pod placement undone and redone every frame, retry, level changes),
+  no element crosses half its range more than 3 times per second, and every complete one-way fade of more than half the
+  range takes at least 0.4 s under Reduce Flashing. Impact: FR-R02G2006-004; SC-R02G2006-003.
+- Q: Where does the sound choice live, and what are the audition and ambient recipes? → A: a Sound toggle in the panel,
+  off by default, held by the presenter (presentation only; saving it is R02-G20-07). The selected site's tone is
+  220 Hz × 2^(n / 12) with n = 2 × the site's index (0, 2, 4 … 14: later sites sound higher); a site that can take a pod
+  (no pod holds it and a slot is free) sounds its tone and the tone × 3/2 at gain 0.04 each, a clean fifth; one that
+  cannot sounds its tone with a second partial detuned upward by 3 Hz, so it beats audibly; 0.6 s with a linear decay
+  to silence; played once per change of the panel's selection (slot or site), a new one replacing the last; never for
+  drag previews. The audition is a pure function of (site index, can take a pod). The ambient recipe is a pure function
+  of the colonies staying in band, the colonies, the moonlight, the actions left as a share of the budget and the stage:
+  a root at 110 Hz times (1, 9/8, 5/4, 4/3) for more than three quarters of the actions left, more than half, more than
+  a quarter, or less; one partial per quarter of the colonies staying in band (floor of four times in band over
+  colonies, up to four), at the root times (5/4, 3/2, 2, 5/2)[q − 1] for q = 1 … quarters, each with the base gain; the
+  root alone when less than a quarter stay; a partial at the root × 3 with the base gain × moonlight / 3 when the
+  moonlight is above 0; an added octave when won and halved gains when failed; the loop's length is the longest the
+  shared player accepts at which every partial has a whole number of cycles (tested). The presenter rebuilds the loop
+  only when the level opens, an action, undo, redo or the run changes the quarters, the root step, the moonlight or the
+  stage, or the toggle turns on, never per frame. Sound plays exactly while the choice is on, the controls are on screen
+  and the scene is active. Impact: FR-R02G2006-006; SC-R02G2006-004.
+- Q: What do Larger Text and Increase Contrast require of the panel? → A: the panel scrolls vertically, uses system text
+  styles that grow with Dynamic Type up to the largest accessibility size, wraps rather than truncates labels, and uses
+  system colours, so Increase Contrast applies; button rows wrap into a column at accessibility sizes; the panel's slot,
+  site and moonlight are accessibility-adjustable elements with their labels and values in words ("pod n", "site at row
+  r, column c", "moonlight l of 3") and each vent a toggle with its value ("open" or "closed"); a summary element reads
+  "a actions left. <the progress in words>. Selected: pod n, site at row r, column c. Level: <the level in words>."; on
+  iPad the panel keeps a readable width (at most 520 points). Impact: FR-R02G2006-001, 005; SC-R02G2006-001.
 
 ## User Scenarios & Testing *(mandatory)*
 
