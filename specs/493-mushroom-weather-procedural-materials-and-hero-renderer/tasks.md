@@ -32,7 +32,7 @@ R02-G19-03 (`git show <R02-G19-03 record commit>:<path>`).
 
 **Independent test**: host geometry, shader-source, adapter and purity tests pass; no simulator needed.
 
-- [ ] T-R02G2003-003 [P] [US1] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherShaders.swift`
+- [X] T-R02G2003-003 [P] [US1] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherShaders.swift` — Verified 2026-11-26: 2026-11-26 host-2 exit 0: 115 tests in 13 suites incl. 19 shader source tests (version, uniforms, 7 of 16 vec4, no samplers or loops, material table 0…28, palette constants, glow caps; glslangValidator absent so its compile test skipped) (.autonomy/migration/checks/R02-G20-03.host-2.json)
   (forest and glow sources, GLSL ES 3.00; lathed shading (core, rim light) from the normal for stalks, caps, pods, logs
   and stones; the translucent cap with an SDF field of moisture beads whose density follows h/M; signed-distance
   shading of the mist squares, site rings, band rings (solid or dashed), vent slats, gauge tracks, band brackets,
