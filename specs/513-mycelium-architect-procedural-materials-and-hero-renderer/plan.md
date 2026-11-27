@@ -26,8 +26,8 @@ VisualCoreDiagnostics; the package gains `MyceliumArchitectExperience` (path `My
 carry `condition: .when(platforms: [.iOS])` and experience sources sit in `#if os(iOS)`, so the Cores still run on the
 host. The kernel's source scans (feature 511's invariant tests, feature 512's generator test scanning `Core/Content`)
 must keep reading only the kernel's files: the presentation sources (adapter, snapshot, geometry, shaders, scenarios)
-go into a new `Core/Presentation/` folder, and any scan that lists `Core/` recursively is narrowed to the kernel's file
-list (research R2). **App**: `project.yml` adds the two products; the registry registers the candidate
+go into a new `Core/Presentation/` folder; both scans list a single directory without recursion (checked
+2026-11-27), so they keep reading only the kernel's files (research R2). **App**: `project.yml` adds the two products; the registry registers the candidate
 (`ExperienceRegistry.candidates`, opening seed 0); `Catalog/registrations.json` gains the entry; `build_catalog.py`
 regenerates the catalog and the VisualCore test fixtures; `RealCatalogTests` lists the new registration;
 `AppModelTests` switches its synthetic unregistered candidate to `r02-g23.erosion-painter`; `scripts/test_scripts.py`

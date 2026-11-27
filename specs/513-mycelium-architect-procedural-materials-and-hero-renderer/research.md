@@ -5,7 +5,8 @@
   reference uses the same function.
 - **R2 Presentation sources outside the kernel scans.** Decision: the adapter, snapshot, geometry, shaders and scenarios
   live in `Core/Presentation/`; feature 511's invariant scans and feature 512's `Core/Content` scan keep their file
-  lists (narrowed to explicit kernel files if any scan reads `Core/` recursively). Rationale: shaders legitimately contain
+  lists: both list one directory without recursion (`contentsOfDirectory` of `Core/` and of `Core/Content/`,
+  checked 2026-11-27), so a subfolder stays outside them. Rationale: shaders legitimately contain
   `sin(`/`cos(` and the snapshot uses Doubles; the kernel's no-clock, no-float rules must keep applying to the kernel
   only (feature 503's lesson).
 - **R3 Drawn values are judged values.** Decision: veins are drawn for exactly the kernel's segments with grown pulse

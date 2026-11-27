@@ -36,7 +36,7 @@ public enum MyceliumArchitectSceneGeometry {
     public static func glow(_ snapshot: MyceliumArchitectSceneSnapshot, tier: MyceliumArchitectTier) -> Mesh }
 public enum MyceliumArchitectShaders { public static let boardVertex, boardFragment, glowVertex, glowFragment: String
     public static let uniformSlots: [String: Int] }
-public final class MyceliumArchitectExperienceCore: ExperienceCore {            // the shared contract
+public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {      // the shared contract (as Binary Gardens)
     public static let experienceID: String              // "r02-g22.mycelium-architect"
     public static let qualityTiers: [String]             // ["level-0", "level-1", "level-2"]
     public static let schemaVersion: Int                 // 1
