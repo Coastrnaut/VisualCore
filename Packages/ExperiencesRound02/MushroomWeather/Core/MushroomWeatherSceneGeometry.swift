@@ -5,9 +5,10 @@
 // ((c − (C − 1)/2) · s, ((R − 1)/2 − r) · s, 0) with s = min(1.8 / C, 1.6 / R), so every floor fills the same box and
 // nothing a player does changes its size. Nothing here is consulted by the rules.
 //
-// Draw order (clarification Q1, research R3): the whole forest mesh is drawn with depth testing on, in the fixed order
-// of the elements (``MushroomWeatherElement``) by kind, then by index within the kind. The solids (floor, logs and
-// stones, fronds, stalks, caps, pods, vents) are resolved by depth; every flat lies on its own plane above what it
+// Draw order (clarification Q1, research R3): the whole forest mesh is drawn in painter's order with depth testing off
+// (the window surface has no depth buffer), in the fixed order of the elements (``MushroomWeatherElement``) by kind,
+// then by index within the kind. The solids (floor, logs and stones, fronds, stalks, caps, pods, vents) emit their far
+// faces first; every flat lies on its own plane above what it
 // covers (site rings at z 0.01, band rings at 0.012, mist at 0.02, the mold patch at 0.025, gauges and bars at 0 below
 // the floor), so the order by kind decides how the translucent flats blend. A "quad of shape half h" spans
 // ±``MushroomWeatherShaders/quadExtent`` · h (1.25 h) around its centre; its shape (square, disc or ring of outer
@@ -147,7 +148,7 @@ public struct MushroomWeatherElement: Sendable, Equatable {
         /// An actions bar (`item` the bar).
         case bar = 17
 
-        /// Whether the kind is a solid resolved by depth (research R3); the others are flats drawn in this order.
+        /// Whether the kind is a solid (its lathes emit far faces first; research R3); the others are flats.
         public var isSolid: Bool {
             switch self {
             case .floor, .blocked, .fronds, .stalk, .cap, .pod, .vent: return true

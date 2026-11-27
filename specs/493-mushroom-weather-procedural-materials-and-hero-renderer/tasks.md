@@ -134,4 +134,4 @@ FR-009 → 007 … 011.
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G2003-014 Correct the draw-order comments of `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSceneGeometry.swift` (the file header and `MushroomWeatherElement.Kind.isSolid`) from "depth testing on / resolved by depth" to painter's order with depth testing off, as built, per research R3 (contradicts); `--name host-5 -- swift test --package-path Packages/ExperiencesRound02 --filter MushroomWeather`
+- [X] T-R02G2003-014 Correct the draw-order comments of `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSceneGeometry.swift` (the file header and `MushroomWeatherElement.Kind.isSolid`) from "depth testing on / resolved by depth" to painter's order with depth testing off, as built, per research R3 (contradicts); `--name host-5 -- swift test --package-path Packages/ExperiencesRound02 --filter MushroomWeather` — Verified 2026-11-26: 2026-11-27 comments corrected to painter's order with depth off; host-5 exit 0: 153 tests in 17 suites (.autonomy/migration/checks/R02-G20-03.host-5.json)
