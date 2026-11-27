@@ -59,7 +59,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
   seeded states migrate and restore with progress kept; 200 seeded saves: honest results survive, edited ones are
   dropped and counted; FR-R02G2007-005: the same save restores to an equal digest twice and the daily level depends only
   on the date given); `--name host-3`
-- [ ] T-R02G2007-005 [P] [US3] Create
+- [X] T-R02G2007-005 [P] [US3] Create — Verified 2026-11-27: host-4 exit=0, MushroomWeatherReplayCatalogTests all 100 levels in 10 groups (.autonomy/migration/checks/R02-G20-07.host-4.json)
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherReplayCatalogTests.swift`: for each of the
   100 certified levels (10 groups of 10, each under 10 s) win the level in campaign through the adapter with its
   certified actions and the run, then `replay.start [level]` and `replay.step` to the end, checking
