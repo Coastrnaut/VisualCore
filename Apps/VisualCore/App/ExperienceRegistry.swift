@@ -146,11 +146,15 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [microscopicAurora].compactMap { $0 }
 
-    /// R02-G19 Microscopic Aurora (feature 483, R02-G19-03): a candidate until X-R02-G19. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G19 Microscopic Aurora (features 481–489, R02-G19-01…09): a candidate until X-R02-G19. Snapshot schema 3
+    /// since feature 487 (R02-G19-07); its schema-1 and schema-2 examples are registered since feature 489
+    /// (R02-G19-09).
     fileprivate static var microscopicAurora: ExperienceRegistration? {
         guard let id = MicroscopicAuroraExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: MicroscopicAuroraExperienceCore.self) { launch in
+        let examples = [MicroscopicAuroraExperienceCore.schemaOneExample(),
+                        MicroscopicAuroraExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: MicroscopicAuroraExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return MicroscopicAuroraExperience.make(
                 id: id, storage: launch.storage,

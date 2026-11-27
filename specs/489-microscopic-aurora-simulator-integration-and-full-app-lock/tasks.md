@@ -15,7 +15,7 @@ change (the shaders and reference of R02-G19-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G1909-002 Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraSchemaExamples.swift`
+- [X] T-R02G1909-002 Create `Packages/ExperiencesRound02/MicroscopicAurora/Core/MicroscopicAuroraSchemaExamples.swift` — Verified 2026-11-26: 2026-11-26 host exit 0, 7 schema example tests (.autonomy/migration/checks/R02-G19-09.host.json); schema-1 and schema-2 examples restore to schema 3; registered with examples:
   (contracts/api.md; data-model: schema 1 "`{level: 1, records}` of a seeded play of level 1 with one non-winning well
   placed (playing, not won), seed 7"; schema 2 "campaign mode, the tutorial done, progress (frontier 2, level 1 solved
   with actions spent one above the certified count and its stars), the records of a fresh play", "the result is kept,
