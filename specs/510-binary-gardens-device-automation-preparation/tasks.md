@@ -21,7 +21,7 @@ is contacted. No {owner} tasks; one {device} task. Prerequisites: R02-G21-05 …
   BG-D5 and BG-D6 quote feature 506's announcements as recorded); edit `scripts/release_check.py` (step
   `device-rows-r02-g21`); `--name device-rows -- python3 scripts/check_device_rows.py --experience
   r02-g21.binary-gardens` (expected `device-rows r02-g21.binary-gardens: PASS (8 rows, 12 scenarios)`)
-- [ ] T-R02G2110-003 [P] [US1] Write `BinaryGardensDeviceRowsCheckTests` (agent A, as a separate file the lead inserts
+- [X] T-R02G2110-003 [P] [US1] Write `BinaryGardensDeviceRowsCheckTests` (agent A, as a separate file the lead inserts — Verified 2026-11-27: BinaryGardensDeviceRowsCheckTests (8 tests) inserted into test_scripts.py; script-tests exit=0 (run alone)
   into `scripts/test_scripts.py` above the `if __name__ == "__main__":` block: the real Binary Gardens definition passes;
   a copy with a scenario removed, a copy with BG-D1's `pass` field removed, a copy naming an unknown scenario, a copy
   with T-R02G2109-011 and a copy with T-R02G2104-011 dropped from every row's covers each fail by name with the five
