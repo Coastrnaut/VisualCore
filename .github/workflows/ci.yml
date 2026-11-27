@@ -238,6 +238,11 @@ jobs:
         # Feature 488 (R02-G19-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/microscopic_aurora_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter MicroscopicAuroraRegression
+      - name: Mushroom Weather regression (host)
+        if: matrix.group == 'b'
+        # Feature 498 (R02-G20-08): the solver regression and the golden frame descriptions, named so a failure shows by
+        # name; the simulator part runs locally through scripts/mushroom_weather_regression.py.
+        run: swift test --package-path Packages/ExperiencesRound02 --filter MushroomWeatherRegression
 
   simulator-build:
     # US5/AC1: an iOS Simulator build of the pure VisualCore package (no ANGLE frameworks needed). Rendering, Showcase

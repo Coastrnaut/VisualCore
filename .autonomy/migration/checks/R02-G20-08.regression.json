@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "python3",
+    "scripts/mushroom_weather_regression.py"
+  ],
+  "command": "python3 scripts/mushroom_weather_regression.py",
+  "elapsed_seconds": 27.008,
+  "exit_code": 0,
+  "finished": "2026-11-27T07:45:20+00:00",
+  "gate": "R02-G20-08",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G20-08.regression.log",
+  "log_sha256": "00fd9001ba08a1bf4a1198401d0e4c0fbf28633a24825db43d046f99d8555844",
+  "name": "regression",
+  "started": "2026-11-27T07:44:53+00:00",
+  "timed_out": false
+}
