@@ -8,8 +8,8 @@
 - **R2 — Driving a win through the interface.** Decision: the interface test cannot import the Core, so level 1's
   certified plan (read from `docs/games/binary-gardens/levels/001.witness.json`: `{luminosity: {star: 1, index: 0}}`,
   then `{run: {}}`; budget 9; two luminosity levels; only star 2's ring and luminosity adjustable) is fixed in
-  `BGSupport` and asserted equal to the Core by an app unit test. The test taps the `star` picker's "Star 2" segment
-  until its value reads "star 2" (presentation only, no action spent), checks the `luminosity` value reads "level 2 of
+  `BGSupport` and asserted equal to the Core by an app unit test. The test taps the `star` row's "Star 2" button (two buttons since
+  T-R02G2109-013: a segmented picker's segments ignored interface-test taps) until its value reads "star 2" (presentation only, no action spent), checks the `luminosity` value reads "level 2 of
   2", taps `luminosity-minus` and counts the press only when the `actions` text moves from 9 to 8 actions left and the
   value reads "level 1 of 2" (never a second press once it does: the lowest level would be refused); then taps `run`,
   which spends no action (`BinaryGardensPlay` budgets arrangement actions only). Rationale: no test-only hooks; the

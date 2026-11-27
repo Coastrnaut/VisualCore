@@ -79,3 +79,11 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
 testing. Shared files (examples source, registry, controls, project.yml, release check, script tests, docs) stay with
 the lead. Agents may draft in isolated copies before 001 (new files only). MVP: Stories 1 and 2. Requirement coverage:
 FR-001 → 003; FR-002 → 004; FR-003 → 002, 005; FR-004 → 006; FR-005 → 006; FR-006 → 005; FR-007 → 004, 005, 007 … 010.
+
+## Phase 7: Convergence
+
+- [X] T-R02G2109-013 Record in `specs/509-binary-gardens-simulator-integration-and-full-app-lock/spec.md` (the `star` — Verified 2026-11-27: spec star entry and research star choice record the two buttons; validate_docs PASS
+  identifier entry) and `research.md` (the interface test's star choice) that the star control is two buttons "Star 1"
+  and "Star 2" in one adjustable element with value "star k", as
+  `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensControls.swift` and `BGSupport.swift` implement
+  (a segmented picker's segments ignored interface-test taps), per FR-R02G2109-001, plan: interface tests (contradicts)

@@ -51,7 +51,8 @@ Answered autonomously under the owner's standing delegation, safest well-support
   (`r02-g21.binary-gardens`, 100 levels, three quality tiers). `BinaryGardensExperienceCore.schemaVersion` is 1. The
   panel (`BinaryGardensControls`, features 503 and 504) gives its controls identifiers through `port.identifier(name)`:
   `actions` ("Level n · a of b actions left"), `status`, `tutorial`, `failure`, `progress`, `message`,
-  `preview-refusal`, `star` (segmented "Star 1" / "Star 2", value "star k"), `star-detail`, `ring-minus`, `ring`,
+  `preview-refusal`, `star` (two buttons "Star 1" / "Star 2" in one adjustable element, value "star k"; a segmented picker's
+  segments ignored interface-test taps), `star-detail`, `ring-minus`, `ring`,
   `ring-plus`, `phase-minus`, `phase`, `phase-plus`, `luminosity-minus`, `luminosity` (value "level i of L"),
   `luminosity-plus`, `tilt-minus`, `tilt`, `tilt-plus`, `tick-minus`, `tick`, `tick-plus`, `run`, `tick-detail`,
   `undo`, `redo`, `next-level`, `ring-choice`, `luminosity-choice`, `phase-target`, `set-phase`, `tilt-choice`,
