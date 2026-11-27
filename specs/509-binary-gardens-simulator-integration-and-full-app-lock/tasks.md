@@ -9,7 +9,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2109-001 Baselines on the committed tree after R02-G21-08 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2109-001 Baselines on the committed tree after R02-G21-08 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 (after R02-G21-08 was recorded)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two chunks, 2 with
   `BinaryGardens`); the rendering baseline is R02-G21-08's rendering runs (exit 0)
 
