@@ -88,7 +88,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
 - [X] T-R02G2108-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit 0 (run alone; BinaryGardensRegressionTests included)
 - [ ] T-R02G2108-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden
   levels (SC-R02G2108-007). Not run before the lock.
-- [ ] T-R02G2108-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2108-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converge round 1 appended T-014 (implemented, docs); converge round 2 clean; README row and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
