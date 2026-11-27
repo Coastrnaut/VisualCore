@@ -114,7 +114,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
   --filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges|BinaryGardens'`; the other four filters unchanged)
 - [X] T-R02G2101-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0 (.autonomy/migration/checks/R02-G21-01.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
-- [ ] T-R02G2101-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2101-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G21-01.reference-1.json)
 - [ ] T-R02G2101-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2101-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2101-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
