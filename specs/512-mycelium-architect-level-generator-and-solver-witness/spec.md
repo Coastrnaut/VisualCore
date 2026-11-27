@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-27
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G22-02 (migration ledger, game feature of experience R02-G22) · ID namespace FR-R02G2202-###,
 SC-R02G2202-###, T-R02G2202-###
@@ -33,6 +33,94 @@ Canonical overrides:
   level without sites keeps feature 511's behaviour, stored form and fingerprint.
 - **Model:** feature 502 (Binary Gardens' content pipeline) and feature 492 (Mushroom Weather's) for manifest,
   generator, solver, witness files, digest and progression, adapted to the growth rules of feature 511.
+
+## Clarifications
+
+### Session 2026-11-27
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following features
+502 and 492 where the games agree. Facts checked (read-only, 2026-11-27): feature 511's specification, data model and
+contract (`MyceliumArchitectLevel` with a 4 … 32 board, 1 … 6 terminals, 0 … 8 fixed nutrients, strength 1 … 8, reach
+1 … 16, penalties 0 … 8, up to 6 placed nutrients and 6 blockers, 1 … 4 seeds with locked starting seeds, 1 … 128
+pulses, nutrient budget 2 … 4094, weight limit 2 … budget, action budget 1 … 24; growth by pulses with ties to the
+smaller turn, branching at consumed nutrients, weights 2 and 3; the judge starved → toxic → unreached → overweight;
+`MyceliumArchitectPuzzle` whose moves are the legal placements, clears, seeds and unseeds while actions are left); the
+kernel is drafted and tested (50 host tests) and is installed in the repository with R02-G22-01, before this feature's
+implementation starts; R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most
+1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (bands
+1 … 5 × 20, budgets as above, five control emphases and five required concepts, 20 each). The search sizes below are
+arithmetic bounds, not measurements; the first implementation task runs the real generator and solver over the real 100
+entries and records in research.md R4 the largest candidate index per band, the work per level and for the catalog,
+the witness lengths by band and the slowest level and group of five; a profile value changed there is written back into
+this section, research.md, data-model.md and plan.md in the same commit.
+
+- Q: How does the kernel change, and what is a placement site? → A: the level gains optional sites, 2 … 12 distinct
+  empty cells (not the root, a terminal, a rock, a toxin or a fixed nutrient), stored in ascending (row, column); with
+  sites, `nutrient(cell)` and `blocker(cell)` on a cell that is not a site are refused `r02-g22.action` ("not a site")
+  by the play and are not moves of the puzzle contract; without sites (the default, omitted from the stored form) a
+  level encodes, fingerprints and plays exactly as in feature 511. The level refuses "site count", "site" (off the
+  board) and "site not empty" after feature 511's range and shared-cell checks and before "nothing placeable" and
+  "already won". Every catalog level declares sites. Impact: FR-R02G2202-009; SC-R02G2202-007.
+- Q: How is a level built from its manifest entry? → A: the 100 entries are a table in `MyceliumArchitectManifest` with
+  their provenance. Candidate c of entry n draws from `SeededRandom(seed: SeedDerivation.derive(plannedSeed, index:
+  c))`, in this order: the board (the band's width and height), the root (column 1 … 2, any row 1 … H − 2), rocks and
+  toxins (each cell outside the root's 3 × 3 neighbourhood a rock with the band's ‰ and else a toxin with the band's ‰),
+  the fixed nutrients (the band's count on empty cells), strength, reach, κ, ο and pulses (the band's ranges), the seed
+  limit (the band's), the sites (the band's count of empty cells), the plan (the band's length p of actions, each a
+  seed in a direction not yet seeded within the seed limit, a nutrient on a free site or a blocker on a free site; the
+  emphasised kind first when the emphasis names one — `place nutrient` a nutrient, `block toxin` a blocker, `seed
+  filament` a seed — the rest drawn uniformly among the kinds still possible), the starting seeds (1 … seed limit − (plan
+  seeds) directions not in the plan, at least one when the plan has no seed). The winning arrangement is the starting
+  seeds plus the plan. It is grown on a probe level with a placeholder terminal and the widest budget; the candidate is
+  skipped unless that growth is neither toxic nor starved and grows at least 4 cells beyond the root. The terminals (the
+  band's count) are the grown cells, other than placed and fixed cells, with the latest grown pulses (ties by cell
+  order); nutrient budget = grown weight + the band's budget slack, weight limit = grown weight + the band's limit slack
+  (at most the budget). Band profiles (width × height, rock ‰, toxin ‰, terminals, sites, fixed nutrients, seed limit,
+  strength, reach, κ, ο, pulses, budget slack, limit slack, plan p): band 1 (8 × 8, 80, 30, 1, 4, 0, 1, 4 … 8, 4 … 8,
+  1 … 2, 0 … 1, 48, 4 … 8, 2 … 6, 1), band 2 (9 … 10, 90, 40, 1 … 2, 5, 0 … 1, 2, 3 … 8, 4 … 8, 1 … 3, 0 … 2, 64, 3 … 6,
+  1 … 4, 2), band 3 (10 … 12, 100, 50, 2, 6, 0 … 1, 2, 3 … 7, 4 … 10, 1 … 3, 0 … 2, 80, 2 … 5, 0 … 3, 3), band 4 (12 … 14,
+  110, 60, 2 … 3, 6, 1 … 2, 2, 2 … 7, 5 … 10, 2 … 4, 1 … 2, 96, 1 … 4, 0 … 2, 3), band 5 (14 … 16, 120, 70, 3, 6, 1 … 2,
+  2, 2 … 6, 5 … 12, 2 … 4, 1 … 3, 112, 0 … 3, 0 … 1, 4). Placement limits are the plan's nutrient and blocker counts
+  plus 1 (at most 6); budget = the manifest's; ids `mycelium-architect-NNN`; tutorial on levels 1 … 3; difficulty =
+  band. A candidate is skipped when the level rules refuse it (including a start that already wins), its board (size,
+  root, rocks, toxins) equals the previous level's, the solver's minimal plan is not p, or the plan does not win through
+  the play; at most 64 candidates, then `generation(n)`. Impact: FR-R02G2202-001, 007; SC-R02G2202-001, 003, 004.
+- Q: How does the solver find a minimal plan, and what proves nothing shorter wins? → A: breadth-first over
+  arrangements by the number of actions from the start (the shortest path in the graph of arrangements). Depth 0 is the
+  start. Depth d + 1 takes the arrangements of depth d in ascending order of their loss (ties keep their discovery order)
+  and, from each, the puzzle contract's moves in its fixed order (research R14 of feature 511), skipping arrangements
+  already reached at any depth (reachability, never pruning by outcome); each new arrangement is judged on discovery by
+  the kernel's growth. Loss = Σ over terminals not reached of 16 × the Chebyshev distance to the nearest grown cell
+  + max(0, weight − limit) + 1 024 when the growth is toxic or starved. The first winning arrangement ends the search;
+  the plan is its path of moves, then `run`, replayed through the play, whose report must agree. Work = arrangements
+  judged, bounded at 20 000 per candidate as a guard (over it the candidate is skipped; counted, never timed). Search
+  depth: at most the band's p. The minimality proof is the count of arrangements at each smaller depth, every one
+  judged and none winning. Impact: FR-R02G2202-002; SC-R02G2202-001, 002, 005.
+- Q: What difficulty metrics are stored and what progression is required? → A: `MyceliumArchitectDifficulty` holds the
+  witness length, the terminals, the board cells, the toxins, the sites, the move space (the number of moves from the
+  start), the arrangements judged at smaller depths, the solver work and the nearest miss (the smallest loss among the
+  arrangements judged at smaller depths, the start included). The catalog keeps R02-F24's standard `ProgressionRule` on
+  the witness length; band means do not fall (by construction 1, 2, 3, 3, 4). Impact: FR-R02G2202-003, 005;
+  SC-R02G2202-004.
+- Q: What is in a witness file, how is the catalog identified and how is certification split? → A:
+  `docs/games/mycelium-architect/levels/NNN.witness.json`, JSON schema 1 with sorted keys: number, the level's stored
+  form, the actions (the plan, then `run`), the state digest after every action (16 hex characters of the SHA-256 of the
+  arrangement and the actions spent), the play fingerprints after `begin` (and `dismissTutorial` when the level has one)
+  and after each action, the terminal report (the truth metric: each terminal reached with its pulse and path weight,
+  the total branch cost against budget and limit, the node count, the forbidden-zone hits (the first toxic entry or
+  none), the outcome), the counterexample (the depth one below the plan, the number of arrangements at that depth, none
+  winning, and the nearest miss: its loss, its arrangement and its first failure in words), the difficulty and the
+  candidates skipped. A test rebuilds every witness and compares bytes; it writes the files only with
+  `MYCELIUM_ARCHITECT_WRITE_WITNESSES=1`. Decoding refuses newer schemas (`r02-g22.newer-schema`), damaged files and
+  witnesses that no longer replay (`r02-g22.witness`). The digest is `PuzzleCatalog<MyceliumArchitectPuzzle>.digest(id:
+  "mycelium-architect", identities:)` over the 100 fingerprints, pinned in a test. Certification tests are split into
+  20 groups of 5 levels, each under 10 s on a debug host build (measured locally, not asserted on CI); generated levels
+  are cached per process. New refusals: `generation(Int)` (`r02-g22.generation`) and `witness(String)`
+  (`r02-g22.witness`). The independent check of SC-R02G2202-002 enumerates every action sequence shorter than the plan
+  through the puzzle contract's moves, with no visited set and no loss ordering, on the two levels with the smallest
+  move space in each band: none wins, and the arrangements first reached at each length equal the solver's count.
+  INV-06 and INV-12 get `testMyceliumArchitectContentBoundary` and `testMyceliumArchitectNoveltyBoundary`, each with a
+  seeded neighbouring-input check. Impact: FR-R02G2202-004, 005, 006, 008; SC-R02G2202-002, 003, 005, 006, 007.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -100,7 +188,7 @@ file is refused.
 ### Edge Cases
 
 - **A seed whose candidate is unsuitable for its band:** the generator moves to the next candidate deterministically
-  (bounded) and records how many it skipped; no candidate within the bound is a named refusal.
+  (at most 64) and records how many it skipped; no candidate within the bound is a named refusal.
 - **A candidate whose starting arrangement already wins:** never emitted (the kernel refuses it).
 - **More than one minimal arrangement:** allowed; the witness is the one the solver finds in its fixed order.
 - **Adjacent levels with the same board:** the later candidate is skipped.
