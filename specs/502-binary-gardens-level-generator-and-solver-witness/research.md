@@ -39,13 +39,13 @@ contract both call it), `BinaryGardensSky.isWellFormed`, `keepsSeparation`, `rep
   and the worlds; set every world's bounds from its winning run; then draw the p changed controls and their starting
   values; let the solver confirm that the minimal plan has exactly p actions. Rationale: building from a winning run
   guarantees a win exists and that its run is inside every band; the lesson of R02-G10-02 and feature 492 (simulate a
-  generator's filters before writing them down) applies. **Measurement (first implementation step, T-R02G2102-003/004,
+  generator's filters before writing them down) applies. **Measurement (first implementation step, T-R02G2102-003,
   before any test depends on the profiles):** run the real generator and solver on the committed kernel over the 100
   manifest entries in a debug host build and record here: the largest accepted candidate index per band, the number of
   entries needing more than candidate 0, the work per level (largest per band) and for the whole catalog, the witness
   lengths by band (must equal p: 1, 2, 3, 3, 4), the slowest level and the slowest group of five, and the catalog's
   total time. The plan stage cannot run it: test chunks occupy this machine and agents never run builds, so it is the
-  first step of implementation, as clarification Q1's "prototype" — its numbers land here and in plan.md's Technical
+  first step of implementation, as the spec's clarification preamble states — its numbers land here and in plan.md's Technical
   Context. **Adjustment ladder** (only if an entry reaches `generation(n)`, a band's witness lengths are not its p, or
   a group exceeds 6 s): (1) when candidates are skipped as "reducible", "already won" or with a plan shorter than p
   (bands too loose, so fewer changes win), narrow the comfort margin m, then the window slack s, then the bloom margin
@@ -53,7 +53,7 @@ contract both call it), `BinaryGardensSky.isWellFormed`, `keepsSeparation`, `rep
   dominate (a far world at luminosity 4 receives only a few milliflux, at most 1000 · 32 / 3² ≈ 3,555 for the nearest
   and brightest), raise the trim k; (4) when a band is slow, lower its world count. Never the
   plan lengths p, the phase steps or the budgets. Each changed value is written back into spec
-  clarification Q1, data-model.md and this entry in the same commit. Measured values: recorded here by T-R02G2102-003.
+  clarification Q1, data-model.md, plan.md's Technical Context and this entry in the same commit. Measured values: recorded here by T-R02G2102-003.
 - **R5 Reducible pre-filter.** Decision: skip a candidate when the winning arrangement with any one changed control put
   back to its starting value still wins. Rationale: such a candidate would fail the plan-length check after a full
   search; at most p ≤ 4 reports decide it. It is also the novelty invariant's core (every changed control matters).

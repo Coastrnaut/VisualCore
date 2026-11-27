@@ -52,10 +52,10 @@ arithmetic bounds, not measurements; R02-F24's `PuzzleCatalog.digest(id:identiti
 standard `ProgressionRule` (drop at most 1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the
 canonical manifest's 100 entries (bands 1 … 5 × 20, budgets as above, five control emphases, 20 each; each row also
 names one of five required concepts — `bounded inverse-square flux`, `circumbinary orbit phase`, `planet survival
-integral`, `time window coverage`, `minimum separation` — 20 each). The first implementation task (T-R02G2102-003/004, before any test depends on the profiles) runs the real
+integral`, `time window coverage`, `minimum separation` — 20 each). The first implementation task (T-R02G2102-003, before any test depends on the profiles) runs the real
 generator and solver on the committed kernel over the real 100 entries and records in research.md R4 the largest
 candidate index per band, the work per level and for the catalog, the witness lengths by band and the slowest level
-and group of five; a profile value changed there is written back into this section, research.md and data-model.md in
+and group of five; a profile value changed there is written back into this section, research.md R4, data-model.md and plan.md's Technical Context in
 the same commit, never left divergent.
 
 - Q: How does the kernel change, and how is a level built from its manifest entry? → A: the kernel gains an optional
@@ -106,8 +106,8 @@ cannot fire: a world receives at most 2 · 64 000 milliflux per tick, so λ_hi �
   of their loss (ties keep their discovery order) and, from each, the moves in the fixed control order (star 1 ring,
   phase, luminosity, star 2 ring, phase, luminosity, tilt), values ascending, skipping arrangements already reached at
   any depth (reachability, never pruning by outcome) and moves the kernel refuses; each new arrangement is judged on
-  discovery. Loss = Σ over worlds of (Σ over ticks 1 … 48 of max(0, c_lo − F, F − c_hi)) + max(0, B_lo − I, I − B_hi) +
-  1000·max(0, W − window), in milliflux. The first winning arrangement ends the search; the plan is its path of moves
+  discovery. Loss = Σ over worlds of [Σ over ticks 1 … 48 of max(0, c_lo − F, F − c_hi) + max(0, B_lo − I, I − B_hi) +
+  1000·max(0, W − window)], in milliflux. The first winning arrangement ends the search; the plan is its path of moves
   from the start (its parent chain), then `run`, replayed through the kernel's play, whose report must agree. Work =
   arrangements judged, counted and bounded at 5,000 per candidate, above the largest search space up to a plan depth
   (band 5: five adjustable controls with at most 7, 7, 4, 4 and 3 other values give 1 + 25 + 243 + 1,147 + 2,632 = 4,048
@@ -142,8 +142,7 @@ cannot fire: a world receives at most 2 · 64 000 milliflux per tick, so λ_hi �
   level n's neighbour rule needs level n − 1. New refusals: `generation(Int)` (`r02-g21.generation`) and
   `witness(String)` (`r02-g21.witness`). The independent check of SC-R02G2102-002 enumerates every action sequence
   shorter than the plan through the puzzle contract's moves, with no visited set and no loss ordering, on the two levels
-  with the smallest move space in each band (ties by level number): none wins, and the distinct arrangements within each
-  depth equal the solver's counts. Feature 501's existing tests stay unchanged (no budget widening is needed). The
+  with the smallest move space in each band (ties by level number): none wins, and the number of arrangements first reached at each length equals the solver's count at that depth. Feature 501's existing tests stay unchanged (no budget widening is needed). The
   invariants INV-06 (content) and INV-12 (novelty), which feature 501 left to this feature, get named direct tests
   `testBinaryGardensContentBoundary` and `testBinaryGardensNoveltyBoundary`, each with a seeded neighbouring-input
   check. Impact: FR-R02G2102-006, 008; SC-R02G2102-002, 006, 007.
@@ -261,8 +260,7 @@ file is refused.
   progression rule; band means of the witness length never fall.
 - **FR-R02G2102-006**: Invalid requests MUST be refused with stable reason codes `r02-g21.*`; existing code MUST change
   only additively; every new public name is documented; the reference regression passes.
-- **FR-R02G2102-007**: Each emitted level MUST differ from its neighbours in the manifest (its fingerprint and its ring
-  radii and worlds are not those of the previous level), so adjacent seeds give genuinely different puzzles.
+- **FR-R02G2102-007**: Each emitted level MUST differ from its neighbours in the manifest (its fingerprint differs, and its ring radii and worlds are not both equal to the previous level's), so adjacent seeds give genuinely different puzzles.
 - **FR-R02G2102-008**: The content invariant (every level has a replaying witness and its difficulty reflects the
   solver's actual work) and the novelty invariant (the mechanic is checked, not its name: every witness consists only of
   ring, phase, luminosity and tilt actions decided by received flux, and putting back any one changed control of the

@@ -21,7 +21,8 @@ levels, measured locally, never asserted on CI). No {owner} or {device} tasks (p
   add `phaseSteps` and an optional `phaseStep` ("g ∈ {1, 2, 3, 4, 6, 8, 12, 16, 24} (default 1)"; refusals "after
   "nothing adjustable", before "separation" and "already won": "phase step" (not a listed divisor), "phase off grid" (a
   starting phase not a multiple of g); g = 1 omitted from the stored form, so every feature-501 level keeps its bytes
-  and fingerprint"; trailing `phaseStep: Int = 1` on the public init and the internal probe; `Content.phaseStep: Int?`;
+  and fingerprint"; trailing `phaseStep: Int = 1` on the public init and the internal probe, a `phaseStep` parameter on the
+  internal `init(…, refusingAWin:)`, passed through `Content(level:)` and `Content.level()`; `Content.phaseStep: Int?`;
   `allowsPhase(_:)`); in `Core/BinaryGardensSky.swift` refuse in `changed` "`.action("off the phase grid")` for a phase
   step not a multiple of g, after "phase out of range" and before "locked"" and require phases on the grid in
   `isWellFormed`; in `Core/BinaryGardensPuzzle.swift` list "phase candidates 0, g, 2g, … < 48" only; add
@@ -46,9 +47,9 @@ no arrangement reachable with fewer actions wins.
   breadth-first sweep; size = actions.count ≥ 1"; `BinaryGardensDifficulty` actions, worlds, narrowest band, tightest
   window, adjustable, move space, arrangements searched, work, nearest miss; `puzzleDifficulty`),
   `Core/BinaryGardensSolver.swift` (breadth-first by actions from the start; "depth d + 1 expands depth d in ascending
-  loss (ties: discovery order) with BinaryGardensPuzzle(level:).moves(in:), skipping arrangements already reached";
-  loss "Σ over worlds of (Σ over ticks 1 … 48 of max(0, c_lo − F, F − c_hi)) + max(0, B_lo − I, I − B_hi) + 1000 ·
-  max(0, W − window)"; work = arrangements judged, bounded at 5,000; search depth at most the band's p, never the
+  loss (ties: discovery order) with BinaryGardensPuzzle(level:).moves(in:), skipping arrangements already reached at any depth";
+  loss "Σ over worlds of [Σ over ticks 1 … 48 of max(0, c_lo − F, F − c_hi) + max(0, B_lo − I, I − B_hi) +
+  1000 · max(0, W − window)]"; work = arrangements judged, bounded at 5,000; search depth at most the band's p, never the
   budget; `replayWins`) and `Core/BinaryGardensGenerator.swift` (band profiles of clarification Q1; candidates from
   `SeedDerivation.derive(plannedSeed, index: c)` in its drawing order and research R15's details; bounds of research
   R12 in exact integer arithmetic; the skip rules "separation not kept within 16 redraws, c_lo = 0, λ_hi > 200 000,
@@ -69,14 +70,16 @@ no arrangement reachable with fewer actions wins.
   smaller depth does; the independent enumeration of research R14 of every action sequence shorter than the plan
   through `BinaryGardensPuzzle` moves, with no visited set and no loss order, reproducing `arrangementsByDepth` on
   seeded levels; the loss order changes only the work, never the depth; the work bound respected; refused moves never
-  followed; the plan is its parent chain and replays through the play); `--name host-2`
+  followed; the plan is its parent chain and replays through the play; `BinaryGardensControl` values, actions and settings in
+  the fixed order; `BinaryGardensDifficulty(level:plan:)` on a hand level: narrowestBand, tightestWindow, adjustable,
+  moveSpace, arrangementsSearched = Σ arrangementsByDepth, work, nearestMiss and `puzzleDifficulty`); `--name host-2`
 
 ## Phase 4: Story 2 — levels come from their planned seeds (P1)
 
 **Independent test**: building the catalog twice gives identical levels and the pinned digest.
 
 - [ ] T-R02G2102-004 [US2] Generator tests against the measured profiles: confirm the R4 values recorded by
-  T-R02G2102-003 are the ones in `BinaryGardensGenerator.swift` and in spec Q1, research.md R4 and data-model.md
+  T-R02G2102-003 are the ones in `BinaryGardensGenerator.swift` and in spec Q1, research.md R4, data-model.md and plan.md's Technical Context
   ("arithmetic values of spec Q1, confirmed or changed (and written back) by the measurement of research R4"); create
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensGeneratorTests.swift` (agent C: determinism, the
   drawing order of clarification Q1 and research R15, band values and kernel ranges of every candidate, "luminosity
@@ -101,7 +104,7 @@ edited file is refused.
   skipped; decode refuses newer (`r02-g21.newer-schema`), damaged and non-replaying or edited (`r02-g21.witness`) files
   with the reasons of contracts/api.md) with
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensWitnessTests.swift`; `--name host-4`
-- [ ] T-R02G2102-006 [US2] [US3] [US4] Create
+- [ ] T-R02G2102-006 [US1] [US2] [US3] [US4] Create
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensCatalogTests.swift` (lead: 100 entries, 20 per
   band; every level generated, won by its witness within the budget, and no arrangement at a smaller depth wins; the
   independent enumeration on the two levels with the smallest move space in each band (ties by level number);
@@ -139,4 +142,4 @@ edited file is refused.
 isolated copies against contracts/api.md; shared files (level, sky, puzzle, error, manifest, difficulty, solver,
 generator, catalog tests, witness files, docs) stay with the lead. MVP: Story 1. Requirement coverage: FR-001 → 003,
 004, 006; FR-002 → 003; FR-003 → 003, 006; FR-004 → 005, 006; FR-005 → 006; FR-006 → 002, 007 … 011; FR-007 → 003,
-004, 006; FR-008 → 006; FR-009 → 002; SC-001 … 005 → 003 … 006; SC-006 → 002, 007 … 011; SC-007 → 006.
+004, 006; FR-008 → 006; FR-009 → 002; SC-001 … 005 → 003 … 006; SC-006 → 002, 007 … 011; SC-007 → 002, 006.

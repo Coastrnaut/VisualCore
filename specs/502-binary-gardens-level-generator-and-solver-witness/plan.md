@@ -20,7 +20,7 @@ p); a constructive generator per manifest entry (a winning arrangement drawn fir
 bloom band set from that winning run in exact integer arithmetic, then p changed controls give the start); a
 breadth-first solver over arrangements by the number of legal actions from the start, each depth expanded from the
 previous depth's arrangements in ascending order of their light loss, moves in the puzzle contract's fixed order,
-skipping arrangements already reached, judging every new arrangement with the kernel's exact 48-tick report, counting
+skipping arrangements already reached at any depth (earlier in the same depth included), judging every new arrangement with the kernel's exact 48-tick report, counting
 arrangements judged against a bound of 5,000 and storing the counts at every smaller depth as the minimality proof;
 difficulty metrics with the nearest miss; witness files with per-action state digests, the terminal light report (per
 world integral, exact mean, lethal run, window, bloom; star separation) and the counterexample with the nearest miss's
@@ -31,8 +31,7 @@ novelty invariant tests. Research: [research.md](research.md). Data: [data-model
 The band profiles of clarification Q1 are arithmetic bounds; the first implementation step (T-R02G2102-003 below)
 runs the real generator and solver on the real kernel over the real 100 entries and records in research.md R4 the
 largest candidate index per band, the work per level and for the catalog, the witness lengths by band and the slowest
-level and group. Any profile value changed there is written back into spec clarification Q1, research.md R4 and
-data-model.md in the same commit, never left divergent.
+level and group. Any profile value changed there is written back into spec clarification Q1, research.md R4, data-model.md and this plan's Technical Context in the same commit, never left divergent.
 
 ## Technical Context
 
@@ -152,15 +151,14 @@ is additive and the witness directory is new.
    the unchanged kernel; then the phase step (level, sky, puzzle), the two error cases, `BinaryGardensPhaseStepTests`
    (the pinned fingerprint and byte-identical stored form without a step, round trip with a step, the two level
    refusals in their order, the play's and the puzzle's off-grid refusal, move lists on the grid); `host`.
-3. **Manifest, difficulty, solver and generator, measured** (T-R02G2102-003 solver and T-R02G2102-004 generator,
-   lead): write the manifest, `BinaryGardensControl`, `BinaryGardensPlan`, `BinaryGardensDifficulty`, the solver and
+3. **Manifest, difficulty, solver and generator, measured** (T-R02G2102-003, lead; T-R02G2102-004 confirms the measured values and adds the generator tests): write the manifest, `BinaryGardensControl`, `BinaryGardensPlan`, `BinaryGardensDifficulty`, the solver and
    the generator from clarifications Q1 and Q2; then, in an isolated copy (no source edits in the working tree while a
    test chain runs), build the whole catalog once in a debug host build with a temporary measurement test that prints
    per level the accepted candidate index, the work, the witness length, the arrangements by depth and the elapsed
    time (removed before commit; elapsed time is printed, never asserted) and record the results in research.md R4.
    If an entry reaches `generation(n)`, a band's witness lengths are not its p, or a group of five exceeds 6 s, adjust
    only the profile values research R4's adjustment ladder names (never p, the phase steps or the budgets), re-measure,
-   and write the changed values back into spec clarification Q1, research.md and data-model.md in the same commit.
+   and write the changed values back into spec clarification Q1, research.md, data-model.md and the Technical Context above in the same commit.
    Agents A and C then write the solver and generator tests against contracts/api.md; `host-2` (solver), `host-3`
    (generator).
 4. **Witness** (T-R02G2102-005, agent B): `BinaryGardensWitness.swift` and its tests; `host-4`.
@@ -179,7 +177,7 @@ The lead writes the kernel extension, the error cases, the manifest, the difficu
 (step 3, measured before anything depends on the profiles); agents A (solver tests, including an independent
 enumeration of every action sequence shorter than the plan through `BinaryGardensPuzzle` moves, with no visited set
 and no loss order), B (witness and its tests) and C (generator tests) then work in parallel against contracts/api.md in
-isolated copies, never running a heavy build while a chain runs; the lead writes the catalog tests and the witness
+isolated copies, never running a heavy build; the lead writes the catalog tests and the witness
 files, retests every agent result in the foreground and records checks only after every agent has reported.
 
 ## Complexity Tracking

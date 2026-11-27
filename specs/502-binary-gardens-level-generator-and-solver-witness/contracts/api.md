@@ -13,7 +13,7 @@ extension BinaryGardensLevel {
     public let phaseStep: Int                    // 1 (feature 501's behaviour) or a listed divisor
     public func allowsPhase(_ step: Int) -> Bool // 0 … 47 and a multiple of phaseStep
     // public init gains a trailing `phaseStep: Int = 1`; refusals "phase step", "phase off grid" after
-    // "nothing adjustable", before "separation" and "already won"; the internal probe(...) gains `phaseStep: Int = 1`;
+    // "nothing adjustable", before "separation" and "already won"; the internal probe(...) gains `phaseStep: Int = 1` and the internal init(…, refusingAWin:) a `phaseStep` parameter;
     // Content gains `phaseStep: Int?` (nil when 1, so omitted from the stored form and the fingerprint text).
 }
 // BinaryGardensSky.changed: a phase step that is not a multiple of the level's phaseStep is refused
@@ -51,8 +51,8 @@ public enum BinaryGardensSolver {
     public static func plan(_ level: BinaryGardensLevel, maxDepth: Int,
                             workBound: Int = workBound) -> BinaryGardensPlan?
         // breadth-first by actions from the start; depth d + 1 expands depth d in ascending loss (ties: discovery
-        // order) with BinaryGardensPuzzle(level:).moves(in:), skipping arrangements already reached; nil without a
-        // win within maxDepth (≤ the budget) or over workBound
+        // order) with BinaryGardensPuzzle(level:).moves(in:), skipping arrangements already reached at any depth; nil without a
+        // win within maxDepth (the band's p, never the budget) or over workBound
     public static func loss(_ level: BinaryGardensLevel, report: BinaryGardensReport) -> Int
     public static func replayWins(_ level: BinaryGardensLevel, actions: [BinaryGardensAction]) -> Bool
         // begin, dismissTutorial when the level has one, each action against the current fingerprint, then run
