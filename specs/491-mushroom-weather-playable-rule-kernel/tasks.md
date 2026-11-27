@@ -84,7 +84,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
   `--name host-full`
 - [X] T-R02G2001-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-26: 2026-11-26 reference-1 exit 0 (.autonomy/migration/checks/R02-G20-01.reference-1.json)
 - [X] T-R02G2001-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-26: 2026-11-26 reference-2 exit 0 (.autonomy/migration/checks/R02-G20-01.reference-2.json)
-- [ ] T-R02G2001-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G2001-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-26: 2026-11-26 script-tests exit 0 run alone (.autonomy/migration/checks/R02-G20-01.script-tests.json)
 - [ ] T-R02G2001-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
 
