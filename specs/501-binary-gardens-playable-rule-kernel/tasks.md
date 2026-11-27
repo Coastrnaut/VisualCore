@@ -112,7 +112,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
   `docs/automatedtesting.md` (BinaryGardens in local chunk round02-host-2 and in CI half b); `--name round02-host-1`,
   `-2`, `-3c`, `-3e`, `-3f` (chunk 2 gains BinaryGardens: `swift test --package-path Packages/ExperiencesRound02
   --filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges|BinaryGardens'`; the other four filters unchanged)
-- [ ] T-R02G2101-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2101-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0 (.autonomy/migration/checks/R02-G21-01.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
 - [ ] T-R02G2101-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2101-010 Reference regression chunk 2 (`--name reference-2`)
