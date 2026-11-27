@@ -40,8 +40,9 @@ with fewer actions wins.
 - [ ] T-R02G2002-003 [US1] Implement `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSolver.swift`
   (lead: arrangements by distance "pod count + vents toggled + one for a changed moonlight" from a start with no pod;
   within a depth "by pod count ascending, then vent count ascending, then pod site combinations and vent combinations
-  in lexicographic order, then the new moonlight ascending, skipping the start's"; "each depth after 0 ordered by the band loss of each arrangement's parent (the moonlight change, else the last vent
-  toggle, else the last pod removed), ties keeping the fixed order"; loss "Σ over colonies of max(0, low − h, h − high)
+  in lexicographic order, then the new moonlight ascending, skipping the start's"; "each depth after 0 ordered by the
+  band loss of each arrangement's parent (the moonlight change, else the last vent toggle, else the last pod removed),
+  ties keeping the fixed order"; loss "Σ over colonies of max(0, low − h, h − high)
   plus K − min(K, final run), plus M per colony when the run fails dried or mold"; the first winning arrangement ends
   the search; the plan's actions "placements in slot order, then vent toggles, then the moonlight change", then `run`;
   arrangements counted at each smaller depth and the nearest miss; work = arrangements judged, "bounded at 1,500";
