@@ -45,6 +45,13 @@
 // only, saving it is R02-G21-07); button rows that become columns at accessibility text sizes; wrapping text and a
 // 520-point readable width (iPad). The existing identifiers and actions are unchanged. Modelled on
 // `MushroomWeatherControls` (feature 496).
+// Feature 507 (R02-G21-07) T-R02G2107-006 (FR-R02G2107-004, 005, 008; clarifications Q4, Q5): "Replay best solution"
+// (identifier `replay`, value "level n") for a level with a verified stored solution, outside replay; during replay
+// its position ("Replay: action k of n", identifier `replay-position`) with Step (identifier `replay-step`, value
+// "Action k of n") and Stop (identifier `replay-stop`, value the trace's actions, "n actions"), each with a label; the
+// replay controls send through the presenter (`replay.start [level]`, `replay.step`, `replay.stop`), so a refusal reads
+// in words; the Sound toggle saves the choice through `settings.sound [1/0]`. The existing identifiers and actions are
+// unchanged. Modelled on `MushroomWeatherControls` (feature 497).
 #if os(iOS)
 import BinaryGardensCore
 import SwiftUI
@@ -92,6 +99,7 @@ struct BinaryGardensControls: View {
                 inspectRow
                 viewRow
                 progressRows
+                replaySection
                 soundToggle
             }
             .padding()
@@ -112,13 +120,57 @@ struct BinaryGardensControls: View {
         }
     }
 
-    /// The Sound toggle (feature 506; off by default; presentation only).
+    /// The Sound toggle (feature 506; off by default; since feature 507 saved through `settings.sound`).
     @ViewBuilder private var soundToggle: some View {
-        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter?.setSound(on: $0) }))
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { saveSound(on: $0) }))
             .disabled(presenter == nil)
             .accessibilityLabel("Sound of the gardens")
             .accessibilityValue(mirror.soundOn ? "on" : "off")
             .accessibilityIdentifier(port.identifier("sound"))
+    }
+
+    /// Saves the sound choice through the presenter (`settings.sound [1/0]`, feature 507), or sends it directly
+    /// without one.
+    private func saveSound(on: Bool) {
+        if let presenter { presenter.saveSound(on: on, port: port) } else { send("settings.sound", [on ? 1 : 0]) }
+    }
+
+    /// Replay of the best stored solution (feature 507): Replay outside replay for a level with a verified solution,
+    /// or during replay its position with Step and Stop.
+    @ViewBuilder private var replaySection: some View {
+        if mirror.replaying {
+            Text(mirror.replayPositionLabel).font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("replay-position"))
+            row {
+                Button("Step") { replay("replay.step") }
+                    .accessibilityLabel("Apply the next action of the replay")
+                    .accessibilityValue(mirror.replayStepValue)
+                    .accessibilityIdentifier(port.identifier("replay-step"))
+                Button("Stop") { replay("replay.stop") }
+                    .accessibilityLabel("Stop the replay")
+                    .accessibilityValue(mirror.replayStopValue)
+                    .accessibilityIdentifier(port.identifier("replay-stop"))
+            }
+        } else if mirror.replayAvailable {
+            Button("Replay best solution") { replay("replay.start") }
+                .accessibilityLabel("Replay your best solution of this level")
+                .accessibilityValue(mirror.replayValue)
+                .accessibilityIdentifier(port.identifier("replay"))
+        }
+    }
+
+    /// Sends a replay control through the presenter (refusals in words), or directly without one (feature 507).
+    private func replay(_ control: String) {
+        guard let presenter else {
+            send(control, control == "replay.start" ? [Double(mirror.levelNumber)] : [])
+            return
+        }
+        switch control {
+        case "replay.start": presenter.startReplay(port: port)
+        case "replay.step": presenter.stepReplay(port: port)
+        default: presenter.stopReplay(port: port)
+        }
     }
 
     /// The step of an adjustable element's action (feature 506): +1 for increment, −1 for decrement, nil otherwise.

@@ -564,7 +564,8 @@ enum BinaryGardensA11y {
         #expect(!source.contains("HStack(spacing: 16)"), "every row wraps into a column at accessibility sizes")
         let sound: Substring? = Access.modifierRun("sound", in: source)
         #expect(sound?.contains("mirror.soundOn ? \"on\" : \"off\"") == true, "Sound reads on or off")
-        #expect(sound?.contains("presenter?.setSound(on: $0)") == true, "the toggle sets the presenter's sound")
+        // Since feature 507 (R02-G21-07) the toggle saves the choice through `settings.sound`.
+        #expect(sound?.contains("saveSound(on: $0)") == true, "the toggle saves the sound choice")
         let summary: Substring? = Access.modifierRun("summary", in: source)
         #expect(summary?.contains(".accessibilityValue(mirror.summary)") == true, "the summary reads the plan's words")
         let reset: Substring? = Access.modifierRun("reset-view", in: source)

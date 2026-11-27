@@ -82,7 +82,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
 
 ## Phase 4: Panel and simulator proof
 
-- [ ] T-R02G2107-006 [US3] Edit `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensPresenter.swift`
+- [X] T-R02G2107-006 [US3] Edit `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensPresenter.swift` — Verified 2026-11-27: sim-27 exit 0 (sim-27.2, BinaryGardensExperienceTests: 75 tests in 8 suites; 6 replay tests)
   and `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensControls.swift` (Replay for a verified solved
   level, Step and Stop with labels and values, the replay position; the Sound toggle sends `settings.sound` and the
   presenter applies the restored `soundOn` when the experience opens, replacing R02-G21-06's presenter-held choice; the

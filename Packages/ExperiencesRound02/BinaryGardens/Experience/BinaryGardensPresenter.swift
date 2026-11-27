@@ -57,6 +57,21 @@
 // state. The mirror carries the summary element's text (`BinaryGardensFeedbackPlan.summaryText(core:star:)`), the
 // controls' values in words (clarification Q5, ", locked" for a locked control) and the sound choice (off by default;
 // saving it is R02-G21-07). Presentation only. Modelled on `MushroomWeatherPresenter` (feature 496).
+// Feature 507 (R02-G21-07) T-R02G2107-006 (FR-R02G2107-004, 005, 007, 008, 009; clarifications Q2, Q4, Q5): the
+// mirror carries whether the current level has a verified solution to replay (`replayAvailable`: the core's
+// `canReplay(level:)` for its level, outside replay), whether a replay runs (`replaying`, the core's `isReplaying`) and
+// its position (`replayPosition`, the trace actions applied, and `replayLength`, the trace's actions with the run: the
+// core's own counts); the mode's name is `BinaryGardensFeedbackPlan.modeName(_:)` (campaign, practice, daily or
+// replay), so the panel and the announcements use the same word; `startReplay`, `stepReplay` and `stopReplay` send
+// `replay.start [level]`, `replay.step` and `replay.stop` through ``send(_:_:port:)``, so a refusal
+// (`r02-g21.no-replay`, `r02-g21.replay-end` or `r02-g21.replay`) is shown and announced in the plan's words and its
+// bare code kept in the refusal log like every other refusal; the Sound toggle saves the choice through
+// `settings.sound [1/0]` (`saveSound(on:port:)`), and the saved choice (`core.soundOn`) is applied when the experience
+// opens (the first core taken in) and whenever it changes, replacing R02-G21-06's presenter-held choice
+// (`setSound(on:)` stays as a presentation-only path that saves nothing); the results a restore dropped
+// (`core.reconciliationDropped`) are announced once per presenter as `state` ("n saved results could not be checked
+// and were removed.", "1 saved result could not be checked and was removed."). Modelled on `MushroomWeatherPresenter`
+// (feature 497).
 #if os(iOS)
 import BinaryGardensCore
 import Foundation
@@ -135,17 +150,13 @@ final class BinaryGardensMirror {
         bestStars > 0 ? "Best: \(bestStars) of 3 stars" : "Best: not won yet"
     }
 
-    /// "Mode: campaign", "Mode: practice" or "Mode: daily" (feature 505).
+    /// "Mode: campaign", "Mode: practice", "Mode: daily" or "Mode: replay" (feature 505; replay since feature 507).
     var modeLabel: String { "Mode: " + Self.modeName(mode) }
 
-    /// The mode's name: campaign, practice or daily (feature 505).
+    /// The mode's name: campaign, practice, daily or replay (feature 505; since feature 507 the feedback plan's
+    /// `BinaryGardensFeedbackPlan.modeName(_:)`, so the panel and the announcements use the same word).
     static func modeName(_ mode: BinaryGardensMode) -> String {
-        switch mode {
-        case .campaign: "campaign"
-        case .practice: "practice"
-        case .daily: "daily"
-        case .replay: "replay"
-        }
+        BinaryGardensFeedbackPlan.modeName(mode)
     }
 
     /// The picker's line for level `level`: "Level n, band b", with ", s of 3 stars" once it has been won
@@ -377,8 +388,28 @@ final class BinaryGardensMirror {
 
     /// The latest core taken in, for the summary element (feature 506); nil before the first.
     var summaryCore: BinaryGardensExperienceCore?
-    /// Whether the sound is on (feature 506; off by default; presentation only, saving it is R02-G21-07).
+    /// Whether the sound is on (feature 506; off by default; since feature 507 the core's saved choice, `soundOn`).
     var soundOn = false
+    /// Whether the current level has a verified solution to replay, outside replay (feature 507).
+    var replayAvailable = false
+    /// Whether a replay is running (feature 507).
+    var replaying = false
+    /// The trace actions of the running replay applied so far (0 when no replay runs; feature 507).
+    var replayPosition = 0
+    /// The actions of the running replay's trace, the run included (0 when no replay runs; feature 507).
+    var replayLength = 0
+
+    /// The replay position line (feature 507): "Replay: action k of n".
+    var replayPositionLabel: String { "Replay: action \(replayPosition) of \(replayLength)" }
+
+    /// Step's value (feature 507): "Action k of n", the trace actions applied of the trace's.
+    var replayStepValue: String { "Action \(replayPosition) of \(replayLength)" }
+
+    /// Stop's value (feature 507): the trace's actions, "n actions" ("1 action" for one).
+    var replayStopValue: String { replayLength == 1 ? "1 action" : "\(replayLength) actions" }
+
+    /// Replay's value (feature 507): "level n", the level whose solution it replays.
+    var replayValue: String { "level \(levelNumber)" }
 
     /// The summary element's text (feature 506): `BinaryGardensFeedbackPlan.summaryText(core:star:)` of the latest core
     /// and the panel's selected star; empty before the first core.
@@ -755,7 +786,8 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     /// and show ticks; the preview, the inspection and the orbit are presentation state.
     var gestureActions: Set<String> { ["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "clock.show"] }
 
-    /// The native controls send every declared control, every action a gesture can and more.
+    /// The native controls send every declared control, every action a gesture can and more (since feature 507 the
+    /// panel's Replay, Step, Stop and Sound send `replay.start`, `replay.step`, `replay.stop` and `settings.sound`).
     var nativeActions: Set<String> { Set(Core.actionIDs) }
 
     /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
@@ -855,6 +887,8 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     /// of the play hides the hint (the next press shows level 1).
     private func absorbProgress(_ core: BinaryGardensExperienceCore) {
         if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        absorbSaved(core)    // feature 507: before `latestCore` moves on, so the first core and a change are seen
+        absorbReplay(core)
         latestCore = core
         if let shown = hintPlay, shown != core.play { clearHint() }
         mirror.tutorialText = core.tutorial == .done ? nil : core.tutorial.text
@@ -1067,7 +1101,9 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         sound.audition(selectedAudition)
     }
 
-    /// Turns the sound on or off (presentation only); turning it on plays the recipe of the current play.
+    /// Turns the sound on or off (presentation only, saves nothing; since feature 507 the Sound toggle saves the
+    /// choice through ``saveSound(on:port:)`` and the saved choice is applied by ``absorbSaved(_:)``); turning it on
+    /// plays the recipe of the current play.
     func setSound(on: Bool) {
         if on, let core = latestCore { sound.offer(Self.recipe(core)) }
         sound.setWanted(on)
@@ -1085,5 +1121,79 @@ final class BinaryGardensPresenter: ExperiencePresenter {
 
     /// The summary element's words (feature 506): the mirror's summary of the latest core and the selected star.
     var summaryText: String { mirror.summary }
+
+    // MARK: Persistence and replay (feature 507, R02-G21-07)
+
+    /// Saves the sound choice through `settings.sound [1]` or `[0]` (feature 507); the change taken in turns the loop
+    /// on or off (``absorbSaved(_:)`` applies `core.soundOn`).
+    @discardableResult
+    func saveSound(on: Bool, port: ExperienceActionPort) -> ActionResult {
+        send("settings.sound", [on ? 1 : 0], port: port)
+    }
+
+    /// Starts the replay of the current level's verified stored solution (`replay.start [level]`; refused in words
+    /// without one).
+    @discardableResult
+    func startReplay(port: ExperienceActionPort) -> ActionResult {
+        let level: Int = latestCore?.levelNumber ?? mirror.levelNumber
+        return send("replay.start", [Double(level)], port: port)
+    }
+
+    /// Applies the next action of the running replay (`replay.step`; refused in words after the last or outside
+    /// replay).
+    @discardableResult
+    func stepReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.step", [], port: port)
+    }
+
+    /// Stops the running replay and returns to the campaign (`replay.stop`; refused in words outside replay).
+    @discardableResult
+    func stopReplay(port: ExperienceActionPort) -> ActionResult {
+        send("replay.stop", [], port: port)
+    }
+
+    /// The trigger of the dropped-results announcement in the feedback log (feature 507).
+    static let droppedTrigger = "reconciliation"
+
+    /// Whether the dropped-results announcement was made (once per presenter; feature 507).
+    private(set) var droppedAnnounced = false
+
+    /// The announcement of `count` saved results a restore dropped (feature 507): "n saved results could not be
+    /// checked and were removed.", in the singular "1 saved result could not be checked and was removed.".
+    static func droppedText(_ count: Int) -> String {
+        count == 1 ? "1 saved result could not be checked and was removed."
+            : "\(count) saved results could not be checked and were removed."
+    }
+
+    /// The `state` plan announcing `count` dropped results (feature 507): no haptic, trigger ``droppedTrigger``.
+    static func droppedPlan(_ count: Int) -> BinaryGardensFeedbackPlan {
+        BinaryGardensFeedbackPlan(text: droppedText(count), kind: .state, haptic: nil, trigger: droppedTrigger)
+    }
+
+    /// Takes the saved parts of `core` in (feature 507): the saved sound choice when the first core arrives (the
+    /// experience opens) or the choice changes, and the dropped results announced once. Runs before `latestCore`
+    /// moves on.
+    private func absorbSaved(_ core: BinaryGardensExperienceCore) {
+        if latestCore == nil || latestCore?.soundOn != core.soundOn {
+            // As `setSound(on:)`, with the recipe of this core (`latestCore` is still the previous one).
+            if core.soundOn { sound.offer(Self.recipe(core)) }
+            sound.setWanted(core.soundOn)
+            mirror.soundOn = core.soundOn
+        }
+        if !droppedAnnounced, core.reconciliationDropped > 0 {
+            droppedAnnounced = true
+            route(Self.droppedPlan(core.reconciliationDropped))
+        }
+    }
+
+    /// Takes the replay state of `core` into the mirror (feature 507): Replay is offered for a level with a verified
+    /// result that has a trace, outside replay; during replay the position is the core's trace actions applied of the
+    /// trace's actions.
+    private func absorbReplay(_ core: BinaryGardensExperienceCore) {
+        mirror.replaying = core.isReplaying
+        mirror.replayAvailable = !core.isReplaying && core.canReplay(level: core.levelNumber)
+        mirror.replayPosition = core.replayPosition
+        mirror.replayLength = core.replayLength
+    }
 }
 #endif
