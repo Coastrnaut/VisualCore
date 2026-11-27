@@ -126,3 +126,13 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
 Agents may draft in isolated copies before 001 (new files only). MVP: Stories 2 and 3. Requirement coverage: FR-001 →
 003, 005; FR-002 → 002, 005; FR-003 → 002, 005; FR-004 → 003, 004, 005; FR-005 → 003, 004; FR-006 → 004; FR-007 →
 004, 006 … 010; FR-008 → 005; FR-009 → 002, 003, 004.
+
+## Phase 6: Convergence
+
+- [ ] T-R02G2105-012 State in `docs/architecture/binary-gardens.md` that the one-line status keeps its short failure
+  words ("Failed: …", asserted by the R02-G21-03 render tests, which clarification Q6 does not let this feature change)
+  while the panel and the description show the full failure explanation, per FR-R02G2105-003 and T-R02G2105-005
+  (partial: the status is not replaced)
+- [ ] T-R02G2105-013 State in `docs/architecture/binary-gardens.md` that the goal reads "Win in at most 1 action for 3
+  stars" in the singular when the certified count is 1, per clarification Q3 (partial: the spec writes only the plural
+  form)
