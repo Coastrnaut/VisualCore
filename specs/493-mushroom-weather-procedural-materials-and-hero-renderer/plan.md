@@ -12,7 +12,7 @@ failure, actions left, budget, level number, presentation time); the forest geom
 with phase ticks, the floor cells, logs and stones, L-system fronds at the two richer tiers, the mist squares sized and
 shaded by humidity, site rings, lathed stalks and umbrella caps with band rings, lathed amber pods, droplets and spore
 motes at the richer tiers, slatted vents, the colony gauges and the actions bars) mapped by s = min(1.8 / C, 1.6 / R)
-about the floor's centre, a fixed authored camera, depth-tested solids and a CPU reference of the projection and
+about the floor's centre, a fixed authored camera, painter's order with depth testing off and a CPU reference of the projection and
 palette; GLSL ES 3.00 forest and glow programs (translucent caps with an SDF moisture sparkle); three tiers (lathe
 detail, droplets, fronds, motes, glow); the adapter `MushroomWeatherExperienceCore` (place, remove, vent, moonlight, run,
 undo, redo, next level, show cycle; digest = level number + play fingerprint; snapshot schema 1); the iOS experience

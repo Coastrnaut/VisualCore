@@ -53,7 +53,8 @@ droplets into a midnight miniature forest" and the geometry "procedural lathed s
 - Q: What exactly does the scene show, and how does it map the rules to space? → A: the floor plane is z = 0; cell (r, c)
   of a level with R rows and C columns has its centre at world ((c − (C − 1)/2) · s, ((R − 1)/2 − r) · s, 0) with
   s = min(1.8 / C, 1.6 / R), so every level fills the same box (one rule for every level); y is up the floor. Drawn in
-  this order with depth testing on for the solid parts: the backdrop (a large quad behind the floor; a vertical gradient
+  this order, painter's order with depth testing off (the window surface has no depth buffer; corrected at
+  implement): the backdrop (a large quad behind the floor; a vertical gradient
   from midnight #050A1A at the bottom to midnight top #0E1A33 at the top, still); the moon (a disc of radius 0.12 at
   (1.15, 1.05, −0.5), moon #E8EEF7, its brightness (4 + L)/7 and four phase ticks around it with L + 1 filled); the
   floor cells (a square of side 0.96 s per floor cell, moss #12261C); the blocked cells (a log — a rounded box 0.8 s long

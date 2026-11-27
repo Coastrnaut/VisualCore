@@ -7,10 +7,11 @@
 - **R2 Drawn values are judged values.** Decision: the mist shows the kernel's integer humidity at the shown cycle (side
   and shade both from h/M), caps glow only when the kernel's colony is in band at that cycle, and gauge markers stand
   at the kernel's value; nothing is interpolated between cycles. Rationale: the exact weather stays exact on screen.
-- **R3 Depth for the solids, painter's order for the flats.** Decision: the floor, logs, stones, stalks, caps, pods and
-  vents are depth-tested; the backdrop, mist, rings, gauges and bars are drawn in a fixed order by kind; the glow is
-  additive and last. Rationale: lathed stalks and caps stand up from the floor under a tilted camera, unlike the flat
-  dish of feature 483.
+- **R3 Painter's order for everything.** Decision (corrected at implement, 2026-11-27): every element is drawn in a fixed
+  order by kind with depth testing off, solids included, each lathe emitting its far faces first; the glow is additive
+  and last. Rationale: the window surface of the shared renderer carries no depth buffer (as `DepthMeshPass` records), so
+  no round-two experience depth-tests; the first draft's "depth-tested solids" could not be met, and the quads' ±1.25
+  transparent fringe would clip neighbours if depth were written.
 - **R4 Lathed meshes and signed-distance shading.** Decision: stalks, caps and pods are lathed from fixed profiles (16,
   10 or flat segments by tier); the cap's fragment shader adds a translucent rim light and an SDF field of moisture
   beads whose density follows h/M; rings, brackets, markers and bars are generated quads shaded by signed distance from
