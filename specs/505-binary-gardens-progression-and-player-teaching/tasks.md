@@ -34,7 +34,7 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
   arrangements judged", the first winning sequence found; `BinaryGardensHints.plan`/`hint` taking the certified plan;
   `BinaryGardensFailureExplanation` with the texts of clarification Q5 for `frozen`, `scorched` (E = 0 and singular
   wordings), `unstable` (w = 0 and singular wordings), `wilted` and `bleached`, worlds numbered from 1, ticks in the
-  level's words (`BinaryGardensLevel` tick wording, ticks beyond 48 as "tick 50 (tick 2 of the next cycle)"), numbers
+  level's words (`BinaryGardensLevel.walkTickWords`, module-internal, so the file sits in the same target; ticks beyond 48 as "tick 50 (tick 2 of the next cycle)"), numbers
   grouped by `BinaryGardensLevel.grouped`, each followed by one space and "Undo the last action or retry the level.")
   with `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensHintsTests.swift` (following exact hints from
   the opening, then the run, wins all 100 certified levels within the certified count, in groups under 10 s each; 200
@@ -70,7 +70,8 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
   on a copy of the level, no stars, no unlocks; the daily level is playable even while still locked in the campaign,
   and a daily win records the level's best result and stars and opens nothing; `mode.campaign` returns to the current
   level or the frontier when the current one is not open; choosing a level or mode starts a fresh play (records
-  dropped, tick 48 shown, tutorial at its first step on levels 1 … 3); digest domain `"r02-g21.binary-gardens.v2"` over
+  dropped, tick 48 shown, tutorial at its first step on levels 1 … 3); a fresh opening of level N (prepare, reset)
+  has no won levels and levels 1 … N open, as feature 495; digest domain `"r02-g21.binary-gardens.v2"` over
   level, play fingerprint, progress and mode, the tutorial step snapshotted but not digested, the shown tick, preview,
   orbit and inspected world unchanged (presentation); snapshot schema 2 `{level, mode, progress, records, tutorial}`
   (sorted keys) with a migration from 1 "no won levels, levels 1 … the restored level open, campaign mode, the tutorial
@@ -80,13 +81,16 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
   prepared level exposed for hints and stars; no level is ever gated by payment — locked means not yet unlocked
   (FR-R02G2105-006)) with tests in
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensProgressionCoreTests.swift` (new controls,
-  refusals, a locked daily level played without opening it, schema 2 round trip, migration from a schema-1 payload,
+  refusals, a locked daily level played without opening it, schema 2 round trip, migration from a schema-1 payload of every level 1 … 100 (SC-R02G2105-005),
   damaged and newer payloads refused); update in place only the assertions clarification Q6 names — the declared
   control list, schema version 2, digest domain v2 and `level.next`'s wrap — in
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensExperienceCoreTests.swift`,
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensScenariosTests.swift` and the R02-G21-04 panel-win
   and gesture wiring tests where they assert them; update
-  `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensScenarios.swift` (`nextLevel` and the controls) and
+  `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensScenarios.swift` (`nextLevel` without wrap; as feature
+  495, full-playthrough's campaign wins open each next level before `level.next`, the integration rows 71 … 80 first win
+  their level's certified plan and the run before `level.next`, a row on level 100 chooses level 1 with `level.select
+  [1]` instead, and rejection also refuses the new controls' wrong value counts) and
   regenerate `Packages/ExperiencesRound02/BinaryGardens/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); lead;
   `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter BinaryGardens`
 - [ ] T-R02G2105-005 Edit `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensPresenter.swift` (the
