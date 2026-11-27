@@ -62,7 +62,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
 
 ## Phase 3: Story 1 — balance the twin stars so every garden world stays in its light (P1) 🎯
 
-- [ ] T-R02G2101-003 [P] [US1] Create
+- [X] T-R02G2101-003 [P] [US1] Create — Verified 2026-11-27: host-2 exit=0, BinaryGardensSkyTests with the independent reference over 500 seeded runs (file committed with T-002) (.autonomy/migration/checks/R02-G21-01.host-2.json)
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensSkyTests.swift` (agent A: an independent
   reimplementation of the cosine table from its symmetry rules, the positions, the milliflux law, the bands, the lethal
   walk, the cyclic window, the integrals and the judge, written from the spec's clarifications only, compared with the
