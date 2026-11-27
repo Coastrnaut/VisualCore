@@ -133,6 +133,6 @@ Agents may draft in isolated copies before 001 (new files only). MVP: Stories 2 
   words ("Failed: …", asserted by the R02-G21-03 render tests, which clarification Q6 does not let this feature change)
   while the panel and the description show the full failure explanation, per FR-R02G2105-003 and T-R02G2105-005
   (partial: the status is not replaced)
-- [ ] T-R02G2105-013 State in `docs/architecture/binary-gardens.md` that the goal reads "Win in at most 1 action for 3
+- [X] T-R02G2105-013 State in `docs/architecture/binary-gardens.md` that the goal reads "Win in at most 1 action for 3 — Verified 2026-11-27: docs/architecture/binary-gardens.md states the singular goal for one action; validate_docs PASS
   stars" in the singular when the certified count is 1, per clarification Q3 (partial: the spec writes only the plural
   form)
