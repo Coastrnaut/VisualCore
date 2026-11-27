@@ -47,16 +47,16 @@ Answered autonomously under the owner's standing delegation, safest well-support
 three adjustable flags each, tilt 0 … T_max with T_max 0 … 6, separation σ 0 … 16, clamp radius 1 … 8, 1 … 5 worlds,
 tolerance 0 … 12, budget 1 … 24, a starting arrangement that must keep the separation and must not win; the 48-step
 integer geometry; flux in milliflux, truncated per star; the judge order lethal → window → bloom, worlds ascending;
-`BinaryGardensPuzzle` whose moves are the legal ring, phase, luminosity and tilt actions while actions are left); the
-module is specified and its implementation follows feature 501's gate, so no Binary Gardens code exists yet and the
-search sizes below are arithmetic bounds, not measurements; R02-F24's `PuzzleCatalog.digest(id:identities:)` and the
+`BinaryGardensPuzzle` whose moves are the legal ring, phase, luminosity and tilt actions while actions are left); the module is committed (R02-G21-01 up to T-006; research.md lists what was read), and the search sizes below are
+arithmetic bounds, not measurements; R02-F24's `PuzzleCatalog.digest(id:identities:)` and the
 standard `ProgressionRule` (drop at most 1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the
 canonical manifest's 100 entries (bands 1 … 5 × 20, budgets as above, five control emphases, 20 each; each row also
 names one of five required concepts — `bounded inverse-square flux`, `circumbinary orbit phase`, `planet survival
-integral`, `time window coverage`, `minimum separation` — 20 each). The plan stage runs a prototype of this generator and
-solver on the real kernel over the real 100 entries and records in research.md the largest candidate index, the work per
-level and for the catalog, and the witness lengths by band; a profile value changed there is written back into this
-section, never left divergent.
+integral`, `time window coverage`, `minimum separation` — 20 each). The first implementation task (T-R02G2102-003/004, before any test depends on the profiles) runs the real
+generator and solver on the committed kernel over the real 100 entries and records in research.md R4 the largest
+candidate index per band, the work per level and for the catalog, the witness lengths by band and the slowest level
+and group of five; a profile value changed there is written back into this section, research.md and data-model.md in
+the same commit, never left divergent.
 
 - Q: How does the kernel change, and how is a level built from its manifest entry? → A: the kernel gains an optional
   phase step g ∈ {1, 2, 3, 4, 6, 8, 12, 16, 24} (the divisors of 48 up to 24); with g > 1 every starting star phase must
@@ -90,8 +90,8 @@ section, never left divergent.
   2 … 3, 2 … 5, 3, 8, 20 … 40, 150, 60, 1 … 3, 2 … 4, 3), band 5 (5, 5, 3 … 4, 6, 3, 3, 3 … 6, 3, 10, 10 … 30, 100, 40,
   0 … 2, 1 … 3, 4). A luminosity control is never drawn adjustable while the level has one luminosity level (every band
   has at least two). Budget = the manifest's; ids `binary-gardens-NNN`; tutorial on levels 1 … 3; difficulty = band.
-  A candidate is skipped when the winning arrangement or the start cannot keep the separation within its tries, a
-  world's c_lo is 0 or its λ_hi exceeds 200 000, the level rules refuse it (including a start that already wins), the
+  A candidate is skipped when the winning arrangement or the start cannot keep the separation within its tries, a world's c_lo is 0 (the kernel needs 0 ≤ λ_lo < c_lo) or its λ_hi exceeds the kernel's 200 000 (a guard that
+cannot fire: a world receives at most 2 · 64 000 milliflux per tick, so λ_hi ≤ 166 400; tested as a bound), the level rules refuse it (including a start that already wins), the
   winning arrangement with any one changed control put back to its starting value still wins ("reducible"), its ring
   radii and worlds equal the previous level's (FR-R02G2102-007), the solver's minimal plan is not p, or the plan does
   not win through the play; at most 64 candidates, then `generation(n)`. Impact: FR-R02G2102-001, 007, 009;
@@ -224,8 +224,9 @@ file is refused.
   (bounded at 64) and records how many it skipped; no candidate within the bound is a named refusal.
 - **A candidate whose starting arrangement already wins, or whose winning arrangement or start cannot keep the
   separation:** never emitted (the kernel refuses the first; the bounded redraws skip the second).
-- **A world whose winning flux is so low that its comfortable floor would be 0, or so high that its lethal ceiling
-  would exceed 200 000 milliflux:** the candidate is skipped; no bound is clamped silently.
+- **A world whose winning flux is so low that its comfortable floor would be 0:** the candidate is skipped; no bound
+  is clamped silently. A lethal ceiling above the kernel's 200 000 milliflux cannot arise (at most 166 400 under the
+  128 000-milliflux flux cap); the skip stays as a guard tested as a bound.
 - **More than one minimal arrangement:** allowed; the witness is the one the solver finds in its fixed order.
 - **An arrangement differing from the start in d controls but reachable only through a detour (the direct order breaks
   the separation):** it lies at its true, larger depth; the sweep follows only legal moves, so depths are exact.
@@ -246,8 +247,8 @@ file is refused.
   budget MAY be emitted.
 - **FR-R02G2102-002**: A solver MUST find a minimal sequence of actions after which committing the light window wins, by
   a bounded sweep over arrangements (star rings, phases, luminosities, orbit tilt) by the number of actions from the
-  start, each judged by feature 501's exact flux sampled at every tick of the cycle, with reachability checks skipping
-  arrangements already reached at a smaller depth (never pruning by outcome) and a light loss guiding the order, with its
+  start, each judged by feature 501's exact flux sampled at every tick of the cycle, with reachability checks skipping arrangements already reached at any depth, earlier in the same depth included
+  (never pruning by outcome) and a light loss guiding the order, with its
   work bounded and counted, and MUST prove that no shorter sequence wins; every plan it reports MUST be replayed through
   the kernel's play.
 - **FR-R02G2102-003**: Each level MUST carry difficulty metrics (witness length, worlds, narrowest comfortable band,

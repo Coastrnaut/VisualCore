@@ -33,5 +33,5 @@
 
 - The feature is a pure content pipeline over a rule kernel, so its requirements name rules and outcomes (the manifest,
   the generator, the solver, the witness files) rather than how; exact values are settled in clarify and plan, as in
-  feature 492 (the model). The search sizes in the clarifications are arithmetic upper bounds; the plan-stage prototype
-  on the real kernel records the measured candidate indices and work in research.md.
+  feature 492 (the model). The search sizes in the clarifications are arithmetic upper bounds; the first implementation
+  task on the committed kernel records the measured candidate indices and work in research.md R4.
