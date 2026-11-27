@@ -166,3 +166,23 @@ accounts for every unit; the catalog's 0.016667 s timestep is a presentation clo
   <level>."), the slot, site and moonlight adjustable with VoiceOver, each vent toggle "open" or "closed", a value in
   words on every control, refusals in the feedback plan's words, rows that become columns at accessibility text sizes
   and a 520-point readable width on iPad.
+
+## Persistence and replay (feature 497, R02-G20-07)
+
+- **Saves.** The one app's shared saved-state store writes the snapshot atomically; schema 3 is `{"level", "mode",
+  "progress", "records", "sound", "tutorial"}` (digest domain `r02-g20.mushroom-weather.v3`) and migrates from schema 1
+  and 2 (2 → 3: every result an empty trace, unverified, sound off). The shown cycle, the panel's selection, a drag
+  preview, the hint level and the camera are presentation and are not saved.
+- **Reconcilable scores.** A campaign or daily win stores the winning trace — the effective pod, vent and moonlight
+  actions in order (an undone action left out unless redone), then the run — with the result. On restore
+  `MushroomWeatherReconciliation` replays every trace (at most 64 actions) on a fresh play of its certified level and
+  keeps the result only when it wins, spends at most the recorded actions and its stars match the stars rule; the
+  frontier is restored as saved. Dropped results are counted (`reconciliationDropped`, never digested) and announced
+  once ("n saved results could not be checked and were removed.").
+- **Replay.** `replay.start [level]` opens mode `replay(level)` for a level with a verified trace (else
+  `r02-g20.no-replay`), `replay.step` applies the next action (finally the run; `r02-g20.replay-end` after it),
+  `replay.stop` returns to the campaign; other play actions are refused (`r02-g20.replay`), nothing is recorded and no
+  stars are claimed. A save taken mid-replay restores only when its records are the start of that trace. The panel
+  offers Replay, Step and Stop with the replay position.
+- **Settings.** The sound choice is saved through `settings.sound [0 … 1]`, snapshotted but never digested, and applied
+  when the experience opens.

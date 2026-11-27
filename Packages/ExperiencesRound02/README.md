@@ -1035,5 +1035,8 @@ practice (budget 24), and snapshot schema 2 with a migration from schema 1. Feat
 and accessibility: `MushroomWeatherFeedbackPlan` (announcements and haptics through the shared route),
 `MushroomWeatherLights` (eased glow and won look, fades of at least 0.4 s under Reduce Flashing),
 `MushroomWeatherSoundRecipe` (the selected site's audition and an ambient loop, both synthesized, off by default) and
-an accessible panel (a summary element, adjustable selection, values in words). See
+an accessible panel (a summary element, adjustable selection, values in words). Feature 497 (R02-G20-07) adds
+persistence and replay: snapshot schema 3 with winning traces, `MushroomWeatherReconciliation` (every saved result
+replayed on restore, edited ones dropped and counted), replay of the best solution (`replay.start`, `replay.step`,
+`replay.stop`) and the saved sound choice (`settings.sound`). See
 [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).

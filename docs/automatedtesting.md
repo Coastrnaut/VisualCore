@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G20-06: Mushroom Weather polish and accessibility).
+Last updated: 2026-11-27 (R02-G20-07: Mushroom Weather persistence and replay).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,16 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mushroom Weather persistence and replay** (R02-G20-07, 2026-11-27). Host: `MushroomWeatherReconciliationTests`
+  (19: net traces over undo and redo, every witness trace verified, edited stars, actions spent, steps and illegal,
+  failing, run-less or over-long traces dropped and counted), `…ProgressTests` (traces, drop, legacy decoding),
+  `…PersistenceTests` (9 functions: 500 seeded round trips, schema 1 and 2 migrations for 100 states each, 200 edited
+  saves) and `…ReplayCatalogTests` (every certified level won, then replayed step by step to its witness's
+  fingerprints, in 10 groups); the adapter (schema 3, 18 controls, a new replay suite), progression and scenario suites
+  follow (manifest regenerated); 281 tests in the filter. Simulator: `…ReplayTests` (4: replay through the panel,
+  refusals during replay, the dropped-results announcement once, the saved sound choice; 63 in the suite). Lesson: the
+  traced results and the replay mode cannot be installed apart from the adapter and the feedback plan (the mode switch
+  must stay exhaustive), so the core was installed in one step and each task's check ran on its own suites.
 - **Mushroom Weather polish and accessibility** (R02-G20-06, 2026-11-27). Host: `MushroomWeatherFeedbackPlanTests`
   (9: texts, kinds and haptics exact for pod, vent and moonlight actions, undo, redo, every refusal code bare and
   prefixed, wins in campaign and practice, failures of all three kinds, level and mode changes), `…LightsTests` (8: a

@@ -84,7 +84,7 @@ regenerated in T-003 with `UPDATE_SCENARIO_MANIFEST=1`) and round02-host in five
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G2007-007 Docs: `docs/architecture/mushroom-weather.md` (persistence and replay),
+- [X] T-R02G2007-007 Docs: `docs/architecture/mushroom-weather.md` (persistence and replay), — Verified 2026-11-27: docs (architecture persistence and replay, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit=0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the five round-two filters)
 - [ ] T-R02G2007-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name
