@@ -49,7 +49,7 @@ tests stay short (< 10 s each). No {owner} tasks. Agents model their files on Mi
 
 ## Phase 3: Stories 1 … 4 — pods, vents, moonlight and the scrubber (P1) 🎯
 
-- [ ] T-R02G2004-003 [US1] [US2] [US3] [US4] Create
+- [X] T-R02G2004-003 [US1] [US2] [US3] [US4] Create — Verified 2026-11-27: 2026-11-27 host-3 exit 0: 172 tests in 19 suites incl. 7 gesture-controller tests (500 seeded scripts at 3 sizes and 3 orbits on playing, won and failed plays against an independent expectation through the adapter; thresholds at their edges; second fingers, cancels and finished plays send no kernel action; orbit and preview change no digest) (.autonomy/migration/checks/R02-G20-04.host-3.json)
   `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherGestureController.swift` (FR-R02G2004-001 … 006,
   008, 009; SC-R02G2004-001 … 003; `MushroomWeatherGestureAction` place(slot, cell), move(slot, cell), remove(slot),
   setVent(index, open), setMoonlight(level), showCycle(cycle), preview(kind), clearPreview, selectSlot(slot),
