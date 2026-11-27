@@ -93,7 +93,7 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
   [1]` instead, and rejection also refuses the new controls' wrong value counts) and
   regenerate `Packages/ExperiencesRound02/BinaryGardens/scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1`); lead;
   `--name host-4 -- swift test --package-path Packages/ExperiencesRound02 --filter BinaryGardens`
-- [ ] T-R02G2105-005 Edit `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensPresenter.swift` (the
+- [X] T-R02G2105-005 Edit `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensPresenter.swift` (the — Verified 2026-11-27: sim-27 exit 0 (sim-27.2, BinaryGardensExperienceTests: 56 tests in 6 suites; 11 teaching tests)
   tutorial step text replacing the single tutorial sentence, the hint at its current level — "Hint" raises the level
   1 → 2 → 3, any play change resets it, the search off the main actor with a generation counter so a stale search never
   owns the hint — and the failure explanation as panel text, replacing the presenter's own failure words, with "Band b

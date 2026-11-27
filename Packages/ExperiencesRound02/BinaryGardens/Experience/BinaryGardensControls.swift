@@ -22,6 +22,15 @@
 // and "Reset view" (the authored camera, presentation only). A choice of the current value sends nothing. A refused
 // drag preview is named in words in the header. A star tapped on the canvas is selected here. Modelled on
 // `MushroomWeatherControls` (feature 494).
+// Feature 505 (R02-G21-05) T-R02G2105-005 (FR-R02G2105-001 … 005, 008; clarifications Q1 … Q5): a teaching block under
+// the header — the tutorial instruction with "Dismiss tutorial" (`tutorial.dismiss`), "Hint" (each press shows the next
+// of three levels through the presenter's `showHint()`; hints send nothing) with the hint text, the failure explanation
+// (in place of the short failure words), and the level's band, goal and best stars — and a progress block after the
+// view row: "Campaign" (`mode.campaign`), "Daily" (`mode.daily [year, month, day]` with today's local date from the
+// presenter) and "Practice" (`mode.practice`), and a picker of the open levels (1 … the frontier, with their bands and
+// stars) with "Play level" (`level.select [n]`). All wrapping text in the panel, never over the scene; refusals read in
+// words. The existing rows, identifiers and the feature 504 gesture wiring are unchanged. Modelled on
+// `MushroomWeatherControls` (feature 495).
 #if os(iOS)
 import BinaryGardensCore
 import SwiftUI
@@ -33,6 +42,8 @@ struct BinaryGardensControls: View {
     let port: ExperienceActionPort
     /// What the panel shows (and the panel's selection).
     @Bindable var mirror: BinaryGardensMirror
+    /// The presenter (feature 505): hints, the tutorial, the modes and the daily date; nil sends through `sendAction`.
+    var presenter: BinaryGardensPresenter? = nil
     /// Sends a control with its values through the presenter (feature 504).
     let sendAction: (String, [Double]) -> Void
     /// Inspects a world, or clears the inspection with nil, through the presenter (feature 504).
@@ -48,6 +59,7 @@ struct BinaryGardensControls: View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
                 header
+                teaching
                 starRow
                 ringRow
                 phaseRow
@@ -58,24 +70,21 @@ struct BinaryGardensControls: View {
                 choiceRows
                 inspectRow
                 viewRow
+                progressRows
             }
             .padding()
         }
         .onChange(of: mirror.star) { _, _ in mirror.phaseTarget = mirror.phase }
     }
 
-    /// The level, actions, status, tutorial, failure and refusal lines.
+    /// The level, actions, status, failure (while no explanation replaces it) and refusal lines.
     @ViewBuilder private var header: some View {
         Text("Level \(mirror.levelNumber) · \(mirror.actionsLeft) of \(mirror.budget) actions left")
             .font(.headline)
             .accessibilityIdentifier(port.identifier("actions"))
         Text(mirror.status).font(.subheadline)
             .accessibilityIdentifier(port.identifier("status"))
-        if let tutorial = mirror.tutorialText {
-            Text(tutorial).font(.footnote)
-                .accessibilityIdentifier(port.identifier("tutorial"))
-        }
-        if let failure = mirror.failureText {
+        if let failure = mirror.failureText, mirror.explanation == nil {
             Text(failure).font(.footnote)
                 .accessibilityIdentifier(port.identifier("failure"))
         }
@@ -279,6 +288,105 @@ struct BinaryGardensControls: View {
             Text(words).font(.footnote)
                 .accessibilityIdentifier(port.identifier("inspect-detail"))
         }
+    }
+
+    /// The tutorial instruction with Dismiss tutorial, Hint with the hint text, the failure explanation, and the band,
+    /// goal and best stars (feature 505).
+    @ViewBuilder private var teaching: some View {
+        if let tutorial = mirror.tutorialText {
+            Text(tutorial).font(.callout).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("tutorial"))
+            Button("Dismiss tutorial") { dismissTutorial() }
+                .accessibilityLabel("Dismiss the tutorial")
+                .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
+        }
+        Button("Hint") { presenter?.showHint() }
+            .disabled(presenter == nil)
+            .accessibilityLabel("Show a hint")
+            .accessibilityValue(mirror.hintLevel == 0 ? "none shown" : "level \(mirror.hintLevel) of 3")
+            .accessibilityIdentifier(port.identifier("hint"))
+        if let hint = mirror.hintText {
+            Text(hint).font(.callout).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("hint-text"))
+        }
+        if let explanation = mirror.explanation {
+            Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier(port.identifier("failure"))
+        }
+        HStack(spacing: 12) {
+            Text(mirror.bandLabel).font(.footnote)
+                .accessibilityIdentifier(port.identifier("band"))
+            Text(mirror.starsLabel).font(.footnote)
+                .accessibilityIdentifier(port.identifier("stars"))
+        }
+        Text(mirror.goalLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier(port.identifier("goal"))
+    }
+
+    /// The mode buttons and the picker of open levels with their bands and stars (feature 505).
+    @ViewBuilder private var progressRows: some View {
+        Text(mirror.modeLabel).font(.footnote)
+            .accessibilityIdentifier(port.identifier("mode"))
+        HStack(spacing: 12) {
+            Button("Campaign") { campaign() }
+                .accessibilityLabel("Play the campaign")
+                .accessibilityValue(modeValue("campaign"))
+                .accessibilityIdentifier(port.identifier("campaign"))
+            Button("Daily") { daily() }
+                .accessibilityLabel("Play today's daily level")
+                .accessibilityValue(modeValue("daily"))
+                .accessibilityIdentifier(port.identifier("daily"))
+            Button("Practice") { practice() }
+                .accessibilityLabel("Practise this level with more actions")
+                .accessibilityValue(modeValue("practice"))
+                .accessibilityIdentifier(port.identifier("practice"))
+        }
+        HStack(spacing: 12) {
+            Stepper(mirror.levelLabel(mirror.pickedLevel),
+                    onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
+                    onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
+                .accessibilityLabel("Level to play")
+                .accessibilityValue(mirror.levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("level-picker"))
+            Button("Play level") { selectLevel(mirror.pickedLevel) }
+                .accessibilityLabel("Play the picked level")
+                .accessibilityValue(mirror.levelLabel(mirror.pickedLevel))
+                .accessibilityIdentifier(port.identifier("play-level"))
+        }
+    }
+
+    /// "selected" when `name` is the current mode's name, else "not selected".
+    private func modeValue(_ name: String) -> String {
+        BinaryGardensMirror.modeName(mirror.mode) == name ? "selected" : "not selected"
+    }
+
+    /// Ends the tutorial of the level (`tutorial.dismiss`).
+    private func dismissTutorial() {
+        if let presenter { presenter.dismissTutorial(port: port) } else { send("tutorial.dismiss") }
+    }
+
+    /// Returns to the campaign (`mode.campaign`).
+    private func campaign() {
+        if let presenter { presenter.playCampaign(port: port) } else { send("mode.campaign") }
+    }
+
+    /// Plays today's daily level (`mode.daily` with the presenter's local calendar date).
+    private func daily() {
+        if let presenter {
+            presenter.playDaily(port: port)
+        } else {
+            send("mode.daily", BinaryGardensPresenter.dateValues(BinaryGardensPresenter.today()))
+        }
+    }
+
+    /// Replays the level with the practice budget (`mode.practice`).
+    private func practice() {
+        if let presenter { presenter.playPractice(port: port) } else { send("mode.practice") }
+    }
+
+    /// Plays open level `level` (`level.select [level]`).
+    private func selectLevel(_ level: Int) {
+        if let presenter { presenter.selectLevel(level, port: port) } else { send("level.select", [Double(level)]) }
     }
 
     /// Reset the view (feature 504; presentation only).

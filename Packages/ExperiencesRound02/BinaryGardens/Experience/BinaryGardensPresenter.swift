@@ -24,6 +24,20 @@
 // refusal log (at most 64). An opening, `level.next`, reset or restore (a new level number, or records that no longer
 // extend the followed ones) clears the preview, the inspection and the orbit. Modelled on `MushroomWeatherPresenter`
 // (feature 494).
+// Feature 505 (R02-G21-05) T-R02G2105-005 (FR-R02G2105-001 … 004, 008, 009; clarifications Q1 … Q3, Q5) adds teaching
+// and progression to the panel: the tutorial instruction (`core.tutorial.text` until the step is `done`, replacing the
+// presenter's own tutorial sentence, which is kept only as a name), the hint at its current level (`showHint()`: each
+// press raises the level 1 → 2 → 3; any change of the play hides it, so the next press shows level 1; one search per
+// play through `BinaryGardensHints.hint(level:play:certified:)` with the core's certified plan, run off the main actor
+// in a detached task, with a generation counter so that a stale search never owns the hint state; hints never send an
+// action), the failure explanation (`core.failureExplanation`, shown in the panel in place of the mirror's short
+// `failureText`, which stays the status line), the mode, the open levels, the level's band ("Band b of 5"), its goal
+// ("Win in at most k actions for 3 stars", k the certified witness's `core.certifiedActionCount`) and its best stars
+// ("Best: s of 3 stars" or "Best: not won yet", `core.progress.stars(of:)`). The description includes them. The daily
+// level is asked for with today's local calendar date read here (`playDaily(port:date:)`); the core never reads a
+// clock. A refused `level.select` or `level.next` (`r02-g21.locked`: "that level is not open yet") and an impossible
+// date (`r02-g21.date`: "that date cannot be used") read in words. Modelled on `MushroomWeatherPresenter`
+// (feature 495).
 #if os(iOS)
 import BinaryGardensCore
 import Foundation
@@ -52,7 +66,7 @@ final class BinaryGardensMirror {
     var measureLabel = ""
     /// The level in words.
     var targetLabel = ""
-    /// The tutorial in words on levels that have one; nil otherwise.
+    /// The tutorial instruction of the current step (`core.tutorial.text`, feature 505); nil once the step is `done`.
     var tutorialText: String?
     /// The shown tick, the adapter's (1 … 48).
     var shownTick = BinaryGardensExperienceCore.openingTick
@@ -70,6 +84,63 @@ final class BinaryGardensMirror {
     var inspectedWorld: Int?
     /// The panel's phase target for the selected star (feature 504; presentation only; on the phase grid 0 … 48 − g).
     var phaseTarget = 0
+    /// The hint level shown, 1 … 3; 0 while no hint is shown (feature 505; presentation only).
+    var hintLevel = 0
+    /// The hint shown at ``hintLevel``, ``BinaryGardensPresenter/searchingText`` while its search runs, or
+    /// ``BinaryGardensPresenter/noHintText`` when the play has no hint; nil while no hint is shown (feature 505).
+    var hintText: String?
+    /// The failure explanation (`core.failureExplanation`: what went wrong, then the advice), nil without a failure
+    /// (feature 505).
+    var explanation: String?
+    /// The mode (feature 505).
+    var mode: BinaryGardensMode = .campaign
+    /// The highest open level (feature 505).
+    var frontier = 1
+    /// The level's difficulty band, 1 … 5 (the five bands of 20; feature 505).
+    var band = 1
+    /// The best stars of the current level, 0 … 3 (0 while it has not been won; feature 505).
+    var bestStars = 0
+    /// The stars of each won level, by level number (the level picker; feature 505).
+    var stars: [Int: Int] = [:]
+    /// The goal in words: "Win in at most k actions for 3 stars" (feature 505).
+    var goalLabel = ""
+    /// The level the picker holds, 1 … ``frontier`` (presentation only; feature 505).
+    var pickedLevel = 1
+
+    /// "Band b of 5" (feature 505).
+    var bandLabel: String { "Band \(band) of 5" }
+
+    /// "Best: s of 3 stars", or "Best: not won yet" while the level has not been won (feature 505).
+    var starsLabel: String {
+        bestStars > 0 ? "Best: \(bestStars) of 3 stars" : "Best: not won yet"
+    }
+
+    /// "Mode: campaign", "Mode: practice" or "Mode: daily" (feature 505).
+    var modeLabel: String { "Mode: " + Self.modeName(mode) }
+
+    /// The mode's name: campaign, practice or daily (feature 505).
+    static func modeName(_ mode: BinaryGardensMode) -> String {
+        switch mode {
+        case .campaign: "campaign"
+        case .practice: "practice"
+        case .daily: "daily"
+        }
+    }
+
+    /// The picker's line for level `level`: "Level n, band b", with ", s of 3 stars" once it has been won
+    /// (feature 505).
+    func levelLabel(_ level: Int) -> String {
+        let band: Int = BinaryGardensProgress.band(of: level)
+        if let won = stars[level] { return "Level \(level), band \(band), \(won) of 3 stars" }
+        return "Level \(level), band \(band)"
+    }
+
+    /// The goal with `certified` actions in the certified plan (feature 505): "Win in at most k actions for 3 stars"
+    /// ("1 action" in the singular).
+    static func goalText(certified: Int) -> String {
+        let unit: String = certified == 1 ? "action" : "actions"
+        return "Win in at most \(certified) \(unit) for 3 stars"
+    }
 
     /// The ticks of one cycle, 48.
     static var cycle: Int { BinaryGardensSky.cycle }
@@ -264,6 +335,8 @@ final class BinaryGardensMirror {
         case "r02-g21.stale": return "the play changed before the action arrived"
         case "r02-g21.level": return "the next level could not be made"
         case "r02-g21.generation": return "the next level could not be made"
+        case BinaryGardensExperienceRule.locked: return "that level is not open yet"
+        case BinaryGardensExperienceRule.date: return "that date cannot be used"
         case BinaryGardensExperienceRule.notWhole: return "the star, ring, phase, luminosity, tilt and tick must be whole "
             + "numbers"
         case BinaryGardensExperienceRule.tick: return "only ticks 1 to 48 can be shown"
@@ -291,7 +364,8 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     /// The pure core this presenter draws.
     typealias Core = BinaryGardensExperienceCore
 
-    /// The tutorial shown on levels that have one (presentation, not a kernel stage).
+    /// The single tutorial sentence of feature 503, no longer shown: since feature 505 the panel shows the tutorial
+    /// step's instruction (`core.tutorial.text`). Kept as a name.
     static let tutorial = "Move the twin stars between their rings, shift their phases, set their brightness and tilt "
         + "the orbit plane so every flower world keeps a long enough comfortable window and its total light inside "
         + "its bloom band, without freezing or scorching for too long; then run the light."
@@ -319,6 +393,22 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     private(set) var refusalLog: [String] = []
     /// The most refusal codes kept.
     static let refusalLogLimit = 64
+    /// The latest core seen (feature 505): hints, the daily date and the progress lines read it.
+    private(set) var latestCore: BinaryGardensExperienceCore?
+    /// The play the shown hint belongs to; nil while no hint is shown (feature 505).
+    private var hintPlay: BinaryGardensPlay?
+    /// The hint texts of levels 1 … 3 searched for a play (nil texts: the play has no hint), one search per play
+    /// (feature 505).
+    private var hintCache: (play: BinaryGardensPlay, texts: [String]?)?
+    /// The search under way, off the main actor, for ``hintPlay`` (feature 505); tests may await its end.
+    private(set) var hintSearch: Task<Void, Never>?
+    /// The hint generation (feature 505): raised by every new search and every hidden hint; a search whose generation
+    /// is no longer current owns nothing.
+    private(set) var hintGeneration = 0
+    /// What the hint line shows while the search runs (feature 505).
+    static let searchingText = "Finding a hint…"
+    /// What the hint line shows when the play has no hint (won, or not under way; feature 505).
+    static let noHintText = "No hint now: the level is not being played."
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -399,6 +489,7 @@ final class BinaryGardensPresenter: ExperiencePresenter {
             tierLog.append(BinaryGardensTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
+        if latestCore != core { absorbProgress(core) }
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         let base: BinaryGardensSceneSnapshot = core.snapshot(time: time)
         lastBase = (snapshot: base, level: core.play.level)
@@ -434,10 +525,10 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbProgress(core)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
-        mirror.tutorialText = level.tutorial ? Self.tutorial : nil
         let tiltWords: String = level.maxTilt == 0 ? "the orbit plane locked" : "tilt up to \(level.maxTilt) steps"
         mirror.targetLabel = "Level: \(level.ringRadii.count) rings, \(level.worlds.count) worlds, "
             + "\(level.luminosityLevels.count) luminosity levels, phase step \(level.phaseStep), " + tiltWords
@@ -455,6 +546,8 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         case .failed, .result:
             let reason: String = BinaryGardensMirror.failureText(play.failure, level: level) ?? "The run failed."
             text += reason
+            // Since feature 505 the failure explanation too (what went wrong, then the advice).
+            if let explanation = mirror.explanation { text += " " + explanation }
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         default:
@@ -464,11 +557,28 @@ final class BinaryGardensPresenter: ExperiencePresenter {
             mirror.status = played ? "Playing" : "Ready"
             mirror.failureText = nil
         }
+        if !text.hasSuffix(" ") { text += " " }
+        text += teachingText()
         if let inspected = mirror.inspectedLabel {
             if !text.hasSuffix(" ") { text += " " }
             text += "Inspected " + inspected + "."
         }
         return text
+    }
+
+    /// The teaching and progress sentences of the description (feature 505): the mode, the band, the goal, the best
+    /// stars, then the tutorial instruction and the hint when shown; each ends in a full stop, joined by spaces.
+    private func teachingText() -> String {
+        var parts: [String] = [mirror.modeLabel, mirror.bandLabel, mirror.goalLabel, mirror.starsLabel]
+        if let tutorial = mirror.tutorialText { parts.append("Tutorial: " + tutorial) }
+        if let hint = mirror.hintText {
+            parts.append((mirror.hintLevel > 0 ? "Hint \(mirror.hintLevel) of 3: " : "Hint: ") + hint)
+        }
+        var sentences: [String] = []
+        for part in parts {
+            sentences.append(part.hasSuffix(".") || part.hasSuffix("…") ? part : part + ".")
+        }
+        return sentences.joined(separator: " ")
     }
 
     /// `snapshot` with the mirror's drag preview (judged by the kernel in `level`) and inspection applied (feature 504;
@@ -492,7 +602,7 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     /// The control panel: the direct choices, "Inspect" and "Reset view" (feature 504); every kernel control sends
     /// through ``send(_:_:port:)``, so refusals are shown and logged.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(BinaryGardensControls(port: port, mirror: mirror,
+        AnyView(BinaryGardensControls(port: port, mirror: mirror, presenter: self,
                                       sendAction: { [weak self] control, values in
                                           self?.send(control, values, port: port)
                                       },
@@ -602,6 +712,151 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         }
         refreshPreview()
         return result
+    }
+
+    // MARK: Teaching and progression (feature 505, R02-G21-05)
+
+    /// Takes the core's teaching and progress state into the mirror (feature 505): the tutorial instruction, the
+    /// failure explanation, the mode, the open levels with their stars, the band, the goal and the best stars; a change
+    /// of the play hides the hint (the next press shows level 1).
+    private func absorbProgress(_ core: BinaryGardensExperienceCore) {
+        if latestCore?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        latestCore = core
+        if let shown = hintPlay, shown != core.play { clearHint() }
+        mirror.tutorialText = core.tutorial == .done ? nil : core.tutorial.text
+        mirror.explanation = core.failureExplanation?.text
+        mirror.mode = core.mode
+        mirror.frontier = core.progress.frontier
+        mirror.pickedLevel = min(max(mirror.pickedLevel, 1), core.progress.frontier)
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        mirror.stars = stars
+        mirror.band = core.band
+        mirror.bestStars = core.progress.stars(of: core.levelNumber)
+        mirror.goalLabel = BinaryGardensMirror.goalText(certified: core.certifiedActionCount)
+    }
+
+    /// Hides the hint shown and drops a search under way; the generation is raised so that search owns nothing.
+    private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hintGeneration += 1
+        hintPlay = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// The hint texts of levels 1 … 3 of `play` from one search (`BinaryGardensHints.hint(level:play:certified:)` at
+    /// level 1): a ring, phase, luminosity or tilt hint gives each level's text
+    /// (`BinaryGardensHint.actionText(level:action:gardens:arrangement:)` from the play's level and arrangement); a
+    /// run, stuck or retry hint reads the same at every level; nil when the play has no hint (won, or not under way).
+    /// Runs off the main actor.
+    nonisolated static func hintTexts(_ play: BinaryGardensPlay, certified: BinaryGardensPlan?) -> [String]? {
+        guard let first = BinaryGardensHints.hint(level: 1, play: play, certified: certified) else { return nil }
+        let changes: Bool = first.kind == .ring || first.kind == .phase || first.kind == .luminosity
+            || first.kind == .tilt
+        guard changes, let action = first.action else {
+            return [first.text, first.text, first.text]
+        }
+        var texts: [String] = []
+        for level in 1...3 {
+            let text: String? = BinaryGardensHint.actionText(level: level, action: action, gardens: play.level,
+                                                             arrangement: play.arrangement)
+            texts.append(text ?? first.text)
+        }
+        return texts
+    }
+
+    /// Shows the next hint level (1 → 2 → 3, then 3 again) for the current play; never sends an action. The search
+    /// runs once per play in a detached task, never on the frame: meanwhile the hint line reads ``searchingText`` (a
+    /// press during the search raises the level it will show); the result is shown only when its generation is still
+    /// current, and later levels come from the cache.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let play: BinaryGardensPlay = core.play
+        let certified: BinaryGardensPlan = core.certifiedPlan
+        let next: Int = hintPlay == play ? min(mirror.hintLevel + 1, 3) : 1
+        if let cached = hintCache, cached.play == play {
+            reveal(cached.texts, level: next, play: play)
+            return
+        }
+        if hintSearch != nil, hintPlay == play {
+            mirror.hintLevel = next   // the search for this play is running; it shows this level
+            return
+        }
+        hintSearch?.cancel()
+        hintGeneration += 1
+        let generation: Int = hintGeneration
+        hintPlay = play
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            let texts: [String]? = BinaryGardensPresenter.hintTexts(play, certified: certified)
+            await self?.finishSearch(texts, play: play, generation: generation)
+        }
+    }
+
+    /// Takes the hint texts searched for `play` by the search of `generation`: cached and shown when that generation is
+    /// still current (a stale search changes nothing, not even the handle of a newer search).
+    private func finishSearch(_ texts: [String]?, play: BinaryGardensPlay, generation: Int) {
+        guard generation == hintGeneration, hintPlay == play else { return }
+        hintSearch = nil
+        hintCache = (play, texts)
+        reveal(texts, level: mirror.hintLevel, play: play)
+    }
+
+    /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
+    private func reveal(_ texts: [String]?, level: Int, play: BinaryGardensPlay) {
+        hintPlay = play
+        guard let texts, texts.indices.contains(level - 1) else {
+            mirror.hintLevel = 0
+            mirror.hintText = Self.noHintText
+            return
+        }
+        mirror.hintLevel = level
+        mirror.hintText = texts[level - 1]
+    }
+
+    /// Ends the tutorial of the current level (`tutorial.dismiss`).
+    @discardableResult
+    func dismissTutorial(port: ExperienceActionPort) -> ActionResult {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Plays open level `level` in campaign mode (`level.select [level]`; a closed level is refused in words).
+    @discardableResult
+    func selectLevel(_ level: Int, port: ExperienceActionPort) -> ActionResult {
+        send("level.select", [Double(level)], port: port)
+    }
+
+    /// Plays the daily level of `date` (`mode.daily [year, month, day]`; the local calendar date by default; the core
+    /// never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = BinaryGardensPresenter.today()) -> ActionResult {
+        send("mode.daily", Self.dateValues(date), port: port)
+    }
+
+    /// Replays the current level with the practice budget (`mode.practice`).
+    @discardableResult
+    func playPractice(port: ExperienceActionPort) -> ActionResult {
+        send("mode.practice", [], port: port)
+    }
+
+    /// Returns to the campaign (`mode.campaign`).
+    @discardableResult
+    func playCampaign(port: ExperienceActionPort) -> ActionResult {
+        send("mode.campaign", [], port: port)
+    }
+
+    /// The local calendar date now: Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the core refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
 }
 #endif
