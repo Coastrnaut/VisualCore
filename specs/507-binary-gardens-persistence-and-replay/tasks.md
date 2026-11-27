@@ -43,7 +43,8 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
   "results with an empty trace and verified false, sound off" (1 → 2 is R02-G21-05's step), digest domain
   `"r02-g21.binary-gardens.v3"` over the level, the play fingerprint, the progress with its traces and the mode (never
   the tutorial step, the shown tick, the sound choice or the dropped count); a campaign or daily win records the winning
-  effective-action trace; restore reconciles and exposes `reconciliationDropped` (not digested); actions "replay.start
+  effective-action trace; restore reconciles and exposes `reconciliationDropped` (not digested), and a refused restore throws a
+  `BinaryGardensRestoreRefusal` whose reason is kept for diagnostics (FR-R02G2107-009); actions "replay.start
   [1…100]" (`r02-g21.no-replay` without a verified traced result), "replay.step" (`r02-g21.replay-end` after the last or
   once ended), "replay.stop" (campaign at that level, the frontier when it is not open); every other play action in
   replay refused with `r02-g21.replay` except `tutorial.dismiss`, `clock.show` (presentation) and `settings.sound`;
@@ -85,7 +86,8 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
   and `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensControls.swift` (Replay for a verified solved
   level, Step and Stop with labels and values, the replay position; the Sound toggle sends `settings.sound` and the
   presenter applies the restored `soundOn` when the experience opens, replacing R02-G21-06's presenter-held choice; the
-  dropped results announced once: "n saved results could not be checked and were removed.") and create
+  dropped results announced once: "n saved results could not be checked and were removed."; refused replay actions
+  logged by bare code in `refusalLog` as other refusals (FR-R02G2107-009)) and create
   `Packages/ExperiencesRound02/BinaryGardens/ExperienceTests/BinaryGardensReplayTests.swift` (agent C: replay through
   the port reproduces the fingerprints action by action and ends won; tick scrubbing allowed and other actions refused
   during replay; progress unchanged; the dropped announcement once; the saved sound choice applied on open); update in
