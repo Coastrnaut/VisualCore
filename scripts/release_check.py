@@ -178,6 +178,9 @@ def steps(stamp: str) -> list[Step]:
         # Feature 480 (R02-G18-10): Apsides Workshop's device-row definition (no device is contacted).
         Step("device-rows-r02-g18", [PY, "scripts/check_device_rows.py", "--experience",
                                      "r02-g18.apsides-workshop"]),
+        # Feature 490 (R02-G19-10): Microscopic Aurora's device-row definition (no device is contacted).
+        Step("device-rows-r02-g19", [PY, "scripts/check_device_rows.py", "--experience",
+                                     "r02-g19.microscopic-aurora"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),

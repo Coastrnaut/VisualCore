@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g19.microscopic-aurora"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g19.microscopic-aurora",
+  "elapsed_seconds": 0.03,
+  "exit_code": 0,
+  "finished": "2026-11-27T00:57:23+00:00",
+  "gate": "R02-G19-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G19-10.device-rows.log",
+  "log_sha256": "775521288fe0d8d8220cbea6e5b5ba87113b3b02acb69442c9c3fa0afa51b7e0",
+  "name": "device-rows",
+  "started": "2026-11-27T00:57:23+00:00",
+  "timed_out": false
+}
