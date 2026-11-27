@@ -20,11 +20,23 @@
 // (feature 493). Feature 505 (R02-G21-05) T-R02G2105-004 (clarification Q6): schema 2 and digest v2, fourteen
 // controls, `level.next` to the next open level (no wrap; `r02-g21.locked` when none); the progression itself is tested
 // in `BinaryGardensProgressionCoreTests`.
+// Feature 507 (R02-G21-07) T-R02G2107-003 (clarification Q6): schema 3 and digest v3, eighteen controls
+// (`replay.start` 1 … 100, `replay.step`, `replay.stop`, `settings.sound` 0 … 1), the replay and sound controls
+// refused without a verified result or with wrong values, an opening with the sound off and nothing dropped, and the
+// refusal of schema 4; the migrations 1 → 3 and 2 → 3 through the engine, reconciliation on restore (an edited result
+// dropped and counted, the count never digested), the replay rules and codes (`r02-g21.no-replay`, `r02-g21.replay`,
+// `r02-g21.replay-end`, presentation and sound accepted during a replay, tick 48 shown at a start and kept by a step,
+// `replay.stop` at a locked daily level going to the frontier), a replay saved mid-way restoring while a changed,
+// reordered or undo-carrying saved replay is refused `damaged`, the sound setting (snapshotted, never digested, off
+// after a reset), and the feedback of a replay (the refusal words, a step announced like the action it applies, a
+// replayed win claiming no stars) are in `BinaryGardensReplayCoreTests` at the end of this file. Seed 2_507 picks the
+// replayed level (2_507 % 100 + 1 = level 8).
 @testable import BinaryGardensCore
 import Foundation
 import Testing
 import VisualCoreDiagnostics
 import VisualCoreExperience
+import VisualCorePersistence
 import VisualCoreSimulation
 
 /// The repository's witness directory, found from this file (five levels up: CoreTests, BinaryGardens, the package,
@@ -107,7 +119,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
                                           ScriptedAction("clock.show", [-1]), ScriptedAction("clock.show", [2.5]),
                                           ScriptedAction("clock.show"), ScriptedAction("play.undo"),
                                           ScriptedAction("play.redo"), ScriptedAction("light.run", [1]),
-                                          ScriptedAction("level.next", [1]), ScriptedAction("bogus")]
+                                          ScriptedAction("level.next", [1]),
+                                          // Feature 507: no replay without a verified result; sound whole 0 … 1.
+                                          ScriptedAction("replay.start", [1]), ScriptedAction("replay.start", [0]),
+                                          ScriptedAction("replay.step"), ScriptedAction("replay.step", [1]),
+                                          ScriptedAction("replay.stop"), ScriptedAction("replay.stop", [1]),
+                                          ScriptedAction("settings.sound", [2]),
+                                          ScriptedAction("settings.sound", [0.5]), ScriptedAction("settings.sound"),
+                                          ScriptedAction("bogus")]
         let plan = ConformancePlan(seeds: [0, 2], stepsPerSegment: 2, actions: actions, rejected: rejected)
         let report: ConformanceReport = await ExperienceConformance.run(Core.self, id: id, plan: plan)
         #expect(report.entries.count == ConformanceCheck.allCases.count)
@@ -118,13 +137,15 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g21.binary-gardens" && Core.schemaVersion == 2)
-        #expect(Core.digestDomain == "r02-g21.binary-gardens.v2")
+        #expect(Core.experienceID == "r02-g21.binary-gardens" && Core.schemaVersion == 3)
+        #expect(Core.digestDomain == "r02-g21.binary-gardens.v3")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "light.run", "play.undo",
                              "play.redo", "level.next", "clock.show", "level.select", "mode.daily", "mode.practice",
-                             "mode.campaign", "tutorial.dismiss"]
-        #expect(Core.actionIDs == ids)
+                             "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step", "replay.stop",
+                             "settings.sound"]
+        #expect(Core.actionIDs == ids && Core.controls.count == 18)
+        #expect(Core.controls[14].ranges == [1...100] && Core.controls[17].ranges == [0...1])
         #expect(Core.controls[0].ranges == [0...1, 0...7])
         #expect(Core.controls[1].ranges == [0...1, 0...47])
         #expect(Core.controls[2].ranges == [0...1, 0...3])
@@ -132,13 +153,13 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(Core.controls[8].ranges == [0...60])
         #expect(Core.controls[9].ranges == [1...100])
         #expect(Core.controls[10].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [4, 5, 6, 7, 11, 12, 13]
+        let plainIndices: [Int] = [4, 5, 6, 7, 11, 12, 13, 15, 16]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.starRange == 0...1 && Core.ringRange == 0...7 && Core.phaseRange == 0...47)
         #expect(Core.luminosityRange == 0...3 && Core.tiltRange == 0...6 && Core.tickRange == 0...60)
         #expect(Core.shownTicks == 1...48 && Core.openingTick == 48)
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == BinaryGardensTier.all.count)
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == BinaryGardensTier.all.map(\.name))
@@ -152,6 +173,12 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(passes == [2, 1, 0] && resolutions == [1, 1, 1])
         #expect(BinaryGardensExperienceRule.notWhole == "r02-g21.not-whole")
         #expect(BinaryGardensExperienceRule.tick == "r02-g21.tick")
+        #expect(BinaryGardensExperienceRule.noReplay == "r02-g21.no-replay")
+        #expect(BinaryGardensExperienceRule.replayEnd == "r02-g21.replay-end")
+        #expect(BinaryGardensExperienceRule.replay == "r02-g21.replay")
+        #expect(Core.soundRange == 0...1)
+        #expect(Core.replayControls == ["replay.start", "replay.step", "replay.stop", "tutorial.dismiss", "clock.show",
+                                        "settings.sound"])
         #expect(Core.wonCode == "won" && Core.failedCode == "failed")
     }
 
@@ -172,6 +199,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
             let opening: Int = expected.tutorial ? 2 : 1
             #expect(first.play.records.count == opening && !first.play.canUndo)
             #expect(first.play.actionsLeft == expected.budget && first.qualityTier == 0 && first.shownTick == 48)
+            // Feature 507: sound off and nothing dropped at an opening.
+            #expect(!first.soundOn && first.reconciliationDropped == 0 && !first.isReplaying)
         }
         #expect(try Core.level(number: 1).tutorial && !(try Core.level(number: 100).tutorial))
         #expect(throws: BinaryGardensError.level("number")) { try Core.level(number: 0) }
@@ -319,6 +348,13 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(probe.apply(Self.act("play.undo", [1])) == noValues)
         #expect(probe.apply(Self.act("play.redo", [1])) == noValues)
         #expect(probe.apply(Self.act("level.next", [1])) == noValues)
+        // Feature 507: replay.step and replay.stop take no values; replay.start and settings.sound one.
+        #expect(probe.apply(Self.act("replay.step", [1])) == noValues)
+        #expect(probe.apply(Self.act("replay.stop", [1])) == noValues)
+        #expect(probe.apply(Self.act("replay.start")) == .rejected(.wrongValueCount(expected: 1, found: 0)))
+        #expect(probe.apply(Self.act("replay.start", [101])) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.act("settings.sound", [2])) == .rejected(.outOfRange(index: 0)))
+        #expect(probe.apply(Self.act("settings.sound")) == .rejected(.wrongValueCount(expected: 1, found: 0)))
         let notWhole: ActionResult = .rejected(.rule(code: BinaryGardensExperienceRule.notWhole))
         #expect(probe.apply(Self.act("star.ring", [0, 0.5])) == notWhole)
         #expect(probe.apply(Self.act("star.phase", [0, 0.5])) == notWhole)
@@ -580,14 +616,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "star.luminosity", values: [1, 0]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
@@ -617,5 +653,424 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(snapshot.actionsLeft == play.actionsLeft && snapshot.budget == level.budget)
         #expect(snapshot.shownTick == 9 && snapshot.levelNumber == 41 && snapshot.time == 2.5)
         #expect(core.renderTier == BinaryGardensTier.of(0))
+    }
+}
+
+/// Feature 507 (R02-G21-07) T-R02G2107-003: the adapter's migrations to schema 3, reconciliation on restore, replay,
+/// saved replays, the sound setting and the replay feedback (see the file header). Level n is prepared from seed
+/// 2_500 + n − 1, so seed 2_507 plays level 8.
+@Suite struct BinaryGardensReplayCoreTests {
+    typealias Core = BinaryGardensExperienceCore
+    typealias Action = BinaryGardensAction
+    typealias Record = BinaryGardensRecord
+    typealias Rule = BinaryGardensExperienceRule
+    typealias Plan = BinaryGardensFeedbackPlan
+
+    /// The feature's seed: level 2_507 % 100 + 1 = 8.
+    static let seed: UInt64 = 2_507
+    /// The `r02-g21.replay-end` refusal.
+    static let replayEnd: ActionResult = .rejected(.rule(code: Rule.replayEnd))
+    /// The `r02-g21.no-replay` refusal.
+    static let noReplay: ActionResult = .rejected(.rule(code: Rule.noReplay))
+    /// The `r02-g21.replay` refusal.
+    static let inReplay: ActionResult = .rejected(.rule(code: Rule.replay))
+
+    /// The digest of `core` as the engine computes it.
+    static func digest(_ core: Core) throws -> StateDigest {
+        try BinaryGardensExperienceCoreTests.digest(core)
+    }
+
+    /// An action of `control` with `values`.
+    static func act(_ control: String, _ values: [Double] = []) -> ExperienceAction {
+        BinaryGardensExperienceCoreTests.act(control, values)
+    }
+
+    /// The adapter action of a kernel action.
+    static func act(_ action: Action) -> ExperienceAction {
+        BinaryGardensExperienceCoreTests.act(action)
+    }
+
+    /// The seed whose opening is level `number`: 2_500 + number − 1.
+    static func seed(of number: Int) -> UInt64 { UInt64(2_500 + number - 1) }
+
+    /// The certified ring, phase, luminosity and tilt actions of level `number`, then the run.
+    static func certifiedTrace(_ number: Int) throws -> [Action] {
+        var actions: [Action] = try Core.generated(number: number).plan.actions
+        actions.append(.run)
+        return actions
+    }
+
+    /// The core prepared on level `number` (open, campaign) with the level won from its certified trace.
+    static func won(_ number: Int) async throws -> Core {
+        var core: Core = try await Core.prepare(seed: seed(of: number))
+        for action in try certifiedTrace(number) {
+            #expect(core.apply(act(action)) == .accepted, "level \(number) \(action)")
+        }
+        #expect(core.play.stage == .won && core.progress.solved[number]?.verified == true, "level \(number)")
+        return core
+    }
+
+    /// The payload's JSON object.
+    static func object(_ payload: Data) throws -> [String: Any] {
+        try #require(try JSONSerialization.jsonObject(with: payload) as? [String: Any])
+    }
+
+    /// The JSON data of `object` with sorted keys.
+    static func data(_ object: [String: Any]) throws -> Data {
+        try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+    }
+
+    /// The payload of `core` with its records replaced by `records`.
+    static func payload(_ core: Core, records: [Record]) throws -> Data {
+        var object: [String: Any] = try Self.object(try core.snapshotPayload())
+        object["records"] = try JSONSerialization.jsonObject(with: try JSONEncoder().encode(records))
+        return try Self.data(object)
+    }
+
+    /// The payload of `core` with the `field` of its won result at array position `position` set to `value`.
+    static func editedResult(_ core: Core, position: Int, field: String, value: Any) throws -> Data {
+        var object: [String: Any] = try Self.object(try core.snapshotPayload())
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        var solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+        try #require(solved.indices.contains(position))
+        solved[position][field] = value
+        progress["solved"] = solved
+        object["progress"] = progress
+        return try Self.data(object)
+    }
+
+    /// The positions of the ring, phase, luminosity, tilt and run records of `records`.
+    static func actionPositions(_ records: [Record]) -> [Int] {
+        var positions: [Int] = []
+        for index in records.indices {
+            switch records[index].kind {
+            case .ring, .phase, .luminosity, .tilt, .run: positions.append(index)
+            case .undo, .redo, .begin, .dismissTutorial, .pause, .resume, .showResult: break
+            }
+        }
+        return positions
+    }
+
+    /// Another action of the same kind as `action`: another ring index, phase step, luminosity index or tilt step; nil
+    /// for the run.
+    static func changed(_ action: Action) -> Action? {
+        switch action {
+        case let .ring(star, index): .ring(star: star, index: index == 0 ? 1 : 0)
+        case let .phase(star, step): .phase(star: star, step: step == 0 ? 1 : 0)
+        case let .luminosity(star, index): .luminosity(star: star, index: index == 0 ? 1 : 0)
+        case let .tilt(step): .tilt(step: step == 0 ? 1 : 0)
+        case .run: nil
+        }
+    }
+
+    // MARK: Migrations to schema 3
+
+    @Test func theEngineMigratesSchemaOneAndTwoEnvelopesToSchemaThree() async throws {
+        let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
+        var engine = ExperienceEngine<Core>(id: id)
+        try await engine.prepare(seed: Self.seed(of: 1))
+        try engine.activate()
+        // A schema-2 state: level 1 won, then level 2 after level.next with its first certified action, the sound on.
+        var core: Core = try await Self.won(1)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        let first: Action = try #require(try Core.generated(number: 2).plan.actions.first)
+        #expect(core.apply(Self.act(first)) == .accepted)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        var object: [String: Any] = try Self.object(try core.snapshotPayload())
+        object["sound"] = nil
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        var solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+        for index in solved.indices {
+            solved[index]["trace"] = nil
+            solved[index]["verified"] = nil
+        }
+        progress["solved"] = solved
+        object["progress"] = progress
+        let stepwise: Data = try Self.data(try Core.migratedToSchemaThree(object))
+        let chained: Data = try Self.data(try Core.migrations.migrate(object, from: 2))
+        #expect(stepwise == chained)
+        let restored: Core = try Core.restore(payload: chained, seed: Self.seed(of: 1))
+        #expect(restored.levelNumber == 2 && restored.play == core.play && restored.mode == .campaign)
+        #expect(restored.progress.frontier == 2 && restored.progress.best(1) == core.progress.best(1))
+        #expect(restored.progress.stars(of: 1) == 3 && restored.progress.solved[1]?.verified == false)
+        #expect(restored.progress.solved[1]?.trace == [] && !restored.soundOn && restored.reconciliationDropped == 0)
+        #expect(!restored.canReplay(level: 1) && core.canReplay(level: 1))
+        let saved: ExperienceSnapshot = try engine.snapshot()
+        let two = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: Self.seed(of: 1),
+                                         stepIndex: saved.stepIndex, digest: try Self.digest(restored),
+                                         payload: try Self.data(object))
+        try engine.restore(two)
+        #expect(engine.core == restored)
+        // A schema-1 envelope `{level, records}` reaches schema 3 through both steps: no won level, the sound off.
+        var schemaOne: [String: Any] = [:]
+        schemaOne["level"] = object["level"]
+        schemaOne["records"] = object["records"]
+        let one = try ExperienceSnapshot(experience: id, schemaVersion: 1, seed: Self.seed(of: 1),
+                                         stepIndex: saved.stepIndex, digest: saved.digest,
+                                         payload: try Self.data(schemaOne))
+        do {
+            try engine.restore(one)
+        } catch {
+            Issue.record("schema 1 refused: \(error)")
+        }
+        let migrated: Core = try #require(engine.core)
+        #expect(migrated.levelNumber == 2 && migrated.play == core.play && migrated.progress.solved.isEmpty)
+        #expect(migrated.progress.frontier == 2 && !migrated.soundOn && migrated.reconciliationDropped == 0)
+        let threeObject: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
+        #expect(threeObject["sound"] as? Bool == false)
+        #expect(throws: BinaryGardensRestoreRefusal.damaged) { try Core.migratedToSchemaThree(["level": 2]) }
+    }
+
+    // MARK: Reconciliation on restore
+
+    @Test func restoreReconcilesAndCountsDroppedResultsWithoutDigestingTheCount() async throws {
+        var core: Core = try await Self.won(1)
+        #expect(core.apply(Self.act("level.next")) == .accepted)
+        for action in try Self.certifiedTrace(2) { #expect(core.apply(Self.act(action)) == .accepted) }
+        #expect(core.progress.solved.count == 2 && core.progress.frontier == 3)
+        let honest: Core = try Core.restore(payload: try core.snapshotPayload(), seed: Self.seed(of: 1))
+        #expect(honest == core && honest.reconciliationDropped == 0)
+        // Level 2's stars edited from 3 to 2: dropped and counted; level 1 kept; the frontier as saved.
+        let editedPayload: Data = try Self.editedResult(core, position: 1, field: "stars", value: 2)
+        let edited: Core = try Core.restore(payload: editedPayload, seed: Self.seed(of: 1))
+        #expect(edited.reconciliationDropped == 1 && edited.progress.solved[2] == nil)
+        #expect(edited.progress.solved[1] == core.progress.solved[1] && edited.progress.frontier == 3)
+        // The same state without level 2's result: equal state and digest, only the dropped count differs.
+        var object: [String: Any] = try Self.object(try core.snapshotPayload())
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        var solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+        solved.removeLast()
+        progress["solved"] = solved
+        object["progress"] = progress
+        let without: Core = try Core.restore(payload: try Self.data(object), seed: Self.seed(of: 1))
+        #expect(without.reconciliationDropped == 0 && without == edited)
+        #expect(try Self.digest(without) == Self.digest(edited))
+        // A saved replay whose result is dropped returns to campaign at that level.
+        var replaying: Core = try await Self.won(1)
+        #expect(replaying.apply(Self.act("replay.start", [1])) == .accepted)
+        #expect(replaying.apply(Self.act("replay.step")) == .accepted)
+        let replayPayload: Data = try Self.editedResult(replaying, position: 0, field: "stars", value: 1)
+        let back: Core = try Core.restore(payload: replayPayload, seed: Self.seed(of: 1))
+        #expect(back.mode == .campaign && back.levelNumber == 1 && back.reconciliationDropped == 1)
+        let freshOne: BinaryGardensPlay = try Core.freshPlay(of: try Core.level(number: 1))
+        #expect(back.play == freshOne && back.progress.solved.isEmpty && back.shownTick == 48)
+    }
+
+    // MARK: Replay rules and codes
+
+    @Test func noReplayWithoutAVerifiedTracedResultOrOutsideAReplay() async throws {
+        var core: Core = try await Core.prepare(seed: Self.seed)
+        let before: Core = core
+        #expect(core.apply(Self.act("replay.start", [8])) == Self.noReplay && core == before)
+        #expect(core.apply(Self.act("replay.step")) == Self.noReplay && core == before)
+        #expect(core.apply(Self.act("replay.stop")) == Self.noReplay && core == before)
+        #expect(core.replayPosition == 0 && core.replayLength == 0 && !core.isReplaying)
+        // An untraced result (as a schema-2 save carries it) cannot be replayed.
+        var won: Core = try await Self.won(8)
+        var object: [String: Any] = try Self.object(try won.snapshotPayload())
+        var progress: [String: Any] = try #require(object["progress"] as? [String: Any])
+        var solved: [[String: Any]] = try #require(progress["solved"] as? [[String: Any]])
+        try #require(solved.count == 1)
+        solved[0]["trace"] = [Any]()
+        solved[0]["verified"] = false
+        progress["solved"] = solved
+        object["progress"] = progress
+        let untraced: Core = try Core.restore(payload: try Self.data(object), seed: Self.seed)
+        #expect(untraced.progress.solved[8]?.verified == false && untraced.reconciliationDropped == 0)
+        var tried: Core = untraced
+        #expect(tried.apply(Self.act("replay.start", [8])) == Self.noReplay && tried == untraced)
+        // The verified level replays with the tutorial done and tick 48 shown; an unsolved level does not.
+        #expect(won.apply(Self.act("replay.start", [9])) == Self.noReplay)
+        #expect(won.apply(Self.act("clock.show", [5])) == .accepted && won.shownTick == 5)
+        #expect(won.apply(Self.act("replay.start", [8])) == .accepted && won.mode == .replay(level: 8))
+        let budget: Int = try Core.level(number: 8).budget
+        #expect(won.tutorial == .done && won.play.level.budget == budget && won.shownTick == 48)
+        let trace: [Action] = try Self.certifiedTrace(8)
+        #expect(won.isReplaying && won.replayPosition == 0 && won.replayLength == trace.count)
+        // A step keeps the shown tick and advances the position.
+        #expect(won.apply(Self.act("clock.show", [12])) == .accepted)
+        #expect(won.apply(Self.act("replay.step")) == .accepted && won.shownTick == 12 && won.replayPosition == 1)
+    }
+
+    @Test func duringAReplayOtherPlayActionsAreRefusedAndPresentationAndSoundStayAccepted() async throws {
+        var core: Core = try await Self.won(41)
+        #expect(core.apply(Self.act("replay.start", [41])) == .accepted)
+        #expect(core.apply(Self.act("replay.step")) == .accepted)
+        let before: Core = core
+        let beforeDigest: StateDigest = try Self.digest(core)
+        let trace: [Action] = try Self.certifiedTrace(41)
+        let refused: [ExperienceAction] = [Self.act(trace[1]), Self.act("star.ring", [0, 1]),
+                                           Self.act("star.phase", [0, 0]), Self.act("star.luminosity", [0, 0]),
+                                           Self.act("orbit.tilt", [0]), Self.act("light.run"), Self.act("play.undo"),
+                                           Self.act("play.redo"), Self.act("level.next"),
+                                           Self.act("level.select", [1]), Self.act("mode.daily", [2026, 1, 1]),
+                                           Self.act("mode.practice"), Self.act("mode.campaign")]
+        for action in refused {
+            var copy: Core = core
+            #expect(copy.apply(action) == Self.inReplay && copy == before, "\(action.control)")
+        }
+        #expect(core.apply(Self.act("tutorial.dismiss")) == .accepted)
+        #expect(core.apply(Self.act("clock.show", [7])) == .accepted && core.shownTick == 7)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        let afterDigest: StateDigest = try Self.digest(core)
+        #expect(afterDigest == beforeDigest && core.play == before.play && core.progress == before.progress)
+        // A restart from the middle begins the replay again; the replay never records.
+        #expect(core.apply(Self.act("replay.start", [41])) == .accepted)
+        let fresh: BinaryGardensPlay = try Core.freshPlay(of: try Core.level(number: 41))
+        #expect(core.play == fresh && core.mode == .replay(level: 41) && core.shownTick == 48)
+        let progress: BinaryGardensProgress = core.progress
+        for _ in 0..<trace.count { #expect(core.apply(Self.act("replay.step")) == .accepted) }
+        #expect(core.play.stage == .won && core.progress == progress && core.replayPosition == trace.count)
+        #expect(core.apply(Self.act("replay.step")) == Self.replayEnd && core.progress == progress)
+        // Stopping returns to campaign at the level, fresh.
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 41 && core.play == fresh && core.progress == progress)
+    }
+
+    @Test func aReplayOfALockedDailyLevelStopsAtTheFrontier() async throws {
+        var core: Core = try await Core.prepare(seed: Self.seed(of: 1))
+        // 2026-01-01 + d days has daily level (13 d) mod 100 + 1; d = 1 (2026-01-02) gives 14.
+        #expect(BinaryGardensProgress.dailyLevel(year: 2026, month: 1, day: 2) == 14)
+        #expect(core.apply(Self.act("mode.daily", [2026, 1, 2])) == .accepted && core.levelNumber == 14)
+        for action in try Self.certifiedTrace(14) { #expect(core.apply(Self.act(action)) == .accepted) }
+        #expect(core.play.stage == .won && core.progress.solved[14]?.verified == true)
+        #expect(!core.progress.isOpen(14) && core.progress.frontier == 1)
+        #expect(core.apply(Self.act("replay.start", [14])) == .accepted)
+        #expect(core.apply(Self.act("replay.stop")) == .accepted)
+        #expect(core.mode == .campaign && core.levelNumber == 1)
+    }
+
+    // MARK: Saved replays
+
+    @Test func aReplaySavedMidwayRestoresWhileAChangedReorderedOrUndoReplayIsDamaged() async throws {
+        var core: Core = try await Self.won(41)
+        let trace: [Action] = try Self.certifiedTrace(41)
+        try #require(trace.count >= 3)
+        #expect(core.apply(Self.act("replay.start", [41])) == .accepted)
+        var steps: Int = 0
+        while true {
+            let payload: Data = try core.snapshotPayload()
+            let restored: Core = try Core.restore(payload: payload, seed: Self.seed(of: 41))
+            let restoredDigest: StateDigest = try Self.digest(restored)
+            let digest: StateDigest = try Self.digest(core)
+            #expect(restored == core && restoredDigest == digest, "after \(steps) steps")
+            #expect(restored.mode == .replay(level: 41) && restored.reconciliationDropped == 0, "after \(steps)")
+            #expect(restored.replayPosition == steps && restored.shownTick == 48, "after \(steps)")
+            // The restored replay continues to the win.
+            var continued: Core = restored
+            var left: Int = trace.count - steps
+            while left > 0 {
+                #expect(continued.apply(Self.act("replay.step")) == .accepted, "after \(steps) steps")
+                left -= 1
+            }
+            #expect(continued.play.stage == .won && continued.apply(Self.act("replay.step")) == Self.replayEnd)
+            if steps == trace.count { break }
+            #expect(core.apply(Self.act("replay.step")) == .accepted)
+            steps += 1
+        }
+        let records: [Record] = core.play.records
+        let positions: [Int] = Self.actionPositions(records)
+        try #require(positions.count == trace.count)
+        // Changed: the first action replaced by another of its kind.
+        let other: Action = try #require(Self.changed(trace[0]))
+        var changed: [Record] = records
+        let first: Record = records[positions[0]]
+        changed[positions[0]] = Record(schema: first.schema, levelSeed: first.levelSeed, index: first.index,
+                                       kind: first.kind, action: other, previous: first.previous, next: first.next)
+        // Reordered: the first two actions swapped.
+        var reordered: [Record] = records
+        reordered[positions[0]] = records[positions[1]]
+        reordered[positions[1]] = records[positions[0]]
+        // Undo-carrying: an undo and a redo after the first action.
+        var undone: [Record] = Array(records.prefix(positions[0] + 1))
+        undone.append(Record(schema: first.schema, levelSeed: first.levelSeed, index: first.index + 1, kind: .undo,
+                             action: nil, previous: first.next, next: first.previous))
+        undone.append(Record(schema: first.schema, levelSeed: first.levelSeed, index: first.index + 2, kind: .redo,
+                             action: nil, previous: first.previous, next: first.next))
+        // Longer than the trace: an extra run after the win.
+        var longer: [Record] = records
+        longer.append(records[positions[positions.count - 1]])
+        let variants: [(name: String, records: [Record])] = [("changed", changed), ("reordered", reordered),
+                                                             ("undo", undone), ("longer", longer)]
+        for variant in variants {
+            let data: Data = try Self.payload(core, records: variant.records)
+            #expect(throws: BinaryGardensRestoreRefusal.damaged, "\(variant.name)") {
+                _ = try Core.restore(payload: data, seed: Self.seed(of: 41))
+            }
+        }
+        // A replay mode naming another level than the saved level is damaged too.
+        var object: [String: Any] = try Self.object(try core.snapshotPayload())
+        object["mode"] = ["mode": "replay", "level": 40]
+        #expect(throws: BinaryGardensRestoreRefusal.damaged) {
+            _ = try Core.restore(payload: try Self.data(object), seed: Self.seed(of: 41))
+        }
+    }
+
+    // MARK: Sound
+
+    @Test func theSoundSettingIsSnapshottedNeverDigestedAndOffAfterAReset() async throws {
+        var core: Core = try await Core.prepare(seed: Self.seed)
+        let opening: StateDigest = try Self.digest(core)
+        #expect(!core.soundOn)
+        let notWhole: ActionResult = .rejected(.rule(code: Rule.notWhole))
+        #expect(core.apply(Self.act("settings.sound", [0.5])) == notWhole && !core.soundOn)
+        #expect(core.apply(Self.act("settings.sound", [1])) == .accepted && core.soundOn)
+        #expect(try Self.digest(core) == opening)
+        let text: String = String(decoding: try core.snapshotPayload(), as: UTF8.self)
+        #expect(text.contains(",\"sound\":true,\"tutorial\":\"done\"}"))
+        let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: Self.seed)
+        let restoredDigest: StateDigest = try Self.digest(restored)
+        #expect(restored.soundOn && restored == core && restoredDigest == opening)
+        var off: Core = core
+        #expect(off.apply(Self.act("settings.sound", [0])) == .accepted && !off.soundOn && off != core)
+        #expect(try Self.digest(off) == opening)
+        // A payload without the sound key (before schema 3) restores with the sound off.
+        let noSound: Data = Data(text.replacingOccurrences(of: ",\"sound\":true", with: "").utf8)
+        let silent: Core = try Core.restore(payload: noSound, seed: Self.seed)
+        #expect(!silent.soundOn)
+        var reset: Core = core
+        reset.reset()
+        let openingCore: Core = try Core.opening(number: 8)
+        #expect(!reset.soundOn && reset == openingCore)
+    }
+
+    // MARK: Feedback
+
+    @Test func theReplayFeedbackNamesRefusalsStepsAndAStarlessWin() async throws {
+        #expect(Plan.refusalText(code: Rule.noReplay) == "There is no saved solution to replay for this level.")
+        #expect(Plan.refusalText(code: Rule.replayEnd) == "The replay is over.")
+        #expect(Plan.refusalText(code: Rule.replay) == "Stop the replay first.")
+        #expect(Plan.refusalText(code: "action.rule." + Rule.replay) == "Stop the replay first.")
+        #expect(Plan.refused(code: Rule.replayEnd).kind == .rejection && Plan.modeName(.replay(level: 3)) == "replay")
+        // Level 8 replayed beside a campaign play of the same actions: each step is announced like the action, and
+        // the replayed win claims no stars while the campaign win does.
+        var replay: Core = try await Self.won(8)
+        var campaign: Core = try await Core.prepare(seed: Self.seed)
+        let started: Core = replay
+        #expect(replay.apply(Self.act("replay.start", [8])) == .accepted)
+        let opened: Plan = Plan.after(old: started, new: replay)
+        #expect(opened.kind == .level && opened.text == "Level 8, band 1, replay.")
+        let trace: [Action] = try Self.certifiedTrace(8)
+        for action in trace {
+            let oldReplay: Core = replay
+            let oldCampaign: Core = campaign
+            #expect(replay.apply(Self.act("replay.step")) == .accepted)
+            #expect(campaign.apply(Self.act(action)) == .accepted)
+            let replayed: Plan = Plan.after(old: oldReplay, new: replay)
+            let played: Plan = Plan.after(old: oldCampaign, new: campaign)
+            if action == .run {
+                let spent: Int = trace.count - 1
+                let words: String = spent == 1 ? "1 action" : "\(spent) actions"
+                #expect(replayed.text == Plan.wonText + " Level won spending " + words + ".")
+                #expect(replayed.kind == .outcome && replayed.haptic == .success && replayed.trigger == "light.run")
+                #expect(played.text == Plan.wonText + " Level won spending " + words + ", 3 of 3 stars.")
+            } else {
+                #expect(replayed == played, "\(action)")
+            }
+        }
+        // Stopping the replay opens campaign at the level.
+        let ended: Core = replay
+        #expect(replay.apply(Self.act("replay.stop")) == .accepted)
+        #expect(Plan.after(old: ended, new: replay).text == "Level 8, band 1, campaign.")
     }
 }

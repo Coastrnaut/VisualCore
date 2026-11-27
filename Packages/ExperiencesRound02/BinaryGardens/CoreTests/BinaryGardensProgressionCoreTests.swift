@@ -18,6 +18,11 @@
 // never wins); levels 1 … 3 carry the tutorial; the daily level of 2026-11-27 is 91 (330 days × 13 mod 100 + 1) and of
 // 2026-01-01 level 1. Seed 2_505 names no random source here: every input is fixed. Explicit types, plain loops, no
 // wall-clock asserts. Modelled on feature 495's MushroomWeatherProgressionCoreTests.
+// Feature 507 (R02-G21-07) T-R02G2107-003 (clarification Q6): schema 3 and digest v3, eighteen controls, wins store
+// their trace (the effective ring, phase, luminosity and tilt actions, an undone detour left out, then `.run`) as a
+// verified result, the schema-3 payload carries the traces and the sound choice, the migration 1 → 2 → 3 (sound off,
+// nothing to reconcile), and the refusal of schema 4; the replay, reconciliation and sound rules are in
+// `BinaryGardensReplayCoreTests` and `BinaryGardensReconciliationTests`.
 @testable import BinaryGardensCore
 import Foundation
 import Testing
@@ -85,17 +90,19 @@ import VisualCoreSimulation
         return ["level": core.levelNumber, "records": recordsObject]
     }
 
-    @Test func theFourteenControlsAreDeclaredInOrder() {
-        #expect(Core.schemaVersion == 2 && Core.digestDomain == "r02-g21.binary-gardens.v2")
+    @Test func theEighteenControlsAreDeclaredInOrder() {
+        #expect(Core.schemaVersion == 3 && Core.digestDomain == "r02-g21.binary-gardens.v3")
         let ids: [String] = ["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "light.run", "play.undo",
                              "play.redo", "level.next", "clock.show", "level.select", "mode.daily", "mode.practice",
-                             "mode.campaign", "tutorial.dismiss"]
-        #expect(Core.actionIDs == ids && Core.controls.map(\.id) == ids && Core.controls.count == 14)
+                             "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step", "replay.stop",
+                             "settings.sound"]
+        #expect(Core.actionIDs == ids && Core.controls.map(\.id) == ids && Core.controls.count == 18)
+        #expect(Core.controls[14].ranges == [1...100] && Core.controls[17].ranges == [0...1])
         #expect(Core.controls[9].ranges == [1...100])
         #expect(Core.controls[10].ranges == [1...9999, 1...12, 1...31])
-        let plainIndices: [Int] = [4, 5, 6, 7, 11, 12, 13]
+        let plainIndices: [Int] = [4, 5, 6, 7, 11, 12, 13, 15, 16]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty, "\(Core.controls[index].id)") }
-        #expect(Core.migrations.currentVersion == 2)
+        #expect(Core.migrations.currentVersion == 3)
         #expect(BinaryGardensExperienceRule.locked == "r02-g21.locked")
         #expect(BinaryGardensExperienceRule.date == "r02-g21.date")
         #expect(BinaryGardensExperienceRule.notWhole == "r02-g21.not-whole")
@@ -169,7 +176,9 @@ import VisualCoreSimulation
         #expect(core.progress.solved.isEmpty && core.progress.frontier == 1)
         #expect(core.apply(Self.act("light.run")) == .accepted)
         #expect(core.play.stage == .won && BinaryGardensProgress.actionsSpent(core.play) == certified)
-        let best = BinaryGardensProgress.Result(actionsSpent: certified, stars: 3)
+        // Feature 507: the result carries the winning trace (the certified actions, then the run), verified.
+        let best = BinaryGardensProgress.Result(actionsSpent: certified, stars: 3, trace: actions + [.run],
+                                                verified: true)
         #expect(core.progress.solved[1] == best && core.progress.stars(of: 1) == 3)
         #expect(core.progress.frontier == 2 && core.progress.isOpen(2) && !core.progress.isOpen(3))
         // level.next goes to the newly opened level 2, fresh, with its tutorial and certified plan.
@@ -195,14 +204,17 @@ import VisualCoreSimulation
     }
 
     @Test func detoursGiveTwoOrOneStarsAndTheBestResultIsKept() async throws {
-        let certified: Int = try Self.plan(1).count
+        let actions: [BinaryGardensAction] = try Self.plan(1)
+        let certified: Int = actions.count
         // One undone change more than the plan: 2 stars.
         var undone: Core = try await Core.prepare(seed: 0)
         #expect(undone.apply(Self.detour) == .accepted)
         #expect(undone.apply(Self.act("play.undo")) == .accepted)
         #expect(try Self.win(&undone))
         #expect(BinaryGardensProgress.actionsSpent(undone.play) == certified + 1)
-        let twoStars = BinaryGardensProgress.Result(actionsSpent: certified + 1, stars: 2)
+        // Feature 507: the undone detour is left out of the trace.
+        let twoStars = BinaryGardensProgress.Result(actionsSpent: certified + 1, stars: 2, trace: actions + [.run],
+                                                    verified: true)
         #expect(undone.progress.solved[1] == twoStars && undone.progress.frontier == 2)
         // Two undone changes more than the plan: still 2 stars.
         var twice: Core = try await Core.prepare(seed: 0)
@@ -211,7 +223,8 @@ import VisualCoreSimulation
             #expect(twice.apply(Self.act("play.undo")) == .accepted)
         }
         #expect(try Self.win(&twice))
-        let twiceResult = BinaryGardensProgress.Result(actionsSpent: certified + 2, stars: 2)
+        let twiceResult = BinaryGardensProgress.Result(actionsSpent: certified + 2, stars: 2,
+                                                       trace: actions + [.run], verified: true)
         #expect(twice.progress.solved[1] == twiceResult)
         // Three undone changes more than the plan: 1 star.
         var many: Core = try await Core.prepare(seed: 0)
@@ -221,12 +234,14 @@ import VisualCoreSimulation
         }
         #expect(try Self.win(&many))
         #expect(BinaryGardensProgress.actionsSpent(many.play) == certified + 3)
-        let oneStar = BinaryGardensProgress.Result(actionsSpent: certified + 3, stars: 1)
+        let oneStar = BinaryGardensProgress.Result(actionsSpent: certified + 3, stars: 1, trace: actions + [.run],
+                                                   verified: true)
         #expect(many.progress.solved[1] == oneStar)
         // A better result replaces the stored one; a worse one keeps it.
         #expect(many.apply(Self.act("level.select", [1])) == .accepted)
         #expect(try Self.win(&many))
-        let best = BinaryGardensProgress.Result(actionsSpent: certified, stars: 3)
+        let best = BinaryGardensProgress.Result(actionsSpent: certified, stars: 3, trace: actions + [.run],
+                                                verified: true)
         #expect(many.progress.solved[1] == best)
         #expect(many.apply(Self.act("level.select", [1])) == .accepted)
         #expect(many.apply(Self.detour) == .accepted)
@@ -286,7 +301,8 @@ import VisualCoreSimulation
         #expect(try Self.win(&core))
         #expect(core.progress.frontier == 1 && !core.progress.isOpen(daily))
         let result: BinaryGardensProgress.Result = try #require(core.progress.solved[daily])
-        #expect(result == BinaryGardensProgress.Result(actionsSpent: dailyActions.count, stars: 3))
+        #expect(result == BinaryGardensProgress.Result(actionsSpent: dailyActions.count, stars: 3,
+                                                        trace: dailyActions + [.run], verified: true))
         // Campaign from a level that is not open goes to the frontier.
         #expect(core.apply(Self.act("mode.campaign")) == .accepted)
         #expect(core.mode == .campaign && core.levelNumber == 1 && core.play.level == certified)
@@ -424,7 +440,7 @@ import VisualCoreSimulation
         #expect(failed.hint(level: 2)?.kind == .retry)
     }
 
-    @Test func theSchemaTwoPayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
+    @Test func theSchemaThreePayloadRoundTripsInEveryModeAndRefusesDamage() async throws {
         // Campaign with progress: level 1 won, level 2 reached with level.next.
         var campaign: Core = try await Core.prepare(seed: 0)
         #expect(try Self.win(&campaign))
@@ -463,9 +479,14 @@ import VisualCoreSimulation
         #expect(restoredPractice.play.level.budget == 24 && restoredPractice.mode == .practice)
         let campaignText: String = String(decoding: try campaign.snapshotPayload(), as: UTF8.self)
         let certified: Int = try Self.plan(1).count
+        // Feature 507: each result carries its trace (the certified actions, then the run) and its verification.
+        let traceText: String = String(decoding: try Core.payloadEncoder().encode(try Self.plan(1) + [.run]),
+                                       as: UTF8.self)
         let progressText: String = "\"progress\":{\"frontier\":2,"
-            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3}]}"
+            + "\"solved\":[{\"actionsSpent\":\(certified),\"level\":1,\"stars\":3,\"trace\":" + traceText
+            + ",\"verified\":true}]}"
         #expect(campaignText.contains(progressText))
+        #expect(campaignText.contains(",\"sound\":false,\"tutorial\":\"adjust\"}"))
         #expect(campaignText.hasPrefix("{\"level\":2,\"mode\":{\"mode\":\"campaign\"},"))
         #expect(campaignText.hasSuffix(",\"tutorial\":\"adjust\"}"))
         let dailyText: String = String(decoding: try daily.snapshotPayload(), as: UTF8.self)
@@ -507,7 +528,7 @@ import VisualCoreSimulation
         #expect(throws: BinaryGardensRestoreRefusal.kernel(.malformed("seed 0"))) {
             try Core.restore(payload: otherTrace, seed: 0)
         }
-        // A schema-1 object is no schema-2 payload (the engine migrates it first).
+        // A schema-1 object is no schema-3 payload (the engine migrates it first).
         #expect(throws: BinaryGardensRestoreRefusal.damaged) {
             try Core.restore(payload: Data("{\"level\":2,\"records\":[]}".utf8), seed: 0)
         }
@@ -526,7 +547,7 @@ import VisualCoreSimulation
         #expect(core.apply(Self.act(first)) == .accepted)
         #expect(core.tutorial == .balance)
         let schemaOne: [String: Any] = try Self.schemaOne(core)
-        let migrated: [String: Any] = try Core.migratedToSchemaTwo(schemaOne)
+        let migrated: [String: Any] = try Core.migratedToSchemaThree(try Core.migratedToSchemaTwo(schemaOne))
         let chained: [String: Any] = try Core.migrations.migrate(schemaOne, from: 1)
         let data: Data = try JSONSerialization.data(withJSONObject: migrated, options: [.sortedKeys])
         let chainedData: Data = try JSONSerialization.data(withJSONObject: chained, options: [.sortedKeys])
@@ -536,13 +557,16 @@ import VisualCoreSimulation
         #expect(restored.progress.frontier == 3 && restored.progress.solved.isEmpty)
         #expect(restored.progress.isOpen(1) && restored.progress.isOpen(3) && !restored.progress.isOpen(4))
         #expect(restored.tutorial == .adjust && restored.tutorial == BinaryGardensTutorialStep.initial(level: 3))
+        // Feature 507: the migration 2 → 3 sets the sound off; nothing to reconcile.
+        #expect(migrated["sound"] as? Bool == false && !restored.soundOn && restored.reconciliationDropped == 0)
         // The tutorial step is not digested, so the migrated state digests as the saved one.
         #expect(try Self.digest(restored) == Self.digest(core))
         // A schema-1 object that is not one is refused.
         #expect(throws: BinaryGardensRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": "3"]) }
         #expect(throws: BinaryGardensRestoreRefusal.damaged) { try Core.migratedToSchemaTwo(["level": 3]) }
         // A newer schema is refused by the chain.
-        #expect(throws: MigrationError.newerVersion(3)) { try Core.migrations.migrate(schemaOne, from: 3) }
+        #expect(Core.schemaVersion == 3)
+        #expect(throws: MigrationError.newerVersion(4)) { try Core.migrations.migrate(schemaOne, from: 4) }
     }
 
     /// SC-R02G2105-005: a schema-1 payload of every level 1 … 100 (after its first certified action, so the trace
@@ -587,17 +611,17 @@ import VisualCoreSimulation
         let migrated: Core = try #require(engine.core)
         #expect(migrated.levelNumber == 3 && migrated.play == played.play && migrated.mode == .campaign)
         #expect(migrated.progress.frontier == 3 && migrated.progress.solved.isEmpty)
-        #expect(migrated.tutorial == .adjust)
+        #expect(migrated.tutorial == .adjust && !migrated.soundOn)
         #expect(try engine.digest() == saved.digest)
-        // An envelope of schema 3 is refused and changes nothing.
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
+        // An envelope of schema 4 is refused and changes nothing.
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 4, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
+            refused = error == .snapshot(.newerSchema(found: 4, current: 3))
         }
         #expect(refused)
         #expect(engine.core == migrated)

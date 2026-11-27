@@ -9,6 +9,8 @@
 // catalog level won by its own plan names 3 of 3 stars (none in practice, reached with `mode.practice`). Mode, tutorial
 // step and certified count are feature 505's adapter state on the cores (hand cores built through the adapter's
 // internal initialiser). Explicit types, plain loops; each test well under 10 s; no clock.
+// Feature 507 (R02-G21-07) T-R02G2107-003: the replay refusal codes have their sentences and the mode name "replay";
+// replayed steps and a replayed win are compared in `BinaryGardensReplayCoreTests`.
 import Foundation
 import Testing
 import VisualCoreExperience
@@ -171,6 +173,9 @@ import VisualCoreSimulation
             ("r02-g21.generation", "That level could not be made."),
             ("r02-g21.not-whole", "That value must be a whole number."),
             ("r02-g21.tick", "Only ticks 1 to 48 can be shown."),
+            ("r02-g21.no-replay", "There is no saved solution to replay for this level."),
+            ("r02-g21.replay-end", "The replay is over."),
+            ("r02-g21.replay", "Stop the replay first."),
             ("r02-g21.newer-schema", "That action was refused."),
             ("r02-g21.malformed", "That action was refused."),
             ("r02-g21.witness", "That action was refused."),
@@ -313,7 +318,7 @@ import VisualCoreSimulation
         let tilted: Plan = try Self.step(&taught, "orbit.tilt", [1])
         #expect(taught.tutorial == .balance && tilted.kind == .state && tilted.trigger == "orbit.tilt")
         #expect(Plan.modeName(.campaign) == "campaign" && Plan.modeName(.practice) == "practice")
-        #expect(Plan.modeName(.daily(level: 7)) == "daily")
+        #expect(Plan.modeName(.daily(level: 7)) == "daily" && Plan.modeName(.replay(level: 7)) == "replay")
         // The core's band is the manifest entry's band for every catalog level.
         for entry in BinaryGardensManifest.entries {
             #expect(BinaryGardensProgress.band(of: entry.number) == entry.band, "level \(entry.number)")

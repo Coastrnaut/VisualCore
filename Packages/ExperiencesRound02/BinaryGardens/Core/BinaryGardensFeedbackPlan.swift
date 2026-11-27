@@ -45,6 +45,12 @@
 // The panel's selected star, previews, the shown tick, inspections and the view are presentation only and plan
 // nothing. A revealed hint is `hint(text:)`: `state` with the hint's words, no haptic, trigger "hint". A refusal is
 // `refused(code:)`: `rejection`, haptic `error`, the trigger the bare code. Integers only; no clock, no randomness.
+// Feature 507 (R02-G21-07) T-R02G2107-003 (FR-R02G2107-004; clarification Q4): the replay refusals have their words
+// ("There is no saved solution to replay for this level." for `r02-g21.no-replay`, "The replay is over." for
+// `r02-g21.replay-end`, "Stop the replay first." for `r02-g21.replay`); a `replay.step` adds one record to the same
+// play, so it is announced like the action it applies (case 2, the trigger that action's control), and `replay.start`
+// and `replay.stop` open a fresh play (case 1, mode "replay" or "campaign"); a replayed win claims no stars (replay
+// never awards them, `BinaryGardensMode.awardsStars`).
 import Foundation
 import VisualCoreSimulation
 
@@ -138,9 +144,10 @@ public struct BinaryGardensFeedbackPlan: Sendable, Equatable {
     /// (`r02-g21.action`), "No actions are left: run the light or undo a change." (`r02-g21.budget`), "The level has
     /// ended." (`r02-g21.stage`), "The play changed before the action arrived." (`r02-g21.stale`), "That level could
     /// not be made." (`r02-g21.level`, `r02-g21.generation`), "That value must be a whole number."
-    /// (`r02-g21.not-whole`), "Only ticks 1 to 48 can be shown." (`r02-g21.tick`); any other code (the kernel's
-    /// `newer-schema`, `malformed`, `witness`, the engine's own codes such as `action.out-of-range`) "That action was
-    /// refused."
+    /// (`r02-g21.not-whole`), "Only ticks 1 to 48 can be shown." (`r02-g21.tick`); since feature 507 "There is no
+    /// saved solution to replay for this level." (`r02-g21.no-replay`), "The replay is over." (`r02-g21.replay-end`)
+    /// and "Stop the replay first." (`r02-g21.replay`); any other code (the kernel's `newer-schema`, `malformed`,
+    /// `witness`, the engine's own codes such as `action.out-of-range`) "That action was refused."
     public static func refusalText(code: String) -> String {
         switch bareCode(code) {
         case BinaryGardensExperienceRule.locked: return "That level is not open yet."
@@ -155,6 +162,10 @@ public struct BinaryGardensFeedbackPlan: Sendable, Equatable {
             return "That level could not be made."
         case BinaryGardensExperienceRule.notWhole: return "That value must be a whole number."
         case BinaryGardensExperienceRule.tick: return "Only ticks 1 to 48 can be shown."
+        // Feature 507: the replay refusals.
+        case BinaryGardensExperienceRule.noReplay: return "There is no saved solution to replay for this level."
+        case BinaryGardensExperienceRule.replayEnd: return "The replay is over."
+        case BinaryGardensExperienceRule.replay: return "Stop the replay first."
         default: return "That action was refused."
         }
     }
@@ -202,7 +213,8 @@ public struct BinaryGardensFeedbackPlan: Sendable, Equatable {
             + actionsWords(level.budget)
     }
 
-    /// The name of a mode in a level announcement: "campaign", "practice" or "daily" (feature 505).
+    /// The name of a mode in a level announcement: "campaign", "practice", "daily" (feature 505) or "replay"
+    /// (feature 507).
     public static func modeName(_ mode: BinaryGardensMode) -> String {
         switch mode {
         case .campaign: "campaign"
@@ -302,8 +314,8 @@ public struct BinaryGardensFeedbackPlan: Sendable, Equatable {
     }
 
     /// The `outcome` plan of `core`'s ended play: the win with its actions spent (and stars against its
-    /// `certifiedActionCount` when its `mode` awards them: campaign and daily, never practice), haptic `success`; or
-    /// its `failureExplanation`, haptic `warning`.
+    /// `certifiedActionCount` when its `mode` awards them: campaign and daily, never practice or replay — feature 507),
+    /// haptic `success`; or its `failureExplanation`, haptic `warning`.
     static func outcomePlan(_ core: BinaryGardensExperienceCore, trigger: String) -> BinaryGardensFeedbackPlan {
         let play: BinaryGardensPlay = core.play
         if play.stage == .won {

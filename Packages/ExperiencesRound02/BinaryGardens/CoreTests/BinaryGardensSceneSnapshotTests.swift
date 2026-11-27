@@ -257,13 +257,13 @@ import VisualCoreExperience
         #expect(snapshot.inspecting(snapshot.worlds.count).inspectedWorld == nil)
         #expect(snapshot.inspecting(-1).inspectedWorld == nil)
         #expect(snapshot.inspecting(0) != snapshot)
-        // Nothing reaches the core: same digest, same payload (schema 2 since feature 505), same snapshot.
+        // Nothing reaches the core: same digest, same payload (schema 3 since feature 507), same snapshot.
         core.setQualityTier(2)
         var after: DigestBuilder = DigestBuilder(domain: BinaryGardensExperienceCore.experienceID)
         try core.writeDigest(into: &after)
         #expect(after.finish() == digest)
         #expect(try core.snapshotPayload() == payload)
-        #expect(BinaryGardensExperienceCore.schemaVersion == 2)
+        #expect(BinaryGardensExperienceCore.schemaVersion == 3)
         #expect(core.snapshot(time: 0).preview == nil && core.snapshot(time: 0).inspectedWorld == nil)
     }
 }

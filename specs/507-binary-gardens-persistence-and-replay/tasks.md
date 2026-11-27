@@ -38,7 +38,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
 
 ## Phase 3: Stories 1 and 3 — save, migrate, replay (P1, P2)
 
-- [ ] T-R02G2107-003 [US1] [US2] [US3] Edit
+- [X] T-R02G2107-003 [US1] [US2] [US3] Edit — Verified 2026-11-27: host-2 exit 0 (swift test --filter BinaryGardens: 307 tests in 28 suites; schema 3, digest v3, replay, sound, manifest regenerated; Q6 assertions updated)
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensExperienceCore.swift` (schema 3, migration 2 → 3
   "results with an empty trace and verified false, sound off" (1 → 2 is R02-G21-05's step), digest domain
   `"r02-g21.binary-gardens.v3"` over the level, the play fingerprint, the progress with its traces and the mode (never
