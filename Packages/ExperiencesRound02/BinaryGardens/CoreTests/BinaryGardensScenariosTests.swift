@@ -9,9 +9,11 @@
 // state of its family (a refusal with the engine's, the kernel's or the adapter's code, a perturbed plan recovered, an
 // exhausted budget refusing further moves, the tick endpoints and the extreme settings undone, a won plan whose digest
 // no quality tier changes, undo and redo restoring digests, a shown tick that leaves the digest alone, a failing run
-// undone, the next level's opening digest); and the committed `scenario-manifest.json` equal to the Swift manifest
-// (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run (`swift test`); explicit types, plain loops. Modelled on
-// `MushroomWeatherScenariosTests` (feature 493).
+// undone, the next level's fresh play after a win); and the committed `scenario-manifest.json` equal to the Swift
+// manifest (`UPDATE_SCENARIO_MANIFEST=1` rewrites it). Host-run (`swift test`); explicit types, plain loops. Feature 505
+// (R02-G21-05) T-R02G2105-004: the integration rows win their level before `level.next` (the next open level; a row on
+// level 100 would choose level 1 after `level.next` is refused). Modelled on `MushroomWeatherScenariosTests`
+// (feature 493).
 #if DEBUG || VISUALCORE_AUTOMATION
 @testable import BinaryGardensCore
 import Foundation
@@ -374,12 +376,29 @@ private func scenarioDigest(of core: BinaryGardensExperienceCore) throws -> Stri
                 let restoredDigest: String = try scenarioDigest(of: restored)
                 #expect(restored == core && restoredDigest == played.final, "\(name)")
             case .integration:
+                // Feature 505: `level.next` needs the next level open, so the row first wins its level's plan; on
+                // level 100 `level.next` is refused `r02-g21.locked` (no wrap) and level 1 is chosen instead.
                 let next: Int = Core.nextLevel(after: level)
                 #expect(core.levelNumber == next && core.play.stage == .playing, "\(name)")
-                let nextOpening: String = try #require(Core.expectedDigest(for: scenarioID, seed: UInt64(next - 1),
-                                                                           entries: []))
-                #expect(played.final == nextOpening, "\(name)")
-                #expect(played.results == ["accepted", "accepted", "accepted", Core.kernelActionCode], "\(name)")
+                let kinds: [Kind] = Self.kinds(core)
+                #expect(kinds.count == 2 && kinds.last == .undo && core.play.actionsSpent == 0, "\(name)")
+                #expect(core.mode == .campaign && core.progress.solved[level] != nil, "\(name)")
+                var won: [ScenarioStep] = Core.winningEntries(level)
+                won += Core.integrationMoveEntries(level)
+                let nextFresh: String = try #require(Core.expectedDigest(for: scenarioID, seed: spec.seed,
+                                                                         entries: won))
+                #expect(played.final == nextFresh, "\(name)")
+                var results: [String] = []
+                for _ in 0...actions.count { results.append("accepted") }
+                if level == Core.levelNumbers.upperBound {
+                    #expect(core.progress.frontier == Core.levelNumbers.upperBound, "\(name)")
+                    results += [Core.lockedCode, "accepted"]
+                } else {
+                    #expect(core.progress.frontier == next, "\(name)")
+                    results.append("accepted")
+                }
+                results += ["accepted", "accepted", Core.kernelActionCode]
+                #expect(played.results == results, "\(name)")
             }
         }
         // The scripted failing runs name only failures the kernel knows, at least three of its five.

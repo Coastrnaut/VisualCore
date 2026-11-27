@@ -33,7 +33,8 @@
 //                                `failed` with its failure;
 //   play.undo, play.redo         the kernel's exact undo and redo (`r02-g21.action` when there is nothing to undo or
 //                                redo; undo works in a failed play and returns it to playing; a won play is final);
-//   level.next                   the next certified level (100 wraps to 1) with a fresh play, tick 48 shown;
+//   level.next                   the next certified level with a fresh play, tick 48 shown (since feature 505 the
+//                                next open level in campaign mode, `r02-g21.locked` when none; no wrap from 100 to 1);
 //   clock.show [0…60]            shows tick 1 … 48 (presentation only; accepted in every stage); 0 and 49 … 60 are
 //                                refused `r02-g21.tick` without touching the kernel.
 // The declared ranges are star 0 … 1, ring index 0 … 7 (`BinaryGardensLevel.ringCounts` upper bound − 1), phase 0 … 47,
@@ -44,7 +45,7 @@
 // expected one, so `r02-g21.stale` cannot arise. A kernel refusal (`BinaryGardensError`) becomes
 // `.rule(code: error.reasonCode)`. A refused action changes nothing, the shown tick included.
 //
-// Digest ("r02-g21.binary-gardens.v1"): the level number and the play's fingerprint (not its record history, so undo
+// Digest ("r02-g21.binary-gardens.v1" until feature 505, see below): the level number and the play's fingerprint (not its record history, so undo
 // restores the earlier digest exactly); never the shown tick, the quality tier or a time. Snapshot schema 1: the JSON
 // object `{"level", "records"}` with sorted keys; restoring replays the records on a fresh play of that level
 // (`BinaryGardensPlay.replay`), shows tick 48 and throws `BinaryGardensRestoreRefusal` for a damaged payload, a level
@@ -57,23 +58,63 @@
 // 8 × 8 quads per face, 12 corona rays, trails of 8 ticks, 8 motes, 2 glow shells; level-1 = 5 × 5, 6 rays, 4 ticks,
 // 4 motes, 1 shell; level-2 = 3 × 3, no rays, trails, motes or glow. Outcome: `won` or `failed` while the play is in
 // that stage, else nil. Rules use integers only.
+//
+// Feature 505 (R02-G21-05) T-R02G2105-004 (FR-R02G2105-001, 004 … 007; clarifications Q2–Q6): the core also holds the
+// player's progress (`BinaryGardensProgress`: won levels with the least actions spent and stars, the open frontier),
+// the mode (campaign, practice with the budget raised to the kernel's maximum 24 on a copy of the level, daily) and
+// the tutorial step (`BinaryGardensTutorialStep`). No level is ever gated by payment: a locked level is one not yet
+// unlocked (FR-R02G2105-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g21.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level ((days from 2026-01-01 × 13) mod 100 + 1), fresh
+//                                  (`r02-g21.date` for an impossible date); a daily level still locked in the campaign
+//                                  is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 24 (a copy of the level);
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Non-whole values of the new controls are refused `r02-g21.not-whole`. Choosing a level or a mode drops the left
+// level's records (the play starts fresh with tick 48 shown and the tutorial at its first step). `level.next` (above)
+// moves to the next open level in campaign mode and is refused with `r02-g21.locked` when there is none (100 no longer
+// wraps to 1). A win (the play reaching `won` on an accepted `light.run` or redo) records
+// `progress.record(level:actionsSpent:certified:mode:)` with the actions spent (`BinaryGardensProgress.actionsSpent`:
+// every accepted ring, phase, luminosity and tilt record, undone ones included) against the certified plan's action
+// count (`certifiedActionCount`): campaign opens the next level, daily records the level's best result and stars and
+// opens nothing, practice records nothing. The certified plan (`certifiedPlan`) feeds the hints (`hint(level:)`) and
+// the stars. A fresh opening of level N (prepare, reset) has levels 1 … N open and no won levels. The tutorial starts at
+// `BinaryGardensTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and is advanced after every
+// accepted ring, phase, luminosity, tilt, run, undo and redo by `advanced(afterAction:actionsThisOpening:ended:)`
+// (afterAction for an arrangement action, the actions this opening counted as for the stars, ended when the play is won
+// or failed — an undo never ends it, a redo only when it restores a won or failed moment), never back; `clock.show`
+// never moves it. The shown tick, the quality tier and the presenter's preview, orbit and inspected world stay
+// presentation. Digest "r02-g21.binary-gardens.v2": level, play fingerprint, progress and mode (never the tutorial step
+// or the shown tick). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys;
+// schema-1 payloads migrate (no won levels, levels 1 … the restored level open, campaign mode, the tutorial at its first
+// step — `adjust` on levels 1 … 3, else `done`); a damaged payload (invalid progress — a frontier or a won level
+// outside 1 … 100, stars outside 1 … 3, actions below 1 —, an unknown mode or tutorial step, a daily mode naming another
+// level) throws `.damaged`, a level outside 1 … 100 `.levelNumber`, a trace the kernel refuses `.kernel`; an envelope
+// of a newer schema is refused by the engine. Modelled on feature 495's `MushroomWeatherExperienceCore`.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCorePersistence
 
-/// The rule codes of Binary Gardens' adapter refusals (feature 503).
+/// The rule codes of Binary Gardens' adapter refusals (feature 503; `locked` and `date` since feature 505).
 public enum BinaryGardensExperienceRule {
-    /// A value that must be a whole number (a star, a ring, a phase, a luminosity, a tilt or a tick) and is not.
+    /// A value that must be a whole number (a star, a ring, a phase, a luminosity, a tilt, a tick, a level or a date
+    /// part) and is not.
     public static let notWhole = "r02-g21.not-whole"
     /// A shown tick outside 1 … 48 within the declared range 0 … 60 (`clock.show`).
     public static let tick = "r02-g21.tick"
+    /// A level that is not open yet, or no next open level (feature 505). Never a payment gate.
+    public static let locked = "r02-g21.locked"
+    /// An impossible calendar date (`mode.daily`, feature 505).
+    public static let date = "r02-g21.date"
 }
 
 /// Why a saved Binary Gardens state was refused on restore (feature 503). A refused restore changes nothing.
 public enum BinaryGardensRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress, the mode or the
+    /// tutorial step is invalid (feature 505).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -81,17 +122,20 @@ public enum BinaryGardensRestoreRefusal: Error, Equatable, Sendable {
     case kernel(BinaryGardensError)
 }
 
-/// The state of Binary Gardens as an experience (see the file header). Snapshot schema 1.
+/// The state of Binary Gardens as an experience (see the file header). Snapshot schema 2.
 public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g21.binary-gardens"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g21.binary-gardens.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g21.binary-gardens.v2"
     /// The action ids in declaration order.
     public static let actionIDs = ["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "light.run",
-                                   "play.undo", "play.redo", "level.next", "clock.show"]
+                                   "play.undo", "play.redo", "level.next", "clock.show", "level.select", "mode.daily",
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`BinaryGardensMode.practiceBudget`, 24).
+    public static let practiceBudget: Int = BinaryGardensMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a star: 0 … 1.
@@ -119,27 +163,71 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: BinaryGardensPlay
+    /// The player's progress (feature 505): in the digest, the snapshot and `==`.
+    public private(set) var progress: BinaryGardensProgress
+    /// The mode (feature 505): in the digest, the snapshot and `==`.
+    public private(set) var mode: BinaryGardensMode
+    /// The tutorial step (feature 505): in the snapshot and `==`, not in the digest.
+    public private(set) var tutorial: BinaryGardensTutorialStep
+    /// The certified plan of the current level (its minimal witness without the run), which the hints follow and the
+    /// stars count against. Derived from the level number.
+    public private(set) var certifiedPlan: BinaryGardensPlan
     /// The shown tick, 1 … 48; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var shownTick: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: BinaryGardensPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber` with tick 48 shown, whose reset returns to `openingPlay` of
-    /// `openingNumber`.
-    init(levelNumber: Int, play: BinaryGardensPlay, openingNumber: Int, openingPlay: BinaryGardensPlay) {
+    /// What a reset restores (feature 505).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: BinaryGardensPlay
+        /// The opening progress: levels 1 … the opening level open, none won.
+        let progress: BinaryGardensProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: BinaryGardensTutorialStep
+        /// The opening level's certified plan.
+        let certifiedPlan: BinaryGardensPlan
+    }
+
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial` and tick 48 shown, whose
+    /// reset returns to `opening` of `openingNumber`.
+    init(levelNumber: Int, play: BinaryGardensPlay, progress: BinaryGardensProgress, mode: BinaryGardensMode,
+         tutorial: BinaryGardensTutorialStep, certifiedPlan: BinaryGardensPlan, openingNumber: Int,
+         opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedPlan = certifiedPlan
         self.shownTick = Self.openingTick
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
+
+    /// The certified plan's action count of the current level (ring, phase, luminosity and tilt actions, the run
+    /// excluded: 1, 2, 3, 3 or 4 by band), against which a win's stars are counted (feature 505).
+    public var certifiedActionCount: Int { certifiedPlan.size }
+
+    /// The difficulty band (1 … 5) of the current level: 20 levels per band, the certified difficulty bands
+    /// (`BinaryGardensProgress.band(of:)`; feature 505).
+    public var band: Int { BinaryGardensProgress.band(of: levelNumber) }
+
+    /// The hint at `level` (1 … 3) for the current play against the certified plan
+    /// (`BinaryGardensHints.hint(level:play:certified:)`); nil when the play is won or not playing. Reads only.
+    public func hint(level: Int) -> BinaryGardensHint? {
+        BinaryGardensHints.hint(level: level, play: play, certified: certifiedPlan)
+    }
+
+    /// The explanation of the play's failure (`BinaryGardensFailureExplanation(play:)`); nil unless it failed.
+    public var failureExplanation: BinaryGardensFailureExplanation? { BinaryGardensFailureExplanation(play: play) }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
     public static func levelNumber(forSeed seed: UInt64) -> Int {
@@ -222,13 +310,44 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
         return play
     }
 
-    /// The opening state of manifest number `number`: a play begun and past its tutorial, ready to accept actions,
-    /// with tick 48 shown.
+    /// The practice copy of `level` (feature 505): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: BinaryGardensLevel) throws(BinaryGardensError) -> BinaryGardensLevel {
+        try BinaryGardensLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, ringRadii: level.ringRadii,
+                               starSpeed: level.starSpeed, luminosityLevels: level.luminosityLevels,
+                               stars: level.stars, maxTilt: level.maxTilt, startTilt: level.startTilt,
+                               minimumSeparation: level.minimumSeparation, clampRadius: level.clampRadius,
+                               worlds: level.worlds, lethalTolerance: level.lethalTolerance,
+                               budget: BinaryGardensMode.practice.budget(base: level.budget),
+                               tutorial: level.tutorial, phaseStep: level.phaseStep)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: BinaryGardensGenerated, mode: BinaryGardensMode)
+        throws(BinaryGardensError) -> BinaryGardensLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
+    /// accept actions, with tick 48 shown; campaign mode, levels 1 … `number` open, none won, the tutorial at its
+    /// first step (feature 505).
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(BinaryGardensError) -> BinaryGardensExperienceCore {
-        let play: BinaryGardensPlay = try freshPlay(of: try level(number: number))
-        return BinaryGardensExperienceCore(levelNumber: number, play: play, openingNumber: number, openingPlay: play)
+        let certified: BinaryGardensGenerated = try generated(number: number)
+        let play: BinaryGardensPlay = try freshPlay(of: certified.level)
+        var progress: BinaryGardensProgress = BinaryGardensProgress()
+        progress.open(through: number)
+        let tutorial: BinaryGardensTutorialStep = BinaryGardensTutorialStep.initial(level: number)
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial,
+                                       certifiedPlan: certified.plan)
+        return BinaryGardensExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                           tutorial: tutorial, certifiedPlan: certified.plan, openingNumber: number,
+                                           opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -271,15 +390,44 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the shown tick, the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown tick, the
+    /// quality tier or the opening level).
     public static func == (lhs: BinaryGardensExperienceCore, rhs: BinaryGardensExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 505): no won levels with levels 1 … the
+    /// restored level open, campaign mode, no tutorial key (restore starts the tutorial at its first step: `adjust` on
+    /// the tutorial levels 1 … 3, else `done`).
+    ///
+    /// - Throws: ``BinaryGardensRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw BinaryGardensRestoreRefusal.damaged
+        }
+        var progress: BinaryGardensProgress = BinaryGardensProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(BinaryGardensMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the ranges of the file header as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -292,6 +440,11 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
         ExperienceControl(id: "clock.show", ranges: [declared(tickRange)]),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(BinaryGardensProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -299,7 +452,8 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The nine controls with their declared ranges (see the file header); run, undo, redo and next take no values.
+    /// The fourteen controls with their declared ranges (see the file header); `light.run`, `play.undo`, `play.redo`,
+    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with tick 48 shown; no clock is read.
@@ -347,24 +501,50 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
         do throws(BinaryGardensError) {
             if let kernel = Self.kernelAction(action.control, values) {
                 try play.apply(kernel, expecting: play.fingerprint)
+                if case .run = kernel {
+                    advanceTutorial(afterAction: false)
+                    recordIfWon()
+                } else {
+                    advanceTutorial(afterAction: true)
+                }
             } else {
                 switch action.control {
                 case "play.undo":
                     try play.undo()
+                    advanceTutorial(afterAction: false)
                 case "play.redo":
                     try play.redo()
+                    advanceTutorial(afterAction: false)
+                    recordIfWon()
                 case "clock.show":
                     // Presentation only: the play and the digest do not change, and the kernel is not consulted.
                     guard Self.shownTicks.contains(values[0]) else {
                         return .rejected(.rule(code: BinaryGardensExperienceRule.tick))
                     }
                     shownTick = values[0]
-                default:   // level.next
-                    let next: Int = levelNumber % Self.levelNumbers.upperBound + 1
-                    let fresh: BinaryGardensPlay = try Self.freshPlay(of: try Self.level(number: next))
-                    levelNumber = next
-                    play = fresh
-                    shownTick = Self.openingTick
+                case "level.next":
+                    // The next open level in campaign mode; no wrap from 100 to 1 (feature 505).
+                    guard let next = progress.nextOpen(after: levelNumber) else {
+                        return .rejected(.rule(code: BinaryGardensExperienceRule.locked))
+                    }
+                    try open(number: next, mode: .campaign)
+                case "level.select":
+                    guard progress.isOpen(values[0]) else {
+                        return .rejected(.rule(code: BinaryGardensExperienceRule.locked))
+                    }
+                    try open(number: values[0], mode: .campaign)
+                case "mode.daily":
+                    guard let daily = BinaryGardensProgress.dailyLevel(year: values[0], month: values[1],
+                                                                       day: values[2]) else {
+                        return .rejected(.rule(code: BinaryGardensExperienceRule.date))
+                    }
+                    try open(number: daily, mode: .daily(level: daily))
+                case "mode.practice":
+                    try open(number: levelNumber, mode: .practice)
+                case "mode.campaign":
+                    try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+                default:   // tutorial.dismiss
+                    tutorial = tutorial.dismissed()
                 }
             }
         } catch {
@@ -380,11 +560,51 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose with tick 48 shown; the quality tier, which is not state, is
-    /// kept.
+    /// Advances the tutorial step after an accepted ring, phase, luminosity, tilt, run, undo or redo
+    /// (`BinaryGardensTutorialStep.advanced(afterAction:actionsThisOpening:ended:)`): `afterAction` for an arrangement
+    /// action, the actions this opening counted as for the stars (`BinaryGardensProgress.actionsSpent`, undone ones
+    /// included), ended when the play is won or failed (never after an undo, which always lands on a moment before the
+    /// end; after a redo only when it restores a won or failed moment). Never back.
+    private mutating func advanceTutorial(afterAction: Bool) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterAction: afterAction,
+                                     actionsThisOpening: BinaryGardensProgress.actionsSpent(play), ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's first
+    /// tutorial step and tick 48 shown; the records of the level left are dropped. Changes nothing when the kernel
+    /// refuses.
+    private mutating func open(number: Int, mode: BinaryGardensMode) throws(BinaryGardensError) {
+        let certified: BinaryGardensGenerated = try Self.generated(number: number)
+        let fresh: BinaryGardensPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedPlan = certified.plan
+        tutorial = BinaryGardensTutorialStep.initial(level: number)
+        shownTick = Self.openingTick
+    }
+
+    /// After an accepted action that won the play: records the actions spent (`BinaryGardensProgress.actionsSpent(_:)`)
+    /// against the certified plan's action count in the current mode (campaign opens the next level; daily records the
+    /// best result and stars and opens nothing; practice records nothing). A won play is final, so a win is recorded
+    /// once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, actionsSpent: BinaryGardensProgress.actionsSpent(play),
+                        certified: certifiedActionCount, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (levels 1 … the opening level open, none won, campaign mode, the
+    /// tutorial at its first step, tick 48 shown); the quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedPlan = opening.certifiedPlan
         shownTick = Self.openingTick
     }
 
@@ -397,38 +617,49 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g21.binary-gardens.v1", then the level number and the play's fingerprint (actions spent, failure, level,
-    /// luminosities, phases, rings, stage, tilt).
+    /// "r02-g21.binary-gardens.v2", then the level number, the play's fingerprint (actions spent, failure, level,
+    /// luminosities, phases, rings, stage, tilt), the progress and the mode (their sorted JSON); never the tutorial step
+    /// or the shown tick.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly; never the
-        // shown tick (presentation).
+        // shown tick (presentation) or the tutorial step.
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: BinaryGardensMode
+        /// The progress.
+        var progress: BinaryGardensProgress
         /// The play's records.
         var records: [BinaryGardensRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: BinaryGardensTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level, with tick 48 shown; a reset
-    /// returns to the level `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), with tick 48
+    /// shown; a reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``BinaryGardensRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level or
-    ///   trace the kernel refuses.
+    /// - Throws: ``BinaryGardensRestoreRefusal`` for a damaged payload (invalid progress — a frontier or a won level
+    ///   outside 1 … 100, stars outside 1 … 3, actions spent below 1 —, an unknown mode or tutorial step, or a daily
+    ///   mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> BinaryGardensExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw BinaryGardensRestoreRefusal.damaged
@@ -436,15 +667,20 @@ public struct BinaryGardensExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw BinaryGardensRestoreRefusal.levelNumber(decoded.level)
         }
+        guard decoded.progress.isValid, decoded.mode.isValid else { throw BinaryGardensRestoreRefusal.damaged }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw BinaryGardensRestoreRefusal.damaged
+        }
         do throws(BinaryGardensError) {
-            let saved: BinaryGardensLevel = try level(number: decoded.level)
-            let play: BinaryGardensPlay = try BinaryGardensPlay.replay(level: saved, records: decoded.records)
-            let openingNumber: Int = levelNumber(forSeed: seed)
-            let openingPlay: BinaryGardensPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return BinaryGardensExperienceCore(levelNumber: decoded.level, play: play, openingNumber: openingNumber,
-                                               openingPlay: openingPlay)
+            let certified: BinaryGardensGenerated = try generated(number: decoded.level)
+            let play: BinaryGardensPlay = try BinaryGardensPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: BinaryGardensTutorialStep = decoded.tutorial
+                ?? BinaryGardensTutorialStep.initial(level: decoded.level)
+            let openingCore: BinaryGardensExperienceCore = try opening(number: levelNumber(forSeed: seed))
+            return BinaryGardensExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                               mode: decoded.mode, tutorial: tutorial, certifiedPlan: certified.plan,
+                                               openingNumber: openingCore.openingNumber, opening: openingCore.opening)
         } catch {
             throw BinaryGardensRestoreRefusal.kernel(error)
         }

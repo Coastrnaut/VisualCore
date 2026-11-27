@@ -62,8 +62,17 @@
 //           else the first failing run found;
 //  61 … 70  persistence and replay — the probe move, undo, redo, undo, then the certified plan and the run (won; the
 //           saved trace replays to the same state);
-//  71 … 80  integration — `level.next` (the next certified level, a fresh play), its probe move, an undo (the next
-//           level's opening digest) and a second undo refused `r02-g21.action`.
+//  71 … 80  integration — the certified plan and the run (won, the next level opened), `level.next` (the next
+//           certified level, a fresh play), its probe move, an undo (the next level's fresh play) and a second undo
+//           refused `r02-g21.action`; a row on level 100 (none of rows 71 … 80 today: they visit levels 61, 68, 75, 82,
+//           89, 96, 3, 10, 17 and 24) would see `level.next` refused `r02-g21.locked` after the win (no wrap) and
+//           choose level 1 with `level.select [1]` instead.
+// Feature 505 (R02-G21-05) T-R02G2105-004: the digests are now schema 2's ("…v2": level, play, progress and mode), and
+// `level.next` moves to the next open level, which full-playthrough's campaign wins open before each `level.next`; the
+// integration rows (71 … 80) therefore first win their level's certified plan and the run (a campaign win opens the
+// next level) before `level.next`; rejection also refuses the progression controls' wrong value counts
+// (`level.select`, `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`); the manifest is regenerated
+// (`UPDATE_SCENARIO_MANIFEST=1`).
 // The expected digests and outcomes are derived by playing the entries on a core exactly as the engine plays them; the
 // tests replay every scenario through `ExperienceEngine` and check each family's kernel state. No clock, no random
 // source.
@@ -76,7 +85,8 @@ extension BinaryGardensExperienceCore {
     public static let manifestSeed: UInt64 = 0
     /// The round of the game in the scenario manifest.
     public static let manifestRound = 2
-    /// The levels `full-playthrough` wins in order, with `level.next` between them.
+    /// The levels `full-playthrough` wins in order, with `level.next` between them (each campaign win opens the next
+    /// level, so `level.next` reaches it; feature 505).
     public static let playthroughLevels: [Int] = [1, 2, 3]
     /// The number of acceptance rows (R2-G21-QA-001 … 080).
     public static let acceptanceRows = 80
@@ -135,7 +145,7 @@ extension BinaryGardensExperienceCore {
         case accessibility
         /// Rows 61 … 70: a move undone, redone and undone, then the plan won.
         case persistence
-        /// Rows 71 … 80: the next level, its probe move, an undo and a refused undo.
+        /// Rows 71 … 80: the plan won, the next level, its probe move, an undo and a refused undo.
         case integration
     }
 
@@ -442,6 +452,12 @@ extension BinaryGardensExperienceCore {
             refusedEntry("level.next", [1], wrongCountCode),
             refusedEntry("clock.show", [], wrongCountCode),
             refusedEntry("clock.show", [1, 1], wrongCountCode),
+            refusedEntry("level.select", [], wrongCountCode),
+            refusedEntry("level.select", [1, 1], wrongCountCode),
+            refusedEntry("mode.daily", [2026, 1], wrongCountCode),
+            refusedEntry("mode.practice", [1], wrongCountCode),
+            refusedEntry("mode.campaign", [1], wrongCountCode),
+            refusedEntry("tutorial.dismiss", [1], wrongCountCode),
         ]
     }
 
@@ -486,8 +502,22 @@ extension BinaryGardensExperienceCore {
     /// The seed that opens level `number`: `number − 1` (``levelNumber(forSeed:)`` gives `seed % 100 + 1`).
     public static func seed(forLevel number: Int) -> UInt64 { UInt64(max(number - 1, 0)) }
 
-    /// The level after `number` as `level.next` opens it (100 wraps to 1).
-    public static func nextLevel(after number: Int) -> Int { number % levelNumbers.upperBound + 1 }
+    /// The level an integration row on level `number` reaches after its campaign win: `number + 1` with `level.next`
+    /// (the level the win opened); for level 100, whose `level.next` is refused `r02-g21.locked` (no wrap, feature
+    /// 505), level 1 chosen with `level.select [1]`.
+    public static func nextLevel(after number: Int) -> Int {
+        number < levelNumbers.upperBound ? number + 1 : levelNumbers.lowerBound
+    }
+
+    /// The code of the adapter's locked refusal (no next open level, a level not yet open; never a payment gate).
+    static let lockedCode = "action.rule." + BinaryGardensExperienceRule.locked
+
+    /// The entries that move an integration row on level `number` from its won play to ``nextLevel(after:)``:
+    /// `level.next`; for level 100 a `level.next` refused ``lockedCode`` and then `level.select [1]` (feature 505).
+    static func integrationMoveEntries(_ number: Int) -> [ScenarioStep] {
+        guard number == levelNumbers.upperBound else { return [acceptedEntry("level.next")] }
+        return [refusedEntry("level.next", [], lockedCode, steps: 1), acceptedEntry("level.select", [1])]
+    }
 
     /// The perturbed last action of manifest number `number`: after the certified plan without its last action, the
     /// first legal move there other than it after which the run fails; nil when there is none.
@@ -666,8 +696,9 @@ extension BinaryGardensExperienceCore {
                     acceptedEntry("play.undo")] + winning
         case .integration:
             guard let next = probeMove(nextLevel(after: number)) else { return [] }
-            return [acceptedEntry("level.next"), actionEntry(next), acceptedEntry("play.undo"),
-                    refusedEntry("play.undo", [], kernelActionCode, steps: 1)]
+            return winning + integrationMoveEntries(number)
+                + [actionEntry(next), acceptedEntry("play.undo"),
+                   refusedEntry("play.undo", [], kernelActionCode, steps: 1)]
         }
     }
 

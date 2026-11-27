@@ -64,7 +64,7 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G2105-004 Edit `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensExperienceCore.swift`
+- [X] T-R02G2105-004 Edit `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensExperienceCore.swift` — Verified 2026-11-27: host-4 exit 0 (swift test --filter BinaryGardens: 245 tests in 23 suites; ProgressionCore 13 tests; manifest regenerated; Q6 assertions updated in place)
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g21.locked`, `r02-g21.date`, non-whole values `r02-g21.not-whole`; practice budget 24
   on a copy of the level, no stars, no unlocks; the daily level is playable even while still locked in the campaign,

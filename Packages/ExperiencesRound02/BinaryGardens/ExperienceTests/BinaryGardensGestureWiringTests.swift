@@ -30,7 +30,8 @@
 //      (FR-R02G2104-011);
 //   j. a tap on a star selects it in the panel and explains the drag; a tap on a ring explains the ring drag; nothing
 //      is sent (FR-R02G2104-001, 011);
-//   k. `level.next` and a reset clear the preview, the inspection and the orbit (FR-R02G2104-016);
+//   k. a new level (since feature 505 the daily level of another level, as `level.next` needs the next level open)
+//      and a reset clear the preview, the inspection and the orbit (FR-R02G2104-016);
 //   l. the gesture actions are the five declared controls of the canvas and the native actions every declared control
 //      (FR-R02G2104-013).
 // Explicit synthetic timestamps (no clock, no sleep, no wall-clock assertion). Explicit types and plain loops (CI
@@ -528,6 +529,19 @@ enum BinaryGardensGestureScript {
             if applied(core, made).result == .accepted {
                 return LevelTarget(number: number, setUp: [], star: 0)
             }
+        }
+        return nil
+    }
+
+    /// A date whose daily level differs from `number` (feature 505): 2026-01-02 (level 14), else 2026-01-03 (level 27);
+    /// the date's values and that level.
+    static func otherDaily(_ number: Int) -> (date: [Double], level: Int)? {
+        let days: [Int] = [2, 3]
+        for day in days {
+            guard let level = BinaryGardensProgress.dailyLevel(year: 2026, month: 1, day: day), level != number else {
+                continue
+            }
+            return ([2026, 1, Double(day)], level)
         }
         return nil
     }
@@ -1051,7 +1065,8 @@ enum BinaryGardensGestureScript {
         #expect(shell.presenter.refusalLog.isEmpty)
     }
 
-    /// k. `level.next` and a reset clear the preview, the inspection and the orbit.
+    /// k. A new level and a reset clear the preview, the inspection and the orbit. Since feature 505 `level.next`
+    /// needs the next level open (no wrap), so the new level is the daily level of a date naming another level.
     @Test func aNewPlayClearsThePresentation() async throws {
         let target = try #require(try Script.worldTarget(), "a world that picks")
         let world: Int = target.star
@@ -1073,9 +1088,10 @@ enum BinaryGardensGestureScript {
         #expect(shell.presenter.mirror.inspectedWorld == world)
         #expect(shell.presenter.orbit != .authored)
 
-        let result: ActionResult = shell.presenter.send("level.next", [], port: shell.port)
+        let daily = try #require(Script.otherDaily(target.number))
+        let result: ActionResult = shell.presenter.send("mode.daily", daily.date, port: shell.port)
         #expect(result == .accepted, "\(result.code)")
-        #expect(try T.core(shell).levelNumber == target.number % 100 + 1)
+        #expect(try T.core(shell).levelNumber == daily.level)
         #expect(shell.presenter.mirror.inspectedWorld == nil, "the next level clears the inspection")
         #expect(shell.presenter.mirror.preview == nil)
         #expect(shell.presenter.orbit == .authored, "the next level returns the camera to the authored view")
@@ -1104,7 +1120,8 @@ enum BinaryGardensGestureScript {
         defer { session.close() }
         let shell = try await Script.open(session, number: target.number, setUp: target.setUp)
         let saved: ExperienceSnapshot = try shell.snapshot()
-        let result: ActionResult = shell.presenter.send("level.next", [], port: shell.port)
+        let daily = try #require(Script.otherDaily(target.number))
+        let result: ActionResult = shell.presenter.send("mode.daily", daily.date, port: shell.port)
         #expect(result == .accepted, "\(result.code)")
         try T.draw(session)
         let snapshot: Snapshot = try Script.drawn(shell)

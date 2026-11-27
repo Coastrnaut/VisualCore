@@ -24,11 +24,12 @@ import VisualCoreExperienceHost
         #expect(BinaryGardensExperienceCore.experienceID == "r02-g21.binary-gardens")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 1, three tiers, the five-colour palette.
+    /// The registration's content facts: 100 certified levels, schema 2 (since feature 505), three tiers, the
+    /// five-colour palette.
     @Test func theRegistrationFactsHold() {
         #expect(BinaryGardensExperienceCore.levelNumbers == 1...100)
         #expect(BinaryGardensExperienceCore.certifiedCandidates.count == 100)
-        #expect(BinaryGardensExperienceCore.schemaVersion == 1)
+        #expect(BinaryGardensExperienceCore.schemaVersion == 2)
         var names: [String] = []
         for level in BinaryGardensExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -42,7 +43,8 @@ import VisualCoreExperienceHost
         for control in BinaryGardensExperienceCore.controls { ids.append(control.id) }
         #expect(ids == BinaryGardensExperienceCore.actionIDs)
         #expect(ids == ["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "light.run", "play.undo",
-                        "play.redo", "level.next", "clock.show"])
+                        "play.redo", "level.next", "clock.show", "level.select", "mode.daily", "mode.practice",
+                        "mode.campaign", "tutorial.dismiss"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers` and equal the names of its

@@ -10,14 +10,16 @@
 // locked control, an unchanged value and nothing to undo or redo, `r02-g21.budget` and `r02-g21.stage`; `stale` cannot
 // arise because every action names the current fingerprint); undo restores the earlier digest exactly and redo the
 // later one; `clock.show` changes the snapshot but never the digest, the play or the payload, and an arrangement
-// action, the run, undo and redo keep it, while `level.next`, reset and restore return it to 48; the certified plan of
-// level 1 wins through the adapter and a run from the opening fails, undo returning the failed play to playing;
-// `level.next` wraps 100 to 1 and reset returns; the snapshot round trip and refused payloads (damaged, level out of
+// action, the run, undo and redo keep it, while a new opening (a mode or a level), reset and restore return it to 48;
+// the certified plan of level 1 wins through the adapter and a run from the opening fails, undo returning the failed
+// play to playing; `level.next` needs an open level (no wrap) and reset returns; the snapshot round trip and refused payloads (damaged, level out of
 // range, a trace of another level, a record of a newer schema, an edited trace, an envelope of a newer schema); the
 // certified-candidate table equals the 100 stored witnesses' `skipped` and the directly certified levels equal the
 // stored witness levels; `snapshot(time:)` copies the play. Levels are certified once per process, so the run stays
 // short. Explicit types, plain loops, single-literal comments. Modelled on MushroomWeatherExperienceCoreTests
-// (feature 493).
+// (feature 493). Feature 505 (R02-G21-05) T-R02G2105-004 (clarification Q6): schema 2 and digest v2, fourteen
+// controls, `level.next` to the next open level (no wrap; `r02-g21.locked` when none); the progression itself is tested
+// in `BinaryGardensProgressionCoreTests`.
 @testable import BinaryGardensCore
 import Foundation
 import Testing
@@ -76,15 +78,16 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
 
     @Test func conformance() async throws {
         let id: ExperienceID = try #require(ExperienceID(rawValue: Core.experienceID))
-        // Levels 1 and 3 (then 2 and 4). Level 1's certified plan is star 2's luminosity to index 0; level 3's the
-        // tilt to 2. The run from the opening fails and is undone.
+        // Levels 1 and 3. Level 1's certified plan is star 2's luminosity to index 0; level 3's the tilt to 2. The run
+        // from the opening fails and is undone; practice reopens the level with the budget raised to 24 (feature 505:
+        // `level.next` needs the next level open), where star 2 moves to ring 1 and is undone.
         let actions: [ScriptedAction] = [ScriptedAction("star.luminosity", [1, 0]), ScriptedAction("play.undo"),
                                          ScriptedAction("play.redo"), ScriptedAction("clock.show", [24]),
                                          ScriptedAction("play.undo"), ScriptedAction("light.run"),
                                          ScriptedAction("play.undo"), ScriptedAction("star.ring", [1, 1]),
                                          ScriptedAction("orbit.tilt", [2]), ScriptedAction("star.phase", [1, 8]),
-                                         ScriptedAction("level.next"), ScriptedAction("clock.show", [12]),
-                                         ScriptedAction("star.ring", [0, 0]), ScriptedAction("play.undo")]
+                                         ScriptedAction("mode.practice"), ScriptedAction("clock.show", [12]),
+                                         ScriptedAction("star.ring", [1, 1]), ScriptedAction("play.undo")]
         // Refused on the openings of levels 1 and 3 (three rings, two luminosity levels, phase step 8, star 1 locked,
         // T_max 0 and 2).
         let rejected: [ScriptedAction] = [ScriptedAction("star.ring", [2, 0]), ScriptedAction("star.ring", [-1, 0]),
@@ -115,24 +118,27 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
     }
 
     @Test func theControlsTheTiersAndTheProfile() {
-        #expect(Core.experienceID == "r02-g21.binary-gardens" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g21.binary-gardens.v1")
+        #expect(Core.experienceID == "r02-g21.binary-gardens" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g21.binary-gardens.v2")
         #expect(Core.controls.map(\.id) == Core.actionIDs)
         let ids: [String] = ["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "light.run", "play.undo",
-                             "play.redo", "level.next", "clock.show"]
+                             "play.redo", "level.next", "clock.show", "level.select", "mode.daily", "mode.practice",
+                             "mode.campaign", "tutorial.dismiss"]
         #expect(Core.actionIDs == ids)
         #expect(Core.controls[0].ranges == [0...1, 0...7])
         #expect(Core.controls[1].ranges == [0...1, 0...47])
         #expect(Core.controls[2].ranges == [0...1, 0...3])
         #expect(Core.controls[3].ranges == [0...6])
         #expect(Core.controls[8].ranges == [0...60])
-        let plainIndices: [Int] = [4, 5, 6, 7]
+        #expect(Core.controls[9].ranges == [1...100])
+        #expect(Core.controls[10].ranges == [1...9999, 1...12, 1...31])
+        let plainIndices: [Int] = [4, 5, 6, 7, 11, 12, 13]
         for index in plainIndices { #expect(Core.controls[index].ranges.isEmpty) }
         #expect(Core.starRange == 0...1 && Core.ringRange == 0...7 && Core.phaseRange == 0...47)
         #expect(Core.luminosityRange == 0...3 && Core.tiltRange == 0...6 && Core.tickRange == 0...60)
         #expect(Core.shownTicks == 1...48 && Core.openingTick == 48)
         #expect(Core.qualityTiers == 3 && Core.qualityTiers == BinaryGardensTier.all.count)
-        #expect(Core.migrations.currentVersion == 1)
+        #expect(Core.migrations.currentVersion == 2)
         let profile: QualityProfile = Core.qualityProfile
         #expect(profile.names == ["level-0", "level-1", "level-2"])
         #expect(profile.names == BinaryGardensTier.all.map(\.name))
@@ -355,8 +361,11 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(probe.apply(Self.act("play.undo")) == .accepted && probe.play.actionsLeft == 7)
         #expect(probe.apply(Self.act("play.redo")) == .accepted && probe.play.actionsLeft == 6)
         #expect(probe.shownTick == 12)
-        #expect(probe.apply(Self.act("level.next")) == .accepted && probe.levelNumber == 2)
-        #expect(probe.play.stage == .playing && probe.play.actionsLeft == probe.play.level.budget)
+        // Feature 505: `level.next` needs the next level open; level 2 is not open until level 1 is won.
+        #expect(probe.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g21.locked")))
+        #expect(probe.shownTick == 12 && probe.levelNumber == 1)
+        #expect(probe.apply(Self.act("mode.practice")) == .accepted && probe.levelNumber == 1)
+        #expect(probe.play.stage == .playing && probe.play.actionsLeft == Core.practiceBudget)
         #expect(probe.shownTick == 48)
     }
 
@@ -439,7 +448,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(core.apply(Self.act("clock.show", [.nan])) == .rejected(.nonFinite(index: 0)))
         #expect(core.snapshot(time: 1).shownTick == shown && core.shownTick == shown)
         #expect(try Self.digest(core) == before)
-        // Reset, restore and level.next return to tick 48.
+        // Reset, restore and a new opening (here practice; since feature 505 `level.next` needs the next level open)
+        // return to tick 48.
         var reset: Core = core
         reset.reset()
         let opened: Core = try Core.opening(number: 1)
@@ -447,7 +457,7 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let restored: Core = try Core.restore(payload: try core.snapshotPayload(), seed: 0)
         #expect(restored == core && restored.shownTick == 48)
         var next: Core = core
-        #expect(next.apply(Self.act("level.next")) == .accepted)
+        #expect(next.apply(Self.act("mode.practice")) == .accepted)
         #expect(next.shownTick == 48)
         // Undo and the run keep the shown tick: the report always covers ticks 1 … 48.
         var undone: Core = core
@@ -457,19 +467,34 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(ran.apply(Self.act("light.run")) == .accepted && ran.shownTick == shown)
     }
 
-    @Test func levelNextWrapsAndResetReturns() async throws {
+    /// The fields of a schema-2 payload after its level number: campaign mode, level 1 open, no records (feature 505).
+    static let restOfPayload: String = ",\"mode\":{\"mode\":\"campaign\"},"
+        + "\"progress\":{\"frontier\":1,\"solved\":[]},\"records\":[]}"
+
+    @Test func levelNextNeedsAnOpenLevelAndResetReturns() async throws {
         var core: Core = try await Core.prepare(seed: 99)
         #expect(core.levelNumber == 100)
-        let first: BinaryGardensAction = try #require(try Core.generated(number: 100).plan.actions.first)
+        let hundred: BinaryGardensGenerated = try Core.generated(number: 100)
+        let first: BinaryGardensAction = try #require(hundred.plan.actions.first)
         #expect(core.apply(Self.act(first)) == .accepted)
         #expect(core.apply(Self.act("clock.show", [1])) == .accepted)
-        #expect(core.apply(Self.act("level.next")) == .accepted)
+        // Feature 505: no wrap; after winning level 100, `level.next` is still refused and level 1 is chosen with
+        // `level.select`.
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g21.locked")))
+        #expect(core.shownTick == 1)
+        #expect(core.apply(Self.act("play.undo")) == .accepted)
+        for step in hundred.plan.actions { #expect(core.apply(Self.act(step)) == .accepted) }
+        #expect(core.apply(Self.act("light.run")) == .accepted)
+        #expect(core.play.stage == .won && core.progress.solved[100] != nil && core.progress.frontier == 100)
+        #expect(core.apply(Self.act("level.next")) == .rejected(.rule(code: "r02-g21.locked")))
+        #expect(core.apply(Self.act("level.select", [1])) == .accepted)
         #expect(core.levelNumber == 1 && core.play.stage == .playing && !core.play.canUndo)
         #expect(core.play.level == (try Core.level(number: 1)))
         #expect(core.shownTick == 48)
         core.setQualityTier(2)
         core.reset()
         #expect(core.levelNumber == 100 && !core.play.canUndo && core.qualityTier == 2)
+        #expect(core.progress.solved.isEmpty && core.mode == .campaign)
         let fresh: Core = try await Core.prepare(seed: 99)
         #expect(core == fresh)
         #expect(try Self.digest(core) == Self.digest(fresh))
@@ -488,7 +513,8 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         let savedDigest: StateDigest = try Self.digest(core)
         let payload: Data = try core.snapshotPayload()
         let text: String = String(decoding: payload, as: UTF8.self)
-        #expect(text.hasPrefix("{\"level\":21,\"records\":["))
+        let prefix: String = "{\"level\":21,\"mode\":{\"mode\":\"campaign\"},\"progress\":{\"frontier\":21,"
+        #expect(text.hasPrefix(prefix))
         let restored: Core = try Core.restore(payload: payload, seed: 20)
         let restoredDigest: StateDigest = try Self.digest(restored)
         #expect(restored == core && restoredDigest == savedDigest)
@@ -520,10 +546,10 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
             try Core.restore(payload: Data("{\"level\":\"21\",\"records\":[]}".utf8), seed: 20)
         }
         #expect(throws: BinaryGardensRestoreRefusal.levelNumber(0)) {
-            try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":0" + Self.restOfPayload).utf8), seed: 20)
         }
         #expect(throws: BinaryGardensRestoreRefusal.levelNumber(101)) {
-            try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 20)
+            try Core.restore(payload: Data(("{\"level\":101" + Self.restOfPayload).utf8), seed: 20)
         }
         // A trace of level 21 restored as level 22 (another seed).
         let wrongLevel: Data = Data(text.replacingOccurrences(of: "{\"level\":21,", with: "{\"level\":22,").utf8)
@@ -554,14 +580,14 @@ private let coreWitnessesPresent: Bool = FileManager.default.fileExists(
         #expect(engine.handle(control: "star.luminosity", values: [1, 0]) == .accepted)
         let before: StateDigest = try engine.digest()
         let saved: ExperienceSnapshot = try engine.snapshot()
-        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 2, seed: saved.seed,
+        let newer = try ExperienceSnapshot(experience: id, schemaVersion: 3, seed: saved.seed,
                                            stepIndex: saved.stepIndex, digest: saved.digest,
                                            payload: Data(saved.payload.utf8))
         var refused: Bool = false
         do {
             try engine.restore(newer)
         } catch {
-            refused = error == .snapshot(.newerSchema(found: 2, current: 1))
+            refused = error == .snapshot(.newerSchema(found: 3, current: 2))
         }
         #expect(refused)
         #expect(try engine.digest() == before)
