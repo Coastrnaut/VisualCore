@@ -53,7 +53,7 @@ contract both call it), `BinaryGardensSky.isWellFormed`, `keepsSeparation`, `rep
   dominate (a far world at luminosity 4 receives only a few milliflux, at most 1000 · 32 / 3² ≈ 3,555 for the nearest
   and brightest), raise the trim k; (4) when a band is slow, lower its world count. Never the
   plan lengths p, the phase steps or the budgets. Each changed value is written back into spec
-  clarification Q1, data-model.md and this entry in the same commit. Measured values: recorded here by T-R02G2102-004.
+  clarification Q1, data-model.md and this entry in the same commit. Measured values: recorded here by T-R02G2102-003.
 - **R5 Reducible pre-filter.** Decision: skip a candidate when the winning arrangement with any one changed control put
   back to its starting value still wins. Rationale: such a candidate would fail the plan-length check after a full
   search; at most p ≤ 4 reports decide it. It is also the novelty invariant's core (every changed control matters).
