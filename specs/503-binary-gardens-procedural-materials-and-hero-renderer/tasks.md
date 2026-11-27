@@ -175,7 +175,7 @@ pass.
 - [X] T-R02G2103-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full, app-unit exit=0 (.autonomy/migration/checks/R02-G21-03.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   `--name host-full`, `--name app-unit` (`python3 scripts/release_check.py --only app-build-for-testing-ios27
   app-unit-ios27`: the candidate opens; the synthetic candidate is `r02-g22.mycelium-architect`)
-- [ ] T-R02G2103-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2103-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G21-03.reference-1.json)
 - [ ] T-R02G2103-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2103-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2103-012 {device} After ImplementationLock-100: frame time per tier on D1/D2/D3 (SC-R02G2103-006)
