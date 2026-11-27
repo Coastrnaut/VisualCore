@@ -66,7 +66,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
   `-3f`; `--name script-tests` (alone)
 - [X] T-R02G2109-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0; app-unit recorded at T-005
   host-full` (app-unit and app-ui are this gate's own runs)
-- [ ] T-R02G2109-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2109-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0
 - [ ] T-R02G2109-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2109-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G2109-006; feature 510
   prepares them)
