@@ -86,3 +86,27 @@ presentation of later features.
   (by the phase step), luminosity and the tilt, steps the shown tick and runs, undoes, redoes and moves on. The
   candidate is registered in the one app (not available until X-R02-G21) with its scenario manifest.
 
+## Gameplay spatial interaction (feature 504, R02-G21-04)
+
+- **Picking.** `BinaryGardensPicker` projects the drawn snapshot (the preview applied) through the drawn camera
+  (`BinaryGardensSceneGeometry.camera(aspect:orbit:)`, the view orbit included) and tries the parts drawn last first:
+  the actions bars (empty space), a gauge row's plate, the bodies front to back from the drawn eye (a star's luminosity
+  pip row within 12 points, then its disc grown by 12 points; a world's disc grown by 12 points), a star ring within 12
+  points of its projected 48-gon (later rings first), the tilt dial within 12 points (only when T_max > 0), the system
+  disc, else empty space.
+- **Gestures.** `BinaryGardensGestureController` turns touches into actions. A star drag of 16 points or more is a
+  phase drag when its travel along the projected orbit tangent exceeds its travel across it, else a ring drag (the
+  star's freedoms override); a pip or dial tap takes the nearest pip, a pip or dial drag counts 32 points per step.
+  While dragging, the target is previewed (`BinaryGardensPreview`: the kernel's own report for the changed arrangement,
+  or its refusal), the dragged star drawn as a ghost (material 38) and the changed gauge cells as ghost cells (39);
+  lifting sends exactly one `star.ring`, `star.phase`, `star.luminosity` or `orbit.tilt` when the target is a change.
+  A world tap inspects it (marks 40 and 41 and its words at the shown tick); a second tap clears it. Scrubbing a gauge
+  row shows ticks (`clock.show`, presentation only). Two fingers orbit the view within yaw ±60° and pitch −20° … +35°;
+  a double tap on empty space or "Reset view" returns to the authored view. A finished play explains itself in words;
+  the preview, the inspection and the orbit never enter the digest, and an opening, `level.next`, a reset or a restore
+  clears them.
+- **Panel parity.** The panel keeps every row and gains a Ring picker, a Luminosity picker, a phase target stepper by
+  the phase step with "Set phase", a Tilt picker (when T_max > 0), "Inspect" with the inspected world's words and "Reset
+  view"; each choice sends one action through the presenter, which shows refusals in words and keeps their bare codes in
+  `refusalLog` (at most 64). A host test wins all 100 certified levels through the panel, one panel action per witness
+  action.

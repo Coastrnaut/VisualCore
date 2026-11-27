@@ -1060,5 +1060,9 @@ the minimal breadth-first solver (`BinaryGardensSolver`, work bound 5 000) and t
 (R02-G21-03) adds the hero renderer and the experience: `BinaryGardensSceneSnapshot`, `BinaryGardensSceneGeometry`
 (orbits through the kernel's table, cube-sphere worlds, star discs, gauges, the CPU reference), `BinaryGardensShaders`,
 the adapter `BinaryGardensExperienceCore`, the scenario manifest and the iOS target `BinaryGardensExperience`
-(presenter, scene, controls), registered as a candidate.
+(presenter, scene, controls), registered as a candidate. Feature 504 (R02-G21-04) adds gameplay spatial
+interaction: `BinaryGardensViewOrbit`, `BinaryGardensPicker` (gauge rows, stars, luminosity pips, worlds, rings, the
+tilt dial and the system disc picked through the drawn camera), `BinaryGardensGestureController` (drag a star across
+its rings or along its orbit with a previewed report, tap or drag pips and the tilt dial, inspect worlds, scrub ticks,
+orbit and reset the view) and the panel's direct ring, luminosity, phase and tilt choices.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).

@@ -153,7 +153,7 @@ modelled on feature 484).
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G2104-006 Docs: `docs/architecture/binary-gardens.md` (gestures, the preview, the ghost star and bands, the
+- [X] T-R02G2104-006 Docs: `docs/architecture/binary-gardens.md` (gestures, the preview, the ghost star and bands, the — Verified 2026-11-27: round02-host-1, -2, -3c, -3e, -3f exit 0; docs: architecture gestures section, package README, automatedtesting
   inspection marks and the orbit), `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name
   round02-host-1`, `-2`, `-3c`, `-3e`, `-3f` (the baseline commands of quickstart step 1)
 - [ ] T-R02G2104-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
