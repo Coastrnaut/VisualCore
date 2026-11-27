@@ -55,7 +55,7 @@ campaign covers the game). Agents model their files on Microscopic Aurora's (fea
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G2005-004 Edit `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherExperienceCore.swift`
+- [X] T-R02G2005-004 Edit `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherExperienceCore.swift` — Verified 2026-11-27: 2026-11-27 host-4 exit 0: 213 tests in 23 suites incl. 11 progression-core tests (14 controls, refusals, a locked daily level played without opening it, practice budget 24, schema-2 round trip, migration 1 → 2, newer schema refused) and the updated adapter, scenario (manifest regenerated) and panel-win suites (.autonomy/migration/checks/R02-G20-05.host-4.json)
   (controls `level.select [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`,
   `tutorial.dismiss`; codes `r02-g20.locked`, `r02-g20.date`; practice budget 24 on a copy of the level, no stars, no
   unlocks; the daily level is playable even while still locked in the campaign, and a daily win records the level's best

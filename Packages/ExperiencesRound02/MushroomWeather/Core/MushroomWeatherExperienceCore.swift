@@ -35,7 +35,8 @@
 //                                 `failed` with its failure;
 //   play.undo, play.redo          the kernel's exact undo and redo (`r02-g20.action` when there is nothing to undo or
 //                                 redo; undo works in a failed play and returns it to playing; a won play is final);
-//   level.next                    the next certified level (100 wraps to 1) with a fresh play;
+//   level.next                    the next certified level with a fresh play (since feature 495 the next open level;
+//                                 see below);
 //   clock.show [0…200]            shows the humidity at a cycle (presentation only; accepted in every stage); a cycle
 //                                 outside 0 … cycles run of the current report is refused `r02-g20.cycle` without
 //                                 touching the kernel.
@@ -47,7 +48,7 @@
 // (`MushroomWeatherError`) becomes `.rule(code: error.reasonCode)`. A refused action changes nothing, the shown cycle
 // included.
 //
-// Digest ("r02-g20.mushroom-weather.v1"): the level number and the play's fingerprint (not its record history, so undo
+// Digest ("r02-g20.mushroom-weather.v1" until feature 495): the level number and the play's fingerprint (not its record history, so undo
 // restores the earlier digest exactly); never the shown cycle, the quality tier or a time. Snapshot schema 1: the JSON
 // object `{"level", "records"}` with sorted keys; restoring replays the records on a fresh play of that level
 // (`MushroomWeatherPlay.replay`), resets the shown cycle and throws `MushroomWeatherRestoreRefusal` for a damaged
@@ -60,23 +61,56 @@
 // 12 droplets per pod, fronds, 8 motes, 2 glow shells; level-1 = 10 segments, 6 droplets, fronds, 4 motes, 1 glow
 // shell; level-2 = flat caps and pods, no droplets, fronds, motes or glow. Outcome: `won` or `failed` while the play is
 // in that stage, else nil. Rules use integers only.
+//
+// Feature 495 (R02-G20-05) T-R02G2005-004 (FR-R02G2005-001, 004 … 007; clarifications Q2–Q5): the core also holds the
+// player's progress (`MushroomWeatherProgress`: won levels with the least actions spent and stars, the open frontier),
+// the mode (campaign, practice with the budget raised to the kernel's maximum 24, daily) and the tutorial step
+// (`MushroomWeatherTutorialStep`). No level is ever gated by payment: a locked level is one not yet unlocked
+// (FR-R02G2005-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g20.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level, fresh (`r02-g20.date` for an impossible date); a daily level
+//                                  still locked in the campaign is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 24 (a copy of the level);
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening.
+// Choosing a level or a mode drops the left level's records (the play starts fresh with cycle 0 shown). `level.next`
+// moves to the next open level in campaign mode and is refused with `r02-g20.locked` when there is none (100 does not
+// wrap). A win (the play reaching `won` on an accepted `weather.run` or redo) records
+// `progress.record(level:actionsSpent:certified:mode:)` with the actions spent (`MushroomWeatherProgress.actionsSpent`:
+// every accepted pod, vent and moonlight record, undone ones included) against the certified plan's action count
+// (`certifiedActionCount`): campaign opens the next level, daily records the level's best result and stars and opens
+// nothing, practice records nothing. The certified plan (`certifiedPlan`) feeds the hints and the stars. The tutorial
+// starts at `MushroomWeatherTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and is advanced
+// after every accepted placement, removal, vent, moonlight, run, undo and redo by
+// `advanced(afterAction:placement:ended:)` (afterAction for a placement, a removal, a vent or the moonlight, placement
+// for a placement; ended when the play is won or failed — an undo never ends it, a redo only when it restores a won or
+// failed moment), never back; `clock.show` never moves it. The shown cycle stays presentation. Digest
+// "r02-g20.mushroom-weather.v2": level, play fingerprint, progress and mode (never the tutorial step or the shown
+// cycle). Snapshot schema 2: `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys; schema-1 payloads
+// migrate (no won levels, level 1 open plus the levels up to the restored level, campaign mode, the tutorial at its
+// first step — `place` on the tutorial levels, else `done`); an envelope of a newer schema is refused.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCorePersistence
 
-/// The rule codes of Mushroom Weather's adapter refusals (feature 493).
+/// The rule codes of Mushroom Weather's adapter refusals (feature 493; `locked` and `date` since feature 495).
 public enum MushroomWeatherExperienceRule {
     /// A value that must be a whole number (a slot, a cell, a vent, a state, a level or a cycle) and is not.
     public static let notWhole = "r02-g20.not-whole"
     /// A shown cycle outside 0 … cycles run of the current report (`clock.show`).
     public static let cycle = "r02-g20.cycle"
+    /// A level that is not open yet, or no next open level (feature 495). Never a payment gate.
+    public static let locked = "r02-g20.locked"
+    /// An impossible calendar date (`mode.daily`, feature 495).
+    public static let date = "r02-g20.date"
 }
 
 /// Why a saved Mushroom Weather state was refused on restore (feature 493). A refused restore changes nothing.
 public enum MushroomWeatherRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress, the mode or the
+    /// tutorial step is invalid (feature 495).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -84,17 +118,20 @@ public enum MushroomWeatherRestoreRefusal: Error, Equatable, Sendable {
     case kernel(MushroomWeatherError)
 }
 
-/// The state of Mushroom Weather as an experience (see the file header). Snapshot schema 1.
+/// The state of Mushroom Weather as an experience (see the file header). Snapshot schema 2.
 public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g20.mushroom-weather"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g20.mushroom-weather.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g20.mushroom-weather.v2"
     /// The action ids in declaration order.
     public static let actionIDs = ["pod.place", "pod.remove", "vent.set", "moon.set", "weather.run", "play.undo",
-                                   "play.redo", "level.next", "clock.show"]
+                                   "play.redo", "level.next", "clock.show", "level.select", "mode.daily",
+                                   "mode.practice", "mode.campaign", "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`MushroomWeatherMode.practiceBudget`, 24).
+    public static let practiceBudget: Int = MushroomWeatherMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a pod slot: 0 … `MushroomWeatherPodRules.slotCounts` upper bound − 1 (0 … 5).
@@ -119,27 +156,62 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: MushroomWeatherPlay
+    /// The player's progress (feature 495): in the digest and the snapshot.
+    public private(set) var progress: MushroomWeatherProgress
+    /// The mode (feature 495): in the digest and the snapshot.
+    public private(set) var mode: MushroomWeatherMode
+    /// The tutorial step (feature 495): in the snapshot and `==`, not in the digest.
+    public private(set) var tutorial: MushroomWeatherTutorialStep
+    /// The certified plan of the current level (its minimal witness without the run), which the hints follow and the
+    /// stars count against. Derived from the level number.
+    public private(set) var certifiedPlan: MushroomWeatherPlan
     /// The shown cycle, 0 … cycles run; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var shownCycle: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: MushroomWeatherPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
 
-    /// A state playing `play` of level `levelNumber` with cycle 0 shown, whose reset returns to `openingPlay` of
-    /// `openingNumber`.
-    init(levelNumber: Int, play: MushroomWeatherPlay, openingNumber: Int, openingPlay: MushroomWeatherPlay) {
+    /// What a reset restores (feature 495).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: MushroomWeatherPlay
+        /// The opening progress: level 1 open plus the levels up to the opening level, none won.
+        let progress: MushroomWeatherProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: MushroomWeatherTutorialStep
+        /// The opening level's certified plan.
+        let certifiedPlan: MushroomWeatherPlan
+    }
+
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial` and cycle 0 shown, whose
+    /// reset returns to `opening` of `openingNumber`.
+    init(levelNumber: Int, play: MushroomWeatherPlay, progress: MushroomWeatherProgress, mode: MushroomWeatherMode,
+         tutorial: MushroomWeatherTutorialStep, certifiedPlan: MushroomWeatherPlan, openingNumber: Int,
+         opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedPlan = certifiedPlan
         self.shownCycle = 0
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
     }
+
+    /// The certified plan's action count of the current level (pods, vents and moonlight, the run excluded), against
+    /// which a win's stars are counted (feature 495).
+    public var certifiedActionCount: Int { certifiedPlan.size }
+
+    /// The difficulty band (1 … 5) of the current level: 20 levels per band, the certified difficulty bands
+    /// (`MushroomWeatherProgress.band(of:)`; feature 495).
+    public var band: Int { MushroomWeatherProgress.band(of: levelNumber) }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
     public static func levelNumber(forSeed seed: UInt64) -> Int {
@@ -224,14 +296,45 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         return play
     }
 
-    /// The opening state of manifest number `number`: a play begun and past its tutorial, ready to accept actions,
-    /// with cycle 0 shown.
+    /// The practice copy of `level` (feature 495): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: MushroomWeatherLevel)
+        throws(MushroomWeatherError) -> MushroomWeatherLevel {
+        try MushroomWeatherLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, rows: level.rows,
+                                 columns: level.columns, blocked: level.blocked, humidity: level.humidity,
+                                 diffusion: level.diffusion, rates: level.rates, vents: level.vents,
+                                 podRules: level.podRules, colonies: level.colonies, moldBound: level.moldBound,
+                                 length: level.length, required: level.required, start: level.start,
+                                 budget: MushroomWeatherMode.practice.budget(base: level.budget),
+                                 tutorial: level.tutorial, sites: level.sites)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: MushroomWeatherGenerated, mode: MushroomWeatherMode)
+        throws(MushroomWeatherError) -> MushroomWeatherLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
+    /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
+    /// accept actions, with cycle 0 shown; campaign mode, level 1 open plus the levels up to `number`, none won, the
+    /// tutorial at its first step (feature 495).
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(MushroomWeatherError) -> MushroomWeatherExperienceCore {
-        let play: MushroomWeatherPlay = try freshPlay(of: try level(number: number))
-        return MushroomWeatherExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                             openingPlay: play)
+        let certified: MushroomWeatherGenerated = try generated(number: number)
+        let play: MushroomWeatherPlay = try freshPlay(of: certified.level)
+        var progress: MushroomWeatherProgress = MushroomWeatherProgress()
+        progress.open(through: number)
+        let tutorial: MushroomWeatherTutorialStep = MushroomWeatherTutorialStep.initial(level: number)
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial,
+                                       certifiedPlan: certified.plan)
+        return MushroomWeatherExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                             tutorial: tutorial, certifiedPlan: certified.plan, openingNumber: number,
+                                             opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -273,15 +376,44 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the shown cycle, the quality tier or the opening level).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown cycle, the
+    /// quality tier or the opening level).
     public static func == (lhs: MushroomWeatherExperienceCore, rhs: MushroomWeatherExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, the first version: no migration steps.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
+
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 495): no won levels with level 1 open
+    /// plus the levels up to the restored level, campaign mode, no tutorial key (restore starts the tutorial at its
+    /// first step: `place` on the tutorial levels 1 … 3, else `done`).
+    ///
+    /// - Throws: ``MushroomWeatherRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw MushroomWeatherRestoreRefusal.damaged
+        }
+        var progress: MushroomWeatherProgress = MushroomWeatherProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(MushroomWeatherMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
+    static func payloadEncoder() -> JSONEncoder {
+        let encoder: JSONEncoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        return encoder
+    }
 
     /// The declared controls, built once: the ranges of the file header as `Double` ranges.
     private static let declaredControls: [ExperienceControl] = [
@@ -294,6 +426,11 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
         ExperienceControl(id: "clock.show", ranges: [declared(cycleRange)]),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(MushroomWeatherProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -301,7 +438,8 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The nine controls with their declared ranges (see the file header); run, undo, redo and next take no values.
+    /// The fourteen controls with their declared ranges (see the file header); `weather.run`, `play.undo`,
+    /// `play.redo`, `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with cycle 0 shown; no clock is read.
@@ -349,12 +487,23 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         do throws(MushroomWeatherError) {
             if let kernel = Self.kernelAction(action.control, values) {
                 try play.apply(kernel, expecting: play.fingerprint)
+                if case .run = kernel {
+                    advanceTutorial(afterAction: false, placement: false)
+                    recordIfWon()
+                } else if case .place = kernel {
+                    advanceTutorial(afterAction: true, placement: true)
+                } else {
+                    advanceTutorial(afterAction: true, placement: false)
+                }
             } else {
                 switch action.control {
                 case "play.undo":
                     try play.undo()
+                    advanceTutorial(afterAction: false, placement: false)
                 case "play.redo":
                     try play.redo()
+                    advanceTutorial(afterAction: false, placement: false)
+                    recordIfWon()
                 case "clock.show":
                     // Presentation only: the play and the digest do not change, and the kernel is not consulted.
                     guard values[0] <= play.report.cycles else {
@@ -362,12 +511,33 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
                     }
                     shownCycle = values[0]
                     return .accepted
-                default:   // level.next
-                    let next: Int = levelNumber % Self.levelNumbers.upperBound + 1
-                    let fresh: MushroomWeatherPlay = try Self.freshPlay(of: try Self.level(number: next))
-                    levelNumber = next
-                    play = fresh
-                    shownCycle = 0
+                case "level.next":
+                    guard let next = progress.nextOpen(after: levelNumber) else {
+                        return .rejected(.rule(code: MushroomWeatherExperienceRule.locked))
+                    }
+                    try open(number: next, mode: .campaign)
+                    return .accepted
+                case "level.select":
+                    guard progress.isOpen(values[0]) else {
+                        return .rejected(.rule(code: MushroomWeatherExperienceRule.locked))
+                    }
+                    try open(number: values[0], mode: .campaign)
+                    return .accepted
+                case "mode.daily":
+                    guard let daily = MushroomWeatherProgress.dailyLevel(year: values[0], month: values[1],
+                                                                         day: values[2]) else {
+                        return .rejected(.rule(code: MushroomWeatherExperienceRule.date))
+                    }
+                    try open(number: daily, mode: .daily(level: daily))
+                    return .accepted
+                case "mode.practice":
+                    try open(number: levelNumber, mode: .practice)
+                    return .accepted
+                case "mode.campaign":
+                    try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+                    return .accepted
+                default:   // tutorial.dismiss
+                    tutorial = tutorial.dismissed()
                     return .accepted
                 }
             }
@@ -385,11 +555,50 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the fresh play of the level the seed chose with cycle 0 shown; the quality tier, which is not state, is
-    /// kept.
+    /// Advances the tutorial step after an accepted placement, removal, vent, moonlight, run, undo or redo
+    /// (`MushroomWeatherTutorialStep.advanced(afterAction:placement:ended:)`): `afterAction` for a placement, a removal,
+    /// a vent or the moonlight, `placement` for a placement, ended when the play is won or failed (never after an undo,
+    /// which always lands on a moment before the end; after a redo only when it restores a won or failed moment). Never
+    /// back.
+    private mutating func advanceTutorial(afterAction: Bool, placement: Bool) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterAction: afterAction, placement: placement, ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's first
+    /// tutorial step and cycle 0 shown; the records of the level left are dropped. Changes nothing when the kernel
+    /// refuses.
+    private mutating func open(number: Int, mode: MushroomWeatherMode) throws(MushroomWeatherError) {
+        let certified: MushroomWeatherGenerated = try Self.generated(number: number)
+        let fresh: MushroomWeatherPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedPlan = certified.plan
+        tutorial = MushroomWeatherTutorialStep.initial(level: number)
+        shownCycle = 0
+    }
+
+    /// After an accepted action that won the play: records the actions spent
+    /// (`MushroomWeatherProgress.actionsSpent(_:)`) against the certified plan's action count in the current mode
+    /// (campaign opens the next level; daily records the best result and stars and opens nothing; practice records
+    /// nothing). A won play is final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, actionsSpent: MushroomWeatherProgress.actionsSpent(play),
+                        certified: certifiedActionCount, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (progress included, campaign mode, cycle 0 shown); the quality tier,
+    /// which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedPlan = opening.certifiedPlan
         shownCycle = 0
     }
 
@@ -402,37 +611,48 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g20.mushroom-weather.v1", then the level number and the play's fingerprint (actions spent, failure, level,
-    /// moonlight, pods, stage, vents).
+    /// "r02-g20.mushroom-weather.v2", then the level number, the play's fingerprint (actions spent, failure, level,
+    /// moonlight, pods, stage, vents), the progress and the mode (their sorted JSON); never the tutorial step or the
+    /// shown cycle.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
         // The play's fingerprint and not its record history, so undo restores the earlier digest exactly; never the
-        // shown cycle (presentation).
+        // shown cycle (presentation) or the tutorial step.
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form.
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: MushroomWeatherMode
+        /// The progress.
+        var progress: MushroomWeatherProgress
         /// The play's records.
         var records: [MushroomWeatherRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: MushroomWeatherTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
-        return try encoder.encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload`: the records replayed on a fresh play of the saved level, with cycle 0 shown; a reset
-    /// returns to the level `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), with cycle 0
+    /// shown; a reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``MushroomWeatherRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level or
+    /// - Throws: ``MushroomWeatherRestoreRefusal`` for a damaged payload (invalid progress, an unknown mode or
+    ///   tutorial step, or a daily mode naming another level among them), a level number outside 1 … 100 or a level or
     ///   trace the kernel refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> MushroomWeatherExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
@@ -441,15 +661,21 @@ public struct MushroomWeatherExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw MushroomWeatherRestoreRefusal.levelNumber(decoded.level)
         }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw MushroomWeatherRestoreRefusal.damaged
+        }
         do throws(MushroomWeatherError) {
-            let saved: MushroomWeatherLevel = try level(number: decoded.level)
-            let play: MushroomWeatherPlay = try MushroomWeatherPlay.replay(level: saved, records: decoded.records)
-            let openingNumber: Int = levelNumber(forSeed: seed)
-            let openingPlay: MushroomWeatherPlay = openingNumber == decoded.level
-                ? try freshPlay(of: saved)
-                : try freshPlay(of: try Self.level(number: openingNumber))
-            return MushroomWeatherExperienceCore(levelNumber: decoded.level, play: play,
-                                                 openingNumber: openingNumber, openingPlay: openingPlay)
+            let certified: MushroomWeatherGenerated = try generated(number: decoded.level)
+            let play: MushroomWeatherPlay = try MushroomWeatherPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: MushroomWeatherTutorialStep = decoded.tutorial
+                ?? MushroomWeatherTutorialStep.initial(level: decoded.level)
+            let openingCore: MushroomWeatherExperienceCore = try opening(number: levelNumber(forSeed: seed))
+            return MushroomWeatherExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                 mode: decoded.mode, tutorial: tutorial,
+                                                 certifiedPlan: certified.plan,
+                                                 openingNumber: openingCore.openingNumber,
+                                                 opening: openingCore.opening)
         } catch {
             throw MushroomWeatherRestoreRefusal.kernel(error)
         }
