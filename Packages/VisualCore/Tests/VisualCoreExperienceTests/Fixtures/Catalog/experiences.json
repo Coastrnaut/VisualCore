@@ -1621,7 +1621,7 @@
         "catalog_sha256": "03c1dc197f26f838811878aa6a1b0e5ca8c8a82704c10ba01738dea106bd3329",
         "levels": 100
       },
-      "available": false
+      "available": true
     },
     {
       "id": "r02-g20.mushroom-weather",

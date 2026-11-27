@@ -1,8 +1,8 @@
 // MASupport — feature 489 (R02-G19-09) T-R02G1909-004, modelled on feature 479 (FR-R02G1909-002, 007; SC-R02G1909-001;
 // clarifications Q1, Q2; research R2): helpers of the interface tests of Microscopic Aurora (R02-G19) inside the one
-// app, ported from `AWSupport` (feature 479). The namespace is `MA` (no other UI test uses `MA`). Microscopic Aurora is
-// a candidate; every launch carries `-vcCandidates` (DebugLaunch: the candidates' catalog entries become available and
-// are registered). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens
+// app, ported from `AWSupport` (feature 479). The namespace is `MA` (no other UI test uses `MA`). Microscopic Aurora was
+// a candidate until X-R02-G19 (2026-11-26); every launch still carries `-vcCandidates` (DebugLaunch: the candidates'
+// catalog entries become available and are registered; harmless now that it is integrated). A fresh start erases the data (`-vcResetData`, so no level is solved), skips the welcome and opens
 // the experience directly with `-openExperience r02-g19.microscopic-aurora`; a relaunch (`MA.reopen`) backgrounds the
 // app first (its save point, the lesson of feature 309), terminates it and starts again without the reset, so the
 // stored progress (solved levels, stars, the frontier, the verified winning trace) survives.

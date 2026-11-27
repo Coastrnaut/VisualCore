@@ -357,9 +357,17 @@
       "name": "Apsides Workshop",
       "permissions": [],
       "tier": "free"
+    },
+    {
+      "category": "puzzle",
+      "code": "R02-G19",
+      "id": "r02-g19.microscopic-aurora",
+      "name": "Microscopic Aurora",
+      "permissions": [],
+      "tier": "free"
     }
   ],
-  "ledger_sha256": "965dca622fa09d0d785c0a9b189afb948dbac2093e06da68ecfa265696502df1",
+  "ledger_sha256": "3c78fe31841d70c99a32361634bddeba2fdd4fdb71fa7ee208eb6e635fb5e237",
   "privacy_answers": "unproven",
   "schema": 1
 }
