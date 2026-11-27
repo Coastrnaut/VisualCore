@@ -38,7 +38,7 @@ Packages/ExperiencesRound02 --filter MyceliumArchitect`. New sources go in `Myce
 - [X] T-R02G2202-004 [P] [US1] Create `CoreTests/MyceliumArchitectSolverTests.swift` (agent A: minimal plans; the — Verified 2026-11-27: MyceliumArchitectSolverTests (7, independent enumeration on the two smallest levels per band) installed; host-3 exit=0
   independent enumeration of every shorter action sequence through the puzzle moves, no visited set, on the two levels
   with the smallest move space per band; per-depth counts equal; work counted; plans replay); `--name host-3`
-- [ ] T-R02G2202-005 [P] [US2] Create `CoreTests/MyceliumArchitectGeneratorTests.swift` (agent C: determinism,
+- [X] T-R02G2202-005 [P] [US2] Create `CoreTests/MyceliumArchitectGeneratorTests.swift` (agent C: determinism, — Verified 2026-11-27: MyceliumArchitectGeneratorTests (14) installed; host-4 exit=0
   manifest budgets, band profiles respected, skip reasons, neighbour rule, `generation(n)` on an impossible profile,
   source scan of `Core/Content/` for clock and floating-point tokens); `--name host-4`
 
