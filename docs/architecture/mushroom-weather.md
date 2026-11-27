@@ -63,3 +63,35 @@ accounts for every unit; the catalog's 0.016667 s timestep is a presentation clo
   totals, each colony's final and longest run and first cycle out of band, cycles run), the counterexample and the
   difficulty; decode replays and rebuilds every stored value. The tests rebuild all 100 byte for byte in 20 groups of 5
   and pin the catalog digest. Witness lengths are 2, 3, 3, 4 and 5 by band, under R02-F24's progression rule.
+
+## Hero renderer and experience (feature 493, R02-G20-03)
+
+- **Snapshot.** `MushroomWeatherSceneSnapshot` is all the renderer reads: the floor (rows, columns, blocked cells), the
+  humidity of every cell at each cycle of the predicted run of the current arrangement, the cycles run and the shown
+  cycle, the mold bound, each colony's band, survival floor, final and longest run and whether it is in band at the shown
+  cycle, the pods with their growth cycles, the sites, the vents with their states, the moonlight, and the stage,
+  failure, actions and level.
+- **The forest.** Cell (r, c) sits at ((c − (C − 1)/2) · s, ((R − 1)/2 − r) · s) with s = min(1.8 / C, 1.6 / R), so every
+  level fills the same box. Drawn premultiplied in a fixed element order with depth testing off (the window surface has
+  no depth buffer, as for every round-two game): the still backdrop, the moon with four phase ticks (L + 1 filled), moss
+  floor squares, logs and stones on blocked cells, fronds at the richer tiers, mist squares sized by h/M, site rings,
+  lathed stalks and translucent caps with moisture beads by h/M and band rings, lathed pods (grown pods larger with a
+  second ring), droplets and motes on fixed paths, slatted vent frames, one gauge row per colony and the actions bars;
+  the glow is additive and last. A failure marks the failing element broken on a failed stage (a dried colony's cap
+  wilts with a broken band ring, a moldy cell gets a broken patch, an unstable colony's marker and run bar turn broken);
+  a won level lights every cap without moving anything.
+- **Tiers.** `level-0`: lathes of 16 segments, 12 droplets per pod, fronds, 8 motes, 2 glow shells; `level-1`: 10
+  segments, 6 droplets, fronds, 4 motes, 1 shell; `level-2`: flat caps and pods, no droplets, fronds, motes or glow.
+- **Shaders.** GLSL ES 3.00 forest and glow programs with 29 material codes in the uv stream (code + 0.4 · value, + 32
+  when drawn broken; quads span ±1.25 of their shape so the fringe is transparent); droplets and motes move by the time
+  uniform times the motion uniform (0 under Reduce Motion); Reduce Flashing caps the glow.
+- **Adapter.** `MushroomWeatherExperienceCore` opens certified level (seed mod 100) + 1 from a table of each witness's
+  candidate index, accepts `pod.place`, `pod.remove`, `vent.set`, `moon.set`, `weather.run`, `play.undo`, `play.redo`,
+  `level.next` and `clock.show` (a cycle outside the run is refused with `r02-g20.cycle`); its digest is the level
+  number and the play's fingerprint (never the shown cycle); snapshot schema 1.
+- **Experience.** The presenter draws with the fixed camera, logs tier changes, falls back to the unlit level-2
+  geometry when a program fails, and declares two backdrop probes; the control panel chooses a slot and a site, places
+  and removes pods, toggles each vent, chooses a moonlight level and sets it with one action, steps the shown cycle and
+  runs, undoes, redoes and moves to the next level. The candidate is registered in the one app (not available until
+  X-R02-G20) with its scenario manifest (the standard scenarios, a three-level playthrough, the hero, fixtures and the
+  80 acceptance rows R2-G20-QA-001 … 080).

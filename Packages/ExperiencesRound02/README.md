@@ -1021,5 +1021,9 @@ growth by time-integrated humidity and colony runs), the judge (`dried`, `mold`,
 vent and moonlight actions and the run, records, undo and redo, and `MushroomWeatherPuzzle` (an R02-F23 `PuzzleRules`
 over arrangements). Feature 492 (R02-G20-02) adds pod sites, the 100-level manifest, the seeded generator
 (`MushroomWeatherGenerator`), the minimal solver (`MushroomWeatherSolver`, work bound 1,500) and the witness
-certificates (`MushroomWeatherWitness`, `docs/games/mushroom-weather/levels/`, pinned catalog digest). See
+certificates (`MushroomWeatherWitness`, `docs/games/mushroom-weather/levels/`, pinned catalog digest). Feature 493
+(R02-G20-03) adds the hero renderer and the experience: `MushroomWeatherSceneSnapshot`, `MushroomWeatherSceneGeometry`
+(the forest floor, mist, lathed caps and pods, vents, gauges, the CPU reference), `MushroomWeatherShaders`, the adapter
+`MushroomWeatherExperienceCore`, the scenario manifest and the iOS target `MushroomWeatherExperience` (presenter, scene,
+controls), registered as a candidate. See
 [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).
