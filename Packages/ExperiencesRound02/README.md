@@ -1077,5 +1077,6 @@ Feature 508 (R02-G21-08) adds the regression net: the solver regression over all
 alterations, `BinaryGardensGolden` (17 pinned frame descriptions, test builds only) with simulator frame checks, the
 memory cycles and `scripts/binary_gardens_regression.py`.
 Feature 509 (R02-G21-09) adds the in-app integration: pinned panel identifiers, the `BG` interface tests (chunk `d4`),
-the registered schema-1 and schema-2 examples and the app unit tests.
+the registered schema-1 and schema-2 examples and the app unit tests. Feature 510 (R02-G21-10) adds its device-row definition and written campaign
+plan (`docs/apps/binary-gardens/`), checked by `scripts/check_device_rows.py`; no device is contacted.
 See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).

@@ -39,7 +39,7 @@ is contacted. No {owner} tasks; one {device} task. Prerequisites: R02-G21-05 …
 
 ## Phase 4: Regression, documentation and close
 
-- [ ] T-R02G2110-005 Docs: `docs/architecture/binary-gardens.md` (device preparation),
+- [X] T-R02G2110-005 Docs: `docs/architecture/binary-gardens.md` (device preparation), — Verified 2026-11-27: docs (architecture device preparation, package README, automatedtesting); validate_docs PASS; round02-host-1/2/3c/3e/3f exit=0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
 - [ ] T-R02G2110-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name

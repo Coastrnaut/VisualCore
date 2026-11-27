@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G21-09: Binary Gardens in-app integration).
+Last updated: 2026-11-27 (R02-G21-10: Binary Gardens device rows).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,10 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Binary Gardens device rows** (R02-G21-10, 2026-11-27). `python3 scripts/check_device_rows.py --experience
+  r02-g21.binary-gardens` (release step `device-rows-r02-g21`, tests `BinaryGardensDeviceRowsCheckTests`, 8) checks
+  the definition (rows BG-D1 … BG-D8, 12 device scenarios) against the scenario manifest, the ledger's DEV1/2/3-R02-G21
+  rows and the open {device} tasks of features 501 … 509; nothing contacts a device.
 - **Binary Gardens in-app integration** (R02-G21-09, 2026-11-27). Host: schema examples (8). Simulator: identifier
   tests (87 tests in the suite). App: `BGPlayUITests` (2) and `BGReplayUITests` (1) in the serial chunk `d4`
   (`python3 scripts/release_check.py --only app-build-for-testing-ios27 app-ui-ios27-d4`), four app unit tests. Lessons:
