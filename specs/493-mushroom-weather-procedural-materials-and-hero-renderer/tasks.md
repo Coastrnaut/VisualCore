@@ -65,7 +65,7 @@ R02-G19-03 (`git show <R02-G19-03 record commit>:<path>`).
   levels; the same positions at every tier; mist sizes from the kernel's values only; gauges at 0, band edges and M; a
   won level in place; the glow mesh empty at level-2 and its shell counts per tier; each failure kind marked); agent B;
   `--name host-3`
-- [ ] T-R02G2003-005 [P] [US2] Create
+- [X] T-R02G2003-005 [P] [US2] Create — Verified 2026-11-26: 2026-11-26 host-4 exit 0: 146 tests in 16 suites incl. adapter conformance, undo digests, clock.show refusals (r02-g20.cycle), snapshot round trip, candidate table equal to the witnesses' skipped, 200 seeded purity snapshots (.autonomy/migration/checks/R02-G20-03.host-4.json)
   `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherExperienceCore.swift` (controls "pod.place [slot, row,
   column], pod.remove [slot], vent.set [index, open], moon.set [level], weather.run, play.undo, play.redo, level.next,
   clock.show [cycle]"; `clock.show` refuses a cycle outside 0 … cycles run; digest "level number and play fingerprint"
