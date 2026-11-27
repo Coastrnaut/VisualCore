@@ -183,7 +183,8 @@ refused.
 - **Flux exactly at a lethal bound:** not lethal; lethal needs a strictly lower or higher flux.
 - **Flux exactly at a comfortable bound:** comfortable.
 - **A lethal run exactly as long as the tolerance:** the world survives; failure needs one tick more.
-- **A lethal run straddling the end of the cycle:** counted whole, through the start of the next cycle.
+- **A lethal run straddling the end of the cycle:** counted whole, through the start of the next cycle; the failure
+  names the walk tick (tick 50 is tick 2 of the next cycle).
 - **A comfortable window exactly as long as required, or the whole cycle comfortable:** the window holds (48 ticks at
   most).
 - **An integral exactly at a bloom bound:** inside the band.
@@ -217,9 +218,11 @@ refused.
   MUST be compared with its bloom band.
 - **FR-R02G2101-005**: Running the cycle MUST end the level: failed at the first tick a world's consecutive lethal
   ticks exceed the tolerance (reason: frozen for lethal low, scorched for lethal high), counting a run across the cycle
-  boundary whole, with the world and the tick; otherwise failed when a world's longest cyclic comfortable window is
+  boundary whole, with the world and the walk tick t (1 … 48 + E; a tick t > 48 has the positions and flux of tick
+  t − 48 and is named in words as tick t − 48 of the next cycle); otherwise failed when a world's longest cyclic comfortable window is
   shorter than its required window (reason: unstable) or its integrated flux is below or above its bloom band (reasons:
-  wilted, bleached), naming the lowest-numbered such world and its measure; otherwise won.
+  wilted, bleached), naming the lowest-numbered such world and its measure (worlds are judged one at a time in ascending order; within
+  one world the window is checked before the bloom band, so a world failing both fails unstable); otherwise won.
 - **FR-R02G2101-006**: An action MUST set a star's ring, a star's phase, a star's luminosity or the orbit tilt, and
   spend one action; every action MUST be validated (ranges, adjustable flags, change, separation, stage, budget,
   previous fingerprint) and refused without change when invalid. Running and inspecting spend nothing.
@@ -239,9 +242,12 @@ refused.
   milliflux against each band, ticks, actions left).
 - **FR-R02G2101-014**: The truth metric MUST be computed exactly and reported after every action, as the kernel's
   observability: per world its integrated flux over the cycle and its normalized integrated flux (the mean flux per
-  tick, kept exact as the integral over 48 ticks), its survival (longest lethal run against the tolerance, longest
-  comfortable window against the requirement, its bloom result), every tick's flux with each star's share and its band,
-  the minimum star separation, the first failure and the predicted outcome.
+  tick, kept exact as the integral over 48 ticks), its survival (longest lethal run, read cyclically and at most 48,
+  against the tolerance; longest comfortable window against the requirement: the longest run of consecutive comfortable
+  ticks over ticks 1 … 48 read cyclically, tick 48 followed by tick 1, at most 48, reported with its start tick, the
+  smallest start among equal longest runs and tick 1 when all 48 ticks are comfortable; its bloom result), every tick's flux with each star's share and its band,
+  the minimum squared star separation over ticks 0 … 47 and the earliest tick at which it occurs, the first failure and
+  the predicted outcome.
 
 ### Key Entities
 

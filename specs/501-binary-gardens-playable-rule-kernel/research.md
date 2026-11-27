@@ -53,8 +53,8 @@
 - **R10 Separation as a level and action invariant.** Decision: the stars' squared separation at every tick 0 … 47
   (the same 48 configurations as ticks 1 … 48) must be ≥ σ²·2^40 (σ 0 … 16; 0 always holds); the level's start must
   hold it, and every action is refused `r02-g21.action` when the new arrangement breaks it; exactly σ is allowed.
-  Rationale: "the stars' minimum separation" decided exactly; the report gives the minimum squared separation and its
-  tick.
+  Rationale: "the stars' minimum separation" decided exactly; the report gives the minimum squared separation and the
+  earliest tick at which it occurs.
 - **R11 Run as the commitment.** Decision: arrangement actions cost one action each and keep the level playing; `run`
   costs nothing, is allowed with the budget spent, and ends the level won or failed; the predicted outcome is reported
   after every action; undo from failed returns to playing with the arrangement before the run (recorded); a won level
