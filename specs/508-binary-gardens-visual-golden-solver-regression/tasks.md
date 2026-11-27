@@ -16,7 +16,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G2108-002 [P] [US1] Create
+- [X] T-R02G2108-002 [P] [US1] Create — Verified 2026-11-27: host exit 0 (swift test --filter BinaryGardensRegressionSolverTests: 15 tests, 100 levels in 10 groups and 13 alterations on levels 1, 41, 81)
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensRegressionSolverTests.swift` (agent B: for every
   level in ten groups of 10, "the generated level equals its witness's level (part by part and by fingerprint); the
   witness's actions replay on a fresh play to a win on exactly the final run and not before, within the budget, with
