@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-27
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G22-01 (migration ledger, game feature of experience R02-G22) · ID namespace FR-R02G2201-###,
 SC-R02G2201-###, T-R02G2201-###
@@ -35,6 +35,74 @@ Canonical overrides:
   so R02-G22-02 can certify levels).
 - **Model:** feature 501 (Binary Gardens' rule kernel) and feature 491 (Mushroom Weather's) for structure, stored
   form, records and refusals.
+
+## Clarifications
+
+### Session 2026-11-27
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following
+features 491 and 501 where the games agree (stages, stored form, records, refusal codes, puzzle contract). Facts
+checked in code (read-only, 2026-11-27): Binary Gardens' kernel refuses with `r02-g21.level`, `.action`, `.budget`,
+`.stage`, `.stale`, `.newer-schema` and `.malformed` (and `.generation`, `.witness` from its feature 502), keeps every
+limit as an integer range, fingerprints levels with SHA-256 of a canonical text and implements R02-F23's puzzle
+contract; its action budget is 1 … 24. No `MyceliumArchitect` module exists yet in `Packages/ExperiencesRound02`. The
+archived manifest of R02-G22 has moves budgets 8 … 19.
+
+- Q: What is the lattice, how are directions numbered and what is the nutrient field? → A: a board of W × H cells
+  (W and H 4 … 32), cells named (column, row) from (0, 0) at the top left, row increasing downward. Eight directions
+  numbered clockwise from north: 0 N (0, −1), 1 NE (1, −1), 2 E (1, 0), 3 SE (1, 1), 4 S (0, 1), 5 SW (−1, 1), 6 W
+  (−1, 0), 7 NW (−1, −1). Distance is the Chebyshev distance d = max(|Δcolumn|, |Δrow|). With strength s (1 … 8) and
+  reach R (1 … 16), the nutrient value of a cell is f(c) = Σ over unconsumed nutrients n of s · max(0, R − d(c, n));
+  every value is a whole number below 2³¹. Obstacles are rocks, blockers and the outside of the board. Impact:
+  FR-R02G2201-001, 003; SC-R02G2201-003.
+- Q: How exactly does a tip choose, branch and stop? → A: a tip at cell c with heading h may step in direction k to
+  cell t when t is on the board, not a rock or blocker, not already in the network, and, for a diagonal k, not both
+  orthogonal cells it passes between are obstacles (no corner cutting); a toxic cell is admissible (entering it fails
+  the run). Its score is (f(t) − f(c)) − κ·turn(h, k) − ο·obs(t), with turn(h, k) = min(|k − h|, 8 − |k − h|) in
+  0 … 4, obs(t) the number of obstacles among t's eight neighbours (0 … 8), and penalties κ and ο each 0 … 8. The
+  highest score wins; ties go to the smaller turn, then the lower direction number. A tip with no admissible direction
+  or whose best score is below 0 goes dormant for good. Each pulse moves the growing tips in ascending tip number; a
+  tip sees cells grown earlier in the same pulse; a tip made during a pulse first moves in the next pulse. The run
+  starts with one tip per seed at the root, numbered 1, 2, … in ascending seed direction, heading its seed direction.
+  A tip that steps onto an unconsumed nutrient consumes it (the field changes from the next choice on) and a new tip
+  with the next unused number is made on that cell with heading (k + 2) mod 8 (a quarter turn clockwise); the parent
+  keeps heading k. After a step, a tip's heading is the direction it stepped. Impact: FR-R02G2201-004; SC-R02G2201-003.
+- Q: How are branch weight, the budget, the limit, the pulses and reaching a terminal measured? → A: an orthogonal
+  segment weighs 2 and a diagonal one 3 (an integer stand-in for 1 : √2). The nutrient budget is 2 … 4094 and the
+  weight limit 2 … budget; the run walks pulses 1 … P (P 1 … 128) and ends early when no tip is growing. Before each
+  step the kernel checks the step's weight: if the total would exceed the budget the run fails `starved` at that
+  pulse, tip and target cell, and nothing is grown; otherwise the step is grown and, if the target is toxic, the run
+  fails `toxic` there. Each grown cell keeps its parent, so the network is a tree rooted at the root and has at most
+  1 + 4094 / 2 = 2048 nodes. A terminal is reached when a tip steps onto it; tips may grow on through it. A terminal's
+  path weight is the sum of segment weights from the root along the tree. After growth: the lowest-numbered terminal
+  not reached fails `unreached`; otherwise a total weight above the limit fails `overweight`; otherwise won. Impact:
+  FR-R02G2201-005, 006, 015; SC-R02G2201-004.
+- Q: Which counts, actions and refusals exist? → A: 1 … 6 terminals, any number of rocks and toxins, 0 … 8 fixed
+  nutrients, up to 6 placed nutrients, up to 6 placed blockers, up to 4 seeds with 0 … 4 starting seeds (starting
+  seeds are locked); at least one placement or seed must be available. Actions: `nutrient(cell)`, `blocker(cell)`
+  (on an empty cell: not rock, toxin, root, terminal, fixed nutrient or already placed), `clear(cell)` (a placed
+  nutrient or blocker), `seed(direction)` (a direction not yet seeded) and `unseed(direction)` (a seed the player
+  added). Each spends one action and is refused `r02-g22.action` when out of range, unchanged, locked or over a count,
+  `r02-g22.budget` when no action is left; the budget is 1 … 24. `run` ("commit graph", "advance growth pulses")
+  spends nothing and ends the level; inspecting a cell is the report and changes nothing. Undo and redo restore
+  arrangements and, from failed, undo returns to playing with the arrangement before the run. A seed is a heading, not
+  a forced first step: the tip chooses its first step by score. Impact: FR-R02G2201-001, 002, 007, 012.
+- Q: How does a level live, how is it stored and what does the report say? → A: as features 491 and 501: stages
+  loading → tutorial → playing ⇄ paused → won or failed → result; begin, dismissTutorial, pause and resume are their
+  own record kinds; each record carries the schema, the level seed, an index, the kind, the action and the
+  fingerprints before and after; replay refuses a record of another level or a broken chain (`r02-g22.malformed`);
+  `r02-g22.stage` (an action in the wrong stage) and `r02-g22.stale` (a previous fingerprint that does not match). The
+  stored form is JSON schema 1 with sorted keys (id, seed, difficulty 1 … 5, width, height, root, terminals, rocks,
+  toxins, fixed nutrients, strength, reach, the two penalties, the three placement limits, starting seeds, pulses,
+  nutrient budget, weight limit, action budget, tutorial, fingerprint = SHA-256 of a canonical text, cell lists in
+  ascending (row, column) order); a damaged or edited form is refused `r02-g22.malformed`, a newer one
+  `r02-g22.newer-schema`, an invalid level `r02-g22.level`. The report after every action holds the field, every tip's
+  step by pulse with its score, the network with the pulse each cell was grown, the node count, the total weight
+  against budget and limit, each terminal's reach pulse and path weight, the first toxic entry, the first failure and
+  the predicted outcome, with words for each ("tip 2 at pulse 7: east to (9, 4), score 12", "terminal 1 reached at
+  pulse 11, path weight 23", "branch weight 41 of 48, budget 60"). The puzzle contract (R02-F23): the position is the
+  arrangement, the moves are the actions legal from it, the goal test is that the predicted run wins. Impact:
+  FR-R02G2201-008, 009, 010, 011, 015.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -100,8 +168,9 @@ refused.
 - **A best score below zero:** the tip goes dormant.
 - **Two tips choosing the same cell in one pulse:** the lower-numbered tip moves first; the cell is then in the
   network and the other tip chooses again among the rest.
-- **A tip entering a nutrient:** the nutrient is consumed and the tip branches once; a consumed nutrient no longer
-  pulls.
+- **A tip entering a nutrient:** the nutrient is consumed and a new tip starts there a quarter turn clockwise; a
+  consumed nutrient no longer pulls.
+- **A step that would exceed the budget onto a toxic cell:** `starved`, since the budget is checked before the step.
 - **Branch weight exactly at the nutrient budget or exactly at the weight limit:** allowed; failure needs one more.
 - **No growing tip left before the last pulse:** growth ends early and the network is judged.
 - **The action budget spent:** further arrangement actions are refused; running is still allowed.
