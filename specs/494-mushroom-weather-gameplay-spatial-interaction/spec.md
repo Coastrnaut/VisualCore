@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-26
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G20-04 (migration ledger, game feature of experience R02-G20) · ID namespace FR-R02G2004-###,
 SC-R02G2004-###, T-R02G2004-###
@@ -28,6 +28,74 @@ Canonical overrides:
   renderer of R02-G20-01 … 03.
 - **Model:** feature 484 (Microscopic Aurora's gameplay spatial interaction) for the gesture controller, picker, orbit
   and panel, adapted to pods placed on sites, vents and the moonlight.
+
+## Clarifications
+
+### Session 2026-11-26
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+484's answers where the games agree. Facts checked (read-only, 2026-11-26): the host's `PointerEvent` (id, phase
+began/moved/ended/cancelled, location in view points with the origin top-left, timestamp); feature 484's thresholds (tap
+below 10 points and 0.5 s, drag from 16 points, double tap within 0.35 s and 22 points, orbit 90° per view width and 60°
+per view height, yaw ±60°, pitch −20° … +35°) and its `MicroscopicAuroraGestureController`, `MicroscopicAuroraPicker`
+and `MicroscopicAuroraViewOrbit`. Mushroom Weather's adapter (feature 493, clarification Q5) declares `pod.place [slot,
+row, column]`, `pod.remove [slot]`, `vent.set [index, open]`, `moon.set [level]`, `weather.run`, `play.undo`,
+`play.redo`, `level.next` and `clock.show [cycle]` (the last presentation only). The scene (feature 493, clarification
+Q1) maps cell (r, c) to ((c − (C − 1)/2) · s, ((R − 1)/2 − r) · s) with s = min(1.8 / C, 1.6 / R) in the plane z = 0,
+draws site rings (radius 0.32 s), pods (radius 0.18 s, 0.26 s grown, at height 0.1 s), vent frames (side 0.9 s at height
+0.9 s), the moon (radius 0.12 at (1.15, 1.05, −0.5)), gauge rows from y −1.0 and the actions bars below them, from eye
+(0, −1.6, 3.0) towards (0, −0.2, 0), fitted to x −1.3 … 1.3, y −1.5 … 1.2, z 0 … 0.3, the floor spanning at most
+x −0.9 … 0.9 and y −0.8 … 0.8. The R02-G20-03 panel already places a pod, toggles a vent and sets the moonlight with one
+action each, so every certified witness fits its budget through the panel.
+
+- Q: How is a touch picked? → A: at touch-down the targets are projected through the drawn camera (orbit included) into
+  view points: a pod is hit within its projected radius grown by 12 points, a site within its projected ring radius
+  grown by 12 points, a vent within its projected frame (the larger half-diagonal of the projected square) grown by 12
+  points, the moon within its projected radius grown by 12 points; of several hits the one drawn last wins (in the
+  scene's order: sites, then pods, then vents, the moon behind them all, later slots and indices last). The cycle
+  scrubber, a track at y = −0.9 from x = −0.9 to 0.9 (between the floor and the gauges) with a mark at the shown cycle,
+  is hit within 14 points of its projected track. The floor is the rest of the projected floor rectangle; anything else
+  (gauges, bars, backdrop, fronds) is empty space. Tap, drag and double-tap thresholds are feature 484's. Impact:
+  FR-R02G2004-007; SC-R02G2004-001.
+- Q: What do taps do? → A: while playing, a tap on an empty site sends `pod.place [slot, row, column]` with the first
+  free slot; with every slot used it sends nothing and says so. A tap on a pod selects its slot in the panel
+  (presentation) and explains that pods are dragged. A tap on a vent sends `vent.set [index, open]` with the other state.
+  A tap on the moon explains that the moon is dragged up or down. A tap on the scrubber sends `clock.show [cycle]` with
+  the cycle nearest the finger along the track (round(fraction × cycles run)) in any stage. A tap on the floor or empty
+  space changes nothing, and two taps off the floor within 0.35 s and 22 points reset the view. On a won or failed play
+  no kernel action is sent (the scrubber still shows cycles) and the description says the play is over (undo or next
+  level). Impact: FR-R02G2004-001, 003, 005, 009; SC-R02G2004-002.
+- Q: How do pod and moon drags map the finger to a change, and what is previewed? → A: a press on a pod that moves 16
+  points or more while playing becomes a pod drag; the finger's target is the site whose projected centre is nearest the
+  finger within 24 points (lower site index on ties); if that site is the pod's own or another pod holds it, no change;
+  outside the projected floor rectangle the target is removal; otherwise no change. A press on the moon that moves 16
+  points or more while playing becomes a moon drag: the level under the finger is the starting level plus round(−dy /
+  40) for the vertical travel dy in view points (up raises), clamped to 0 … 3. The snapshot gains a preview (the pod's
+  slot and target, or the moonlight level, and the previewed run of that arrangement: fields, colony runs, growth and
+  failure; none in the digest); the scene draws the previewed run in place of the committed one, the dragged pod as a
+  ghost at its target and the moon at the previewed brightness. On release exactly one `pod.place [slot, row, column]`
+  (moving the pod) or `pod.remove [slot]`, or one `moon.set [level]` when the level differs from the current one, is
+  sent; otherwise nothing. A release outside playing, a cancel or a second finger clears the preview and sends nothing.
+  Impact: FR-R02G2004-002, 004, 006, 009; SC-R02G2004-001, 003.
+- Q: How do the scrubber and two fingers behave? → A: from touch-down on the scrubber, every move sets the cycle nearest
+  the finger along the track and sends `clock.show [cycle]` (never an undo step, never a kernel action). Two fingers as
+  feature 484: a second finger cancels any one-finger gesture (nothing sent) and orbits — yaw ±60° about the vertical
+  axis through the authored box centre (90° per view width), pitch −20° … +35° (60° per view height); a third finger
+  re-bases the midpoint; a double tap off the floor or "Reset view" returns to orbit (0, 0); the camera refits so the
+  authored box stays inside the view with a 5 % margin at every orbit and aspect 0.4 … 2.5 and the eye stays outside
+  the box; meshes are rebuilt when the orbit changes; orbit and the preview are not saved (schema stays 1). Impact:
+  FR-R02G2004-005, 008; SC-R02G2004-002, 004.
+- Q: How is it built and tested, and what does the panel gain? → A: a Core gesture controller
+  (`MushroomWeatherGestureController`) with a picker (`MushroomWeatherPicker`) and a view orbit
+  (`MushroomWeatherViewOrbit`, with `camera(aspect:orbit:)` equal to the authored camera at orbit 0) takes pointer
+  events with the view size, the drawn snapshot and the orbit and returns gesture actions (place, move, remove,
+  setVent, setMoonlight, showCycle, preview, clearPreview, selectSlot, resetView, explain) and the orbit; the geometry
+  draws the scrubber and the preview; host tests feed 500 seeded taps, pod drags, vent taps, moon drags and scrubs on
+  certified levels at several orbits against an independent pick in the test; simulator tests send touches through the
+  experience's pointer entry. The panel keeps its one-action placement, vent toggles and moonlight − and + and gains
+  "Reset view"; a host test wins all 100 certified levels through panel actions alone (each witness action as the
+  panel's slot and site with Place, a vent toggle or the moonlight buttons, then Run), each within its budget. Impact:
+  FR-R02G2004-007, 010, 011; SC-R02G2004-001 … 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
