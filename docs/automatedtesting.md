@@ -418,6 +418,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   so the step looked silent for minutes). The round-two host tests and their regressions moved to their own job,
   `round02-host-tests`, with 60 minutes. When a run is cancelled, read `gh run view <id> --json jobs` for the job that
   hit its limit before assuming a push cancelled it.
+- **The round-two host job split in two halves** (R02-G20-03, 2026-11-27). With 19 games the round-two package's host
+  tests took 54 minutes on a runner and the regression steps pushed `round02-host-tests` past its 60 minutes (run
+  45931217289, cancelled on the last regression step, no failing test). The job is now a matrix of two halves (`a`: the
+  games of R02-G01 … G10; `b`: R02-G11 … G20), each building the package once and running its games' filter and their
+  named regression steps. A new game's name joins half `b`'s filter.
 - **Overloads on enums that share case names can recurse** (R02-G11-04, 2026-11-23). Echo Cartographer's gesture
   action and kernel action both have `.claim(x, y)`; a test helper `adapterAction(_:)` overloaded on both resolved
   `adapterAction(.claim(x, y))` to the gesture overload, which called itself, and the run crashed with a stack overflow

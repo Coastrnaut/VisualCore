@@ -102,8 +102,18 @@ jobs:
     # R02-G11-04 (2026-11-23): split from host-tests. The round-two package's build (about 6 minutes on a runner) and
     # its host tests (past 17 minutes on a runner, about three times the local time) no longer fit host-tests' 30
     # minutes beside the VisualCore tests; five ci runs in a row were cut at the limit with no failing test.
+    # R02-G20-03 (2026-11-27): split into two parallel halves by game. The whole package's host tests reached 54
+    # minutes on a runner and, with the regression steps, a run was cut at the 60-minute limit with no failing test.
     runs-on: macos-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - group: a
+            filter: 'AuroraLoom|LissajousLabyrinth|WaveKnotKeeper|HueCompass|ColorfallCanyons|ChronoConstellator|AmethystEscape|FacetedForge|NocturneGarden|BackwardsAurora'
+          - group: b
+            filter: 'EchoCartographer|HarmonicBridges|AcousticConstellator|MoonlitMechanism|VoxelOrigami|StarlitCartouche|CelestialEclipseLab|ApsidesWorkshop|MicroscopicAurora|MushroomWeather'
     steps:
       - uses: actions/checkout@v5
       - name: Toolchain
@@ -131,81 +141,100 @@ jobs:
       - name: ANGLE stand-ins (link only)
         if: steps.host-standin-cache.outputs.cache-hit != 'true'
         run: python3 scripts/make_ci_angle_standins.py --out External/projectm-ios/Build/ANGLEFrameworks
-      - name: ExperiencesRound02 host tests
-        run: swift test --package-path Packages/ExperiencesRound02
+      - name: ExperiencesRound02 host tests (half ${{ matrix.group }})
+        run: swift test --package-path Packages/ExperiencesRound02 --filter '${{ matrix.filter }}'
       - name: Aurora Loom regression (host)
+        if: matrix.group == 'a'
         # Feature 308 (R02-G01-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/aurora_loom_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter AuroraLoomRegression
       - name: Lissajous Labyrinth regression (host)
+        if: matrix.group == 'a'
         # Feature 318 (R02-G02-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/lissajous_labyrinth_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter LissajousLabyrinthRegression
       - name: Wave Knot Keeper regression (host)
+        if: matrix.group == 'a'
         # Feature 328 (R02-G03-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/wave_knot_keeper_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter WaveKnotKeeperRegression
       - name: Hue Compass regression (host)
+        if: matrix.group == 'a'
         # Feature 338 (R02-G04-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/hue_compass_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter HueCompassRegression
       - name: Colorfall Canyons regression (host)
+        if: matrix.group == 'a'
         # Feature 348 (R02-G05-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/colorfall_canyons_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter ColorfallCanyonsRegression
       - name: Chrono Constellator regression (host)
+        if: matrix.group == 'a'
         # Feature 358 (R02-G06-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/chrono_constellator_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter ChronoConstellatorRegression
       - name: Amethyst Escape regression (host)
+        if: matrix.group == 'a'
         # Feature 368 (R02-G07-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/amethyst_escape_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter AmethystEscapeRegression
       - name: Faceted Forge regression (host)
+        if: matrix.group == 'a'
         # Feature 378 (R02-G08-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/faceted_forge_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter FacetedForgeRegression
       - name: Nocturne Garden regression (host)
+        if: matrix.group == 'a'
         # Feature 388 (R02-G09-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/nocturne_garden_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter NocturneGardenRegression
       - name: Backwards Aurora regression (host)
+        if: matrix.group == 'a'
         # Feature 398 (R02-G10-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/backwards_aurora_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter BackwardsAuroraRegression
       - name: Echo Cartographer regression (host)
+        if: matrix.group == 'b'
         # Feature 408 (R02-G11-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/echo_cartographer_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter EchoCartographerRegression
       - name: Harmonic Bridges regression (host)
+        if: matrix.group == 'b'
         # Feature 418 (R02-G12-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/harmonic_bridges_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter HarmonicBridgesRegression
       - name: Acoustic Constellator regression (host)
+        if: matrix.group == 'b'
         # Feature 428 (R02-G13-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/acoustic_constellator_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter AcousticConstellatorRegression
       - name: Moonlit Mechanism regression (host)
+        if: matrix.group == 'b'
         # Feature 438 (R02-G14-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/moonlit_mechanism_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter MoonlitMechanismRegression
       - name: Voxel Origami regression (host)
+        if: matrix.group == 'b'
         # Feature 448 (R02-G15-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/voxel_origami_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter VoxelOrigamiRegression
       - name: Starlit Cartouche regression (host)
+        if: matrix.group == 'b'
         # Feature 458 (R02-G16-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/starlit_cartouche_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter StarlitCartoucheRegression
       - name: Celestial Eclipse Lab regression (host)
+        if: matrix.group == 'b'
         # Feature 468 (R02-G17-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/celestial_eclipse_lab_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter CelestialEclipseLabRegression
       - name: Apsides Workshop regression (host)
+        if: matrix.group == 'b'
         # Feature 478 (R02-G18-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/apsides_workshop_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter ApsidesWorkshopRegression
       - name: Microscopic Aurora regression (host)
+        if: matrix.group == 'b'
         # Feature 488 (R02-G19-08): the solver regression and the golden frame descriptions, named so a failure shows by
         # name; the simulator part runs locally through scripts/microscopic_aurora_regression.py.
         run: swift test --package-path Packages/ExperiencesRound02 --filter MicroscopicAuroraRegression
