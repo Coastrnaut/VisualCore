@@ -108,6 +108,12 @@
 //     the rest of the row.
 // Without a preview and an inspection, at the authored camera, every mesh is R02-G21-03's. The orbit, the preview and
 // the inspection are presentation only: never saved, never read by the rules.
+//
+// Feature 506 (R02-G21-06) T-R02G2106-004 (FR-R02G2106-004; SC-R02G2106-003; clarification Q3; research R3) adds the
+// camera-taking `glowPart(_:tier:wonLevel:camera:bloom:)` and `glowMesh(_:tier:camera:bloom:)`: each world's shell
+// factor (vertex data, a_uv.x) is its eased bloom level (`BinaryGardensLights.bloom`) instead of the 0/1 factor of its
+// band, so a world's shells fade in and out; the scene rebuilds the glow mesh when a level crosses a 1/32 step. Nil
+// bloom levels give the R02-G21-04 meshes bit for bit.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -876,6 +882,15 @@ public enum BinaryGardensSceneGeometry {
         try glowPart(snapshot, tier: tier, camera: camera).mesh
     }
 
+    /// The glow mesh seen from `camera` with each world's shell factor set by `bloom` (feature 506,
+    /// T-R02G2106-004, research R3): ``glowPart(_:tier:wonLevel:camera:bloom:)`` without colours; nil `bloom` gives
+    /// ``glowMesh(_:tier:camera:)`` bit for bit. The scene passes the presenter's eased bloom levels
+    /// (`BinaryGardensLights.bloom`) and rebuilds when a level crosses a 1/32 step.
+    public static func glowMesh(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                                camera: BinaryGardensCamera, bloom: [Double]?) throws(MeshError) -> Mesh {
+        try glowPart(snapshot, tier: tier, camera: camera, bloom: bloom).mesh
+    }
+
     /// The whole system with fallback colours for the shared unlit renderer: each vertex in its fallback colour
     /// (``colour(of:won:)``: worlds tinted by their band, broken parts in the broken colour, a shared ring's dashes
     /// and a corona ray in their star's colour), the backdrop from space at its bottom to space top at its top. The
@@ -1294,10 +1309,32 @@ public enum BinaryGardensSceneGeometry {
         try glow(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(camera: camera))
     }
 
+    /// The glow with fallback colours seen from `camera`, each world's shell factor its eased bloom level (feature
+    /// 506, T-R02G2106-004, clarification Q3, research R3): world `i`'s shells carry factor `bloom[i]` clamped to
+    /// 0 … 1 (a non-finite level counts as 0) in a_uv.x (``BinaryGardensShaders/GlowKind/code(factor:)``) and the world
+    /// colour times that factor (or 1 on a won level) as their fallback colour; a world `bloom` does not cover keeps
+    /// today's 0/1 factor. Nil `bloom` gives ``glowPart(_:tier:wonLevel:camera:)`` bit for bit. Positions, star shells
+    /// and the order are unchanged by `bloom`.
+    public static func glowPart(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                                wonLevel: Bool? = nil, camera: BinaryGardensCamera,
+                                bloom: [Double]?) throws(MeshError) -> BinaryGardensColouredMesh {
+        try glow(snapshot, tier: tier, wonLevel: wonLevel, parts: Parts(camera: camera), bloom: bloom)
+    }
+
+    /// World `world`'s glow shell factor: its eased level in `bloom` clamped to 0 … 1 (non-finite: 0) when `bloom`
+    /// covers it (feature 506), else ``BinaryGardensShaders/glowFactor(blooming:)`` of its band at the shown tick.
+    static func shellFactor(_ world: Int, _ snapshot: BinaryGardensSceneSnapshot, bloom: [Double]?) -> Double {
+        if let levels = bloom, levels.indices.contains(world) {
+            let level: Double = levels[world]
+            return level.isFinite ? min(max(level, 0), 1) : 0
+        }
+        return BinaryGardensShaders.glowFactor(blooming: blooms(world, snapshot, won: false))
+    }
+
     /// Builds the glow into `parts` (empty, with the eye to face; see ``glowPart(_:tier:wonLevel:)``) from the drawn
-    /// snapshot (``drawnSnapshot(_:)``).
+    /// snapshot (``drawnSnapshot(_:)``), each world's factor from ``shellFactor(_:_:bloom:)`` (feature 506).
     static func glow(_ source: BinaryGardensSceneSnapshot, tier: BinaryGardensTier, wonLevel: Bool?,
-                     parts start: Parts) throws(MeshError) -> BinaryGardensColouredMesh {
+                     parts start: Parts, bloom: [Double]? = nil) throws(MeshError) -> BinaryGardensColouredMesh {
         typealias K = BinaryGardensShaders.GlowKind
         var parts: Parts = start
         let snapshot: BinaryGardensSceneSnapshot = drawnSnapshot(source)
@@ -1313,7 +1350,7 @@ public enum BinaryGardensSceneGeometry {
                                    slot: colour, colour: colour)
             }
             for world in snapshot.worlds.indices {
-                let factor: Double = BinaryGardensShaders.glowFactor(blooming: blooms(world, snapshot, won: false))
+                let factor: Double = shellFactor(world, snapshot, bloom: bloom)
                 try parts.glowBand(centre: worldCentre(world, snapshot), inner: worldGlowInner,
                                    outer: worldRadius + worldGlowGrowth * Double(k), code: K.world.code(factor: factor),
                                    slot: SIMD3(0, 0, 0), colour: BinaryGardensPalette.world * (won ? 1 : factor))

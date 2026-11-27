@@ -22,6 +22,11 @@
 // committed cells, the inspection ring and brackets; without a preview and an inspection every mesh is R02-G21-03's
 // element loop, the camera-taking meshes equal the authored ones at the authored camera, and orbit meshes face the
 // drawn eye.
+//
+// Feature 506 (R02-G21-06) T-R02G2106-004 (FR-R02G2106-004; SC-R02G2106-003; clarification Q3; research R3) adds: nil
+// bloom levels give today's glow bit for bit (every tier, the authored and an orbit camera, won or not, a preview drawn);
+// fractional levels set each world's shell factor and fallback colour and nothing else; levels are clamped, a world they
+// do not cover keeps today's factor.
 import Foundation
 import Testing
 import VisualCoreMath
@@ -1128,5 +1133,114 @@ import VisualCoreScenes
             #expect(Self.key(Self.positions(mesh, flat)) == Self.key(Self.positions(authored, flat)))
             Self.checkGlow(try G.glowMesh(snap, tier: tier, camera: camera))
         }
+    }
+
+    // MARK: Feature 506 (R02-G21-06) T-R02G2106-004 — eased bloom levels as shell factors
+
+    /// The world whose glow shell holds vertex `p` of a glow mesh of `snapshot` with `shells` shells: the world whose
+    /// centre lies at one of the shell radii (inner 0.06, outer 0.07 + 0.035 k) from `p`, the closest match.
+    static func shellWorld(_ p: SIMD3<Double>, _ snapshot: Snapshot, shells: Int) -> Int {
+        var best: (world: Int, error: Double) = (0, Double.infinity)
+        for world in snapshot.worlds.indices {
+            let d: Double = Self.distance(p, G.worldCentre(world, snapshot))
+            var radii: [Double] = [G.worldGlowInner]
+            for k in 1...max(shells, 1) { radii.append(G.worldRadius + G.worldGlowGrowth * Double(k)) }
+            for r in radii where abs(d - r) < best.error { best = (world, abs(d - r)) }
+        }
+        return best.world
+    }
+
+    @Test func nilBloomLevelsGiveTodaysGlowBitForBit() throws {
+        for n in [0, 4, 9] {
+            let level: BinaryGardensLevel = Self.levels[n]
+            let snap: Snapshot = try Self.snapshot(level, tick: 11)
+            let won: Snapshot = Self.variant(snap, failure: .some(nil), stage: .won)
+            for tier in BinaryGardensTier.all {
+                for orbit in [BinaryGardensViewOrbit.authored, BinaryGardensViewOrbit(yaw: 0.5, pitch: 0.3)] {
+                    let camera: BinaryGardensCamera = G.camera(aspect: 1.3, orbit: orbit)
+                    for s in [snap, won] {
+                        for wonLevel in [nil, false, true] as [Bool?] {
+                            #expect(try G.glowPart(s, tier: tier, wonLevel: wonLevel, camera: camera, bloom: nil)
+                                        == G.glowPart(s, tier: tier, wonLevel: wonLevel, camera: camera))
+                        }
+                        #expect(try G.glowMesh(s, tier: tier, camera: camera, bloom: nil)
+                                    == G.glowMesh(s, tier: tier, camera: camera))
+                    }
+                }
+            }
+            // Bloom levels equal to today's 0/1 factors also give today's glow.
+            var today: [Double] = []
+            for world in snap.worlds.indices { today.append(G.blooms(world, snap, won: false) ? 1 : 0) }
+            let camera: BinaryGardensCamera = G.camera(aspect: 1)
+            #expect(try G.glowPart(snap, tier: .of(0), camera: camera, bloom: today)
+                        == G.glowPart(snap, tier: .of(0), camera: camera))
+            // An accepted preview's drawn worlds keep the equality.
+            let puzzle: BinaryGardensPuzzle = BinaryGardensPuzzle(level: level)
+            if let move = puzzle.moves(in: puzzle.initialState).first {
+                let previewed: Snapshot = snap.previewing(move, level: level)
+                #expect(try G.glowPart(previewed, tier: .of(1), camera: camera, bloom: nil)
+                            == G.glowPart(previewed, tier: .of(1), camera: camera))
+            }
+        }
+    }
+
+    @Test func fractionalBloomLevelsSetEachWorldsShellFactor() throws {
+        let snap: Snapshot = try Self.snapshot(Self.levels[6], tick: 30)
+        let count: Int = snap.worlds.count
+        var levels: [Double] = []
+        for world in 0..<count { levels.append(Double(world + 1) / Double(count + 1)) }
+        let camera: BinaryGardensCamera = G.camera(aspect: 1.2, orbit: BinaryGardensViewOrbit(yaw: -0.3, pitch: -0.2))
+        for tier in BinaryGardensTier.all {
+            let plain: BinaryGardensColouredMesh = try G.glowPart(snap, tier: tier, camera: camera)
+            let eased: BinaryGardensColouredMesh = try G.glowPart(snap, tier: tier, camera: camera, bloom: levels)
+            #expect(try G.glowMesh(snap, tier: tier, camera: camera, bloom: levels) == eased.mesh)
+            Self.checkGlow(eased.mesh)
+            // Only the world shells' factors (and fallback colours) change: positions, indices, normals and the radial
+            // coordinate stay.
+            #expect(eased.mesh.positions == plain.mesh.positions && eased.mesh.indices == plain.mesh.indices)
+            #expect(eased.mesh.normals == plain.mesh.normals && eased.mesh.uvs.count == plain.mesh.uvs.count)
+            var seen: Set<Int> = []
+            for k in eased.mesh.positions.indices {
+                #expect(eased.mesh.uvs[k].y == plain.mesh.uvs[k].y)
+                let decoded = BinaryGardensShaders.GlowKind.decode(eased.mesh.uvs[k].x)
+                if decoded.kind == .star {
+                    #expect(eased.mesh.uvs[k].x == plain.mesh.uvs[k].x && eased.colours[k] == plain.colours[k])
+                    continue
+                }
+                let p: Vec3 = eased.mesh.positions[k]
+                let world: Int = Self.shellWorld(SIMD3(p.x, p.y, p.z), snap, shells: tier.glowShells)
+                seen.insert(world)
+                #expect(abs(decoded.factor - levels[world]) < 1e-12, "\(tier.name) world \(world)")
+                let colour: SIMD3<Double> = BinaryGardensPalette.world * levels[world]
+                let c: Vec4 = eased.colours[k]
+                #expect(abs(c.x - colour.x) < 1e-12 && abs(c.y - colour.y) < 1e-12 && abs(c.z - colour.z) < 1e-12)
+            }
+            #expect(seen.count == (tier.glowShells > 0 ? count : 0), "\(tier.name)")
+        }
+        // Levels are clamped to 0 … 1 (non-finite: 0); a world the levels do not cover keeps today's factor.
+        let tier: BinaryGardensTier = .of(0)
+        var wild: [Double] = Array(repeating: 2, count: count)
+        wild[0] = .nan
+        if count > 1 { wild[1] = -1 }
+        let clamped: [Double] = wild.map { $0.isFinite ? min(max($0, 0), 1) : 0 }
+        #expect(try G.glowPart(snap, tier: tier, camera: camera, bloom: wild)
+                    == G.glowPart(snap, tier: tier, camera: camera, bloom: clamped))
+        var today: [Double] = []
+        for world in snap.worlds.indices { today.append(G.blooms(world, snap, won: false) ? 1 : 0) }
+        var short: [Double] = levels
+        short.removeLast()
+        var filled: [Double] = short
+        filled.append(today[count - 1])
+        #expect(try G.glowPart(snap, tier: tier, camera: camera, bloom: short)
+                    == G.glowPart(snap, tier: tier, camera: camera, bloom: filled))
+        #expect(try G.glowPart(snap, tier: tier, camera: camera, bloom: [])
+                    == G.glowPart(snap, tier: tier, camera: camera))
+        // A won level's fallback colours stay the full world colour, whatever the levels.
+        let lit: BinaryGardensColouredMesh = try G.glowPart(snap, tier: tier, wonLevel: true, camera: camera,
+                                                            bloom: levels)
+        let full: BinaryGardensColouredMesh = try G.glowPart(snap, tier: tier, wonLevel: true, camera: camera)
+        #expect(lit.colours == full.colours && lit.mesh.positions == full.mesh.positions)
+        // Level-2 has no shells at all.
+        #expect(try G.glowMesh(snap, tier: .of(2), camera: camera, bloom: levels).positions.isEmpty)
     }
 }

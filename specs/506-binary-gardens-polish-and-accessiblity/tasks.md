@@ -41,7 +41,7 @@ round02-host in five chunks (1, 2, 3c, 3e, 3f). Prerequisites: R02-G21-04 and R0
   level and mode changes compare texts, kinds, haptics and triggers exactly; showing a tick plans nothing; equal inputs
   give equal plans); agent B; `--name host-2 -- swift test --package-path Packages/ExperiencesRound02 --filter
   BinaryGardens`
-- [ ] T-R02G2106-004 [P] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensLights.swift`
+- [X] T-R02G2106-004 [P] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensLights.swift` — Verified 2026-11-27: host-2 exit 0 covers it (same command on the tree with T-004 installed; Lights 9, SoundRecipe 6, geometry +2 pass)
   ("glow 0.7 playing / 1 won / 0.35 failed (only once the run failed); won 1 once won, else 0; bloom 1 when the world is
   comfortable at the drawn shown tick or the level is won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce
   Flashing, a started fade finishing before turning back under Reduce Flashing, stepped by the frame clock's elapsed
