@@ -130,7 +130,7 @@ SC-001 … 005 → 002 … 006; SC-006 → 007 … 011.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G2101-013 State in `specs/501-binary-gardens-playable-rule-kernel/spec.md` FR-R02G2101-014 and in
+- [X] T-R02G2101-013 State in `specs/501-binary-gardens-playable-rule-kernel/spec.md` FR-R02G2101-014 and in — Verified 2026-11-27: host-6 exit=0; FR-014 and the data model state window 0 with start 0; SkyTests already pin it (aWindowOneTickShortOfTheRequirementAndTheWholeCycle) (.autonomy/migration/checks/R02-G21-01.host-6.json)
   `data-model.md` (`BinaryGardensWorldLight`) that a world with no comfortable tick reports window 0 with start tick 0
   (as `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSky.swift` does), and pin it in
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensSkyTests.swift`; `--name host-6` per FR-R02G2101-014

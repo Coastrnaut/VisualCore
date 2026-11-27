@@ -247,7 +247,8 @@ refused.
   tick, kept exact as the integral over 48 ticks), its survival (longest lethal run, read cyclically and at most 48,
   against the tolerance; longest comfortable window against the requirement: the longest run of consecutive comfortable
   ticks over ticks 1 … 48 read cyclically, tick 48 followed by tick 1, at most 48, reported with its start tick, the
-  smallest start among equal longest runs and tick 1 when all 48 ticks are comfortable; its bloom result), every tick's flux with each star's share and its band,
+  smallest start among equal longest runs, tick 1 when all 48 ticks are comfortable and window 0 with start 0 when
+  no tick is; its bloom result), every tick's flux with each star's share and its band,
   the minimum squared star separation over ticks 0 … 47 and the earliest tick at which it occurs, the first failure and
   the predicted outcome.
 
