@@ -40,7 +40,7 @@ campaign covers the game). Agents model their files on Microscopic Aurora's (fea
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G2005-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherProgress.swift`
+- [X] T-R02G2005-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherProgress.swift` — Verified 2026-11-27: 2026-11-27 host-3 exit 0: 202 tests in 22 suites incl. 20 progress tests (tutorial steps on levels 1 … 3 by scripted plays, stars and frontier over 100 levels, daily level for every date 2026 … 2036 in 1 … 100 and stable, impossible dates refused, Codable round trips) (.autonomy/migration/checks/R02-G20-05.host-3.json)
   (`MushroomWeatherTutorialStep` place → balance → recover → done with the texts of clarification Q2, advanced by an
   accepted placement (place → balance), a second accepted action (balance → recover) or the level's end (→ done), never
   moved back by undo — an undo passes no action and the play's real end, a redo that restores a won or failed play ends
