@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MyceliumArchitect"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter MyceliumArchitect",
+  "elapsed_seconds": 16.21,
+  "exit_code": 0,
+  "finished": "2026-11-27T23:04:19+00:00",
+  "gate": "R02-G22-02",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G22-02.host-2.log",
+  "log_sha256": "e20afd1055b491f2206cc7c4d2df9708f82facf83e02b1e30f3230ab6372eefb",
+  "name": "host-2",
+  "started": "2026-11-27T23:04:03+00:00",
+  "timed_out": false
+}

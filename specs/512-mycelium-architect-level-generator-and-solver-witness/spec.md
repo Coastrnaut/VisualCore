@@ -49,7 +49,10 @@ kernel is drafted and tested (50 host tests) and is installed in the repository 
 implementation starts; R02-F24's `PuzzleCatalog.digest(id:identities:)` and the standard `ProgressionRule` (drop at most
 1, jump at most 3); `SeedDerivation.derive(_:index:)` and `SeededRandom`; the canonical manifest's 100 entries (bands
 1 … 5 × 20, budgets as above, five control emphases and five required concepts, 20 each). The search sizes below are
-arithmetic bounds, not measurements; the first implementation task runs the real generator and solver over the real 100
+arithmetic bounds, not measurements; measured 2026-11-27 (research R4): all 100 entries generate with the profiles below
+(largest accepted candidate index 99, 71, 98, 349, 146 by band; witness lengths exactly 1, 2, 3, 3, 4; largest work per
+level 15, 95, 488, 408, 2 219; catalog 28 600 arrangements judged; slowest level 100 at 0.9 s; slowest group of five
+96 … 100 at 2.2 s; whole catalog 8.9 s on a debug host build); the first implementation task runs the real generator and solver over the real 100
 entries and records in research.md R4 the largest candidate index per band, the work per level and for the catalog,
 the witness lengths by band and the slowest level and group of five; a profile value changed there is written back into
 this section, research.md, data-model.md and plan.md in the same commit.
@@ -76,15 +79,16 @@ this section, research.md, data-model.md and plan.md in the same commit.
   band's count) are the grown cells, other than sites and fixed nutrients, with the latest grown pulses (ties by cell
   order); nutrient budget = grown weight + the band's budget slack, weight limit = grown weight + the band's limit slack
   (at most the budget). Band profiles (width × height, rock ‰, toxin ‰, terminals, sites, fixed nutrients, seed limit,
-  strength, reach, κ, ο, pulses, budget slack, limit slack, plan p): band 1 (8 × 8, 80, 30, 1, 4, 0, 1, 4 … 8, 4 … 8,
-  1 … 2, 0 … 1, 48, 4 … 8, 2 … 6, 1), band 2 (9 … 10, 90, 40, 1 … 2, 5, 0 … 1, 2, 3 … 8, 4 … 8, 1 … 3, 0 … 2, 64, 3 … 6,
-  1 … 4, 2), band 3 (10 … 12, 100, 50, 2, 6, 0 … 1, 2, 3 … 7, 4 … 10, 1 … 3, 0 … 2, 80, 2 … 5, 0 … 3, 3), band 4 (12 … 14,
-  110, 60, 2 … 3, 6, 1 … 2, 2, 2 … 7, 5 … 10, 2 … 4, 1 … 2, 96, 1 … 4, 0 … 2, 3), band 5 (14 … 16, 120, 70, 3, 6, 1 … 2,
-  2, 2 … 6, 5 … 12, 2 … 4, 1 … 3, 112, 0 … 3, 0 … 1, 4). Placement limits are the plan's nutrient and blocker counts
+  strength, reach, κ, ο, pulses, budget slack, limit slack, plan p): band 1 (8 × 8, 80, 30, 1, 4, 1, 1, 4 … 8, 4 … 8,
+  1 … 2, 0 … 1, 48, 4 … 8, 2 … 6, 1), band 2 (9 … 10, 90, 40, 1 … 2, 5, 1 … 2, 2, 3 … 8, 4 … 8, 1 … 2, 0 … 1, 64, 3 … 6,
+  1 … 4, 2), band 3 (10 … 12, 100, 50, 2, 6, 1 … 2, 2, 3 … 7, 4 … 10, 1 … 2, 0 … 1, 80, 2 … 5, 0 … 3, 3), band 4 (12 … 14,
+  100, 40, 2 … 3, 6, 1 … 2, 2, 2 … 7, 5 … 10, 1 … 2, 0 … 1, 96, 1 … 4, 0 … 2, 3), band 5 (14 … 16, 100, 40, 3, 6, 1 … 2,
+  2, 2 … 6, 5 … 12, 1 … 2, 0 … 1, 112, 0 … 3, 0 … 1, 4) (measured 2026-11-27, research R4: every band has at least one
+  fixed nutrient, κ ≤ 2 and ο ≤ 1, bands 4 and 5 have 100 ‰ rock and 40 ‰ toxin). Placement limits are the plan's nutrient and blocker counts
   plus 1 (at most 6); budget = the manifest's; ids `mycelium-architect-NNN`; tutorial on levels 1 … 3; difficulty =
   band. A candidate is skipped when the level rules refuse it (including a start that already wins), its board (size,
   root, rocks, toxins) equals the previous level's, the solver's minimal plan is not p, or the plan does not win through
-  the play; at most 64 candidates, then `generation(n)`. Impact: FR-R02G2202-001, 007; SC-R02G2202-001, 003, 004.
+  the play; at most 1 024 candidates, then `generation(n)`. Impact: FR-R02G2202-001, 007; SC-R02G2202-001, 003, 004.
 - Q: How does the solver find a minimal plan, and what proves nothing shorter wins? → A: breadth-first over
   arrangements by the number of actions from the start (the shortest path in the graph of arrangements). Depth 0 is the
   start. Depth d + 1 takes the arrangements of depth d in ascending order of their loss (ties keep their discovery order)
@@ -188,7 +192,7 @@ file is refused.
 ### Edge Cases
 
 - **A seed whose candidate is unsuitable for its band:** the generator moves to the next candidate deterministically
-  (at most 64) and records how many it skipped; no candidate within the bound is a named refusal.
+  (at most 1 024) and records how many it skipped; no candidate within the bound is a named refusal.
 - **A candidate whose starting arrangement already wins:** never emitted (the kernel refuses it).
 - **More than one minimal arrangement:** allowed; the witness is the one the solver finds in its fixed order.
 - **Adjacent levels with the same board:** the later candidate is skipped.

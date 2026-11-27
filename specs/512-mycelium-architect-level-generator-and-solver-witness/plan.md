@@ -24,6 +24,7 @@ witness files `docs/games/mycelium-architect/levels/NNN.witness.json`, written o
 Packages/ExperiencesRound02 --filter MyceliumArchitect`. **Performance**: a growth run is at most a few thousand integer
 steps on boards up to 16 × 16; the solver judges at most 20 000 arrangements per candidate (band 5: 6 sites with two kinds each and up to 8 seed directions give at most 20 changes from any
 arrangement, so within plan length 4 at most 1 + 20 + 190 + 1 140 + 4 845 = 6 196 distinct arrangements; below the bound);
+the measured catalog (research R4) takes 8.9 s with a candidate bound of 1 024 and its slowest group of five 2.2 s;
 certification is split into 20 groups of 5 levels, each measured under 10 s locally (never asserted on CI); generated
 levels are cached per process. **Constraints**: additive changes only; reason codes `r02-g22.*` (new `generation`,
 `witness`); the new sources sit in `Core/Content/` so feature 511's source scans keep their file lists. **Scale/Scope**:

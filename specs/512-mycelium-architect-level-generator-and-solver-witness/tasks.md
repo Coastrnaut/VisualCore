@@ -27,7 +27,7 @@ Packages/ExperiencesRound02 --filter MyceliumArchitect`. New sources go in `Myce
 
 ## Phase 3: Stories 1 and 2 — solvable levels from planned seeds (P1) 🎯
 
-- [ ] T-R02G2202-003 [US1] [US2] Create `Core/Content/MyceliumArchitectManifest.swift` (the 100 entries with
+- [X] T-R02G2202-003 [US1] [US2] Create `Core/Content/MyceliumArchitectManifest.swift` (the 100 entries with — Verified 2026-11-27: manifest, difficulty, solver, generator installed; catalog measured in an isolated copy (all 100 generate, 8.9 s; research R4) with profile changes and candidate bound 1 024 written back to spec Q2, research, data model, plan; host-2 exit=0
   provenance), `MyceliumArchitectDifficulty.swift`, `MyceliumArchitectSolver.swift` (clarification Q3: breadth-first by
   action count, loss order, reachability, depth ≤ p, work bound 20 000, replay through the play) and
   `MyceliumArchitectGenerator.swift` (clarification Q2: draw order, band profiles, terminals from the winning growth,

@@ -14,8 +14,14 @@
 - **R4 Measurements.** Decision: the first implementation task measures the real catalog (accepted candidate index per
   band, work per level and catalog, witness lengths, slowest level and group of five) and records it here; adjustment
   ladder if an entry reaches `generation(n)` or a group of five exceeds 6 s: first the band's limit slack, then its
-  budget slack, then its rock ‰ and toxin ‰, never p or the manifest's budgets. Measured: pending (filled by
-  T-R02G2202-003).
+  budget slack, then its rock ‰ and toxin ‰, never p or the manifest's budgets; the candidate bound may be raised (candidates are cheap). Measured 2026-11-27
+  (debug host build, the drafted pipeline): with the clarified profiles 76 of 100 entries generated within 64 candidates
+  (skips: networks under 5 cells, toxic or starved growth, minimal plans shorter than p); with every band given at least
+  one fixed nutrient, κ ≤ 2, ο ≤ 1, and bands 4 and 5 at 100 ‰ rock and 40 ‰ toxin, 90 generated; with the candidate
+  bound at 1 024 all 100 generate: largest accepted candidate index 99, 71, 98, 349, 146 by band; witness lengths exactly
+  1, 2, 3, 3, 4; largest work per level 15, 95, 488, 408, 2 219; 28 600 arrangements judged for the catalog; slowest
+  level 100 (0.9 s); slowest group of five 96 … 100 (2.2 s); whole catalog 8.9 s. These values are written back into
+  spec clarification Q2, data-model.md and plan.md.
 - **R5 Loss.** Decision: 16 × Chebyshev distance from each unreached terminal to the nearest grown cell + overweight
   excess + 1 024 for toxic or starved. Rationale: whole numbers; zero exactly when won; nearer networks first.
 - **R6 Witness layout.** Decision: as feature 502 (schema 1, sorted keys, per-action 16-hex state digests, play
