@@ -28,7 +28,7 @@ change (the shaders and reference of R02-G19-03 are unchanged and re-proven by t
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G1909-003 [US1] Edit `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraControls.swift`:
+- [X] T-R02G1909-003 [US1] Edit `Packages/ExperiencesRound02/MicroscopicAurora/Experience/MicroscopicAuroraControls.swift`: — Verified 2026-11-26: 2026-11-26 sim-27 exit 0, 73 simulator tests incl. 5 identifier tests (.autonomy/migration/checks/R02-G19-09.sim-27.json); the explanation has its own identifier and identifierNames pins the 48 names, each used once
   the failure explanation's identifier becomes `explanation` (it shared `failure`), and `identifierNames` lists the 48
   identifiers (spec Clarifications Q1: slot, slot-minus, slot-plus, selection, wells-detail, site, site-minus, site-plus,
   strength, strength-minus, strength-plus, sense, place, remove, freeze, reset-view, tick, tick-minus, tick-plus, tick-detail, play, undo, redo, next-level, dismiss-tutorial, hint, campaign, daily, practice,

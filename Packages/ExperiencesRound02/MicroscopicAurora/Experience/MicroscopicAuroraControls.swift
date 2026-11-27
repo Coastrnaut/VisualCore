@@ -37,6 +37,10 @@
 // n", identifier `replay-position`) with Step (identifier `replay-step`, value "Action k of n") and Stop (identifier
 // `replay-stop`, value the trace's actions), each with a label; the Sound toggle saves the choice through
 // `settings.sound`.
+//
+// Feature 489 (R02-G19-09) T-R02G1909-003 (clarification Q1): the failure explanation has its own identifier
+// `explanation` (it shared `failure` with the short failure line); every identifier the panel gives through
+// `port.identifier` (`experience.r02-g19.microscopic-aurora.<name>`) is listed in ``identifierNames``, each once.
 #if os(iOS)
 import MicroscopicAuroraCore
 import SwiftUI
@@ -60,6 +64,17 @@ struct MicroscopicAuroraControls: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 486).
     @Environment(\.scenePhase) private var scenePhase
+
+    /// Every identifier name the panel gives through `port.identifier`, each exactly once (feature 489, clarification
+    /// Q1): the interface tests find the controls by these names.
+    static let identifierNames: [String] = [
+        "slot", "slot-minus", "slot-plus", "selection", "wells-detail", "site", "site-minus", "site-plus", "strength",
+        "strength-minus", "strength-plus", "sense", "place", "remove", "freeze", "reset-view", "tick", "tick-minus",
+        "tick-plus", "tick-detail", "play", "undo", "redo", "next-level", "dismiss-tutorial", "hint", "campaign", "daily",
+        "practice", "level-picker", "play-level", "replay", "replay-step", "replay-stop", "sound", "actions", "status",
+        "failure", "explanation", "progress", "summary", "message", "tutorial", "hint-text", "band", "stars", "goal",
+        "replay-position",
+    ]
 
     /// The widest the panel's content grows, padding included (clarification Q5 of feature 486).
     static let readableWidth: CGFloat = 520
@@ -362,7 +377,7 @@ struct MicroscopicAuroraControls: View {
         }
         if let explanation = mirror.explanation {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier(port.identifier("failure"))
+                .accessibilityIdentifier(port.identifier("explanation"))
         }
         row {
             Text(mirror.bandLabel).font(.footnote)
