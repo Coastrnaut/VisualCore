@@ -44,7 +44,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 - [X] T-R02G1910-008 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-26: 2026-11-26 reference-2 exit 0 (.autonomy/migration/checks/R02-G19-10.reference-2.json)
 - [ ] T-R02G1910-009 {device} After ImplementationLock-100: the device campaign (UA-F13) runs rows MA-D1 … MA-D8 on D1,
   D2, D3 (SC-R02G1910-004)
-- [ ] T-R02G1910-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G1910-010 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-26: 2026-11-26 /speckit-converge: converged (nothing appended); README row, feature count 190 and gate list updated
   README row and gate list updated; after the record push, check its CI run with `gh run list`
 
 ## Dependencies and parallel work
