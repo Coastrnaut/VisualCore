@@ -11,7 +11,7 @@ Prerequisites: R02-G21-04, R02-G21-05 and R02-G21-06 recorded.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2107-001 Baselines on the committed tree after R02-G21-06 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2107-001 Baselines on the committed tree after R02-G21-06 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 (after R02-G21-06 was recorded)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters)
 
 ## Phase 2: Story 2 — reconcilable scores (P1) 🎯
