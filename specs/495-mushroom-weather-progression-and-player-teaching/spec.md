@@ -91,7 +91,8 @@ multipliers are 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 
   tutorial levels). A failure is explained from the play's failure, colonies numbered from 1 and cells in the level's
   words ("the cell at row r, column c"): dried — "Colony n dried out at cycle t: it fell below its survival floor.";
   mold — "The cell at row r, column c grew mold at cycle t: it rose above the mold bound."; unstable — "Colony n stayed
-  in its band for only the last r cycles; k were needed." — each followed by "Undo the last action or retry the level."
+  in its band for only the last r cycles; k were needed." ("the last 1 cycle" and "1 was needed" in the singular)
+  — each followed by "Undo the last action or retry the level."
   Impact: FR-R02G2005-003, 007; SC-R02G2005-003.
 
 ## User Scenarios & Testing *(mandatory)*
