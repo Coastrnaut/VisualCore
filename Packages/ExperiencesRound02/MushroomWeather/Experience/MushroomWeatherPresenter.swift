@@ -8,6 +8,18 @@
 // action is shown in words. A memory warning releases the GPU objects; the next frame rebuilds them. The presenter only
 // reads `core.snapshot`: no drawing result reaches the kernel (renderer purity). Its probes (two backdrop corners) let
 // the verification runner check a frame. Modelled on `MicroscopicAuroraPresenter` (feature 483).
+// Feature 494 (R02-G20-04) T-R02G2004-005 (FR-R02G2004-001 … 011): a canvas touch goes through the presenter's
+// `MushroomWeatherGestureController` with the drawn snapshot (`pointer`): a tap on an empty site places a pod in the
+// first free slot (`pod.place [slot, row, column]`), a pod drag previews the weather with the pod moved or removed (the
+// preview of `MushroomWeatherSceneSnapshot.previewing`, presentation only, kept in the mirror) and its release sends
+// one `pod.place` to the new site or one `pod.remove` off the floor; a vent tap sends `vent.set [index, open]` with the
+// other state; a vertical moon drag previews the moonlight and its release sends one `moon.set [level]`; a scrubber
+// drag shows cycles (`clock.show`, in any stage); a tapped pod selects its slot in the panel; two fingers orbit the
+// camera and a double tap off the floor or "Reset view" (`resetView()`) returns it (presentation only; the meshes are
+// rebuilt). Kernel actions are sent only while playing (the controller's rule); a gesture on a finished play says "The
+// play is over: undo or go to the next level". A refused action is shown in the panel and its code, read with or
+// without the engine's `action.rule.` prefix, is kept in the refusal log. Modelled on `MicroscopicAuroraPresenter`
+// (feature 484).
 #if os(iOS)
 import Foundation
 import MushroomWeatherCore
@@ -16,6 +28,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show: the latest state the presenter described, the shown cycle and the panel's selection.
 @MainActor
@@ -41,8 +54,11 @@ final class MushroomWeatherMirror {
     var shownCycle = 0
     /// The play followed (a copy; never sent anywhere).
     var play: MushroomWeatherPlay?
-    /// The text of the last refused change, if any.
+    /// The text of the last refused change, or why a gesture did nothing, if any.
     var message: String?
+    /// A pod or moon drag's preview (feature 494; presentation only): what the drag would change, nil while no drag
+    /// previews.
+    var preview: MushroomWeatherPreviewKind?
     /// The pod slot the panel edits (0 … slots − 1).
     var slot = 0
     /// The index of the site the panel would place on.
@@ -141,9 +157,28 @@ final class MushroomWeatherMirror {
         return level.failureDescription(failure).capitalizedFirst + "."
     }
 
-    /// A refused action's reason code in words.
+    /// The engine's prefix of rule codes (feature 494: codes are read with or without it).
+    static let rulePrefix = "action.rule."
+
+    /// `code` without the engine's ``rulePrefix``.
+    static func bareCode(_ code: String) -> String {
+        code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+    }
+
+    /// The panel line of a refusal: "That change was refused: " and the reason in words.
+    static func refusalMessage(code: String) -> String {
+        "That change was refused: \(refusalText(code: code))."
+    }
+
+    /// Records the result of sending a control (feature 494): a refusal is shown in words; an accepted action clears
+    /// the message.
+    func record(accepted: Bool, code: String) {
+        message = accepted ? nil : Self.refusalMessage(code: code)
+    }
+
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix`` (feature 494).
     static func refusalText(code: String) -> String {
-        switch code {
+        switch bareCode(code) {
         case "r02-g20.stage": "the play is over: undo a failed run or go to the next level"
         case "r02-g20.action": "that pod, vent or moonlight cannot be set that way, or there is nothing to undo, redo "
             + "or remove"
@@ -193,8 +228,16 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
     let scene = MushroomWeatherForestScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G2003-004).
     private(set) var tierLog: [MushroomWeatherTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot drawn (tests, the description and the gestures), with the drawn preview applied.
     private(set) var lastSnapshot: MushroomWeatherSceneSnapshot?
+    /// The core's snapshot last drawn, without the preview, and its level (feature 494).
+    private var lastBase: (snapshot: MushroomWeatherSceneSnapshot, level: MushroomWeatherLevel)?
+    /// The gesture controller (feature 494): site, pod, vent and moon gestures, the scrubber, double taps and orbits.
+    private(set) var gestures = MushroomWeatherGestureController()
+    /// The bare codes of refused actions, oldest first, at most ``refusalLogLimit`` (feature 494).
+    private(set) var refusalLog: [String] = []
+    /// The most refusal codes kept.
+    static let refusalLogLimit = 64
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -246,8 +289,11 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
         }
         follow(core)
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
-        let snapshot = core.snapshot(time: time)
+        let base: MushroomWeatherSceneSnapshot = core.snapshot(time: time)
+        lastBase = (snapshot: base, level: core.play.level)
+        let snapshot: MushroomWeatherSceneSnapshot = presented(base, level: core.play.level)
         lastSnapshot = snapshot
+        scene.orbit = gestures.orbit
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
 
@@ -309,9 +355,109 @@ final class MushroomWeatherPresenter: ExperiencePresenter {
         return text
     }
 
-    /// The control panel.
+    /// `snapshot` with the mirror's drag preview applied (feature 494; presentation only).
+    private func presented(_ snapshot: MushroomWeatherSceneSnapshot,
+                           level: MushroomWeatherLevel) -> MushroomWeatherSceneSnapshot {
+        guard let preview = mirror.preview else { return snapshot }
+        return snapshot.previewing(preview, level: level)
+    }
+
+    /// Re-applies the mirror's preview to the last snapshot, so tests and the next gesture read it.
+    private func refreshPreview() {
+        guard let base = lastBase else { return }
+        lastSnapshot = presented(base.snapshot, level: base.level)
+    }
+
+    /// The control panel: "Reset view" (feature 494); every kernel button sends through ``send(_:_:port:)``.
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(MushroomWeatherControls(port: port, mirror: mirror))
+        AnyView(MushroomWeatherControls(port: port, mirror: mirror,
+                                        sendAction: { [weak self] control, values in
+                                            self?.send(control, values, port: port)
+                                        },
+                                        resetView: { [weak self] in self?.resetView() }))
+    }
+
+    /// The camera's orbit (presentation only; the gesture controller's).
+    var orbit: MushroomWeatherViewOrbit { gestures.orbit }
+
+    /// The canvas gestures place, move and remove pods, open and shut vents, set the moonlight and show cycles; the
+    /// preview and the orbit are presentation state.
+    var gestureActions: Set<String> { ["pod.place", "pod.remove", "vent.set", "moon.set", "clock.show"] }
+
+    /// The native controls send every action a gesture can, and more.
+    var nativeActions: Set<String> { Set(Core.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot and applies what it returns, in
+    /// order: a placement or move through `pod.place [slot, row, column]` and a removal through `pod.remove [slot]`
+    /// (one action each; the preview is dropped), a vent through `vent.set [index, open]`, the moonlight through
+    /// `moon.set [level]` (the preview is dropped and the panel's chosen level follows), a cycle through `clock.show
+    /// [cycle]` (presentation only), a preview kept in the mirror and drawn, a slot selected in the panel, a reset view
+    /// (the controller is already at the authored orbit) and an explanation to the mirror's message.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let drawn = lastSnapshot else { return }
+        let actions: [MushroomWeatherGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: drawn)
+        for action in actions {
+            switch action {
+            case let .place(slot, cell), let .move(slot, cell):
+                mirror.preview = nil
+                send("pod.place", [Double(slot), Double(cell.row), Double(cell.column)], port: port)
+            case let .remove(slot):
+                mirror.preview = nil
+                send("pod.remove", [Double(slot)], port: port)
+            case let .setVent(index, open):
+                send("vent.set", [Double(index), open ? 1 : 0], port: port)
+            case let .setMoonlight(level):
+                mirror.preview = nil
+                mirror.chosenMoonlight = mirror.clampedMoonlight(level)
+                send("moon.set", [Double(level)], port: port)
+            case let .showCycle(cycle):
+                send("clock.show", [Double(cycle)], port: port)
+            case let .preview(kind):
+                mirror.preview = kind
+            case .clearPreview:
+                mirror.preview = nil
+            case let .selectSlot(slot):
+                mirror.slot = slot
+            case .resetView:
+                break   // the controller has already returned to the authored orbit; the next frame draws it
+            case let .explain(reason):
+                mirror.message = reason
+            }
+        }
+        if event.phase == .ended || event.phase == .cancelled || gestures.state == .orbiting
+            || gestures.state == .cancelled {
+            mirror.preview = nil
+        }
+        scene.orbit = gestures.orbit
+        refreshPreview()
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the preview disappears.
+    func cancelPointers() {
+        gestures.cancel()
+        mirror.preview = nil
+        refreshPreview()
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        gestures.resetView()
+        scene.orbit = gestures.orbit
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its bare code in ``refusalLog``.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        let result = port.send(control, values)
+        mirror.record(accepted: result.isAccepted, code: result.code)
+        if !result.isAccepted {
+            refusalLog.append(MushroomWeatherMirror.bareCode(result.code))
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        refreshPreview()
+        return result
     }
 }
 #endif

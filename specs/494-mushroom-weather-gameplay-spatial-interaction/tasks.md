@@ -80,7 +80,7 @@ tests stay short (< 10 s each). No {owner} tasks. Agents model their files on Mi
 
 ## Phase 5: Story 5 and wiring — orbit, reset, presenter, panel
 
-- [ ] T-R02G2004-005 [US5] Wire `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherPresenter.swift`
+- [X] T-R02G2004-005 [US5] Wire `Packages/ExperiencesRound02/MushroomWeather/Experience/MushroomWeatherPresenter.swift` — Verified 2026-11-27: 2026-11-27 sim-27 exit 0 on sim-27.2: 37 tests in 5 suites incl. 11 gesture wiring tests (site tap places, pod drag moves and removes with the drawn preview, vent tap toggles, moon drag sets the moonlight, scrub shows a cycle, orbit and reset change no digest, a refused change is shown and logged, a won play sends nothing and explains) (.autonomy/migration/checks/R02-G20-04.sim-27.json)
   (FR-R02G2004-001 … 011; `pointer(_:viewSize:port:)` routing through the gesture controller with the drawn snapshot;
   placements, moves and removals sent through `pod.place` and `pod.remove`, vents through `vent.set`, the moonlight
   through `moon.set`, cycles through `clock.show`; the preview kept as presentation state and drawn; explain texts for

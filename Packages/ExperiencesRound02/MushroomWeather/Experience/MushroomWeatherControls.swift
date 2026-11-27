@@ -2,15 +2,18 @@
 // control panel: a labelled slot picker (pod 1 … slots, slot − and +), the site (site − and +, over the level's sites,
 // or every free floor cell on a level without sites) of the pod to place; place (`pod.place [slot, row, column]`: one
 // action of the budget), remove (`pod.remove [slot]`: one action); a toggle per vent (`vent.set [index, open]`, open 1,
-// shut 0: one action); the moonlight (moonlight − and + choose a level 0 … 3, Set moonlight sends `moon.set [level]`: one action); the shown
-// cycle (cycle − and +, `clock.show [cycle]` clamped to 0 … cycles run); running the weather (`weather.run`), undo,
-// redo and next level (kernel actions through the action port), each with an accessibility label, value and identifier.
-// The shown cycle is presentation state of the adapter (a level opens at cycle 0). A change the kernel refuses (a site
-// another pod occupies, an unchanged pod, vent or moonlight, no action left) is still sent: the kernel refuses it and
-// the panel says why. The header shows the actions left of the budget, the status (stage, or the failure in words), the
-// progress description, the level in words, the tutorial on levels that have one, the failure in words and a refused
-// action in words. Dragging pods, scrubbing the run and full accessibility come in later features of R02-G20. Modelled
-// on `MicroscopicAuroraControls` (feature 483).
+// shut 0: one action); the moonlight (moonlight − and + choose a level 0 … 3, Set moonlight sends `moon.set [level]`:
+// one action); the shown cycle (cycle − and +, `clock.show [cycle]` clamped to 0 … cycles run); running the weather
+// (`weather.run`), undo, redo and next level (kernel actions through the action port), each with an accessibility
+// label, value and identifier. The shown cycle is presentation state of the adapter (a level opens at cycle 0). A
+// change the kernel refuses (a site another pod occupies, an unchanged pod, vent or moonlight, no action left) is still
+// sent: the kernel refuses it and the panel says why. The header shows the actions left of the budget, the status
+// (stage, or the failure in words), the progress description, the level in words, the tutorial on levels that have one,
+// the failure in words and a refused action in words. Feature 494 (R02-G20-04) T-R02G2004-005 (FR-R02G2004-010, 011):
+// every kernel button sends through the presenter (so refusals are shown and logged with their code), and the panel
+// gains "Reset view" (the authored camera, presentation only); a pod tapped on the canvas selects its slot here, and a
+// moon drag's level becomes the chosen moonlight. Full accessibility comes in a later feature of R02-G20. Modelled on
+// `MicroscopicAuroraControls` (features 483 and 484).
 #if os(iOS)
 import MushroomWeatherCore
 import SwiftUI
@@ -22,6 +25,10 @@ struct MushroomWeatherControls: View {
     let port: ExperienceActionPort
     /// What the panel shows (and the panel's selection).
     @Bindable var mirror: MushroomWeatherMirror
+    /// Sends a control with its values through the presenter (feature 494).
+    let sendAction: (String, [Double]) -> Void
+    /// Returns the camera to the authored view (feature 494).
+    let resetView: () -> Void
 
     /// The panel.
     var body: some View {
@@ -35,6 +42,7 @@ struct MushroomWeatherControls: View {
                 moonRow
                 cycleRow
                 playRow
+                viewRow
             }
             .padding()
         }
@@ -186,6 +194,15 @@ struct MushroomWeatherControls: View {
         }
     }
 
+    /// Reset the view (feature 494; presentation only).
+    @ViewBuilder private var viewRow: some View {
+        HStack(spacing: 16) {
+            Button("Reset view") { resetView() }
+                .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityIdentifier(port.identifier("reset-view"))
+        }
+    }
+
     /// Moves the slot selection by `step`, wrapping over the level's slots.
     private func moveSlot(_ step: Int) {
         let count: Int = mirror.slotCount
@@ -212,11 +229,9 @@ struct MushroomWeatherControls: View {
         send("clock.show", [Double(mirror.clampedCycle(cycle))])
     }
 
-    /// Sends `control` and shows a refusal in words.
+    /// Sends `control` through the presenter, which shows a refusal in words.
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(MushroomWeatherMirror.refusalText(code: result.code))."
+        sendAction(control, values)
     }
 }
 #endif

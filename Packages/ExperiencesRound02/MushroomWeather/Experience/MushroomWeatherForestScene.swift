@@ -8,7 +8,10 @@
 // (around the caps and pods) with the glow program, additive and last (level-0 two shells, level-1 one, level-2 none),
 // the gain capped by `u_glowLimit` (the Reduce Flashing cap). The meshes do not depend on the time, so they are rebuilt
 // only when what they read changes: the level, the pods, the vents, the moonlight, the shown cycle, the stage, the
-// failure, the actions left, the tier, the aspect or the fallback. Depth and blend state as Microscopic Aurora's scene
+// failure, the actions left, the tier, the aspect, the fallback or (feature 494, R02-G20-04 T-R02G2004-005,
+// FR-R02G2004-006, 008) the camera's orbit or the drawn preview; the meshes face the camera of the presenter's orbit
+// (`MushroomWeatherSceneGeometry.camera(aspect:orbit:)` and the camera-taking mesh builders) and draw the preview
+// (the previewed run, the ghost pod) and the cycle scrubber. Depth and blend state as Microscopic Aurora's scene
 // (feature 483): depth testing off (the window surface carries no depth buffer) and no face culling; the geometry
 // emits its triangles in its fixed order (by kind, then index; a cap's underside before its dome), and a quad's
 // transparent fringe (its quad spans ±1.25 of its shape, the shader gives the fringe coverage 0, premultiplied zero)
@@ -41,6 +44,9 @@ final class MushroomWeatherForestScene {
     /// The `u_time` value of the last frame drawn by the shader path (tests; it still advances under Reduce Motion,
     /// where `u_motion` 0 keeps the droplets and motes still).
     private(set) var lastShaderTime: Double = 0
+    /// The camera's orbit (feature 494; presentation only, the presenter's gesture controller's). A changed orbit
+    /// rebuilds the meshes on the next draw.
+    var orbit: MushroomWeatherViewOrbit = .authored
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the fallback.
     private struct GeometryKey: Equatable {
@@ -54,6 +60,12 @@ final class MushroomWeatherForestScene {
         let actionsLeft: Int
         let tier: Int
         let fallback: Bool
+        /// The camera's orbit (feature 494; the meshes face the drawn camera).
+        let orbit: MushroomWeatherViewOrbit
+        /// The aspect the meshes were built for.
+        let aspect: Double
+        /// The drawn preview (feature 494; presentation only).
+        let preview: MushroomWeatherPreview?
     }
 
     private var registry: ResourceRegistry?
@@ -69,8 +81,8 @@ final class MushroomWeatherForestScene {
         resize(context)
     }
 
-    /// Records the new aspect; the camera follows on the next draw. The meshes face the authored camera, so they are
-    /// rebuilt only when the aspect really changed.
+    /// Records the new aspect; the camera follows on the next draw. The meshes face the drawn camera, so they are
+    /// rebuilt only when the aspect (or, at the next draw, the orbit) really changed.
     func resize(_ context: RenderContext) {
         let next: Double = Double(max(1, context.pixelWidth)) / Double(max(1, context.pixelHeight))
         if next != aspect { geometryKey = nil }
@@ -112,9 +124,9 @@ final class MushroomWeatherForestScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera = MushroomWeatherSceneGeometry.camera(aspect: aspect)
+        let camera = MushroomWeatherSceneGeometry.camera(aspect: aspect, orbit: orbit)
         let next: GeometryKey = key(snapshot, tier: tier)
-        if next != geometryKey { try rebuild(snapshot, tier: tier) }
+        if next != geometryKey { try rebuild(snapshot, tier: tier, camera: camera) }
         geometryKey = key(snapshot, tier: tier)
         if fallbackReason != nil {
             try drawFallback(camera)
@@ -134,23 +146,25 @@ final class MushroomWeatherForestScene {
     private func key(_ s: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, pods: s.pods, ventsOpen: s.ventsOpen, moonlight: s.moonlight,
                     shownCycle: s.shownCycle, stage: s.stage, failure: s.failure, actionsLeft: s.actionsLeft,
-                    tier: tier.index, fallback: fallbackReason != nil)
+                    tier: tier.index, fallback: fallbackReason != nil, orbit: orbit, aspect: aspect,
+                    preview: s.preview)
     }
 
-    /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.
-    private func rebuild(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier) throws {
+    /// Rebuilds the GPU objects for `snapshot` at `tier` facing `camera`: the two programs, or the unlit fallback.
+    private func rebuild(_ snapshot: MushroomWeatherSceneSnapshot, tier: MushroomWeatherTier,
+                         camera: MushroomWeatherCamera) throws {
         guard let registry else { return }
         let keepFallback = fallbackReason
         release()
         fallbackReason = keepFallback
         if fallbackReason == nil {
             do {
-                let forest = try MushroomWeatherSceneGeometry.forestMesh(snapshot, tier: tier)
+                let forest = try MushroomWeatherSceneGeometry.forestMesh(snapshot, tier: tier, camera: camera)
                 forestRenderer = try Self.renderer(forest, vertex: MushroomWeatherShaders.forestVertex,
                                                    fragment: forestFragment, name: "mushroom-weather-forest",
                                                    registry: registry)
                 forestBuilds += 1
-                let glow = try MushroomWeatherSceneGeometry.glowMesh(snapshot, tier: tier)
+                let glow = try MushroomWeatherSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera)
                 glowBuilds += 1
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: MushroomWeatherShaders.glowVertex,
@@ -168,8 +182,8 @@ final class MushroomWeatherForestScene {
         let minimal = MushroomWeatherTier.of(MushroomWeatherTier.all.count - 1)
         let up = Vec3(0, 0, 1)
         let parts: [MushroomWeatherColouredMesh] = [
-            try MushroomWeatherSceneGeometry.forestPart(snapshot, tier: minimal),
-            try MushroomWeatherSceneGeometry.glowPart(snapshot, tier: minimal),
+            try MushroomWeatherSceneGeometry.forestPart(snapshot, tier: minimal, camera: camera),
+            try MushroomWeatherSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh
