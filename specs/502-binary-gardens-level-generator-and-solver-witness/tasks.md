@@ -146,7 +146,7 @@ generator, catalog tests, witness files, docs) stay with the lead. MVP: Story 1.
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G2102-013 Record in `specs/502-binary-gardens-level-generator-and-solver-witness/data-model.md` and against
+- [X] T-R02G2102-013 Record in `specs/502-binary-gardens-level-generator-and-solver-witness/data-model.md` and against — Verified 2026-11-27: data-model.md records the Core/Content placement and the scan that covers it
   T-R02G2102-003 and -005 that the five content files live in
   `Packages/ExperiencesRound02/BinaryGardens/Core/Content/` (feature 501's invariant scan counts the files directly in
   `Core/`), as plan.md states, per plan: project structure (contradicts)

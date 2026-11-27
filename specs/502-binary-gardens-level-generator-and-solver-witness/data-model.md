@@ -25,3 +25,11 @@ Generation of entry n: for c in 0 … 63 — draw candidate c → skip (separati
 > 200 000, refused by the level rules, reducible) → skip (ring radii and worlds equal level n − 1's) → solve → skip (no
 plan within the work bound, plan size ≠ p, replay through the play does not win) → emit with skipped = c. No candidate:
 `generation(n)`.
+
+## Source placement (feature 502 convergence, T-R02G2102-013)
+
+The five content-pipeline files (`BinaryGardensManifest`, `BinaryGardensDifficulty`, `BinaryGardensSolver`,
+`BinaryGardensGenerator`, `BinaryGardensWitness`) live in `Packages/ExperiencesRound02/BinaryGardens/Core/Content/`,
+the same target and module as the kernel, because feature 501's invariant scan counts the files directly in `Core/`;
+`BinaryGardensGeneratorTests.theContentPipelineHoldsNoClockOrFloatingPoint` applies the same scan to `Core/Content`.
+The paths in tasks T-R02G2102-003 and -005 read relative to that folder.
