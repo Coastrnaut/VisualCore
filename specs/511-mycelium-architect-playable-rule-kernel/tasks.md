@@ -13,7 +13,7 @@ reasons as they are added (feature 501's convergence lesson).
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2201-001 Baselines after X-R02-G21 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G2201-001 Baselines after X-R02-G21 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1/2/3c/3e/3f exit=0
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two filters as at R02-G21-10, without
   `MyceliumArchitect`, on the committed tree before the targets exist); the rendering baseline is X-R02-G21's
   visualcore-rendering run
