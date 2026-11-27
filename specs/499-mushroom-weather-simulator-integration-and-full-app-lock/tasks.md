@@ -15,7 +15,7 @@ change (the shaders and reference of R02-G20-03 are unchanged and re-proven by t
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2009-002 Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSchemaExamples.swift`
+- [X] T-R02G2009-002 Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSchemaExamples.swift` — Verified 2026-11-27: host exit=0, MushroomWeatherSchemaExampleTests 8 tests (.autonomy/migration/checks/R02-G20-09.host.json); registry examples compiled and restored in app-unit (T-005)
   (contracts/api.md; data-model: schema 1 "`{level: 1, records}` of a seeded play of level 1 with one non-winning pod
   placed (playing, not won), seed 7"; schema 2 "campaign mode, the tutorial done, progress (frontier 2, level 1 solved
   with actions spent one above the certified count and its stars), the records of a fresh play", "the result is kept,

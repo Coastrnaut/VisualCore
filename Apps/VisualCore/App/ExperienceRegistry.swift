@@ -148,11 +148,15 @@ enum ExperienceRegistry {
     /// gate moves its registration from here to `all`.
     static let candidates: [ExperienceRegistration] = [mushroomWeather].compactMap { $0 }
 
-    /// R02-G20 Mushroom Weather (feature 493, R02-G20-03): a candidate until X-R02-G20. Snapshot schema 1, so no
-    /// earlier example is stored yet.
+    /// R02-G20 Mushroom Weather (features 491–499, R02-G20-01…09): a candidate until X-R02-G20. Snapshot schema 3
+    /// since feature 497 (R02-G20-07); its schema-1 and schema-2 examples are registered since feature 499
+    /// (R02-G20-09).
     fileprivate static var mushroomWeather: ExperienceRegistration? {
         guard let id = MushroomWeatherExperience.id else { return nil }
-        var registration = ExperienceRegistration(id: id, core: MushroomWeatherExperienceCore.self) { launch in
+        let examples = [MushroomWeatherExperienceCore.schemaOneExample(),
+                        MushroomWeatherExperienceCore.schemaTwoExample()].compactMap { $0 }
+        var registration = ExperienceRegistration(id: id, core: MushroomWeatherExperienceCore.self,
+                                                  examples: examples) { launch in
             let system = SystemAccessibilityObserver.systemValues()
             return MushroomWeatherExperience.make(
                 id: id, storage: launch.storage,
