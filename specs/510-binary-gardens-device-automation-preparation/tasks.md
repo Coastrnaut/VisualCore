@@ -8,7 +8,7 @@ is contacted. No {owner} tasks; one {device} task. Prerequisites: R02-G21-05 …
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2110-001 Baselines after R02-G21-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G2110-001 Baselines after R02-G21-09 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1/2/3c/3e/3f exit=0
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the five round-two chunks, 2 with `BinaryGardens`; no Swift changes
   follow; the rendering baseline is R02-G21-09's runs)
 
