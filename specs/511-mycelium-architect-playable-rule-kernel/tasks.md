@@ -110,7 +110,7 @@ reasons as they are added (feature 501's convergence lesson).
   and in CI half b); `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f` (chunk 1 gains MyceliumArchitect: `swift test
   --package-path Packages/ExperiencesRound02 --filter 'VoxelOrigami|MyceliumArchitect'`; the other four filters
   unchanged)
-- [ ] T-R02G2201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2201-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0
   `--name host-full`
 - [ ] T-R02G2201-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2201-010 Reference regression chunk 2 (`--name reference-2`)
