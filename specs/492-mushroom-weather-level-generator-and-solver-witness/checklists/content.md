@@ -80,3 +80,5 @@ and vent rates 0 … 30 / 120 … 200 of 0 … 200, release 10 … 30 of 1 … 4
 ## Notes
 
 - `/speckit-implement` reads these markers and does not change them.
+- The items were first drafted before `/speckit-checklist` was invoked (a slip of the skill-first rule); the invocation
+  then reviewed every item against the spec's clarifications, research and SC-R02G2002-006 and kept all sixteen.
