@@ -1038,5 +1038,7 @@ and accessibility: `MushroomWeatherFeedbackPlan` (announcements and haptics thro
 an accessible panel (a summary element, adjustable selection, values in words). Feature 497 (R02-G20-07) adds
 persistence and replay: snapshot schema 3 with winning traces, `MushroomWeatherReconciliation` (every saved result
 replayed on restore, edited ones dropped and counted), replay of the best solution (`replay.start`, `replay.step`,
-`replay.stop`) and the saved sound choice (`settings.sound`). See
+`replay.stop`) and the saved sound choice (`settings.sound`). Feature 498 (R02-G20-08) adds the regression net: a
+solver regression over all 100 levels, golden frame descriptions (`MushroomWeatherGolden`, `golden-frames.json`),
+simulator golden-frame and memory tests, a CI step and `scripts/mushroom_weather_regression.py`. See
 [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).

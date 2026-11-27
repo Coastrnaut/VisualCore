@@ -186,3 +186,23 @@ accounts for every unit; the catalog's 0.016667 s timestep is a presentation clo
   offers Replay, Step and Stop with the replay position.
 - **Settings.** The sound choice is saved through `settings.sound [0 … 1]`, snapshotted but never digested, and applied
   when the experience opens.
+
+## Regression net (feature 498, R02-G20-08)
+
+- **Solver regression.** For all 100 levels the generated level equals its witness, the witness replays to a win on
+  exactly its final run (not before) with its per-action fingerprints and digests, and the minimal solver returns
+  exactly the witness's actions with the counterexample's arrangements one action short and its nearest miss, within
+  its work bound (counted, never timed); twelve kinds of alteration (a colony's band or survival floor, a starting
+  humidity, the diffusion, a vent's rate, the pod release, the growth threshold, the mold bound, the budget, a plan or
+  witness action, a per-action fingerprint or digest, the counterexample's count) are each detected and named. Ten
+  tests of ten levels.
+- **Golden frames.** `MushroomWeatherGolden` (debug and automation builds only; forbidden in Release) describes 16
+  frames — levels 1, 21, 41, 61 and 81 at three tiers after their certified actions but not the run, shown at half the
+  cycles run, plus the hero frame — by the projected floor centre, caps, moon, first gauge track and first actions bar
+  in eighths of a pixel, element counts, the moonlight and the 21 palette colours, pinned with SHA-256 digests in
+  `golden-frames.json` and rewritten only with `MUSHROOM_WEATHER_WRITE_GOLDEN=1`. The simulator renders the same frames
+  and checks them with the feature-493 tolerances.
+- **Memory.** Twelve open–draw–warn–close cycles on the simulator stay within 16 MB of the first (bound applied when the
+  class runs alone) and release every GPU object of the scene.
+- **Running it.** CI's round-two job (half b) has a "Mushroom Weather regression (host)" step;
+  `python3 scripts/mushroom_weather_regression.py` runs the host and simulator parts with one summary.

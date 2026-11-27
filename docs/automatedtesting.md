@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G20-07: Mushroom Weather persistence and replay).
+Last updated: 2026-11-27 (R02-G20-08: Mushroom Weather visual golden and solver regression).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,14 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mushroom Weather visual golden and solver regression** (R02-G20-08, 2026-11-27). Host:
+  `MushroomWeatherRegressionSolverTests` (15 tests, 115 cases, about 4 s: all 100 levels in ten groups — level, witness
+  replay winning on exactly the final run with per-action fingerprints and digests, the minimal plan with the
+  counterexample and nearest miss within the work bound — and the twelve alterations named), `…RegressionGoldenTests`
+  (13: the 16 golden frame descriptions against `golden-frames.json`, the one-quantum fallback, the digest self-check,
+  every kind of manifest damage named). Simulator: `…RegressionGoldenFrameTests` and `…RegressionMemoryTests` (12
+  cycles within 16 MB when run alone with `TEST_RUNNER_MUSHROOM_WEATHER_MEMORY_ISOLATED=1`; 69 tests in the suite).
+  Local: `python3 scripts/mushroom_weather_regression.py`; CI step "Mushroom Weather regression (host)" in half b.
 - **Mushroom Weather persistence and replay** (R02-G20-07, 2026-11-27). Host: `MushroomWeatherReconciliationTests`
   (19: net traces over undo and redo, every witness trace verified, edited stars, actions spent, steps and illegal,
   failing, run-less or over-long traces dropped and counted), `…ProgressTests` (traces, drop, legacy decoding),
