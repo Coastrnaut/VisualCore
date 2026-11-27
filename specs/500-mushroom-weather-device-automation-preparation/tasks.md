@@ -14,7 +14,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
 
 ## Phase 2: Story 1 — the campaign knows what to run (P1) 🎯
 
-- [ ] T-R02G2010-002 [US1] Create `docs/apps/mushroom-weather/device-rows.json` (data-model.md: "schema 1, sorted keys";
+- [X] T-R02G2010-002 [US1] Create `docs/apps/mushroom-weather/device-rows.json` (data-model.md: "schema 1, sorted keys"; — Verified 2026-11-27: device-rows exit=0, PASS (8 rows, 12 scenarios) (.autonomy/migration/checks/R02-G20-10.device-rows.json); release step device-rows-r02-g20
   devices D1 → DEV1-R02-G20, D2 → DEV2-R02-G20, D3 → DEV3-R02-G20; the 12 scenarios of clarification Q2; rows MW-D1 …
   MW-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false only
   for MW-D6), covers, owner_steps, status "pending device campaign"; no result field); edit `scripts/release_check.py`

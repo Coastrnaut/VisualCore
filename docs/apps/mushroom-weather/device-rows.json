@@ -1,0 +1,227 @@
+{
+  "devices": [
+    {
+      "ledger": "DEV1-R02-G20",
+      "name": "D1"
+    },
+    {
+      "ledger": "DEV2-R02-G20",
+      "name": "D2"
+    },
+    {
+      "ledger": "DEV3-R02-G20",
+      "name": "D3"
+    }
+  ],
+  "experience": "r02-g20.mushroom-weather",
+  "rows": [
+    {
+      "covers": [
+        "launch",
+        "first-frame"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "MW-D1",
+      "measurements": [
+        "launch",
+        "first-frame"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "No shader program is compiled after the experience became interactive; stage times recorded for 200 samples per device and tier (docs/performance/budgets.md, proposal).",
+      "procedure": "Open Mushroom Weather from the catalog with the testing argument, 200 times per device across the three host tiers; the campaign records preparation, shader set-up and first present as stage times.",
+      "status": "pending device campaign",
+      "title": "Launch and first frame"
+    },
+    {
+      "covers": [
+        "frame-pacing",
+        "T-R02G2003-012",
+        "T-R02G2008-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "MW-D2",
+      "measurements": [
+        "frame-pacing",
+        "frame-time-per-tier"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "60 frames per second with automatic levels (a documented 30 frames per second mode is acceptable on the last level), 200 samples per device; frame time per pinned tier recorded.",
+      "procedure": "Run the hero and full-playthrough scenarios pinned to tiers 0, 1 and 2 in turn, then with automatic levels; the campaign records each frame's interval.",
+      "status": "pending device campaign",
+      "title": "Frame pacing and frame time per tier"
+    },
+    {
+      "covers": [
+        "memory",
+        "thermal",
+        "stress",
+        "T-R02G2008-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "MW-D3",
+      "measurements": [
+        "memory",
+        "thermal",
+        "stress"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner keeps the device unplugged for the stress session and tells the campaign the starting battery level."
+      ],
+      "pass": "Memory flat within the declared resource budget over the session (the growth rule of feature 192), 200 samples per device; thermal state and any tier change recorded.",
+      "procedure": "Run the 30-minute round-two stress session of UA-F13 (levels opened, pods placed on sites by tap and with the panel, pods dragged to other sites and off the floor with the weather preview, vents toggled, the moon dragged and the moonlight set, the weather run, the shown cycle scrubbed, actions undone and redone, the camera orbited, levels retried and replayed in a loop) at automatic levels; the campaign samples the footprint and the thermal state.",
+      "status": "pending device campaign",
+      "title": "Memory, thermal state and the round-two stress session"
+    },
+    {
+      "covers": [
+        "T-R02G2004-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "MW-D4",
+      "measurements": [
+        "touch-to-frame"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner taps sites and vents, drags pods, the moon and the scrubber, double-taps off the floor and orbits with two fingers; the campaign does not synthesise touches on hardware."
+      ],
+      "pass": "Touch-to-frame latency recorded for 200 samples per device; a tap (travel under 10 points, lifted within 0.5 s) on an empty site sends exactly one pod.place to the first free slot, or says that every slot is used; a tap on a vent sends exactly one vent.set with its other state; a drag of a pod (16 points or more) shows the previewed weather from the kernel's own run with the pod drawn as a ghost and sends exactly one pod.place to the nearest site within 24 points or one pod.remove off the floor on release, and nothing when the target is unchanged; a vertical drag on the moon previews the moonlight one level per 40 points (clamped 0 to 3) and sends exactly one moon.set on release when it differs; a drag along the scrubber shows the nearest cycle under the finger; a gesture on a finished play explains why nothing happens; a double tap off the floor (within 0.35 s and 22 points) restores the authored view.",
+      "procedure": "Tap an empty site to place a pod, drag a pod to another site and off the floor to preview the weather and move or remove it, tap a vent to toggle it, drag the moon up and down to preview and set the moonlight, drag along the cycle scrubber to show a cycle, orbit the camera with two fingers and double-tap off the floor on each device; the campaign records the interval from touch to the first frame showing the change.",
+      "status": "pending device campaign",
+      "title": "Touch feel and touch-to-frame latency"
+    },
+    {
+      "covers": [
+        "T-R02G2006-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "MW-D5",
+      "measurements": [
+        "sound-audible",
+        "haptics-felt"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner listens and feels, and sets the silent switch and the system haptics setting."
+      ],
+      "pass": "The sound is audible only while it is on, the panel is shown and the scene is active, and follows the silent switch; each planned haptic is felt (where the device has no haptic engine, the haptic part is recorded as not applicable).",
+      "procedure": "Turn the Sound toggle on and play a level to a win and to a failure with the haptics switch on, including one refused action (Remove on an empty slot, which the rules refuse); change the selected slot and site with the panel to hear the site auditions; observe the ambient sound and the selection, success, warning and error haptics.",
+      "status": "pending device campaign",
+      "title": "Sound heard and haptics felt"
+    },
+    {
+      "covers": [
+        "T-R02G2006-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": false,
+      "id": "MW-D6",
+      "measurements": [
+        "voiceover-observation"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner turns VoiceOver and the text size on and off in Settings and performs the walk-through."
+      ],
+      "pass": "Every control and the summary element are read with their label and value; each placement, move, removal, vent change, moonlight change, undo, redo, refusal, failure and the win are announced; the panel stays readable at the largest accessibility text size; recorded as an observation (non-gating, P-08).",
+      "procedure": "With VoiceOver on and the largest accessibility text size, choose a slot and a site with the adjustable controls, place the pod with Place, toggle a vent, choose and set the moonlight and run the weather with Run to hear each change and the win; replay it.",
+      "status": "pending device campaign",
+      "title": "VoiceOver walk-through (manual, non-gating)"
+    },
+    {
+      "covers": [
+        "T-R02G2007-012"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "MW-D7",
+      "measurements": [
+        "progress-kept"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's).",
+        "The owner ends the app from the app switcher."
+      ],
+      "pass": "Level 1 is solved with its stars, level 2 is open and the replay of level 1 is offered after the reopen; an unfinished level restores to the same pods, vents, moonlight, actions left and records.",
+      "procedure": "Win level 1, leave the app to the background, end it from the app switcher, reopen Mushroom Weather.",
+      "status": "pending device campaign",
+      "title": "Progress across a real termination"
+    },
+    {
+      "covers": [
+        "T-R02G2009-011"
+      ],
+      "devices": [
+        "D1",
+        "D2",
+        "D3"
+      ],
+      "gating": true,
+      "id": "MW-D8",
+      "measurements": [
+        "scenarios",
+        "journeys"
+      ],
+      "owner_steps": [
+        "The owner has the device in hand, unlocked, trusted and charged; the automation build is installed by the campaign (signing is the owner's)."
+      ],
+      "pass": "Every scenario of the device set passes; level 1 is won with its certified plan (one pod in slot 1 on the site at row 2, column 5, vent 1 closed, then the run) with 3 of 3 stars, level 2 is open, progress survives the relaunch, the replay ends won.",
+      "procedure": "Run the device scenario set by id and the interface journeys of chunk c4 (MWPlayUITests and MWReplayUITests: win level 1 with its pod placed, its vent closed and the run, replay, relaunch).",
+      "status": "pending device campaign",
+      "title": "Panel journeys in the app"
+    }
+  ],
+  "scenarios": [
+    "launch-first-frame",
+    "input-response",
+    "completion",
+    "rejection",
+    "save-restore",
+    "reset",
+    "suspend-resume",
+    "teardown-reentry",
+    "cancel-prepare",
+    "full-playthrough",
+    "hero",
+    "fixture-level-1-solved"
+  ],
+  "schema": 1
+}

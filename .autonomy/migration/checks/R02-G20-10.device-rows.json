@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g20.mushroom-weather"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g20.mushroom-weather",
+  "elapsed_seconds": 0.031,
+  "exit_code": 0,
+  "finished": "2026-11-27T09:07:13+00:00",
+  "gate": "R02-G20-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G20-10.device-rows.log",
+  "log_sha256": "a2a5e8f88208fbf5536aec64baecd98a58eb6d75b897116fab7007f38d5f4e59",
+  "name": "device-rows",
+  "started": "2026-11-27T09:07:13+00:00",
+  "timed_out": false
+}
