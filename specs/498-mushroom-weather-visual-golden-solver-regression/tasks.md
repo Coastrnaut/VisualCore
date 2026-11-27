@@ -76,7 +76,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 - [X] T-R02G2008-007 Docs: `docs/architecture/mushroom-weather.md` (regression net), — Verified 2026-11-27: docs (architecture regression net, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit=0
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f` (the chunks of T-001)
-- [ ] T-R02G2008-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name
+- [X] T-R02G2008-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full and app-unit exit=0 (.autonomy/migration/checks/R02-G20-08.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   host-full`, `--name app-unit`
 - [ ] T-R02G2008-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2008-010 Reference regression chunk 2 (`--name reference-2`)
