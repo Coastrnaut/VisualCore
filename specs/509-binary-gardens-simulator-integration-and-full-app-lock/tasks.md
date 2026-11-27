@@ -70,7 +70,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
 - [X] T-R02G2109-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0
 - [ ] T-R02G2109-011 {device} After ImplementationLock-100: the same journeys on D1/D2/D3 (SC-R02G2109-006; feature 510
   prepares them)
-- [ ] T-R02G2109-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2109-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converge round 1 appended T-013 (done), round 2 converged; README row and gate list updated
   README row and gate list updated; after the record push, check its CI run with `gh run list`
 
 ## Dependencies and parallel work
