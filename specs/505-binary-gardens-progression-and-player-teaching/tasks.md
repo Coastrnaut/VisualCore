@@ -9,7 +9,7 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2105-001 Baselines on the committed tree after R02-G21-04 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2105-001 Baselines on the committed tree after R02-G21-04 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 (on 79810762a after R02-G21-04 was recorded)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G21-04's
   rendering runs (exit 0)
 
