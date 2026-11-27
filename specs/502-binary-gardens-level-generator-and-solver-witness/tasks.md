@@ -78,7 +78,7 @@ no arrangement reachable with fewer actions wins.
 
 **Independent test**: building the catalog twice gives identical levels and the pinned digest.
 
-- [ ] T-R02G2102-004 [US2] Generator tests against the measured profiles: confirm the R4 values recorded by
+- [X] T-R02G2102-004 [US2] Generator tests against the measured profiles: confirm the R4 values recorded by — Verified 2026-11-27: host-3 exit=0, BinaryGardensGeneratorTests (14) (.autonomy/migration/checks/R02-G21-02.host-3.json)
   T-R02G2102-003 are the ones in `BinaryGardensGenerator.swift` and in spec Q1, research.md R4, data-model.md and plan.md's Technical Context
   ("arithmetic values of spec Q1, confirmed or changed (and written back) by the measurement of research R4"); create
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensGeneratorTests.swift` (agent C: determinism, the
