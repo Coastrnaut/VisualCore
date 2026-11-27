@@ -7,7 +7,7 @@ reimplementation of the growth on 500 seeded runs (every field value, step, scor
 weight, node count and outcome), and no network exceeds 2048 nodes; known arrangements win when run; `toxic`,
 `starved`, `unreached` and `overweight` failures named with the pulse, tip and cell or the measure, in the judge order
 starved/toxic during growth → unreached → overweight; a branch weight one unit either side of the budget and of the
-limit, a toxin one cell either side of a tip's path, a terminal one cell beyond the network, equal scores broken by
+limit, a toxin one cell either side of a tip's path, a terminal one cell beyond the network, a starved step onto toxin, equal scores broken by
 turn and then direction, corner cutting refused, a negative best score making a tip dormant, a nutrient consumed with a
 quarter-turn branch; refusals with reason codes `r02-g22.*` (off the board, not empty, over a count, unchanged, locked
 seed, budget, stage, stale); undo (including from failed), redo and replay fingerprints on 500 seeded traces;

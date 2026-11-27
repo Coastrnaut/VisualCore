@@ -27,8 +27,9 @@ public struct MyceliumArchitectStep: Sendable, Equatable { public let pulse: Int
 public struct MyceliumArchitectReport: Sendable, Equatable {
     public let field: [[Int]]                                           // [row][column], before growth
     public let steps: [MyceliumArchitectStep]
-    public let grown: [MyceliumArchitectCell: Int]                      // cell → pulse grown (root: 0)
-    public let parents: [MyceliumArchitectCell: MyceliumArchitectCell]
+    public let grown: [MyceliumArchitectCell]                           // in growth order, the root first
+    public let grownPulses: [Int]                                       // aligned with grown (root: 0)
+    public let parents: [Int?]                                          // index into grown (root: nil)
     public let nodeCount: Int; public let totalWeight: Int; public let pulsesRun: Int
     public let terminalPulses: [Int?]; public let terminalPathWeights: [Int?]
     public let failure: MyceliumArchitectFailure?; public var wins: Bool { get } }
