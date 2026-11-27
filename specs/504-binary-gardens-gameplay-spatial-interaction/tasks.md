@@ -40,9 +40,11 @@ modelled on feature 484).
   report's cells as outline strips, `ghostCellWidth` 0.003, behind the previewed worlds and gauges), the inspection
   marks (`inspectRingRadius` 0.115 round the inspected world; `bracketWidth` 0.006, `bracketHalf` 0.05, `bracketLeft`
   −0.962, `bracketRight` 1.232 round its gauge row) and the camera-taking `systemMesh`, `glowMesh`, `systemPart` and
-  `glowPart`; add the materials `ghostStar` = 38 (quad, dashed ring of the star's colour; broken when refused),
-  `ghostCell` = 39 (outline strips; value = band index / 4), `inspectRing` = 40 (quad, ring, marker colour) and
-  `inspectBracket` = 41 (strip, marker colour), `maxMaterial` = 41, to
+  `glowPart`; add the materials `ghostStar` = 38 (quad, dashed ring by a new angular dash coverage rule, the
+  star's colour chosen by `a_normal.z` = star; broken when refused), `ghostCell` = 39 (outline strips, square coverage,
+  a valued material added to `isValued` whose value band index / 4 selects BG_LETHAL_LOW … BG_LETHAL_HIGH in the vertex
+  shader, `baseColour` and `colour(of:won:)`), `inspectRing` = 40 (quad, joins the ring coverage, marker colour) and
+  `inspectBracket` = 41 (strip, square coverage, marker colour), `maxMaterial` = `inspectBracket.rawValue` = 41, to
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensShaders.swift`; create
   `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensPicker.swift` (FR-R02G2104-004, 007, 009, 010, 012;
   SC-R02G2104-001, 004; `BinaryGardensPick` gauge(world), pips(star), star(star), world(world), ring(index), dial,
@@ -133,7 +135,9 @@ modelled on feature 484).
   rebuilt when any of them changes) and `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensControls.swift`
   (every row kept; Ring picker 1 … n, Luminosity picker 1 … L, Phase target stepper by g with "Set phase", Tilt picker
   0 … T_max when T_max > 0, "Inspect" none or world 1 … W with the inspected world's words below it, "Reset view"; each
-  choice sends one action); agent E writes
+  ring, luminosity, tilt and Set phase choice sends one action; Inspect and Reset view are presentation only; the panel
+  is built by `makeControls` with a send closure through the presenter's `send` (refusals shown and logged in
+  `refusalLog`) and a `resetView` closure, as in feature 494); agent E writes
   `Packages/ExperiencesRound02/BinaryGardens/ExperienceTests/BinaryGardensGestureWiringTests.swift` (through the
   pointer entry: a radial star drag moves it to a ring with the drawn preview, a tangential drag shifts its phase, a
   pip tap and a pip drag set the luminosity, a dial tap and drag set the tilt, a world tap inspects (marks drawn, words
