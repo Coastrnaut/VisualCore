@@ -176,3 +176,14 @@ MVP: Story 1. Requirement coverage: FR-001 → 002, 003, 005; FR-002 → 002, 00
 002, 003, 005; FR-005 → 002, 003, 005; FR-006 → 002, 003, 005; FR-007 → 002, 003, 005; FR-008 → 002, 003, 005; FR-009 →
 002; FR-010 → 002, 003, 005; FR-011 → 003, 005; FR-012 → 002, 003; FR-013 → 004, 005; FR-014 → 003, 005 … 010; FR-015
 → 002, 005; FR-016 → 002, 005.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G2104-013 Add a gesture wiring test in
+  `Packages/ExperiencesRound02/BinaryGardens/ExperienceTests/BinaryGardensGestureWiringTests.swift` that a restore
+  through the shell of a saved play different from the shown one clears the preview, the inspected world and the orbit,
+  per spec Edge Cases (opening, next level, reset and restore) and FR-R02G2104-016 (partial: only `level.next` and a
+  reset after play are tested); `--name sim-27-2`
+- [ ] T-R02G2104-014 State in `docs/architecture/binary-gardens.md` that the presenter recognises a new play by the
+  level number and the play's records (the shell gives no reset or restore hook, as for feature 494), so a reset or
+  restore that leaves the shown play unchanged keeps the inspection and the orbit, per spec Edge Cases (partial)
