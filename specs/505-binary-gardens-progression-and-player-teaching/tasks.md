@@ -46,7 +46,7 @@ campaign covers the game). Agents model their files on Mushroom Weather's (featu
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G2105-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensProgress.swift`
+- [X] T-R02G2105-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensProgress.swift` — Verified 2026-11-27: host-2 exit 0 covers it (same command on the tree with T-003 installed; BinaryGardensProgressTests 19 pass)
   (`BinaryGardensTutorialStep` adjust → balance → recover → done with the texts of clarification Q2, advanced by an
   accepted arrangement action (adjust → balance), a second accepted arrangement action in this opening (balance →
   recover) or the level's end (→ done), never moved back by undo or redo — an undo passes no action, a redo that
