@@ -156,7 +156,7 @@ modelled on feature 484).
 - [X] T-R02G2104-006 Docs: `docs/architecture/binary-gardens.md` (gestures, the preview, the ghost star and bands, the — Verified 2026-11-27: round02-host-1, -2, -3c, -3e, -3f exit 0; docs: architecture gestures section, package README, automatedtesting
   inspection marks and the orbit), `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name
   round02-host-1`, `-2`, `-3c`, `-3e`, `-3f` (the baseline commands of quickstart step 1)
-- [ ] T-R02G2104-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2104-007 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   `--name host-full`, `--name app-unit` (the quickstart step 5 commands)
 - [ ] T-R02G2104-008 Reference regression chunk 1 (`--name reference-1 -- python3 scripts/release_check.py --only
   reference-engine-xcframework reference-build-projectm-ios-sim reference-clean`)
