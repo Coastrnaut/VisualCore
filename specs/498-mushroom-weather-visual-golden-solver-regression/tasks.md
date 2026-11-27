@@ -29,7 +29,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 3: Story 2 — the picture does not drift (P1)
 
-- [ ] T-R02G2008-003 [US2] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherGolden.swift`
+- [X] T-R02G2008-003 [US2] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherGolden.swift` — Verified 2026-11-27: MushroomWeatherGolden (DEBUG or VISUALCORE_AUTOMATION), golden-frames.json schema 1 with 16 frames generated with MUSHROOM_WEATHER_WRITE_GOLDEN=1, MushroomWeatherGolden in RELEASE_FORBIDDEN; verified by host-2 exit=0 (.autonomy/migration/checks/R02-G20-08.host-2.json)
   (DEBUG or VISUALCORE_AUTOMATION; "16 frames: levels 1, 21, 41, 61, 81 at tiers 0 … 2 at presentation time 0 after all
   of the witness's actions but not the run, with no preview, shown at the cycle half the cycles run,
   plus the hero frame of `scenario-manifest.json` at tier 0; at 1,152 × 768 with the authored camera: the floor centre,
