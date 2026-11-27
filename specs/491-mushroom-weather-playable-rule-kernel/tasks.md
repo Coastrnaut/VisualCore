@@ -65,7 +65,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 5: Story 4 — contract and invariants (P2)
 
-- [ ] T-R02G2001-005 [P] [US4] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherPuzzle.swift`
+- [X] T-R02G2001-005 [P] [US4] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherPuzzle.swift` — Verified 2026-11-26: 2026-11-26 host-4 exit 0: 4 puzzle tests (move order and refusals, agreement with the kernel and with the play on 200 seeded walks each) (.autonomy/migration/checks/R02-G20-01.host-4.json)
   (agent C: `PuzzleRules`: State = position (arrangement, actions spent), Move = an arrangement action; legal moves
   "every legal arrangement action while actions are left"; goal "the predicted run wins"; rulesID
   "r02-g20-mushroom-weather") with `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherPuzzleTests.swift`
