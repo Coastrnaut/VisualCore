@@ -2,7 +2,7 @@
  "schema": 1,
  "name": "VisualCore unified-app migration ledger (ADR-0009)",
  "created": "2026-11-12T02:54:10+00:00",
- "updated": "2026-11-27T17:30:12+00:00",
+ "updated": "2026-11-27T18:11:32+00:00",
  "rules": [
   "Only scripts/migration_ledger.py writes this file.",
   "The legacy ledger .autonomy/state.json is never reset or rewritten by the migration; its passed gates stay passed.",
@@ -376,7 +376,7 @@
   {"id":"R02-G21-04","kind":"game-feature","title":"Binary Gardens: Gameplay spatial interaction","depends":["R02-G21-03"],"status":"pass","attempts":[{"at":"2026-11-27T15:40:02+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G21-04.json","evidence_sha256":"ecd74259882a680057c50762b11b6b630939cc78c8810dd9e53d187e2cb21237","revision":"279b47f77d8f7fc7c06a5a84c2b107df7c0edc04"}],"experience":"R02-G21","spec_dir":"specs/504-binary-gardens-gameplay-spatial-interaction"},
   {"id":"R02-G21-05","kind":"game-feature","title":"Binary Gardens: Progression and player teaching","depends":["R02-G21-04"],"status":"pass","attempts":[{"at":"2026-11-27T16:37:49+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G21-05.json","evidence_sha256":"2745c022069d56c8da948a2219756f9d334550118e9463015b408bf6049e0618","revision":"5f8e502ed0625a250032bb0d7164df676e2754c5"}],"experience":"R02-G21","spec_dir":"specs/505-binary-gardens-progression-and-player-teaching"},
   {"id":"R02-G21-06","kind":"game-feature","title":"Binary Gardens: Polish and accessiblity","depends":["R02-G21-05"],"status":"pass","attempts":[{"at":"2026-11-27T17:30:12+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G21-06.json","evidence_sha256":"026803f7f7365aceccd32319dad21496f59487a078b1eba935902f729fb190b7","revision":"213c3d6d5d0f796f5bdf698c607937121dc66907"}],"experience":"R02-G21","spec_dir":"specs/506-binary-gardens-polish-and-accessiblity"},
-  {"id":"R02-G21-07","kind":"game-feature","title":"Binary Gardens: Persistence and replay","depends":["R02-G21-06"],"status":"pending","attempts":[],"experience":"R02-G21","spec_dir":"specs/507-binary-gardens-persistence-and-replay"},
+  {"id":"R02-G21-07","kind":"game-feature","title":"Binary Gardens: Persistence and replay","depends":["R02-G21-06"],"status":"pass","attempts":[{"at":"2026-11-27T18:11:32+00:00","result":"pass","evidence":".autonomy/migration/evidence/R02-G21-07.json","evidence_sha256":"f9bc94e2a0c91997870f480fe810314cf6c6ffd87a709cf87be3de480dbf7de4","revision":"ac9cf1fe25438ab584b06db2862dd7d102609b3b"}],"experience":"R02-G21","spec_dir":"specs/507-binary-gardens-persistence-and-replay"},
   {"id":"R02-G21-08","kind":"game-feature","title":"Binary Gardens: Visual golden/solver regression","depends":["R02-G21-07"],"status":"pending","attempts":[],"experience":"R02-G21","spec_dir":"specs/508-binary-gardens-visual-golden-solver-regression"},
   {"id":"R02-G21-09","kind":"game-feature","title":"Binary Gardens: Simulator integration and full app lock","depends":["R02-G21-08"],"status":"pending","attempts":[],"experience":"R02-G21","spec_dir":"specs/509-binary-gardens-simulator-integration-and-full-app-lock"},
   {"id":"R02-G21-10","kind":"game-feature","title":"Binary Gardens: Device automation preparation","depends":["R02-G21-09"],"status":"pending","attempts":[],"experience":"R02-G21","spec_dir":"specs/510-binary-gardens-device-automation-preparation"},
