@@ -828,12 +828,21 @@ let package = Package(
         // Feature 501 (R02-G21-01): Binary Gardens' pure rule kernel.
         .target(name: "BinaryGardensCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
-                               .product(name: "VisualCoreMath", package: visualCore)],
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               // Feature 503 (R02-G21-03): the adapter, snapshot, geometry and scenarios.
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreDiagnostics", package: visualCore),
+                               .product(name: "VisualCorePersistence", package: visualCore)],
                 path: "BinaryGardens/Core"),
         .testTarget(name: "BinaryGardensCoreTests",
                     dependencies: ["BinaryGardensCore",
                                    .product(name: "VisualCoreSimulation", package: visualCore),
-                                   .product(name: "VisualCoreMath", package: visualCore)],
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   // Feature 503 (R02-G21-03): meshes, quality profiles and the experience contract.
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "BinaryGardens/CoreTests"),
         // Feature 491 (R02-G20-01): Mushroom Weather's pure rule kernel.
         .target(name: "MushroomWeatherCore",

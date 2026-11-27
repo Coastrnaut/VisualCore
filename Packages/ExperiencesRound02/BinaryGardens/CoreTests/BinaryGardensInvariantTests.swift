@@ -35,6 +35,9 @@
 //   Foundation, VisualCoreMath and VisualCoreSimulation.
 // Test data uses explicit types and plain loops (CI type-check rule). Forbidden tokens are built by concatenation so
 // that this file never holds the token sequence the repository's compliance scan matches.
+// Feature 503 (R02-G21-03) T-R02G2103-002 (FR-R02G2103-009): the kernel scans read a fixed list of the kernel's ten
+// files (feature 501's five and feature 502's five in `Core/Content`, read relative to `Core/`), so the presentation
+// sources (snapshot, shaders with run-time trigonometry, geometry, adapter, scenarios) stay outside them.
 import Foundation
 import Testing
 import VisualCoreSimulation
@@ -162,13 +165,23 @@ import VisualCoreSimulation
             return (play, fingerprints)
         }
 
-        /// The kernel sources present in the Core directory next to this test directory.
+        /// The kernel's source files, relative to `Core/`: feature 501's five and feature 502's five in `Content/`
+        /// (the presentation files of feature 503 — the scene snapshot, shaders, geometry, adapter and scenarios — draw
+        /// with floating point and run-time trigonometry and are not part of the kernel).
+        static let kernelFiles: [String] = ["BinaryGardensError.swift", "BinaryGardensLevel.swift",
+                                            "BinaryGardensPlay.swift", "BinaryGardensPuzzle.swift",
+                                            "BinaryGardensSky.swift", "Content/BinaryGardensManifest.swift",
+                                            "Content/BinaryGardensDifficulty.swift",
+                                            "Content/BinaryGardensSolver.swift",
+                                            "Content/BinaryGardensGenerator.swift",
+                                            "Content/BinaryGardensWitness.swift"]
+
+        /// The kernel sources in the Core directory next to this test directory.
         static func kernelSources() throws -> [(name: String, text: String)] {
             let tests: URL = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
             let core: URL = tests.deletingLastPathComponent().appendingPathComponent("Core")
             var sources: [(name: String, text: String)] = []
-            let names: [String] = (try? FileManager.default.contentsOfDirectory(atPath: core.path)) ?? []
-            for name in names.sorted() where name.hasSuffix(".swift") {
+            for name in kernelFiles {
                 let url: URL = core.appendingPathComponent(name)
                 sources.append((name, try String(contentsOf: url, encoding: .utf8)))
             }
@@ -239,7 +252,7 @@ import VisualCoreSimulation
                                    "Dou" + "ble", "Flo" + "at", "clo" + "ck", "si" + "n(", "co" + "s(", "sq" + "rt(",
                                    "Continuous" + "Clock", "process" + "Info"]
         let sources: [(name: String, text: String)] = try Inv.kernelSources()
-        #expect(sources.count == 5)
+        #expect(sources.count == 10)
         for source in sources {
             for line in Inv.codeLines(source.text) {
                 for token in forbidden { #expect(!line.contains(token), "\(source.name): \(token)") }

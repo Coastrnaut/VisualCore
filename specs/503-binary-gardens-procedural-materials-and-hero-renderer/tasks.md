@@ -13,7 +13,7 @@ R02-G20-03 (`git show a3269b5cc:<path>`, the R02-G20-03 record commit).
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (2 with BinaryGardens:
   `'MoonlitMechanism|AcousticConstellator|HarmonicBridges|BinaryGardens'`); the rendering baseline is R02-G21-02's
   rendering runs (exit 0)
-- [ ] T-R02G2103-002 Edit `Packages/ExperiencesRound02/Package.swift` (`BinaryGardensCore` gains VisualCoreScenes,
+- [X] T-R02G2103-002 Edit `Packages/ExperiencesRound02/Package.swift` (`BinaryGardensCore` gains VisualCoreScenes, — Verified 2026-11-27: host exit=0, 157 tests in 16 suites; Core dependencies added; invariant scans read the fixed ten-file list (count 10); snapshot, palette and tiers with BinaryGardensSceneSnapshotTests (.autonomy/migration/checks/R02-G21-03.host.json)
   VisualCoreExperience, VisualCoreDiagnostics and VisualCorePersistence; `BinaryGardensCoreTests` gains
   VisualCoreScenes, VisualCoreExperience and VisualCoreDiagnostics; `BinaryGardensExperience` (path
   `BinaryGardens/Experience`) and `BinaryGardensExperienceTests` (path `BinaryGardens/ExperienceTests`) with
