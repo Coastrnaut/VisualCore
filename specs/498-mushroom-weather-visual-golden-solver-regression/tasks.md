@@ -14,7 +14,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 
 ## Phase 2: Story 1 — every level stays solvable as certified (P1) 🎯
 
-- [ ] T-R02G2008-002 [P] [US1] Create
+- [X] T-R02G2008-002 [P] [US1] Create — Verified 2026-11-27: host exit=0, MushroomWeatherRegressionSolverTests 15 tests (115 cases) in 4.2 s (.autonomy/migration/checks/R02-G20-08.host.json)
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherRegressionSolverTests.swift` (agent A: for
   every level in ten groups of 10, "the generated level equals its witness's level (fingerprint); the witness's actions
   replay on a fresh play to a win on exactly the final run and not before, within the budget, with its per-action
