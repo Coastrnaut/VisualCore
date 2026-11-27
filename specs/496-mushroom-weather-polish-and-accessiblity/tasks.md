@@ -31,7 +31,7 @@ chunks (1, 2, 3c, 3e, 3f; Mushroom Weather in 3f).
   pod placements, moves and removals, vent and moonlight changes, undos, redos, refusals of every code (bare and
   prefixed), won runs in campaign and practice, failed runs by every failure kind (dried, mold, unstable), and level and
   mode changes compare texts, kinds and haptics exactly; showing a cycle plans nothing); agent A; `--name host-2`
-- [ ] T-R02G2006-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherLights.swift`
+- [X] T-R02G2006-004 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherLights.swift` — Verified 2026-11-27: host-3 exit=0, MushroomWeatherLightsTests and MushroomWeatherSoundRecipeTests passed (.autonomy/migration/checks/R02-G20-06.host-3.json)
   ("glow 0.7 playing / 1 won / 0.35 failed; won 1 once won, else 0", eased linearly over 0.15 s, 0.45 s under Reduce
   Flashing, no reversal mid-fade under Reduce Flashing, stepped by the frame clock's elapsed time;
   `maxHalfRangeCrossingsPerSecond`) and `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherSoundRecipe.swift`
