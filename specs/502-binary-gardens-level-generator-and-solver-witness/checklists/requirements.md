@@ -1,0 +1,37 @@
+# Specification Quality Checklist: R02-G21-02 — Binary Gardens: level generator and solver witness
+
+**Purpose**: Validate specification completeness and quality before proceeding to planning
+**Created**: 2026-11-27
+**Feature**: [spec.md](../spec.md)
+
+## Content Quality
+
+- [x] No implementation details (languages, frameworks, APIs)
+- [x] Focused on user value and business needs
+- [x] Written for non-technical stakeholders
+- [x] All mandatory sections completed
+
+## Requirement Completeness
+
+- [x] No [NEEDS CLARIFICATION] markers remain
+- [x] Requirements are testable and unambiguous
+- [x] Success criteria are measurable
+- [x] Success criteria are technology-agnostic (no implementation details)
+- [x] All acceptance scenarios are defined
+- [x] Edge cases are identified
+- [x] Scope is clearly bounded
+- [x] Dependencies and assumptions identified
+
+## Feature Readiness
+
+- [x] All functional requirements have clear acceptance criteria
+- [x] User scenarios cover primary flows
+- [x] Feature meets measurable outcomes defined in Success Criteria
+- [x] No implementation details leak into specification
+
+## Notes
+
+- The feature is a pure content pipeline over a rule kernel, so its requirements name rules and outcomes (the manifest,
+  the generator, the solver, the witness files) rather than how; exact values are settled in clarify and plan, as in
+  feature 492 (the model). The search sizes in the clarifications are arithmetic upper bounds; the plan-stage prototype
+  on the real kernel records the measured candidate indices and work in research.md.
