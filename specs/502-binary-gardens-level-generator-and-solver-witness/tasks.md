@@ -9,7 +9,7 @@ levels, measured locally, never asserted on CI). No {owner} or {device} tasks (p
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2102-001 Baselines after R02-G21-01 is recorded, on the committed tree before any source edit of this
+- [X] T-R02G2102-001 Baselines after R02-G21-01 is recorded, on the committed tree before any source edit of this — Verified 2026-11-27: baseline-host, baseline-timing, baseline-round02-1, -2 (with BinaryGardens), -3c, -3e, -3f exit=0 (.autonomy/migration/checks/R02-G21-02.baseline-*.json)
   feature: `--name baseline-host`, `--name baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`
   (the round-two filters of quickstart.md, chunk 2 `'MoonlitMechanism|AcousticConstellator|HarmonicBridges|BinaryGardens'`);
   the rendering baseline is R02-G21-01's rendering runs (exit 0)
