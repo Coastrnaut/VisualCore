@@ -84,7 +84,7 @@ the solver regression (T-002) reads only the unchanged levels, witnesses and sol
 - [X] T-R02G2108-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full, app-unit exit 0
   host-full`, `--name app-unit`
 - [X] T-R02G2108-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit 0
-- [ ] T-R02G2108-010 Reference regression chunk 2 (`--name reference-2`)
+- [X] T-R02G2108-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit 0
 - [ ] T-R02G2108-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2108-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden
   levels (SC-R02G2108-007). Not run before the lock.
