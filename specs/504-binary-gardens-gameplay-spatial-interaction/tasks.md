@@ -71,7 +71,9 @@ modelled on feature 484).
   `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensSceneGeometryTests.swift` (every element, ghost
   and mark inside the view at the orbit corners and 7 aspects 0.4 … 2.5; no preview, no inspection and the authored
   orbit identical to R02-G21-03's geometry; the drawn snapshot equals the kernel's previewed report) and
-  `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensShaderSourceTests.swift` (the materials 38 … 41);
+  `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensShaderSourceTests.swift` (the materials 38 … 41; the existing
+  asserts of 37 codes, 38 materials, `BG_MAX_MATERIAL` 37, the valued set and the header's "contiguous 0 … 37" moved to
+  41, 42 and the new valued ghostCell);
   agent B; `--name host-2 -- swift test --package-path Packages/ExperiencesRound02 --filter BinaryGardens`
 
 ## Phase 3: Stories 1 … 5 — ring and phase drags, luminosity, tilt, inspection and the scrub (P1) 🎯
