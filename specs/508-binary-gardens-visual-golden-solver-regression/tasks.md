@@ -98,3 +98,10 @@ task outside this campaign. Agent B may draft 002 in an isolated copy before 001
 inputs), but runs no host tests while the lead's baselines or chain run. Shared files (golden source, release list,
 workflow, script tests, docs) stay with the lead. MVP: Story 1. Requirement coverage: FR-001/002 → 002; FR-003/004 →
 003, 004, 005; FR-005 → 005; FR-006 → 006; FR-007 → 002 … 006; FR-008 → 007 … 011; FR-009 → 001, 003, 013.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G2108-014 State in `docs/architecture/binary-gardens.md` the tolerance used for level 25's tilt pip (a pixel
+  within the larger of 3 px and the pip's projected outer radius at least 0.05 from the backdrop in luminance, the same
+  rule as the gauge-margin check), since feature 503 defines no tilt-pip tolerance, per clarification Q3 and
+  FR-R02G2108-004 (partial: the spec names only the feature-503 tolerances)
