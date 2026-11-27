@@ -20,7 +20,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   for MA-D6), covers, owner_steps, status "pending device campaign"; no result field); edit `scripts/release_check.py`
   (step `device-rows-r02-g19`); `--name device-rows -- python3 scripts/check_device_rows.py --experience
   r02-g19.microscopic-aurora`
-- [ ] T-R02G1910-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Microscopic Aurora definition passes; a
+- [X] T-R02G1910-003 [P] [US1] Edit `scripts/test_scripts.py` (agent A: the real Microscopic Aurora definition passes; a — Verified 2026-11-26: 2026-11-26 script-tests exit 0 run alone (.autonomy/migration/checks/R02-G19-10.script-tests.json): 8 MicroscopicAuroraDeviceRowsCheckTests (real definition passes; removed scenario, missing pass field and uncovered tasks fail by name; release step runs the check)
   copy with a scenario removed, a copy with MA-D1's `pass` field removed and a copy with T-R02G1909-011 dropped from
   every row's covers each fail by name; the release step `device-rows-r02-g19` runs the check for
   `r02-g19.microscopic-aurora`); `--name script-tests` (alone)
