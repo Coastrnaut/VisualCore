@@ -18,7 +18,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2101-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `BinaryGardensCore` depending on
+- [X] T-R02G2101-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `BinaryGardensCore` depending on — Verified 2026-11-27: host exit=0, 41 tests in 5 suites incl. LevelTests and SkyTests (.autonomy/migration/checks/R02-G21-01.host.json); targets BinaryGardensCore and tests added; CI half b filter includes BinaryGardens
   VisualCoreSimulation and VisualCoreMath, path `BinaryGardens/Core`; `BinaryGardensCoreTests`, path
   `BinaryGardens/CoreTests`, depending on BinaryGardensCore, VisualCoreSimulation and VisualCoreMath; product) and
   `.github/workflows/ci.yml` (job `round02-host-tests`, matrix `group: b`: `|BinaryGardens` appended after

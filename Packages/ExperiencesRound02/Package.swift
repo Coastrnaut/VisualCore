@@ -67,6 +67,8 @@ let package = Package(
         // Feature 491 (R02-G20-01): Mushroom Weather's rule kernel, a candidate until X-R02-G20.
         .library(name: "MushroomWeatherCore", targets: ["MushroomWeatherCore"]),
         .library(name: "MushroomWeatherExperience", targets: ["MushroomWeatherExperience"]),
+        // Feature 501 (R02-G21-01): Binary Gardens' rule kernel, a candidate until X-R02-G21.
+        .library(name: "BinaryGardensCore", targets: ["BinaryGardensCore"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -823,6 +825,16 @@ let package = Package(
                                    .product(name: "VisualCoreAudioDSP", package: visualCore),
                                    .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "ApsidesWorkshop/ExperienceTests"),
+        // Feature 501 (R02-G21-01): Binary Gardens' pure rule kernel.
+        .target(name: "BinaryGardensCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "BinaryGardens/Core"),
+        .testTarget(name: "BinaryGardensCoreTests",
+                    dependencies: ["BinaryGardensCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "BinaryGardens/CoreTests"),
         // Feature 491 (R02-G20-01): Mushroom Weather's pure rule kernel.
         .target(name: "MushroomWeatherCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
