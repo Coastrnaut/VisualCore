@@ -22,7 +22,7 @@ chunks (1, 2, 3c, 3e, 3f; Mushroom Weather in 3f).
 
 ## Phase 2: Stories 1 and 3 — feedback plan, lights and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G2006-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherFeedbackPlan.swift`
+- [X] T-R02G2006-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherFeedbackPlan.swift` — Verified 2026-11-27: host-2 exit=0, MushroomWeatherFeedbackPlanTests passed (.autonomy/migration/checks/R02-G20-06.host-2.json)
   (texts and kinds of clarification Q1 word for word, "colonies staying in band" as the colonies whose final in-band run
   of the predicted run reaches the required cycles, the engine's `action.rule.` prefix read as the bare code, a revealed
   hint as `state` (`hint(text:)`); haptics of Q2 — the run plans only its outcome; `after(old:new:)`, `refused(code:)`,
