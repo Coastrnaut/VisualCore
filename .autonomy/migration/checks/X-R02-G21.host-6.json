@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xr02g21-host-6",
+    "--only-testing",
+    "ApsidesWorkshopCoreTests",
+    "ApsidesWorkshopExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g21-host-6 --only-testing ApsidesWorkshopCoreTests ApsidesWorkshopExperienceTests",
+  "elapsed_seconds": 28.198,
+  "exit_code": 0,
+  "finished": "2026-11-27T21:16:54+00:00",
+  "gate": "X-R02-G21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G21.host-6.log",
+  "log_sha256": "6682fe8db7c109466f4746d88f323cb7a7a358fded8b4f0c3cca218ecece55df",
+  "name": "host-6",
+  "started": "2026-11-27T21:16:26+00:00",
+  "timed_out": false
+}

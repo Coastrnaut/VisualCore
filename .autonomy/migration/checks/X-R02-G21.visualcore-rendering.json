@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/VisualCoreRendering",
+    "--scheme",
+    "VisualCoreRendering-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xr02g21-rendering"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/VisualCoreRendering --scheme VisualCoreRendering-Package --destination sim-27.2 --action test --result-name xr02g21-rendering",
+  "elapsed_seconds": 46.983,
+  "exit_code": 0,
+  "finished": "2026-11-27T21:01:38+00:00",
+  "gate": "X-R02-G21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G21.visualcore-rendering.log",
+  "log_sha256": "905805f3cbac3737f35dd898eb48dee2193394e0078156e665acd422b2df6285",
+  "name": "visualcore-rendering",
+  "started": "2026-11-27T21:00:51+00:00",
+  "timed_out": false
+}

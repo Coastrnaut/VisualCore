@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--result-name",
+    "xr02g21-host-7",
+    "--only-testing",
+    "MicroscopicAuroraCoreTests",
+    "MicroscopicAuroraExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --result-name xr02g21-host-7 --only-testing MicroscopicAuroraCoreTests MicroscopicAuroraExperienceTests",
+  "elapsed_seconds": 116.272,
+  "exit_code": 0,
+  "finished": "2026-11-27T21:18:51+00:00",
+  "gate": "X-R02-G21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G21.host-7.log",
+  "log_sha256": "f5e68f95ec323e8c499d54f90d65ac5263b4013394284588902d6c38d2639b4f",
+  "name": "host-7",
+  "started": "2026-11-27T21:16:55+00:00",
+  "timed_out": false
+}

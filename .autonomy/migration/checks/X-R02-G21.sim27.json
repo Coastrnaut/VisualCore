@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "python3",
+    "scripts/verify_experiences.py",
+    "--only",
+    "r02-g21.binary-gardens",
+    "--runtime",
+    "27"
+  ],
+  "command": "python3 scripts/verify_experiences.py --only r02-g21.binary-gardens --runtime 27",
+  "elapsed_seconds": 512.74,
+  "exit_code": 0,
+  "finished": "2026-11-27T21:29:56+00:00",
+  "gate": "X-R02-G21",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/X-R02-G21.sim27.log",
+  "log_sha256": "d4404aee2802ea7275c28d4dae8efaf84c730f5af0fec11a4635738ea7d3a7b2",
+  "name": "sim27",
+  "started": "2026-11-27T21:21:23+00:00",
+  "timed_out": false
+}
