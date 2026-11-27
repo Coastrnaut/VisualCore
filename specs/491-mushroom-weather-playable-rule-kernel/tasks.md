@@ -10,7 +10,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2001-001 Baselines after X-R02-G19 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G2001-001 Baselines after X-R02-G19 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-26: 2026-11-26 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 after X-R02-G19 (.autonomy/migration/checks/R02-G20-01.baseline-*.json)
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the round-two chunks of feature 457); the rendering baseline is
   X-R02-G19's visualcore-rendering run
 
