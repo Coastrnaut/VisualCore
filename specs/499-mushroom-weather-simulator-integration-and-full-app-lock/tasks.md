@@ -40,7 +40,7 @@ change (the shaders and reference of R02-G20-03 are unchanged and re-proven by t
   name of Q1 is listed once, has the prefix `experience.r02-g20.mushroom-weather.`, and the panel source uses each
   exactly once); `--name sim-27 -- python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme
   ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing MushroomWeatherExperienceTests`
-- [ ] T-R02G2009-004 [US1] Create `Apps/VisualCore/Tests/UI/MushroomWeather/MWSupport.swift`, `MWPlayUITests.swift`,
+- [X] T-R02G2009-004 [US1] Create `Apps/VisualCore/Tests/UI/MushroomWeather/MWSupport.swift`, `MWPlayUITests.swift`, — Verified 2026-11-27: app-ui exit=0, chunk c4 executed 3 tests (MWPlayUITests, MWReplayUITests) on iOS 27.2 (.autonomy/migration/checks/R02-G20-09.app-ui.json); xcodegen generated, project lists MWPlayUITests; c4 key unique
   `MWReplayUITests.swift` (agent C: spec Clarifications Q2; level 1's certified plan (a pod at row 2, column 5 in slot 0, then vent 0 closed)
   and the budget pinned in `MW`; the slot and site moved with Pod and Site − or + by their controls' values, Place
   tapped, counted only when the actions-left count of the `actions` text moves; vent 1's toggle tapped until its value

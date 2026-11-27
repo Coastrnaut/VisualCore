@@ -1346,6 +1346,24 @@ class ReleaseCheckTests(unittest.TestCase):
         self.assertEqual(argv[start:start + 2],
                          ["VisualCoreUITests/MAPlayUITests", "VisualCoreUITests/MAReplayUITests"])
 
+    def test_mushroom_weather_ui_chunk(self):
+        """Feature 499 R02-G20-09 (T-R02G2009-004): the serial chunk `c4` runs the Mushroom Weather interface
+        journeys; its key appears once in the `UI_CHUNKS` literal and its classes in no other chunk."""
+        self.assertEqual(relcheck.UI_CHUNKS["c4"], ["MWPlayUITests", "MWReplayUITests"])
+        self.assertIn("c4", relcheck.SERIAL_CHUNKS)
+        source = Path(relcheck.__file__).read_text(encoding="utf-8")
+        self.assertEqual(source.count('"c4": ['), 1)
+        for name, chunk in relcheck.UI_CHUNKS.items():
+            if name != "c4":
+                self.assertNotIn("MWPlayUITests", chunk, name)
+                self.assertNotIn("MWReplayUITests", chunk, name)
+        steps = {s.name: s.argv for s in relcheck.unified_app_steps("X")}
+        argv = steps["app-ui-ios27-c4"]
+        self.assertNotIn("--parallel", argv)
+        start = argv.index("--only-testing") + 1
+        self.assertEqual(argv[start:start + 2],
+                         ["VisualCoreUITests/MWPlayUITests", "VisualCoreUITests/MWReplayUITests"])
+
     def test_ui_chunk_keys_are_unique_in_source(self):
         """Feature 319 (T-R02G0209-004): a repeated key in the `UI_CHUNKS` literal would silently drop the earlier
         chunk's test classes, so the source literal is parsed and every key must appear once."""
