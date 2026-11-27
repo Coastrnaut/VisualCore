@@ -68,7 +68,7 @@ round02-host in five chunks (1, 2, 3c, 3e, 3f). Prerequisites: R02-G21-04 and R0
 
 ## Phase 3: Wiring — presenter, scene, sound and panel
 
-- [ ] T-R02G2106-005 [US1] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensSound.swift`
+- [X] T-R02G2106-005 [US1] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensSound.swift` — Verified 2026-11-27: sim-27-2 exit 0 (sim-27.2, BinaryGardensExperienceTests: 69 tests in 7 suites; 13 accessibility tests; first attempt sim-27 exit 65 on three test assumptions fixed: a not-whole value sent to a valueless control, the won-look pixel check replaced by the drawn won level, star 2 selected on level 1)
   (the ambient loop over `AmbientLoopPlayer` and the audition over `SoundEffectPlayer`, playing exactly while the Sound
   toggle is on, the controls are on screen and the scene is active); edit
   `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensPresenter.swift` (feedback through

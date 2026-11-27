@@ -31,6 +31,20 @@
 // stars) with "Play level" (`level.select [n]`). All wrapping text in the panel, never over the scene; refusals read in
 // words. The existing rows, identifiers and the feature 504 gesture wiring are unchanged. Modelled on
 // `MushroomWeatherControls` (feature 495).
+// Feature 506 (R02-G21-06) T-R02G2106-005 (FR-R02G2106-001, 005, 006; clarification Q5): the summary element
+// ("Gardens", identifier `summary`, the words of `BinaryGardensFeedbackPlan.summaryText(core:star:)`); the star, ring,
+// phase, luminosity, tilt and shown tick as adjustable elements (`accessibilityAdjustableAction`) with their values in
+// words ("star n of 2", "ring r of R, ρ units", "phase p of 47, step g", "level l of m, luminosity L", "tilt t of T
+// steps", "tick t of 48"; ", locked" added when the level locks that control): incrementing or decrementing the star
+// or the shown tick changes only the presentation (the star through the presenter, which plays its audition when the
+// sound is on), while the ring, phase, luminosity and tilt send one action each like their − and + buttons (a refused
+// one is announced); a label and a value in words on every control (Run the progress, Undo and Redo the actions made,
+// Next level the next open level, Reset view "authored" or "orbited", Dismiss tutorial the instruction, Hint the level
+// shown, the level picker the picked level, Campaign / Daily / Practice "selected" or "not selected", Sound "on" or
+// "off"); refusals in the feedback plan's words; the Sound toggle (off by default, identifier `sound`; presentation
+// only, saving it is R02-G21-07); button rows that become columns at accessibility text sizes; wrapping text and a
+// 520-point readable width (iPad). The existing identifiers and actions are unchanged. Modelled on
+// `MushroomWeatherControls` (feature 496).
 #if os(iOS)
 import BinaryGardensCore
 import SwiftUI
@@ -51,8 +65,15 @@ struct BinaryGardensControls: View {
     /// Returns the camera to the authored view (feature 504).
     let resetView: () -> Void
 
+    /// The text size: rows become columns at accessibility sizes (feature 506).
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// Whether the app's scene is active: the sound plays only while it is (feature 506).
+    @Environment(\.scenePhase) private var scenePhase
+
     /// The "Inspect" picker's tag for no world (feature 504).
     private static let noWorld = -1
+    /// The widest the panel's content grows, padding included (clarification Q5 of feature 506).
+    static let readableWidth: CGFloat = 520
 
     /// The panel.
     var body: some View {
@@ -71,10 +92,66 @@ struct BinaryGardensControls: View {
                 inspectRow
                 viewRow
                 progressRows
+                soundToggle
             }
             .padding()
+            .frame(maxWidth: Self.readableWidth, alignment: .leading)
         }
         .onChange(of: mirror.star) { _, _ in mirror.phaseTarget = mirror.phase }
+        .onAppear { presenter?.controlsAppeared() }
+        .onDisappear { presenter?.controlsDisappeared() }
+        .onChange(of: scenePhase) { _, phase in presenter?.sceneActive(phase == .active) }
+    }
+
+    /// A row of controls that becomes a column at accessibility text sizes (feature 506).
+    @ViewBuilder private func row(@ViewBuilder _ content: () -> some View) -> some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 8) { content() }
+        } else {
+            HStack(spacing: 12) { content() }
+        }
+    }
+
+    /// The Sound toggle (feature 506; off by default; presentation only).
+    @ViewBuilder private var soundToggle: some View {
+        Toggle("Sound", isOn: Binding(get: { mirror.soundOn }, set: { presenter?.setSound(on: $0) }))
+            .disabled(presenter == nil)
+            .accessibilityLabel("Sound of the gardens")
+            .accessibilityValue(mirror.soundOn ? "on" : "off")
+            .accessibilityIdentifier(port.identifier("sound"))
+    }
+
+    /// The step of an adjustable element's action (feature 506): +1 for increment, −1 for decrement, nil otherwise.
+    private static func step(_ direction: AccessibilityAdjustmentDirection) -> Int? {
+        switch direction {
+        case .increment: return 1
+        case .decrement: return -1
+        @unknown default: return nil
+        }
+    }
+
+    /// Selects star `star` through the presenter (which plays its audition when the sound is on), or directly without
+    /// one (feature 506).
+    private func selectStar(_ star: Int) {
+        if let presenter { presenter.changeStar(star) } else { mirror.select(star: star) }
+    }
+
+    /// The star picker's selection (feature 506): choosing a star goes through ``selectStar(_:)``.
+    private var starChoice: Binding<Int> {
+        Binding(get: { mirror.star }, set: { star in selectStar(star) })
+    }
+
+    /// An adjustable element's action (feature 506): increment and decrement move the selected star or the shown tick
+    /// (presentation only), or send one ring, phase, luminosity or tilt action like the + and − buttons.
+    private func adjust(_ direction: AccessibilityAdjustmentDirection, star: Bool = false, ring: Bool = false,
+                        phase: Bool = false, luminosity: Bool = false, tilt: Bool = false, tick: Bool = false) {
+        guard let step = Self.step(direction) else { return }
+        if star { selectStar(min(max(mirror.selectedStar + step, 0), 1)) }
+        if ring { send("star.ring", [Double(mirror.selectedStar), Double(mirror.ring(moved: step))]) }
+        if phase { send("star.phase", [Double(mirror.selectedStar), Double(mirror.phase(moved: step))]) }
+        if luminosity { send("star.luminosity", [Double(mirror.selectedStar), Double(mirror.luminosity(moved: step))]) }
+        if tilt { send("orbit.tilt", [Double(mirror.tilt(moved: step))]) }
+        if tick { show(tick: mirror.shownTick + step) }
     }
 
     /// The level, actions, status, failure (while no explanation replaces it) and refusal lines.
@@ -89,42 +166,51 @@ struct BinaryGardensControls: View {
                 .accessibilityIdentifier(port.identifier("failure"))
         }
         Text(mirror.measureLabel).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("progress"))
-        Text(mirror.targetLabel).font(.footnote)
+        Text(mirror.summary).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Gardens")
+            .accessibilityValue(mirror.summary)
+            .accessibilityIdentifier(port.identifier("summary"))
+        Text(mirror.targetLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
         if let message = mirror.message {
-            Text(message).font(.footnote)
+            Text(message).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("message"))
         }
         if let refused = mirror.previewRefusalLabel {
-            Text(refused).font(.footnote)
+            Text(refused).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("preview-refusal"))
         }
     }
 
     /// Choose the star the panel edits.
     @ViewBuilder private var starRow: some View {
-        Picker("Star", selection: $mirror.star) {
+        Picker("Star", selection: starChoice) {
             Text("Star 1").tag(0)
             Text("Star 2").tag(1)
         }
         .pickerStyle(.segmented)
         .accessibilityLabel("Star to adjust")
-        .accessibilityValue("star \(mirror.selectedStar + 1)")
+        .accessibilityValue(mirror.starValue)
+        .accessibilityAdjustableAction { direction in adjust(direction, star: true) }
         .accessibilityIdentifier(port.identifier("star"))
-        Text(mirror.starLabel).font(.footnote)
+        Text(mirror.starLabel).font(.footnote).fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("star-detail"))
     }
 
     /// Move the selected star to the inner or outer neighbouring ring.
     @ViewBuilder private var ringRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Ring −") { send("star.ring", [Double(mirror.selectedStar), Double(mirror.ring(moved: -1))]) }
                 .accessibilityLabel("Move the star to the inner ring")
                 .accessibilityValue(mirror.starLabel)
                 .accessibilityIdentifier(port.identifier("ring-minus"))
             Text("ring \(mirror.ring + 1) of \(mirror.ringCount)")
-                .accessibilityLabel("Ring")
-                .accessibilityValue("ring \(mirror.ring + 1) of \(mirror.ringCount)")
+                .accessibilityLabel("Ring of the star")
+                .accessibilityValue(mirror.ringValue)
+                .accessibilityAdjustableAction { direction in adjust(direction, ring: true) }
                 .accessibilityIdentifier(port.identifier("ring"))
             Button("Ring +") { send("star.ring", [Double(mirror.selectedStar), Double(mirror.ring(moved: 1))]) }
                 .accessibilityLabel("Move the star to the outer ring")
@@ -135,14 +221,15 @@ struct BinaryGardensControls: View {
 
     /// Shift the selected star's phase by the level's phase step.
     @ViewBuilder private var phaseRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Phase −") { send("star.phase", [Double(mirror.selectedStar), Double(mirror.phase(moved: -1))]) }
                 .accessibilityLabel("Shift the star's phase back by \(mirror.phaseStep)")
                 .accessibilityValue(mirror.starLabel)
                 .accessibilityIdentifier(port.identifier("phase-minus"))
             Text("phase \(mirror.phase), step \(mirror.phaseStep)")
-                .accessibilityLabel("Phase")
-                .accessibilityValue("phase \(mirror.phase) of 47, step \(mirror.phaseStep)")
+                .accessibilityLabel("Phase of the star")
+                .accessibilityValue(mirror.phaseValue)
+                .accessibilityAdjustableAction { direction in adjust(direction, phase: true) }
                 .accessibilityIdentifier(port.identifier("phase"))
             Button("Phase +") { send("star.phase", [Double(mirror.selectedStar), Double(mirror.phase(moved: 1))]) }
                 .accessibilityLabel("Shift the star's phase forward by \(mirror.phaseStep)")
@@ -153,7 +240,7 @@ struct BinaryGardensControls: View {
 
     /// Dim or brighten the selected star.
     @ViewBuilder private var luminosityRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Luminosity −") {
                 send("star.luminosity", [Double(mirror.selectedStar), Double(mirror.luminosity(moved: -1))])
             }
@@ -161,8 +248,9 @@ struct BinaryGardensControls: View {
             .accessibilityValue(mirror.starLabel)
             .accessibilityIdentifier(port.identifier("luminosity-minus"))
             Text("level \(mirror.luminosity + 1) of \(mirror.luminosityCount)")
-                .accessibilityLabel("Luminosity")
-                .accessibilityValue("level \(mirror.luminosity + 1) of \(mirror.luminosityCount)")
+                .accessibilityLabel("Luminosity of the star")
+                .accessibilityValue(mirror.luminosityValue)
+                .accessibilityAdjustableAction { direction in adjust(direction, luminosity: true) }
                 .accessibilityIdentifier(port.identifier("luminosity"))
             Button("Luminosity +") {
                 send("star.luminosity", [Double(mirror.selectedStar), Double(mirror.luminosity(moved: 1))])
@@ -175,12 +263,15 @@ struct BinaryGardensControls: View {
 
     /// Tilt the orbit plane of the stars.
     @ViewBuilder private var tiltRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Tilt −") { send("orbit.tilt", [Double(mirror.tilt(moved: -1))]) }
                 .accessibilityLabel("Tilt the star orbits flatter")
                 .accessibilityValue(mirror.tiltLabel)
                 .accessibilityIdentifier(port.identifier("tilt-minus"))
             Text(mirror.tiltLabel)
+                .accessibilityLabel("Tilt of the star orbits")
+                .accessibilityValue(mirror.tiltValue)
+                .accessibilityAdjustableAction { direction in adjust(direction, tilt: true) }
                 .accessibilityIdentifier(port.identifier("tilt"))
             Button("Tilt +") { send("orbit.tilt", [Double(mirror.tilt(moved: 1))]) }
                 .accessibilityLabel("Tilt the star orbits steeper")
@@ -191,12 +282,15 @@ struct BinaryGardensControls: View {
 
     /// Show an earlier or later tick of the cycle, and run the light.
     @ViewBuilder private var tickRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Tick −") { show(tick: mirror.shownTick - 1) }
                 .accessibilityLabel("Show the cycle one tick earlier")
                 .accessibilityValue(mirror.tickLabel)
                 .accessibilityIdentifier(port.identifier("tick-minus"))
             Text("tick \(mirror.shownTick)")
+                .accessibilityLabel("Shown tick")
+                .accessibilityValue(mirror.tickValue)
+                .accessibilityAdjustableAction { direction in adjust(direction, tick: true) }
                 .accessibilityIdentifier(port.identifier("tick"))
             Button("Tick +") { show(tick: mirror.shownTick + 1) }
                 .accessibilityLabel("Show the cycle one tick later")
@@ -208,20 +302,24 @@ struct BinaryGardensControls: View {
                 .accessibilityIdentifier(port.identifier("run"))
         }
         Text(mirror.tickLabel + ": " + mirror.worldsLabel).font(.footnote)
+            .fixedSize(horizontal: false, vertical: true)
             .accessibilityIdentifier(port.identifier("tick-detail"))
     }
 
     /// Undo, redo and next level.
     @ViewBuilder private var playRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Undo") { send("play.undo") }
                 .accessibilityLabel("Undo the last ring, phase, luminosity, tilt or run")
+                .accessibilityValue(mirror.actionsMadeLabel)
                 .accessibilityIdentifier(port.identifier("undo"))
             Button("Redo") { send("play.redo") }
                 .accessibilityLabel("Redo the ring, phase, luminosity, tilt or run")
+                .accessibilityValue(mirror.actionsMadeLabel)
                 .accessibilityIdentifier(port.identifier("redo"))
             Button("Next level") { send("level.next") }
                 .accessibilityLabel("Go to the next level")
+                .accessibilityValue(mirror.nextLevelLabel)
                 .accessibilityIdentifier(port.identifier("next-level"))
         }
     }
@@ -236,7 +334,7 @@ struct BinaryGardensControls: View {
         }
         .pickerStyle(.menu)
         .accessibilityLabel("Ring of the star")
-        .accessibilityValue("ring \(mirror.ring + 1) of \(mirror.ringCount)")
+        .accessibilityValue(mirror.ringValue)
         .accessibilityIdentifier(port.identifier("ring-choice"))
         Picker("Luminosity", selection: luminosityChoice) {
             ForEach(0..<mirror.luminosityCount, id: \.self) { index in
@@ -245,9 +343,9 @@ struct BinaryGardensControls: View {
         }
         .pickerStyle(.menu)
         .accessibilityLabel("Luminosity of the star")
-        .accessibilityValue("level \(mirror.luminosity + 1) of \(mirror.luminosityCount)")
+        .accessibilityValue(mirror.luminosityValue)
         .accessibilityIdentifier(port.identifier("luminosity-choice"))
-        HStack(spacing: 16) {
+        row {
             Stepper("Phase target \(mirror.gridPhaseTarget)",
                     onIncrement: { mirror.phaseTarget = mirror.phaseTarget(moved: 1) },
                     onDecrement: { mirror.phaseTarget = mirror.phaseTarget(moved: -1) })
@@ -267,7 +365,7 @@ struct BinaryGardensControls: View {
             }
             .pickerStyle(.menu)
             .accessibilityLabel("Tilt of the star orbits")
-            .accessibilityValue(mirror.tiltLabel)
+            .accessibilityValue(mirror.tiltValue)
             .accessibilityIdentifier(port.identifier("tilt-choice"))
         }
     }
@@ -285,7 +383,7 @@ struct BinaryGardensControls: View {
         .accessibilityValue(mirror.inspectedWorld.map { "world \($0 + 1)" } ?? "none")
         .accessibilityIdentifier(port.identifier("inspect"))
         if let words = mirror.inspectedLabel {
-            Text(words).font(.footnote)
+            Text(words).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("inspect-detail"))
         }
     }
@@ -298,6 +396,7 @@ struct BinaryGardensControls: View {
                 .accessibilityIdentifier(port.identifier("tutorial"))
             Button("Dismiss tutorial") { dismissTutorial() }
                 .accessibilityLabel("Dismiss the tutorial")
+                .accessibilityValue(tutorial)
                 .accessibilityIdentifier(port.identifier("dismiss-tutorial"))
         }
         Button("Hint") { presenter?.showHint() }
@@ -313,7 +412,7 @@ struct BinaryGardensControls: View {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier(port.identifier("failure"))
         }
-        HStack(spacing: 12) {
+        row {
             Text(mirror.bandLabel).font(.footnote)
                 .accessibilityIdentifier(port.identifier("band"))
             Text(mirror.starsLabel).font(.footnote)
@@ -327,7 +426,7 @@ struct BinaryGardensControls: View {
     @ViewBuilder private var progressRows: some View {
         Text(mirror.modeLabel).font(.footnote)
             .accessibilityIdentifier(port.identifier("mode"))
-        HStack(spacing: 12) {
+        row {
             Button("Campaign") { campaign() }
                 .accessibilityLabel("Play the campaign")
                 .accessibilityValue(modeValue("campaign"))
@@ -341,7 +440,7 @@ struct BinaryGardensControls: View {
                 .accessibilityValue(modeValue("practice"))
                 .accessibilityIdentifier(port.identifier("practice"))
         }
-        HStack(spacing: 12) {
+        row {
             Stepper(mirror.levelLabel(mirror.pickedLevel),
                     onIncrement: { mirror.pickedLevel = min(mirror.pickedLevel + 1, mirror.frontier) },
                     onDecrement: { mirror.pickedLevel = max(mirror.pickedLevel - 1, 1) })
@@ -391,9 +490,10 @@ struct BinaryGardensControls: View {
 
     /// Reset the view (feature 504; presentation only).
     @ViewBuilder private var viewRow: some View {
-        HStack(spacing: 16) {
+        row {
             Button("Reset view") { resetView() }
                 .accessibilityLabel("Return the camera to the authored view")
+                .accessibilityValue((presenter?.orbit ?? .authored) == .authored ? "authored" : "orbited")
                 .accessibilityIdentifier(port.identifier("reset-view"))
         }
     }

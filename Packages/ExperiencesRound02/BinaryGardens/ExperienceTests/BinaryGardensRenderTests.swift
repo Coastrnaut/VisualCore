@@ -16,7 +16,9 @@
 // unstable world's window bracket or required tick, or the wilted or bleached world's bloom marker) where it was not
 // broken before the run, moves nothing, is named in words, and undo draws the frame before it again; level 1 won by
 // its certified plan and `light.run` makes every world bloom (motes and a raised glow shell around every world at
-// level-0) without moving any position and passes the same checks. Each test well under 10 s.
+// level-0) without moving any position and passes the same checks. Each test well under 10 s. Since feature 506
+// (R02-G21-06, FR-R02G2106-009) the won test draws one settling frame (time 10) before its checked frames, since the
+// presenter eases the won look, the glow and the blooms by the frame clock.
 #if os(iOS)
 import BinaryGardensCore
 import Foundation
@@ -192,6 +194,12 @@ import VisualCoreScenes
         _ = shell.presenter.describe(core)
         #expect(shell.presenter.mirror.status == "Won")
         #expect(shell.presenter.mirror.failureText == nil)
+        // Feature 506: the won look, the glow and the worlds' blooms fade in by the frame clock (0.15 s), so one
+        // settling frame well after the last live frame settles them; the checked frames are then drawn at time 0
+        // again (no elapsed time, the lights stay settled).
+        _ = try BinaryGardensTest.still(session, time: 10)
+        #expect(shell.presenter.lights.isSettled, "the settling frame settles the lights")
+        #expect(shell.presenter.lights.won == 1, "the won look rests at 1")
         let reference: BinaryGardensSceneSnapshot = try BinaryGardensTest.coreAfter(1, plan + [.run])
             .snapshot(time: 0)
         var pixels: [[SIMD2<Double>?]] = []

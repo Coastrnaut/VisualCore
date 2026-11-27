@@ -38,10 +38,30 @@
 // clock. A refused `level.select` or `level.next` (`r02-g21.locked`: "that level is not open yet") and an impossible
 // date (`r02-g21.date`: "that date cannot be used") read in words. Modelled on `MushroomWeatherPresenter`
 // (feature 495).
+// Feature 506 (R02-G21-06) T-R02G2106-005 (FR-R02G2106-001 … 008; clarifications Q1 … Q6): the presenter routes
+// `BinaryGardensFeedbackPlan.after(old:new:)` (an announcement and a haptic) through its feedback route (`feedback`,
+// injectable; the shared `ExperienceFeedback` by default) once for every new core it takes in, from the frame or the
+// description, and keeps a feedback log (`feedbackLog`, at most 256 plans) beside the tier log and the refusal log;
+// refusals are shown and announced in words (`refused(code:)`; the panel shows exactly the plan's sentence,
+// `refusalText(code:)`, in place of the former "That change was refused: …" line), and a revealed hint is announced as
+// `state` (`hint(text:)`). Changing the panel's selected star or phase target, previews, the shown tick, an
+// inspection, the view, dismissing the tutorial and the Sound toggle are not announced (the controls speak their own
+// values). The scene's lights (`BinaryGardensLights`: the glow, the won look and each world's bloom) step toward the
+// drawn snapshot (the preview applied) every frame by the frame clock's elapsed time (0.15 s fades, 0.45 s under Reduce
+// Flashing; the first frame settles them). The ambient loop (`BinaryGardensSound`) is offered the recipe of the
+// actions left, the quarters of the worlds keeping their light, the stars' brightness and the stage when the first
+// core is taken in, when a level or mode opens and when that recipe changes; a change of the panel's selected star
+// (`changeStar(_:)`: the star picker, the adjustable star and a star tapped on the canvas) and an accepted ring change
+// of the selected star play its audition (`BinaryGardensAudition.of(ring:canChange:)`) when the sound is on, on screen
+// and active; previews play none. A tier change or a memory warning resets no eased level, feedback log or sound
+// state. The mirror carries the summary element's text (`BinaryGardensFeedbackPlan.summaryText(core:star:)`), the
+// controls' values in words (clarification Q5, ", locked" for a locked control) and the sound choice (off by default;
+// saving it is R02-G21-07). Presentation only. Modelled on `MushroomWeatherPresenter` (feature 496).
 #if os(iOS)
 import BinaryGardensCore
 import Foundation
 import SwiftUI
+import VisualCoreAudioDSP
 import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
@@ -296,9 +316,10 @@ final class BinaryGardensMirror {
         code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
     }
 
-    /// The panel line of a refusal: "That change was refused: " and the reason in words, with a full stop.
+    /// The panel line of a refusal: since feature 506 exactly the feedback plan's sentence
+    /// (`BinaryGardensFeedbackPlan.refusalText(code:)`, clarification Q1), the words that are announced.
     static func refusalMessage(code: String) -> String {
-        "That change was refused: \(refusalText(code: code))."
+        BinaryGardensFeedbackPlan.refusalText(code: code)
     }
 
     /// Records the result of sending a control (feature 504): a refusal is shown in words; an accepted action clears
@@ -314,7 +335,7 @@ final class BinaryGardensMirror {
         case .action("separation"): return "the two stars would come too close to each other"
         case .action("locked"): return "that control is locked on this level"
         case .action("off the phase grid"): return "that phase is off the level's phase grid"
-        default: return refusalText(code: refusal.reasonCode)
+        default: return previewReasonText(code: refusal.reasonCode)
         }
     }
 
@@ -323,9 +344,16 @@ final class BinaryGardensMirror {
         "That change would be refused: \(previewRefusalText(refusal))."
     }
 
-    /// A refused action's reason code in words: the rule's code (`r02-g21.…`), with or without the engine's
-    /// `action.rule.` prefix (an action result's code carries it).
+    /// A refused action's reason code in words, read with or without the engine's ``rulePrefix``. Since feature 506 it
+    /// forwards to `BinaryGardensFeedbackPlan.refusalText(code:)` (clarification Q1's sentences, e.g. "That level is
+    /// not open yet.").
     static func refusalText(code: String) -> String {
+        BinaryGardensFeedbackPlan.refusalText(code: code)
+    }
+
+    /// A refused preview's reason code in lower-case words, inside "That change would be refused: …" (feature 504's
+    /// words, unchanged by feature 506: a preview is not a sent action and is never announced).
+    static func previewReasonText(code: String) -> String {
         let rule: String = bareCode(code)
         switch rule {
         case "r02-g21.stage": return "the play is over: undo a failed run or go to the next level"
@@ -342,6 +370,79 @@ final class BinaryGardensMirror {
         case BinaryGardensExperienceRule.tick: return "only ticks 1 to 48 can be shown"
         default: return "that action is not available now"
         }
+    }
+
+    // MARK: Accessibility (feature 506, R02-G21-06)
+
+    /// The latest core taken in, for the summary element (feature 506); nil before the first.
+    var summaryCore: BinaryGardensExperienceCore?
+    /// Whether the sound is on (feature 506; off by default; presentation only, saving it is R02-G21-07).
+    var soundOn = false
+
+    /// The summary element's text (feature 506): `BinaryGardensFeedbackPlan.summaryText(core:star:)` of the latest core
+    /// and the panel's selected star; empty before the first core.
+    var summary: String {
+        guard let core = summaryCore else { return "" }
+        return BinaryGardensFeedbackPlan.summaryText(core: core, star: selectedStar)
+    }
+
+    /// The selected star's level entry, or nil while no play is followed.
+    private var selectedStarRules: BinaryGardensStar? {
+        guard let stars = play?.level.stars, stars.indices.contains(selectedStar) else { return nil }
+        return stars[selectedStar]
+    }
+
+    /// Whether the level locks the selected star's ring (feature 506); false while no play is followed.
+    var ringLocked: Bool { selectedStarRules.map { !$0.ringAdjustable } ?? false }
+    /// Whether the level locks the selected star's phase (feature 506); false while no play is followed.
+    var phaseLocked: Bool { selectedStarRules.map { !$0.phaseAdjustable } ?? false }
+    /// Whether the level locks the selected star's luminosity (feature 506); false while no play is followed.
+    var luminosityLocked: Bool { selectedStarRules.map { !$0.luminosityAdjustable } ?? false }
+    /// Whether the level locks the tilt (T_max = 0; feature 506).
+    var tiltLocked: Bool { maxTilt == 0 }
+
+    /// `words` with ", locked" when `locked` (clarification Q5).
+    static func locking(_ words: String, _ locked: Bool) -> String { locked ? words + ", locked" : words }
+
+    /// The adjustable star's value (clarification Q5): "star n of 2".
+    var starValue: String { "star \(selectedStar + 1) of 2" }
+
+    /// The adjustable ring's value (clarification Q5): "ring r of R, ρ units" (", locked" when the level locks the
+    /// selected star's ring).
+    var ringValue: String {
+        let radii: [Int] = play?.level.ringRadii ?? []
+        let radius: Int = radii.indices.contains(ring) ? radii[ring] : 0
+        return Self.locking("ring \(ring + 1) of \(ringCount), \(radius) units", ringLocked)
+    }
+
+    /// The adjustable phase's value (clarification Q5): "phase p of 47, step g" (", locked" when locked).
+    var phaseValue: String {
+        Self.locking("phase \(phase) of \(Self.cycle - 1), step \(phaseStep)", phaseLocked)
+    }
+
+    /// The adjustable luminosity's value (clarification Q5): "level l of m, luminosity L" (", locked" when locked).
+    var luminosityValue: String {
+        let levels: [Int] = play?.level.luminosityLevels ?? []
+        let units: Int = levels.indices.contains(luminosity) ? levels[luminosity] : 0
+        return Self.locking("level \(luminosity + 1) of \(luminosityCount), luminosity \(units)", luminosityLocked)
+    }
+
+    /// The adjustable tilt's value (clarification Q5): "tilt t of T steps" (", locked" when T_max = 0).
+    var tiltValue: String { Self.locking(tiltLabel, tiltLocked) }
+
+    /// The adjustable shown tick's value (clarification Q5): "tick t of 48".
+    var tickValue: String { tickLabel }
+
+    /// The actions made of the budget, in words (feature 506; Undo and Redo's value): "k actions made" ("1 action
+    /// made" for one).
+    var actionsMadeLabel: String {
+        let made: Int = max(budget - actionsLeft, 0)
+        return made == 1 ? "1 action made" : "\(made) actions made"
+    }
+
+    /// Next level's value (feature 506): "level n" when the next level is open, else "no further level open".
+    var nextLevelLabel: String {
+        levelNumber < frontier ? "level \(levelNumber + 1)" : "no further level open"
     }
 }
 
@@ -409,6 +510,18 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     static let searchingText = "Finding a hint…"
     /// What the hint line shows when the play has no hint (won, or not under way; feature 505).
     static let noHintText = "No hint now: the level is not being played."
+    /// The feedback route of announcements and haptics (feature 506; tests inject their own).
+    var feedback: ExperienceFeedback = .shared
+    /// Every routed feedback plan, oldest first, at most ``feedbackLogLimit`` (feature 506; tests and diagnostics).
+    private(set) var feedbackLog: [BinaryGardensFeedbackPlan] = []
+    /// The most feedback plans kept.
+    static let feedbackLogLimit = 256
+    /// The eased light levels drawn by the scene (feature 506).
+    private(set) var lights: BinaryGardensLights
+    /// The frame time of the last draw, for easing the lights; nil before the first frame (which settles them).
+    private var lastFrameTime: Double?
+    /// The ambient loop and the selected star's audition (feature 506).
+    let sound: BinaryGardensSound
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -416,6 +529,9 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         self.reduceFlashing = reduceFlashing
         scene.reducedMotion = reduceMotion
         scene.reducedFlash = reduceFlashing
+        lights = BinaryGardensLights(reducedFlash: reduceFlashing)
+        // A placeholder recipe until the first core is taken in, which offers its own (feature 506).
+        sound = BinaryGardensSound(recipe: AmbientLoopRecipe.gentle)
     }
 
     /// The tests' seam: before `setup`, replaces the system program's fragment source with one that does not compile.
@@ -489,7 +605,10 @@ final class BinaryGardensPresenter: ExperiencePresenter {
             tierLog.append(BinaryGardensTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
-        if latestCore != core { absorbProgress(core) }
+        if latestCore != core {
+            absorbFeedback(core)
+            absorbProgress(core)
+        }
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         let base: BinaryGardensSceneSnapshot = core.snapshot(time: time)
         lastBase = (snapshot: base, level: core.play.level)
@@ -497,6 +616,17 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         lastSnapshot = snapshot
         mirror.previewRefusal = snapshot.preview?.refusal
         scene.orbit = gestures.orbit
+        // The lights settle on the very first frame; every later change, a level change included, fades, stepped by
+        // the frame clock from the drawn snapshot (the preview applied; feature 506). A frame clock that went back (an
+        // off-screen still drawn at an earlier time than the last frame, never a live frame) is not a frame sequence
+        // and settles them too, so a still shows the state at rest. A tier change or a memory warning resets nothing.
+        if let last = lastFrameTime, frame.time.isFinite, frame.time >= last {
+            lights.step(toward: snapshot, elapsed: frame.time - last)
+        } else {
+            lights.settle(to: snapshot)
+        }
+        if frame.time.isFinite { lastFrameTime = frame.time }
+        scene.lights = lights
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
 
@@ -525,7 +655,9 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         let play = core.play
         let level = play.level
         follow(core)
+        absorbFeedback(core)
         absorbProgress(core)
+        mirror.summaryCore = core
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -663,7 +795,7 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         case let .inspectWorld(world):
             mirror.inspectedWorld = world
         case let .selectStar(star):
-            mirror.select(star: star)
+            changeStar(star)   // feature 506: plays the selected star's audition when the sound is on
         case let .preview(change):
             mirror.preview = change
         case .clearPreview:
@@ -705,6 +837,7 @@ final class BinaryGardensPresenter: ExperiencePresenter {
         let result: ActionResult = port.send(control, values)
         mirror.record(accepted: result.isAccepted, code: result.code)
         if !result.isAccepted {
+            route(BinaryGardensFeedbackPlan.refused(code: result.code))   // feature 506: announced and felt
             refusalLog.append(BinaryGardensMirror.bareCode(result.code))
             if refusalLog.count > Self.refusalLogLimit {
                 refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
@@ -808,13 +941,18 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
     private func reveal(_ texts: [String]?, level: Int, play: BinaryGardensPlay) {
         hintPlay = play
-        guard let texts, texts.indices.contains(level - 1) else {
+        let before: (Int, String?) = (mirror.hintLevel, mirror.hintText)
+        if let texts, texts.indices.contains(level - 1) {
+            mirror.hintLevel = level
+            mirror.hintText = texts[level - 1]
+        } else {
             mirror.hintLevel = 0
             mirror.hintText = Self.noHintText
-            return
         }
-        mirror.hintLevel = level
-        mirror.hintText = texts[level - 1]
+        // Feature 506: a newly shown hint (or the no-hint line) is announced as `state`.
+        if let text = mirror.hintText, before.0 != mirror.hintLevel || before.1 != text {
+            route(BinaryGardensFeedbackPlan.hint(text: text))
+        }
     }
 
     /// Ends the tutorial of the current level (`tutorial.dismiss`).
@@ -858,5 +996,93 @@ final class BinaryGardensPresenter: ExperiencePresenter {
     static func dateValues(_ date: DateComponents) -> [Double] {
         [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
+
+    // MARK: Feedback and sound (feature 506, R02-G21-06)
+
+    /// Plays `plan` through the feedback route (its haptic and its announcement) and logs it (at most
+    /// ``feedbackLogLimit``); `.none` does nothing.
+    func route(_ plan: BinaryGardensFeedbackPlan) {
+        guard plan != .none else { return }
+        if let haptic = plan.haptic { feedback.haptic(haptic) }
+        if let text = plan.text, let kind = plan.kind { feedback.announce(text, kind: kind) }
+        feedbackLog.append(plan)
+        if feedbackLog.count > Self.feedbackLogLimit {
+            feedbackLog.removeFirst(feedbackLog.count - Self.feedbackLogLimit)
+        }
+    }
+
+    /// Takes a new core into the feedback and the sound, once per core (from the frame or the description): routes the
+    /// plan of the change from the latest core, plays the selected star's audition after an accepted ring change of
+    /// it, and offers the ambient recipe when a level or mode opened or the recipe changed. The first core only offers
+    /// its recipe, so the sound never holds the placeholder. Runs before ``absorbProgress(_:)``, which takes the core
+    /// as the latest.
+    private func absorbFeedback(_ core: BinaryGardensExperienceCore) {
+        guard let previous = latestCore else {
+            sound.offer(Self.recipe(core))
+            return
+        }
+        guard previous != core else { return }
+        let plan: BinaryGardensFeedbackPlan = BinaryGardensFeedbackPlan.after(old: previous, new: core)
+        route(plan)
+        let star: Int = mirror.selectedStar
+        if plan.trigger == "star.ring", previous.play.arrangement.rings.indices.contains(star),
+           core.play.arrangement.rings.indices.contains(star),
+           previous.play.arrangement.rings[star] != core.play.arrangement.rings[star], mirror.soundOn {
+            sound.audition(Self.audition(star: star, play: core.play))
+        }
+        let opened: Bool = previous.levelNumber != core.levelNumber || previous.mode != core.mode
+        if opened || Self.recipe(previous) != Self.recipe(core) { sound.offer(Self.recipe(core)) }
+    }
+
+    /// The ambient recipe of `core`: its actions left, the quarters of the worlds keeping their light, the stars'
+    /// brightness and its stage.
+    static func recipe(_ core: BinaryGardensExperienceCore) -> AmbientLoopRecipe {
+        BinaryGardensSoundRecipe.recipe(play: core.play)
+    }
+
+    /// The audition of star `star` (0 … 1) of `play`: `BinaryGardensAudition.of(ring:canChange:)` of its ring index
+    /// and whether it can change now.
+    static func audition(star: Int, play: BinaryGardensPlay) -> BinaryGardensAudition {
+        let rings: [Int] = play.arrangement.rings
+        let ring: Int = rings.indices.contains(star) ? rings[star] : 0
+        return BinaryGardensAudition.of(ring: ring,
+                                        canChange: BinaryGardensAudition.canChange(star: star, play: play))
+    }
+
+    /// The audition of the panel's selected star (its ring and whether it can change now); the outermost tone that
+    /// cannot change while no play is followed.
+    var selectedAudition: BinaryGardensAudition {
+        guard let play = mirror.play else { return BinaryGardensAudition.of(ring: 0, canChange: false) }
+        return Self.audition(star: mirror.selectedStar, play: play)
+    }
+
+    /// Selects star `star` in the panel (clamped to 0 … 1; presentation only: the star picker, the adjustable star and
+    /// a star tapped on the canvas); when the selected star changed (clarification Q4: once per change) and the sound
+    /// is on, plays its audition (feature 506). Previews never come here.
+    func changeStar(_ star: Int) {
+        let before: Int = mirror.selectedStar
+        mirror.select(star: star)
+        guard mirror.soundOn, mirror.selectedStar != before else { return }
+        sound.audition(selectedAudition)
+    }
+
+    /// Turns the sound on or off (presentation only); turning it on plays the recipe of the current play.
+    func setSound(on: Bool) {
+        if on, let core = latestCore { sound.offer(Self.recipe(core)) }
+        sound.setWanted(on)
+        mirror.soundOn = on
+    }
+
+    /// The controls view appeared (the loop may play).
+    func controlsAppeared() { sound.setOnScreen(true) }
+
+    /// The controls view disappeared (the loop and any audition stop).
+    func controlsDisappeared() { sound.setOnScreen(false) }
+
+    /// The scene became active or inactive.
+    func sceneActive(_ active: Bool) { sound.setActive(active) }
+
+    /// The summary element's words (feature 506): the mirror's summary of the latest core and the selected star.
+    var summaryText: String { mirror.summary }
 }
 #endif

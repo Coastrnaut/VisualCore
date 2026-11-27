@@ -23,6 +23,17 @@
 // ring round the inspected world, the bracket by its gauge row); the geometry key also holds the orbit, the aspect, the
 // preview and the inspected world, so the meshes are rebuilt when any of them changes. The two-sun light directions are
 // the drawn snapshot's stars (`BinaryGardensSceneGeometry.drawnSnapshot`: a previewed luminosity or tilt moves them).
+// Feature 506 (R02-G21-06) T-R02G2106-005 (FR-R02G2106-004, 007; clarifications Q3, Q6; research R3 … R5): the
+// presenter's eased lights (`BinaryGardensLights`) are drawn: the glow gain is multiplied by the glow level, `u_won` is
+// the won level, and each world's glow shell factor is its bloom level (vertex data of the glow mesh, built by
+// `BinaryGardensSceneGeometry.glowMesh(_:tier:camera:bloom:)`; only the glow mesh is rebuilt, when a bloom level crosses
+// a 1/32 step). `u_motion` is 0 under Reduce Motion or Reduce Flashing, so the coronas and motes hold their time-zero
+// places and the system is still between actions. The unlit fallback's geometry takes a won flag, not a level, so the
+// fallback system blends the colours of the not-won and the won system part by the won level
+// (`blendedColours(off:on:level:)`; the two parts share their positions, the won look changes colours only) and is
+// rebuilt when that level moves by a tenth or more. Without lights the snapshot's levels are drawn at once. A tier
+// change or a memory warning resets none of the presenter's levels. Modelled on `MushroomWeatherForestScene`
+// (feature 496).
 #if os(iOS)
 import BinaryGardensCore
 import Foundation
@@ -39,20 +50,30 @@ final class BinaryGardensSystemScene {
     var systemFragment = BinaryGardensShaders.systemFragment
     /// Whether the coronas and motes stand still (Reduce Motion): `u_motion` 0.
     var reducedMotion = false
-    /// Whether the glow gain is capped (Reduce Flashing).
+    /// Whether the glow gain is capped (Reduce Flashing); since feature 506 the coronas and motes stand still too.
     var reducedFlash = false
     /// How many times the system mesh was built (tests: it is not rebuilt while nothing it reads changes).
     private(set) var systemBuilds = 0
     /// How many times the glow mesh was built (tests).
     private(set) var glowBuilds = 0
-    /// The `u_time` value of the last frame drawn by the shader path (tests; it still advances under Reduce Motion,
-    /// where `u_motion` 0 keeps the coronas and motes still).
+    /// The `u_time` value of the last frame drawn by the shader path (tests; it still advances under Reduce Motion or
+    /// Reduce Flashing, where `u_motion` 0 holds the coronas and motes at their time-zero places).
     private(set) var lastShaderTime: Double = 0
     /// The `u_star1` and `u_star2` values of the last frame drawn by the shader path (tests).
     private(set) var lastStarUniforms: (SIMD3<Double>, SIMD3<Double>)?
     /// The camera's orbit (feature 504; presentation only, the presenter's gesture controller's). A changed orbit
     /// rebuilds the meshes on the next draw.
     var orbit: BinaryGardensViewOrbit = .authored
+    /// The eased light levels the presenter steps every frame (feature 506): the glow gain is multiplied by
+    /// `lights.glow`, `u_won` is `lights.won`, each world's glow shell factor is `lights.bloom` (the glow mesh rebuilt
+    /// when a level crosses a 1/32 step) and the fallback system's won colours are blended by `lights.won` (rebuilt
+    /// when it moves by a tenth or more). Nil draws the snapshot's levels at once (the renderer tests' default).
+    var lights: BinaryGardensLights?
+    /// The steps of 1/32 of each world's bloom level the glow mesh was last built with (feature 506); nil without
+    /// lights.
+    private var glowBloomSteps: [Int]?
+    /// The steps of a bloom level (feature 506).
+    static let bloomStepsPerUnit: Double = 32
 
     /// What the meshes depend on: everything of the snapshot that the geometry reads, the tier and the fallback.
     private struct GeometryKey: Equatable {
@@ -72,6 +93,8 @@ final class BinaryGardensSystemScene {
         let preview: BinaryGardensPreview?
         /// The inspected world (feature 504; presentation only).
         let inspectedWorld: Int?
+        /// The won level in tenths, in the fallback only (feature 506): the fallback's colours depend on it.
+        let wonTenths: Int
     }
 
     private var registry: ResourceRegistry?
@@ -104,6 +127,7 @@ final class BinaryGardensSystemScene {
         glowRenderer = nil
         fallbackRenderers = []
         geometryKey = nil
+        glowBloomSteps = nil
     }
 
     /// The number of GPU objects the scene holds: 0 after ``release()`` and positive after a frame was drawn.
@@ -117,8 +141,8 @@ final class BinaryGardensSystemScene {
     /// The glow limit passed as `u_glowLimit`.
     var glowLimit: Double { BinaryGardensShaders.glowLimit(reduceFlashing: reducedFlash) }
 
-    /// The motion passed as `u_motion`: 0 under Reduce Motion, else 1.
-    var motion: Double { BinaryGardensShaders.motion(reduceMotion: reducedMotion) }
+    /// The motion passed as `u_motion`: 0 under Reduce Motion or (feature 506) Reduce Flashing, else 1.
+    var motion: Double { BinaryGardensShaders.motion(reduceMotion: reducedMotion || reducedFlash) }
 
     /// Draws `snapshot` at `tier` into `context`'s framebuffer.
     func render(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier, context: RenderContext,
@@ -132,21 +156,26 @@ final class BinaryGardensSystemScene {
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
         let camera = BinaryGardensSceneGeometry.camera(aspect: aspect, orbit: orbit)
         let next: GeometryKey = key(snapshot, tier: tier)
-        if next != geometryKey { try rebuild(snapshot, tier: tier, camera: camera) }
+        if next != geometryKey {
+            try rebuild(snapshot, tier: tier, camera: camera)
+        } else if fallbackReason == nil, bloomSteps() != glowBloomSteps {
+            try rebuildGlow(snapshot, tier: tier, camera: camera)
+        }
         geometryKey = key(snapshot, tier: tier)
         if fallbackReason != nil {
             try drawFallback(camera)
             return
         }
-        let won: Float = snapshot.isWon ? 1 : 0
+        let won = Float(wonLevel(snapshot))
         let time: Double = BinaryGardensShaders.shaderTime(snapshot.time)
         lastShaderTime = time
         let stars: (SIMD3<Double>, SIMD3<Double>) =
             BinaryGardensSceneGeometry.starUniforms(BinaryGardensSceneGeometry.drawnSnapshot(snapshot))
         lastStarUniforms = stars
         try drawSystem(camera, time: time, won: won, stars: stars)
-        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty.
-        let gain = BinaryGardensShaders.glowGain(for: tier)
+        // The glow gain is 0 without glow shells (level-2), where the glow mesh is also empty. Feature 506 eases the
+        // glow gain by the glow level.
+        let gain = BinaryGardensShaders.glowGain(for: tier) * (lights?.glow ?? 1)
         guard gain > 0 else { return }
         try drawGlow(camera, gain: gain, won: won)
     }
@@ -155,7 +184,60 @@ final class BinaryGardensSystemScene {
     private func key(_ s: BinaryGardensSceneSnapshot, tier: BinaryGardensTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, arrangement: s.arrangement, shownTick: s.shownTick, stage: s.stage,
                     failure: s.failure, actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil,
-                    orbit: orbit, aspect: aspect, preview: s.preview, inspectedWorld: s.inspectedWorld)
+                    orbit: orbit, aspect: aspect, preview: s.preview, inspectedWorld: s.inspectedWorld,
+                    wonTenths: fallbackReason != nil ? Int((wonLevel(s) * 10).rounded(.down)) : 0)
+    }
+
+    /// The won level drawn (feature 506): the eased `lights.won`, or 1 on a won snapshot and 0 otherwise without
+    /// lights.
+    private func wonLevel(_ snapshot: BinaryGardensSceneSnapshot) -> Double {
+        lights?.won ?? (snapshot.isWon ? 1 : 0)
+    }
+
+    /// The 1/32 steps of each world's eased bloom level (feature 506; a non-finite level reads 0); nil without lights.
+    private func bloomSteps() -> [Int]? {
+        guard let bloom = lights?.bloom else { return nil }
+        var steps: [Int] = []
+        steps.reserveCapacity(bloom.count)
+        for level in bloom {
+            let clamped: Double = level.isFinite ? min(max(level, 0), 1) : 0
+            steps.append(Int((clamped * Self.bloomStepsPerUnit).rounded(.down)))
+        }
+        return steps
+    }
+
+    /// The colours of the fallback system at won level `level` (feature 506): each colour of `off` (the not-won part)
+    /// moved toward the same vertex's colour of `on` (the won part) by `level`, clamped to 0 … 1 (a non-finite level
+    /// reads 0). Parts of different sizes cannot be blended vertex by vertex: then `on`'s colours from a level of 0.5
+    /// up, `off`'s below. Pure.
+    static func blendedColours(off: [Vec4], on: [Vec4], level: Double) -> [Vec4] {
+        let t: Double = level.isFinite ? min(max(level, 0), 1) : 0
+        guard off.count == on.count else { return t >= 0.5 ? on : off }
+        return zip(off, on).map { a, b in a + (b - a) * t }
+    }
+
+    /// Rebuilds only the glow mesh for the current bloom levels (feature 506: a bloom level crossed a 1/32 step while
+    /// nothing else the meshes read changed). A failing glow program falls back like ``rebuild(_:tier:camera:)``.
+    private func rebuildGlow(_ snapshot: BinaryGardensSceneSnapshot, tier: BinaryGardensTier,
+                             camera: BinaryGardensCamera) throws {
+        guard let registry else { return }
+        glowRenderer?.release()
+        glowRenderer = nil
+        glowBloomSteps = bloomSteps()
+        do {
+            let glow = try BinaryGardensSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera,
+                                                               bloom: lights?.bloom)
+            glowBuilds += 1
+            if !glow.indices.isEmpty {
+                glowRenderer = try Self.renderer(glow, vertex: BinaryGardensShaders.glowVertex,
+                                                 fragment: BinaryGardensShaders.glowFragment,
+                                                 name: "binary-gardens-glow", registry: registry)
+            }
+        } catch {
+            release()
+            fallbackReason = "binary-gardens shader: \(error)"
+            try rebuild(snapshot, tier: tier, camera: camera)
+        }
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier` facing `camera`: the two programs, or the unlit fallback.
@@ -172,7 +254,10 @@ final class BinaryGardensSystemScene {
                                                    fragment: systemFragment, name: "binary-gardens-system",
                                                    registry: registry)
                 systemBuilds += 1
-                let glow = try BinaryGardensSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera)
+                // Feature 506: each world's shell factor is its eased bloom level (nil lights: today's 0/1 factors).
+                glowBloomSteps = bloomSteps()
+                let glow = try BinaryGardensSceneGeometry.glowMesh(snapshot, tier: tier, camera: camera,
+                                                                   bloom: lights?.bloom)
                 glowBuilds += 1
                 if !glow.indices.isEmpty {
                     glowRenderer = try Self.renderer(glow, vertex: BinaryGardensShaders.glowVertex,
@@ -189,9 +274,17 @@ final class BinaryGardensSystemScene {
         // included; level-2 has no glow, no coronas, no trails and no motes).
         let minimal = BinaryGardensTier.of(BinaryGardensTier.all.count - 1)
         let up = Vec3(0, 0, 1)
-        let parts: [BinaryGardensColouredMesh] = [
-            try BinaryGardensSceneGeometry.systemPart(snapshot, tier: minimal, camera: camera),
-            try BinaryGardensSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera),
+        // Feature 506: the system's won colours blended by the won level (the won look changes colours, not
+        // positions).
+        let off = try BinaryGardensSceneGeometry.systemPart(snapshot, tier: minimal, wonLevel: false, camera: camera)
+        let on = try BinaryGardensSceneGeometry.systemPart(snapshot, tier: minimal, wonLevel: true, camera: camera)
+        let level: Double = wonLevel(snapshot)
+        // Parts of different sizes switch whole at a level of 0.5 (see `blendedColours(off:on:level:)`).
+        let systemMesh: Mesh = off.colours.count == on.colours.count || level < 0.5 ? off.mesh : on.mesh
+        let glow = try BinaryGardensSceneGeometry.glowPart(snapshot, tier: minimal, camera: camera)
+        let parts: [(mesh: Mesh, colours: [Vec4])] = [
+            (systemMesh, Self.blendedColours(off: off.colours, on: on.colours, level: level)),
+            (glow.mesh, glow.colours),
         ]
         for part in parts where !part.mesh.indices.isEmpty {
             var mesh = part.mesh

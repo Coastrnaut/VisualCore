@@ -41,7 +41,8 @@
 // `resetView()`, `inspect(_:)`, `send(_:_:port:)`, `refusalLog` (bare codes, oldest first), `lastSnapshot` (carries
 // the drawn `preview` and `inspectedWorld`), `describe(_:)` ("Inspected " and the kernel's words of the inspected
 // world, then a full stop), `mirror.message` (the controller's explain texts verbatim; a refusal as
-// `BinaryGardensMirror.refusalMessage(code:)`), `mirror.preview`, `mirror.previewRefusal` and
+// `BinaryGardensMirror.refusalMessage(code:)`, since feature 506 the feedback plan's sentence), `mirror.preview`,
+// `mirror.previewRefusal` and
 // `mirror.previewRefusalLabel` (`BinaryGardensMirror.previewRefusalMessage(_:)`), `mirror.inspectedWorld`,
 // `mirror.selectedStar`, `mirror.phaseTarget`, `gestureActions`, `nativeActions`. Explain texts: the controller's
 // `starReason`, `ringReason` and `finishedReason`.
@@ -987,6 +988,8 @@ enum BinaryGardensGestureScript {
         #expect(sentAfter.rejected == sentBefore.rejected + 1, "the change was sent once and refused")
         let message: String = try #require(shell.presenter.mirror.message, "the refusal is shown")
         #expect(message.contains(Mirror.refusalText(code: Script.budgetCode)), "\(message)")
+        // Since feature 506 (FR-R02G2106-009) the panel shows the feedback plan's sentence alone.
+        #expect(message == "No actions are left: run the light or undo a change.", "\(message)")
         #expect(message == Mirror.refusalMessage(code: Script.rulePrefix + Script.budgetCode), "\(message)")
         #expect(Mirror.refusalText(code: Script.rulePrefix + Script.budgetCode)
                     == Mirror.refusalText(code: Script.budgetCode), "codes are read with or without the prefix")

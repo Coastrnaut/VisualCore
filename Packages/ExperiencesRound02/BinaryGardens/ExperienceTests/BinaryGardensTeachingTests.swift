@@ -21,7 +21,9 @@
 // returns to the frontier); the Daily button's date is today's local date; a locked level, `level.next` on the last
 // open level and an impossible date (2027-02-29) are refused in words ("that level is not open yet", "that date cannot
 // be used") and change nothing. Fixed dates except the today check, no wall-clock assertion; each test short.
-// Explicit types and plain loops (CI type-check rule). Synthetic data only.
+// Explicit types and plain loops (CI type-check rule). Synthetic data only. Since feature 506 (R02-G21-06,
+// FR-R02G2106-009) the refusal lines are the feedback plan's sentences ("That level is not open yet.", "That date
+// cannot be used.").
 #if os(iOS)
 import BinaryGardensCore
 import CoreGraphics
@@ -56,9 +58,9 @@ enum BinaryGardensTeaching {
     /// The most hint-guided steps tried when following the hints (at most 4 certified actions, then the run).
     nonisolated static let followLimit: Int = 7
 
-    /// The panel message of a refusal with reason `code`.
+    /// The panel message of a refusal with reason `code` (since feature 506 the feedback plan's sentence).
     static func refusalMessage(_ code: String) -> String {
-        "That change was refused: " + BinaryGardensMirror.refusalText(code: code) + "."
+        BinaryGardensMirror.refusalMessage(code: code)
     }
 
     /// Opens level `number` (seed `number − 1`) at a small view (one frame drawn, tick 48 shown) and describes the
@@ -511,7 +513,7 @@ enum BinaryGardensTeaching {
         #expect(code == "r02-g21.locked")
         #expect(Teaching.isRefusal(locked, code), "\(locked.code)")
         let message: String = Teaching.refusalMessage(code)
-        #expect(message == "That change was refused: that level is not open yet.")
+        #expect(message == "That level is not open yet.")
         #expect(presenter.mirror.message == message, "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused pick changes nothing")
@@ -556,7 +558,7 @@ enum BinaryGardensTeaching {
         #expect(code == "r02-g21.date")
         #expect(Teaching.isRefusal(refused, code), "\(refused.code)")
         let message: String = Teaching.refusalMessage(code)
-        #expect(message == "That change was refused: that date cannot be used.")
+        #expect(message == "That date cannot be used.")
         #expect(presenter.mirror.message == message, "\(presenter.mirror.message ?? "nil")")
         #expect(presenter.refusalLog.last == code)
         #expect(try Teaching.core(shell) == before, "a refused date changes nothing")
