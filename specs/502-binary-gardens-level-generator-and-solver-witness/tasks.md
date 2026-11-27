@@ -143,3 +143,10 @@ isolated copies against contracts/api.md; shared files (level, sky, puzzle, erro
 generator, catalog tests, witness files, docs) stay with the lead. MVP: Story 1. Requirement coverage: FR-001 → 003,
 004, 006; FR-002 → 003; FR-003 → 003, 006; FR-004 → 005, 006; FR-005 → 006; FR-006 → 002, 007 … 011; FR-007 → 003,
 004, 006; FR-008 → 006; FR-009 → 002; SC-001 … 005 → 003 … 006; SC-006 → 002, 007 … 011; SC-007 → 002, 006.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G2102-013 Record in `specs/502-binary-gardens-level-generator-and-solver-witness/data-model.md` and against
+  T-R02G2102-003 and -005 that the five content files live in
+  `Packages/ExperiencesRound02/BinaryGardens/Core/Content/` (feature 501's invariant scan counts the files directly in
+  `Core/`), as plan.md states, per plan: project structure (contradicts)
