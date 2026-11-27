@@ -101,7 +101,7 @@ workflow, script tests, docs) stay with the lead. MVP: Story 1. Requirement cove
 
 ## Phase 7: Convergence
 
-- [ ] T-R02G2108-014 State in `docs/architecture/binary-gardens.md` the tolerance used for level 25's tilt pip (a pixel
+- [X] T-R02G2108-014 State in `docs/architecture/binary-gardens.md` the tolerance used for level 25's tilt pip (a pixel — Verified 2026-11-27: docs/architecture/binary-gardens.md states the tilt-pip tolerance; validate_docs PASS
   within the larger of 3 px and the pip's projected outer radius at least 0.05 from the backdrop in luminance, the same
   rule as the gauge-margin check), since feature 503 defines no tilt-pip tolerance, per clarification Q3 and
   FR-R02G2108-004 (partial: the spec names only the feature-503 tolerances)

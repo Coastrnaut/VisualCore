@@ -207,7 +207,8 @@ presentation of later features.
   stars' controls, each world's light, the whole palette and the material table, pinned with SHA-256 digests in
   `golden-frames.json` (written after R02-G21-04 … 07 were recorded) and rewritten only with
   `BINARY_GARDENS_WRITE_GOLDEN=1`. The simulator renders the same frames and checks them with the feature-503
-  tolerances.
+  tolerances; level 25's first tilt pip, which feature 503 never checked, must show a pixel at least 0.05 from the
+  backdrop in luminance within the larger of 3 px and the pip's projected outer radius (the gauge-margin rule).
 - **Memory.** Twelve open–draw–warn–close cycles on the simulator stay within 16 MB of the first (bound applied when the
   class runs alone) and release every GPU object of the scene.
 - **Running it.** CI's round-two job (half b) has a "Binary Gardens regression (host)" step;
