@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "scripts/check_device_rows.py",
+    "--experience",
+    "r02-g21.binary-gardens"
+  ],
+  "command": "python3 scripts/check_device_rows.py --experience r02-g21.binary-gardens",
+  "elapsed_seconds": 0.029,
+  "exit_code": 0,
+  "finished": "2026-11-27T20:33:27+00:00",
+  "gate": "R02-G21-10",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G21-10.device-rows.log",
+  "log_sha256": "29965a09dfd667ee691116d97c535121aacbeb14fb0ae806521dd6ed9bafd822",
+  "name": "device-rows",
+  "started": "2026-11-27T20:33:27+00:00",
+  "timed_out": false
+}

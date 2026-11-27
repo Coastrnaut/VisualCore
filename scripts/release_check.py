@@ -184,6 +184,9 @@ def steps(stamp: str) -> list[Step]:
         # Feature 500 (R02-G20-10): Mushroom Weather's device-row definition (no device is contacted).
         Step("device-rows-r02-g20", [PY, "scripts/check_device_rows.py", "--experience",
                                      "r02-g20.mushroom-weather"]),
+        # Feature 510 (R02-G21-10): Binary Gardens' device-row definition (no device is contacted).
+        Step("device-rows-r02-g21", [PY, "scripts/check_device_rows.py", "--experience",
+                                     "r02-g21.binary-gardens"]),
         Step("public-api", [PY, "scripts/check_public_api.py"]),
         Step("documented-api-showcase", [PY, "scripts/check_documented_api.py", "--sources", "Showcase/App"]),
         Step("documented-api-interactive-demo", [PY, "scripts/check_documented_api.py", "--sources", "Harnesses/InteractiveDemo"]),

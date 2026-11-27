@@ -14,7 +14,7 @@ is contacted. No {owner} tasks; one {device} task. Prerequisites: R02-G21-05 …
 
 ## Phase 2: Story 1 — the campaign knows what to run (P1) 🎯
 
-- [ ] T-R02G2110-002 [US1] Create `docs/apps/binary-gardens/device-rows.json` (data-model.md: "schema 1, sorted keys";
+- [X] T-R02G2110-002 [US1] Create `docs/apps/binary-gardens/device-rows.json` (data-model.md: "schema 1, sorted keys"; — Verified 2026-11-27: device-rows.json (8 rows, 12 scenarios) and release step device-rows-r02-g21 installed; device-rows exit=0: PASS (8 rows, 12 scenarios)
   devices D1 → DEV1-R02-G21, D2 → DEV2-R02-G21, D3 → DEV3-R02-G21; the 12 scenarios of clarification Q2; rows BG-D1 …
   BG-D8 of clarification Q1 with title, devices, procedure, measurements, pass (clarification Q5), gating (false only
   for BG-D6), covers, owner_steps, status "pending device campaign"; no result field; BG-D8 reads the panel's win text,
