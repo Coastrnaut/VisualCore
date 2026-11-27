@@ -127,3 +127,16 @@ against the play contract in contracts/api.md; shared files (package, ci.yml, er
 with the lead. Agents may draft in isolated copies before 001 (new files only). MVP: Story 1. Requirement coverage:
 FR-001, 002, 009, 013 → 002; FR-003, 004, 005, 014 → 002, 003; FR-006 … 008, 011 → 004; FR-010 → 005; FR-012 → 006;
 SC-001 … 005 → 002 … 006; SC-006 → 007 … 011.
+
+## Phase 7: Convergence
+
+- [ ] T-R02G2101-013 State in `specs/501-binary-gardens-playable-rule-kernel/spec.md` FR-R02G2101-014 and in
+  `data-model.md` (`BinaryGardensWorldLight`) that a world with no comfortable tick reports window 0 with start tick 0
+  (as `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensSky.swift` does), and pin it in
+  `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensSkyTests.swift`; `--name host-6` per FR-R02G2101-014
+  (partial)
+- [ ] T-R02G2101-014 Record in `specs/501-binary-gardens-playable-rule-kernel/contracts/api.md` the public names the
+  kernel exposes beyond the contract (memberwise initializers of Star, World, Arrangement, Point, WorldLight and Report;
+  `BinaryGardensBand.isLethal` and `.words`; `BinaryGardensFailure.world`; `BinaryGardensLevel.startReport`,
+  `grouped(_:)` and its range constants; `BinaryGardensSky.tableScale`, `positionScale`, `squaredScale`,
+  `millifluxPerUnit`), each with its reason, per plan: contracts/api.md (unrequested)
