@@ -16,7 +16,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2001-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `MushroomWeatherCore` depending on
+- [X] T-R02G2001-002 Edit `Packages/ExperiencesRound02/Package.swift` (+ `MushroomWeatherCore` depending on — Verified 2026-11-26: 2026-11-26 host exit 0: 13 level tests (ranges, every refusal, stored form, fixtures, ledger, hand cycles, words) (.autonomy/migration/checks/R02-G20-01.host.json)
   VisualCoreSimulation and VisualCoreMath, `MushroomWeatherCoreTests`, product); create
   `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherError.swift` (codes "r02-g20.level, .action, .budget,
   .stage, .stale, .newer-schema, .malformed"),

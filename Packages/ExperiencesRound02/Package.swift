@@ -64,6 +64,8 @@ let package = Package(
         .library(name: "MicroscopicAuroraCore", targets: ["MicroscopicAuroraCore"]),
         // Feature 483 (R02-G19-03): Microscopic Aurora's experience (iOS only; a registered candidate until X-R02-G19).
         .library(name: "MicroscopicAuroraExperience", targets: ["MicroscopicAuroraExperience"]),
+        // Feature 491 (R02-G20-01): Mushroom Weather's rule kernel, a candidate until X-R02-G20.
+        .library(name: "MushroomWeatherCore", targets: ["MushroomWeatherCore"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -820,6 +822,16 @@ let package = Package(
                                    .product(name: "VisualCoreAudioDSP", package: visualCore),
                                    .product(name: "VisualCoreAudio", package: rendering, condition: .when(platforms: [.iOS]))],
                     path: "ApsidesWorkshop/ExperienceTests"),
+        // Feature 491 (R02-G20-01): Mushroom Weather's pure rule kernel.
+        .target(name: "MushroomWeatherCore",
+                dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
+                               .product(name: "VisualCoreMath", package: visualCore)],
+                path: "MushroomWeather/Core"),
+        .testTarget(name: "MushroomWeatherCoreTests",
+                    dependencies: ["MushroomWeatherCore",
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreMath", package: visualCore)],
+                    path: "MushroomWeather/CoreTests"),
         // Feature 481 (R02-G19-01): Microscopic Aurora's pure rule kernel.
         .target(name: "MicroscopicAuroraCore",
                 dependencies: [.product(name: "VisualCoreSimulation", package: visualCore),
