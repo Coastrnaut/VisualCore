@@ -112,7 +112,7 @@ modelled on feature 484).
 
 ## Phase 4: Story 7 — every move without gestures (P1)
 
-- [ ] T-R02G2104-004 [P] [US7] Create `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensPanelWinTests.swift`:
+- [X] T-R02G2104-004 [P] [US7] Create `Packages/ExperiencesRound02/BinaryGardens/CoreTests/BinaryGardensPanelWinTests.swift`: — Verified 2026-11-27: host-2 exit 0 covers it (same command on the tree with T-004 installed): 20 panel-win groups of 5 levels and undo/redo on levels 1, 50, 100
   all 100 certified levels won through panel actions only (FR-R02G2104-013; SC-R02G2104-005; each witness action of
   `docs/games/binary-gardens/levels/NNN.witness.json` as the selected star and its direct ring, phase, luminosity or
   tilt choice — one `star.ring`, `star.phase`, `star.luminosity` or `orbit.tilt` — then Run; never more actions than
