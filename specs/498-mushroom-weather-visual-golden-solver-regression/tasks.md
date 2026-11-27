@@ -83,7 +83,7 @@ tests stay short (< 10 s each); no wall-clock assertion. No agent runs host test
 - [X] T-R02G2008-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit=0 (.autonomy/migration/checks/R02-G20-08.script-tests.json)
 - [ ] T-R02G2008-012 {device} After ImplementationLock-100, on D1, D2 and D3: frame time and memory of the golden
   levels. Not run before the lock.
-- [ ] T-R02G2008-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2008-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converge found nothing to append (0 findings); README updated (198 features); gate sealed and recorded
   README row and gate list updated
 
 ## Dependencies and parallel work
