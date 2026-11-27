@@ -73,3 +73,15 @@ Packages/ExperiencesRound02 --filter MyceliumArchitect`. New sources go in `Myce
 (kernel, manifest, difficulty, solver, generator, catalog tests, docs) stay with the lead. MVP: Stories 1 and 2.
 Coverage: FR-001, 007 → 003, 005; FR-002 → 003, 004; FR-003, 005 → 003, 007; FR-004 → 006, 007; FR-006 → 002, 008 …
 012; FR-008 → 007; FR-009 → 002; SC-001 … 005, 007 → 003 … 007; SC-006 → 008 … 012.
+
+## Phase 6: Convergence
+
+- [X] T-R02G2202-014 Record in `specs/512-mycelium-architect-level-generator-and-solver-witness/contracts/api.md` the — Verified 2026-11-27: contracts/api.md lists the public names beyond the contract with reasons and the verify note; validate_docs PASS
+  public names the pipeline exposes beyond the contract, each with its reason (`MyceliumArchitectBandProfile` and
+  `band(_:)`; `MyceliumArchitectGenerator.catalogID` and `candidateBound`; `MyceliumArchitectManifest.provenance`;
+  `MyceliumArchitectLevel.isSite(_:)` and `siteCounts`; `MyceliumArchitectSolution.length` and its initializer;
+  `MyceliumArchitectDifficulty.init(level:solution:)`; `MyceliumArchitectWitnessReport` with `Terminal` and
+  `ToxicEntry`, `MyceliumArchitectCounterexample`, `MyceliumArchitectWitness.canonicalText(arrangement:spent:)` and
+  `digest(arrangement:spent:)` and its stored fields), and note that `verify()` regenerates the accepted candidate
+  without a previous level (the neighbour rule is checked by the catalog tests), per plan: contracts/api.md
+  (unrequested)
