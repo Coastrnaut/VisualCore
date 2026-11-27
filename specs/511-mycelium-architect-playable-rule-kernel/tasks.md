@@ -71,7 +71,7 @@ reasons as they are added (feature 501's convergence lesson).
 
 ## Phase 4: Stories 2 and 3 — failures, undo, redo, replay (P1)
 
-- [ ] T-R02G2201-004 [P] [US1] [US2] [US3] Create
+- [X] T-R02G2201-004 [P] [US1] [US2] [US3] Create — Verified 2026-11-27: MyceliumArchitectPlay and its tests (13 Swift Testing tests) installed; host-3 exit=0 (24 XCTest + 13 Swift Testing)
   `Packages/ExperiencesRound02/MyceliumArchitect/Core/MyceliumArchitectPlay.swift` (agent B: stages "loading,
   tutorial, playing, paused, won, failed, result"; `nutrient(cell)`, `blocker(cell)`, `clear(cell)`, `seed(direction)`
   and `unseed(direction)` validated in the order stage, previous fingerprint, action ("a cell off the board or not
