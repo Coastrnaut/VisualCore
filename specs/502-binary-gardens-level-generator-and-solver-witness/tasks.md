@@ -131,7 +131,7 @@ edited file is refused.
   `--name host-full`
 - [X] T-R02G2102-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G21-02.reference-1.json)
 - [X] T-R02G2102-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0 (.autonomy/migration/checks/R02-G21-02.reference-2.json)
-- [ ] T-R02G2102-011 Script tests, run alone (`--name script-tests`)
+- [X] T-R02G2102-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit=0 (.autonomy/migration/checks/R02-G21-02.script-tests.json)
 - [ ] T-R02G2102-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
   README row and gate list updated
 
