@@ -117,7 +117,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
 - [X] T-R02G2101-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G21-01.reference-1.json)
 - [X] T-R02G2101-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0 (.autonomy/migration/checks/R02-G21-01.reference-2.json)
 - [X] T-R02G2101-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit=0 (.autonomy/migration/checks/R02-G21-01.script-tests.json)
-- [ ] T-R02G2101-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2101-012 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converge round 2 found nothing to append after T-013 and T-014; README updated (201 features, R02-G21 row); gate sealed and recorded
   README row and gate list updated
 
 ## Dependencies and parallel work
