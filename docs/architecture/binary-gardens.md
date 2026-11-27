@@ -155,7 +155,8 @@ presentation of later features.
   levels (`u_won`, the glow gain, each world's shell factor in the glow mesh rebuilt at each 1/32 step, and in the
   unlit fallback the not-won and won colours blended by the won level, rebuilt per tenth), so no element crosses half
   its range more than three times a second. The corona rays and motes hold still under Reduce Motion or Reduce
-  Flashing; a won run's motes appear with the outcome.
+  Flashing; a won run's motes appear with the outcome. When a frame's time is earlier than the last frame's (an off-screen still drawn after
+  live frames), the lights settle at once, so a still never shows a half-finished fade.
 - **Sound.** Off by default (a Sound toggle). Choosing a star plays its audition: the tone 220 Hz × 2^(n/12), n = 2 ×
   (7 − ring index), with a fifth when the star can change or a partial 3 Hz above when it cannot, 0.6 s. The ambient
   loop's root (110 Hz × 1, 9/8, 5/4, 4/3) comes from the actions left, up to four partials from the quarters of the
@@ -164,4 +165,5 @@ presentation of later features.
 - **Panel.** A summary element, the star, ring, phase, luminosity, tilt and tick adjustable with VoiceOver (", locked"
   for a locked control), a value in words on every control, refusals in the feedback plan's sentences, rows that become
   columns at accessibility text sizes and a 520-point readable width on iPad; the same behaviour at every tier and in
-  the fallback.
+  the fallback; a sent refusal reads in the feedback plan's sentence, while a refused preview (never sent
+  and never announced) keeps feature 504's short words inside "That change would be refused: …".

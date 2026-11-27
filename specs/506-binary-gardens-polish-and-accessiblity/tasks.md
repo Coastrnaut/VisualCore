@@ -120,7 +120,7 @@ coverage: FR-001/005 → 005; FR-002/003 → 003, 005; FR-004 → 004, 005; FR-0
 
 ## Phase 5: Convergence
 
-- [ ] T-R02G2106-013 State in `docs/architecture/binary-gardens.md` that the lights settle at once when a frame's time
+- [X] T-R02G2106-013 State in `docs/architecture/binary-gardens.md` that the lights settle at once when a frame's time — Verified 2026-11-27: docs/architecture/binary-gardens.md states the still-frame settling rule; validate_docs PASS
   is earlier than the last frame's (an off-screen still drawn after live frames), so stills never show a half-finished
   fade, per spec Clarifications Q3 (unrequested: a rule beyond feature 496's, kept for the still-frame tests)
 - [ ] T-R02G2106-014 State in `docs/architecture/binary-gardens.md` that a refused preview keeps feature 504's short
