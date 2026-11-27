@@ -22,7 +22,7 @@ round02-host in five chunks (1, 2, 3c, 3e, 3f). Prerequisites: R02-G21-04 and R0
 
 ## Phase 2: Stories 1, 2 and 3 — feedback plan, lights, bloom levels and sound recipes (P1, P2) 🎯
 
-- [ ] T-R02G2106-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensFeedbackPlan.swift`
+- [X] T-R02G2106-003 [P] [US1] [US3] Create `Packages/ExperiencesRound02/BinaryGardens/Core/BinaryGardensFeedbackPlan.swift` — Verified 2026-11-27: host-2 exit 0 (swift test --filter BinaryGardens: 275 tests in 26 suites; FeedbackPlan 13 pass)
   (text, kind, haptic and trigger; the texts and kinds of clarification Q1 word for word — "Star n moved to ring r (ρ
   units).", "Star n shifted to phase p.", "Star n's luminosity set to L.", "Tilt set to t of T steps.", "Undone.",
   "Redone.", each followed by the worlds keeping their light, whether running now would win or fail and the actions left;
