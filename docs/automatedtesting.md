@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G20-10: Mushroom Weather device rows).
+Last updated: 2026-11-27 (R02-G21-01: Binary Gardens rule kernel).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,12 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Binary Gardens rule kernel** (R02-G21-01, 2026-11-27). `swift test --package-path Packages/ExperiencesRound02
+  --filter BinaryGardens` (41 tests in five suites, about 4 s): level checks and the stored form, the sky against an
+  independent reference over 500 seeded runs (cosine table, positions, milliflux, bands, lethal walk, cyclic window,
+  judge), 500 seeded traces replaying exactly, the puzzle contract (200 walks, 120 moves on the largest level) and nine
+  boundary invariants. Binary Gardens joins the local round-two chunk 2 (`MoonlitMechanism|AcousticConstellator|
+  HarmonicBridges|BinaryGardens`, the lightest) and CI's round02-host-tests half b.
 - **Mushroom Weather device rows** (R02-G20-10, 2026-11-27). `python3 scripts/check_device_rows.py --experience
   r02-g20.mushroom-weather` (release step `device-rows-r02-g20`, tests `MushroomWeatherDeviceRowsCheckTests`, 8)
   checks the definition (rows MW-D1 … MW-D8, 12 device scenarios) against the scenario manifest, the ledger's

@@ -1045,3 +1045,13 @@ simulator golden-frame and memory tests, a CI step and `scripts/mushroom_weather
 `c4`) and app unit tests. Feature 500 (R02-G20-10) adds its device-row definition and written campaign plan
 (`docs/apps/mushroom-weather/`), checked by `scripts/check_device_rows.py`; no device is contacted. See
 [docs/architecture/mushroom-weather.md](../../docs/architecture/mushroom-weather.md).
+
+## Binary Gardens (R02-G21, `r02-g21.binary-gardens`, free)
+
+`BinaryGardensCore` (feature 501, R02-G21-01) is the playable rule kernel: the exact sky in deterministic integer
+arithmetic (`BinaryGardensSky`: two stars on quantized analytic orbits of 48 phase steps from an integer cosine table,
+tilt, separation, milliflux by the clamped inverse square, flux bands, the cyclic comfortable window and the integral),
+the judge (`frozen`, `scorched`, `unstable`, `wilted`, `bleached`), `BinaryGardensLevel` (immutable, fingerprinted,
+JSON schema 1, with names in words), the play state `BinaryGardensPlay` with stages, ring, phase, luminosity and tilt
+actions and the run, records, undo and redo, and `BinaryGardensPuzzle` (an R02-F23 `PuzzleRules` over arrangements).
+See [docs/architecture/binary-gardens.md](../../docs/architecture/binary-gardens.md).

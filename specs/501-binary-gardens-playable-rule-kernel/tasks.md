@@ -108,7 +108,7 @@ run. Every `host` … `host-5` check runs `swift test --package-path Packages/Ex
 
 ## Phase 6: Regression, documentation and close
 
-- [ ] T-R02G2101-007 Docs: `docs/architecture/binary-gardens.md` (new: rules), `Packages/ExperiencesRound02/README.md`,
+- [X] T-R02G2101-007 Docs: `docs/architecture/binary-gardens.md` (new: rules), `Packages/ExperiencesRound02/README.md`, — Verified 2026-11-27: docs (architecture binary-gardens.md new, package README, automatedtesting) and round02-host-1, -2 (with BinaryGardens), -3c, -3e, -3f exit=0
   `docs/automatedtesting.md` (BinaryGardens in local chunk round02-host-2 and in CI half b); `--name round02-host-1`,
   `-2`, `-3c`, `-3e`, `-3f` (chunk 2 gains BinaryGardens: `swift test --package-path Packages/ExperiencesRound02
   --filter 'MoonlitMechanism|AcousticConstellator|HarmonicBridges|BinaryGardens'`; the other four filters unchanged)
