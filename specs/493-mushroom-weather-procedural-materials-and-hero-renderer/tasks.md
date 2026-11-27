@@ -115,7 +115,7 @@ pass.
 - [X] T-R02G2003-007 Docs: `docs/architecture/mushroom-weather.md` (renderer and experience), — Verified 2026-11-26: 2026-11-27 docs (architecture renderer and experience, package README, automatedtesting) and round02-host-1, -2, -3c, -3e, -3f exit 0 (.autonomy/migration/checks/R02-G20-03.round02-host-*.json)
   `Packages/ExperiencesRound02/README.md`, `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`,
   `-3f`
-- [ ] T-R02G2003-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2003-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-26: 2026-11-27 rendering-27, rendering-26, experiences, host-full, app-unit exit 0 (.autonomy/migration/checks/R02-G20-03.{rendering-27,rendering-26,experiences,host-full,app-unit}.json)
   `--name host-full`, `--name app-unit`
 - [ ] T-R02G2003-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2003-010 Reference regression chunk 2 (`--name reference-2`)
