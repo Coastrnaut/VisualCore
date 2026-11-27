@@ -40,7 +40,7 @@ trailers). No device is contacted. No {owner} tasks; one {device} task.
   `-3f`
 - [X] T-R02G2010-006 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, `--name — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0 (.autonomy/migration/checks/R02-G20-10.{rendering-27,rendering-26,experiences,host-full}.json); nothing in the app changes
   host-full` (nothing in the app changes)
-- [ ] T-R02G2010-007 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2010-007 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G20-10.reference-1.json)
 - [ ] T-R02G2010-008 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2010-009 {device} After ImplementationLock-100: the device campaign (UA-F13) runs rows MW-D1 … MW-D8 on D1,
   D2, D3 (SC-R02G2010-004)
