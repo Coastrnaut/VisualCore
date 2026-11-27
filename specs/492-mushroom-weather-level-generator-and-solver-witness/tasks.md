@@ -9,7 +9,7 @@ on CI). No {owner} or {device} tasks (pure logic); no GLSL.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2002-001 Baselines after R02-G20-01 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G2002-001 Baselines after R02-G20-01 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-26: 2026-11-26 baseline-host, baseline-timing, baseline-round02-1, -2, -3c, -3e, -3f exit 0 after R02-G20-01 (.autonomy/migration/checks/R02-G20-02.baseline-*.json)
   baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f` (the round-two filters of feature 491, chunk 3f with
   MushroomWeather); the rendering baseline is R02-G20-01's rendering runs (exit 0)
 
