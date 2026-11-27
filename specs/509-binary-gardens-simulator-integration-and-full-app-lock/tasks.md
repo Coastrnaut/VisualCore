@@ -48,7 +48,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
 
 ## Phase 4: Story 2 — the app's logic accepts the game (P1)
 
-- [ ] T-R02G2109-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through
+- [X] T-R02G2109-005 [US2] Edit `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (agent B: both examples restore through — Verified 2026-11-27: app-unit exit 0 (build-for-testing pass, app-unit-ios27 pass; four Binary Gardens app tests: stored examples restore, not available without -vcCandidates, opens and wins level 1, BG pins equal the Core)
   the app's migration check; the candidate opens through the registry and engine and plays level 1 to a win; without
   `-vcCandidates` it is not available and not openable; `BG`'s pinned level 1 certified plan and budget equal the
   Core's); `--name app-unit -- python3 scripts/release_check.py --only app-build-for-testing-ios27 app-unit-ios27`

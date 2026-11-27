@@ -7,6 +7,7 @@ import AmethystEscapeCore
 import ApsidesWorkshopCore
 import AuroraLoomCore
 import BackwardsAuroraCore
+import BinaryGardensCore
 import CelestialEclipseLabCore
 import ChronoConstellatorCore
 import ColorfallCanyonsCore
@@ -4063,6 +4064,174 @@ final class AppModelTests: XCTestCase {
         XCTAssertEqual(opening.play.stage, MushroomWeatherStage.playing, "the opening accepts actions")
         XCTAssertEqual(opening.certifiedActionCount, plan.count, "stars are counted against the witness")
         XCTAssertEqual(MushroomWeatherExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+    }
+
+
+    // MARK: Binary Gardens in the app (feature 509, R02-G21-09; T-R02G2109-005, FR-R02G2109-003, 006;
+    // SC-R02G2109-002)
+
+    /// Binary Gardens' registration: a candidate until X-R02-G21.
+    private func binaryGardensRegistration() throws -> ExperienceRegistration {
+        let id = try ExperienceID(BinaryGardensExperienceCore.experienceID)
+        return try XCTUnwrap(ExperienceRegistry.candidates.first { $0.id == id },
+                             "Binary Gardens is a candidate")
+    }
+
+    /// FR-R02G2109-003: the snapshot is schema 3 and the stored schema-1 and schema-2 examples restore to their digests
+    /// through the migrations (the app's migration check, which also reports a version without a stored example).
+    func testTheBinaryGardensRegistrationRestoresItsStoredExamples() async throws {
+        let registration = try binaryGardensRegistration()
+        XCTAssertEqual(BinaryGardensExperienceCore.schemaVersion, 3)
+        let one = try XCTUnwrap(BinaryGardensExperienceCore.schemaOneExample(), "schema-1 example")
+        let two = try XCTUnwrap(BinaryGardensExperienceCore.schemaTwoExample(), "schema-2 example")
+        let versions: [Int] = [one.version, two.version]
+        XCTAssertEqual(versions, [1, 2])
+        XCTAssertNotEqual(one.expectedDigest, two.expectedDigest)
+        let problems: [String] = await registration.migrationProblems()
+        XCTAssertEqual(problems, [], "\(registration.id)")
+    }
+
+    /// FR-R02G2109-006: without `-vcCandidates` Binary Gardens is a candidate only: in `candidates`, outside `all`,
+    /// listed in the bundled catalog as not available, without a tile and not opened.
+    func testBinaryGardensIsACandidateAndNotAvailableWithoutTheCandidatesArgument() async throws {
+        let id = try ExperienceID(BinaryGardensExperienceCore.experienceID)
+        XCTAssertEqual(id.rawValue, "r02-g21.binary-gardens")
+        XCTAssertTrue(ExperienceRegistry.candidates.map(\.id).contains(id))
+        XCTAssertFalse(ExperienceRegistry.all.map(\.id).contains(id))
+        let categories = try CategoryList(data: bundled("categories"))
+        let manifest = try CatalogManifest(data: bundled("experiences"), categories: categories)
+        XCTAssertTrue(manifest.experiences.contains { $0.id == id }, "a catalog id")
+        XCTAssertFalse(manifest.available.contains { $0.id == id }, "not available")
+        let storage = try TestStorage(self)
+        let model = AppModel(environment: storage.environment(catalog: try bundled("experiences"),
+                                                              categories: try bundled("categories"),
+                                                              registry: ExperienceRegistry.all))
+        XCTAssertFalse(model.shown.map(\.id).contains(id), "no tile")
+        let opened = await model.open(id)
+        XCTAssertFalse(opened)
+        XCTAssertNil(model.session.experience)
+    }
+
+    /// FR-R02G2109-003, SC-R02G2109-002: with `-vcCandidates` Binary Gardens is shown, opens through the registry and
+    /// engine with seed 0 (level 1), and level 1 is won by its certified plan (`generated(number: 1).plan.actions`:
+    /// star 2, 0-based star 1, set to luminosity index 0) sent as `star.luminosity [star, index]`, then `light.run`
+    /// (which spends no action), with three stars (the opening play is already in stage `playing`; the tutorial of
+    /// levels 1 … 3 is presentation and blocks no action, so no `tutorial.dismiss` is needed); the win is recorded
+    /// verified with its trace (the plan, then the run), opens level 2, and `level.next` plays it.
+    func testBinaryGardensOpensAsACandidateAndLevelOneIsWonByItsCertifiedPlan() async throws {
+        let registration = try binaryGardensRegistration()
+        let id = registration.id
+        let storage = try TestStorage(self)
+        let base = try storage.environment(catalog: bundled("experiences"), categories: bundled("categories"),
+                                           registry: ExperienceRegistry.all,
+                                           arguments: [DebugLaunch.candidatesArgument])
+        let environment = DebugLaunch.environment(base: base, candidates: [registration])
+        XCTAssertTrue(environment.registry.map(\.id).contains(id))
+        XCTAssertEqual(environment.registry.filter { $0.id == id }.count, 1, "registered once")
+        let categories = try CategoryList(data: try XCTUnwrap(environment.categoriesData))
+        let manifest = try CatalogManifest(data: try XCTUnwrap(environment.catalogData), categories: categories)
+        XCTAssertTrue(manifest.available.contains { $0.id == id }, "available with the candidates argument")
+        let model = AppModel(environment: environment)
+        XCTAssertTrue(model.shown.map(\.id).contains(id), "the launcher shows the candidate")
+        let controls: [String] = registration.controls.map(\.id)
+        for control in BinaryGardensExperienceCore.actionIDs {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        for control in ["star.ring", "star.phase", "star.luminosity", "orbit.tilt", "light.run", "play.undo",
+                        "play.redo", "level.next", "clock.show", "level.select", "mode.daily", "mode.practice",
+                        "mode.campaign", "tutorial.dismiss", "replay.start", "replay.step", "replay.stop",
+                        "settings.sound"] {
+            XCTAssertTrue(controls.contains(control), control)
+        }
+        XCTAssertEqual(registration.openingSeed, 0)
+        XCTAssertEqual(BinaryGardensExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
+
+        var engine = ExperienceEngine<BinaryGardensExperienceCore>(id: id)
+        try await engine.prepare(seed: 0)
+        try engine.activate()
+        XCTAssertNil(engine.outcome)
+        XCTAssertEqual(engine.core?.levelNumber, 1)
+        XCTAssertEqual(engine.core?.play.stage, BinaryGardensStage.playing, "the opening play accepts actions")
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9, "level 1's budget")
+        let plan: [BinaryGardensAction] = try BinaryGardensExperienceCore.generated(number: 1).plan.actions
+        let expectedPlan: [BinaryGardensAction] = [.luminosity(star: 1, index: 0)]
+        XCTAssertEqual(plan, expectedPlan, "level 1's certified plan")
+        for action in plan {
+            switch action {
+            case .luminosity(let star, let index):
+                let values: [Double] = [Double(star), Double(index)]
+                XCTAssertEqual(engine.handle(control: "star.luminosity", values: values), .accepted,
+                               "luminosity \(values)")
+            case .ring, .phase, .tilt, .run:
+                XCTFail("level 1's certified plan holds one luminosity change only")
+            }
+        }
+        XCTAssertNil(engine.outcome, "the arrangement actions alone do not end the level")
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9 - plan.count, "each arrangement action spends one action")
+        XCTAssertEqual(engine.handle(control: "light.run"), .accepted)
+        XCTAssertEqual(engine.core?.play.actionsLeft, 9 - plan.count, "the run spends no action")
+        XCTAssertEqual(engine.outcome?.code, BinaryGardensExperienceCore.wonCode)
+        XCTAssertEqual(BinaryGardensExperienceCore.wonCode, "won")
+        XCTAssertEqual(engine.core?.play.stage, BinaryGardensStage.won)
+        XCTAssertEqual(engine.core?.progress.solved[1]?.stars, 3, "the certified plan earns three stars")
+        XCTAssertEqual(engine.core?.progress.solved[1]?.verified, true, "the win is recorded with its trace")
+        let trace: [BinaryGardensAction] = plan + [.run]
+        XCTAssertEqual(engine.core?.progress.solved[1]?.trace, trace, "the trace is the certified plan, then the run")
+        XCTAssertEqual(engine.core?.progress.isOpen(2), true, "the win opens level 2")
+        XCTAssertEqual(engine.handle(control: "level.next"), .accepted)
+        XCTAssertEqual(engine.core?.levelNumber, 2)
+        XCTAssertNil(engine.outcome, "level 2 is being played")
+    }
+
+    /// The convergence lesson of feature 319: the interface tests pin level 1 in `BG` (their own literals in
+    /// Tests/UI/BinaryGardens/BGSupport.swift, which this target cannot import); the same literals equal the Core's
+    /// certified level 1 (data-model.md "Level 1 constants"): the plan is star 2 (the `star` picker's "Star 2", 0-based
+    /// star 1) set to luminosity index 0, then the run; the budget is 9; the level has 2 luminosity levels and star 2
+    /// starts at luminosity index 1 (the `luminosity` value "level 2 of 2" before the press, "level 1 of 2" after);
+    /// only star 2's ring and luminosity are adjustable. Seed 0 opens level 1.
+    func testBinaryGardensLevelOnePinsInBGEqualTheCore() throws {
+        // The same literals as BGSupport.swift's level 1 constants (`BG`, agent C of feature 509: the certified star,
+        // its luminosity index, the budget, the luminosity level count and the starting luminosity index); keep both in
+        // step.
+        let levelOneStar = 1
+        let levelOneLuminosityIndex = 0
+        let levelOneBudget = 9
+        let levelOneLuminosityLevels = 2
+        let levelOneStartLuminosityIndex = 1
+
+        let certified = try BinaryGardensExperienceCore.generated(number: 1)
+        let plan: [BinaryGardensAction] = certified.plan.actions
+        let pinnedPlan: [BinaryGardensAction] = [.luminosity(star: levelOneStar, index: levelOneLuminosityIndex)]
+        XCTAssertEqual(plan, pinnedPlan, "level 1's certified plan (star, luminosity index)")
+        XCTAssertEqual(plan.count, 1, "the certified action count (the run not counted)")
+
+        let level: BinaryGardensLevel = certified.level
+        XCTAssertEqual(level.budget, levelOneBudget, "level 1's budget")
+        XCTAssertGreaterThanOrEqual(level.budget, plan.count, "the witness fits the budget")
+        XCTAssertEqual(level.luminosityLevels.count, levelOneLuminosityLevels, "level 1's luminosity levels")
+        XCTAssertTrue(BinaryGardensExperienceCore.starRange.contains(levelOneStar), "a declared star")
+        XCTAssertTrue(BinaryGardensExperienceCore.luminosityRange.contains(levelOneLuminosityIndex),
+                      "a declared luminosity index")
+        XCTAssertEqual(level.stars.count, 2, "two stars")
+        let star: BinaryGardensStar = level.stars[levelOneStar]
+        XCTAssertEqual(star.luminosity, levelOneStartLuminosityIndex, "star 2's starting luminosity index")
+        XCTAssertEqual(level.start.luminosities[levelOneStar], levelOneStartLuminosityIndex,
+                       "the starting arrangement")
+        XCTAssertNotEqual(levelOneLuminosityIndex, levelOneStartLuminosityIndex, "the pinned change moves star 2")
+        XCTAssertTrue(star.luminosityAdjustable, "star 2's luminosity is adjustable")
+        XCTAssertTrue(star.ringAdjustable, "star 2's ring is adjustable")
+        XCTAssertFalse(star.phaseAdjustable, "star 2's phase is locked")
+        let other: BinaryGardensStar = level.stars[1 - levelOneStar]
+        XCTAssertFalse(other.ringAdjustable || other.phaseAdjustable || other.luminosityAdjustable,
+                       "star 1 is locked")
+        XCTAssertTrue(level.tutorial, "level 1 carries the tutorial")
+
+        let opening = try BinaryGardensExperienceCore.opening(number: 1)
+        XCTAssertEqual(opening.play.actionsLeft, levelOneBudget, "the opening's actions left")
+        XCTAssertEqual(opening.play.level.id, level.id, "the opening plays certified level 1")
+        XCTAssertEqual(opening.play.stage, BinaryGardensStage.playing, "the opening accepts actions")
+        XCTAssertEqual(opening.certifiedActionCount, plan.count, "stars are counted against the witness")
+        XCTAssertEqual(BinaryGardensExperienceCore.levelNumber(forSeed: 0), 1, "seed 0 opens level 1")
     }
     #endif
 }
