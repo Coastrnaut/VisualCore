@@ -198,6 +198,6 @@ FR-009 → 002, 007 … 011; FR-010 → 003, 004, 006.
   (share / 64 000), since a linear share leaves catalog worlds black, per Clarifications Q1 (contradicts)
 - [X] T-R02G2103-015 State in `spec.md` (clarification Q3) that in the unlit fallback a star's frame check is its flat — Verified 2026-11-27: spec Q3 states the fallback star check (committed with T-014)
   colour within 0.1 (the +0.4 margin applies to the shader path), per SC-R02G2103-001 (partial)
-- [ ] T-R02G2103-016 Record in `research.md` that failure marks are drawn on a failed play only (as feature 493), that the
+- [X] T-R02G2103-016 Record in `research.md` that failure marks are drawn on a failed play only (as feature 493), that the — Verified 2026-11-27: research records failure marks on failed plays, the hero tick and the plate quad (committed with T-014)
   hero tick is the earliest tick with the most comfortable worlds after the certified plan, and that the gauge plate's
   quad spans u = ±1 to stay inside the fitted box, per plan: research (partial)
