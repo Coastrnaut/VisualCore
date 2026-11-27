@@ -75,7 +75,7 @@ with fewer actions wins.
 **Independent test**: band means of the witness length do not fall; the 100 witness files match byte for byte and an
 edited file is refused.
 
-- [ ] T-R02G2002-005 [P] [US4] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherWitness.swift`
+- [X] T-R02G2002-005 [P] [US4] Create `Packages/ExperiencesRound02/MushroomWeather/Core/MushroomWeatherWitness.swift` — Verified 2026-11-26: 2026-11-26 host-4 exit 0: 83 tests in 10 suites incl. 8 witness tests (byte round trip, digests, independent replay, damaged and edited files refused by reason) (.autonomy/migration/checks/R02-G20-02.host-4.json)
   (agent B: schema 1 sorted-key JSON; state digests "16 hex characters of the SHA-256 of the arrangement and the actions
   spent" after each action; play fingerprints after begin (and dismissTutorial) and each action; terminal report
   (ledger totals: start, released, evaporated, end; each colony's final run, longest run and first cycle out of band;
