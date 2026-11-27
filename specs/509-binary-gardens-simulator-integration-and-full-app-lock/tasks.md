@@ -28,7 +28,7 @@ reference change. Prerequisites: R02-G21-05 … R02-G21-08 recorded (R02-G21-04 
 
 ## Phase 3: Story 1 — the game works inside the real app (P1) 🎯
 
-- [ ] T-R02G2109-003 [US1] Edit `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensControls.swift`:
+- [X] T-R02G2109-003 [US1] Edit `Packages/ExperiencesRound02/BinaryGardens/Experience/BinaryGardensControls.swift`: — Verified 2026-11-27: sim-27 exit 0 (sim-27.2, BinaryGardensExperienceTests: 87 tests in 11 suites; identifierNames of 56 unique names, the failure explanation renamed explanation)
   `identifierNames` lists every identifier the panel carries (spec Clarifications Q1, aligned with the names features
   505 … 507 built; the level line carries none), pinned as built and unique, with
   `Packages/ExperiencesRound02/BinaryGardens/ExperienceTests/BinaryGardensIdentifierTests.swift` (every name listed

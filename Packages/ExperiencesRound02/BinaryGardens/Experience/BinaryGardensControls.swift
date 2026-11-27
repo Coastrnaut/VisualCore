@@ -52,6 +52,10 @@
 // replay controls send through the presenter (`replay.start [level]`, `replay.step`, `replay.stop`), so a refusal reads
 // in words; the Sound toggle saves the choice through `settings.sound [1/0]`. The existing identifiers and actions are
 // unchanged. Modelled on `MushroomWeatherControls` (feature 497).
+// Feature 509 (R02-G21-09) T-R02G2109-003 (FR-R02G2109-001; clarification Q1): the failure explanation has its own
+// identifier `explanation` (it gave `failure`, the short failure line's name, before), and every name the panel gives
+// through `port.identifier` (`experience.r02-g21.binary-gardens.<name>`) is listed in ``identifierNames``, each once.
+// Modelled on `MushroomWeatherControls` (feature 499).
 #if os(iOS)
 import BinaryGardensCore
 import SwiftUI
@@ -76,6 +80,18 @@ struct BinaryGardensControls: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     /// Whether the app's scene is active: the sound plays only while it is (feature 506).
     @Environment(\.scenePhase) private var scenePhase
+
+    /// Every identifier name the panel gives through `port.identifier`, each exactly once (feature 509, clarification
+    /// Q1), pinned as built: the interface tests find the controls by these names. The level line carries none.
+    static let identifierNames: [String] = [
+        "actions", "status", "tutorial", "failure", "progress", "message", "preview-refusal", "star", "star-detail",
+        "ring-minus", "ring", "ring-plus", "phase-minus", "phase", "phase-plus", "luminosity-minus", "luminosity",
+        "luminosity-plus", "tilt-minus", "tilt", "tilt-plus", "tick-minus", "tick", "tick-plus", "run", "tick-detail",
+        "undo", "redo", "next-level", "ring-choice", "luminosity-choice", "phase-target", "set-phase", "tilt-choice",
+        "inspect", "inspect-detail", "reset-view", "dismiss-tutorial", "hint", "hint-text", "stars", "goal", "band",
+        "explanation", "mode", "campaign", "daily", "practice", "level-picker", "play-level", "summary", "sound",
+        "replay", "replay-step", "replay-stop", "replay-position",
+    ]
 
     /// The "Inspect" picker's tag for no world (feature 504).
     private static let noWorld = -1
@@ -462,7 +478,7 @@ struct BinaryGardensControls: View {
         }
         if let explanation = mirror.explanation {
             Text(explanation).font(.callout).fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier(port.identifier("failure"))
+                .accessibilityIdentifier(port.identifier("explanation"))
         }
         row {
             Text(mirror.bandLabel).font(.footnote)
