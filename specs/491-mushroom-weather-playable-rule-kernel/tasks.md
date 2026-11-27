@@ -41,7 +41,7 @@ consume). Agents compile but run no tests while the lead's baselines or chain ru
 
 ## Phase 3: Story 1 — arrange the fungi so every colony stays in band (P1) 🎯
 
-- [ ] T-R02G2001-003 [P] [US1] Create
+- [X] T-R02G2001-003 [P] [US1] Create — Verified 2026-11-26: 2026-11-26 host-2 exit 0: 11 weather tests against an independent reimplementation, 500 seeded fixtures with three arrangements each, every field, ledger entry, growth cycle, colony run and outcome equal (.autonomy/migration/checks/R02-G20-01.host-2.json)
   `Packages/ExperiencesRound02/MushroomWeather/CoreTests/MushroomWeatherWeatherTests.swift` (agent A: an independent
   reimplementation of the cycle law, ledger, growth, colony runs and the judge, written from the spec's clarifications
   only, compared with the kernel on 500 seeded runs: every humidity value at every cycle, every ledger entry, growth
