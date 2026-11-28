@@ -6,11 +6,11 @@ public enum MyceliumArchitectPickTarget: Sendable, Hashable { case empty, gauge,
     cell(MyceliumArchitectCell) }
 public enum MyceliumArchitectPicker {
     public static let allowance: Double                  // 12 points
-    public static func pick(_ point: SIMD2<Double>, viewSize: SIMD2<Double>, snapshot: MyceliumArchitectSceneSnapshot,
+    public static func pick(_ point: Vec2, viewSize: Vec2, snapshot: MyceliumArchitectSceneSnapshot,
                             orbit: MyceliumArchitectViewOrbit) -> MyceliumArchitectPickTarget
-    public static func cast(_ point: SIMD2<Double>, viewSize: SIMD2<Double>, orbit: MyceliumArchitectViewOrbit)
-        -> SIMD2<Double>?                                // the finger on the board plane z = 0
-    public static func direction(from: SIMD2<Double>, to: SIMD2<Double>) -> MyceliumArchitectDirection
+    public static func cast(_ point: Vec2, viewSize: Vec2, orbit: MyceliumArchitectViewOrbit)
+        -> Vec2?                                // the finger on the board plane z = 0
+    public static func direction(from: Vec2, to: Vec2) -> MyceliumArchitectDirection
     public static func pulse(atPlaneX x: Double, pulsesRun: Int) -> Int }
 public struct MyceliumArchitectViewOrbit: Sendable, Equatable { public let yaw, pitch: Double
     public static let authored: MyceliumArchitectViewOrbit; public static let yawRange, pitchRange: ClosedRange<Double>
@@ -23,7 +23,7 @@ public struct MyceliumArchitectGestureController: Sendable {
     public static let yawPerViewWidth, pitchPerViewHeight: Double
     public static let finishedReason, notRunningReason, rootReason, sproutReason: String
     public init()
-    public mutating func handle(_ event: PointerEvent, viewSize: SIMD2<Double>, snapshot: MyceliumArchitectSceneSnapshot,
+    public mutating func handle(_ event: PointerEvent, viewSize: Vec2, snapshot: MyceliumArchitectSceneSnapshot,
                                 tool: MyceliumArchitectTool, orbit: MyceliumArchitectViewOrbit) -> [MyceliumArchitectGestureAction] }
 extension MyceliumArchitectExperienceCore {
     public func previewReport(_ action: MyceliumArchitectAction) -> Result<MyceliumArchitectReport, MyceliumArchitectError> }
