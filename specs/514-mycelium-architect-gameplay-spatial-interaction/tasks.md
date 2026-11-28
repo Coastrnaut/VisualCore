@@ -45,7 +45,7 @@ MyceliumArchitect`.
 
 - [X] T-R02G2204-007 Docs: `docs/architecture/mycelium-architect.md` (gestures), package README, — Verified 2026-11-27: 2026-11-27: architecture gestures section, package README, automatedtesting; round02-host-1/2/3c/3e/3f exit=0 (.autonomy/migration/checks/R02-G22-04.round02-host-*.json)
   `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f`
-- [ ] T-R02G2204-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
+- [X] T-R02G2204-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0 (.autonomy/migration/checks/R02-G22-04.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
 - [ ] T-R02G2204-009 Reference regression chunk 1 (`--name reference-1`)
 - [ ] T-R02G2204-010 Reference regression chunk 2 (`--name reference-2`)
