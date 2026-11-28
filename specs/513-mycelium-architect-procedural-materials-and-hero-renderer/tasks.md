@@ -85,7 +85,7 @@ Stories 1 and 2. Coverage: FR-001, 002 → 003, 004; FR-003 → 002, 003, 005; F
   `MyceliumArchitectElement`, `MyceliumArchitectColouredMesh`, the camera's view and projection, `paintOrder`,
   `boardPart`, `glowPart`, `fallback`, `project` and the backdrop helpers; the shaders' constants and helpers), per plan:
   contracts/api.md (unrequested)
-- [ ] T-R02G2203-016 Record in `specs/513-mycelium-architect-procedural-materials-and-hero-renderer/plan.md` and
+- [X] T-R02G2203-016 Record in `specs/513-mycelium-architect-procedural-materials-and-hero-renderer/plan.md` and — Verified 2026-11-27: plan lists the extra experience tests, the scene's glow helpers and the pinned material tables; data model notes the two tables
   `data-model.md` the experience test files beyond the render tests (test support, fallback, tier and identity tests,
   as feature 503), the glow and motion helpers on `MyceliumArchitectBoardScene`, and the shaders' material table pinned
   equal to the geometry's by `theShaderAndGeometryMaterialTablesAgree`, per plan: project structure (unrequested)

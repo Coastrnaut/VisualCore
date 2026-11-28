@@ -8,3 +8,6 @@
 | `MyceliumArchitectElement` | kind (backdrop, floor, site, toxin, rock, blocker, nutrient, vein, sprout, root, terminal, gauge, actionsBar, glow), index, item, centre | painter's order of research R4 |
 | `MyceliumArchitectReferencePoint` | kind (boardCentre, root, terminal, gaugeMargin, actionsBar), index, centre | projected by the CPU reference |
 | `MyceliumArchitectExperienceCore` | level number, play, shown pulse | controls of spec clarification Q5; digest domain `r02-g22.mycelium-architect.v1`; snapshot schema 1 `{level, records}` |
+
+The material table (24 codes, backdrop 0 … spore 23; `a_uv.x` = code + 0.25 · value + 0.5 when broken) exists twice,
+in the geometry and in the shaders, and a test pins the two equal (T-R02G2203-016).

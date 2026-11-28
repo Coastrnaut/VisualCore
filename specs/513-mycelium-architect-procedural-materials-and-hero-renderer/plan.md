@@ -88,6 +88,7 @@ Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectPresen
 Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectBoardScene.swift              new  (agent C)
 Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectControls.swift                new  (agent C)
 Packages/ExperiencesRound02/MyceliumArchitect/ExperienceTests/MyceliumArchitectRenderTests.swift        new  simulator frame checks (agent C)
+Packages/ExperiencesRound02/MyceliumArchitect/ExperienceTests/MyceliumArchitect{TestSupport,FallbackTests,TierTests,ExperienceIdentityTests}.swift  new  (agent C, as feature 503)
 Catalog/registrations.json, Catalog/experiences.json, VisualCore test fixtures, project.yml, Apps/VisualCore/App/ExperienceRegistry.swift,
 Apps/VisualCore/Tests/Unit/AppModelTests.swift, Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift,
 scripts/test_scripts.py                                                                       edit  registration (lead)
@@ -96,6 +97,10 @@ docs/architecture/mycelium-architect.md, Packages/ExperiencesRound02/README.md, 
 
 **Migration**: none (snapshot schema 1 is new). **Rollback**: revert the feature's commits; the candidate stays
 unavailable, so removing it touches no player.
+
+Recorded at convergence (T-R02G2203-016): the glow gain per tier, the Reduce Flashing cap and the motion switch are statics
+on `MyceliumArchitectBoardScene`; the shaders keep their own material table (`MyceliumArchitectShaderMaterial`), pinned
+equal to the geometry's (`MyceliumArchitectMaterial`) by `theShaderAndGeometryMaterialTablesAgree`.
 
 ## Implementation order
 
