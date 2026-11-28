@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G22-02: Mycelium Architect content pipeline).
+Last updated: 2026-11-27 (R02-G22-03: Mycelium Architect hero renderer).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,11 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mycelium Architect hero renderer** (R02-G22-03, 2026-11-27). Host: adapter, geometry and shader tests in the
+  `MyceliumArchitect` filter (33 XCTest, 102 Swift Testing). Simulator: `MyceliumArchitectExperienceTests` (29 tests:
+  frames of levels 1, 21, 41, 61, 81 at each tier against the CPU reference, fallback, tiers, identity). Lesson: the
+  first simulator run failed because spores drawn over the caps hid every measurable cap point at the richer tiers;
+  decoration is now drawn beneath the caps.
 - **Mycelium Architect content pipeline** (R02-G22-02, 2026-11-27). `swift test --package-path
   Packages/ExperiencesRound02 --filter MyceliumArchitect` (95 tests: 33 XCTest, 62 Swift Testing, about 6 s): the sites
   extension with a pinned fingerprint, the solver against an independent enumeration on the two smallest levels per

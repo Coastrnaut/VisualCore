@@ -56,3 +56,25 @@ presentation of later features.
   compared byte for byte otherwise. The catalog digest over the 100 fingerprints is pinned; witness lengths keep the
   standard progression rule (band means 1, 2, 3, 3, 4). The whole catalog generates in about 9 s on a debug host build.
 
+## Hero renderer (feature 513, R02-G22-03)
+
+- **Scene.** The board lies in the plane z = 0, fitted by one rule per level (cell side s = 1.9 / max(W, H), the board a
+  square of side 1.9 centred at (0, 0.05)), seen from a fixed authored perspective (eye (0, −1.9, 2.8), target
+  (0, −0.3, 0), fitted with a 5 % margin for aspects 0.4 … 2.5). Drawn in painter's order with depth testing off: the
+  cave backdrop with hashed spores, the floor and grid, sites, violet toxin pools, rocks with copper veins, blockers,
+  copper nutrient orbs, the emerald vein tubes of every segment grown up to the shown pulse (tapering from 0.16·s at the
+  root to 0.06·s by path weight, pulsing outward with time), blooms where nutrients were consumed, hyphae fuzz and spores
+  (beneath the caps, so decoration never hides them), seed sprouts, the root cap and the terminal caps (open and lit when
+  reached), then the weight gauge with its limit tick, the terminal pips and the actions bars, and the additive glow.
+- **Purity.** The presenter draws only `MyceliumArchitectSceneSnapshot`, made by the adapter from the play; the shown
+  pulse (`growth.show`) is presentation state, never in the digest; tiers, time and failures never change the kernel.
+- **Tiers.** `level-0` (tubes of 8 sides, caps of 16 segments, 6 fuzz strands, 24 spores, 2 glow shells), `level-1`
+  (6, 12, 3, 12, 1) and `level-2` (4, 8, none); everything else is identical; the presenter logs tier changes.
+- **Materials.** GLSL ES 3.00 board and glow programs (7 uniform slots each, no samplers, bounded loops, a fixed hash);
+  the material code, a value and a broken mark travel in `a_uv.x`; flats are cut out by signed distance. A failed
+  program falls back to the unlit renderer with the level-2 geometry in flat palette colours, keeping the reason.
+- **Candidate.** `MyceliumArchitectExperienceCore` adapts the kernel (cell nutrient, blocker and clear, root seed and
+  unseed, growth run and show, undo, redo, next level; digest domain `r02-g22.mycelium-architect.v1`; snapshot schema 1),
+  registered in the one app as a candidate (not available) with 100 levels and the pinned catalog digest; simulator
+  tests check frames of levels 1, 21, 41, 61 and 81 at every tier against the CPU reference.
+

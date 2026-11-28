@@ -1091,4 +1091,7 @@ words), the play state `MyceliumArchitectPlay` with nutrient, blocker, clear, se
 records, undo and redo, and `MyceliumArchitectPuzzle` (an R02-F23 `PuzzleRules` over arrangements). Feature 512 (R02-G22-02) adds placement
 sites, the 100-entry manifest, the seeded generator, the breadth-first solver with its minimality proof, difficulty
 metrics and the witness files in `docs/games/mycelium-architect/levels/`.
+Feature 513 (R02-G22-03) adds the hero renderer: the adapter, scene snapshot, board geometry with a CPU reference,
+GLSL programs, three quality tiers, the iOS experience `MyceliumArchitectExperience` (presenter, board scene, panel)
+and the candidate registration in the one app.
 See [docs/architecture/mycelium-architect.md](../../docs/architecture/mycelium-architect.md).

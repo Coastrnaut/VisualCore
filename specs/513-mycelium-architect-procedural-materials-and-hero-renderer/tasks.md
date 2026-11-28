@@ -53,7 +53,7 @@ only after every agent has reported; read `exit=` before ticking). Commit after 
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G2203-007 Docs: `docs/architecture/mycelium-architect.md` (hero renderer), package README,
+- [X] T-R02G2203-007 Docs: `docs/architecture/mycelium-architect.md` (hero renderer), package README, — Verified 2026-11-27: architecture (hero renderer), package README, automatedtesting; validate_docs PASS; round02-host-1/2/3c/3e/3f exit=0
   `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f`
 - [ ] T-R02G2203-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`
