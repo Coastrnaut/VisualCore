@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "MyceliumArchitectPanelWin"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter MyceliumArchitectPanelWin",
+  "elapsed_seconds": 14.339,
+  "exit_code": 0,
+  "finished": "2026-11-28T01:28:33+00:00",
+  "gate": "R02-G22-04",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G22-04.host-4.log",
+  "log_sha256": "e085bec386d18330795ec2ad0c25039888807bf3d9901520d14d25e9204df860",
+  "name": "host-4",
+  "started": "2026-11-28T01:28:18+00:00",
+  "timed_out": false
+}

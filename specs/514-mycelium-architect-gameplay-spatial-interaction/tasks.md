@@ -34,7 +34,7 @@ MyceliumArchitect`.
 
 ## Phase 4: Story 6 — every move without gestures (P1)
 
-- [ ] T-R02G2204-005 [US6] Create `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPanelWinTests.swift` (all 100 certified witnesses won
+- [X] T-R02G2204-005 [US6] Create `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPanelWinTests.swift` (all 100 certified witnesses won — Verified 2026-11-27: 2026-11-27: all 100 witnesses won through panel actions within budget; host-4 exit=0 (.autonomy/migration/checks/R02-G22-04.host-4.json)
   through panel actions within their budgets, in groups); `--name host-4`
 - [ ] T-R02G2204-006 [US1] [US6] Edit `Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectPresenter.swift`, `MyceliumArchitectBoardScene.swift`,
   `MyceliumArchitectControls.swift` (pointer routing through the controller, tool buttons Nutrient and Blocker, place
