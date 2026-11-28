@@ -71,3 +71,21 @@ device testing. Shared files (package, snapshot, adapter, scenarios, registratio
 Stories 1 and 2. Coverage: FR-001, 002 → 003, 004; FR-003 → 002, 003, 005; FR-004 → 002, 005; FR-005 → 002; FR-006 →
 003, 005; FR-007 → 005; FR-008, 009 → 006 … 011; FR-010 → 005; SC-001 → 005; SC-002 → 002; SC-003 → 003; SC-004 →
 006; SC-005 → 007 … 011; SC-006 → 012.
+
+## Phase 6: Convergence
+
+- [X] T-R02G2203-014 Record in `specs/513-mycelium-architect-procedural-materials-and-hero-renderer/spec.md` (the drawn — Verified 2026-11-27: spec Q1 and research R4 record fuzz and spores beneath the caps; validate_docs PASS
+  order of clarification Q1) and `research.md` R4 that blooms, hyphae fuzz and spores are drawn after the veins and
+  beneath the sprouts and caps (the first simulator run showed spores over the caps hid every cap point), as
+  `MyceliumArchitectSceneGeometry.paintOrder` draws them, per FR-R02G2203-001, plan: painter's order (contradicts)
+- [ ] T-R02G2203-015 Record in `specs/513-mycelium-architect-procedural-materials-and-hero-renderer/contracts/api.md` the
+  public names beyond the contract with reasons (`qualityTiers` is the `ExperienceCore` protocol's tier count with the
+  names in `qualityProfile.levels` and `MyceliumArchitectTier.all`; the adapter's rule and restore types, constants,
+  state and scenario statics; the snapshot's `boardSide`, `fitScale(width:height:)`, budgets and `largestPathWeight`;
+  `MyceliumArchitectElement`, `MyceliumArchitectColouredMesh`, the camera's view and projection, `paintOrder`,
+  `boardPart`, `glowPart`, `fallback`, `project` and the backdrop helpers; the shaders' constants and helpers), per plan:
+  contracts/api.md (unrequested)
+- [ ] T-R02G2203-016 Record in `specs/513-mycelium-architect-procedural-materials-and-hero-renderer/plan.md` and
+  `data-model.md` the experience test files beyond the render tests (test support, fallback, tier and identity tests,
+  as feature 503), the glow and motion helpers on `MyceliumArchitectBoardScene`, and the shaders' material table pinned
+  equal to the geometry's by `theShaderAndGeometryMaterialTablesAgree`, per plan: project structure (unrequested)

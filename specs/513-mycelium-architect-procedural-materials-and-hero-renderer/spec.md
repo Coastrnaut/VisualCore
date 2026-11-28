@@ -72,7 +72,8 @@ hyphae bloom under translucent luminous caps".
   (one tapered tube per grown segment up to the shown pulse, from the parent cell's centre to the child's, radius from
   0.16·s at the root end down to 0.06·s by the child's path weight over the network's largest path weight, emerald
   #2FE08A, whose brightness pulses outward along the path weight with presentation time; a small bloom at every cell
-  where a nutrient was consumed); seeds (a short sprout from the root in each seeded direction, sprout #5BE38F); the
+  where a nutrient was consumed); the hyphae fuzz and spores of the richer tiers (drawn here, beneath the sprouts
+  and caps, so decoration never hides them); seeds (a short sprout from the root in each seeded direction, sprout #5BE38F); the
   root cap (radius 0.36·s, cap #9FF2D0); the terminal caps (radius 0.42·s; closed and hollow when not reached by the
   shown pulse, cap closed #4B6B60, open and lit when reached, cap open #C9FFE9, with a ring of terminal + 1 pips); the
   gauges below the board: a weight bar plate from x = −0.95 to 0.95 at y = −1.12 (gauge plate #1A2347) whose fill

@@ -13,7 +13,9 @@
   ≤ the shown pulse, from parent to child cell centres; terminals are open exactly when the kernel's terminal pulse is
   ≤ the shown pulse; the weight fill is the kernel's total weight. Rationale: renderer purity (INV-10).
 - **R4 Painter's order for everything.** Decision: backdrop, floor and grid, sites, toxins, rocks, blockers, nutrients,
-  veins (in growth order), sprouts, root cap, terminal caps, gauges, actions bars, then the additive glow; depth testing
+  veins (in growth order), blooms, hyphae fuzz and spores (beneath the caps: the first simulator run showed spores
+  drawn over the caps hid every cap point at the richer tiers), sprouts, root cap, terminal caps, gauges, actions bars,
+  then the additive glow; depth testing
   off and no culling (the window surface has no depth buffer). Rationale: features 493 and 503.
 - **R5 Tapered tubes.** Decision: each segment is a tube of n sides (8, 6, 4 by tier) whose radius goes from 0.16·s at
   the root end to 0.06·s by the child's path weight over the network's largest path weight; normals point outward from
