@@ -45,7 +45,7 @@ campaign covers the game). Agents model their files on Binary Gardens' (feature 
 
 ## Phase 3: Stories 1 and 4 — tutorial and progress (P1, P2)
 
-- [ ] T-R02G2205-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/MyceliumArchitectProgress.swift`
+- [X] T-R02G2205-003 [P] [US1] [US4] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/MyceliumArchitectProgress.swift` — Verified 2026-11-27: 2026-11-27: host-3 exit=0 (same command with T-003 installed; MyceliumArchitectProgressTests 20 pass; daily × 11 checked independently)
   (`MyceliumArchitectTutorialStep` place → grow → recover → done with the texts of clarification Q2, advanced by an
   accepted arrangement action (place → grow), a second accepted arrangement action in this opening (grow → recover) or
   the level's end (→ done), never moved back by undo or redo — an undo passes no action, a redo that restores a won or
