@@ -1698,7 +1698,10 @@ class UnifiedAppTargetTests(unittest.TestCase):
                                     "MushroomWeatherCore", "MushroomWeatherExperience",
                                     # Feature 503 (R02-G21-03): Binary Gardens, a registered candidate until
                                     # X-R02-G21.
-                                    "BinaryGardensCore", "BinaryGardensExperience"])
+                                    "BinaryGardensCore", "BinaryGardensExperience",
+                                    # Feature 513 (R02-G22-03): Mycelium Architect, a registered candidate until
+                                    # X-R02-G22.
+                                    "MyceliumArchitectCore", "MyceliumArchitectExperience"])
 
     def test_the_standing_isolation_step_requires_sources(self):
         listing = subprocess.run([sys.executable, str(HERE / "release_check.py"), "--list"],

@@ -66,6 +66,8 @@ import MushroomWeatherCore
 import MushroomWeatherExperience
 import BinaryGardensCore
 import BinaryGardensExperience
+import MyceliumArchitectCore
+import MyceliumArchitectExperience
 import VoxelOrigamiCore
 import VoxelOrigamiExperience
 import VisualCoreExperience
@@ -149,7 +151,26 @@ enum ExperienceRegistry {
     /// each carries its scenario manifest, so that the verification runner can open it, but it stays unavailable
     /// in the catalog and outside `all`. Debug builds show them with `-vcCandidates`. Recording an experience's X
     /// gate moves its registration from here to `all`.
-    static let candidates: [ExperienceRegistration] = []
+    static let candidates: [ExperienceRegistration] = [myceliumArchitect].compactMap { $0 }
+
+    /// R02-G22 Mycelium Architect (feature 513, R02-G22-03): a candidate until X-R02-G22. Snapshot schema 1, so no
+    /// earlier example is stored yet.
+    fileprivate static var myceliumArchitect: ExperienceRegistration? {
+        guard let id = MyceliumArchitectExperience.id else { return nil }
+        var registration = ExperienceRegistration(id: id, core: MyceliumArchitectExperienceCore.self) { launch in
+            let system = SystemAccessibilityObserver.systemValues()
+            return MyceliumArchitectExperience.make(
+                id: id, storage: launch.storage,
+                reduceMotion: launch.reduceMotion.resolved(system: system.reduceMotion),
+                reduceFlashing: launch.reduceFlashing.resolved(system: system.dimFlashingLights))
+        }
+        // Seed 0 opens certified level 1, as for the other round-two puzzles.
+        registration.openingSeed = 0
+        #if DEBUG || VISUALCORE_AUTOMATION
+        registration.scenarioManifest = MyceliumArchitectExperienceCore.manifest(for: id)
+        #endif
+        return registration
+    }
 
     /// R02-G21 Binary Gardens (features 501–510, R02-G21-01…10): integrated at X-R02-G21 (2026-11-27). Snapshot schema 3
     /// since feature 507 (R02-G21-07); its schema-1 and schema-2 examples are registered since feature 509 (R02-G21-09).

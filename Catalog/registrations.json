@@ -1194,6 +1194,34 @@
       "manifest": "Packages/ExperiencesRound02/BinaryGardens/scenario-manifest.json",
       "permissions": [],
       "summary": "Move twin stars between their rings, shift their phases, set their brightness and tilt the orbit plane so every flower world circling them keeps a long enough comfortable window and blooms over the cycle, without a world freezing or scorching for too long."
+    },
+    "r02-g22.mycelium-architect": {
+      "capabilities": [
+        "Grow veins to every terminal",
+        "Growth in exact whole units",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "palette": [
+        "#06070A",
+        "#2FE08A",
+        "#E08A3C",
+        "#7B3FB8",
+        "#12161C"
+      ],
+      "content": {
+        "catalog_sha256": "3a2b82b6363ef37ad1678847640b07e33f58e2ac2127ef39e9a34ff32797b040",
+        "levels": 100
+      },
+      "manifest": "Packages/ExperiencesRound02/MyceliumArchitect/scenario-manifest.json",
+      "permissions": [],
+      "summary": "Seed filaments from the root, place nutrients that pull growth and blockers that turn it from toxin, then advance the growth pulses so the glowing veins join every terminal within the branch-weight limit, without touching toxin or running out of nutrient."
     }
   }
 }

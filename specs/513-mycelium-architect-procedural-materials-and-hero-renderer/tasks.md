@@ -44,7 +44,7 @@ only after every agent has reported; read `exit=` before ticking). Commit after 
 
 ## Phase 4: Story 4 — a registered candidate (P2)
 
-- [ ] T-R02G2203-006 [US4] Registration: `Catalog/registrations.json` (Q5), `build_catalog.py` (catalog and VisualCore
+- [X] T-R02G2203-006 [US4] Registration: `Catalog/registrations.json` (Q5), `build_catalog.py` (catalog and VisualCore — Verified 2026-11-27: registration (registrations.json, catalog and fixtures rebuilt, project.yml with xcodegen, registry candidate at seed 0, AppModelTests synthetic candidate r02-g23.erosion-painter, RealCatalogTests, test_scripts products); packages, catalog-search, app-unit exit=0
   fixtures), `project.yml` (two products) and `xcodegen generate`, `Apps/VisualCore/App/ExperienceRegistry.swift`
   (candidate, opening seed 0), `Apps/VisualCore/Tests/Unit/AppModelTests.swift` (synthetic candidate
   `r02-g23.erosion-painter`), `Packages/VisualCore/Tests/VisualCoreExperienceTests/RealCatalogTests.swift`,

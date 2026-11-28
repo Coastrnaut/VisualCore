@@ -1705,7 +1705,7 @@
       "id": "r02-g22.mycelium-architect",
       "code": "R02-G22",
       "title": "Mycelium Architect",
-      "summary": "Feed fungal networks so glowing veins form a target graph around rocks",
+      "summary": "Seed filaments from the root, place nutrients that pull growth and blockers that turn it from toxin, then advance the growth pulses so the glowing veins join every terminal within the branch-weight limit, without touching toxin or running out of nutrient.",
       "kind": "game",
       "tier": "free",
       "category": "puzzle",
@@ -1714,11 +1714,30 @@
         "organic-growth"
       ],
       "order": 47,
-      "palette": [],
+      "palette": [
+        "#06070A",
+        "#2FE08A",
+        "#E08A3C",
+        "#7B3FB8",
+        "#12161C"
+      ],
       "tile_seed": 2946499318,
-      "capabilities": [],
-      "quality_tiers": [],
-      "content": null,
+      "capabilities": [
+        "Grow veins to every terminal",
+        "Growth in exact whole units",
+        "100 solver-certified levels",
+        "Every action can be undone",
+        "Three quality levels, same rules"
+      ],
+      "quality_tiers": [
+        "level-0",
+        "level-1",
+        "level-2"
+      ],
+      "content": {
+        "catalog_sha256": "3a2b82b6363ef37ad1678847640b07e33f58e2ac2127ef39e9a34ff32797b040",
+        "levels": 100
+      },
       "available": false
     },
     {
