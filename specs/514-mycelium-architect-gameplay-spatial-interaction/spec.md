@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-27
 
-**Status**: Draft
+**Status**: Clarified
 
 **Ledger gate**: R02-G22-04 (migration ledger, game feature of experience R02-G22) · ID namespace FR-R02G2204-###,
 SC-R02G2204-###, T-R02G2204-###
@@ -30,6 +30,72 @@ Canonical overrides:
 - **Model:** feature 504 (Binary Gardens' gameplay spatial interaction: gesture controller, picker, view orbit and the
   presenter wiring), adapted to placements on sites, seeds dragged from the root, ghost growth, pulse scrubbing and cell
   inspection.
+
+## Clarifications
+
+### Session 2026-11-27
+
+Answered autonomously under the owner's standing delegation, safest well-supported option each time, following feature
+504's answers where the games agree. Facts checked (read-only, 2026-11-27): the host's `PointerEvent` (id, phase
+began/moved/ended/cancelled, location in view points with the origin top-left, monotonic timestamp in seconds); feature
+504's constants as implemented (`BinaryGardensGestureController`: tap below 10 points and 0.5 s, drag from 16 points,
+double tap within 0.35 s and 22 points, orbit 90° per view width and 60° per view height; `BinaryGardensViewOrbit`: yaw
+±60°, pitch −20° … +35°; `BinaryGardensPicker`: allowance 12 points, step travel 32 points). Feature 513 (R02-G22-03) gives
+the scene: cell (c, r) centred at ((c + 0.5 − W/2)·s, 0.05 + (H/2 − r − 0.5)·s, 0) with s = 1.9 / max(W, H); the root
+cap of radius 0.36·s and terminal caps of 0.42·s; seed sprouts 0.4·s from the root towards their direction; the weight
+plate x −0.95 … 0.95 at y −1.12 ± 0.045; the terminal pips at y −1.24 and the actions bars at y −1.34; painter's order;
+the authored camera eye (0, −1.9, 2.8) looking at (0, −0.3, 0) fitted with a 5 % margin for aspects 0.4 … 2.5. Its
+adapter declares `cell.nutrient [column, row]`, `cell.blocker [column, row]`, `cell.clear [column, row]`, `root.seed
+[direction]`, `root.unseed [direction]`, `growth.run`, `play.undo`, `play.redo`, `level.next` and `growth.show [pulse]`
+(0 … pulses run, presentation only). The kernel's change rule (`MyceliumArchitectPlay.changed`) refuses off-board,
+not-empty, not-a-site, over-limit, already-seeded, seed-limit, not-seeded and starting-seed changes with
+`r02-g22.action` and a reason; the play also refuses with no action left (`r02-g22.budget`).
+
+- Q: How is a touch picked? → A: at touch-down the targets are projected through the drawn camera (orbit included) and
+  the one drawn last wins, in the reverse of the painter's order: (1) the actions bars and the terminal pip row are empty
+  space; (2) the weight gauge: the finger cast onto the plane z = 0 lies inside the plate rectangle; (3) a sprout: within
+  12 points of the projected segment from the root's centre to its tip (later directions first); (4) the root: within
+  the projected cap radius grown by 12 points; (5) a cell: the finger cast onto z = 0 lies inside the board, giving
+  (column, row) = (⌊x/s + W/2⌋, ⌊H/2 − (y − 0.05)/s⌋); (6) anything else, and unusable input (a non-finite point, a size
+  that is not finite and positive), is empty space. Thresholds and the 12-point allowance are feature 504's. Impact:
+  FR-R02G2204-007, 010; SC-R02G2204-001.
+- Q: What do taps do? → A: while playing, a tap on an empty site sends `cell.nutrient` or `cell.blocker` for that cell by
+  the current tool (nutrient by default, chosen in the panel by two buttons, never a segmented picker); a tap on a placed
+  nutrient or blocker sends `cell.clear`; a tap on a cell that is neither (a rock, toxin, terminal, fixed nutrient, grown
+  or empty non-site cell) inspects it (ringed in the marker colour; the description gives the kernel's
+  `cellDescription`), and so does any cell tap outside playing; a second tap on the inspected cell or "Inspect: none"
+  clears it. A tap on the root explains that a filament is seeded by dragging from the root; a tap on a sprout explains
+  that it is removed by dragging it back onto the root. A tap on the gauge sets the shown pulse to
+  clamp(round((x + 0.9) / 1.8 · pulses run), 0, pulses run) in any stage. Two taps on empty space within 0.35 s and 22
+  points reset the view. A kernel action outside playing sends nothing and says "The play is over: undo or go to the next
+  level" (won or failed) or "The level is not being played" (loading, tutorial, paused); a refused change is sent once
+  and its refusal shown with its reason code, as feature 504 does. Impact: FR-R02G2204-001, 004, 005, 009.
+- Q: What is previewed while a finger rests on a site? → A: at touch-down on a site while playing, the preview is the
+  tool's change (or the clear of a placed item) as a kernel action with the report of the changed arrangement computed
+  by the kernel's own change rule and growth (never a second implementation), or the change rule's refusal; the scene
+  draws the previewed network's veins as dashed ghost tubes over the committed ones and the predicted verdict in words;
+  a refused preview names the refusal and draws nothing ghostly. Release within the tap thresholds, or after a longer
+  press without moving 16 points, sends the previewed change once; moving 16 points or more cancels the preview and sends
+  nothing; a cancel or a second finger clears it. Previews never enter the digest, the snapshot's game state or the
+  kernel. Impact: FR-R02G2204-002, 006; SC-R02G2204-003, 006.
+- Q: How do the seed drag and the pulse scrub work? → A: a press on the root that travels 16 points or more while playing
+  becomes a seed drag: both the start and the finger are cast onto z = 0 and the direction is the one of the eight whose
+  board angle is nearest the travel's (ties to the lower direction number); the preview is `root.seed [direction]` with
+  its ghost growth, or the refusal; release with a cast travel of at least 0.5·s sends it once, otherwise nothing. A
+  press on a sprout that travels 16 points or more becomes an unseed drag, previewing `root.unseed [direction]`; release
+  inside the root's pick disc sends it once, otherwise nothing. A press on the gauge that travels 16 points or more
+  becomes a scrub: the shown pulse follows the finger by the tap formula, in any stage, sending only `growth.show`.
+  Impact: FR-R02G2204-003, 004; SC-R02G2204-001.
+- Q: How do orbit, the panel and the stored state behave? → A: orbit as feature 504: a second finger cancels the gesture
+  and orbits by 90° per view width and 60° per view height within yaw ±60° and pitch −20° … +35°, the camera re-fitted
+  so the board and gauges keep a margin of at least 5 % at every aspect 0.4 … 2.5; a double tap on empty space or "Reset
+  view" returns to the authored view. The gesture constants are public and equal to feature 504's; only event
+  timestamps are read. The panel gains the tool buttons (Nutrient, Blocker), a direct "place at cursor" for the chosen
+  tool, "Inspect: none" and "Reset view", keeping every existing control, so every certified witness (seeds, nutrients
+  and blockers, then the run) replays through panel actions within its budget. The snapshot schema stays 1: the orbit,
+  the tool, the preview, the inspected cell and the shown pulse are presentation state, not saved, and return to their
+  defaults at opening, next level, reset and restore. The presenter exposes its gesture state, preview, inspected cell,
+  tool and orbit for diagnostics. Impact: FR-R02G2204-008, 010, 011, 013, 014; SC-R02G2204-004, 005.
 
 ## User Scenarios & Testing *(mandatory)*
 
