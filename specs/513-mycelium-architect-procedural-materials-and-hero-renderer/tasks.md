@@ -32,7 +32,7 @@ only after every agent has reported; read `exit=` before ticking). Commit after 
   rule, cell centres, camera and fitted box of Q1, painter's order, board and glow meshes with materials in uv, tapered
   tubes and caps by tier, CPU reference points) with `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectSceneGeometryTests.swift`
   (finiteness and bounds for extreme levels, order, reference agreement, aspect 0.4 … 2.5 margins); `--name host-2`
-- [ ] T-R02G2203-004 [P] [US1] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectShaders.swift` (agent B: GLSL ES 3.00
+- [X] T-R02G2203-004 [P] [US1] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectShaders.swift` (agent B: GLSL ES 3.00 — Verified 2026-11-27: MyceliumArchitectShaders (board and glow GLSL ES 3.00, 7 uniform slots each, no samplers, bounded loops, palette equal to Swift) and its tests (15, incl. agreement with the geometry's material table) installed; host-3 exit=0
   board and glow programs, at most 16 vec4 uniforms, no samplers, bounded loops, fixed hash, palette equal to Swift)
   with `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectShaderSourceTests.swift`; `--name host-3`
 - [ ] T-R02G2203-005 [US1] [US3] Create the iOS experience `Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectExperience.swift`,
