@@ -28,7 +28,7 @@ only after every agent has reported; read `exit=` before ticking). Commit after 
 
 ## Phase 3: Stories 1 and 2 — the hero scene, pure (P1) 🎯
 
-- [ ] T-R02G2203-003 [P] [US1] [US2] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectSceneGeometry.swift` (agent A: fit
+- [X] T-R02G2203-003 [P] [US1] [US2] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectSceneGeometry.swift` (agent A: fit — Verified 2026-11-27: MyceliumArchitectSceneGeometry (fit, camera, painter's order, board and glow meshes, tapered tubes, CPU reference, fallback) and its tests (13) installed; host-2 exit=0
   rule, cell centres, camera and fitted box of Q1, painter's order, board and glow meshes with materials in uv, tapered
   tubes and caps by tier, CPU reference points) with `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectSceneGeometryTests.swift`
   (finiteness and bounds for extreme levels, order, reference agreement, aspect 0.4 … 2.5 margins); `--name host-2`
