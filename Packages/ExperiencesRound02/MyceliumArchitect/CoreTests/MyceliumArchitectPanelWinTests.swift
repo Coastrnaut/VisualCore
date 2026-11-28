@@ -15,6 +15,10 @@
 // groups of 5 (each level is certified once per process, which dominates the time). Panel Undo then Redo restore the
 // adapter digests of every arrangement action exactly. Explicit types, plain loops. Modelled on
 // BinaryGardensPanelWinTests (feature 504).
+// T-R02G2204-006 extends the model with the panel's placement tool (the "Nutrient tool" and "Blocker tool" buttons,
+// presentation only, nutrient at an opening) and "Place at cursor" (one `cell.nutrient` or `cell.blocker [column, row]`
+// by the tool on the cursor's cell); "Inspect cursor", "Inspect: none" and "Reset view" send nothing and change no
+// digest, so the model counts them as selection presses.
 import Foundation
 import Testing
 import VisualCoreExperience
@@ -51,6 +55,8 @@ struct MyceliumArchitectPanelModel {
     let height: Int
     /// The control presses that sent no action (cursor and direction moves), counted for the report.
     private(set) var selectionPresses: Int = 0
+    /// The placement tool the tool buttons choose (nutrient at an opening; presentation only).
+    private(set) var tool: MyceliumArchitectTool = .nutrient
 
     /// The panel showing `core`: the cursor on column 0, row 0, the direction north.
     init(_ core: MyceliumArchitectExperienceCore) {
@@ -81,6 +87,17 @@ struct MyceliumArchitectPanelModel {
         selectionPresses += 1
     }
 
+    /// "Nutrient tool" or "Blocker tool": chooses `tool`; no action is sent.
+    mutating func chooseTool(_ tool: MyceliumArchitectTool) {
+        self.tool = tool
+        selectionPresses += 1
+    }
+
+    /// "Inspect cursor", "Inspect: none" or "Reset view": presentation only; no action is sent.
+    mutating func presentationPress() {
+        selectionPresses += 1
+    }
+
     /// "Direction −": the previous direction, north wrapping to north-west; no action is sent.
     mutating func directionMinus() {
         direction = (direction + 7) % 8
@@ -95,6 +112,9 @@ struct MyceliumArchitectPanelModel {
 
     /// "Blocker": one `cell.blocker [column, row]` on the cursor's cell.
     func blocker() -> ExperienceAction { Self.action("cell.blocker", cellValues) }
+
+    /// "Place at cursor": one placement by the tool (`cell.nutrient` or `cell.blocker`) on the cursor's cell.
+    func placeAtCursor() -> ExperienceAction { Self.action(tool.controlID, cellValues) }
 
     /// "Clear": one `cell.clear [column, row]` on the cursor's cell.
     func clear() -> ExperienceAction { Self.action("cell.clear", cellValues) }
@@ -296,5 +316,58 @@ struct MyceliumArchitectPanelModel {
         #expect(panel.direction == 0)
         #expect(try Self.digest(core) == before)
         #expect(core.play.actionsSpent == 0)
+    }
+
+    /// The tool buttons choose what "Place at cursor" sends (nutrient at an opening), the presentation-only buttons
+    /// send nothing, and a witness placement made through "Place at cursor" reproduces the witness digest of the same
+    /// action made through its own button (level 1's first placement, when its witness has one).
+    @Test func theToolChoosesWhatPlaceAtCursorSends() async throws {
+        let core: Core = try await Core.prepare(seed: 0)
+        var panel: Panel = Panel(core)
+        let before: StateDigest = try Self.digest(core)
+        #expect(panel.tool == .nutrient)
+        #expect(panel.placeAtCursor().control == "cell.nutrient" && panel.placeAtCursor().values == panel.cellValues)
+        panel.chooseTool(.blocker)
+        #expect(panel.tool == .blocker)
+        #expect(panel.placeAtCursor().control == "cell.blocker" && panel.placeAtCursor().values == panel.cellValues)
+        panel.chooseTool(.nutrient)
+        #expect(panel.placeAtCursor().control == "cell.nutrient")
+        panel.presentationPress()
+        #expect(panel.selectionPresses == 3)
+        #expect(try Self.digest(core) == before, "no tool or presentation press changes the digest")
+
+        let witness: MyceliumArchitectWitness = try panelWitness(1)
+        var first: MyceliumArchitectAction?
+        for action in witness.actions {
+            switch action {
+            case .nutrient, .blocker:
+                if first == nil { first = action }
+            default:
+                break
+            }
+        }
+        guard let placement = first else { return }
+        var byButton: Core = core
+        var buttonPanel: Panel = Panel(core)
+        let sent: ExperienceAction = try #require(try Self.panelAction(for: placement, core: byButton,
+                                                                       panel: &buttonPanel, number: 1))
+        var byPlace: Core = core
+        var placePanel: Panel = Panel(core)
+        switch placement {
+        case let .nutrient(cell):
+            try Self.moveCursor(to: cell, core: byPlace, panel: &placePanel, number: 1)
+            placePanel.chooseTool(.nutrient)
+        case let .blocker(cell):
+            try Self.moveCursor(to: cell, core: byPlace, panel: &placePanel, number: 1)
+            placePanel.chooseTool(.blocker)
+        default:
+            break
+        }
+        let placed: ExperienceAction = placePanel.placeAtCursor()
+        #expect(placed.control == sent.control && placed.values == sent.values)
+        let buttonResult: ActionResult = byButton.apply(sent)
+        let placeResult: ActionResult = byPlace.apply(placed)
+        #expect(buttonResult == placeResult)
+        #expect(try Self.digest(byButton) == Self.digest(byPlace), "the same placement either way")
     }
 }

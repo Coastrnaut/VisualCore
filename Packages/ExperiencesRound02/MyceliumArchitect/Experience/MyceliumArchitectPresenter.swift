@@ -11,6 +11,24 @@
 // rebuilds them. The presenter only reads `core.snapshot`: no drawing result reaches the kernel (renderer purity). Its
 // probes (two backdrop corners) let the verification runner check a frame (the round-two X gates require them).
 // Modelled on `BinaryGardensPresenter` (feature 503).
+// Feature 514 (R02-G22-04) T-R02G2204-006 (FR-R02G2204-001 … 006, 008, 009, 011 … 014; clarifications Q1–Q5): a canvas
+// touch goes through the presenter's `MyceliumArchitectGestureController` with the drawn snapshot, the panel's tool
+// and the presenter's view orbit (`pointer`). The presenter owns the presentation state (the tool, the previewed
+// change, the inspected cell and the orbit) and applies it through the adapter: every frame draws a copy of the core
+// with `setTool`, `setPreview` or `clearPreview`, `inspect` and `setOrbit` applied (the kernel's own preview, judged by
+// its change rule and growth; an inspection off the board and an orbit outside its bounds are corrected by the
+// adapter), so the drawn snapshot carries the ghost veins, the inspection ring and the orbit, and the scene draws with
+// `snapshot.orbit.camera(aspect:)`, the camera the picker reads. The copy never reaches the host: the host's core, its
+// digest and its save do not change. A site tap or press sends one `cell.nutrient`, `cell.blocker` or `cell.clear`
+// [column, row], a seed drag one `root.seed [direction]`, an unseed drag one `root.unseed [direction]` (each through
+// ``send(_:_:port:)``, dropping the preview), a gauge press or scrub `growth.show [pulse]` (presentation only); a cell
+// tap inspects (the description gives the kernel's cell words) and a second tap clears; two fingers orbit; a double
+// tap on empty space or "Reset view" returns to the authored view. A gesture that does nothing for a stated reason
+// (the root or a sprout tapped, the play not running) says it in the mirror's message and the description (the
+// controller's texts verbatim). A preview is named in words (the predicted verdict, or the refusal). A refused action
+// is shown in the panel and its bare code kept in the refusal log (at most 64). An opening, `level.next`, reset or
+// restore (a new level number, or records that no longer extend the followed ones) returns the tool, the preview, the
+// inspection and the orbit to their defaults, as the adapter does. Modelled on `BinaryGardensPresenter` (feature 504).
 #if os(iOS)
 import Foundation
 import MyceliumArchitectCore
@@ -19,6 +37,7 @@ import VisualCoreExperience
 import VisualCoreExperienceHost
 import VisualCoreMath
 import VisualCoreRendering
+import VisualCoreScenes
 
 /// What the controls show: the latest state the presenter described, the shown pulse and the panel's selection (the
 /// cell cursor and the direction).
@@ -53,6 +72,16 @@ final class MyceliumArchitectMirror {
     var row: Int = 0
     /// The direction the panel seeds or unseeds (0 north … 7 north-west).
     var direction: Int = 0
+    /// The placement tool: what a tap on an empty site and "Place at cursor" place (feature 514; presentation only).
+    var tool: MyceliumArchitectTool = .nutrient
+    /// The change a press or drag previews, if any (feature 514; presentation only).
+    var preview: MyceliumArchitectAction?
+    /// The preview in words: the predicted verdict, or the refusal; nil without a preview (feature 514).
+    var previewLabel: String?
+    /// The inspected cell, if any (feature 514; presentation only).
+    var inspectedCell: MyceliumArchitectCell?
+    /// Whether the camera is turned away from the authored view (feature 514; presentation only).
+    var orbited: Bool = false
 
     /// The board's width of the followed play (1 while no play is followed).
     var boardWidth: Int { max(play?.level.width ?? 1, 1) }
@@ -118,6 +147,51 @@ final class MyceliumArchitectMirror {
         self.shownPulse = shownPulse
     }
 
+    /// The tool in words: "nutrient" or "blocker" (feature 514).
+    var toolLabel: String {
+        switch tool {
+        case .nutrient: return "nutrient"
+        case .blocker: return "blocker"
+        }
+    }
+
+    /// The inspected cell in words (the kernel's cell description), or nil without an inspection (feature 514).
+    var inspectedLabel: String? {
+        guard let cell = inspectedCell, let play else { return nil }
+        return play.level.cellDescription(cell, arrangement: play.arrangement, report: play.report)
+    }
+
+    /// The tool, the preview, the inspection and the orbit flag back to their defaults (a new play; feature 514).
+    func clearPresentation() {
+        tool = .nutrient
+        preview = nil
+        previewLabel = nil
+        inspectedCell = nil
+        orbited = false
+    }
+
+    /// A preview in words (feature 514, clarification Q3): "Preview refused: " and the refusal in words, or
+    /// "Preview: " and the predicted verdict (every terminal reached, or the failure the kernel's report names).
+    static func previewText(_ preview: MyceliumArchitectPreview, level: MyceliumArchitectLevel) -> String {
+        if let refusal = preview.refusal {
+            return "Preview refused: " + refusalText(code: refusal.reasonCode)
+        }
+        if let failure = preview.failure {
+            return "Preview: the growth would fail: " + level.failureDescription(failure)
+        }
+        return "Preview: the growth would reach every terminal"
+    }
+
+    /// A refused action's code without the engine's `action.rule.` prefix (the refusal log keeps bare codes).
+    static func bareCode(_ code: String) -> String {
+        code.hasPrefix(rulePrefix) ? String(code.dropFirst(rulePrefix.count)) : code
+    }
+
+    /// The panel's sentence for a refused action of reason code `code`.
+    static func refusalMessage(code: String) -> String {
+        "That change was refused: \(refusalText(code: code))."
+    }
+
     /// A failure in words, naming what the kernel's reason names (the level's failure description, first letter in
     /// upper case, with a full stop); nil without a failure.
     static func failureText(_ failure: MyceliumArchitectFailure?, level: MyceliumArchitectLevel) -> String? {
@@ -172,6 +246,9 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
         + "the growing veins reach every terminal cap without entering a toxin, running out of nutrient or growing "
         + "heavier than the limit; then run the growth."
 
+    /// The most refusal codes kept in ``refusalLog`` (feature 514).
+    static let refusalLogLimit: Int = 64
+
     /// Whether Reduce Motion is on (the vein pulses, ripples, fuzz and spores stand still).
     let reduceMotion: Bool
     /// Whether the glow gain is capped (Reduce Flashing).
@@ -182,8 +259,42 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
     let scene: MyceliumArchitectBoardScene = MyceliumArchitectBoardScene()
     /// Every tier change with its reason, oldest first (the tier log, FR-R02G2203-004).
     private(set) var tierLog: [MyceliumArchitectTierChange] = []
-    /// The last snapshot drawn (tests and the description).
+    /// The last snapshot drawn (tests, the description and the gestures), with the presentation state applied through
+    /// the adapter (feature 514): the tool, the preview, the inspected cell and the orbit.
     private(set) var lastSnapshot: MyceliumArchitectSceneSnapshot?
+    /// The gesture controller (feature 514): site presses, seed and unseed drags, gauge presses and scrubs, cell taps,
+    /// double taps and orbits.
+    private(set) var gestures: MyceliumArchitectGestureController = MyceliumArchitectGestureController()
+    /// The camera's orbit, clamped (feature 514; presentation only; passed with every pointer event).
+    private(set) var orbit: MyceliumArchitectViewOrbit = .authored
+    /// The bare codes of refused actions, oldest first, at most ``refusalLogLimit`` (feature 514).
+    private(set) var refusalLog: [String] = []
+    /// The host's core last drawn or described (without presentation state; feature 514).
+    private var lastCore: MyceliumArchitectExperienceCore?
+    /// The presentation time of the last frame drawn, seconds (feature 514: a refreshed snapshot keeps it).
+    private var lastTime: Double = 0
+    /// The level number of the play last followed (feature 514: a new one is a new play).
+    private var followedLevel: Int?
+
+    /// What a presented core depends on (feature 514): the host's core (its `==` compares the level and the play),
+    /// the shown pulse (not in `==`) and the presentation state.
+    private struct PresentationKey: Equatable {
+        /// The host's core.
+        let core: MyceliumArchitectExperienceCore
+        /// The core's shown pulse.
+        let shownPulse: Int
+        /// The tool.
+        let tool: MyceliumArchitectTool
+        /// The previewed change.
+        let preview: MyceliumArchitectAction?
+        /// The inspected cell.
+        let inspected: MyceliumArchitectCell?
+        /// The orbit.
+        let orbit: MyceliumArchitectViewOrbit
+    }
+
+    /// The last presented core with its key (feature 514): the preview's growth runs once per change, not per frame.
+    private var presentedCache: (key: PresentationKey, core: MyceliumArchitectExperienceCore)?
 
     /// A presenter with the given accessibility settings.
     init(reduceMotion: Bool, reduceFlashing: Bool) {
@@ -219,14 +330,91 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
         scene.resize(context)
     }
 
-    /// Follows `core`'s play and presentation in the mirror when they changed.
+    /// Follows `core`'s play and presentation in the mirror when they changed. A new play (an opening, `level.next`,
+    /// reset or restore: another level number, or records that do not extend the followed ones) returns the tool, the
+    /// preview, the inspection and the orbit to their defaults (feature 514), as the adapter's own reset does.
     private func follow(_ core: MyceliumArchitectExperienceCore) {
-        if mirror.play != core.play || mirror.shownPulse != core.shownPulse {
-            mirror.follow(core.play, shownPulse: core.shownPulse)
+        lastCore = core
+        let previous: MyceliumArchitectPlay? = mirror.play
+        guard previous != core.play || mirror.shownPulse != core.shownPulse || followedLevel != core.levelNumber else {
+            return
         }
+        let fresh: Bool = Self.isNewPlay(previous, core.play, followedLevel: followedLevel,
+                                         levelNumber: core.levelNumber)
+        followedLevel = core.levelNumber
+        mirror.follow(core.play, shownPulse: core.shownPulse)
+        if fresh { clearPresentation() }
     }
 
-    /// Draws `core` at host tier `tier`, logging tier changes.
+    /// Whether `next` (of level `levelNumber`) is a new play after `previous` (of level `followedLevel`): no play was
+    /// followed, the level number changed, or `next`'s records do not extend `previous`'s (a reset or a restore; the
+    /// records are append-only, undo and redo included).
+    static func isNewPlay(_ previous: MyceliumArchitectPlay?, _ next: MyceliumArchitectPlay, followedLevel: Int?,
+                          levelNumber: Int) -> Bool {
+        guard let previous, followedLevel == levelNumber else { return true }
+        let old: [MyceliumArchitectRecord] = previous.records
+        let new: [MyceliumArchitectRecord] = next.records
+        guard new.count >= old.count else { return true }
+        return !new.starts(with: old)
+    }
+
+    /// Returns the tool, the preview, the inspection and the orbit to their defaults and cancels a gesture in progress
+    /// (feature 514: a new play).
+    private func clearPresentation() {
+        mirror.clearPresentation()
+        if gestures.state != .idle { gestures.cancel() }
+        orbit = .authored
+        refresh()
+    }
+
+    /// `core` with the presentation state applied through the adapter (feature 514): `setTool`, `setPreview` (the
+    /// kernel's own preview of the change) or `clearPreview`, `inspect` and `setOrbit` (clamped). A copy: the host's
+    /// core, its digest and its save do not change. Cached while nothing it reads changes.
+    private func presented(_ core: MyceliumArchitectExperienceCore) -> MyceliumArchitectExperienceCore {
+        let key: PresentationKey = PresentationKey(core: core, shownPulse: core.shownPulse, tool: mirror.tool,
+                                                   preview: mirror.preview, inspected: mirror.inspectedCell,
+                                                   orbit: orbit)
+        if let cached = presentedCache, cached.key == key { return cached.core }
+        var copy: MyceliumArchitectExperienceCore = core
+        copy.setTool(mirror.tool)
+        if let change = mirror.preview {
+            copy.setPreview(change)
+        } else {
+            copy.clearPreview()
+        }
+        copy.inspect(mirror.inspectedCell)
+        if orbit.isAuthored {
+            copy.resetView()
+        } else {
+            copy.setOrbit(orbit)
+        }
+        presentedCache = (key: key, core: copy)
+        return copy
+    }
+
+    /// Takes what the adapter made of the presentation state into the presenter and the mirror (feature 514): the
+    /// inspection (none off the board), the orbit (clamped) and the preview in words.
+    private func absorb(_ shown: MyceliumArchitectExperienceCore) {
+        if mirror.inspectedCell != shown.inspectedCell { mirror.inspectedCell = shown.inspectedCell }
+        if orbit != shown.orbit { orbit = shown.orbit }
+        let orbited: Bool = !orbit.isAuthored
+        if mirror.orbited != orbited { mirror.orbited = orbited }
+        var label: String?
+        if let preview = shown.preview { label = MyceliumArchitectMirror.previewText(preview, level: shown.play.level) }
+        if mirror.previewLabel != label { mirror.previewLabel = label }
+    }
+
+    /// Re-applies the presentation state to the last core seen, so tests, the description and the next gesture read
+    /// it (feature 514). The last snapshot is replaced only once a frame was drawn (the probes and the gestures wait for
+    /// the first frame).
+    private func refresh() {
+        guard let base = lastCore else { return }
+        let shown: MyceliumArchitectExperienceCore = presented(base)
+        absorb(shown)
+        if lastSnapshot != nil { lastSnapshot = shown.snapshot(time: lastTime) }
+    }
+
+    /// Draws `core` at host tier `tier`, logging tier changes; the drawn snapshot carries the presentation state.
     func draw(_ core: MyceliumArchitectExperienceCore, tier: Int, context: RenderContext, frame: FrameInfo) throws {
         let drawn: MyceliumArchitectTier = MyceliumArchitectTier.of(tier)
         if tierLog.last?.tier != drawn.index {
@@ -235,7 +423,10 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
         }
         follow(core)
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
-        let snapshot: MyceliumArchitectSceneSnapshot = core.snapshot(time: time)
+        lastTime = time
+        let shown: MyceliumArchitectExperienceCore = presented(core)
+        absorb(shown)
+        let snapshot: MyceliumArchitectSceneSnapshot = shown.snapshot(time: time)
         lastSnapshot = snapshot
         try scene.render(snapshot, tier: drawn, context: context, frame: frame)
     }
@@ -264,11 +455,13 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
         return probes
     }
 
-    /// The state in words; also refreshes the mirror.
+    /// The state in words; also refreshes the mirror. Since feature 514 it ends with the tool, the preview in words,
+    /// the inspected cell's words ("Inspected " and the kernel's cell description) and the last explanation or refusal.
     func describe(_ core: MyceliumArchitectExperienceCore) -> String {
         let play: MyceliumArchitectPlay = core.play
         let level: MyceliumArchitectLevel = play.level
         follow(core)
+        refresh()
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
@@ -301,12 +494,148 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
             mirror.status = played ? "Playing" : "Ready"
             mirror.failureText = nil
         }
+        var extras: [String] = ["Tool: " + mirror.toolLabel]
+        if let preview = mirror.previewLabel { extras.append(preview) }
+        if let inspected = mirror.inspectedLabel { extras.append("Inspected " + inspected) }
+        if let message = mirror.message { extras.append(message) }
+        for extra in extras {
+            if !text.hasSuffix(" ") { text += " " }
+            text += extra.hasSuffix(".") ? extra : extra + "."
+        }
         return text
     }
 
-    /// The control panel.
+    /// The control panel: every kernel control sends through ``send(_:_:port:)`` (refusals shown and logged); the tool
+    /// buttons, "Place at cursor", "Inspect cursor", "Inspect: none" and "Reset view" reach the presenter (feature 514).
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(MyceliumArchitectControls(port: port, mirror: mirror))
+        AnyView(MyceliumArchitectControls(port: port, mirror: mirror,
+                                          sendAction: { [weak self] (control: String, values: [Double]) in
+                                              self?.send(control, values, port: port)
+                                          },
+                                          chooseTool: { [weak self] (tool: MyceliumArchitectTool) in
+                                              self?.chooseTool(tool)
+                                          },
+                                          placeAtCursor: { [weak self] in
+                                              self?.placeAtCursor(port: port)
+                                          },
+                                          inspect: { [weak self] (cell: MyceliumArchitectCell?) in
+                                              self?.inspect(cell)
+                                          },
+                                          resetView: { [weak self] in
+                                              self?.resetView()
+                                          }))
+    }
+
+    // MARK: Gestures and presentation (feature 514)
+
+    /// The gesture controller's state (diagnostics, FR-R02G2204-013).
+    var gestureState: MyceliumArchitectGestureController.State { gestures.state }
+
+    /// The placement tool (diagnostics; the panel's).
+    var tool: MyceliumArchitectTool { mirror.tool }
+
+    /// The previewed change, if any (diagnostics).
+    var previewChange: MyceliumArchitectAction? { mirror.preview }
+
+    /// The inspected cell, if any (diagnostics).
+    var inspectedCell: MyceliumArchitectCell? { mirror.inspectedCell }
+
+    /// The canvas gestures place, clear, seed and unseed, and show pulses; the preview, the inspection and the orbit
+    /// are presentation state.
+    var gestureActions: Set<String> {
+        ["cell.nutrient", "cell.blocker", "cell.clear", "root.seed", "root.unseed", "growth.show"]
+    }
+
+    /// The native controls send every declared control.
+    var nativeActions: Set<String> { Set(Core.actionIDs) }
+
+    /// Routes a canvas touch through the gesture controller with the drawn snapshot, the tool and the orbit, and
+    /// applies what it returns, in order: a kernel action through ``send(_:_:port:)`` (one each; the preview is
+    /// dropped), a pulse through `growth.show [pulse]` (presentation only), an inspection, a preview (judged by the
+    /// adapter and drawn), an orbit, a reset view and an explanation to the mirror's message. A finished, orbiting or
+    /// cancelled gesture leaves no preview.
+    func pointer(_ event: PointerEvent, viewSize: Vec2, port: ExperienceActionPort) {
+        guard let drawn = lastSnapshot else { return }
+        let actions: [MyceliumArchitectGestureAction] = gestures.handle(event, viewSize: viewSize, snapshot: drawn,
+                                                                        tool: mirror.tool, orbit: orbit)
+        for action in actions { apply(action, port: port) }
+        let state: MyceliumArchitectGestureController.State = gestures.state
+        if state == .idle || state == .orbiting || state == .cancelled { mirror.preview = nil }
+        refresh()
+    }
+
+    /// Applies one gesture action (see ``pointer(_:viewSize:port:)``).
+    private func apply(_ action: MyceliumArchitectGestureAction, port: ExperienceActionPort) {
+        switch action {
+        case let .send(control, values):
+            mirror.preview = nil
+            send(control, values, port: port)
+        case let .showPulse(pulse):
+            send("growth.show", [Double(pulse)], port: port)
+        case let .inspect(cell):
+            mirror.inspectedCell = cell
+        case let .preview(change):
+            mirror.preview = change
+        case .clearPreview:
+            mirror.preview = nil
+        case let .orbit(turned):
+            orbit = turned.clamped()
+        case .resetView:
+            orbit = .authored
+        case let .explain(reason):
+            mirror.message = reason
+        }
+    }
+
+    /// Cancels the touches in progress (suspension): nothing is sent and the preview disappears.
+    func cancelPointers() {
+        gestures.cancel()
+        mirror.preview = nil
+        refresh()
+    }
+
+    /// Chooses the placement tool ("Nutrient tool" or "Blocker tool"; presentation only, nothing is sent).
+    func chooseTool(_ tool: MyceliumArchitectTool) {
+        mirror.tool = tool
+        refresh()
+    }
+
+    /// "Place at cursor": sends the tool's placement (`cell.nutrient` or `cell.blocker`) on the panel's cursor cell
+    /// through ``send(_:_:port:)``.
+    @discardableResult
+    func placeAtCursor(port: ExperienceActionPort) -> ActionResult {
+        let cell: MyceliumArchitectCell = mirror.cursor
+        return send(mirror.tool.controlID, [Double(cell.column), Double(cell.row)], port: port)
+    }
+
+    /// Inspects `cell`, or clears the inspection with nil ("Inspect: none") or a cell off the board (presentation only).
+    func inspect(_ cell: MyceliumArchitectCell?) {
+        mirror.inspectedCell = cell
+        refresh()
+    }
+
+    /// Returns the camera to the authored view ("Reset view"; presentation only).
+    func resetView() {
+        orbit = .authored
+        refresh()
+    }
+
+    /// Sends `control` with `values`, shows a refusal in words in the panel and keeps its bare code in ``refusalLog``;
+    /// an accepted action leaves no message.
+    @discardableResult
+    func send(_ control: String, _ values: [Double], port: ExperienceActionPort) -> ActionResult {
+        // Cleared first, so the description the shell takes after an accepted action carries no stale message.
+        mirror.message = nil
+        let result: ActionResult = port.send(control, values)
+        if !result.isAccepted {
+            mirror.message = MyceliumArchitectMirror.refusalMessage(code: result.code)
+            refusalLog.append(MyceliumArchitectMirror.bareCode(result.code))
+            if refusalLog.count > Self.refusalLogLimit {
+                refusalLog.removeFirst(refusalLog.count - Self.refusalLogLimit)
+            }
+        }
+        refresh()
+        return result
     }
 }
 #endif

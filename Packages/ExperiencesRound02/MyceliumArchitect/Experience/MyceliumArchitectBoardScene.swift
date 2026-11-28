@@ -17,6 +17,11 @@
 // (`MyceliumArchitectSceneGeometry.fallback`: ambient 1, the palette colours, the broken marks included) and keeps the
 // reason; nothing here can reach the kernel. A zero-sized drawable is cleared and nothing else is drawn. Modelled on
 // `BinaryGardensSystemScene` (feature 503).
+// Feature 514 (R02-G22-04) T-R02G2204-006 (FR-R02G2204-007, 008, 013): the scene draws with the snapshot's view orbit,
+// `snapshot.orbit.camera(aspect:)` (at the authored orbit the fixed camera of R02-G22-03, bit for bit), the camera the
+// picker reads, so drawing and picking agree; the meshes also depend on the snapshot's presentation state (the ghost
+// veins of a preview, the inspection ring and the orbit's drawn eye and backdrop), so a change of the preview, the
+// inspected cell or the orbit rebuilds them. The orbit last drawn is kept for diagnostics.
 #if os(iOS)
 import Foundation
 import MyceliumArchitectCore
@@ -42,6 +47,8 @@ final class MyceliumArchitectBoardScene {
     /// The `u_time` value of the last frame drawn by the shader path (tests; it still advances under Reduce Motion,
     /// where `u_motion` 0 keeps everything still).
     private(set) var lastShaderTime: Double = 0
+    /// The view orbit of the last frame drawn (feature 514; diagnostics and tests).
+    private(set) var orbit: MyceliumArchitectViewOrbit = .authored
 
     /// The glow limit passed normally (no cap below the glow program's highest gain).
     static let standardGlowLimit: Double = MyceliumArchitectShaders.maxGlowGain
@@ -84,6 +91,12 @@ final class MyceliumArchitectBoardScene {
         let actionsLeft: Int
         let tier: Int
         let fallback: Bool
+        /// The previewed change and its verdict (feature 514: the ghost veins).
+        let preview: MyceliumArchitectPreview?
+        /// The inspected cell (feature 514: the inspection ring).
+        let inspectedCell: MyceliumArchitectCell?
+        /// The view orbit (feature 514: the drawn eye and the backdrop face it).
+        let orbit: MyceliumArchitectViewOrbit
     }
 
     private var registry: ResourceRegistry?
@@ -99,8 +112,8 @@ final class MyceliumArchitectBoardScene {
         resize(context)
     }
 
-    /// Records the new aspect; the camera follows on the next draw. The meshes face the authored eye, so they are
-    /// rebuilt only when the aspect really changed.
+    /// Records the new aspect; the camera follows on the next draw. The meshes face the drawn eye of the snapshot's
+    /// orbit, so they are rebuilt only when the aspect really changed (or the orbit, see the geometry key).
     func resize(_ context: RenderContext) {
         let next: Double = Double(max(1, context.pixelWidth)) / Double(max(1, context.pixelHeight))
         if next != aspect { geometryKey = nil }
@@ -142,7 +155,9 @@ final class MyceliumArchitectBoardScene {
         try clear.render(context, frame: frame)
         guard context.pixelWidth > 0, context.pixelHeight > 0 else { return }
         aspect = Double(context.pixelWidth) / Double(context.pixelHeight)
-        let camera: MyceliumArchitectCamera = MyceliumArchitectSceneGeometry.camera(aspect: aspect)
+        // The snapshot's orbit (feature 514): the camera the picker reads; the authored orbit is R02-G22-03's camera.
+        orbit = snapshot.orbit
+        let camera: MyceliumArchitectCamera = snapshot.orbit.camera(aspect: aspect)
         let next: GeometryKey = key(snapshot, tier: tier)
         if next != geometryKey { try rebuild(snapshot, tier: tier) }
         geometryKey = key(snapshot, tier: tier)
@@ -163,7 +178,8 @@ final class MyceliumArchitectBoardScene {
     /// The geometry key of `snapshot` at `tier`.
     private func key(_ s: MyceliumArchitectSceneSnapshot, tier: MyceliumArchitectTier) -> GeometryKey {
         GeometryKey(levelNumber: s.levelNumber, arrangement: s.arrangement, shownPulse: s.shownPulse, stage: s.stage,
-                    failure: s.failure, actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil)
+                    failure: s.failure, actionsLeft: s.actionsLeft, tier: tier.index, fallback: fallbackReason != nil,
+                    preview: s.preview, inspectedCell: s.inspectedCell, orbit: s.orbit)
     }
 
     /// Rebuilds the GPU objects for `snapshot` at `tier`: the two programs, or the unlit fallback.

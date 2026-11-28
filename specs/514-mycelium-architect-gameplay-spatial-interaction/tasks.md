@@ -36,7 +36,7 @@ MyceliumArchitect`.
 
 - [X] T-R02G2204-005 [US6] Create `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPanelWinTests.swift` (all 100 certified witnesses won — Verified 2026-11-27: 2026-11-27: all 100 witnesses won through panel actions within budget; host-4 exit=0 (.autonomy/migration/checks/R02-G22-04.host-4.json)
   through panel actions within their budgets, in groups); `--name host-4`
-- [ ] T-R02G2204-006 [US1] [US6] Edit `Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectPresenter.swift`, `MyceliumArchitectBoardScene.swift`,
+- [X] T-R02G2204-006 [US1] [US6] Edit `Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectPresenter.swift`, `MyceliumArchitectBoardScene.swift`, — Verified 2026-11-27: 2026-11-27: presenter, board scene and panel wired through the gesture controller (import VisualCoreScenes added by the lead); MyceliumArchitectExperienceTests 38 tests passed on sim-27.2, sim-27 exit=0 (.autonomy/migration/checks/R02-G22-04.sim-27.json); host 33 XCTest + 140 Swift Testing passed
   `MyceliumArchitectControls.swift` (pointer routing through the controller, tool buttons Nutrient and Blocker, place
   at cursor, Inspect: none, Reset view, ghosts and inspection drawn) and create
   `Packages/ExperiencesRound02/MyceliumArchitect/ExperienceTests/MyceliumArchitectGestureWiringTests.swift` (agent C); `--name sim-27`

@@ -12,6 +12,15 @@
 // levels that have one, the failure in words and a refused action in words; every terminal is named in words, so no
 // information is carried by colour alone. Touching the board, scrubbing the growth and full accessibility come in later
 // features of R02-G22. Modelled on `BinaryGardensControls` (feature 503).
+// Feature 514 (R02-G22-04) T-R02G2204-006 (FR-R02G2204-011, 013; clarification Q2): every kernel control sends through
+// the presenter (so refusals are shown and logged with their reason code) and every row is kept. The panel gains the
+// placement tool as two buttons, "Nutrient tool" and "Blocker tool" (never a segmented picker, which interface tests
+// cannot tap; the chosen one carries the selected trait and the value "selected"), which choose what a tap on an empty
+// site places; "Place at cursor" (one `cell.nutrient` or `cell.blocker [column, row]` by the tool on the cursor's cell);
+// "Inspect cursor" and "Inspect: none" (presentation only) with the inspected cell's words; "Reset view" (the authored
+// camera, presentation only; its value "authored" or "orbited"); and the preview in words (the predicted verdict or
+// the refusal), so no preview or inspection is carried by colour alone. Modelled on `BinaryGardensControls`
+// (feature 504).
 #if os(iOS)
 import MyceliumArchitectCore
 import SwiftUI
@@ -23,17 +32,40 @@ struct MyceliumArchitectControls: View {
     let port: ExperienceActionPort
     /// What the panel shows (and the panel's selection).
     @Bindable var mirror: MyceliumArchitectMirror
+    /// Sends a kernel control with its values through the presenter (feature 514: refusals shown and logged).
+    let sendAction: (String, [Double]) -> Void
+    /// Chooses the placement tool through the presenter (feature 514; presentation only).
+    let chooseTool: (MyceliumArchitectTool) -> Void
+    /// Sends the tool's placement on the cursor's cell through the presenter (feature 514).
+    let placeAtCursor: () -> Void
+    /// Inspects a cell, or clears the inspection with nil, through the presenter (feature 514; presentation only).
+    let inspect: (MyceliumArchitectCell?) -> Void
+    /// Returns the camera to the authored view through the presenter (feature 514; presentation only).
+    let resetView: () -> Void
+
+    /// The accessibility identifier names of the panel's elements (each prefixed by the experience's prefix), as
+    /// built: the interface tests find the controls by these names.
+    static let identifierNames: [String] = [
+        "actions", "status", "tutorial", "failure", "progress", "message", "column-minus", "column-plus", "row-minus",
+        "row-plus", "cell", "nutrient", "blocker", "clear", "direction-minus", "direction", "direction-plus", "seed",
+        "unseed", "pulse-minus", "pulse", "pulse-plus", "run", "terminals", "undo", "redo", "next-level",
+        "tool-nutrient", "tool-blocker", "place", "preview", "inspect-cursor", "inspect-none", "inspect-detail",
+        "reset-view",
+    ]
 
     /// The panel.
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 8) {
                 header
+                toolRow
                 cursorRow
                 cellRow
+                inspectRow
                 directionRow
                 pulseRow
                 playRow
+                viewRow
             }
             .padding()
         }
@@ -61,6 +93,62 @@ struct MyceliumArchitectControls: View {
             Text(message).font(.footnote)
                 .accessibilityIdentifier(port.identifier("message"))
         }
+        if let preview = mirror.previewLabel {
+            Text(preview).font(.footnote)
+                .accessibilityIdentifier(port.identifier("preview"))
+        }
+    }
+
+    /// The placement tool as two buttons (feature 514; never a segmented picker) and "Place at cursor".
+    @ViewBuilder private var toolRow: some View {
+        HStack(spacing: 12) {
+            toolButton(.nutrient, title: "Nutrient tool", name: "tool-nutrient")
+            toolButton(.blocker, title: "Blocker tool", name: "tool-blocker")
+            Button("Place at cursor") { placeAtCursor() }
+                .accessibilityLabel("Place the chosen tool's item on the cursor's cell")
+                .accessibilityValue(mirror.toolLabel + " at " + mirror.cellLabel)
+                .accessibilityIdentifier(port.identifier("place"))
+        }
+    }
+
+    /// One tool button: chooses `tool` (presentation only); the chosen one is marked selected in words and by trait.
+    private func toolButton(_ tool: MyceliumArchitectTool, title: String, name: String) -> some View {
+        let chosen: Bool = mirror.tool == tool
+        let traits: AccessibilityTraits = chosen ? .isSelected : []
+        let shown: String = chosen ? title + " ✓" : title
+        return Button(shown) { chooseTool(tool) }
+            .accessibilityLabel(title)
+            .accessibilityValue(chosen ? "selected" : "not selected")
+            .accessibilityAddTraits(traits)
+            .accessibilityIdentifier(port.identifier(name))
+    }
+
+    /// Inspect the cursor's cell or nothing (feature 514; presentation only), with the inspected cell in words.
+    @ViewBuilder private var inspectRow: some View {
+        HStack(spacing: 16) {
+            Button("Inspect cursor") { inspect(mirror.cursor) }
+                .accessibilityLabel("Inspect the cursor's cell")
+                .accessibilityValue(mirror.cellLabel)
+                .accessibilityIdentifier(port.identifier("inspect-cursor"))
+            Button("Inspect: none") { inspect(nil) }
+                .accessibilityLabel("Clear the inspection")
+                .accessibilityValue(mirror.inspectedLabel ?? "none")
+                .accessibilityIdentifier(port.identifier("inspect-none"))
+        }
+        if let words = mirror.inspectedLabel {
+            Text("Inspected " + words).font(.footnote)
+                .accessibilityLabel("Inspected cell")
+                .accessibilityValue(words)
+                .accessibilityIdentifier(port.identifier("inspect-detail"))
+        }
+    }
+
+    /// Return the camera to the authored view (feature 514; presentation only).
+    @ViewBuilder private var viewRow: some View {
+        Button("Reset view") { resetView() }
+            .accessibilityLabel("Return the camera to the authored view")
+            .accessibilityValue(mirror.orbited ? "orbited" : "authored")
+            .accessibilityIdentifier(port.identifier("reset-view"))
     }
 
     /// Move the cell cursor by a column or a row.
@@ -175,11 +263,9 @@ struct MyceliumArchitectControls: View {
     /// The cursor's column and row as action values.
     private var cellValues: [Double] { [Double(mirror.cursorColumn), Double(mirror.cursorRow)] }
 
-    /// Sends `control` and shows a refusal in words.
+    /// Sends `control` through the presenter, which shows a refusal in words and logs its code (feature 514).
     private func send(_ control: String, _ values: [Double] = []) {
-        let result = port.send(control, values)
-        mirror.message = result.isAccepted
-            ? nil : "That change was refused: \(MyceliumArchitectMirror.refusalText(code: result.code))."
+        sendAction(control, values)
     }
 }
 #endif
