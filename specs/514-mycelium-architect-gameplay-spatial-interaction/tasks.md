@@ -27,7 +27,7 @@ MyceliumArchitect`.
   clarification Q1 priority and hit rules, cast onto z = 0, direction by board angle, pulse by the gauge formula) with
   `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPickerTests.swift` (500 seeded cases against an independent projection at several sizes
   and orbits); `--name host-2`
-- [ ] T-R02G2204-004 [P] [US1] [US2] [US3] [US4] [US5] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectGestureController.swift`
+- [X] T-R02G2204-004 [P] [US1] [US2] [US3] [US4] [US5] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectGestureController.swift` — Verified 2026-11-27: 2026-11-27: gesture controller against the real picker, 139 MyceliumArchitect tests passed (gauge scan along the projected plate axis); host-3 exit=0 (.autonomy/migration/checks/R02-G22-04.host-3.json)
   (agent B: clarification Q2–Q5 state machine, feature 504's constants, reasons in words) with
   `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectGestureControllerTests.swift` (taps, presses, previews, seed and unseed drags, scrubs,
   second fingers, cancels, outside playing; 200 previews equal the kernel's); `--name host-3`
