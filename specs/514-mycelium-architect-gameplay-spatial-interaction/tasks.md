@@ -61,3 +61,10 @@ files (snapshot, geometry, adapter, orbit, docs) stay with the lead. MVP: Storie
 FR-003, 004, 005 → 003, 004; FR-006 → 002, 004; FR-007 → 003; FR-008 → 002, 004; FR-009, 010 → 004; FR-011 → 005, 006;
 FR-012 → 003 … 006; FR-013 → 002, 006; FR-014 → 002; SC-001 … 004, 006 → 003, 004; SC-005 → 005; SC-007 → 007 … 011;
 SC-008 → 012.
+
+## Phase 6: Convergence
+
+- [ ] T-R02G2204-014 Make a site press send its change only when the release point picks the same cell (otherwise
+  `.clearPreview` only) in `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectGestureController.swift`,
+  with a test in `MyceliumArchitectGestureControllerTests.swift` (a release under 16 points over a neighbouring cell
+  sends nothing) per FR-R02G2204-002 (partial); `--name host-5`
