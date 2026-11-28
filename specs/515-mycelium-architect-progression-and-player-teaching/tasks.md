@@ -82,8 +82,11 @@ campaign covers the game). Agents model their files on Binary Gardens' (feature 
   1 … 100 (SC-R02G2205-005), damaged and newer payloads refused); update in place only the assertions clarification Q5
   names — the declared control list, schema version 2, digest domain v2 and `level.next`'s wrap — in
   `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectExperienceCoreTests.swift`, `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPreviewTests.swift`,
-  `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPanelWinTests.swift` and the simulator identity and gesture wiring tests where they
-  assert them; update `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectScenarios.swift` (`nextLevel` without wrap; as feature
+  `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPanelWinTests.swift`,
+  `Packages/ExperiencesRound02/MyceliumArchitect/ExperienceTests/MyceliumArchitectExperienceIdentityTests.swift` (control list) and
+  `Packages/ExperiencesRound02/MyceliumArchitect/ExperienceTests/MyceliumArchitectGestureWiringTests.swift` where they assert them — the preview test's and the
+  wiring test's `level.next` on a fresh opening now first win the level's certified plan and the run (an unwon level
+  opens nothing, so `level.next` would be refused `r02-g22.locked`); update `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectScenarios.swift` (`nextLevel` without wrap; as feature
   505, full-playthrough's campaign wins open each next level before `level.next`, rows that move past a level first
   win its certified plan and the run, a row on level 100 chooses level 1 with `level.select [1]` instead, and rejection
   also refuses the new controls' wrong value counts) and regenerate `Packages/ExperiencesRound02/MyceliumArchitect/scenario-manifest.json`
