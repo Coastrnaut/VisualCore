@@ -57,7 +57,7 @@ only after every agent has reported; read `exit=` before ticking). Commit after 
   `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f`
 - [X] T-R02G2203-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0
   `--name host-full`
-- [ ] T-R02G2203-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2203-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: reference-1 exit=0
 - [ ] T-R02G2203-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2203-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2203-012 {device} After ImplementationLock-100: frame time per tier on D1/D2/D3 (SC-R02G2203-006)
