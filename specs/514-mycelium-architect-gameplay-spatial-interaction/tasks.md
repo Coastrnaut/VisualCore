@@ -23,7 +23,7 @@ MyceliumArchitect`.
 
 ## Phase 3: Stories 1–5 — gestures (P1) 🎯
 
-- [ ] T-R02G2204-003 [P] [US1] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectPicker.swift` (agent A:
+- [X] T-R02G2204-003 [P] [US1] [US2] [US3] [US4] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectPicker.swift` (agent A: — Verified 2026-11-27: 2026-11-27: picker with root-cap priority correction (spec Q1, research R1); host-2 exit=0 (.autonomy/migration/checks/R02-G22-04.host-2.json)
   clarification Q1 priority and hit rules, cast onto z = 0, direction by board angle, pulse by the gauge formula) with
   `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectPickerTests.swift` (500 seeded cases against an independent projection at several sizes
   and orbits); `--name host-2`

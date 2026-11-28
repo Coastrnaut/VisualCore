@@ -53,8 +53,10 @@ not-empty, not-a-site, over-limit, already-seeded, seed-limit, not-seeded and st
 
 - Q: How is a touch picked? → A: at touch-down the targets are projected through the drawn camera (orbit included) and
   the one drawn last wins, in the reverse of the painter's order: (1) the actions bars and the terminal pip row are empty
-  space; (2) the weight gauge: the finger cast onto the plane z = 0 lies inside the plate rectangle; (3) a sprout: within
-  12 points of the projected segment from the root's centre to its tip (later directions first); (4) the root: within
+  space; (2) the weight gauge: the finger cast onto the plane z = 0 lies inside the plate rectangle; (3) a sprout: outside
+  the root's projected cap radius and within 12 points of the projected segment from the root's centre to its tip
+  (later directions first) — inside the cap the root wins, so a seed drag starts from the root on a seeded level too
+  (implementation correction, 2026-11-27: the 0.4·s sprouts end only 0.04·s beyond the 0.36·s cap); (4) the root: within
   the projected cap radius grown by 12 points; (5) a cell: the finger cast onto z = 0 lies inside the board, giving
   (column, row) = (⌊x/s + W/2⌋, ⌊H/2 − (y − 0.05)/s⌋); (6) anything else, and unusable input (a non-finite point, a size
   that is not finite and positive), is empty space. Thresholds and the 12-point allowance are feature 504's. Impact:

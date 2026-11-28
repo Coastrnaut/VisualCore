@@ -2,7 +2,9 @@
 
 - **R1 Reverse painter's order for picking.** Decision: gauge, sprouts, root, cells, in that priority (the reverse of
   feature 513's order), through the drawn camera with the orbit. Rationale: the target drawn last is what the finger
-  sees; feature 504.
+  sees; feature 504. Correction (implementation, 2026-11-27): the sprouts (0.4·s from the root's centre) end only
+  0.04·s beyond the root's 0.36·s cap, so inside the projected cap the root outranks the sprouts; otherwise a press on
+  the root of a seeded level would pick the latest sprout and a seed drag could not start.
 - **R2 Cells by casting onto the board plane.** Decision: the finger's ray is cast onto z = 0 and the cell index is
   computed from the fit rule. Rationale: exact, O(1) per cell, and independent of tier geometry.
 - **R3 One tool, two buttons.** Decision: the tool (nutrient or blocker) is presentation state chosen by two buttons.
