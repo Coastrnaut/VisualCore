@@ -9,7 +9,7 @@ MyceliumArchitect`.
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2204-001 Baselines after R02-G22-03 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name
+- [X] T-R02G2204-001 Baselines after R02-G22-03 is recorded: `--name baseline-host`, `--name baseline-timing`, `--name — Verified 2026-11-27: 2026-11-27: baseline-host, baseline-timing, baseline-round02-1/2/3c/3e/3f exit=0 (.autonomy/migration/checks/R02-G22-04.baseline-*.json)
   baseline-round02-1` (`VoxelOrigami|MyceliumArchitect`), `-2`, `-3c`, `-3e`, `-3f`
 
 ## Phase 2: Foundational
