@@ -78,3 +78,32 @@ presentation of later features.
   registered in the one app as a candidate (not available) with 100 levels and the pinned catalog digest; simulator
   tests check frames of levels 1, 21, 41, 61 and 81 at every tier against the CPU reference.
 
+## Gameplay spatial interaction (feature 514, R02-G22-04)
+
+- **Picking.** `MyceliumArchitectPicker` projects the drawn snapshot through the drawn camera
+  (`MyceliumArchitectSceneGeometry.camera(aspect:orbit:)`, the view orbit included) and tries the parts drawn last first:
+  the actions bars and the terminal pip row (empty space), the weight gauge's plate (the finger cast onto z = 0), a
+  sprout within 12 points of its projected segment but outside the root's projected cap (later directions first), the
+  root within its projected cap radius grown by 12 points, a cell by the cast point, else empty space. Inside the cap
+  the root outranks the sprouts: they end only 0.04·s beyond it, and a seed drag must be able to start on a seeded
+  level.
+- **Gestures.** `MyceliumArchitectGestureController` turns touches into actions with feature 504's constants (tap under
+  10 points and 0.5 s, drag from 16 points, double tap within 0.35 s and 22 points). A press on an empty site or a
+  placed item previews the current tool's placement or the clear (`MyceliumArchitectPreview`: the kernel's own growth
+  report for the changed arrangement, or its refusal, drawn as dashed ghost veins) and sends exactly one
+  `cell.nutrient`, `cell.blocker` or `cell.clear` on release under 16 points; a refused change is still sent once so
+  its refusal is shown. A drag from the root previews and sends `root.seed` in the direction nearest the cast travel
+  (at least 0.5·s); a drag from a sprout released on the root sends `root.unseed`. A tap on another cell inspects it
+  (a marker ring and the kernel's words), a second tap clears it; taps on the root or a sprout explain the drag. The
+  gauge shows the pulse under the finger by tap or scrub (`growth.show`, presentation only, any stage). Two fingers
+  orbit the view (90° per view width, 60° per view height) within yaw ±60° and pitch −20° … +35°, re-fitted with the
+  5 % margin; a double tap on empty space returns to the authored view. Kernel actions are produced only while playing;
+  otherwise the gesture says why. The tool, preview, inspection and orbit never enter the digest; an opening,
+  `level.next`, a reset or a restore returns them to their defaults.
+- **Panel parity.** The panel keeps every control (cursor, direction, Nutrient, Blocker, Clear, Seed, Unseed, Run,
+  Undo, Redo, pulses) and gains two tool buttons (Nutrient tool and Blocker tool, never a segmented picker), "Place at
+  cursor", "Inspect cursor", "Inspect: none" with the inspected cell's words, the preview's verdict in words and "Reset
+  view"; every kernel action goes through the presenter, which shows refusals in words and keeps their bare codes in
+  `refusalLog` (at most 64). A host test wins all 100 certified levels through the panel's actions within their
+  budgets; simulator wiring tests drive scripted pointer events through the presenter.
+

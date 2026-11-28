@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G22-03: Mycelium Architect hero renderer).
+Last updated: 2026-11-27 (R02-G22-04: Mycelium Architect gameplay spatial interaction).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mycelium Architect gameplay spatial interaction** (R02-G22-04, 2026-11-27). Host: the `MyceliumArchitect` filter
+  now runs 33 XCTest and 140 Swift Testing tests (about 14 s): preview and orbit (10: orbit bounds and the 5 % fit at 203
+  cameras, 200 previews equal the play's own result, digest untouched by tool, preview, inspection and orbit), picker
+  (7: 500 seeded cases against an independent projection), gesture controller (17: taps, presses, seed and unseed
+  drags, scrubs, orbit, cancels, outside playing, 200 previews) and panel wins (4: all 100 witnesses through panel
+  actions within budget). Simulator: `MyceliumArchitectExperienceTests` now runs 38 (9 wiring tests: scripted pointer
+  events through the presenter). Lessons: the 0.4·s sprouts end only 0.04·s beyond the 0.36·s root cap, so the root
+  must outrank them inside the cap or a seed drag cannot start on a seeded level; a horizontal scan finds too few
+  gauge points under a yawed orbit, so tests sample along the projected plate axis.
 - **Mycelium Architect hero renderer** (R02-G22-03, 2026-11-27). Host: adapter, geometry and shader tests in the
   `MyceliumArchitect` filter (33 XCTest, 102 Swift Testing). Simulator: `MyceliumArchitectExperienceTests` (29 tests:
   frames of levels 1, 21, 41, 61, 81 at each tier against the CPU reference, fallback, tiers, identity). Lesson: the

@@ -43,7 +43,7 @@ MyceliumArchitect`.
 
 ## Phase 5: Regression, documentation and close
 
-- [ ] T-R02G2204-007 Docs: `docs/architecture/mycelium-architect.md` (gestures), package README,
+- [X] T-R02G2204-007 Docs: `docs/architecture/mycelium-architect.md` (gestures), package README, — Verified 2026-11-27: 2026-11-27: architecture gestures section, package README, automatedtesting; round02-host-1/2/3c/3e/3f exit=0 (.autonomy/migration/checks/R02-G22-04.round02-host-*.json)
   `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f`
 - [ ] T-R02G2204-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`,
   `--name host-full`

@@ -1094,4 +1094,7 @@ metrics and the witness files in `docs/games/mycelium-architect/levels/`.
 Feature 513 (R02-G22-03) adds the hero renderer: the adapter, scene snapshot, board geometry with a CPU reference,
 GLSL programs, three quality tiers, the iOS experience `MyceliumArchitectExperience` (presenter, board scene, panel)
 and the candidate registration in the one app.
+Feature 514 (R02-G22-04) adds gameplay spatial interaction: the analytic picker, the gesture controller (placements,
+clears, seed and unseed drags, pulse scrubs, cell inspection, previews drawn as ghost veins), the two-finger view orbit
+and the panel's tool buttons, "Place at cursor", inspection and "Reset view".
 See [docs/architecture/mycelium-architect.md](../../docs/architecture/mycelium-architect.md).
