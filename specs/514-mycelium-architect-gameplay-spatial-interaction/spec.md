@@ -156,9 +156,11 @@ Every action stays available in the panel, so every certified level can be won w
 - **A touch that never moves far enough:** a tap is below 10 points and lifted within 0.5 s; a press lifted at 0.5 s or
   later without moving commits the previewed placement only if a ghost was shown; two taps on empty space within 0.35 s
   and 22 points reset the view.
-- **A tap on a cell that is not a site, or a full count:** nothing is sent; the kernel's reason is given in words.
-- **A drag from the root that ends in an already seeded direction or with the seed limit reached:** nothing is sent; the
-  reason is given; a drag back onto the root from a starting seed is refused as locked.
+- **A tap on a cell that is not a site:** it inspects the cell (nothing is sent). **A tap on a site with the tool's count
+  full:** the change is sent once and the kernel's refusal (reason and code) is shown, as feature 504 does.
+- **A drag from the root that ends in an already seeded direction or with the seed limit reached, or a drag of a
+  starting seed back onto the root:** the change is sent once and the kernel's refusal (already seeded, seed limit,
+  starting seed) is shown with its reason code.
 - **Cells under each other** (a terminal cap over its cell, a sprout over a neighbouring site): the target drawn last is
   picked, as drawn.
 - **A finished play or a play not running:** placements and seeds send nothing (scrubbing and inspecting still work);
@@ -175,8 +177,8 @@ Every action stays available in the panel, so every certified level can be won w
 ### Functional Requirements
 
 - **FR-R02G2204-001**: A tap on an empty site with the nutrient or blocker tool while playing MUST send exactly one
-  placement of that kind for that cell; a tap on a placed item MUST send exactly one clear; any other tap on a site MUST
-  send nothing and say why.
+  placement of that kind for that cell; a tap on a placed item MUST send exactly one clear; a change the kernel refuses
+  (a full count) MUST be sent once and its refusal shown with its reason code.
 - **FR-R02G2204-002**: A press held on a site while playing MUST show the ghost growth and verdict of the placement the
   tool would make (or the clear), computed by the kernel's own rules, and send it only on release over the same cell.
 - **FR-R02G2204-003**: A drag that starts on the root while playing MUST preview the seed in the direction nearest the
