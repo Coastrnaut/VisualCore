@@ -92,7 +92,7 @@ campaign covers the game). Agents model their files on Binary Gardens' (feature 
   also refuses the new controls' wrong value counts) and regenerate `Packages/ExperiencesRound02/MyceliumArchitect/scenario-manifest.json`
   (`UPDATE_SCENARIO_MANIFEST=1`); lead; `--name host-4 -- swift test --package-path Packages/ExperiencesRound02
   --filter MyceliumArchitect`
-- [ ] T-R02G2205-005 Edit `Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectPresenter.swift` (the tutorial step text replacing the single
+- [X] T-R02G2205-005 Edit `Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectPresenter.swift` (the tutorial step text replacing the single — Verified 2026-11-27: 2026-11-27: sim-27 exit=0 (sim-27.2, MyceliumArchitectExperienceTests: 50 tests in 6 suites; 11 teaching tests)
   tutorial sentence, the hint at its current level — "Hint" raises the level 1 → 2 → 3, any play change resets it, the
   search off the main actor with a generation counter so a stale search never owns the hint — and the failure
   explanation as panel text, with "Band b of 5", the goal "Win in at most k actions for 3 stars" ("1 action" in the

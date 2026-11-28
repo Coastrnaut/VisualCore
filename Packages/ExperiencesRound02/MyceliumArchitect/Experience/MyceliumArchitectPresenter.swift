@@ -29,6 +29,21 @@
 // is shown in the panel and its bare code kept in the refusal log (at most 64). An opening, `level.next`, reset or
 // restore (a new level number, or records that no longer extend the followed ones) returns the tool, the preview, the
 // inspection and the orbit to their defaults, as the adapter does. Modelled on `BinaryGardensPresenter` (feature 504).
+// Feature 515 (R02-G22-05) T-R02G2205-005 (FR-R02G2205-001 … 005, 008, 010; clarifications Q1 … Q5) adds teaching
+// and progression to the panel: the tutorial instruction (`core.tutorial.text` until the step is `done`, replacing the
+// presenter's own tutorial sentence, which is kept only as a name), the hint at its current level (`showHint()`: each
+// press raises the level 1 → 2 → 3; any change of the play — an accepted action, undo, redo, an opening, a level or a
+// mode — hides it, so the next press shows level 1; one search per play through
+// `MyceliumArchitectHints.hint(level:play:certified:)` with the core's certified plan, run off the main actor in a
+// detached task, with a generation counter so that a stale search never owns the hint state; hints never send an
+// action), the failure explanation (`core.failureExplanation`, shown in the panel in place of the mirror's short
+// `failureText`, which stays the status line), the mode, the open levels, the level's band ("Band b of 5"), its goal
+// ("Win in at most k actions for 3 stars", "1 action" in the singular, k the certified plan's
+// `core.certifiedActionCount`) and its best stars ("Best: s of 3 stars" or "Best: not won yet",
+// `core.progress.stars(of:)`). The description includes them. The daily level is asked for with today's local calendar
+// date read here (`playDaily(port:date:)`); the core never reads a clock. A refused `level.select` or `level.next`
+// (`r02-g22.locked`: "that level is not open yet") and an impossible date (`r02-g22.date`: "that date cannot be used")
+// read in words and are logged by code like every refusal. Modelled on `BinaryGardensPresenter` (feature 505).
 #if os(iOS)
 import Foundation
 import MyceliumArchitectCore
@@ -58,7 +73,7 @@ final class MyceliumArchitectMirror {
     var measureLabel: String = ""
     /// The level in words.
     var targetLabel: String = ""
-    /// The tutorial in words on levels that have one; nil otherwise.
+    /// The tutorial instruction of the current step (`core.tutorial.text`, feature 515); nil once the step is `done`.
     var tutorialText: String?
     /// The shown pulse, the adapter's (0 … the pulses run).
     var shownPulse: Int = 0
@@ -82,6 +97,63 @@ final class MyceliumArchitectMirror {
     var inspectedCell: MyceliumArchitectCell?
     /// Whether the camera is turned away from the authored view (feature 514; presentation only).
     var orbited: Bool = false
+    /// The hint level shown, 1 … 3; 0 while no hint is shown (feature 515; presentation only).
+    var hintLevel: Int = 0
+    /// The hint shown at ``hintLevel``, ``MyceliumArchitectPresenter/searchingText`` while its search runs, or
+    /// ``MyceliumArchitectPresenter/noHintText`` when the play has no hint; nil while no hint is shown (feature 515).
+    var hintText: String?
+    /// The failure explanation (`core.failureExplanation`: what went wrong, then the advice), nil without a failure
+    /// (feature 515).
+    var explanation: String?
+    /// The mode (feature 515).
+    var mode: MyceliumArchitectMode = .campaign
+    /// The highest open level (feature 515).
+    var frontier: Int = 1
+    /// The level's difficulty band, 1 … 5 (the five bands of 20; feature 515).
+    var band: Int = 1
+    /// The best stars of the current level, 0 … 3 (0 while it has not been won; feature 515).
+    var bestStars: Int = 0
+    /// The stars of each won level, by level number (the level picker; feature 515).
+    var stars: [Int: Int] = [:]
+    /// The goal in words: "Win in at most k actions for 3 stars" (feature 515).
+    var goalLabel: String = ""
+    /// The level the picker holds, 1 … ``frontier`` (presentation only; feature 515).
+    var pickedLevel: Int = 1
+
+    /// "Band b of 5" (feature 515).
+    var bandLabel: String { "Band \(band) of 5" }
+
+    /// "Best: s of 3 stars", or "Best: not won yet" while the level has not been won (feature 515).
+    var starsLabel: String {
+        bestStars > 0 ? "Best: \(bestStars) of 3 stars" : "Best: not won yet"
+    }
+
+    /// "Mode: campaign", "Mode: practice" or "Mode: daily" (feature 515).
+    var modeLabel: String { "Mode: " + Self.modeName(mode) }
+
+    /// The mode's name: campaign, practice or daily (feature 515).
+    nonisolated static func modeName(_ mode: MyceliumArchitectMode) -> String {
+        switch mode {
+        case .campaign: return "campaign"
+        case .practice: return "practice"
+        case .daily: return "daily"
+        }
+    }
+
+    /// The picker's line for level `level`: "Level n, band b", with ", s of 3 stars" once it has been won
+    /// (feature 515).
+    func levelLabel(_ level: Int) -> String {
+        let band: Int = MyceliumArchitectProgress.band(of: level)
+        if let won = stars[level] { return "Level \(level), band \(band), \(won) of 3 stars" }
+        return "Level \(level), band \(band)"
+    }
+
+    /// The goal with `certified` actions in the certified plan (feature 515): "Win in at most k actions for 3 stars"
+    /// ("1 action" in the singular).
+    nonisolated static func goalText(certified: Int) -> String {
+        let unit: String = certified == 1 ? "action" : "actions"
+        return "Win in at most \(certified) \(unit) for 3 stars"
+    }
 
     /// The board's width of the followed play (1 while no play is followed).
     var boardWidth: Int { max(play?.level.width ?? 1, 1) }
@@ -214,6 +286,8 @@ final class MyceliumArchitectMirror {
         case "r02-g22.stale": return "the play changed before the action arrived"
         case "r02-g22.level": return "the next level could not be made"
         case "r02-g22.generation": return "the next level could not be made"
+        case MyceliumArchitectExperienceRule.locked: return "that level is not open yet"
+        case MyceliumArchitectExperienceRule.date: return "that date cannot be used"
         case MyceliumArchitectExperienceRule.notWhole: return "the column, row, direction and pulse must be whole "
             + "numbers"
         case MyceliumArchitectExperienceRule.pulse: return "only the pulses the growth has run can be shown"
@@ -241,7 +315,8 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
     /// The pure core this presenter draws.
     typealias Core = MyceliumArchitectExperienceCore
 
-    /// The tutorial shown on levels that have one (presentation, not a kernel stage).
+    /// The single tutorial sentence of feature 513, no longer shown: since feature 515 the panel shows the tutorial
+    /// step's instruction (`core.tutorial.text`). Kept as a name.
     static let tutorial: String = "Place nutrients and blockers on the marked sites and seed directions at the root so "
         + "the growing veins reach every terminal cap without entering a toxin, running out of nutrient or growing "
         + "heavier than the limit; then run the growth."
@@ -275,6 +350,22 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
     private var lastTime: Double = 0
     /// The level number of the play last followed (feature 514: a new one is a new play).
     private var followedLevel: Int?
+    /// The latest core seen (feature 515): hints, the daily date and the progress lines read it.
+    private(set) var latestCore: MyceliumArchitectExperienceCore?
+    /// The play the shown hint belongs to; nil while no hint is shown (feature 515).
+    private var hintPlay: MyceliumArchitectPlay?
+    /// The hint texts of levels 1 … 3 searched for a play (nil texts: the play has no hint), one search per play
+    /// (feature 515).
+    private var hintCache: (play: MyceliumArchitectPlay, texts: [String]?)?
+    /// The search under way, off the main actor, for ``hintPlay`` (feature 515); tests may await its end.
+    private(set) var hintSearch: Task<Void, Never>?
+    /// The hint generation (feature 515): raised by every new search and every hidden hint; a search whose generation
+    /// is no longer current owns nothing.
+    private(set) var hintGeneration: Int = 0
+    /// What the hint line shows while the search runs (feature 515).
+    static let searchingText: String = "Finding a hint…"
+    /// What the hint line shows when the play has no hint (won, or not under way; feature 515).
+    static let noHintText: String = "No hint now: the level is not being played."
 
     /// What a presented core depends on (feature 514): the host's core (its `==` compares the level and the play),
     /// the shown pulse (not in `==`) and the presentation state.
@@ -422,6 +513,7 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
             tierLog.append(MyceliumArchitectTierChange(tier: drawn.index, reason: reason))
         }
         follow(core)
+        if latestCore != core { absorbProgress(core) }
         let time: Double = frame.time.isFinite ? max(0, frame.time) : 0
         lastTime = time
         let shown: MyceliumArchitectExperienceCore = presented(core)
@@ -457,15 +549,17 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
 
     /// The state in words; also refreshes the mirror. Since feature 514 it ends with the tool, the preview in words,
     /// the inspected cell's words ("Inspected " and the kernel's cell description) and the last explanation or refusal.
+    /// Since feature 515 a failure is followed by its explanation, and the mode, band, goal and best stars sentences
+    /// (then the tutorial instruction and the hint when shown) come before the tool.
     func describe(_ core: MyceliumArchitectExperienceCore) -> String {
         let play: MyceliumArchitectPlay = core.play
         let level: MyceliumArchitectLevel = play.level
         follow(core)
         refresh()
+        absorbProgress(core)
         mirror.levelNumber = core.levelNumber
         mirror.actionsLeft = play.actionsLeft
         mirror.budget = level.budget
-        mirror.tutorialText = level.tutorial ? Self.tutorial : nil
         let sites: Int = level.sites?.count ?? 0
         mirror.targetLabel = "Level: \(level.width) × \(level.height) cave, \(level.terminals.count) terminals, "
             + "\(level.rocks.count) rocks, \(level.toxins.count) toxins, \(sites) sites, up to \(level.maxNutrients) "
@@ -484,6 +578,8 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
         } else if failed {
             let reason: String = MyceliumArchitectMirror.failureText(play.failure, level: level) ?? "The run failed."
             text += reason
+            // Since feature 515 the failure explanation too (what went wrong, then the advice).
+            if let explanation = mirror.explanation { text += " " + explanation }
             mirror.status = "Failed: " + reason
             mirror.failureText = reason
         } else {
@@ -494,6 +590,8 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
             mirror.status = played ? "Playing" : "Ready"
             mirror.failureText = nil
         }
+        if !text.hasSuffix(" ") { text += " " }
+        text += teachingText()
         var extras: [String] = ["Tool: " + mirror.toolLabel]
         if let preview = mirror.previewLabel { extras.append(preview) }
         if let inspected = mirror.inspectedLabel { extras.append("Inspected " + inspected) }
@@ -506,9 +604,10 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
     }
 
     /// The control panel: every kernel control sends through ``send(_:_:port:)`` (refusals shown and logged); the tool
-    /// buttons, "Place at cursor", "Inspect cursor", "Inspect: none" and "Reset view" reach the presenter (feature 514).
+    /// buttons, "Place at cursor", "Inspect cursor", "Inspect: none" and "Reset view" reach the presenter (feature 514);
+    /// "Hint", "Dismiss tutorial", the modes and "Play level" reach it too (feature 515).
     func makeControls(_ port: ExperienceActionPort) -> AnyView {
-        AnyView(MyceliumArchitectControls(port: port, mirror: mirror,
+        AnyView(MyceliumArchitectControls(port: port, mirror: mirror, presenter: self,
                                           sendAction: { [weak self] (control: String, values: [Double]) in
                                               self?.send(control, values, port: port)
                                           },
@@ -636,6 +735,173 @@ final class MyceliumArchitectPresenter: ExperiencePresenter {
         }
         refresh()
         return result
+    }
+
+    // MARK: Teaching and progression (feature 515, R02-G22-05)
+
+    /// The teaching and progress sentences of the description (feature 515): the mode, the band, the goal, the best
+    /// stars, then the tutorial instruction and the hint when shown; each ends in a full stop, joined by spaces.
+    private func teachingText() -> String {
+        var parts: [String] = [mirror.modeLabel, mirror.bandLabel, mirror.goalLabel, mirror.starsLabel]
+        if let tutorial = mirror.tutorialText { parts.append("Tutorial: " + tutorial) }
+        if let hint = mirror.hintText {
+            parts.append((mirror.hintLevel > 0 ? "Hint \(mirror.hintLevel) of 3: " : "Hint: ") + hint)
+        }
+        var sentences: [String] = []
+        for part in parts {
+            sentences.append(part.hasSuffix(".") || part.hasSuffix("…") ? part : part + ".")
+        }
+        return sentences.joined(separator: " ")
+    }
+
+    /// Takes the core's teaching and progress state into the mirror (feature 515): the tutorial instruction, the
+    /// failure explanation, the mode, the open levels with their stars, the band, the goal and the best stars. A change
+    /// of the play (or of the level or the mode: a fresh opening) hides the hint, so the next press shows level 1.
+    private func absorbProgress(_ core: MyceliumArchitectExperienceCore) {
+        let previous: MyceliumArchitectExperienceCore? = latestCore
+        if previous?.levelNumber != core.levelNumber { mirror.pickedLevel = core.levelNumber }
+        var reopened: Bool = false
+        if let previous, previous.levelNumber != core.levelNumber || previous.mode != core.mode { reopened = true }
+        latestCore = core
+        if let shown = hintPlay, shown != core.play || reopened { clearHint() }
+        let tutorial: String? = core.tutorial == .done ? nil : core.tutorial.text
+        if mirror.tutorialText != tutorial { mirror.tutorialText = tutorial }
+        let explanation: String? = core.failureExplanation?.text
+        if mirror.explanation != explanation { mirror.explanation = explanation }
+        if mirror.mode != core.mode { mirror.mode = core.mode }
+        let frontier: Int = core.progress.frontier
+        if mirror.frontier != frontier { mirror.frontier = frontier }
+        let picked: Int = min(max(mirror.pickedLevel, 1), frontier)
+        if mirror.pickedLevel != picked { mirror.pickedLevel = picked }
+        var stars: [Int: Int] = [:]
+        for (number, result) in core.progress.solved { stars[number] = result.stars }
+        if mirror.stars != stars { mirror.stars = stars }
+        if mirror.band != core.band { mirror.band = core.band }
+        let best: Int = core.progress.stars(of: core.levelNumber)
+        if mirror.bestStars != best { mirror.bestStars = best }
+        let goal: String = MyceliumArchitectMirror.goalText(certified: core.certifiedActionCount)
+        if mirror.goalLabel != goal { mirror.goalLabel = goal }
+    }
+
+    /// Hides the hint shown and drops a search under way; the generation is raised so that search owns nothing.
+    private func clearHint() {
+        hintSearch?.cancel()
+        hintSearch = nil
+        hintGeneration += 1
+        hintPlay = nil
+        mirror.hintLevel = 0
+        mirror.hintText = nil
+    }
+
+    /// The hint texts of levels 1 … 3 of `play` from one search (`MyceliumArchitectHints.hint(level:play:certified:)`
+    /// at level 1 against the certified plan `certified`): a nutrient, blocker, clear, seed or unseed hint gives each
+    /// level's text (`MyceliumArchitectHint.actionText(level:action:on:)` on the play's level, the same text the
+    /// adapter's `hint(level:)` gives); a run, stuck or retry hint reads the same at every level; nil when the play has
+    /// no hint (won, or not under way). Runs off the main actor.
+    nonisolated static func hintTexts(_ play: MyceliumArchitectPlay,
+                                      certified: [MyceliumArchitectAction]) -> [String]? {
+        guard let first = MyceliumArchitectHints.hint(level: 1, play: play, certified: certified) else { return nil }
+        guard let action = first.action, action != .run else {
+            return [first.text, first.text, first.text]
+        }
+        var texts: [String] = []
+        for level in 1...3 {
+            let text: String? = MyceliumArchitectHint.actionText(level: level, action: action, on: play.level)
+            texts.append(text ?? first.text)
+        }
+        return texts
+    }
+
+    /// Shows the next hint level (1 → 2 → 3, then 3 again) for the current play; never sends an action. The search
+    /// runs once per play in a detached task, never on the main actor or the frame: meanwhile the hint line reads
+    /// ``searchingText`` (a press during the search raises the level it will show); the result is shown only when its
+    /// generation is still current, and later levels come from the cache.
+    func showHint() {
+        guard let core = latestCore else { return }
+        let play: MyceliumArchitectPlay = core.play
+        let certified: [MyceliumArchitectAction] = core.certifiedPlan
+        let next: Int = hintPlay == play ? min(mirror.hintLevel + 1, 3) : 1
+        if let cached = hintCache, cached.play == play {
+            reveal(cached.texts, level: next, play: play)
+            return
+        }
+        if hintSearch != nil, hintPlay == play {
+            mirror.hintLevel = next   // the search for this play is running; it shows this level
+            return
+        }
+        hintSearch?.cancel()
+        hintGeneration += 1
+        let generation: Int = hintGeneration
+        hintPlay = play
+        mirror.hintLevel = next
+        mirror.hintText = Self.searchingText
+        hintSearch = Task.detached(priority: .userInitiated) { [weak self] in
+            let texts: [String]? = MyceliumArchitectPresenter.hintTexts(play, certified: certified)
+            await self?.finishSearch(texts, play: play, generation: generation)
+        }
+    }
+
+    /// Takes the hint texts searched for `play` by the search of `generation`: cached and shown when that generation is
+    /// still current (a stale search changes nothing, not even the handle of a newer search).
+    private func finishSearch(_ texts: [String]?, play: MyceliumArchitectPlay, generation: Int) {
+        guard generation == hintGeneration, hintPlay == play else { return }
+        hintSearch = nil
+        hintCache = (play: play, texts: texts)
+        reveal(texts, level: mirror.hintLevel, play: play)
+    }
+
+    /// Shows level `level` of `texts` for `play`, or ``noHintText`` (level 0) when the play has no hint.
+    private func reveal(_ texts: [String]?, level: Int, play: MyceliumArchitectPlay) {
+        hintPlay = play
+        guard let texts, texts.indices.contains(level - 1) else {
+            mirror.hintLevel = 0
+            mirror.hintText = Self.noHintText
+            return
+        }
+        mirror.hintLevel = level
+        mirror.hintText = texts[level - 1]
+    }
+
+    /// Ends the tutorial of the current level (`tutorial.dismiss`).
+    @discardableResult
+    func dismissTutorial(port: ExperienceActionPort) -> ActionResult {
+        send("tutorial.dismiss", [], port: port)
+    }
+
+    /// Plays open level `level` in campaign mode (`level.select [level]`; a closed level is refused in words).
+    @discardableResult
+    func selectLevel(_ level: Int, port: ExperienceActionPort) -> ActionResult {
+        send("level.select", [Double(level)], port: port)
+    }
+
+    /// Plays the daily level of `date` (`mode.daily [year, month, day]`; the local calendar date by default; the core
+    /// never reads a clock).
+    @discardableResult
+    func playDaily(port: ExperienceActionPort,
+                   date: DateComponents = MyceliumArchitectPresenter.today()) -> ActionResult {
+        send("mode.daily", Self.dateValues(date), port: port)
+    }
+
+    /// Replays the current level with the practice budget (`mode.practice`).
+    @discardableResult
+    func playPractice(port: ExperienceActionPort) -> ActionResult {
+        send("mode.practice", [], port: port)
+    }
+
+    /// Returns to the campaign (`mode.campaign`).
+    @discardableResult
+    func playCampaign(port: ExperienceActionPort) -> ActionResult {
+        send("mode.campaign", [], port: port)
+    }
+
+    /// The local calendar date now: Gregorian year, month and day in the current time zone.
+    static func today() -> DateComponents {
+        Calendar(identifier: .gregorian).dateComponents(in: .current, from: Date())
+    }
+
+    /// The values of `mode.daily` for `date`: year, month, day (0 for a missing part, which the core refuses).
+    static func dateValues(_ date: DateComponents) -> [Double] {
+        [Double(date.year ?? 0), Double(date.month ?? 0), Double(date.day ?? 0)]
     }
 }
 #endif
