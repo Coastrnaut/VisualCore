@@ -9,7 +9,7 @@ campaign covers the game). Agents model their files on Binary Gardens' (feature 
 
 ## Phase 1: Setup
 
-- [ ] T-R02G2205-001 Baselines on the committed tree after R02-G22-04 is recorded: `--name baseline-host`, `--name
+- [X] T-R02G2205-001 Baselines on the committed tree after R02-G22-04 is recorded: `--name baseline-host`, `--name — Verified 2026-11-27: 2026-11-27: baseline-host, baseline-timing, baseline-round02-1/2/3c/3e/3f exit=0 (.autonomy/migration/checks/R02-G22-05.baseline-*.json)
   baseline-timing`, `--name baseline-round02-1`, `-2`, `-3c`, `-3e`, `-3f`; the rendering baseline is R02-G22-04's
   rendering runs (exit 0)
 
