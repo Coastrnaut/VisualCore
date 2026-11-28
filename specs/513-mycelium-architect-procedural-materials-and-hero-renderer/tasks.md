@@ -78,7 +78,7 @@ Stories 1 and 2. Coverage: FR-001, 002 → 003, 004; FR-003 → 002, 003, 005; F
   order of clarification Q1) and `research.md` R4 that blooms, hyphae fuzz and spores are drawn after the veins and
   beneath the sprouts and caps (the first simulator run showed spores over the caps hid every cap point), as
   `MyceliumArchitectSceneGeometry.paintOrder` draws them, per FR-R02G2203-001, plan: painter's order (contradicts)
-- [ ] T-R02G2203-015 Record in `specs/513-mycelium-architect-procedural-materials-and-hero-renderer/contracts/api.md` the
+- [X] T-R02G2203-015 Record in `specs/513-mycelium-architect-procedural-materials-and-hero-renderer/contracts/api.md` the — Verified 2026-11-27: contracts/api.md lists the public names beyond the contract with reasons
   public names beyond the contract with reasons (`qualityTiers` is the `ExperienceCore` protocol's tier count with the
   names in `qualityProfile.levels` and `MyceliumArchitectTier.all`; the adapter's rule and restore types, constants,
   state and scenario statics; the snapshot's `boardSide`, `fitScale(width:height:)`, budgets and `largestPathWeight`;

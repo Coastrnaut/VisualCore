@@ -44,3 +44,23 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {      
 // Experience (iOS): MyceliumArchitectExperience (factory), MyceliumArchitectPresenter (probes(_:), qualityLevels,
 // tierLog, fallbackReason), MyceliumArchitectBoardScene, MyceliumArchitectControls (labelled minimal panel).
 ```
+
+## Public names beyond this contract (feature 513 convergence, T-R02G2203-015)
+
+- `MyceliumArchitectExperienceCore.qualityTiers` is the `ExperienceCore` protocol's tier count (3), as for Binary
+  Gardens; the tier names `level-0` … `level-2` are `qualityProfile.levels` and `MyceliumArchitectTier.all`.
+- The adapter's `MyceliumArchitectExperienceRule` (`notWhole`, `pulse`) and `MyceliumArchitectRestoreRefusal`; its
+  constants (`digestDomain`, `actionIDs`, `levelNumbers`, `cellRange`, `directionRange`, `pulseRange`, `wonCode`,
+  `failedCode`), state (`levelNumber`, `play`, `shownPulse`, `openingNumber`, `qualityTier`, `renderTier`), functions
+  (`levelNumber(forSeed:)`, `level(number:)`, `generated(number:)`, `certifiedCandidates`, `freshPlay(of:)`,
+  `opening(number:)`, `snapshot(time:)`) and the scenario statics: the experience, the scenarios and the tests read them,
+  as Binary Gardens' adapter exposes the same names.
+- The snapshot's `boardSide`, `fitScale(width:height:)`, `budget`, `nutrientBudget`, `weightLimit` and
+  `largestPathWeight`: the geometry and the gauges read them.
+- `MyceliumArchitectElement` (with `Kind`), `MyceliumArchitectColouredMesh`, the camera's `view` and `projection`,
+  `MyceliumArchitectSceneGeometry.paintOrder(_:)`, `boardPart(_:tier:)`, `glowPart(_:tier:)`, `fallback(_:)`,
+  `actionsBar(_:_:)`, `project(_:camera:)` and the backdrop helpers and values: the scene, the fallback renderer and the
+  frame checks use them.
+- `MyceliumArchitectShaders`' board and glow uniform lists, palette constants, tuning constants and
+  `glowGain(gain:limit:)`: the scene and the shader-source tests use them.
+
