@@ -51,7 +51,7 @@ MyceliumArchitect`.
 - [X] T-R02G2204-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: 2026-11-27: reference-2 exit=0 (.autonomy/migration/checks/R02-G22-04.reference-2.json)
 - [X] T-R02G2204-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: 2026-11-27: script-tests exit=0, run alone (.autonomy/migration/checks/R02-G22-04.script-tests.json)
 - [ ] T-R02G2204-012 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G2204-008)
-- [ ] T-R02G2204-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2204-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: 2026-11-27: converge round 1 appended T-014 (implemented, host-5 exit=0); converge round 2 appended nothing; README row and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
