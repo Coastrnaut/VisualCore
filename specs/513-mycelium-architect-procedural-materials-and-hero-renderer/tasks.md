@@ -61,7 +61,7 @@ only after every agent has reported; read `exit=` before ticking). Commit after 
 - [X] T-R02G2203-010 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: reference-2 exit=0
 - [X] T-R02G2203-011 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: script-tests exit=0 (run alone)
 - [ ] T-R02G2203-012 {device} After ImplementationLock-100: frame time per tier on D1/D2/D3 (SC-R02G2203-006)
-- [ ] T-R02G2203-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2203-013 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: converge round 1 appended T-014 … 016 (done), round 2 converged; README row and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
