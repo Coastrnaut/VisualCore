@@ -53,6 +53,15 @@
 // `MyceliumArchitectTier.all`'s names (`level-0`, `level-1`, `level-2`). Host tier `t` draws
 // `MyceliumArchitectTier.of(t)`. Outcome: `won` or `failed` while the play is in that stage, else nil. Rules use
 // integers only.
+//
+// Feature 514 (R02-G22-04) T-R02G2204-002 (FR-R02G2204-002, 005, 006, 008, 014; SC-R02G2204-003, 006; clarifications
+// Q2, Q3, Q5; research R4, R7): the core also holds the presentation state of the gestures and the panel — the tool
+// (nutrient by default), the preview (``MyceliumArchitectPreview``, computed by the kernel's change rule and growth),
+// the inspected cell and the view orbit — never in the digest, the snapshot payload or `==`, and carried into
+// `snapshot(time:)`. ``previewReport(_:)`` gives the kernel's report of a changed arrangement or its refusal without
+// changing anything. The tool, the preview, the inspection and the orbit return to their defaults at an opening, at
+// `level.next`, at `reset()` and at restore (with the shown pulse at the pulses run, as before); every other accepted
+// action but `growth.show` clears the preview (its arrangement is gone), keeping the tool, the inspection and the orbit.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
@@ -114,6 +123,14 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
+    /// The placement tool (feature 514); presentation only — not in the digest, the snapshot payload or `==`.
+    public private(set) var tool: MyceliumArchitectTool = .nutrient
+    /// The previewed change (feature 514); presentation only — not in the digest, the snapshot payload or `==`.
+    public private(set) var preview: MyceliumArchitectPreview? = nil
+    /// The inspected cell (feature 514); presentation only — not in the digest, the snapshot payload or `==`.
+    public private(set) var inspectedCell: MyceliumArchitectCell? = nil
+    /// The view orbit, clamped (feature 514); presentation only — not in the digest, the snapshot payload or `==`.
+    public private(set) var orbit: MyceliumArchitectViewOrbit = .authored
 
     /// A state playing `play` of level `levelNumber` with the pulses run shown, whose reset returns to `openingPlay` of
     /// `openingNumber`.
@@ -221,6 +238,7 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
     /// or negative time becomes 0). Reads only; the state and its digest do not change.
     public func snapshot(time: Double) -> MyceliumArchitectSceneSnapshot {
         MyceliumArchitectSceneSnapshot(play: play, shownPulse: shownPulse, levelNumber: levelNumber, time: time)
+            .presenting(tool: tool, preview: preview, inspectedCell: inspectedCell, orbit: orbit)
     }
 
     /// The snapshot the renderer reads at presentation time 0 (``snapshot(time:)``); the presenter supplies its own
@@ -229,6 +247,68 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
 
     /// The tier the host quality tier draws: `MyceliumArchitectTier.of(qualityTier)` (both ordered richest first).
     public var renderTier: MyceliumArchitectTier { MyceliumArchitectTier.of(qualityTier) }
+
+    // MARK: Presentation state (feature 514)
+
+    /// The kernel's growth report of the arrangement `action` would make, or the refusal the play would give it, in
+    /// the play's order (`.stage` outside `playing`, the change rule `MyceliumArchitectPlay.changed`, `.budget` with no
+    /// action left), through ``MyceliumArchitectPreview/of(_:level:arrangement:stage:actionsLeft:)`` —
+    /// `MyceliumArchitectPlay.changed` and `MyceliumArchitectGrowth.report`, never a second implementation. Reads only:
+    /// the state, its digest and the preview do not change.
+    public func previewReport(_ action: MyceliumArchitectAction)
+        -> Result<MyceliumArchitectReport, MyceliumArchitectError> {
+        let previewed: MyceliumArchitectPreview = MyceliumArchitectPreview.of(
+            action, level: play.level, arrangement: play.arrangement, stage: play.stage,
+            actionsLeft: play.actionsLeft)
+        switch previewed.outcome {
+        case .accepted(_, let report): return .success(report)
+        case .refused(let error): return .failure(error)
+        }
+    }
+
+    /// Chooses `tool`; the state and its digest do not change.
+    public mutating func setTool(_ tool: MyceliumArchitectTool) {
+        self.tool = tool
+    }
+
+    /// Previews `change` (``MyceliumArchitectPreview/of(_:level:arrangement:stage:actionsLeft:)`` of the play); the
+    /// state and its digest do not change.
+    public mutating func setPreview(_ change: MyceliumArchitectAction) {
+        preview = MyceliumArchitectPreview.of(change, level: play.level, arrangement: play.arrangement,
+                                              stage: play.stage, actionsLeft: play.actionsLeft)
+    }
+
+    /// Clears the preview; the state and its digest do not change.
+    public mutating func clearPreview() {
+        preview = nil
+    }
+
+    /// Inspects `cell` (nil, or a cell off the board, clears the inspection); the state and its digest do not change.
+    public mutating func inspect(_ cell: MyceliumArchitectCell?) {
+        if let target = cell, play.level.contains(target) {
+            inspectedCell = target
+        } else {
+            inspectedCell = nil
+        }
+    }
+
+    /// Sets the view orbit (clamped); the state and its digest do not change.
+    public mutating func setOrbit(_ orbit: MyceliumArchitectViewOrbit) {
+        self.orbit = orbit.clamped()
+    }
+
+    /// Returns to the authored view; the state and its digest do not change.
+    public mutating func resetView() {
+        orbit = .authored
+    }
+
+    /// The tool, the preview, the inspection and the orbit back to their defaults (an opening, `level.next`, reset).
+    mutating func resetPresentation() {
+        tool = .nutrient
+        preview = nil
+        inspectedCell = nil
+        orbit = .authored
+    }
 
     // MARK: Quality
 
@@ -256,7 +336,8 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the shown pulse, the quality tier or the opening level).
+    /// Equal states: the level number and the play (not the shown pulse, the quality tier, the opening level or the
+    /// presentation state of feature 514).
     public static func == (lhs: MyceliumArchitectExperienceCore, rhs: MyceliumArchitectExperienceCore) -> Bool {
         lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
     }
@@ -362,13 +443,15 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
                     let fresh: MyceliumArchitectPlay = try Self.freshPlay(of: try Self.level(number: next))
                     levelNumber = next
                     play = fresh
+                    resetPresentation()
                 }
             }
         } catch {
             return .rejected(.rule(code: error.reasonCode))
         }
-        // Every accepted action but `growth.show` shows the whole growth of the report again.
+        // Every accepted action but `growth.show` shows the whole growth of the report again, and its preview is gone.
         shownPulse = play.report.pulsesRun
+        preview = nil
         return .accepted
     }
 
@@ -378,12 +461,13 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the opening state the seed chose with the pulses run shown; the quality tier, which is not state, is
-    /// kept.
+    /// Back to the opening state the seed chose with the pulses run shown and the presentation state at its defaults
+    /// (feature 514); the quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
         play = openingPlay
         shownPulse = play.report.pulsesRun
+        resetPresentation()
     }
 
     /// `won` or `failed` while the play is in that stage; nil otherwise.

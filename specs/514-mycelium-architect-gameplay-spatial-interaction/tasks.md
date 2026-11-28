@@ -14,7 +14,7 @@ MyceliumArchitect`.
 
 ## Phase 2: Foundational
 
-- [ ] T-R02G2204-002 Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectViewOrbit.swift` (yaw ±60°, pitch −20° … +35°,
+- [X] T-R02G2204-002 Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectViewOrbit.swift` (yaw ±60°, pitch −20° … +35°, — Verified 2026-11-27: 2026-11-27: swift test --filter MyceliumArchitect 122 tests passed; host exit=0 (.autonomy/migration/checks/R02-G22-04.host.json)
   re-fitted camera with ≥ 5 % margin at aspects 0.4 … 2.5); edit `MyceliumArchitectSceneSnapshot.swift` (tool,
   preview, inspected cell, orbit as presentation state), `MyceliumArchitectSceneGeometry.swift` (dashed ghost veins,
   inspection ring, orbit camera) and `MyceliumArchitectExperienceCore.swift` (`previewReport(_:)` through the kernel's

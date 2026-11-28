@@ -70,6 +70,33 @@
 // Spores, fuzz angles and lengths come from a fixed integer hash, never a random source. Tiers change only the tube
 // sides, the cap segments, the fuzz, the spores and the glow: every element centre is the same at every tier. Doubles
 // are used for drawing only. Modelled on `BinaryGardensSceneGeometry` (feature 503).
+//
+// Feature 514 (R02-G22-04) T-R02G2204-002 (FR-R02G2204-006, 008, 013, 014; SC-R02G2204-003, 004, 006; clarifications
+// Q3, Q5; research R4, R6, R7) adds, presentation only and modelled on feature 504:
+//   * the player's view orbit (``MyceliumArchitectViewOrbit``, carried by the snapshot) and `camera(aspect:orbit:)`: the
+//     authored camera frame (eye, look-at point and up direction) is turned rigidly by the pitch about the authored
+//     right axis (+x) through the look-at point (positive raises the eye), then by the yaw about the vertical axis (+z)
+//     through the look-at point, so the camera always looks at (0, −0.3, 0); the field of view stays the authored one
+//     for the aspect and the eye moves along the turned view axis to the larger of the authored distance (≈ 3.22) and
+//     the distance at which every corner of the authored box lies inside the view with ``refitMargin`` per side, so
+//     everything inside the box (board, gauges, pips, actions bars) keeps a margin of at least 5 % at every orbit within
+//     bounds and every aspect 0.4 … 2.5, and the eye stays in front of every corner. At the authored orbit it is
+//     `camera(aspect:)`, bit for bit;
+//   * the drawn eye (``drawnEye(_:)``): the solids emit their far triangles first as seen from the orbit's eye, and the
+//     backdrop stands perpendicular to the orbit's view axis, ``backdropDistance`` − the authored eye distance beyond
+//     the look-at point, enlarged so it fills the view of every orbit camera for the aspects 0.25 … 4
+//     (``backdropFrame(_:)``); at the authored orbit both are R02-G22-03's;
+//   * the ghost veins of an accepted preview (``ghostVeins(_:)``, clarification Q3): every vein of the previewed report
+//     (whole growth, every pulse) as ``ghostDashes`` dashes of duty ``ghostDuty`` along the segment from the parent's
+//     centre to the child's, flat `limitTick` strips ``ghostWidth``·s wide at height ``ghostLift``·s (above every
+//     committed tube), drawn right before the fuzz element, so over the committed veins and blooms and under the
+//     sprouts and caps. The shaders have no ghost material, so the dashes are cut geometrically and the shaders are
+//     unchanged; a refused preview draws nothing ghostly (the refusal is named in words by the presenter);
+//   * the inspection ring (FR-R02G2204-005, 013): a `pipHollow` ring of half ``inspectRing``·s (outside the failure
+//     marks' 0.5·s and the terminal pips' circle) around the inspected cell, drawn right before the gauge element, so
+//     over every cap.
+// Without a preview and an inspection, at the authored orbit, every mesh is R02-G22-03's. The orbit, the tool, the
+// preview and the inspection are presentation only: never saved, never read by the rules.
 import Foundation
 import VisualCoreMath
 import VisualCoreScenes
@@ -472,6 +499,23 @@ public enum MyceliumArchitectSceneGeometry {
     static let glowGrowth: Double = 0.08
     /// The sides of a glow annulus.
     static let glowSides: Int = 24
+    /// The margin per side in view coordinates an orbiting camera refits the authored box to (feature 514; equal to
+    /// ``fitMargin``, so the refit is continuous at the authored orbit).
+    public static let refitMargin: Double = 0.06
+    /// The width of a ghost vein's dashes as a share of s (feature 514).
+    public static let ghostWidth: Double = 0.06
+    /// The height of a ghost vein's dashes as a share of s, above every committed tube (top 0.32·s) (feature 514).
+    public static let ghostLift: Double = 0.34
+    /// The dashes along one ghost vein (feature 514).
+    public static let ghostDashes: Int = 3
+    /// The share of each dash's slot a ghost dash fills (feature 514).
+    public static let ghostDuty: Double = 0.55
+    /// The half size of the inspection ring around the inspected cell as a share of s (feature 514).
+    public static let inspectRing: Double = 0.56
+    /// The aspects whose orbit cameras the orbit backdrop is sized for (feature 514; spans ``backdropAspects``).
+    static let orbitBackdropAspects: [Double] = [0.25, 0.4, 0.6, 0.8, 1, 1.25, 1.6, 2, 2.5, 3.2, 4]
+    /// The safety factor on the orbit backdrop's size (feature 514).
+    static let orbitBackdropSlack: Double = 1.1
 
     // MARK: Places (the CPU reference)
 
@@ -686,7 +730,7 @@ public enum MyceliumArchitectSceneGeometry {
     public static func paintOrder(_ snapshot: MyceliumArchitectSceneSnapshot) -> [MyceliumArchitectElement] {
         typealias E = MyceliumArchitectElement
         let level: MyceliumArchitectLevel = snapshot.level
-        var list: [E] = [E(kind: .backdrop, index: 0, item: 0, centre: backdropCentre()),
+        var list: [E] = [E(kind: .backdrop, index: 0, item: 0, centre: backdropFrame(snapshot.orbit).centre),
                          E(kind: .floor, index: 0, item: 0, centre: boardCentre)]
         let sites: [MyceliumArchitectCell] = level.sites ?? []
         for (index, cell) in sites.enumerated() {
@@ -773,8 +817,12 @@ public enum MyceliumArchitectSceneGeometry {
     public static func boardPart(_ snapshot: MyceliumArchitectSceneSnapshot,
                                  tier: MyceliumArchitectTier) -> MyceliumArchitectColouredMesh {
         var parts: Parts = Parts()
+        parts.eye = drawnEye(snapshot.orbit)
         do {
             for element in paintOrder(snapshot) where element.kind != .glow {
+                // Feature 514: the ghost veins right before the fuzz, the inspection ring right before the gauge.
+                if element.kind == .fuzz { try ghosts(&parts, snapshot) }
+                if element.kind == .gauge { try inspection(&parts, snapshot) }
                 try draw(element, into: &parts, snapshot, tier: tier)
             }
         } catch {
@@ -834,7 +882,7 @@ public enum MyceliumArchitectSceneGeometry {
         let c: SIMD3<Double> = element.centre
         switch element.kind {
         case .backdrop:
-            try backdrop(&parts)
+            try backdrop(&parts, orbit: snapshot.orbit)
         case .floor:
             try floor(&parts, snapshot)
         case .site:
@@ -927,11 +975,15 @@ public enum MyceliumArchitectSceneGeometry {
     }
 
     /// Draws the backdrop: a quad on the view axis at ``backdropDistance``, perpendicular to it (a_normal its plane
-    /// offsets, a_uv.y the height; colours cave at the bottom, cave top at the top).
-    static func backdrop(_ parts: inout Parts) throws(MeshError) {
-        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis()
-        let half: SIMD2<Double> = backdropHalf()
-        let c: SIMD3<Double> = backdropCentre()
+    /// offsets, a_uv.y the height; colours cave at the bottom, cave top at the top); for a non-authored `orbit` the
+    /// quad of ``backdropFrame(_:)`` (feature 514).
+    static func backdrop(_ parts: inout Parts, orbit: MyceliumArchitectViewOrbit = .authored) throws(MeshError) {
+        let frame: (centre: SIMD3<Double>, forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>,
+                    half: SIMD2<Double>) = backdropFrame(orbit)
+        let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) =
+            (forward: frame.forward, right: frame.right, up: frame.up)
+        let half: SIMD2<Double> = frame.half
+        let c: SIMD3<Double> = frame.centre
         let w: SIMD3<Double> = basis.right * half.x
         let h: SIMD3<Double> = basis.up * half.y
         let low: Vec4 = MyceliumArchitectPalette.cave
@@ -1161,6 +1213,196 @@ public enum MyceliumArchitectSceneGeometry {
         return SIMD2(p.x, p.y)
     }
 
+    // MARK: Orbit, ghosts and inspection (feature 514)
+
+    /// The camera for `orbit` (clamped, see ``MyceliumArchitectViewOrbit/clamped()``) and `aspect` (feature 514,
+    /// T-R02G2204-002; FR-R02G2204-008): the authored frame turned by the orbit (``orbitFrame(_:)``), the authored field
+    /// of view for the aspect, and the eye on the turned view axis at the larger of the authored distance (≈ 3.22) and
+    /// the distance at which every corner of the authored box lies inside the view with ``refitMargin`` per side, so
+    /// everything inside the box keeps a margin of at least 5 % at every orbit and aspect 0.4 … 2.5; every corner stays
+    /// in front of the eye. The target is always the look-at point (the yaw pivot). Near half the nearest corner's depth
+    /// (at least 0.001), far 2 past the larger of the farthest corner's depth + 1 and the orbit backdrop. At the
+    /// authored orbit it is ``camera(aspect:)``, bit for bit. Presentation only; independent of the snapshot, the tier
+    /// and the time.
+    public static func camera(aspect: Double, orbit: MyceliumArchitectViewOrbit) -> MyceliumArchitectCamera {
+        let o: MyceliumArchitectViewOrbit = orbit.clamped()
+        guard o.yaw != 0 || o.pitch != 0 else { return camera(aspect: aspect) }
+        let a: Double = usableAspect(aspect)
+        let fovY: Double = camera(aspect: a).fovY
+        let frame: (target: SIMD3<Double>, back: SIMD3<Double>, up: SIMD3<Double>) = orbitFrame(o)
+        let forward: SIMD3<Double> = -frame.back
+        let right: SIMD3<Double> = unit(cross(forward, frame.up))
+        let up: SIMD3<Double> = cross(right, forward)
+        let tanHalf: Double = tan(fovY / 2)
+        let limit: Double = 1 - 2 * refitMargin
+        var distance: Double = authoredDistance
+        for index in 0..<8 {
+            let r: SIMD3<Double> = corner(index) - frame.target
+            let along: Double = dot(r, forward)
+            let vertical: Double = abs(dot(r, up)) / (limit * tanHalf) - along
+            let horizontal: Double = abs(dot(r, right)) / (limit * tanHalf * a) - along
+            distance = max(distance, vertical, horizontal)
+        }
+        let eyePoint: SIMD3<Double> = frame.target + frame.back * distance
+        var nearest: Double = Double.infinity
+        var farthest: Double = 0
+        for index in 0..<8 {
+            let depth: Double = dot(corner(index) - eyePoint, forward)
+            nearest = min(nearest, depth)
+            farthest = max(farthest, depth)
+        }
+        let near: Double = max(nearest * 0.5, 1e-3)
+        let far: Double = max(farthest + 1, distance + orbitBackdropOffset) + 2
+        let view: Mat4 = Mat4.lookAt(eye: vec(eyePoint), target: vec(frame.target), up: vec(up))
+        let projection: Mat4 = Mat4.perspective(fovY: fovY, aspect: a, near: near, far: far)
+        return MyceliumArchitectCamera(eye: eyePoint, target: frame.target, fovY: fovY, aspect: a, near: near,
+                                       far: far, view: view, projection: projection,
+                                       viewProjection: projection * view)
+    }
+
+    /// The authored distance from the eye to the look-at point, |(0, −1.6, 2.8)| ≈ 3.22 (feature 514).
+    static var authoredDistance: Double {
+        let d: SIMD3<Double> = eye - lookAt
+        return dot(d, d).squareRoot()
+    }
+
+    /// How far beyond the look-at point an orbit's backdrop stands along the view axis: ``backdropDistance`` − the
+    /// authored distance (≈ 3.78; the authored backdrop's offset) (feature 514).
+    static var orbitBackdropOffset: Double { backdropDistance - authoredDistance }
+
+    /// `v` turned by `angle` radians about +x (the authored right axis), counter-clockwise seen from +x.
+    static func pitched(_ v: SIMD3<Double>, _ angle: Double) -> SIMD3<Double> {
+        let c: Double = cos(angle)
+        let s: Double = sin(angle)
+        return SIMD3(v.x, v.y * c - v.z * s, v.y * s + v.z * c)
+    }
+
+    /// `v` turned by `angle` radians about +z, counter-clockwise seen from above.
+    static func yawed(_ v: SIMD3<Double>, _ angle: Double) -> SIMD3<Double> {
+        let c: Double = cos(angle)
+        let s: Double = sin(angle)
+        return SIMD3(v.x * c - v.y * s, v.x * s + v.y * c, v.z)
+    }
+
+    /// The frame of `orbit` (clamped; feature 514): the look-at point, the unit direction from it back towards the eye
+    /// and the unit up direction. The authored frame (back along (0, −1.6, 2.8), up ``viewBasis()``'s) is turned
+    /// rigidly by −pitch about +x (so a positive pitch raises the eye; the frame never rolls, even with the eye just past
+    /// the vertical at pitch +35°), then by the yaw about +z; the look-at point is the pivot and stays put.
+    static func orbitFrame(_ orbit: MyceliumArchitectViewOrbit)
+        -> (target: SIMD3<Double>, back: SIMD3<Double>, up: SIMD3<Double>) {
+        let o: MyceliumArchitectViewOrbit = orbit.clamped()
+        let back0: SIMD3<Double> = unit(eye - lookAt)
+        let up0: SIMD3<Double> = viewBasis().up
+        let back1: SIMD3<Double> = pitched(back0, -o.pitch)
+        let up1: SIMD3<Double> = pitched(up0, -o.pitch)
+        return (target: lookAt, back: unit(yawed(back1, o.yaw)), up: unit(yawed(up1, o.yaw)))
+    }
+
+    /// `camera`'s unit forward, right and up vectors, read from its view matrix (feature 514): for the authored camera
+    /// those of ``viewBasis()`` within rounding.
+    public static func viewBasis(_ camera: MyceliumArchitectCamera)
+        -> (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) {
+        let v: Mat4 = camera.view
+        let right: SIMD3<Double> = SIMD3(v.c0.x, v.c1.x, v.c2.x)
+        let up: SIMD3<Double> = SIMD3(v.c0.y, v.c1.y, v.c2.y)
+        let forward: SIMD3<Double> = SIMD3(-v.c0.z, -v.c1.z, -v.c2.z)
+        return (forward: forward, right: right, up: up)
+    }
+
+    /// The eye the board mesh is built for (feature 514): ``eye`` at the authored orbit, else the eye of the orbit's
+    /// camera at aspect 1 (an orbit camera's eye moves only along its view axis with the aspect, so the far-first
+    /// emission of the solids is the same for every aspect but in extreme cases).
+    public static func drawnEye(_ orbit: MyceliumArchitectViewOrbit) -> SIMD3<Double> {
+        guard !orbit.isAuthored else { return eye }
+        return camera(aspect: 1, orbit: orbit).eye
+    }
+
+    /// The backdrop quad of `orbit` (feature 514): its centre, the view axis it is perpendicular to, its right and up
+    /// directions and its half size. At the authored orbit R02-G22-03's (``backdropCentre()``, ``viewBasis()``,
+    /// ``backdropHalf()``); otherwise centred ``orbitBackdropOffset`` beyond the look-at point on the orbit's view axis,
+    /// with ``backdropHalf()`` scaled by the largest (eye distance + offset) / ``backdropDistance`` of the orbit's
+    /// cameras at ``orbitBackdropAspects`` and by ``orbitBackdropSlack``, so it fills the view of every orbit camera.
+    static func backdropFrame(_ orbit: MyceliumArchitectViewOrbit)
+        -> (centre: SIMD3<Double>, forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>,
+            half: SIMD2<Double>) {
+        guard !orbit.isAuthored else {
+            let basis: (forward: SIMD3<Double>, right: SIMD3<Double>, up: SIMD3<Double>) = viewBasis()
+            return (centre: backdropCentre(), forward: basis.forward, right: basis.right, up: basis.up,
+                    half: backdropHalf())
+        }
+        let frame: (target: SIMD3<Double>, back: SIMD3<Double>, up: SIMD3<Double>) = orbitFrame(orbit)
+        let forward: SIMD3<Double> = -frame.back
+        let right: SIMD3<Double> = unit(cross(forward, frame.up))
+        let up: SIMD3<Double> = cross(right, forward)
+        var scale: Double = 1
+        for aspect in orbitBackdropAspects {
+            let view: MyceliumArchitectCamera = camera(aspect: aspect, orbit: orbit)
+            let d: SIMD3<Double> = view.eye - view.target
+            scale = max(scale, (dot(d, d).squareRoot() + orbitBackdropOffset) / backdropDistance)
+        }
+        let half: SIMD2<Double> = backdropHalf() * (scale * orbitBackdropSlack)
+        return (centre: frame.target + forward * orbitBackdropOffset, forward: forward, right: right, up: up,
+                half: half)
+    }
+
+    /// The backdrop's centre seen from `orbit` (feature 514): ``backdropFrame(_:)``'s centre; ``backdropCentre()`` at
+    /// the authored orbit.
+    public static func backdropCentre(orbit: MyceliumArchitectViewOrbit) -> SIMD3<Double> {
+        backdropFrame(orbit).centre
+    }
+
+    /// The ghost veins of `snapshot`'s preview (feature 514, clarification Q3): for an accepted preview, every vein of
+    /// the previewed report (each grown cell but the root with a parent the report has, in growth order, whatever the
+    /// shown pulse) as the segment from the parent's centre to the child's at height ``ghostLift``·s; empty without a
+    /// preview or for a refused one.
+    static func ghostVeins(_ snapshot: MyceliumArchitectSceneSnapshot)
+        -> [(from: SIMD3<Double>, to: SIMD3<Double>)] {
+        guard let report = snapshot.preview?.report else { return [] }
+        let s: Double = snapshot.fitScale
+        let lift: SIMD3<Double> = SIMD3(0, 0, ghostLift * s)
+        var veins: [(from: SIMD3<Double>, to: SIMD3<Double>)] = []
+        for index in report.grown.indices where index > 0 {
+            guard index < report.parents.count, let parent = report.parents[index],
+                  report.grown.indices.contains(parent) else { continue }
+            veins.append((from: centre(report.grown[parent], snapshot) + lift,
+                          to: centre(report.grown[index], snapshot) + lift))
+        }
+        return veins
+    }
+
+    /// The ``ghostDashes`` dashes of a ghost vein from `a` to `b` (feature 514): dash k spans the shares
+    /// (k + (1 − duty) / 2) / n … (k + (1 + duty) / 2) / n of the segment, duty ``ghostDuty``.
+    static func ghostDashSegments(from a: SIMD3<Double>, to b: SIMD3<Double>)
+        -> [(from: SIMD3<Double>, to: SIMD3<Double>)] {
+        let n: Int = max(ghostDashes, 1)
+        var dashes: [(from: SIMD3<Double>, to: SIMD3<Double>)] = []
+        for k in 0..<n {
+            let t0: Double = (Double(k) + (1 - ghostDuty) / 2) / Double(n)
+            let t1: Double = (Double(k) + (1 + ghostDuty) / 2) / Double(n)
+            dashes.append((from: a + (b - a) * t0, to: a + (b - a) * t1))
+        }
+        return dashes
+    }
+
+    /// Draws the ghost veins of `snapshot`'s accepted preview as dashed flat `limitTick` strips ``ghostWidth``·s wide
+    /// (feature 514); nothing without a preview or for a refused one.
+    static func ghosts(_ parts: inout Parts, _ snapshot: MyceliumArchitectSceneSnapshot) throws(MeshError) {
+        let width: Double = ghostWidth * snapshot.fitScale
+        for vein in ghostVeins(snapshot) {
+            for dash in ghostDashSegments(from: vein.from, to: vein.to) {
+                try parts.segment(dash.from, dash.to, width: width, code: code(.limitTick))
+            }
+        }
+    }
+
+    /// Draws the inspection ring (feature 514): a `pipHollow` ring of half ``inspectRing``·s around the inspected cell;
+    /// nothing without an inspection or for a cell off the board.
+    static func inspection(_ parts: inout Parts, _ snapshot: MyceliumArchitectSceneSnapshot) throws(MeshError) {
+        guard let cell = snapshot.inspectedCell, snapshot.level.contains(cell) else { return }
+        let half: Double = inspectRing * snapshot.fitScale
+        try parts.flatQuad(centre: centre(cell, snapshot), half: SIMD2(half, half), code: code(.pipHollow))
+    }
+
     // MARK: Building
 
     /// The length of `v`.
@@ -1224,7 +1466,7 @@ public enum MyceliumArchitectSceneGeometry {
                     let c = vertices[t.z]
                     let outward: SIMD3<Double> = a.n + b.n + c.n
                     let middle: SIMD3<Double> = (a.p + b.p + c.p) / 3
-                    let front: Bool = G.dot(outward, G.eye - middle) > 0
+                    let front: Bool = G.dot(outward, parts.eye - middle) > 0
                     if (pass == 0) == front { continue }
                     let ia: UInt32 = try parts.vertex(a.p, slot: a.n, code: a.code, local: a.local)
                     let ib: UInt32 = try parts.vertex(b.p, slot: b.n, code: b.code, local: b.local)
@@ -1241,6 +1483,9 @@ public enum MyceliumArchitectSceneGeometry {
         var builder: MeshBuilder = MeshBuilder()
         /// One colour per welded vertex.
         var colours: [Vec4] = []
+        /// The eye the solids are emitted for, far triangles first (feature 514: ``drawnEye(_:)`` of the snapshot's
+        /// orbit; the authored eye by default).
+        var eye: SIMD3<Double> = MyceliumArchitectSceneGeometry.eye
         /// The side flats face: up.
         static let up: SIMD3<Double> = SIMD3(0, 0, 1)
         /// The zero vector.

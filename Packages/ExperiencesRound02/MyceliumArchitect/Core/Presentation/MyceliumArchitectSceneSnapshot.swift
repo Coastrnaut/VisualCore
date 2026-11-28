@@ -9,6 +9,16 @@
 // The renderer never holds the kernel, so no drawing result can change the game (renderer purity), and every drawn
 // cell, segment, weight and terminal state is the kernel's integer. Lives in `Core/Presentation/`, outside the kernel's
 // source scans of features 511 and 512 (research R2). Modelled on `BinaryGardensSceneSnapshot` (feature 503).
+//
+// Feature 514 (R02-G22-04) T-R02G2204-002 (FR-R02G2204-002, 005, 006, 008, 013, 014; SC-R02G2204-003, 006;
+// clarifications Q2, Q3, Q5; research R3, R4, R7) adds, presentation only: the tool (``MyceliumArchitectTool``:
+// nutrient or blocker, chosen by two panel buttons); the preview of a press (``MyceliumArchitectPreview``: the change
+// as a kernel action and either the changed arrangement with the kernel's own report of it — the kernel's change rule
+// `MyceliumArchitectPlay.changed` and `MyceliumArchitectGrowth.report`, never a second implementation — or the kernel's
+// refusal in the order the play gives it: stage, change rule, budget); the inspected cell; and the view orbit
+// (``MyceliumArchitectViewOrbit``). Every initialiser leaves the tool at nutrient, no preview, no inspection and the
+// authored orbit, so the drawing of R02-G22-03 is unchanged; none of it enters the digest (the snapshot never does)
+// and nothing is saved (snapshot schema 1).
 import Foundation
 import VisualCoreMath
 
@@ -130,6 +140,104 @@ public struct MyceliumArchitectTier: Sendable, Equatable, Hashable {
     }
 }
 
+/// The placement tool of the panel and the gestures (feature 514, clarification Q2): what a tap on an empty site
+/// places. Presentation only; never in the digest or the save.
+public enum MyceliumArchitectTool: String, Sendable, CaseIterable {
+    /// Place a nutrient (`cell.nutrient`); the default.
+    case nutrient
+    /// Place a blocker (`cell.blocker`).
+    case blocker
+
+    /// The adapter control the tool sends for a cell: `cell.nutrient` or `cell.blocker`.
+    public var controlID: String {
+        switch self {
+        case .nutrient: "cell.nutrient"
+        case .blocker: "cell.blocker"
+        }
+    }
+
+    /// The kernel action placing this tool's item on `cell`: `.nutrient(cell)` or `.blocker(cell)`.
+    public func placement(_ cell: MyceliumArchitectCell) -> MyceliumArchitectAction {
+        switch self {
+        case .nutrient: .nutrient(cell)
+        case .blocker: .blocker(cell)
+        }
+    }
+}
+
+/// The preview of one press or drag (feature 514, clarification Q3): the change as a kernel action and what the kernel
+/// makes of it — the changed arrangement with the kernel's report of it, or the kernel's refusal. Presentation only;
+/// never in the digest, the snapshot's game state or the kernel.
+public struct MyceliumArchitectPreview: Sendable, Equatable {
+    /// What the kernel makes of the change.
+    public enum Outcome: Sendable, Equatable {
+        /// The kernel accepts the change: the changed arrangement and the kernel's growth report of it.
+        case accepted(arrangement: MyceliumArchitectArrangement, report: MyceliumArchitectReport)
+        /// The kernel refuses the change with this refusal (`.stage`, the change rule's `.action(reason)`, or
+        /// `.budget`).
+        case refused(MyceliumArchitectError)
+    }
+
+    /// The change: a `.nutrient`, `.blocker`, `.clear`, `.seed` or `.unseed` action (`.run` is always refused by the
+    /// change rule).
+    public let change: MyceliumArchitectAction
+    /// What the kernel makes of it.
+    public let outcome: Outcome
+
+    /// A preview of the given values (unchecked; ``of(_:level:arrangement:stage:actionsLeft:)`` computes one).
+    public init(change: MyceliumArchitectAction, outcome: Outcome) {
+        self.change = change
+        self.outcome = outcome
+    }
+
+    /// The previewed report; nil when refused.
+    public var report: MyceliumArchitectReport? {
+        if case .accepted(_, let report) = outcome { return report }
+        return nil
+    }
+
+    /// The previewed arrangement; nil when refused.
+    public var arrangement: MyceliumArchitectArrangement? {
+        if case .accepted(let arrangement, _) = outcome { return arrangement }
+        return nil
+    }
+
+    /// The kernel's refusal; nil when accepted.
+    public var refusal: MyceliumArchitectError? {
+        if case .refused(let error) = outcome { return error }
+        return nil
+    }
+
+    /// The predicted verdict: whether running the changed arrangement would win; nil when refused.
+    public var wins: Bool? { report?.wins }
+
+    /// The predicted failure of running the changed arrangement (nil when it would win or the change is refused).
+    public var failure: MyceliumArchitectFailure? { report?.failure }
+
+    /// The preview of `change` from `arrangement` in `level` at `stage` with `actionsLeft` actions left, judged in the
+    /// order the play's `apply(_:expecting:)` judges an arrangement action: `.stage` outside `playing`, then the
+    /// kernel's change rule (`MyceliumArchitectPlay.changed`: off the board or not empty, not a site, a limit reached,
+    /// nothing to clear, already seeded, not seeded, a starting seed; `.action("run")` for `.run`), then `.budget` with
+    /// no action left, then `MyceliumArchitectGrowth.report` of the changed arrangement. Pure; the kernel is not
+    /// changed.
+    public static func of(_ change: MyceliumArchitectAction, level: MyceliumArchitectLevel,
+                          arrangement: MyceliumArchitectArrangement, stage: MyceliumArchitectStage,
+                          actionsLeft: Int) -> MyceliumArchitectPreview {
+        guard stage == .playing else { return MyceliumArchitectPreview(change: change, outcome: .refused(.stage)) }
+        let next: MyceliumArchitectArrangement
+        do throws(MyceliumArchitectError) {
+            next = try MyceliumArchitectPlay.changed(level, arrangement, by: change)
+        } catch {
+            return MyceliumArchitectPreview(change: change, outcome: .refused(error))
+        }
+        guard actionsLeft > 0 else { return MyceliumArchitectPreview(change: change, outcome: .refused(.budget)) }
+        return MyceliumArchitectPreview(change: change,
+                                        outcome: .accepted(arrangement: next,
+                                                           report: MyceliumArchitectGrowth.report(level,
+                                                                                                  arrangement: next)))
+    }
+}
+
 /// An immutable copy of what the renderer may read (see the file header).
 public struct MyceliumArchitectSceneSnapshot: Sendable, Equatable {
     /// The side of the square every board fills (clarification Q1).
@@ -170,6 +278,14 @@ public struct MyceliumArchitectSceneSnapshot: Sendable, Equatable {
     public let levelNumber: Int
     /// The presentation time in seconds (never negative or non-finite).
     public let time: Double
+    /// The placement tool; nutrient from every initialiser (feature 514; presentation only; never in the digest).
+    public private(set) var tool: MyceliumArchitectTool = .nutrient
+    /// The previewed press or drag; nil from every initialiser (feature 514; presentation only; never in the digest).
+    public private(set) var preview: MyceliumArchitectPreview? = nil
+    /// The inspected cell; nil from every initialiser (feature 514; presentation only; never in the digest).
+    public private(set) var inspectedCell: MyceliumArchitectCell? = nil
+    /// The view orbit; the authored view from every initialiser (feature 514; presentation only; never in the digest).
+    public private(set) var orbit: MyceliumArchitectViewOrbit = .authored
 
     /// A snapshot of `play` with pulse `shownPulse` shown (clamped to 0 … the pulses run), at presentation time `time`
     /// (a non-finite or negative time becomes 0). Copies the play's report; never holds the kernel.
@@ -250,5 +366,59 @@ public struct MyceliumArchitectSceneSnapshot: Sendable, Equatable {
     public func isReached(_ terminal: Int) -> Bool {
         guard terminalPulses.indices.contains(terminal), let pulse = terminalPulses[terminal] else { return false }
         return pulse <= shownPulse
+    }
+
+    // MARK: Presentation state (feature 514)
+
+    /// This snapshot with `tool` chosen (presentation only: nothing else changes).
+    public func choosing(_ tool: MyceliumArchitectTool) -> MyceliumArchitectSceneSnapshot {
+        var copy: MyceliumArchitectSceneSnapshot = self
+        copy.tool = tool
+        return copy
+    }
+
+    /// This snapshot with `change` previewed: ``preview`` is
+    /// ``MyceliumArchitectPreview/of(_:level:arrangement:stage:actionsLeft:)`` of this snapshot's level, arrangement,
+    /// stage and actions left — the kernel's own judgement. Presentation only: nothing else changes.
+    public func previewing(_ change: MyceliumArchitectAction) -> MyceliumArchitectSceneSnapshot {
+        var copy: MyceliumArchitectSceneSnapshot = self
+        copy.preview = MyceliumArchitectPreview.of(change, level: level, arrangement: arrangement, stage: stage,
+                                                   actionsLeft: actionsLeft)
+        return copy
+    }
+
+    /// This snapshot without a preview (presentation only).
+    public func clearingPreview() -> MyceliumArchitectSceneSnapshot {
+        var copy: MyceliumArchitectSceneSnapshot = self
+        copy.preview = nil
+        return copy
+    }
+
+    /// This snapshot with `cell` inspected (nil, or a cell off the board, clears the inspection); presentation only.
+    public func inspecting(_ cell: MyceliumArchitectCell?) -> MyceliumArchitectSceneSnapshot {
+        var copy: MyceliumArchitectSceneSnapshot = self
+        if let target = cell, level.contains(target) {
+            copy.inspectedCell = target
+        } else {
+            copy.inspectedCell = nil
+        }
+        return copy
+    }
+
+    /// This snapshot seen from `orbit` (clamped); presentation only.
+    public func orbiting(_ orbit: MyceliumArchitectViewOrbit) -> MyceliumArchitectSceneSnapshot {
+        var copy: MyceliumArchitectSceneSnapshot = self
+        copy.orbit = orbit.clamped()
+        return copy
+    }
+
+    /// This snapshot with the adapter's presentation state: `tool`, `preview` as given (the adapter computed it from the
+    /// same play), the inspected `cell` (off the board: none) and `orbit` (clamped).
+    func presenting(tool: MyceliumArchitectTool, preview: MyceliumArchitectPreview?,
+                    inspectedCell cell: MyceliumArchitectCell?,
+                    orbit: MyceliumArchitectViewOrbit) -> MyceliumArchitectSceneSnapshot {
+        var copy: MyceliumArchitectSceneSnapshot = choosing(tool).inspecting(cell).orbiting(orbit)
+        copy.preview = preview
+        return copy
     }
 }
