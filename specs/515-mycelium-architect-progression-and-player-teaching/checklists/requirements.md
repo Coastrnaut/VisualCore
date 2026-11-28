@@ -32,5 +32,4 @@
 ## Notes
 
 - Validated 2026-11-27 in one pass. Reason codes and the experience id are named because they are the player-visible
-  contract shared with feature 505; exact hint texts, tutorial wording, star thresholds and the daily multiplier are
-  settled in /speckit-clarify.
+  contract shared with feature 505. Re-validated 2026-11-27 after /speckit-clarify (five answers): 16/16 still pass.
