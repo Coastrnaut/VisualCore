@@ -1097,4 +1097,7 @@ and the candidate registration in the one app.
 Feature 514 (R02-G22-04) adds gameplay spatial interaction: the analytic picker, the gesture controller (placements,
 clears, seed and unseed drags, pulse scrubs, cell inspection, previews drawn as ghost veins), the two-finger view orbit
 and the panel's tool buttons, "Place at cursor", inspection and "Reset view".
+Feature 515 (R02-G22-05) adds teaching and progression: hints from the certified witness or a bounded search in three
+levels, failure explanations, a tutorial on levels 1 … 3, stars and unlocks, the daily level (× 11), practice (budget
+24) and snapshot schema 2 with a migration from 1.
 See [docs/architecture/mycelium-architect.md](../../docs/architecture/mycelium-architect.md).

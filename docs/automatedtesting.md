@@ -5,7 +5,7 @@ building the experiences. This file is kept current: every gate that changes a t
 new lesson updates it (CLAUDE.md, section 4). Older simulator-specific lessons from the first app campaign are in
 [testing/simulator-test-lessons.md](testing/simulator-test-lessons.md); they still apply.
 
-Last updated: 2026-11-27 (R02-G22-04: Mycelium Architect gameplay spatial interaction).
+Last updated: 2026-11-27 (R02-G22-05: Mycelium Architect progression and player teaching).
 
 ## 1. What is tested, and where
 
@@ -1008,6 +1008,15 @@ other: the runner holds a lock), the experience's UI chunk and the reference reg
   tests build them once in a static. Lessons: with rates at most 200 and moonlight at most 3 a cell loses under 35 % a
   cycle, so the evaporation cap can never bind and is tested as a bound; the round-two host chunk 3f now also covers
   `MushroomWeather`.
+- **Mycelium Architect progression and player teaching** (R02-G22-05, 2026-11-27). Host: the `MyceliumArchitect`
+  filter now runs 33 XCTest and 205 Swift Testing tests (about 16 s): hints (30: exact hints from every opening win all
+  100 levels with the certified count, 200 seeded reachable states, 500 seeded failures over all four causes, off-path
+  searches against a brute force, the 2,000-arrangement work bound — at most 168 judged in practice), progress (20:
+  tutorial steps, stars and frontier, the daily level × 11 over 2026 … 2036) and progression in the adapter (13:
+  controls, refusals, schema 2 and the migration of a schema-1 payload of every level). The certified plans in the hint
+  tests are read from the witness files, which keeps them fast. Simulator: `MyceliumArchitectExperienceTests` now runs
+  50 (11 teaching tests). Lesson: with progression, `level.next` from an unwon opening is refused, so the preview and
+  gesture wiring tests now win the level's certified plan first.
 - **Mycelium Architect gameplay spatial interaction** (R02-G22-04, 2026-11-27). Host: the `MyceliumArchitect` filter
   now runs 33 XCTest and 140 Swift Testing tests (about 14 s): preview and orbit (10: orbit bounds and the 5 % fit at 203
   cameras, 200 previews equal the play's own result, digest untouched by tool, preview, inspection and orbit), picker

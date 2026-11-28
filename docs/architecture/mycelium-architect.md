@@ -107,3 +107,36 @@ presentation of later features.
   `refusalLog` (at most 64). A host test wins all 100 certified levels through the panel's actions within their
   budgets; simulator wiring tests drive scripted pointer events through the presenter.
 
+## Teaching and progression (feature 515, R02-G22-05)
+
+- **Hints.** `MyceliumArchitectHints` gives the certified witness's remaining actions while the arrangement lies on the
+  way from the start to the certified arrangement (for placed nutrients, placed blockers and seeds alike, everything in
+  both is present and nothing outside either) and the actions left cover them, so exact hints from every opening
+  replay the witness (1 … 4 actions) and win all 100 levels with the certified count; otherwise it searches at most two
+  legal arrangement moves from the current arrangement in the puzzle's fixed order, one before two, at most 2,000
+  arrangements judged (a catalog level's two-action space is at most 1,190). The hint escalates from the kind of change
+  ("Place a nutrient", "Place a blocker", "Clear a placed nutrient or blocker", "Seed a filament from the root", "Remove
+  a seeded filament") to where (a cell's quarter of the board, a direction's side) to the exact action ("Place a
+  nutrient at (c, r)", "Seed a filament to the north-east"); a winning arrangement says to run the growth; no plan says
+  so and suggests undo or retry. The presenter runs the search off the main actor with a generation counter so a stale
+  search never owns the hint.
+- **Failure text.** `MyceliumArchitectFailureExplanation` uses the level's own failure words (a tip grown into toxin, a
+  tip out of nutrient, a terminal not reached, a network over its weight limit, with tip or terminal, cell, pulse and
+  numbers grouped), capitalised, followed by "Undo the last action or retry the level."
+- **Tutorial.** Levels 1 … 3 show three instructions (place a nutrient or seed from the root; reach every terminal
+  within the limits, then run; what fails a run), each advancing when done (an accepted arrangement action, then a
+  second one or the level's end, then the level's end); dismissible; undo, redo and showing a pulse never move it back.
+- **Progress.** Stars by actions spent (undone ones included) against the certified plan's actions (3 at most, 2
+  within two more, else 1), level 1 open and a campaign win opening the next (no wrap after 100; a fresh opening of
+  level N opens 1 … N), five bands of 20; the daily level is (days since 2026-01-01 × 11) mod 100 + 1 and is playable
+  while still locked without opening it; practice raises the budget to 24 without stars or unlocks. The snapshot is
+  schema 2 (digest domain `r02-g22.mycelium-architect.v2`) with a migration from schema 1; locked means not yet won,
+  never paid for.
+- **Panel.** The panel shows the tutorial step with "Dismiss tutorial", "Show a hint" with the hint at its level (1 … 3,
+  reset by any play change), the failure explanation, the band ("Band b of 5"), the goal ("Win in at most k actions
+  for 3 stars", "1 action" in the singular), the best stars, the modes (Campaign, Daily from the presenter's local date,
+  Practice) and a stepper over the open levels with "Play level"; refusals read in words ("That change was refused:
+  that level is not open yet.") and their codes are logged. The one-line status keeps its short failure words
+  ("Failed: …"), which the feature-513 render tests assert, while the panel and the description show the full
+  explanation.
+

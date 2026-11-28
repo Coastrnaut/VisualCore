@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "swift",
+    "test",
+    "--package-path",
+    "Packages/ExperiencesRound02",
+    "--filter",
+    "VoxelOrigami|MyceliumArchitect"
+  ],
+  "command": "swift test --package-path Packages/ExperiencesRound02 --filter 'VoxelOrigami|MyceliumArchitect'",
+  "elapsed_seconds": 80.591,
+  "exit_code": 0,
+  "finished": "2026-11-28T03:15:34+00:00",
+  "gate": "R02-G22-05",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G22-05.round02-host-1.log",
+  "log_sha256": "50723a42ad79d2c2a286ef1d25c1dba7cf127d6343b4af1fc1d99c35384379ac",
+  "name": "round02-host-1",
+  "started": "2026-11-28T03:14:13+00:00",
+  "timed_out": false
+}
