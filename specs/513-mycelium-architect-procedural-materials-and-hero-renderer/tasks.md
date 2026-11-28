@@ -35,7 +35,7 @@ only after every agent has reported; read `exit=` before ticking). Commit after 
 - [X] T-R02G2203-004 [P] [US1] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectShaders.swift` (agent B: GLSL ES 3.00 — Verified 2026-11-27: MyceliumArchitectShaders (board and glow GLSL ES 3.00, 7 uniform slots each, no samplers, bounded loops, palette equal to Swift) and its tests (15, incl. agreement with the geometry's material table) installed; host-3 exit=0
   board and glow programs, at most 16 vec4 uniforms, no samplers, bounded loops, fixed hash, palette equal to Swift)
   with `Packages/ExperiencesRound02/MyceliumArchitect/CoreTests/MyceliumArchitectShaderSourceTests.swift`; `--name host-3`
-- [ ] T-R02G2203-005 [US1] [US3] Create the iOS experience `Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectExperience.swift`,
+- [X] T-R02G2203-005 [US1] [US3] Create the iOS experience `Packages/ExperiencesRound02/MyceliumArchitect/Experience/MyceliumArchitectExperience.swift`, — Verified 2026-11-27: experience target (experience, presenter with probes and tier log, board scene with fallback, labelled panel) and its simulator tests (29) installed; sim-27 exit=65 (spores drawn over the caps hid every cap point at tiers 0/1: spores moved beneath the caps, hollow pips' fallback colour set to ring), sim-27-2 exit=0
   `MyceliumArchitectPresenter.swift` (frame `probes(_:)`, quality levels equal to the Core's `qualityTiers`,
   `tierLog`, `fallbackReason`), `MyceliumArchitectBoardScene.swift`, `MyceliumArchitectControls.swift` (labelled
   minimal panel) and `Packages/ExperiencesRound02/MyceliumArchitect/ExperienceTests/MyceliumArchitectRenderTests.swift` (agent C: frames of levels 1, 21, 41, 61,

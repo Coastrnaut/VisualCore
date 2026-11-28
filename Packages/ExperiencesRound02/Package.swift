@@ -73,6 +73,8 @@ let package = Package(
         .library(name: "BinaryGardensExperience", targets: ["BinaryGardensExperience"]),
         // Feature 511 (R02-G22-01): Mycelium Architect's rule kernel, a candidate until X-R02-G22.
         .library(name: "MyceliumArchitectCore", targets: ["MyceliumArchitectCore"]),
+        // Feature 513 (R02-G22-03): Mycelium Architect's experience (iOS only; a registered candidate until X-R02-G22).
+        .library(name: "MyceliumArchitectExperience", targets: ["MyceliumArchitectExperience"]),
         // Feature 443 (R02-G15-03): Voxel Origami's experience (iOS only; a registered candidate until X-R02-G15).
         .library(name: "VoxelOrigamiExperience", targets: ["VoxelOrigamiExperience"]),
         // Feature 423 (R02-G13-03): Acoustic Constellator's experience (iOS only; a registered candidate until X-R02-G13).
@@ -1096,5 +1098,26 @@ let package = Package(
                                    .product(name: "VisualCoreExperience", package: visualCore),
                                    .product(name: "VisualCoreDiagnostics", package: visualCore)],
                     path: "MyceliumArchitect/CoreTests"),
+        // Feature 513 (R02-G22-03): Mycelium Architect's experience (presenter, board scene, controls).
+        .target(name: "MyceliumArchitectExperience",
+                dependencies: ["MyceliumArchitectCore",
+                               .product(name: "VisualCoreMath", package: visualCore),
+                               .product(name: "VisualCoreScenes", package: visualCore),
+                               .product(name: "VisualCoreExperience", package: visualCore),
+                               .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                               .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                path: "MyceliumArchitect/Experience"),
+        // Feature 513 (R02-G22-03): the simulator tests of Mycelium Architect's experience.
+        .testTarget(name: "MyceliumArchitectExperienceTests",
+                    dependencies: ["MyceliumArchitectExperience", "MyceliumArchitectCore",
+                                   .product(name: "VisualCoreMath", package: visualCore),
+                                   .product(name: "VisualCoreScenes", package: visualCore),
+                                   .product(name: "VisualCoreExperience", package: visualCore),
+                                   .product(name: "VisualCoreSimulation", package: visualCore),
+                                   .product(name: "VisualCoreRendering", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreExperienceHost", package: rendering, condition: .when(platforms: [.iOS])),
+                                   .product(name: "VisualCoreUI", package: rendering, condition: .when(platforms: [.iOS]))],
+                    path: "MyceliumArchitect/ExperienceTests"),
     ]
 )

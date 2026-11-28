@@ -27,13 +27,14 @@
 //    8. bloom: per consumed nutrient whose step is shown, a disc of half 0.22·s at its cell;
 //    9. fuzz: one group: at the tiers with fuzz, `tier.fuzzStrands` strands per branch point (a shown cell with two or
 //       more shown children; 0 … 0.4·s out) and per open terminal cap (0.3·s … 0.5·s out), at hashed angles;
-//   10. sprout: per seed, a short tapered tube from the root 0.4·s towards the seeded direction (0.1·s → 0.04·s);
-//   11. root: the root cap, a flattened dome of radius 0.36·s and `tier.capSegments` segments;
-//   12. terminal: per terminal a flattened dome of radius 0.42·s, `terminalOpen` when ``MyceliumArchitectSceneSnapshot/
+//   10. spore: one group: at the tiers with spores, `tier.spores` hashed spore dots over the board, beneath the
+//       sprouts and caps so this decoration never hides them;
+//   11. sprout: per seed, a short tapered tube from the root 0.4·s towards the seeded direction (0.1·s → 0.04·s);
+//   12. root: the root cap, a flattened dome of radius 0.36·s and `tier.capSegments` segments;
+//   13. terminal: per terminal a flattened dome of radius 0.42·s, `terminalOpen` when ``MyceliumArchitectSceneSnapshot/
 //       isReached(_:)`` else `terminalClosed`, with its ring of terminal + 1 pips (half 0.06·s on a circle of 0.5·s,
 //       filled when reached, hollow otherwise); for the terminal an unreached failure names, then a broken `pipHollow`
 //       ring of half 0.5·s around it;
-//   13. spore: one group: at the tiers with spores, `tier.spores` hashed spore dots over the board;
 //   14. gauge: the weight bar: the plate x −0.95 … 0.95, y −1.12 ± 0.045; the fill from x −0.9 over 1.8 · min(weight,
 //       budget) / budget (value: that fraction; on an overweight failure the part past the limit broken); the limit
 //       tick at the weight limit; the budget end tick at x 0.9 (a `limitTick`, broken on a starved failure);
@@ -185,7 +186,7 @@ enum MyceliumArchitectMaterial: Int, Sendable, CaseIterable {
         case .weightFill: return P.weight
         case .limitTick: return P.limit
         case .pipFilled: return P.capOpen
-        case .pipHollow: return P.capClosed
+        case .pipHollow: return P.ring
         case .actionsLit: return P.actionsLit
         case .actionsUnlit: return P.actionsUnlit
         case .fuzz: return P.spore
@@ -267,14 +268,14 @@ public struct MyceliumArchitectElement: Sendable, Equatable {
         case bloom = 8
         /// The hyphae fuzz (one group; nothing at a tier without fuzz).
         case fuzz = 9
+        /// The spores (one group; nothing at a tier without spores), beneath the caps so decoration never hides them.
+        case spore = 10
         /// A sprout (`item` the seed's index in the arrangement).
-        case sprout = 10
+        case sprout = 11
         /// The root cap.
-        case root = 11
+        case root = 12
         /// A terminal cap with its pips (`item` the terminal).
-        case terminal = 12
-        /// The spores (one group; nothing at a tier without spores).
-        case spore = 13
+        case terminal = 13
         /// The weight gauge.
         case gauge = 14
         /// A terminal pip of the gauge row (`item` the terminal).
@@ -717,6 +718,7 @@ public enum MyceliumArchitectSceneGeometry {
             list.append(E(kind: .bloom, index: index, item: bloom.index, centre: centre(bloom.cell, snapshot)))
         }
         list.append(E(kind: .fuzz, index: 0, item: 0, centre: boardCentre))
+        list.append(E(kind: .spore, index: 0, item: 0, centre: boardCentre))
         let rootCentre: SIMD3<Double> = centre(level.root, snapshot)
         for (index, direction) in snapshot.arrangement.seeds.enumerated() {
             let tip: SIMD3<Double> = rootCentre + planeDirection(direction) * (sproutLength * snapshot.fitScale)
@@ -726,7 +728,6 @@ public enum MyceliumArchitectSceneGeometry {
         for (index, cell) in level.terminals.enumerated() {
             list.append(E(kind: .terminal, index: index, item: index, centre: centre(cell, snapshot)))
         }
-        list.append(E(kind: .spore, index: 0, item: 0, centre: boardCentre))
         list.append(E(kind: .gauge, index: 0, item: 0, centre: SIMD3((plateLeft + plateRight) / 2, gaugeY, 0)))
         for index in level.terminals.indices {
             list.append(E(kind: .pip, index: index, item: index, centre: rowPip(index, count: level.terminals.count)))

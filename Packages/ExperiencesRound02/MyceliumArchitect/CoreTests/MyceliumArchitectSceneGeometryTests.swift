@@ -430,8 +430,8 @@ import VisualCoreScenes
 
     @Test func elementsAndTrianglesFollowThePaintersOrder() throws {
         let rank: [Material: Int] = [.backdrop: 0, .floor: 1, .grid: 1, .site: 2, .toxin: 3, .rock: 4, .blocker: 5,
-                                     .nutrient: 6, .nutrientConsumed: 6, .vein: 7, .bloom: 8, .fuzz: 9, .sprout: 10,
-                                     .root: 11, .terminalClosed: 12, .terminalOpen: 12, .spore: 13, .gaugePlate: 14,
+                                     .nutrient: 6, .nutrientConsumed: 6, .vein: 7, .bloom: 8, .fuzz: 9, .spore: 10,
+                                     .sprout: 11, .root: 12, .terminalClosed: 13, .terminalOpen: 13, .gaugePlate: 14,
                                      .weightFill: 14, .limitTick: 14, .actionsLit: 16, .actionsUnlit: 16]
         for snapshot in try Self.extremes() {
             let order: [MyceliumArchitectElement] = G.paintOrder(snapshot)

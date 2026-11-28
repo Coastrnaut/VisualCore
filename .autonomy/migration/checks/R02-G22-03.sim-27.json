@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "python3",
+    "scripts/xcodebuild_package.py",
+    "--package",
+    "Packages/ExperiencesRound02",
+    "--scheme",
+    "ExperiencesRound02-Package",
+    "--destination",
+    "sim-27.2",
+    "--action",
+    "test",
+    "--only-testing",
+    "MyceliumArchitectExperienceTests"
+  ],
+  "command": "python3 scripts/xcodebuild_package.py --package Packages/ExperiencesRound02 --scheme ExperiencesRound02-Package --destination sim-27.2 --action test --only-testing MyceliumArchitectExperienceTests",
+  "elapsed_seconds": 28.586,
+  "exit_code": 65,
+  "finished": "2026-11-28T00:31:01+00:00",
+  "gate": "R02-G22-03",
+  "ledger": "migration",
+  "log": ".autonomy/logs/migration/R02-G22-03.sim-27.log",
+  "log_sha256": "8f485b8d30540027b4b486b51fb7df39a6798e652f0d22fff7ad6de5e5543949",
+  "name": "sim-27",
+  "started": "2026-11-28T00:30:32+00:00",
+  "timed_out": false
+}
