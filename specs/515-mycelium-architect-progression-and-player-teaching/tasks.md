@@ -116,7 +116,7 @@ campaign covers the game). Agents model their files on Binary Gardens' (feature 
 - [X] T-R02G2205-008 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G22-05.reference-1.json)
 - [X] T-R02G2205-009 Reference regression chunk 2 (`--name reference-2`) — Verified 2026-11-27: 2026-11-27: reference-2 exit=0 (.autonomy/migration/checks/R02-G22-05.reference-2.json)
 - [X] T-R02G2205-010 Script tests, run alone (`--name script-tests`) — Verified 2026-11-27: 2026-11-27: script-tests exit=0, run alone (.autonomy/migration/checks/R02-G22-05.script-tests.json)
-- [ ] T-R02G2205-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record;
+- [X] T-R02G2205-011 Run `/speckit-converge` and `/speckit-implement` until nothing is appended; then seal and record; — Verified 2026-11-27: 2026-11-27: converge round 1 appended nothing (converged); README row and gate list updated
   README row and gate list updated
 
 ## Dependencies and parallel work
