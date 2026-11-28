@@ -331,6 +331,49 @@ private struct GestureScript {
         #expect(moved.controller.state == .idle)
     }
 
+    /// FR-R02G2204-002 (T-R02G2204-014): a site press lifted under 16 points away but over a neighbouring cell sends
+    /// nothing; lifted inside the same cell it sends its change.
+    @Test func sitePressSendsOnlyWhenReleasedOverTheSameCell() throws {
+        let snapshot: MyceliumArchitectSceneSnapshot = try Self.core(1).snapshot(time: 0)
+        var checked: Int = 0
+        for orbit in Self.orbits {
+            let map: [Target: Vec2] = Self.points(snapshot, viewSize: Self.phone, orbit: orbit)
+            let site: (cell: Cell, point: Vec2) = try #require(Self.emptySite(snapshot, map))
+            // Walk right from the site's point to the first point that no longer picks the site's cell.
+            var edge: Double? = nil
+            var dx: Double = 0
+            while dx < 200 {
+                let p: Vec2 = Vec2(site.point.x + dx, site.point.y)
+                if MyceliumArchitectPicker.pick(p, viewSize: Self.phone, snapshot: snapshot, orbit: orbit)
+                    != .cell(site.cell) {
+                    edge = dx
+                    break
+                }
+                dx += 0.5
+            }
+            let boundary: Double = try #require(edge)
+            let inside: Vec2 = Vec2(site.point.x + boundary - 3, site.point.y)
+            let outside: Vec2 = Vec2(site.point.x + boundary + 3, site.point.y)
+            #expect(MyceliumArchitectPicker.pick(inside, viewSize: Self.phone, snapshot: snapshot, orbit: orbit)
+                    == .cell(site.cell))
+            var across: GestureScript = GestureScript(snapshot: snapshot, viewSize: Self.phone, orbit: orbit)
+            var actions: [Action] = across.event(1, .began, inside, dt: 1)
+            actions += across.event(1, .moved, outside)
+            actions += across.event(1, .ended, outside)
+            #expect(actions == [.preview(.nutrient(site.cell)), .clearPreview])
+            #expect(across.controller.state == .idle)
+            var within: GestureScript = GestureScript(snapshot: snapshot, viewSize: Self.phone, orbit: orbit)
+            let stay: Vec2 = Vec2(inside.x - 2, inside.y)
+            var kept: [Action] = within.event(1, .began, inside, dt: 1)
+            kept += within.event(1, .moved, stay)
+            kept += within.event(1, .ended, stay)
+            #expect(kept == [.preview(.nutrient(site.cell)), .send("cell.nutrient", Self.values(site.cell)),
+                             .clearPreview])
+            checked += 1
+        }
+        #expect(checked == Self.orbits.count)
+    }
+
     // MARK: Inspection (FR-005)
 
     @Test func tapInspectsACellAndASecondTapClears() throws {

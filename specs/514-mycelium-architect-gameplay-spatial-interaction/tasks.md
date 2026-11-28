@@ -64,7 +64,7 @@ SC-008 → 012.
 
 ## Phase 6: Convergence
 
-- [ ] T-R02G2204-014 Make a site press send its change only when the release point picks the same cell (otherwise
+- [X] T-R02G2204-014 Make a site press send its change only when the release point picks the same cell (otherwise — Verified 2026-11-27: 2026-11-27: site press re-picks the release point with the touch-down snapshot and orbit; test sitePressSendsOnlyWhenReleasedOverTheSameCell at three orbits; 141 Swift Testing + 33 XCTest passed; host-5 exit=0 (.autonomy/migration/checks/R02-G22-04.host-5.json)
   `.clearPreview` only) in `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectGestureController.swift`,
   with a test in `MyceliumArchitectGestureControllerTests.swift` (a release under 16 points over a neighbouring cell
   sends nothing) per FR-R02G2204-002 (partial); `--name host-5`

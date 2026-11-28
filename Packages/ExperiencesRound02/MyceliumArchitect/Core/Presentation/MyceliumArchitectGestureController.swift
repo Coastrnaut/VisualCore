@@ -31,7 +31,8 @@
 //   - a cell or empty press: nothing (a release does nothing).
 //   A release never previews itself (a drag begun by the release point commits without a preview).
 // - Release (`.ended`):
-//   - a site press not dragged (any duration; a tap or a longer press under 16 points): while the releasing snapshot is
+//   - a site press not dragged (any duration; a tap or a longer press under 16 points) released over the same cell
+//     (picked with the touch-down snapshot and orbit; otherwise only `.clearPreview`): while the releasing snapshot is
 //     playing, exactly one `.send(control, values)` of the change (`cell.nutrient`, `cell.blocker` or `cell.clear`
 //     with [column, row]) and `.clearPreview`; a change the kernel refuses (a count at its limit) is still sent once,
 //     so its refusal is shown and logged; when the play stopped meanwhile, `[.clearPreview, .explain(stageReason)]`;
@@ -459,6 +460,22 @@ public struct MyceliumArchitectGestureController: Sendable {
 
     /// The release actions of the one-finger gesture `touch` lifted by `event` (its last move already followed) in a
     /// view of `viewSize`; `snapshot` is the releasing snapshot.
+    /// Whether `point` picks the cell `change` acts on, with the touch-down snapshot and orbit (feature 514,
+    /// FR-R02G2204-002, T-R02G2204-014): a site press lifted over a neighbouring cell sends nothing.
+    private static func releasesOverSameCell(_ change: MyceliumArchitectAction, at point: Vec2, viewSize: Vec2,
+                                             touch: Touch) -> Bool {
+        let cell: MyceliumArchitectCell
+        switch change {
+        case .nutrient(let c), .blocker(let c), .clear(let c): cell = c
+        default: return false
+        }
+        guard usable(viewSize), point.isFinite else { return false }
+        let picked: MyceliumArchitectPickTarget = MyceliumArchitectPicker.pick(point, viewSize: viewSize,
+                                                                               snapshot: touch.snapshot,
+                                                                               orbit: touch.orbit)
+        return picked == .cell(cell)
+    }
+
     private mutating func release(_ touch: Touch, at event: PointerEvent, viewSize: Vec2,
                                   snapshot: MyceliumArchitectSceneSnapshot) -> [MyceliumArchitectGestureAction] {
         let tap: Bool = isTap(touch, at: event)
@@ -484,6 +501,10 @@ public struct MyceliumArchitectGestureController: Sendable {
             return [.showPulse(pulse)]
         case .site(let change):
             guard !touch.dragging else { return [] }
+            // FR-R02G2204-002 (T-R02G2204-014): sent only on release over the same cell, picked as at touch-down.
+            guard Self.releasesOverSameCell(change, at: event.location, viewSize: viewSize, touch: touch) else {
+                return [.clearPreview]
+            }
             guard playing else { return [.clearPreview, .explain(Self.stageReason(snapshot.stage))] }
             guard let send = Self.send(change) else { return [.clearPreview] }
             return [send, .clearPreview]
