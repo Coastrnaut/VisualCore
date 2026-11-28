@@ -8,7 +8,9 @@
 // the scene (`motion` 0) and Reduce Flashing caps the glow; the presenter declares its two frame probes (the backdrop
 // corners) once a frame was drawn; the feature's seed 2_513 opens level 14 with the full growth shown; the panel's
 // cursor, direction and pulse stay inside the level's ranges; and a refused action is named in words with or without
-// the engine's `action.rule.` prefix. iOS only, as the target.
+// the engine's `action.rule.` prefix. iOS only, as the target. Feature 515 (R02-G22-05) T-R02G2205-004 (clarification
+// Q5): fifteen declared actions (`level.select`, `mode.daily`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`
+// added) and schema 2.
 #if os(iOS)
 import Foundation
 import MyceliumArchitectCore
@@ -25,11 +27,12 @@ import VisualCoreExperienceHost
         #expect(MyceliumArchitectExperienceCore.experienceID == "r02-g22.mycelium-architect")
     }
 
-    /// The registration's content facts: 100 certified levels, schema 1, three tiers, the five-colour palette.
+    /// The registration's content facts: 100 certified levels, schema 2 (feature 515), three tiers, the five-colour
+    /// palette.
     @Test func theRegistrationFactsHold() {
         #expect(MyceliumArchitectExperienceCore.levelNumbers == 1...100)
         #expect(MyceliumArchitectExperienceCore.certifiedCandidates.count == 100)
-        #expect(MyceliumArchitectExperienceCore.schemaVersion == 1)
+        #expect(MyceliumArchitectExperienceCore.schemaVersion == 2)
         var names: [String] = []
         for level in MyceliumArchitectExperienceCore.qualityProfile.levels { names.append(level.name) }
         #expect(names == ["level-0", "level-1", "level-2"])
@@ -43,7 +46,8 @@ import VisualCoreExperienceHost
         for control in MyceliumArchitectExperienceCore.controls { ids.append(control.id) }
         #expect(ids == MyceliumArchitectExperienceCore.actionIDs)
         #expect(ids == ["cell.nutrient", "cell.blocker", "cell.clear", "root.seed", "root.unseed", "growth.run",
-                        "play.undo", "play.redo", "level.next", "growth.show"])
+                        "play.undo", "play.redo", "level.next", "growth.show", "level.select", "mode.daily",
+                        "mode.practice", "mode.campaign", "tutorial.dismiss"])
     }
 
     /// The presenter's quality levels are as many as the Core's `qualityTiers` and equal the names of its

@@ -12,7 +12,10 @@
 // equal to the committed `scenario-manifest.json` (`UPDATE_SCENARIO_MANIFEST=1` rewrites it) and its digests, results
 // and outcomes equal to what `ExperienceEngine` gives, every acceptance row ending in the state of its family.
 // Host-run (`swift test`); explicit types, plain loops (CI type-check rule). Modelled on
-// `BinaryGardensExperienceCoreTests` and `BinaryGardensScenariosTests` (feature 503).
+// `BinaryGardensExperienceCoreTests` and `BinaryGardensScenariosTests` (feature 503). Feature 515 (R02-G22-05)
+// T-R02G2205-004 (clarification Q5): schema 2 `{level, mode, progress, records, tutorial}` and digest v2, fifteen
+// controls, `level.next` to the next open level (no wrap; `r02-g22.locked` when none); the progression itself is tested
+// in `MyceliumArchitectProgressionCoreTests`.
 import Foundation
 @testable import MyceliumArchitectCore
 import Testing
@@ -70,12 +73,12 @@ private let builtManifest: ScenarioManifest = MyceliumArchitectExperienceCore.ma
     /// The values of `cell`.
     static func values(_ cell: Cell) -> [Double] { [Double(cell.column), Double(cell.row)] }
 
-    @Test func theTenControlsAreDeclaredWithTheirRanges() {
+    @Test func theFifteenControlsAreDeclaredWithTheirRanges() {
         var ids: [String] = []
         for control in Core.controls { ids.append(control.id) }
-        #expect(ids == Core.actionIDs && ids.count == 10)
-        #expect(Core.experienceID == "r02-g22.mycelium-architect" && Core.schemaVersion == 1)
-        #expect(Core.digestDomain == "r02-g22.mycelium-architect.v1")
+        #expect(ids == Core.actionIDs && ids.count == 15)
+        #expect(Core.experienceID == "r02-g22.mycelium-architect" && Core.schemaVersion == 2)
+        #expect(Core.digestDomain == "r02-g22.mycelium-architect.v2")
         for control in Core.controls {
             switch control.id {
             case "cell.nutrient", "cell.blocker", "cell.clear":
@@ -84,6 +87,10 @@ private let builtManifest: ScenarioManifest = MyceliumArchitectExperienceCore.ma
                 #expect(control.ranges == [0...7], "\(control.id)")
             case "growth.show":
                 #expect(control.ranges == [0...128], "\(control.id)")
+            case "level.select":
+                #expect(control.ranges == [1...100], "\(control.id)")
+            case "mode.daily":
+                #expect(control.ranges == [1...9999, 1...12, 1...31], "\(control.id)")
             default:
                 #expect(control.ranges.isEmpty, "\(control.id)")
             }
@@ -141,12 +148,11 @@ private let builtManifest: ScenarioManifest = MyceliumArchitectExperienceCore.ma
         #expect(core.shownPulse == pulses, "the run shows the whole growth again")
         core = Self.accepted(core, "growth.show", [1])
         #expect(core.shownPulse == 1)
-        // The next level, a fresh play; 100 wraps to 1.
+        // The next level (opened by the campaign win), a fresh play; since feature 515 no wrap from 100 to 1.
         core = Self.accepted(core, "level.next")
         #expect(core.levelNumber == 2 && core.play.actionsSpent == 0 && core.play.stage == .playing)
         #expect(core.shownPulse == core.play.report.pulsesRun && core.outcome == nil)
-        let last: Core = Self.accepted(try Self.core(100), "level.next")
-        #expect(last.levelNumber == 1 && last.play == opening.play)
+        #expect(try Self.code(try Self.core(100), "level.next") == "action.rule.r02-g22.locked")
     }
 
     @Test func everyControlIsRefusedAsStated() throws {
@@ -297,6 +303,10 @@ private let builtManifest: ScenarioManifest = MyceliumArchitectExperienceCore.ma
         #expect(digests.count > 20, "the samples cover many states: \(digests.count)")
     }
 
+    /// The fields of a schema-2 payload after its level number: campaign mode, level 1 open, no records (feature 515).
+    static let restOfPayload: String = ",\"mode\":{\"mode\":\"campaign\"},"
+        + "\"progress\":{\"frontier\":1,\"solved\":[]},\"records\":[]}"
+
     @Test func theSnapshotRoundTripsAndDamagedPayloadsAreRefused() throws {
         let opening: Core = try Self.core(1)
         let sites: [Cell] = try #require(opening.play.level.sites)
@@ -306,7 +316,7 @@ private let builtManifest: ScenarioManifest = MyceliumArchitectExperienceCore.ma
         core = Self.accepted(core, "growth.show", [0])
         let payload: Data = try core.snapshotPayload()
         let object: [String: Any] = try #require(try JSONSerialization.jsonObject(with: payload) as? [String: Any])
-        #expect(Set(object.keys) == ["level", "records"])
+        #expect(Set(object.keys) == ["level", "mode", "progress", "records", "tutorial"])
         let restored: Core = try Core.restore(payload: payload, seed: Self.seed)
         let restoredDigest: String = try digest(of: restored)
         let savedDigest: String = try digest(of: core)
@@ -324,10 +334,10 @@ private let builtManifest: ScenarioManifest = MyceliumArchitectExperienceCore.ma
             _ = try Core.restore(payload: Data("not json".utf8), seed: 0)
         }
         #expect(throws: MyceliumArchitectRestoreRefusal.levelNumber(0)) {
-            _ = try Core.restore(payload: Data("{\"level\":0,\"records\":[]}".utf8), seed: 0)
+            _ = try Core.restore(payload: Data(("{\"level\":0" + Self.restOfPayload).utf8), seed: 0)
         }
         #expect(throws: MyceliumArchitectRestoreRefusal.levelNumber(101)) {
-            _ = try Core.restore(payload: Data("{\"level\":101,\"records\":[]}".utf8), seed: 0)
+            _ = try Core.restore(payload: Data(("{\"level\":101" + Self.restOfPayload).utf8), seed: 0)
         }
         var moved: [String: Any] = object
         moved["level"] = 2

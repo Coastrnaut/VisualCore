@@ -31,7 +31,8 @@
 //                                `failed` with its failure;
 //   play.undo, play.redo         the kernel's exact undo and redo (`r02-g22.action` when there is nothing to undo or
 //                                redo; undo works in a failed play and returns it to playing; a won play is final);
-//   level.next                   the next certified level (100 wraps to 1) with a fresh play;
+//   level.next                   the next certified level with a fresh play (since feature 515 the next open level in
+//                                campaign mode, `r02-g22.locked` when none; no wrap from 100 to 1);
 //   growth.show [0…128]          shows pulse 0 … the pulses run (presentation only; accepted in every stage); a pulse
 //                                above the pulses run is refused `r02-g22.pulse` without touching the kernel.
 // The declared ranges are column and row 0 … 31 (`MyceliumArchitectLevel.sides` upper bound − 1), direction 0 … 7 and
@@ -41,12 +42,13 @@
 // expected one, so `r02-g22.stale` cannot arise. A kernel refusal (`MyceliumArchitectError`) becomes
 // `.rule(code: error.reasonCode)`. A refused action changes nothing, the shown pulse included.
 //
-// Digest ("r02-g22.mycelium-architect.v1"): the level number and the play's fingerprint (not its record history, so
-// undo restores the earlier digest exactly); never the shown pulse, the quality tier or a time. Snapshot schema 1: the
-// JSON object `{"level", "records"}` with sorted keys; restoring replays the records on a fresh play of that level
-// (`MyceliumArchitectPlay.replay`), shows the pulses run and throws `MyceliumArchitectRestoreRefusal` for a damaged
-// payload, a level number outside 1 … 100 or a trace the kernel refuses (a record of a newer schema or of another
-// level's seed among them). An envelope of a newer schema is refused by the engine before the core sees it.
+// Digest ("r02-g22.mycelium-architect.v1" until feature 515, see below): the level number and the play's fingerprint
+// (not its record history, so undo restores the earlier digest exactly); never the shown pulse, the quality tier or a
+// time. Snapshot schema 1: the JSON object `{"level", "records"}` with sorted keys; restoring replays the records on a
+// fresh play of that level (`MyceliumArchitectPlay.replay`), shows the pulses run and throws
+// `MyceliumArchitectRestoreRefusal` for a damaged payload, a level number outside 1 … 100 or a trace the kernel refuses
+// (a record of a newer schema or of another level's seed among them). An envelope of a newer schema is refused by the
+// engine before the core sees it.
 //
 // Quality (research R12): three host tiers, best first as the contract requires (`qualityProfile` level 0 is the best
 // and no budget may rise); `qualityTiers` is their count and the profile's level names are
@@ -62,23 +64,65 @@
 // changing anything. The tool, the preview, the inspection and the orbit return to their defaults at an opening, at
 // `level.next`, at `reset()` and at restore (with the shown pulse at the pulses run, as before); every other accepted
 // action but `growth.show` clears the preview (its arrangement is gone), keeping the tool, the inspection and the orbit.
+//
+// Feature 515 (R02-G22-05) T-R02G2205-004 (FR-R02G2205-001, 003 … 007; SC-R02G2205-003 … 005; clarifications Q1–Q5):
+// the core also holds the player's progress (`MyceliumArchitectProgress`: won levels with the least actions spent and
+// stars, the open frontier), the mode (campaign, practice with the budget raised to the kernel's maximum 24 on a copy
+// of the level, daily) and the tutorial step (`MyceliumArchitectTutorialStep`). No level is ever gated by payment: a
+// locked level is one not yet unlocked (FR-R02G2205-006). New actions:
+//   level.select [1…100]           an open level, fresh, in campaign mode (`r02-g22.locked` otherwise);
+//   mode.daily [year, month, day]  the date's daily level ((days from 2026-01-01 × 11) mod 100 + 1), fresh
+//                                  (`r02-g22.date` for an impossible date); a daily level still locked in the campaign
+//                                  is playable and is not opened;
+//   mode.practice                  the current level fresh with the budget raised to 24 (a copy of the level);
+//   mode.campaign                  the current level fresh in campaign mode (the frontier when it is not open);
+//   tutorial.dismiss               the tutorial ends for this opening (the shown pulse and the preview are kept).
+// Non-whole values of the new controls are refused `r02-g22.not-whole`. Choosing a level or a mode starts a fresh play:
+// the left level's records are dropped, the pulses run shown, the tutorial at its first step, and the tool, the
+// preview, the inspection and the orbit at their defaults (as at an opening). `level.next` (above) moves to the next
+// open level in campaign mode and is refused with `r02-g22.locked` when there is none (100 no longer wraps to 1). A win
+// (the play reaching `won` on an accepted `growth.run` or redo) records
+// `progress.record(level:actionsSpent:certified:mode:)` with the actions spent
+// (`MyceliumArchitectProgress.actionsSpent`: every accepted nutrient, blocker, clear, seed and unseed record, undone
+// ones included) against the certified plan's action count (`certifiedActionCount`): campaign opens the next level,
+// daily records the level's best result and stars and opens nothing, practice records nothing. The certified plan
+// (`certifiedPlan`: the certified witness's arrangement actions, without the run) feeds the hints (`hint(level:)`) and
+// the stars. A fresh opening of level N (prepare, reset) has levels 1 … N open and no won levels. The tutorial starts
+// at `MyceliumArchitectTutorialStep.initial(level:)` at every opening (levels 1 … 3 in every mode) and is advanced
+// after every accepted nutrient, blocker, clear, seed, unseed, run, undo and redo by
+// `advanced(afterAction:actionsThisOpening:ended:)` (afterAction for an arrangement action, the actions this opening
+// counted as for the stars, ended when the play is won or failed — an undo never ends it, a redo only when it restores
+// a won or failed moment), never back; `growth.show` never moves it. The shown pulse, the quality tier, the tool, the
+// preview, the inspected cell and the orbit stay presentation. Digest "r02-g22.mycelium-architect.v2": level, play
+// fingerprint, progress and mode (never the tutorial step or the presentation state). Snapshot schema 2: `{"level",
+// "mode", "progress", "records", "tutorial"}` with sorted keys; schema-1 payloads migrate (no won levels, levels 1 …
+// the restored level open, campaign mode, the tutorial at its first step — `place` on levels 1 … 3, else `done`); a
+// damaged payload (invalid progress — a frontier or a won level outside 1 … 100, stars outside 1 … 3, actions below 1
+// —, an unknown mode or tutorial step, a daily mode naming another level) throws `.damaged`, a level outside 1 … 100
+// `.levelNumber`, a trace the kernel refuses `.kernel`; an envelope of a newer schema is refused by the engine.
+// Modelled on feature 505's `BinaryGardensExperienceCore`.
 import Foundation
 import Synchronization
 import VisualCoreDiagnostics
 import VisualCoreExperience
 import VisualCorePersistence
 
-/// The rule codes of Mycelium Architect's adapter refusals (feature 513).
+/// The rule codes of Mycelium Architect's adapter refusals (feature 513; `locked` and `date` since feature 515).
 public enum MyceliumArchitectExperienceRule {
-    /// A value that must be a whole number (a column, a row, a direction or a pulse) and is not.
+    /// A value that must be a whole number (a column, a row, a direction, a pulse, a level or a date part) and is not.
     public static let notWhole = "r02-g22.not-whole"
     /// A shown pulse above the pulses run within the declared range 0 … 128 (`growth.show`).
     public static let pulse = "r02-g22.pulse"
+    /// A level that is not open yet, or no next open level (feature 515). Never a payment gate.
+    public static let locked = "r02-g22.locked"
+    /// An impossible calendar date (`mode.daily`, feature 515).
+    public static let date = "r02-g22.date"
 }
 
 /// Why a saved Mycelium Architect state was refused on restore (feature 513). A refused restore changes nothing.
 public enum MyceliumArchitectRestoreRefusal: Error, Equatable, Sendable {
-    /// The payload is not the JSON object `{"level", "records"}` or a field has the wrong type.
+    /// The payload is not the JSON object of its schema, a field has the wrong type, or the progress, the mode or the
+    /// tutorial step is invalid (feature 515).
     case damaged
     /// The level number is outside 1 … 100; the value is that number.
     case levelNumber(Int)
@@ -86,17 +130,20 @@ public enum MyceliumArchitectRestoreRefusal: Error, Equatable, Sendable {
     case kernel(MyceliumArchitectError)
 }
 
-/// The state of Mycelium Architect as an experience (see the file header). Snapshot schema 1.
+/// The state of Mycelium Architect as an experience (see the file header). Snapshot schema 2.
 public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
     /// The experience's id in the catalog.
     public static let experienceID = "r02-g22.mycelium-architect"
     /// The snapshot schema this build writes.
-    public static let schemaVersion = 1
-    /// The digest's domain string (schema 1).
-    public static let digestDomain = "r02-g22.mycelium-architect.v1"
+    public static let schemaVersion = 2
+    /// The digest's domain string (schema 2).
+    public static let digestDomain = "r02-g22.mycelium-architect.v2"
     /// The action ids in declaration order.
     public static let actionIDs = ["cell.nutrient", "cell.blocker", "cell.clear", "root.seed", "root.unseed",
-                                   "growth.run", "play.undo", "play.redo", "level.next", "growth.show"]
+                                   "growth.run", "play.undo", "play.redo", "level.next", "growth.show",
+                                   "level.select", "mode.daily", "mode.practice", "mode.campaign", "tutorial.dismiss"]
+    /// The budget of a practice play: the kernel's maximum (`MyceliumArchitectMode.practiceBudget`, 24).
+    public static let practiceBudget: Int = MyceliumArchitectMode.practiceBudget
     /// The level numbers of the catalog.
     public static let levelNumbers: ClosedRange<Int> = 1...100
     /// The declared range of a column or a row: 0 … `MyceliumArchitectLevel.sides` upper bound − 1 (0 … 31).
@@ -112,14 +159,24 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
 
     /// The number of the certified level being played (1 … 100).
     public private(set) var levelNumber: Int
-    /// The kernel's play of that level.
+    /// The kernel's play of that level (of its practice copy in practice mode).
     public private(set) var play: MyceliumArchitectPlay
+    /// The player's progress (feature 515): in the digest, the snapshot and `==`.
+    public private(set) var progress: MyceliumArchitectProgress
+    /// The mode (feature 515): in the digest, the snapshot and `==`.
+    public private(set) var mode: MyceliumArchitectMode
+    /// The tutorial step (feature 515): in the snapshot and `==`, not in the digest.
+    public private(set) var tutorial: MyceliumArchitectTutorialStep
+    /// The certified plan of the current level: its certified witness's arrangement actions without the closing run
+    /// (1, 2, 3, 3 or 4 by band), which the hints follow and the stars count against (feature 515). Derived from the
+    /// level number.
+    public private(set) var certifiedPlan: [MyceliumArchitectAction]
     /// The shown pulse, 0 … the pulses run; presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var shownPulse: Int
     /// The level number the seed chose; a reset returns to it. Derived from the seed, so not in the digest or `==`.
     public let openingNumber: Int
-    /// The fresh play of the opening level; a reset returns to it. Derived from the seed, so not in the digest or `==`.
-    private let openingPlay: MyceliumArchitectPlay
+    /// The opening state; a reset returns to it. Derived from the seed, so not in the digest or `==`.
+    private let opening: Opening
     /// The host quality tier (0 = level-0, the best, … 2, clamped); presentation only — not in the digest, the snapshot
     /// or `==`.
     public private(set) var qualityTier = 0
@@ -132,14 +189,62 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
     /// The view orbit, clamped (feature 514); presentation only — not in the digest, the snapshot payload or `==`.
     public private(set) var orbit: MyceliumArchitectViewOrbit = .authored
 
-    /// A state playing `play` of level `levelNumber` with the pulses run shown, whose reset returns to `openingPlay` of
-    /// `openingNumber`.
-    init(levelNumber: Int, play: MyceliumArchitectPlay, openingNumber: Int, openingPlay: MyceliumArchitectPlay) {
+    /// What a reset restores (feature 515).
+    struct Opening: Sendable {
+        /// The fresh play of the opening level.
+        let play: MyceliumArchitectPlay
+        /// The opening progress: levels 1 … the opening level open, none won.
+        let progress: MyceliumArchitectProgress
+        /// The opening level's initial tutorial step.
+        let tutorial: MyceliumArchitectTutorialStep
+        /// The opening level's certified plan (arrangement actions, without the run).
+        let certifiedPlan: [MyceliumArchitectAction]
+    }
+
+    /// A state playing `play` of level `levelNumber` with `progress`, `mode` and `tutorial` and the pulses run shown,
+    /// whose reset returns to `opening` of `openingNumber`.
+    init(levelNumber: Int, play: MyceliumArchitectPlay, progress: MyceliumArchitectProgress,
+         mode: MyceliumArchitectMode, tutorial: MyceliumArchitectTutorialStep,
+         certifiedPlan: [MyceliumArchitectAction], openingNumber: Int, opening: Opening) {
         self.levelNumber = levelNumber
         self.play = play
+        self.progress = progress
+        self.mode = mode
+        self.tutorial = tutorial
+        self.certifiedPlan = certifiedPlan
         self.shownPulse = play.report.pulsesRun
         self.openingNumber = openingNumber
-        self.openingPlay = openingPlay
+        self.opening = opening
+    }
+
+    // MARK: Teaching and progression (feature 515)
+
+    /// The certified plan's action count of the current level (nutrient, blocker, clear, seed and unseed actions, the
+    /// run excluded: 1, 2, 3, 3 or 4 by band), against which a win's stars are counted.
+    public var certifiedActionCount: Int { certifiedPlan.count }
+
+    /// The difficulty band (1 … 5) of the current level: 20 levels per band, the certified difficulty bands
+    /// (`MyceliumArchitectProgress.band(of:)`).
+    public var band: Int { MyceliumArchitectProgress.band(of: levelNumber) }
+
+    /// The hint at `level` (1 … 3) for the current play against the certified plan
+    /// (`MyceliumArchitectHints.hint(level:play:certified:)`); nil when the play is won or not playing (a failed play
+    /// gives the retry advice). Reads only; it may search up to `MyceliumArchitectHints.workBound` arrangements, so the
+    /// presenter runs it off the main actor.
+    public func hint(level: Int) -> MyceliumArchitectHint? {
+        MyceliumArchitectHints.hint(level: level, play: play, certified: certifiedPlan)
+    }
+
+    /// The explanation of the play's failure (`MyceliumArchitectFailureExplanation(play:)`); nil unless it failed.
+    public var failureExplanation: MyceliumArchitectFailureExplanation? {
+        MyceliumArchitectFailureExplanation(play: play)
+    }
+
+    /// The arrangement actions of `generated`'s certified plan: its solution's actions without the closing run.
+    public static func arrangementPlan(of generated: MyceliumArchitectGeneratedLevel) -> [MyceliumArchitectAction] {
+        var actions: [MyceliumArchitectAction] = []
+        for action in generated.solution.actions where action != .run { actions.append(action) }
+        return actions
     }
 
     /// The level number a seed chooses: `seed % 100 + 1`.
@@ -220,14 +325,48 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         return play
     }
 
+    /// The practice copy of `level` (feature 515): every field kept, the budget raised to ``practiceBudget``.
+    ///
+    /// - Throws: the kernel's refusal of the copy (never for a certified level).
+    public static func practiceLevel(of level: MyceliumArchitectLevel) throws(MyceliumArchitectError)
+        -> MyceliumArchitectLevel {
+        try MyceliumArchitectLevel(id: level.id, seed: level.seed, difficulty: level.difficulty, width: level.width,
+                                   height: level.height, root: level.root, terminals: level.terminals,
+                                   rocks: level.rocks, toxins: level.toxins, fixedNutrients: level.fixedNutrients,
+                                   strength: level.strength, reach: level.reach, curvature: level.curvature,
+                                   obstacle: level.obstacle, maxNutrients: level.maxNutrients,
+                                   maxBlockers: level.maxBlockers, maxSeeds: level.maxSeeds,
+                                   startSeeds: level.startSeeds, pulses: level.pulses,
+                                   nutrientBudget: level.nutrientBudget, weightLimit: level.weightLimit,
+                                   budget: MyceliumArchitectMode.practice.budget(base: level.budget),
+                                   tutorial: level.tutorial, sites: level.sites)
+    }
+
+    /// The level a play of `certified` in `mode` uses: the practice copy in practice mode, otherwise the certified
+    /// level.
+    ///
+    /// - Throws: as ``practiceLevel(of:)``.
+    static func playedLevel(of certified: MyceliumArchitectGeneratedLevel, mode: MyceliumArchitectMode)
+        throws(MyceliumArchitectError) -> MyceliumArchitectLevel {
+        mode == .practice ? try practiceLevel(of: certified.level) : certified.level
+    }
+
     /// The opening state of manifest number `number`: a play begun and past the kernel's tutorial stage, ready to
-    /// accept actions, with the pulses run shown.
+    /// accept actions, with the pulses run shown; campaign mode, levels 1 … `number` open, none won, the tutorial at
+    /// its first step (feature 515).
     ///
     /// - Throws: as ``level(number:)``.
     public static func opening(number: Int) throws(MyceliumArchitectError) -> MyceliumArchitectExperienceCore {
-        let play: MyceliumArchitectPlay = try freshPlay(of: try level(number: number))
-        return MyceliumArchitectExperienceCore(levelNumber: number, play: play, openingNumber: number,
-                                               openingPlay: play)
+        let certified: MyceliumArchitectGeneratedLevel = try generated(number: number)
+        let play: MyceliumArchitectPlay = try freshPlay(of: certified.level)
+        var progress: MyceliumArchitectProgress = MyceliumArchitectProgress()
+        progress.open(through: number)
+        let tutorial: MyceliumArchitectTutorialStep = MyceliumArchitectTutorialStep.initial(level: number)
+        let plan: [MyceliumArchitectAction] = arrangementPlan(of: certified)
+        let opening: Opening = Opening(play: play, progress: progress, tutorial: tutorial, certifiedPlan: plan)
+        return MyceliumArchitectExperienceCore(levelNumber: number, play: play, progress: progress, mode: .campaign,
+                                               tutorial: tutorial, certifiedPlan: plan, openingNumber: number,
+                                               opening: opening)
     }
 
     // MARK: Scene snapshots
@@ -336,18 +475,39 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         qualityTier = min(max(tier, 0), Self.qualityTiers - 1)
     }
 
-    /// Equal states: the level number and the play (not the shown pulse, the quality tier, the opening level or the
-    /// presentation state of feature 514).
+    /// Equal states: the level number, the play, the progress, the mode and the tutorial step (not the shown pulse, the
+    /// quality tier, the opening level or the presentation state of feature 514).
     public static func == (lhs: MyceliumArchitectExperienceCore, rhs: MyceliumArchitectExperienceCore) -> Bool {
-        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play
+        lhs.levelNumber == rhs.levelNumber && lhs.play == rhs.play && lhs.progress == rhs.progress
+            && lhs.mode == rhs.mode && lhs.tutorial == rhs.tutorial
     }
 
     // MARK: Contract
 
-    /// Schema 1, no migration steps; a payload that does not decode is refused.
-    public static var migrations: MigrationChain { MigrationChain(currentVersion: schemaVersion) }
+    /// Schema 2 with the step 1 → 2 (``migratedToSchemaTwo(_:)``); a payload that does not decode is refused.
+    public static var migrations: MigrationChain {
+        MigrationChain(currentVersion: schemaVersion, steps: [1: { payload in try migratedToSchemaTwo(payload) }])
+    }
 
-    /// The encoder of payloads: sorted keys, unescaped slashes.
+    /// The schema-2 object of a schema-1 object `{"level", "records"}` (feature 515): no won levels with levels 1 … the
+    /// restored level open, campaign mode, no tutorial key (restore starts the tutorial at its first step: `place` on
+    /// the tutorial levels 1 … 3, else `done`).
+    ///
+    /// - Throws: ``MyceliumArchitectRestoreRefusal/damaged`` when `object` is not a schema-1 object.
+    public static func migratedToSchemaTwo(_ object: [String: Any]) throws -> [String: Any] {
+        guard let level = object["level"] as? Int, object["records"] is [Any] else {
+            throw MyceliumArchitectRestoreRefusal.damaged
+        }
+        var progress: MyceliumArchitectProgress = MyceliumArchitectProgress()
+        progress.open(through: level)
+        var migrated: [String: Any] = object
+        migrated["progress"] = try JSONSerialization.jsonObject(with: try payloadEncoder().encode(progress))
+        migrated["mode"] = try JSONSerialization.jsonObject(
+            with: try payloadEncoder().encode(MyceliumArchitectMode.campaign))
+        return migrated
+    }
+
+    /// The encoder of payloads and digested values: sorted keys, unescaped slashes.
     static func payloadEncoder() -> JSONEncoder {
         let encoder: JSONEncoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
@@ -366,6 +526,11 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         ExperienceControl(id: "play.redo"),
         ExperienceControl(id: "level.next"),
         ExperienceControl(id: "growth.show", ranges: [declared(pulseRange)]),
+        ExperienceControl(id: "level.select", ranges: [declared(levelNumbers)]),
+        ExperienceControl(id: "mode.daily", ranges: [declared(MyceliumArchitectProgress.dailyYears), 1...12, 1...31]),
+        ExperienceControl(id: "mode.practice"),
+        ExperienceControl(id: "mode.campaign"),
+        ExperienceControl(id: "tutorial.dismiss"),
     ]
 
     /// `range` as the `Double` range a control declares.
@@ -373,8 +538,8 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         Double(range.lowerBound)...Double(range.upperBound)
     }
 
-    /// The ten controls with their declared ranges (see the file header); `growth.run`, `play.undo`, `play.redo` and
-    /// `level.next` take no values.
+    /// The fifteen controls with their declared ranges (see the file header); `growth.run`, `play.undo`, `play.redo`,
+    /// `level.next`, `mode.practice`, `mode.campaign` and `tutorial.dismiss` take no values.
     public static var controls: [ExperienceControl] { declaredControls }
 
     /// The opening state of level `seed % 100 + 1`, in stage `playing` with the pulses run shown; no clock is read.
@@ -424,12 +589,21 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         do throws(MyceliumArchitectError) {
             if let kernel = Self.kernelAction(action.control, values) {
                 try play.apply(kernel, expecting: play.fingerprint)
+                if case .run = kernel {
+                    advanceTutorial(afterAction: false)
+                    recordIfWon()
+                } else {
+                    advanceTutorial(afterAction: true)
+                }
             } else {
                 switch action.control {
                 case "play.undo":
                     try play.undo()
+                    advanceTutorial(afterAction: false)
                 case "play.redo":
                     try play.redo()
+                    advanceTutorial(afterAction: false)
+                    recordIfWon()
                 case "growth.show":
                     // Presentation only: the play and the digest do not change, and the kernel is not consulted.
                     guard values[0] <= play.report.pulsesRun else {
@@ -437,13 +611,30 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
                     }
                     shownPulse = values[0]
                     return .accepted
-                default:   // level.next: the next certified level, 100 wraps to 1.
-                    let next: Int = levelNumber < Self.levelNumbers.upperBound
-                        ? levelNumber + 1 : Self.levelNumbers.lowerBound
-                    let fresh: MyceliumArchitectPlay = try Self.freshPlay(of: try Self.level(number: next))
-                    levelNumber = next
-                    play = fresh
-                    resetPresentation()
+                case "level.next":
+                    // The next open level in campaign mode; no wrap from 100 to 1 (feature 515).
+                    guard let next = progress.nextOpen(after: levelNumber) else {
+                        return .rejected(.rule(code: MyceliumArchitectExperienceRule.locked))
+                    }
+                    try open(number: next, mode: .campaign)
+                case "level.select":
+                    guard progress.isOpen(values[0]) else {
+                        return .rejected(.rule(code: MyceliumArchitectExperienceRule.locked))
+                    }
+                    try open(number: values[0], mode: .campaign)
+                case "mode.daily":
+                    guard let daily = MyceliumArchitectProgress.dailyLevel(year: values[0], month: values[1],
+                                                                            day: values[2]) else {
+                        return .rejected(.rule(code: MyceliumArchitectExperienceRule.date))
+                    }
+                    try open(number: daily, mode: .daily(level: daily))
+                case "mode.practice":
+                    try open(number: levelNumber, mode: .practice)
+                case "mode.campaign":
+                    try open(number: progress.isOpen(levelNumber) ? levelNumber : progress.frontier, mode: .campaign)
+                default:   // tutorial.dismiss: the play, the shown pulse and the preview do not change.
+                    tutorial = tutorial.dismissed()
+                    return .accepted
                 }
             }
         } catch {
@@ -461,11 +652,53 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         return Int(value)
     }
 
-    /// Back to the opening state the seed chose with the pulses run shown and the presentation state at its defaults
-    /// (feature 514); the quality tier, which is not state, is kept.
+    /// Advances the tutorial step after an accepted nutrient, blocker, clear, seed, unseed, run, undo or redo
+    /// (`MyceliumArchitectTutorialStep.advanced(afterAction:actionsThisOpening:ended:)`): `afterAction` for an
+    /// arrangement action, the actions this opening counted as for the stars (`MyceliumArchitectProgress.actionsSpent`,
+    /// undone ones included), ended when the play is won or failed (never after an undo, which always lands on a moment
+    /// before the end; after a redo only when it restores a won or failed moment). Never back.
+    private mutating func advanceTutorial(afterAction: Bool) {
+        guard tutorial != .done else { return }
+        let ended: Bool = play.stage == .won || play.stage == .failed
+        tutorial = tutorial.advanced(afterAction: afterAction,
+                                     actionsThisOpening: MyceliumArchitectProgress.actionsSpent(play), ended: ended)
+    }
+
+    /// A fresh play of manifest number `number` in `mode` (the practice copy in practice mode) with the level's first
+    /// tutorial step, the pulses run shown and the presentation state at its defaults (feature 514); the records of
+    /// the level left are dropped. Changes nothing when the kernel refuses.
+    private mutating func open(number: Int, mode: MyceliumArchitectMode) throws(MyceliumArchitectError) {
+        let certified: MyceliumArchitectGeneratedLevel = try Self.generated(number: number)
+        let fresh: MyceliumArchitectPlay = try Self.freshPlay(of: try Self.playedLevel(of: certified, mode: mode))
+        levelNumber = number
+        play = fresh
+        self.mode = mode
+        certifiedPlan = Self.arrangementPlan(of: certified)
+        tutorial = MyceliumArchitectTutorialStep.initial(level: number)
+        shownPulse = play.report.pulsesRun
+        resetPresentation()
+    }
+
+    /// After an accepted action that won the play: records the actions spent
+    /// (`MyceliumArchitectProgress.actionsSpent(_:)`) against the certified plan's action count in the current mode
+    /// (campaign opens the next level; daily records the best result and stars and opens nothing; practice records
+    /// nothing). A won play is final, so a win is recorded once.
+    private mutating func recordIfWon() {
+        guard play.stage == .won else { return }
+        progress.record(level: levelNumber, actionsSpent: MyceliumArchitectProgress.actionsSpent(play),
+                        certified: certifiedActionCount, mode: mode)
+    }
+
+    /// Back to the opening state the seed chose (levels 1 … the opening level open, none won, campaign mode, the
+    /// tutorial at its first step, the pulses run shown) with the presentation state at its defaults (feature 514);
+    /// the quality tier, which is not state, is kept.
     public mutating func reset() {
         levelNumber = openingNumber
-        play = openingPlay
+        play = opening.play
+        progress = opening.progress
+        mode = .campaign
+        tutorial = opening.tutorial
+        certifiedPlan = opening.certifiedPlan
         shownPulse = play.report.pulsesRun
         resetPresentation()
     }
@@ -479,35 +712,50 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         }
     }
 
-    /// "r02-g22.mycelium-architect.v1", then the level number and the play's fingerprint (actions spent, blockers,
-    /// failure, level, nutrients, seeds, stage); never the shown pulse, the quality tier or a time.
+    /// "r02-g22.mycelium-architect.v2", then the level number, the play's fingerprint (actions spent, blockers,
+    /// failure, level, nutrients, seeds, stage), the progress and the mode (their sorted JSON); never the tutorial
+    /// step, the shown pulse, the presentation state, the quality tier or a time.
     public func writeDigest(into builder: inout DigestBuilder) throws(DigestError) {
         builder.add(Self.digestDomain)
         builder.add(levelNumber)
-        // The play's fingerprint and not its record history, so undo restores the earlier digest exactly.
+        // The play's fingerprint and not its record history, so undo restores the earlier digest exactly; never the
+        // shown pulse (presentation) or the tutorial step.
         builder.add(play.fingerprint)
+        let encoder: JSONEncoder = Self.payloadEncoder()
+        builder.add(String(decoding: (try? encoder.encode(progress)) ?? Data(), as: UTF8.self))
+        builder.add(String(decoding: (try? encoder.encode(mode)) ?? Data(), as: UTF8.self))
     }
 
     // MARK: Snapshot
 
-    /// The payload's JSON form (schema 1).
+    /// The payload's JSON form (schema 2); `tutorial` is absent in a migrated schema-1 payload.
     private struct Payload: Codable {
         /// The level number.
         var level: Int
+        /// The mode.
+        var mode: MyceliumArchitectMode
+        /// The progress.
+        var progress: MyceliumArchitectProgress
         /// The play's records.
         var records: [MyceliumArchitectRecord]
+        /// The tutorial step; nil in a migrated schema-1 payload.
+        var tutorial: MyceliumArchitectTutorialStep?
     }
 
-    /// The JSON object `{"level", "records"}` with sorted keys and unescaped slashes.
+    /// The JSON object `{"level", "mode", "progress", "records", "tutorial"}` with sorted keys and unescaped slashes.
     public func snapshotPayload() throws -> Data {
-        try Self.payloadEncoder().encode(Payload(level: levelNumber, records: play.records))
+        try Self.payloadEncoder().encode(Payload(level: levelNumber, mode: mode, progress: progress,
+                                                 records: play.records, tutorial: tutorial))
     }
 
-    /// The core of `payload` (schema 1): the records replayed on a fresh play of the saved level, with the pulses run
-    /// shown; a reset returns to the opening state `seed` chooses.
+    /// The core of `payload` (schema 2): the records replayed on a fresh play of the saved level (the practice copy in
+    /// practice mode) with the saved progress, mode and tutorial step (the first step when absent), the pulses run
+    /// shown and the presentation state at its defaults; a reset returns to the opening state `seed` chooses.
     ///
-    /// - Throws: ``MyceliumArchitectRestoreRefusal`` for a damaged payload, a level number outside 1 … 100 or a level
-    ///   or trace the kernel refuses.
+    /// - Throws: ``MyceliumArchitectRestoreRefusal`` for a damaged payload (invalid progress — a frontier or a won
+    ///   level outside 1 … 100, stars outside 1 … 3, actions spent below 1 —, an unknown mode or tutorial step, or a
+    ///   daily mode naming another level among them), a level number outside 1 … 100 or a level or trace the kernel
+    ///   refuses.
     public static func restore(payload: Data, seed: UInt64) throws -> MyceliumArchitectExperienceCore {
         guard let decoded = try? JSONDecoder().decode(Payload.self, from: payload) else {
             throw MyceliumArchitectRestoreRefusal.damaged
@@ -515,13 +763,22 @@ public struct MyceliumArchitectExperienceCore: ExperienceCore, Equatable {
         guard levelNumbers.contains(decoded.level) else {
             throw MyceliumArchitectRestoreRefusal.levelNumber(decoded.level)
         }
+        guard decoded.progress.isValid, decoded.mode.isValid else { throw MyceliumArchitectRestoreRefusal.damaged }
+        if case .daily(let daily) = decoded.mode, daily != decoded.level {
+            throw MyceliumArchitectRestoreRefusal.damaged
+        }
         do throws(MyceliumArchitectError) {
-            let level: MyceliumArchitectLevel = try level(number: decoded.level)
-            let play: MyceliumArchitectPlay = try MyceliumArchitectPlay.replay(level: level, records: decoded.records)
+            let certified: MyceliumArchitectGeneratedLevel = try generated(number: decoded.level)
+            let play: MyceliumArchitectPlay = try MyceliumArchitectPlay.replay(
+                level: try playedLevel(of: certified, mode: decoded.mode), records: decoded.records)
+            let tutorial: MyceliumArchitectTutorialStep = decoded.tutorial
+                ?? MyceliumArchitectTutorialStep.initial(level: decoded.level)
             let openingCore: MyceliumArchitectExperienceCore = try opening(number: levelNumber(forSeed: seed))
-            return MyceliumArchitectExperienceCore(levelNumber: decoded.level, play: play,
+            return MyceliumArchitectExperienceCore(levelNumber: decoded.level, play: play, progress: decoded.progress,
+                                                   mode: decoded.mode, tutorial: tutorial,
+                                                   certifiedPlan: arrangementPlan(of: certified),
                                                    openingNumber: openingCore.openingNumber,
-                                                   openingPlay: openingCore.openingPlay)
+                                                   opening: openingCore.opening)
         } catch {
             throw MyceliumArchitectRestoreRefusal.kernel(error)
         }

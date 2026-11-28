@@ -62,7 +62,7 @@ campaign covers the game). Agents model their files on Binary Gardens' (feature 
 
 ## Phase 4: Adapter, scenarios, presenter
 
-- [ ] T-R02G2205-004 Edit `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectExperienceCore.swift` (controls `level.select
+- [X] T-R02G2205-004 Edit `Packages/ExperiencesRound02/MyceliumArchitect/Core/Presentation/MyceliumArchitectExperienceCore.swift` (controls `level.select — Verified 2026-11-27: 2026-11-27: host-4 exit=0 (swift test --filter MyceliumArchitect: 205 Swift Testing + 33 XCTest; ProgressionCore 13 tests; manifest regenerated; Q5 assertions updated in place); simulator MyceliumArchitectExperienceTests 38 passed on sim-27.2 with the updated identity and wiring tests
   [1 … 100]`, `mode.daily [year, month, day]`, `mode.practice`, `mode.campaign`, `tutorial.dismiss`; codes
   `r02-g22.locked`, `r02-g22.date`, non-whole values `r02-g22.not-whole`; practice budget 24 on a copy of the level,
   no stars, no unlocks; the daily level is playable even while still locked in the campaign, and a daily win records

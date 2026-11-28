@@ -8,7 +8,9 @@
 // snapshot's; the digest, `==` and the payload unchanged by previews, inspection, orbit and tool; the presentation
 // state back to its defaults at an opening, `level.next`, reset and restore; the ghost veins dashed (three `limitTick`
 // dashes per previewed vein), nothing ghostly for a refused preview, the inspection ring, and R02-G22-03's meshes
-// unchanged without them. Host-run (`swift test`); explicit types, plain loops (CI type-check rule).
+// unchanged without them. Host-run (`swift test`); explicit types, plain loops (CI type-check rule). Feature 515
+// (R02-G22-05) T-R02G2205-004 (clarification Q5): `level.next` needs the next level open, so the presentation test
+// first wins the opening level's certified plan and the run (an unwon level opens nothing).
 import Foundation
 @testable import MyceliumArchitectCore
 import Testing
@@ -317,7 +319,14 @@ private func previewDigest(of core: MyceliumArchitectExperienceCore) throws -> S
     @Test func presentationStateReturnsToItsDefaults() throws {
         let opening: Core = try Core.opening(number: 3)
         #expect(Self.isPlain(opening))
-        var next: Core = Self.dressed(opening)
+        // Feature 515: `level.next` needs level 4 open, so level 3 is first won (its certified plan and the run).
+        var won: Core = opening
+        for action in opening.certifiedPlan + [.run] {
+            let issued: (id: String, values: [Double]) = Self.control(action)
+            #expect(Self.applied(&won, issued.id, issued.values))
+        }
+        #expect(won.play.stage == .won && won.progress.isOpen(4))
+        var next: Core = Self.dressed(won)
         #expect(Self.applied(&next, "level.next"))
         #expect(Self.isPlain(next) && next.levelNumber == 4)
         var reset: Core = Self.dressed(next)

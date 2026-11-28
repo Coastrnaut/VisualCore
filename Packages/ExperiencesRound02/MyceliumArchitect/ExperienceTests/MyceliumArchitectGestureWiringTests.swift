@@ -22,7 +22,9 @@
 //   g. a new level and a reset return the tool, the inspection and the orbit to their defaults;
 //   h. the gesture actions are the six canvas controls and the native actions every declared control.
 // Explicit synthetic timestamps (no clock, no sleep, no wall-clock assertion). Explicit types and plain loops (CI
-// type-check rule); no nested closure literals. Synthetic data only. Each test well under 10 s.
+// type-check rule); no nested closure literals. Synthetic data only. Each test well under 10 s. Feature 515
+// (R02-G22-05) T-R02G2205-004 (clarification Q5): g.'s `level.next` needs the next level open, so the level is first
+// won through the presenter (its certified plan and the run; an unwon level opens nothing).
 #if os(iOS)
 import CoreGraphics
 import Foundation
@@ -617,6 +619,14 @@ enum MyceliumArchitectGestureScript {
         #expect(shell.presenter.inspectedCell == target.cell)
         #expect(shell.presenter.orbit != .authored)
 
+        // Feature 515: `level.next` needs the next level open, so the level is first won (certified plan, then run).
+        let winning: [Action] = try T.certifiedPlan(target.number) + [.run]
+        for action in winning {
+            let issued: (control: String, values: [Double]) = T.control(action)
+            let result: ActionResult = shell.presenter.send(issued.control, issued.values, port: shell.port)
+            #expect(result == .accepted, "\(issued.control): \(result.code)")
+        }
+        #expect(try T.core(shell).play.stage == .won)
         let next: ActionResult = shell.presenter.send("level.next", [], port: shell.port)
         #expect(next == .accepted, "\(next.code)")
         #expect(try T.core(shell).levelNumber != target.number)
