@@ -15,7 +15,7 @@ campaign covers the game). Agents model their files on Binary Gardens' (feature 
 
 ## Phase 2: Stories 2 and 3 — hints and failure explanation (P1) 🎯
 
-- [ ] T-R02G2205-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/MyceliumArchitectHints.swift`
+- [X] T-R02G2205-002 [P] [US2] [US3] Create `Packages/ExperiencesRound02/MyceliumArchitect/Core/MyceliumArchitectHints.swift` — Verified 2026-11-27: 2026-11-27: host-2 exit=0 (swift test --filter MyceliumArchitect: 191 Swift Testing + 33 XCTest; MyceliumArchitectHintsTests 30 pass; largest hint work 168 of 2,000)
   (`MyceliumArchitectHintPlan`, `MyceliumArchitectHintKind` nutrient/blocker/clear/seed/unseed/run/stuck/retry,
   `MyceliumArchitectHint` with levels 1 … 3 and the texts of clarification Q1 — level 1 "Place a nutrient", "Place a
   blocker", "Clear a placed nutrient or blocker", "Seed a filament from the root" or "Remove a seeded filament"; level 2
