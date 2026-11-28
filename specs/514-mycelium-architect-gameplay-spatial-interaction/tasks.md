@@ -47,7 +47,7 @@ MyceliumArchitect`.
   `docs/automatedtesting.md`; `--name round02-host-1`, `-2`, `-3c`, `-3e`, `-3f`
 - [X] T-R02G2204-008 No Stage One breakage: `--name rendering-27`, `--name rendering-26`, `--name experiences`, — Verified 2026-11-27: 2026-11-27: rendering-27, rendering-26, experiences, host-full exit=0 (.autonomy/migration/checks/R02-G22-04.{rendering-27,rendering-26,experiences,host-full}.json)
   `--name host-full`
-- [ ] T-R02G2204-009 Reference regression chunk 1 (`--name reference-1`)
+- [X] T-R02G2204-009 Reference regression chunk 1 (`--name reference-1`) — Verified 2026-11-27: 2026-11-27: reference-1 exit=0 (.autonomy/migration/checks/R02-G22-04.reference-1.json)
 - [ ] T-R02G2204-010 Reference regression chunk 2 (`--name reference-2`)
 - [ ] T-R02G2204-011 Script tests, run alone (`--name script-tests`)
 - [ ] T-R02G2204-012 {device} After ImplementationLock-100: touch feel and latency on D1/D2/D3 (SC-R02G2204-008)
